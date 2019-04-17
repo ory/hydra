@@ -41,7 +41,7 @@
 
   /**
    * Constructs a new <code>EmptyResponse</code>.
-   * Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
+   * EmptyResponse Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
    * @alias module:model/EmptyResponse
    * @class
    */

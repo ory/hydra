@@ -130,7 +130,7 @@ func migrationsSqlMysql11Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/11.sql", size: 479, mode: os.FileMode(420), modTime: time.Unix(1555515140, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/11.sql", size: 479, mode: os.FileMode(420), modTime: time.Unix(1555515264, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -250,7 +250,7 @@ func migrationsSqlMysql9Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/9.sql", size: 326, mode: os.FileMode(420), modTime: time.Unix(1555515140, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/9.sql", size: 326, mode: os.FileMode(420), modTime: time.Unix(1555515264, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -290,7 +290,7 @@ func migrationsSqlPostgres11Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/11.sql", size: 443, mode: os.FileMode(420), modTime: time.Unix(1555515140, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/11.sql", size: 443, mode: os.FileMode(420), modTime: time.Unix(1555515264, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -410,7 +410,7 @@ func migrationsSqlPostgres9Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/9.sql", size: 196, mode: os.FileMode(420), modTime: time.Unix(1555515140, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/9.sql", size: 196, mode: os.FileMode(420), modTime: time.Unix(1555515264, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -470,7 +470,7 @@ func migrationsSqlShared10Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/10.sql", size: 593, mode: os.FileMode(420), modTime: time.Unix(1555515140, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/10.sql", size: 593, mode: os.FileMode(420), modTime: time.Unix(1555515264, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

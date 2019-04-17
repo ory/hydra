@@ -5,14 +5,12 @@
 package internal
 
 import (
+	gomock "github.com/golang/mock/gomock"
+	tracing "github.com/ory/x/tracing"
+	cors "github.com/rs/cors"
 	url "net/url"
 	reflect "reflect"
 	time "time"
-
-	gomock "github.com/golang/mock/gomock"
-	cors "github.com/rs/cors"
-
-	tracing "github.com/ory/x/tracing"
 )
 
 // MockConfiguration is a mock of Provider interface

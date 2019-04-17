@@ -35,6 +35,7 @@ use \ArrayAccess;
  * Swaggeroauth2TokenParameters Class Doc Comment
  *
  * @category    Class
+ * @description Swaggeroauth2TokenParameters swaggeroauth2 token parameters
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen

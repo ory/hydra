@@ -5,12 +5,8 @@
 package internal
 
 import (
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
 	sessions "github.com/gorilla/sessions"
-	logrus "github.com/sirupsen/logrus"
-
 	fosite "github.com/ory/fosite"
 	openid "github.com/ory/fosite/handler/openid"
 	herodot "github.com/ory/herodot"
@@ -24,6 +20,8 @@ import (
 	x "github.com/ory/hydra/x"
 	healthx "github.com/ory/x/healthx"
 	tracing "github.com/ory/x/tracing"
+	logrus "github.com/sirupsen/logrus"
+	reflect "reflect"
 )
 
 // MockRegistry is a mock of Registry interface

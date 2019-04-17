@@ -35,7 +35,7 @@ use \ArrayAccess;
  * EmptyResponse Class Doc Comment
  *
  * @category    Class
- * @description Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
+ * @description EmptyResponse Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
  * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen

@@ -26,7 +26,7 @@ import java.util.List;
  * It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.
  */
 @ApiModel(description = "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:33:18.188+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:51:30.376+02:00")
 public class WellKnown {
   @JsonProperty("authorization_endpoint")
   private String authorizationEndpoint = null;

@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerOAuthIntrospectionRequest swagger o auth introspection request
-// swagger:model swaggerOAuthIntrospectionRequest
+// SwaggerOAuthIntrospectionRequest SwaggerOAuthIntrospectionRequest swagger o auth introspection request
+// swagger:model SwaggerOAuthIntrospectionRequest
 type SwaggerOAuthIntrospectionRequest struct {
 
 	// An optional, space separated list of required scopes. If the access token was not granted one of the

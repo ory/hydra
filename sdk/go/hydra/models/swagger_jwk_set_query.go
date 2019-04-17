@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerJwkSetQuery SwaggerJwkSetQuery swagger jwk set query
-// swagger:model SwaggerJwkSetQuery
+// SwaggerJwkSetQuery swagger jwk set query
+// swagger:model swaggerJwkSetQuery
 type SwaggerJwkSetQuery struct {
 
 	// The set

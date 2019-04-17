@@ -28,7 +28,7 @@ import java.util.Map;
  * https://tools.ietf.org/html/rfc7662
  */
 @ApiModel(description = "https://tools.ietf.org/html/rfc7662")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:20:02.344+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:33:18.188+02:00")
 public class OAuth2TokenIntrospection {
   @JsonProperty("active")
   private Boolean active = null;

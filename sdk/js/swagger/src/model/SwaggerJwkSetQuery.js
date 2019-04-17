@@ -41,7 +41,6 @@
 
   /**
    * Constructs a new <code>SwaggerJwkSetQuery</code>.
-   * SwaggerJwkSetQuery swagger jwk set query
    * @alias module:model/SwaggerJwkSetQuery
    * @class
    * @param set {String} The set in: path

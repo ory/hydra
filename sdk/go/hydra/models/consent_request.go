@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ConsentRequest ConsentRequest ConsentRequest ConsentRequest Contains information on an ongoing consent request.
+// ConsentRequest Contains information on an ongoing consent request.
 // swagger:model ConsentRequest
 type ConsentRequest struct {
 
@@ -31,8 +31,10 @@ type ConsentRequest struct {
 	// a login and consent request in the login & consent app.
 	LoginChallenge string `json:"login_challenge,omitempty"`
 
-	// LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at
-	// ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	// LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
+	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
+	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
+	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	LoginSessionID string `json:"login_session_id,omitempty"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which

@@ -196,6 +196,7 @@ Class | Method | HTTP request | Description
  - [OryHydra.SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [OryHydra.SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
  - [OryHydra.SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
+ - [OryHydra.SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
  - [OryHydra.SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [OryHydra.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [OryHydra.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)

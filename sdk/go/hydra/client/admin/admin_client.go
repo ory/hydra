@@ -544,6 +544,8 @@ ListOAuth2Clients lists o auth 2 0 clients
 This endpoint lists all clients in the database, and never returns client secrets.
 
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+Multiple links can be included in this header, and will be separated by a comma.
 */
 func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2ClientsOK, error) {
 	// TODO: Validate the params before sending
@@ -573,7 +575,9 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2
 /*
 ListUserConsentSessions lists all consent sessions of a user
 
-This endpoint lists all user's granted consent sessions, including client and granted scope
+This endpoint lists all user's granted consent sessions, including client and granted scope.
+The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+Multiple links can be included in this header, and will be separated by a comma.
 */
 func (a *Client) ListUserConsentSessions(params *ListUserConsentSessionsParams) (*ListUserConsentSessionsOK, error) {
 	// TODO: Validate the params before sending

@@ -318,6 +318,38 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 	return rs[start:end], nil
 }
 
+func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
+	var rs []HandledConsentRequest
+	for _, c := range m.handledConsentRequests {
+		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		if err != nil {
+			return 0, err
+		}
+
+		if subject != cr.Subject {
+			continue
+		}
+
+		if c.Error != nil {
+			continue
+		}
+
+		if cr.Skip {
+			continue
+		}
+
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
+			continue
+		}
+
+		cr.Client.ClientID = cr.Client.GetID()
+		c.ConsentRequest = cr
+		rs = append(rs, c)
+	}
+
+	return len(rs), nil
+}
+
 func (m *MemoryManager) GetAuthenticationSession(ctx context.Context, id string) (*AuthenticationSession, error) {
 	m.m["authSessions"].RLock()
 	defer m.m["authSessions"].RUnlock()

@@ -47,10 +47,10 @@ mocks:
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin
 sqlbin:
-		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
-		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
-		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
-		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/shared ./migrations/sql/mysql ./migrations/sql/postgres ./migrations/sql/tests
+		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
+		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
+		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
+		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
 
 # Runs all code generators
 .PHONY: gen

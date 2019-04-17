@@ -154,3 +154,7 @@ func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clie
 
 	return clients, nil
 }
+
+func (m *MemoryManager) CountClients(ctx context.Context) (n int, err error) {
+	return len(m.Clients), nil
+}

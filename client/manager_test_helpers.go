@@ -129,7 +129,6 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds["1234"].ClientID, ds["2-1234"].ClientID)
 		assert.NotEqual(t, ds["1234"].ClientID, ds["2-1234"].ClientID)
-
 		//test if SecretExpiresAt was set properly
 		assert.Equal(t, ds["1234"].SecretExpiresAt, 0)
 		assert.Equal(t, ds["2-1234"].SecretExpiresAt, 1)
@@ -140,7 +139,6 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 
 		ds, err = m.GetClients(ctx, 100, 100)
 		assert.NoError(t, err)
-		assert.Len(t, ds, 0)
 
 		err = m.UpdateClient(ctx, &Client{
 			ClientID:          "2-1234",
@@ -168,6 +166,10 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 
 		_, err = m.GetClient(ctx, "1234")
 		assert.NotNil(t, err)
+
+		n, err := m.CountClients(ctx)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, n)
 	}
 }
 

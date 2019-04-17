@@ -342,7 +342,7 @@ class ConsentRequest implements ArrayAccess
 
     /**
      * Sets login_session_id
-     * @param string $login_session_id LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+     * @param string $login_session_id LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back- channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
      * @return $this
      */
     public function setLoginSessionId($login_session_id)

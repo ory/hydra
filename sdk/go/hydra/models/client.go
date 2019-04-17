@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Client Client Client represents an OAuth 2.0 Client.
+// Client Client Client Client Client Client Client Client Client Client Client Client Client Client represents an OAuth 2.0 Client.
 // swagger:model Client
 type Client struct {
 
@@ -41,6 +41,17 @@ type Client struct {
 	Contacts []string `json:"contacts"`
 
 	// CreatedAt returns the timestamp of the client's creation.
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
@@ -107,9 +118,6 @@ type Client struct {
 	// secret will expire or 0 if it will not expire. The time is
 	// represented as the number of seconds from 1970-01-01T00:00:00Z as
 	// measured in UTC until the date/time of expiration.
-	//
-	// This feature is currently not supported and it's value will always
-	// be set to 0.
 	SecretExpiresAt int64 `json:"client_secret_expires_at,omitempty"`
 
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
@@ -131,6 +139,17 @@ type Client struct {
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 
 	// UpdatedAt returns the timestamp of the last update.
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`

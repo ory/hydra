@@ -39,7 +39,7 @@ var client = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: 
 
 func login(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("login_challenge")
-	res, err := client.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(challenge))
+	res, err := client.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(challenge))
 	if err != nil {
 		log.Fatalf("Unable to fetch clogin request: %s", err)
 	}
@@ -54,7 +54,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 
 		var vr *admin.AcceptLoginRequestOK
 		vr, err = client.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-			WithChallenge(challenge).
+			WithLoginChallenge(challenge).
 			WithBody(&models.HandledLoginRequest{
 				Subject:  pointerx.String("the-subject"),
 				Remember: remember,
@@ -65,7 +65,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		var vr *admin.RejectLoginRequestOK
 		vr, err = client.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
-			WithChallenge(challenge).
+			WithLoginChallenge(challenge).
 			WithBody(&models.RequestDeniedError{
 				Name: "invalid_request",
 			}))
@@ -82,7 +82,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 func consent(rw http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("consent_challenge")
 
-	rrr, err := client.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(challenge))
+	rrr, err := client.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(challenge))
 	if err != nil {
 		log.Fatalf("Unable to fetch consent request: %s", err)
 	}
@@ -101,7 +101,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 
 		var vr *admin.AcceptConsentRequestOK
 		vr, err = client.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-			WithChallenge(challenge).
+			WithConsentChallenge(challenge).
 			WithBody(&models.HandledConsentRequest{
 				GrantedScope: o.RequestedScope,
 				Remember:     remember,
@@ -116,7 +116,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 	} else {
 		var vr *admin.RejectConsentRequestOK
 		vr, err = client.Admin.RejectConsentRequest(
-			admin.NewRejectConsentRequestParams().WithChallenge(challenge).
+			admin.NewRejectConsentRequestParams().WithConsentChallenge(challenge).
 				WithBody(
 					&models.RequestDeniedError{
 						Name: "invalid_request",

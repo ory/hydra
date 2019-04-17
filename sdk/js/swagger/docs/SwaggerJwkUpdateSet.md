@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**JSONWebKeySet**](JSONWebKeySet.md) |  | [optional] 
+**body** | [**SwaggerJSONWebKeySet**](SwaggerJSONWebKeySet.md) |  | [optional] 
 **set** | **String** | The set in: path | 
 
 

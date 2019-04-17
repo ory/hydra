@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/client"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
@@ -480,7 +482,7 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 		r, err := m.GetConsentRequest(ctx, v.Challenge)
 		if err != nil {
 			return nil, err
-		} else if errors.Cause(err) == sqlcon.ErrNoRows {
+		} else if errors.Cause(err) == x.ErrNotFound {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		}
 
@@ -501,4 +503,99 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 	}
 
 	return aa, nil
+}
+
+func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+	return m.listUserAuthenticatedClients(ctx, subject, "front")
+}
+
+func (m *SQLManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+	return m.listUserAuthenticatedClients(ctx, subject, "back")
+}
+
+func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject string, channel string) ([]client.Client, error) {
+	var ids []string
+	if err := m.DB.SelectContext(ctx, ids, m.DB.Rebind(fmt.Sprintf("SELECT c.id FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND LEN(c.%schannel_logout_uri) > 0", channel)), subject); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	cs := make([]client.Client, len(ids))
+	for k, id := range ids {
+		c, err := m.r.ClientManager().GetConcreteClient(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		cs[k] = *c
+	}
+
+	return cs, nil
+}
+
+func (m *SQLManager) CreateLogoutRequest(ctx context.Context, r *LogoutRequest) error {
+	d := newSQLLogoutRequest(r)
+	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
+		"INSERT INTO hydra_oauth2_logout_request (%s) VALUES (%s)",
+		strings.Join(sqlParamsLogoutRequest, ", "),
+		":"+strings.Join(sqlParamsLogoutRequest, ", :"),
+	), d); err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	return nil
+}
+
+func (m *SQLManager) AcceptLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_logout_request SET accepted=true WHERE challenge=?"), challenge); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return m.GetLogoutRequest(ctx, challenge)
+}
+
+func (m *SQLManager) RejectLogoutRequest(ctx context.Context, challenge string) error {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_logout_request SET was_used=true WHERE challenge=?"), challenge); err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
+	var d sqlLogoutRequest
+	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE challenge=?"), challenge); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
+	if err != nil {
+		return nil, err
+	}
+
+	return d.ToLogoutRequest(c), nil
+}
+
+func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {
+	var d sqlLogoutRequest
+	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE verifier=? AND was_used=false AND accepted=true"), verifier); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_logout_request SET was_used=true WHERE verifier=?"), verifier); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return d.ToLogoutRequest(c), nil
 }

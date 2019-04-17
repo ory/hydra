@@ -13,7 +13,7 @@ import (
 )
 
 // SwaggerFlushInactiveAccessTokens swagger flush inactive access tokens
-// swagger:model swaggerFlushInactiveAccessTokens
+// swagger:model SwaggerFlushInactiveAccessTokens
 type SwaggerFlushInactiveAccessTokens struct {
 
 	// body

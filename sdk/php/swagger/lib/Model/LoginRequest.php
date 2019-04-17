@@ -219,7 +219,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets challenge
-     * @param string $challenge Challenge is the identifier (\"authentication challenge\") of the consent authentication request. It is used to identify the session.
+     * @param string $challenge Challenge is the identifier (\"login challenge\") of the login request. It is used to identify the session.
      * @return $this
      */
     public function setChallenge($challenge)
@@ -345,7 +345,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets session_id
-     * @param string $session_id SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+     * @param string $session_id SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back- channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
      * @return $this
      */
     public function setSessionId($session_id)

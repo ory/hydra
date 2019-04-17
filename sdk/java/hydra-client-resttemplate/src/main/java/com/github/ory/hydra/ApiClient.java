@@ -50,7 +50,7 @@ import com.github.ory.hydra.auth.HttpBasicAuth;
 import com.github.ory.hydra.auth.ApiKeyAuth;
 import com.github.ory.hydra.auth.OAuth;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:20:02.344+02:00")
 @Component("com.github.ory.hydra.ApiClient")
 public class ApiClient {
     public enum CollectionFormat {

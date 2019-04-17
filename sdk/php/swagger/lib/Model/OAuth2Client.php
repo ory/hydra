@@ -56,6 +56,8 @@ class OAuth2Client implements ArrayAccess
     protected static $swaggerTypes = [
         'allowed_cors_origins' => 'string[]',
         'audience' => 'string[]',
+        'backchannel_logout_session_required' => 'bool',
+        'backchannel_logout_uri' => 'string',
         'client_id' => 'string',
         'client_name' => 'string',
         'client_secret' => 'string',
@@ -63,12 +65,15 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'string',
         'contacts' => 'string[]',
         'created_at' => '\DateTime',
+        'frontchannel_logout_session_required' => 'bool',
+        'frontchannel_logout_uri' => 'string',
         'grant_types' => 'string[]',
         'jwks' => '\HydraSDK\Model\JSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
         'policy_uri' => 'string',
+        'post_logout_redirect_uris' => 'string[]',
         'redirect_uris' => 'string[]',
         'request_object_signing_alg' => 'string',
         'request_uris' => 'string[]',
@@ -89,6 +94,8 @@ class OAuth2Client implements ArrayAccess
     protected static $swaggerFormats = [
         'allowed_cors_origins' => null,
         'audience' => null,
+        'backchannel_logout_session_required' => null,
+        'backchannel_logout_uri' => null,
         'client_id' => null,
         'client_name' => null,
         'client_secret' => null,
@@ -96,12 +103,15 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => null,
         'contacts' => null,
         'created_at' => 'date-time',
+        'frontchannel_logout_session_required' => null,
+        'frontchannel_logout_uri' => null,
         'grant_types' => null,
         'jwks' => null,
         'jwks_uri' => null,
         'logo_uri' => null,
         'owner' => null,
         'policy_uri' => null,
+        'post_logout_redirect_uris' => null,
         'redirect_uris' => null,
         'request_object_signing_alg' => null,
         'request_uris' => null,
@@ -132,6 +142,8 @@ class OAuth2Client implements ArrayAccess
     protected static $attributeMap = [
         'allowed_cors_origins' => 'allowed_cors_origins',
         'audience' => 'audience',
+        'backchannel_logout_session_required' => 'backchannel_logout_session_required',
+        'backchannel_logout_uri' => 'backchannel_logout_uri',
         'client_id' => 'client_id',
         'client_name' => 'client_name',
         'client_secret' => 'client_secret',
@@ -139,12 +151,15 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'client_uri',
         'contacts' => 'contacts',
         'created_at' => 'created_at',
+        'frontchannel_logout_session_required' => 'frontchannel_logout_session_required',
+        'frontchannel_logout_uri' => 'frontchannel_logout_uri',
         'grant_types' => 'grant_types',
         'jwks' => 'jwks',
         'jwks_uri' => 'jwks_uri',
         'logo_uri' => 'logo_uri',
         'owner' => 'owner',
         'policy_uri' => 'policy_uri',
+        'post_logout_redirect_uris' => 'post_logout_redirect_uris',
         'redirect_uris' => 'redirect_uris',
         'request_object_signing_alg' => 'request_object_signing_alg',
         'request_uris' => 'request_uris',
@@ -166,6 +181,8 @@ class OAuth2Client implements ArrayAccess
     protected static $setters = [
         'allowed_cors_origins' => 'setAllowedCorsOrigins',
         'audience' => 'setAudience',
+        'backchannel_logout_session_required' => 'setBackchannelLogoutSessionRequired',
+        'backchannel_logout_uri' => 'setBackchannelLogoutUri',
         'client_id' => 'setClientId',
         'client_name' => 'setClientName',
         'client_secret' => 'setClientSecret',
@@ -173,12 +190,15 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'setClientUri',
         'contacts' => 'setContacts',
         'created_at' => 'setCreatedAt',
+        'frontchannel_logout_session_required' => 'setFrontchannelLogoutSessionRequired',
+        'frontchannel_logout_uri' => 'setFrontchannelLogoutUri',
         'grant_types' => 'setGrantTypes',
         'jwks' => 'setJwks',
         'jwks_uri' => 'setJwksUri',
         'logo_uri' => 'setLogoUri',
         'owner' => 'setOwner',
         'policy_uri' => 'setPolicyUri',
+        'post_logout_redirect_uris' => 'setPostLogoutRedirectUris',
         'redirect_uris' => 'setRedirectUris',
         'request_object_signing_alg' => 'setRequestObjectSigningAlg',
         'request_uris' => 'setRequestUris',
@@ -200,6 +220,8 @@ class OAuth2Client implements ArrayAccess
     protected static $getters = [
         'allowed_cors_origins' => 'getAllowedCorsOrigins',
         'audience' => 'getAudience',
+        'backchannel_logout_session_required' => 'getBackchannelLogoutSessionRequired',
+        'backchannel_logout_uri' => 'getBackchannelLogoutUri',
         'client_id' => 'getClientId',
         'client_name' => 'getClientName',
         'client_secret' => 'getClientSecret',
@@ -207,12 +229,15 @@ class OAuth2Client implements ArrayAccess
         'client_uri' => 'getClientUri',
         'contacts' => 'getContacts',
         'created_at' => 'getCreatedAt',
+        'frontchannel_logout_session_required' => 'getFrontchannelLogoutSessionRequired',
+        'frontchannel_logout_uri' => 'getFrontchannelLogoutUri',
         'grant_types' => 'getGrantTypes',
         'jwks' => 'getJwks',
         'jwks_uri' => 'getJwksUri',
         'logo_uri' => 'getLogoUri',
         'owner' => 'getOwner',
         'policy_uri' => 'getPolicyUri',
+        'post_logout_redirect_uris' => 'getPostLogoutRedirectUris',
         'redirect_uris' => 'getRedirectUris',
         'request_object_signing_alg' => 'getRequestObjectSigningAlg',
         'request_uris' => 'getRequestUris',
@@ -259,6 +284,8 @@ class OAuth2Client implements ArrayAccess
     {
         $this->container['allowed_cors_origins'] = isset($data['allowed_cors_origins']) ? $data['allowed_cors_origins'] : null;
         $this->container['audience'] = isset($data['audience']) ? $data['audience'] : null;
+        $this->container['backchannel_logout_session_required'] = isset($data['backchannel_logout_session_required']) ? $data['backchannel_logout_session_required'] : null;
+        $this->container['backchannel_logout_uri'] = isset($data['backchannel_logout_uri']) ? $data['backchannel_logout_uri'] : null;
         $this->container['client_id'] = isset($data['client_id']) ? $data['client_id'] : null;
         $this->container['client_name'] = isset($data['client_name']) ? $data['client_name'] : null;
         $this->container['client_secret'] = isset($data['client_secret']) ? $data['client_secret'] : null;
@@ -266,12 +293,15 @@ class OAuth2Client implements ArrayAccess
         $this->container['client_uri'] = isset($data['client_uri']) ? $data['client_uri'] : null;
         $this->container['contacts'] = isset($data['contacts']) ? $data['contacts'] : null;
         $this->container['created_at'] = isset($data['created_at']) ? $data['created_at'] : null;
+        $this->container['frontchannel_logout_session_required'] = isset($data['frontchannel_logout_session_required']) ? $data['frontchannel_logout_session_required'] : null;
+        $this->container['frontchannel_logout_uri'] = isset($data['frontchannel_logout_uri']) ? $data['frontchannel_logout_uri'] : null;
         $this->container['grant_types'] = isset($data['grant_types']) ? $data['grant_types'] : null;
         $this->container['jwks'] = isset($data['jwks']) ? $data['jwks'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
         $this->container['logo_uri'] = isset($data['logo_uri']) ? $data['logo_uri'] : null;
         $this->container['owner'] = isset($data['owner']) ? $data['owner'] : null;
         $this->container['policy_uri'] = isset($data['policy_uri']) ? $data['policy_uri'] : null;
+        $this->container['post_logout_redirect_uris'] = isset($data['post_logout_redirect_uris']) ? $data['post_logout_redirect_uris'] : null;
         $this->container['redirect_uris'] = isset($data['redirect_uris']) ? $data['redirect_uris'] : null;
         $this->container['request_object_signing_alg'] = isset($data['request_object_signing_alg']) ? $data['request_object_signing_alg'] : null;
         $this->container['request_uris'] = isset($data['request_uris']) ? $data['request_uris'] : null;
@@ -355,6 +385,48 @@ class OAuth2Client implements ArrayAccess
     public function setAudience($audience)
     {
         $this->container['audience'] = $audience;
+
+        return $this;
+    }
+
+    /**
+     * Gets backchannel_logout_session_required
+     * @return bool
+     */
+    public function getBackchannelLogoutSessionRequired()
+    {
+        return $this->container['backchannel_logout_session_required'];
+    }
+
+    /**
+     * Sets backchannel_logout_session_required
+     * @param bool $backchannel_logout_session_required Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.
+     * @return $this
+     */
+    public function setBackchannelLogoutSessionRequired($backchannel_logout_session_required)
+    {
+        $this->container['backchannel_logout_session_required'] = $backchannel_logout_session_required;
+
+        return $this;
+    }
+
+    /**
+     * Gets backchannel_logout_uri
+     * @return string
+     */
+    public function getBackchannelLogoutUri()
+    {
+        return $this->container['backchannel_logout_uri'];
+    }
+
+    /**
+     * Sets backchannel_logout_uri
+     * @param string $backchannel_logout_uri RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
+     * @return $this
+     */
+    public function setBackchannelLogoutUri($backchannel_logout_uri)
+    {
+        $this->container['backchannel_logout_uri'] = $backchannel_logout_uri;
 
         return $this;
     }
@@ -507,6 +579,48 @@ class OAuth2Client implements ArrayAccess
     }
 
     /**
+     * Gets frontchannel_logout_session_required
+     * @return bool
+     */
+    public function getFrontchannelLogoutSessionRequired()
+    {
+        return $this->container['frontchannel_logout_session_required'];
+    }
+
+    /**
+     * Sets frontchannel_logout_session_required
+     * @param bool $frontchannel_logout_session_required Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.
+     * @return $this
+     */
+    public function setFrontchannelLogoutSessionRequired($frontchannel_logout_session_required)
+    {
+        $this->container['frontchannel_logout_session_required'] = $frontchannel_logout_session_required;
+
+        return $this;
+    }
+
+    /**
+     * Gets frontchannel_logout_uri
+     * @return string
+     */
+    public function getFrontchannelLogoutUri()
+    {
+        return $this->container['frontchannel_logout_uri'];
+    }
+
+    /**
+     * Sets frontchannel_logout_uri
+     * @param string $frontchannel_logout_uri RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be.
+     * @return $this
+     */
+    public function setFrontchannelLogoutUri($frontchannel_logout_uri)
+    {
+        $this->container['frontchannel_logout_uri'] = $frontchannel_logout_uri;
+
+        return $this;
+    }
+
+    /**
      * Gets grant_types
      * @return string[]
      */
@@ -628,6 +742,27 @@ class OAuth2Client implements ArrayAccess
     public function setPolicyUri($policy_uri)
     {
         $this->container['policy_uri'] = $policy_uri;
+
+        return $this;
+    }
+
+    /**
+     * Gets post_logout_redirect_uris
+     * @return string[]
+     */
+    public function getPostLogoutRedirectUris()
+    {
+        return $this->container['post_logout_redirect_uris'];
+    }
+
+    /**
+     * Sets post_logout_redirect_uris
+     * @param string[] $post_logout_redirect_uris Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the post_logout_redirect_uri parameter after a logout has been performed.
+     * @return $this
+     */
+    public function setPostLogoutRedirectUris($post_logout_redirect_uris)
+    {
+        $this->container['post_logout_redirect_uris'] = $post_logout_redirect_uris;
 
         return $this;
     }

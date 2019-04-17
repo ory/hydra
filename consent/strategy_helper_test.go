@@ -36,7 +36,7 @@ import (
 var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.HandledLoginRequest{
+			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.HandledLoginRequest{
 				Subject:     pointerx.String("user"),
 				Remember:    remember,
 				RememberFor: 0,
@@ -52,7 +52,7 @@ var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t 
 var passAuthorization = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")).WithBody(&models.HandledConsentRequest{
+			v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")).WithBody(&models.HandledConsentRequest{
 				GrantedScope: []string{"scope-a"},
 				Remember:     remember,
 				RememberFor:  0,

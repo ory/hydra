@@ -35,9 +35,9 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
+	"github.com/ory/x/urlx"
 )
 
 type transporter struct {

@@ -246,12 +246,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      newCookieJar(),
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									rr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 									assert.False(t, rr.Payload.Skip)
 									assert.Empty(t, rr.Payload.Subject)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
 											Context: map[string]interface{}{"context": "bar"},
@@ -263,12 +263,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									assert.False(t, rr.Payload.Skip)
 									assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Payload.Context)
 									v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
 											GrantedAudience: rr.Payload.RequestedAudience,
@@ -314,10 +314,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      newCookieJar(),
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
 										}))
@@ -328,12 +328,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
 											GrantedAudience: rr.RequestedAudience,
@@ -369,12 +369,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      newCookieJar(),
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									challenge, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									challenge, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 									assert.False(t, challenge.Payload.Skip)
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String(""), Remember: false, RememberFor: 0, ACR: "1",
 										}))
@@ -407,11 +407,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      newCookieJar(),
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: false, RememberFor: 0, ACR: "1",
 										}))
@@ -423,12 +423,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
 											GrantedAudience: rr.RequestedAudience,
@@ -466,7 +466,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      newCookieJar(),
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 
@@ -483,7 +483,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestURL)
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0,
 										}))
@@ -495,7 +495,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 
 									rr := rrr.Payload
@@ -511,7 +511,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
 											GrantedAudience: rr.RequestedAudience,
@@ -584,7 +584,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 
@@ -599,7 +599,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0,
 										}))
@@ -612,7 +612,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 
 									rr := rrr.Payload
@@ -627,7 +627,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
 											Session: &models.ConsentRequestSessionData{
@@ -687,7 +687,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 
 									rr := rrr.Payload
@@ -695,7 +695,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, "user-a", rr.Subject)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{Subject: pointerx.String("user-a")}))
 									require.NoError(t, err)
 
@@ -706,14 +706,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 									assert.True(t, rr.Skip)
 									assert.EqualValues(t, "user-a", rr.Subject)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "offline"},
 											Session: &models.ConsentRequestSessionData{
@@ -797,7 +797,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 
 									rr := rrr.Payload
@@ -805,7 +805,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, "", rr.Subject)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"),
 										}))
@@ -818,7 +818,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 
@@ -826,7 +826,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, "user-a", rr.Subject)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "openid"},
 											Session: &models.ConsentRequestSessionData{
@@ -859,7 +859,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 
 									rr := rrr.Payload
@@ -868,7 +868,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.Empty(t, rr.Client.Secret)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"),
 										}))
@@ -881,7 +881,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 									rr := rrr.Payload
 									assert.True(t, rr.Skip)
@@ -889,7 +889,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.Empty(t, rr.Client.Secret)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "openid"},
 											Session: &models.ConsentRequestSessionData{
@@ -945,13 +945,13 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							//cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithChallenge(r.URL.Query().Get("login_challenge")))
+									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
 
 									time.Sleep(time.Second * 2)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithChallenge(r.URL.Query().Get("login_challenge")).
+										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 										WithBody(&models.HandledLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
 										}))
@@ -964,11 +964,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									_, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge(r.URL.Query().Get("consent_challenge")))
+									_, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithChallenge(r.URL.Query().Get("consent_challenge")).
+										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
 										WithBody(&models.HandledConsentRequest{
 											GrantedScope: []string{"hydra", "openid"},
 											Session: &models.ConsentRequestSessionData{

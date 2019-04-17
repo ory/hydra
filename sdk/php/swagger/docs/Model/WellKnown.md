@@ -4,8 +4,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **authorization_endpoint** | **string** | URL of the OP&#39;s OAuth 2.0 Authorization Endpoint. | 
+**backchannel_logout_session_supported** | **bool** | Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP | [optional] 
+**backchannel_logout_supported** | **bool** | Boolean value specifying whether the OP supports back-channel logout, with true indicating support. | [optional] 
 **claims_parameter_supported** | **bool** | Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support. | [optional] 
 **claims_supported** | **string[]** | JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply values for. Note that for privacy or other reasons, this might not be an exhaustive list. | [optional] 
+**end_session_endpoint** | **string** | URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP. | [optional] 
+**frontchannel_logout_session_supported** | **bool** | Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP. | [optional] 
+**frontchannel_logout_supported** | **bool** | Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support. | [optional] 
 **grant_types_supported** | **string[]** | JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports. | [optional] 
 **id_token_signing_alg_values_supported** | **string[]** | JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT. | 
 **issuer** | **string** | URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier. If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL. | 

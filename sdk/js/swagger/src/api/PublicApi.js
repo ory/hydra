@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/GenericError', 'model/JSONWebKeySet', 'model/Oauth2TokenResponse', 'model/UserinfoResponse', 'model/WellKnown'], factory);
+    define(['ApiClient', 'model/GenericError', 'model/JSONWebKeySet', 'model/LogoutRequest', 'model/Oauth2TokenResponse', 'model/UserinfoResponse', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/GenericError'), require('../model/JSONWebKeySet'), require('../model/Oauth2TokenResponse'), require('../model/UserinfoResponse'), require('../model/WellKnown'));
+    module.exports = factory(require('../ApiClient'), require('../model/GenericError'), require('../model/JSONWebKeySet'), require('../model/LogoutRequest'), require('../model/Oauth2TokenResponse'), require('../model/UserinfoResponse'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.PublicApi = factory(root.OryHydra.ApiClient, root.OryHydra.GenericError, root.OryHydra.JSONWebKeySet, root.OryHydra.Oauth2TokenResponse, root.OryHydra.UserinfoResponse, root.OryHydra.WellKnown);
+    root.OryHydra.PublicApi = factory(root.OryHydra.ApiClient, root.OryHydra.GenericError, root.OryHydra.JSONWebKeySet, root.OryHydra.LogoutRequest, root.OryHydra.Oauth2TokenResponse, root.OryHydra.UserinfoResponse, root.OryHydra.WellKnown);
   }
-}(this, function(ApiClient, GenericError, JSONWebKeySet, Oauth2TokenResponse, UserinfoResponse, WellKnown) {
+}(this, function(ApiClient, GenericError, JSONWebKeySet, LogoutRequest, Oauth2TokenResponse, UserinfoResponse, WellKnown) {
   'use strict';
 
   /**
@@ -46,6 +46,44 @@
   var exports = function(apiClient) {
     this.apiClient = apiClient || ApiClient.instance;
 
+
+    /**
+     * Callback function to receive the result of the disconnectUser operation.
+     * @callback module:api/PublicApi~disconnectUserCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * OpenID Connect Front-Backchannel enabled Logout
+     * This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:  https://openid.net/specs/openid-connect-frontchannel-1_0.html https://openid.net/specs/openid-connect-backchannel-1_0.html
+     * @param {module:api/PublicApi~disconnectUserCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    this.disconnectUser = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = null;
+
+      return this.apiClient.callApi(
+        '/oauth2/disconnect', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the discoverOpenIDConfiguration operation.
@@ -224,19 +262,20 @@
     }
 
     /**
-     * Callback function to receive the result of the revokeSubjectLoginCookie operation.
-     * @callback module:api/PublicApi~revokeSubjectLoginCookieCallback
+     * Callback function to receive the result of the userLogout operation.
+     * @callback module:api/PublicApi~userLogoutCallback
      * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
+     * @param {module:model/LogoutRequest} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Logs subject out by deleting the session cookie
-     * This endpoint deletes ths subject&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the subject&#39;s browser.
-     * @param {module:api/PublicApi~revokeSubjectLoginCookieCallback} callback The callback function, accepting three arguments: error, data, response
+     * Get a logout request
+     * Use this endpoint to fetch a logout request.
+     * @param {module:api/PublicApi~userLogoutCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/LogoutRequest}
      */
-    this.revokeSubjectLoginCookie = function(callback) {
+    this.userLogout = function(callback) {
       var postBody = null;
 
 
@@ -252,10 +291,10 @@
       var authNames = [];
       var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
       var accepts = ['application/json'];
-      var returnType = null;
+      var returnType = LogoutRequest;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/login/revoke', 'GET',
+        '/oauth2/auth/sessions/logout', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

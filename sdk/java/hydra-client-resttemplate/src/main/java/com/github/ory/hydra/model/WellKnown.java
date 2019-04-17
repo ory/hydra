@@ -26,16 +26,31 @@ import java.util.List;
  * It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.
  */
 @ApiModel(description = "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:20:02.344+02:00")
 public class WellKnown {
   @JsonProperty("authorization_endpoint")
   private String authorizationEndpoint = null;
+
+  @JsonProperty("backchannel_logout_session_supported")
+  private Boolean backchannelLogoutSessionSupported = null;
+
+  @JsonProperty("backchannel_logout_supported")
+  private Boolean backchannelLogoutSupported = null;
 
   @JsonProperty("claims_parameter_supported")
   private Boolean claimsParameterSupported = null;
 
   @JsonProperty("claims_supported")
   private List<String> claimsSupported = null;
+
+  @JsonProperty("end_session_endpoint")
+  private String endSessionEndpoint = null;
+
+  @JsonProperty("frontchannel_logout_session_supported")
+  private Boolean frontchannelLogoutSessionSupported = null;
+
+  @JsonProperty("frontchannel_logout_supported")
+  private Boolean frontchannelLogoutSupported = null;
 
   @JsonProperty("grant_types_supported")
   private List<String> grantTypesSupported = null;
@@ -106,6 +121,42 @@ public class WellKnown {
     this.authorizationEndpoint = authorizationEndpoint;
   }
 
+  public WellKnown backchannelLogoutSessionSupported(Boolean backchannelLogoutSessionSupported) {
+    this.backchannelLogoutSessionSupported = backchannelLogoutSessionSupported;
+    return this;
+  }
+
+   /**
+   * Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
+   * @return backchannelLogoutSessionSupported
+  **/
+  @ApiModelProperty(value = "Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP")
+  public Boolean getBackchannelLogoutSessionSupported() {
+    return backchannelLogoutSessionSupported;
+  }
+
+  public void setBackchannelLogoutSessionSupported(Boolean backchannelLogoutSessionSupported) {
+    this.backchannelLogoutSessionSupported = backchannelLogoutSessionSupported;
+  }
+
+  public WellKnown backchannelLogoutSupported(Boolean backchannelLogoutSupported) {
+    this.backchannelLogoutSupported = backchannelLogoutSupported;
+    return this;
+  }
+
+   /**
+   * Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
+   * @return backchannelLogoutSupported
+  **/
+  @ApiModelProperty(value = "Boolean value specifying whether the OP supports back-channel logout, with true indicating support.")
+  public Boolean getBackchannelLogoutSupported() {
+    return backchannelLogoutSupported;
+  }
+
+  public void setBackchannelLogoutSupported(Boolean backchannelLogoutSupported) {
+    this.backchannelLogoutSupported = backchannelLogoutSupported;
+  }
+
   public WellKnown claimsParameterSupported(Boolean claimsParameterSupported) {
     this.claimsParameterSupported = claimsParameterSupported;
     return this;
@@ -148,6 +199,60 @@ public class WellKnown {
 
   public void setClaimsSupported(List<String> claimsSupported) {
     this.claimsSupported = claimsSupported;
+  }
+
+  public WellKnown endSessionEndpoint(String endSessionEndpoint) {
+    this.endSessionEndpoint = endSessionEndpoint;
+    return this;
+  }
+
+   /**
+   * URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
+   * @return endSessionEndpoint
+  **/
+  @ApiModelProperty(value = "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.")
+  public String getEndSessionEndpoint() {
+    return endSessionEndpoint;
+  }
+
+  public void setEndSessionEndpoint(String endSessionEndpoint) {
+    this.endSessionEndpoint = endSessionEndpoint;
+  }
+
+  public WellKnown frontchannelLogoutSessionSupported(Boolean frontchannelLogoutSessionSupported) {
+    this.frontchannelLogoutSessionSupported = frontchannelLogoutSessionSupported;
+    return this;
+  }
+
+   /**
+   * Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP.
+   * @return frontchannelLogoutSessionSupported
+  **/
+  @ApiModelProperty(value = "Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP.")
+  public Boolean getFrontchannelLogoutSessionSupported() {
+    return frontchannelLogoutSessionSupported;
+  }
+
+  public void setFrontchannelLogoutSessionSupported(Boolean frontchannelLogoutSessionSupported) {
+    this.frontchannelLogoutSessionSupported = frontchannelLogoutSessionSupported;
+  }
+
+  public WellKnown frontchannelLogoutSupported(Boolean frontchannelLogoutSupported) {
+    this.frontchannelLogoutSupported = frontchannelLogoutSupported;
+    return this;
+  }
+
+   /**
+   * Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
+   * @return frontchannelLogoutSupported
+  **/
+  @ApiModelProperty(value = "Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.")
+  public Boolean getFrontchannelLogoutSupported() {
+    return frontchannelLogoutSupported;
+  }
+
+  public void setFrontchannelLogoutSupported(Boolean frontchannelLogoutSupported) {
+    this.frontchannelLogoutSupported = frontchannelLogoutSupported;
   }
 
   public WellKnown grantTypesSupported(List<String> grantTypesSupported) {
@@ -522,8 +627,13 @@ public class WellKnown {
     }
     WellKnown wellKnown = (WellKnown) o;
     return Objects.equals(this.authorizationEndpoint, wellKnown.authorizationEndpoint) &&
+        Objects.equals(this.backchannelLogoutSessionSupported, wellKnown.backchannelLogoutSessionSupported) &&
+        Objects.equals(this.backchannelLogoutSupported, wellKnown.backchannelLogoutSupported) &&
         Objects.equals(this.claimsParameterSupported, wellKnown.claimsParameterSupported) &&
         Objects.equals(this.claimsSupported, wellKnown.claimsSupported) &&
+        Objects.equals(this.endSessionEndpoint, wellKnown.endSessionEndpoint) &&
+        Objects.equals(this.frontchannelLogoutSessionSupported, wellKnown.frontchannelLogoutSessionSupported) &&
+        Objects.equals(this.frontchannelLogoutSupported, wellKnown.frontchannelLogoutSupported) &&
         Objects.equals(this.grantTypesSupported, wellKnown.grantTypesSupported) &&
         Objects.equals(this.idTokenSigningAlgValuesSupported, wellKnown.idTokenSigningAlgValuesSupported) &&
         Objects.equals(this.issuer, wellKnown.issuer) &&
@@ -545,7 +655,7 @@ public class WellKnown {
 
   @Override
   public int hashCode() {
-    return Objects.hash(authorizationEndpoint, claimsParameterSupported, claimsSupported, grantTypesSupported, idTokenSigningAlgValuesSupported, issuer, jwksUri, registrationEndpoint, requestParameterSupported, requestUriParameterSupported, requireRequestUriRegistration, responseModesSupported, responseTypesSupported, revocationEndpoint, scopesSupported, subjectTypesSupported, tokenEndpoint, tokenEndpointAuthMethodsSupported, userinfoEndpoint, userinfoSigningAlgValuesSupported);
+    return Objects.hash(authorizationEndpoint, backchannelLogoutSessionSupported, backchannelLogoutSupported, claimsParameterSupported, claimsSupported, endSessionEndpoint, frontchannelLogoutSessionSupported, frontchannelLogoutSupported, grantTypesSupported, idTokenSigningAlgValuesSupported, issuer, jwksUri, registrationEndpoint, requestParameterSupported, requestUriParameterSupported, requireRequestUriRegistration, responseModesSupported, responseTypesSupported, revocationEndpoint, scopesSupported, subjectTypesSupported, tokenEndpoint, tokenEndpointAuthMethodsSupported, userinfoEndpoint, userinfoSigningAlgValuesSupported);
   }
 
 
@@ -555,8 +665,13 @@ public class WellKnown {
     sb.append("class WellKnown {\n");
     
     sb.append("    authorizationEndpoint: ").append(toIndentedString(authorizationEndpoint)).append("\n");
+    sb.append("    backchannelLogoutSessionSupported: ").append(toIndentedString(backchannelLogoutSessionSupported)).append("\n");
+    sb.append("    backchannelLogoutSupported: ").append(toIndentedString(backchannelLogoutSupported)).append("\n");
     sb.append("    claimsParameterSupported: ").append(toIndentedString(claimsParameterSupported)).append("\n");
     sb.append("    claimsSupported: ").append(toIndentedString(claimsSupported)).append("\n");
+    sb.append("    endSessionEndpoint: ").append(toIndentedString(endSessionEndpoint)).append("\n");
+    sb.append("    frontchannelLogoutSessionSupported: ").append(toIndentedString(frontchannelLogoutSessionSupported)).append("\n");
+    sb.append("    frontchannelLogoutSupported: ").append(toIndentedString(frontchannelLogoutSupported)).append("\n");
     sb.append("    grantTypesSupported: ").append(toIndentedString(grantTypesSupported)).append("\n");
     sb.append("    idTokenSigningAlgValuesSupported: ").append(toIndentedString(idTokenSigningAlgValuesSupported)).append("\n");
     sb.append("    issuer: ").append(toIndentedString(issuer)).append("\n");

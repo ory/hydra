@@ -46,5 +46,5 @@ Before running this command on an existing database, create a back up!
 func init() {
 	migrateCmd.AddCommand(migrateSqlCmd)
 
-	migrateSqlCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database URL from the environment variable DATABASE_URL.")
+	migrateSqlCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN.")
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/x"
 )
 
@@ -24,6 +25,8 @@ type InternalRegistry interface {
 type Registry interface {
 	ConsentManager() Manager
 	ConsentStrategy() Strategy
+	PrometheusManager() *prometheus.MetricsManager
+
 	SubjectIdentifierAlgorithm() map[string]SubjectIdentifierAlgorithm
 }
 

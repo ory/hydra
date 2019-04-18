@@ -489,14 +489,18 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
 
-	var p HandledConsentRequest
+	var (
+		p   HandledConsentRequest
+		err error
+	)
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
+	defer recordAcceptConsentRequest(h.r.PrometheusManager(), &p, &err)
 	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
@@ -519,7 +523,6 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {hr.Verifier}}).String(),
 	})

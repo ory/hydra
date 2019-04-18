@@ -896,8 +896,8 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 	}
 
 	return &HandledLogoutRequest{
-		RedirectTo:         lr.PostLogoutRedirectURI,
-		FrontChannelLogout: urls,
+		RedirectTo:             lr.PostLogoutRedirectURI,
+		FrontChannelLogoutURLs: urls,
 	}, nil
 }
 

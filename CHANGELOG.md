@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v1.0.0-rc.9+oryOS.10 (2019-04-18)](#v100-rc9oryos10-2019-04-18)
   - [v1.0.0-rc.8+oryOS.10 (2019-04-03)](#v100-rc8oryos10-2019-04-03)
   - [v1.0.0-rc.7+oryOS.10 (2019-04-02)](#v100-rc7oryos10-2019-04-02)
   - [v1.0.0-rc.6+oryOS.10 (2018-12-18)](#v100-rc6oryos10-2018-12-18)
@@ -142,6 +143,49 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v1.0.0-rc.9+oryOS.10](https://github.com/ory/hydra/tree/v1.0.0-rc.9+oryOS.10) (2019-04-18)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.8+oryOS.10...v1.0.0-rc.9+oryOS.10)
+
+**Implemented enhancements:**
+
+- consent: Login and consent request challenge should be sent as query parameter [\#1307](https://github.com/ory/hydra/issues/1307)
+- oauth2: Support OAuth2 discovery [\#1127](https://github.com/ory/hydra/issues/1127)
+- pagination: Add paging to output [\#1047](https://github.com/ory/hydra/issues/1047)
+- Allow for insecure redirect URI for development [\#1021](https://github.com/ory/hydra/issues/1021)
+- consent: Share session state between login and consent [\#1003](https://github.com/ory/hydra/issues/1003)
+- cli: Add retry for broken network [\#846](https://github.com/ory/hydra/issues/846)
+- cmd: Add resilience to CLI REST commands [\#1359](https://github.com/ory/hydra/pull/1359) ([aeneasr](https://github.com/aeneasr))
+
+**Fixed bugs:**
+
+- Missing /.well-known/jwks.json endpoint [\#1349](https://github.com/ory/hydra/issues/1349)
+
+**Closed issues:**
+
+- Misuse of `http.Header{}.Write\(...\)` [\#1361](https://github.com/ory/hydra/issues/1361)
+- Hydra \(Linux Container\) on Windows docker cannot reach PostgreSQL [\#1360](https://github.com/ory/hydra/issues/1360)
+- Migrations have stopped working on tests locally [\#1357](https://github.com/ory/hydra/issues/1357)
+- Reenable Config Option [\#1344](https://github.com/ory/hydra/issues/1344)
+- OpenID Connect Discovery endpoint is missing revocation\_endpoint [\#1268](https://github.com/ory/hydra/issues/1268)
+- Error: "Command failed because error occurred: invalid character 'p' after top-level value" on running hydra client create [\#1244](https://github.com/ory/hydra/issues/1244)
+- Problem with import path for go-resty and go1.11 modules [\#1063](https://github.com/ory/hydra/issues/1063)
+
+**Merged pull requests:**
+
+- Fix pagination headers [\#1362](https://github.com/ory/hydra/pull/1362) ([kminehart](https://github.com/kminehart))
+- Pagination headers [\#1358](https://github.com/ory/hydra/pull/1358) ([kminehart](https://github.com/kminehart))
+- oauth2: Expose revocation endpoint at OIDC Discover [\#1356](https://github.com/ory/hydra/pull/1356) ([aeneasr](https://github.com/aeneasr))
+- oauth2: Expose revocation endpoint at OIDC Discovery [\#1355](https://github.com/ory/hydra/pull/1355) ([aeneasr](https://github.com/aeneasr))
+- oauth2: Allow whitelisting insecure redirect URLs [\#1354](https://github.com/ory/hydra/pull/1354) ([aeneasr](https://github.com/aeneasr))
+- consent: Add ability to share data from login to consent request [\#1353](https://github.com/ory/hydra/pull/1353) ([aeneasr](https://github.com/aeneasr))
+- Add package-lock.json [\#1352](https://github.com/ory/hydra/pull/1352) ([aeneasr](https://github.com/aeneasr))
+- consent: Use query parameters for challenges [\#1351](https://github.com/ory/hydra/pull/1351) ([aeneasr](https://github.com/aeneasr))
+- driver: Initialize everything on start up [\#1350](https://github.com/ory/hydra/pull/1350) ([aeneasr](https://github.com/aeneasr))
+- sdk: Move to go-swagger code generator [\#1347](https://github.com/ory/hydra/pull/1347) ([aeneasr](https://github.com/aeneasr))
+-  make: Introduce install-stable and install tasks [\#1346](https://github.com/ory/hydra/pull/1346) ([aeneasr](https://github.com/aeneasr))
+- cmd: Reenable -c cli flag [\#1345](https://github.com/ory/hydra/pull/1345) ([aeneasr](https://github.com/aeneasr))
+- docs: Fix environment variable DATABASE\_URL to DSN [\#1343](https://github.com/ory/hydra/pull/1343) ([sawadashota](https://github.com/sawadashota))
 
 ## [v1.0.0-rc.8+oryOS.10](https://github.com/ory/hydra/tree/v1.0.0-rc.8+oryOS.10) (2019-04-03)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.7+oryOS.10...v1.0.0-rc.8+oryOS.10)
@@ -445,7 +489,6 @@
 - Support Kubernetes Secrets [\#1079](https://github.com/ory/hydra/issues/1079)
 - Silent token refresh fails with "The Authorization Server requires End-User consent" [\#1068](https://github.com/ory/hydra/issues/1068)
 - Invalid login\_challenge [\#1065](https://github.com/ory/hydra/issues/1065)
-- Problem with import path for go-resty and go1.11 modules [\#1063](https://github.com/ory/hydra/issues/1063)
 - sql: Add auto-increment PKs [\#1059](https://github.com/ory/hydra/issues/1059)
 - Feature: admin endpoint for deleting expired tokens [\#1058](https://github.com/ory/hydra/issues/1058)
 - consent: Send error response if consent or login challenge is expired or invalid [\#1056](https://github.com/ory/hydra/issues/1056)

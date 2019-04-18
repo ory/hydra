@@ -142,7 +142,9 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 //
 // Lists all consent sessions of a user
 //
-// This endpoint lists all user's granted consent sessions, including client and granted scope
+// This endpoint lists all user's granted consent sessions, including client and granted scope.
+// The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+// Multiple links can be included in this header, and will be separated by a comma.
 //
 //     Consumes:
 //     - application/json
@@ -183,6 +185,14 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	if len(a) == 0 {
 		a = []PreviousConsentSession{}
 	}
+
+	n, err := h.r.ConsentManager().CountSubjectsGrantedConsentRequests(r.Context(), user)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	pagination.Header(w, r.URL, n, limit, offset)
 
 	h.r.Writer().Write(w, r, a)
 }

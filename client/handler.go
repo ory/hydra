@@ -169,6 +169,8 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 // This endpoint lists all clients in the database, and never returns client secrets.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+// Multiple links can be included in this header, and will be separated by a comma.
 //
 //     Consumes:
 //     - application/json
@@ -183,6 +185,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
+
 	c, err := h.r.ClientManager().GetClients(r.Context(), limit, offset)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -196,6 +199,14 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		clients[k].Secret = ""
 		k++
 	}
+
+	n, err := h.r.ClientManager().CountClients(r.Context())
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	pagination.Header(w, r.URL, n, limit, offset)
 
 	h.r.Writer().Write(w, r, clients)
 }

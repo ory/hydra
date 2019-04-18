@@ -192,8 +192,9 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
+	pagination.Header(w, r.URL, n, limit, offset)
+
 	h.r.Writer().Write(w, r, a)
-	pagination.Header(r.URL, n, limit, offset).Write(w)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/login/{user} admin revokeAuthenticationSession

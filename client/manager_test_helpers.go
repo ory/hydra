@@ -198,6 +198,11 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 		assert.EqualValues(t, expected.UserinfoSignedResponseAlg, actual.UserinfoSignedResponseAlg)
 		assert.EqualValues(t, expected.CreatedAt.Unix(), actual.CreatedAt.Unix())
 		assert.EqualValues(t, expected.UpdatedAt.Unix(), actual.UpdatedAt.Unix())
+		assert.EqualValues(t, expected.FrontChannelLogoutURI, actual.FrontChannelLogoutURI)
+		assert.EqualValues(t, expected.FrontChannelLogoutSessionRequired, actual.FrontChannelLogoutSessionRequired)
+		assert.EqualValues(t, expected.PostLogoutRedirectURIs, actual.PostLogoutRedirectURIs)
+		assert.EqualValues(t, expected.BackChannelLogoutURI, actual.BackChannelLogoutURI)
+		assert.EqualValues(t, expected.BackChannelLogoutSessionRequired, actual.BackChannelLogoutSessionRequired)
 	}
 
 	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {

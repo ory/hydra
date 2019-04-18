@@ -130,26 +130,72 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	if len(handled.FrontChannelLogout) == 0 {
+	if len(handled.FrontChannelLogoutURLs) == 0 {
 		http.Redirect(w, r, handled.RedirectTo, http.StatusFound)
 		return
 	}
 
+	// TODO How are we supposed to test this? Maybe with cypress? #1368
 	t, err := template.New("logout").Parse(`<html>
 <head>
-	<meta http-equiv="refresh" content="5; URL={{ .RedirectTo }}">
+    <meta http-equiv="refresh" content="4; URL={{ .RedirectTo }}">
 </head>
-<body>
+<style type="text/css">
+    iframe { position: absolute; left: 0; top: 0; height: 0; width: 0; border: none; }
+</style>
+<script>
+    var total = {{ len .FrontChannelLogoutURLs }};
+    var redir = {{ .RedirectTo }};
 
+	function redirect() {
+		window.location.replace(redir);
+
+		// In case replace failed try href
+		setTimeout(function () {
+			window.location.href = redir;
+		}, 250) // Show message after http-equiv="refresh"
+	}
+
+    function done() {
+        total--;
+        if (total < 1) {
+			redirect();
+        }
+    }
+
+	setTimeout(redirect, 2500); // redirect after 2.5 seconds if e.g. an iframe doesn't load
+
+	// If the redirect takes unusually long, show a message
+	setTimeout(function () {
+		document.getElementById("redir").style.display = "block";
+	}, 1500);
+
+</script>
+<body>
+<noscript>
+    <p>
+        JavaScript is disabled - you should be redirected in 5 seconds but if not, click <a
+            href="{{ .RedirectTo }}">here</a> to continue.
+    </p>
+</noscript>
+
+<p id="redir" style="display: none">
+    Redirection takes unusually long. If you are not being redirected within the next seconds, click <a href="{{ .RedirectTo }}">here</a> to continue.
+</p>
+
+{{ range .FrontChannelLogoutURLs }}<iframe src="{{ . }}" onload="done(this)"></iframe>
+{{ end }}
 </body>
 </html>`)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
+		x.LogError(err, h.r.Logger())
+		h.forwardError(w, r, err)
 		return
 	}
 
 	if err := t.Execute(w, handled); err != nil {
-		h.r.Writer().WriteError(w, r, err)
+		x.LogError(err, h.r.Logger())
+		h.forwardError(w, r, err)
 		return
 	}
 }

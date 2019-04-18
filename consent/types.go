@@ -258,8 +258,8 @@ type LogoutRequest struct {
 //
 // swagger:ignore
 type HandledLogoutRequest struct {
-	RedirectTo         string
-	FrontChannelLogout []string
+	RedirectTo             string
+	FrontChannelLogoutURLs []string
 }
 
 // Contains information on an ongoing login request.

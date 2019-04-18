@@ -4,6 +4,7 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
 
@@ -37,6 +38,7 @@ type Registry interface {
 	consent.Registry
 	jwk.Registry
 	oauth2.Registry
+	PrometheusManager() *prometheus.MetricsManager
 	Tracer() *tracing.Tracer
 
 	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)

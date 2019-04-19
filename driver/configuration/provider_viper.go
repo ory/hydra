@@ -125,9 +125,13 @@ func (v *ViperProvider) SubjectTypesSupported() []string {
 
 	if stringslice.Has(types, "pairwise") {
 		if v.AccessTokenStrategy() == "jwt" {
-			v.l.Fatalf(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy. Please remove "pairwise" from oidc.subject_identifiers.supported or set strategies.access_token to "opaque".`)
-		}
-		if len(v.SubjectIdentifierAlgorithmSalt()) < 8 {
+			v.l.Warn(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy and is thus being disabled. Please remove "pairwise" from oidc.subject_identifiers.enable" (e.g. oidc.subject_identifiers.enable=public) or set strategies.access_token to "opaque".`)
+			types = stringslice.Filter(types,
+				func(s string) bool {
+					return !(s == "public")
+				},
+			)
+		} else if len(v.SubjectIdentifierAlgorithmSalt()) < 8 {
 			v.l.Fatalf(`The pairwise subject identifier algorithm was set but length of oidc.subject_identifier.salt is too small (%d < 8), please set oidc.subject_identifiers.pairwise.salt to a random string with 8 characters or more.`, len(v.SubjectIdentifierAlgorithmSalt()))
 		}
 	}

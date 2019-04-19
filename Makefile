@@ -24,7 +24,13 @@ test-resetdb:
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.
+
+# Runs tests in short mode, without database adapters
+.PHONY: docker
+docker:
+		GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:latest .
+		rm hydra
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

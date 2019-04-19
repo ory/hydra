@@ -32,7 +32,6 @@ services:
       - OAUTH2_SHARE_ERROR_DEBUG=1
       - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
       - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
-#      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
     restart: unless-stopped
 
   consent:

@@ -36,7 +36,7 @@ func TestSubjectTypesSupported(t *testing.T) {
 		},
 		{
 			d: "Load legacy environment variable in legacy format",
-			p: func(t *testing.T){
+			p: func(t *testing.T) {
 				setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), "public,pairwise,foobar")(t)
 				setEnv(strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)), "jwt")(t)
 			},

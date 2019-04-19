@@ -92,7 +92,7 @@ func (v *ViperProvider) InsecureRedirects() []string {
 
 func (v *ViperProvider) WellKnownKeys(include ...string) []string {
 	if v.AccessTokenStrategy() == "jwt" {
-		include = append(include, x.OpenIDConnectKeyName)
+		include = append(include, x.OAuth2JWTKeyName)
 	}
 
 	include = append(include, x.OpenIDConnectKeyName)

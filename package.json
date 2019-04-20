@@ -9,5 +9,8 @@
   },
   "dependencies": {
     "superagent": "3.7.0"
+  },
+  "devDependencies": {
+    "cypress": "^3.2.0"
   }
 }

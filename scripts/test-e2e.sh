@@ -91,14 +91,14 @@ if [[ "$(hydra token introspect $userToken)" =~ "false" ]]; then
     exit 1
 fi
 
-if [[ "$(curl http://localhost:4445/oauth2/auth/sessions/consent/the-subject)" =~ "the-subject" ]]; then
+if [[ "$(curl http://localhost:4445/oauth2/auth/sessions/consent?subject=the-subject)" =~ "the-subject" ]]; then
     echo "Consent session looks good"
 else
     echo "Checking consent session should show the-subject"
     exit 1
 fi
 
-curl -X DELETE http://localhost:4445/oauth2/auth/sessions/consent/the-subject
+curl -X DELETE http://localhost:4445/oauth2/auth/sessions/consent?subject=the-subject
 
 if [[ "$(hydra token introspect $userToken)" =~ "true" ]]; then
     echo "Token introspection should return false because the consent session was revoked"

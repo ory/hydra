@@ -143,7 +143,8 @@ have been updated as well:
 * DELETE /oauth2/auth/sessions/consent/:user -> DELETE /oauth2/auth/sessions/login?user=:user
 * DELETE /oauth2/auth/sessions/consent/:user/:client -> DELETE /oauth2/auth/sessions/login?user=:user&client=:client
 
-Thus, clients and users are now allowed to contain slashes and dots.
+While this does not include a security warning, this patch allows developers to use slashes in dots in their subject/user
+IDs.
 
 ## 1.0.0-rc.9
 

@@ -157,7 +157,7 @@ func (v *Validator) Validate(c *Client) error {
 			}
 		}
 
-		if !found {
+ 		if !found {
 			return errors.WithStack(fosite.ErrInvalidRequest.
 				WithHintf(`post_logout_redirect_uri "%s" must match the domain, port, scheme of at least one of the registered redirect URIs but did not'`, l),
 			)

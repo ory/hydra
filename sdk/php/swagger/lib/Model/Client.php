@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * Client Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -64,7 +64,7 @@ class Client implements ArrayAccess
         'contacts' => 'string[]',
         'created_at' => '\DateTime',
         'grant_types' => 'string[]',
-        'jwks' => '\Hydra\SDK\Model\SwaggerJSONWebKeySet',
+        'jwks' => '\HydraSDK\Model\SwaggerJSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
@@ -433,7 +433,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets client_secret_expires_at
-     * @param int $client_secret_expires_at SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+     * @param int $client_secret_expires_at SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it's value will always be set to 0.
      * @return $this
      */
     public function setClientSecretExpiresAt($client_secret_expires_at)
@@ -496,7 +496,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets created_at
-     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation. Format: date-time
      * @return $this
      */
     public function setCreatedAt($created_at)
@@ -529,7 +529,7 @@ class Client implements ArrayAccess
 
     /**
      * Gets jwks
-     * @return \Hydra\SDK\Model\SwaggerJSONWebKeySet
+     * @return \HydraSDK\Model\SwaggerJSONWebKeySet
      */
     public function getJwks()
     {
@@ -538,7 +538,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets jwks
-     * @param \Hydra\SDK\Model\SwaggerJSONWebKeySet $jwks
+     * @param \HydraSDK\Model\SwaggerJSONWebKeySet $jwks
      * @return $this
      */
     public function setJwks($jwks)
@@ -837,7 +837,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets updated_at
-     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update. Format: date-time
      * @return $this
      */
     public function setUpdatedAt($updated_at)
@@ -919,10 +919,10 @@ class Client implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

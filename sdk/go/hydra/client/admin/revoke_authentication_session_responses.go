@@ -32,6 +32,13 @@ func (o *RevokeAuthenticationSessionReader) ReadResponse(response runtime.Client
 		}
 		return result, nil
 
+	case 400:
+		result := NewRevokeAuthenticationSessionBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	case 404:
 		result := NewRevokeAuthenticationSessionNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -65,10 +72,39 @@ type RevokeAuthenticationSessionNoContent struct {
 }
 
 func (o *RevokeAuthenticationSessionNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login/{user}][%d] revokeAuthenticationSessionNoContent ", 204)
+	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionNoContent ", 204)
 }
 
 func (o *RevokeAuthenticationSessionNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewRevokeAuthenticationSessionBadRequest creates a RevokeAuthenticationSessionBadRequest with default headers values
+func NewRevokeAuthenticationSessionBadRequest() *RevokeAuthenticationSessionBadRequest {
+	return &RevokeAuthenticationSessionBadRequest{}
+}
+
+/*RevokeAuthenticationSessionBadRequest handles this case with default header values.
+
+genericError
+*/
+type RevokeAuthenticationSessionBadRequest struct {
+	Payload *models.GenericError
+}
+
+func (o *RevokeAuthenticationSessionBadRequest) Error() string {
+	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *RevokeAuthenticationSessionBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }
@@ -87,7 +123,7 @@ type RevokeAuthenticationSessionNotFound struct {
 }
 
 func (o *RevokeAuthenticationSessionNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login/{user}][%d] revokeAuthenticationSessionNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionNotFound  %+v", 404, o.Payload)
 }
 
 func (o *RevokeAuthenticationSessionNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -116,7 +152,7 @@ type RevokeAuthenticationSessionInternalServerError struct {
 }
 
 func (o *RevokeAuthenticationSessionInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login/{user}][%d] revokeAuthenticationSessionInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *RevokeAuthenticationSessionInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

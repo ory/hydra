@@ -39,7 +39,8 @@ type RequestHandlerResponse struct {
 	RedirectTo string `json:"redirect_to"`
 }
 
-type AuthenticationSession struct {
+// swagger:ignore
+type SubjectSession struct {
 	ID              string    `db:"id"`
 	AuthenticatedAt time.Time `db:"authenticated_at"`
 	Subject         string    `db:"subject"`

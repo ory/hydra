@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-[**revokeUserLoginCookie**](PublicApi.md#revokeUserLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs user out by deleting the session cookie
+[**revokeSubjectLoginCookie**](PublicApi.md#revokeSubjectLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs subject out by deleting the session cookie
 [**userinfo**](PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 
@@ -215,13 +215,13 @@ null (empty response body)
  - **Content-Type**: application/x-www-form-urlencoded
  - **Accept**: application/json
 
-<a name="revokeUserLoginCookie"></a>
-# **revokeUserLoginCookie**
-> revokeUserLoginCookie()
+<a name="revokeSubjectLoginCookie"></a>
+# **revokeSubjectLoginCookie**
+> revokeSubjectLoginCookie()
 
-Logs user out by deleting the session cookie
+Logs subject out by deleting the session cookie
 
-This endpoint deletes ths user&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the user&#39;s browser.
+This endpoint deletes ths subject&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the subject&#39;s browser.
 
 ### Example
 ```java
@@ -232,9 +232,9 @@ This endpoint deletes ths user&#39;s login session cookie and redirects the brow
 
 PublicApi apiInstance = new PublicApi();
 try {
-    apiInstance.revokeUserLoginCookie();
+    apiInstance.revokeSubjectLoginCookie();
 } catch (ApiException e) {
-    System.err.println("Exception when calling PublicApi#revokeUserLoginCookie");
+    System.err.println("Exception when calling PublicApi#revokeSubjectLoginCookie");
     e.printStackTrace();
 }
 ```

@@ -88,7 +88,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
-	session, err := s.r.ConsentManager().GetAuthenticationSession(r.Context(), sessionID)
+	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), sessionID)
 	if errors.Cause(err) == x.ErrNotFound {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
@@ -131,7 +131,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedAuthenticationSession(r.Context(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == x.ErrNotFound {
+	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(r.Context(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == x.ErrNotFound {
 		// do nothing
 	} else if err != nil {
 		return err
@@ -146,7 +146,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *AuthenticationSession) error {
+func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *SubjectSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
 	}
@@ -187,7 +187,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	}
 
 	// Set the session
-	if err := s.r.ConsentManager().CreateAuthenticationRequest(
+	if err := s.r.ConsentManager().CreateLoginRequest(
 		r.Context(),
 		&LoginRequest{
 			Challenge:         challenge,
@@ -234,7 +234,7 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 		return nil
 	}
 
-	return s.r.ConsentManager().DeleteAuthenticationSession(r.Context(), sid)
+	return s.r.ConsentManager().DeleteLoginSession(r.Context(), sid)
 }
 
 func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessions.Store) (string, error) {
@@ -271,7 +271,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(req fosite.AuthorizeRequest
 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
 	ctx := r.Context()
-	session, err := s.r.ConsentManager().VerifyAndInvalidateAuthenticationRequest(ctx, verifier)
+	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Cause(err) == x.ErrNotFound {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
@@ -346,7 +346,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if session.ForceSubjectIdentifier != "" {
-		if err := s.r.ConsentManager().CreateForcedObfuscatedAuthenticationSession(r.Context(), &ForcedObfuscatedAuthenticationSession{
+		if err := s.r.ConsentManager().CreateForcedObfuscatedLoginSession(r.Context(), &ForcedObfuscatedLoginSession{
 			Subject:           session.Subject,
 			ClientID:          req.GetClient().GetID(),
 			SubjectObfuscated: session.ForceSubjectIdentifier,
@@ -370,7 +370,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	cookie, _ := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	sid := uuid.New()
 
-	if err := s.r.ConsentManager().CreateAuthenticationSession(r.Context(), &AuthenticationSession{
+	if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &SubjectSession{
 		ID:              sid,
 		Subject:         session.Subject,
 		AuthenticatedAt: session.AuthenticatedAt,

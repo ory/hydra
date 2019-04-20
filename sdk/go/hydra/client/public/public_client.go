@@ -162,27 +162,27 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 }
 
 /*
-RevokeUserLoginCookie logs user out by deleting the session cookie
+RevokeSubjectLoginCookie logs subject out by deleting the session cookie
 
-This endpoint deletes ths user's login session cookie and redirects the browser to the url
+This endpoint deletes ths subject's login session cookie and redirects the browser to the url
 listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to
-be called from the user's browser.
+be called from the subject's browser.
 */
-func (a *Client) RevokeUserLoginCookie(params *RevokeUserLoginCookieParams) error {
+func (a *Client) RevokeSubjectLoginCookie(params *RevokeSubjectLoginCookieParams) error {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewRevokeUserLoginCookieParams()
+		params = NewRevokeSubjectLoginCookieParams()
 	}
 
 	_, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "revokeUserLoginCookie",
+		ID:                 "revokeSubjectLoginCookie",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth/sessions/login/revoke",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &RevokeUserLoginCookieReader{formats: a.formats},
+		Reader:             &RevokeSubjectLoginCookieReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})

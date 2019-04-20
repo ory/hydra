@@ -23,7 +23,6 @@ require (
 	github.com/golang/gddo v0.0.0-20190312205958-5a2505f3dbf0 // indirect
 	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.3.1 // indirect
-	github.com/gorilla/context v1.1.1
 	github.com/gorilla/handlers v1.4.0 // indirect
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.4-0.20181208214519-12bd4761fc66

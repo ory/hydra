@@ -19,12 +19,11 @@ Method | HTTP request | Description
 [**getOAuth2Client**](AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 [**introspectOAuth2Token**](AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 [**listOAuth2Clients**](AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
-[**listUserConsentSessions**](AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+[**listUserConsentSessions**](AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a user
 [**rejectConsentRequest**](AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 [**rejectLoginRequest**](AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
-[**revokeAllUserConsentSessions**](AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
-[**revokeUserClientConsentSessions**](AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
+[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login | Invalidates a user&#39;s authentication session
+[**revokeConsentSessions**](AdminApi.md#revokeConsentSessions) | **DELETE** /oauth2/auth/sessions/consent | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 [**updateJsonWebKey**](AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 [**updateJsonWebKeySet**](AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 [**updateOAuth2Client**](AdminApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
@@ -713,7 +712,7 @@ Name | Type | Description  | Notes
 
 List OAuth 2.0 Clients
 
-This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components. The \&quot;Link\&quot; header is also included in successful responses, which contains one or more links for pagination, formatted like so: &#39;&lt;https://hydra-url/admin/clients?limit&#x3D;{limit}&amp;offset&#x3D;{offset}&gt;; rel&#x3D;\&quot;{page}\&quot;&#39;, where page is one of the following applicable pages: &#39;first&#39;, &#39;next&#39;, &#39;last&#39;, and &#39;previous&#39;. Multiple links can be included in this header, and will be separated by a comma.
 
 ### Example
 ```javascript
@@ -762,7 +761,7 @@ No authorization required
 
 Lists all consent sessions of a user
 
-This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
+This endpoint lists all user&#39;s granted consent sessions, including client and granted scope. The \&quot;Link\&quot; header is also included in successful responses, which contains one or more links for pagination, formatted like so: &#39;&lt;https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit&#x3D;{limit}&amp;offset&#x3D;{offset}&gt;; rel&#x3D;\&quot;{page}\&quot;&#39;, where page is one of the following applicable pages: &#39;first&#39;, &#39;next&#39;, &#39;last&#39;, and &#39;previous&#39;. Multiple links can be included in this header, and will be separated by a comma.
 
 ### Example
 ```javascript
@@ -902,52 +901,6 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="revokeAllUserConsentSessions"></a>
-# **revokeAllUserConsentSessions**
-> revokeAllUserConsentSessions(user)
-
-Revokes all previous consent sessions of a user
-
-This endpoint revokes a user&#39;s granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-
-### Example
-```javascript
-var OryHydra = require('ory_hydra');
-
-var apiInstance = new OryHydra.AdminApi();
-
-var user = "user_example"; // String | 
-
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully.');
-  }
-};
-apiInstance.revokeAllUserConsentSessions(user, callback);
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **user** | **String**|  | 
-
-### Return type
-
-null (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
 <a name="revokeAuthenticationSession"></a>
 # **revokeAuthenticationSession**
 > revokeAuthenticationSession(user)
@@ -994,9 +947,9 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
-<a name="revokeUserClientConsentSessions"></a>
-# **revokeUserClientConsentSessions**
-> revokeUserClientConsentSessions(user, client)
+<a name="revokeConsentSessions"></a>
+# **revokeConsentSessions**
+> revokeConsentSessions(user, opts)
 
 Revokes consent sessions of a user for a specific OAuth 2.0 Client
 
@@ -1008,10 +961,11 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
-var user = "user_example"; // String | 
+var user = "user_example"; // String | The user who's consent sessions should be deleted.
 
-var client = "client_example"; // String | 
-
+var opts = { 
+  'client': "client_example" // String | If set, deletes only those consent sessions by the user that have been granted to the specified OAuth 2.0 Client ID
+};
 
 var callback = function(error, data, response) {
   if (error) {
@@ -1020,15 +974,15 @@ var callback = function(error, data, response) {
     console.log('API called successfully.');
   }
 };
-apiInstance.revokeUserClientConsentSessions(user, client, callback);
+apiInstance.revokeConsentSessions(user, opts, callback);
 ```
 
 ### Parameters
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **user** | **String**|  | 
- **client** | **String**|  | 
+ **user** | **String**| The user who&#39;s consent sessions should be deleted. | 
+ **client** | **String**| If set, deletes only those consent sessions by the user that have been granted to the specified OAuth 2.0 Client ID | [optional] 
 
 ### Return type
 

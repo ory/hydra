@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,8 @@ use \ArrayAccess;
  * SwaggerJwkUpdateSetKey Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @description SwaggerJwkUpdateSetKey swagger jwk update set key
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -54,7 +55,7 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'body' => '\Hydra\SDK\Model\JSONWebKey',
+        'body' => '\HydraSDK\Model\SwaggerJSONWebKey',
         'kid' => 'string',
         'set' => 'string'
     ];
@@ -186,7 +187,7 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
 
     /**
      * Gets body
-     * @return \Hydra\SDK\Model\JSONWebKey
+     * @return \HydraSDK\Model\SwaggerJSONWebKey
      */
     public function getBody()
     {
@@ -195,7 +196,7 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
 
     /**
      * Sets body
-     * @param \Hydra\SDK\Model\JSONWebKey $body
+     * @param \HydraSDK\Model\SwaggerJSONWebKey $body
      * @return $this
      */
     public function setBody($body)
@@ -298,10 +299,10 @@ class SwaggerJwkUpdateSetKey implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

@@ -21,9 +21,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerJwkSetQuery
+ * SwaggerJwkSetQuery swagger jwk set query
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@ApiModel(description = "SwaggerJwkSetQuery swagger jwk set query")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T10:32:55.035+02:00")
 public class SwaggerJwkSetQuery {
   @JsonProperty("set")
   private String set = null;

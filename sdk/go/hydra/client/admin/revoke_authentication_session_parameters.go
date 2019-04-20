@@ -121,9 +121,13 @@ func (o *RevokeAuthenticationSessionParams) WriteToRequest(r runtime.ClientReque
 	}
 	var res []error
 
-	// path param user
-	if err := r.SetPathParam("user", o.User); err != nil {
-		return err
+	// query param user
+	qrUser := o.User
+	qUser := qrUser
+	if qUser != "" {
+		if err := r.SetQueryParam("user", qUser); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

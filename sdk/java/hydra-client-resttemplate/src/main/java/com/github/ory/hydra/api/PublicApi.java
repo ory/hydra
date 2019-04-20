@@ -27,7 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T10:32:55.035+02:00")
 @Component("com.github.ory.hydra.api.PublicApi")
 public class PublicApi {
     private ApiClient apiClient;

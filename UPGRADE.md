@@ -131,6 +131,20 @@ Do you want the latest features and patches without work and hassle? Are you loo
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
+## 1.0.0-rc.10
+
+### Login and Consent Management
+
+Orthogonal to the changes when accepting and rejection consent and login requests, the following endpoints
+have been updated as well:
+
+* DELETE /oauth2/auth/sessions/login/:user ->DELETE /oauth2/auth/sessions/login?user=:user
+* GET /oauth2/auth/sessions/consent/:user -> GET /oauth2/auth/sessions/login?user=:user
+* DELETE /oauth2/auth/sessions/consent/:user -> DELETE /oauth2/auth/sessions/login?user=:user
+* DELETE /oauth2/auth/sessions/consent/:user/:client -> DELETE /oauth2/auth/sessions/login?user=:user&client=:client
+
+Thus, clients and users are now allowed to contain slashes and dots.
+
 ## 1.0.0-rc.9
 
 ### Go SDK

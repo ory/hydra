@@ -511,6 +511,8 @@ ListOAuth2Clients lists o auth 2 0 clients
 This endpoint lists all clients in the database, and never returns client secrets.
 
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+Multiple links can be included in this header, and will be separated by a comma.
 */
 func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2ClientsOK, error) {
 	// TODO: Validate the params before sending
@@ -540,7 +542,9 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2
 /*
 ListUserConsentSessions lists all consent sessions of a user
 
-This endpoint lists all user's granted consent sessions, including client and granted scope
+This endpoint lists all user's granted consent sessions, including client and granted scope.
+The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+Multiple links can be included in this header, and will be separated by a comma.
 */
 func (a *Client) ListUserConsentSessions(params *ListUserConsentSessionsParams) (*ListUserConsentSessionsOK, error) {
 	// TODO: Validate the params before sending
@@ -551,7 +555,7 @@ func (a *Client) ListUserConsentSessions(params *ListUserConsentSessionsParams) 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "listUserConsentSessions",
 		Method:             "GET",
-		PathPattern:        "/oauth2/auth/sessions/consent/{user}",
+		PathPattern:        "/oauth2/auth/sessions/consent",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -653,36 +657,6 @@ func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLo
 }
 
 /*
-RevokeAllUserConsentSessions revokes all previous consent sessions of a user
-
-This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-*/
-func (a *Client) RevokeAllUserConsentSessions(params *RevokeAllUserConsentSessionsParams) (*RevokeAllUserConsentSessionsNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRevokeAllUserConsentSessionsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "revokeAllUserConsentSessions",
-		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/consent/{user}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RevokeAllUserConsentSessionsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*RevokeAllUserConsentSessionsNoContent), nil
-
-}
-
-/*
 RevokeAuthenticationSession invalidates a user s authentication session
 
 This endpoint invalidates a user's authentication session. After revoking the authentication session, the user
@@ -697,7 +671,7 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "revokeAuthenticationSession",
 		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/login/{user}",
+		PathPattern:        "/oauth2/auth/sessions/login",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -714,33 +688,33 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
 }
 
 /*
-RevokeUserClientConsentSessions revokes consent sessions of a user for a specific o auth 2 0 client
+RevokeConsentSessions revokes consent sessions of a user for a specific o auth 2 0 client
 
 This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 associated OAuth 2.0 Access Tokens.
 */
-func (a *Client) RevokeUserClientConsentSessions(params *RevokeUserClientConsentSessionsParams) (*RevokeUserClientConsentSessionsNoContent, error) {
+func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*RevokeConsentSessionsNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewRevokeUserClientConsentSessionsParams()
+		params = NewRevokeConsentSessionsParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "revokeUserClientConsentSessions",
+		ID:                 "revokeConsentSessions",
 		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/consent/{user}/{client}",
+		PathPattern:        "/oauth2/auth/sessions/consent",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &RevokeUserClientConsentSessionsReader{formats: a.formats},
+		Reader:             &RevokeConsentSessionsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RevokeUserClientConsentSessionsNoContent), nil
+	return result.(*RevokeConsentSessionsNoContent), nil
 
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 // Swaggeroauth2TokenParameters swaggeroauth2 token parameters
-// swagger:model swaggeroauth2TokenParameters
+// swagger:model Swaggeroauth2TokenParameters
 type Swaggeroauth2TokenParameters struct {
 
 	// in: formData

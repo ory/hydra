@@ -27,34 +27,30 @@ type swaggerGetRequestByChallenge struct {
 	Challenge string `json:"challenge"`
 }
 
-// swagger:parameters revokeAllUserConsentSessions
-type swaggerRevokeAllUserConsentSessionsPayload struct {
-	// in: path
-	// required: true
-	User string `json:"user"`
-}
-
-// swagger:parameters revokeUserClientConsentSessions
-type swaggerRevokeUserClientConsentSessionsPayload struct {
-	// in: path
+// swagger:parameters revokeConsentSessions
+type swaggerRevokeConsentSessions struct {
+	// The user who's consent sessions should be deleted.
+	//
+	// in: query
 	// required: true
 	User string `json:"user"`
 
-	// in: path
-	// required: true
+	// If set, deletes only those consent sessions by the user that have been granted to the specified OAuth 2.0 Client ID
+	//
+	// in: query
 	Client string `json:"client"`
 }
 
 // swagger:parameters listUserConsentSessions
 type swaggerListUserConsentSessionsPayload struct {
-	// in: path
+	// in: query
 	// required: true
 	User string `json:"user"`
 }
 
 // swagger:parameters revokeAuthenticationSession
 type swaggerRevokeAuthenticationSessionPayload struct {
-	// in: path
+	// in: query
 	// required: true
 	User string `json:"user"`
 }

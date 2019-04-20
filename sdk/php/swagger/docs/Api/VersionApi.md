@@ -1,4 +1,4 @@
-# Hydra\SDK\VersionApi
+# HydraSDK\VersionApi
 Client for Hydra
 
 All URIs are relative to *http://localhost*
@@ -9,7 +9,7 @@ Method | HTTP request | Description
 
 
 # **getVersion**
-> \Hydra\SDK\Model\Version getVersion()
+> \HydraSDK\Model\Version getVersion()
 
 Get service version
 
@@ -20,7 +20,7 @@ This endpoint returns the service version typically notated using semantic versi
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\VersionApi();
+$api_instance = new HydraSDK\Api\VersionApi();
 
 try {
     $result = $api_instance->getVersion();
@@ -36,7 +36,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**\Hydra\SDK\Model\Version**](../Model/Version.md)
+[**\HydraSDK\Model\Version**](../Model/Version.md)
 
 ### Authorization
 

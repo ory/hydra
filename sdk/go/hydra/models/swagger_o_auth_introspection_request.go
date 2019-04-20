@@ -14,7 +14,7 @@ import (
 )
 
 // SwaggerOAuthIntrospectionRequest swagger o auth introspection request
-// swagger:model swaggerOAuthIntrospectionRequest
+// swagger:model SwaggerOAuthIntrospectionRequest
 type SwaggerOAuthIntrospectionRequest struct {
 
 	// An optional, space separated list of required scopes. If the access token was not granted one of the

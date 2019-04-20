@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,8 @@ use \ArrayAccess;
  * SwaggerJwkUpdateSet Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @description SwaggerJwkUpdateSet swagger jwk update set
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -54,7 +55,7 @@ class SwaggerJwkUpdateSet implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'body' => '\Hydra\SDK\Model\JSONWebKeySet',
+        'body' => '\HydraSDK\Model\SwaggerJSONWebKeySet',
         'set' => 'string'
     ];
 
@@ -174,7 +175,7 @@ class SwaggerJwkUpdateSet implements ArrayAccess
 
     /**
      * Gets body
-     * @return \Hydra\SDK\Model\JSONWebKeySet
+     * @return \HydraSDK\Model\SwaggerJSONWebKeySet
      */
     public function getBody()
     {
@@ -183,7 +184,7 @@ class SwaggerJwkUpdateSet implements ArrayAccess
 
     /**
      * Sets body
-     * @param \Hydra\SDK\Model\JSONWebKeySet $body
+     * @param \HydraSDK\Model\SwaggerJSONWebKeySet $body
      * @return $this
      */
     public function setBody($body)
@@ -265,10 +266,10 @@ class SwaggerJwkUpdateSet implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

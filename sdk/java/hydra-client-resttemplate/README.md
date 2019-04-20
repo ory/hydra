@@ -106,12 +106,11 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**getOAuth2Client**](docs/AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 *AdminApi* | [**introspectOAuth2Token**](docs/AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *AdminApi* | [**listOAuth2Clients**](docs/AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
-*AdminApi* | [**listUserConsentSessions**](docs/AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+*AdminApi* | [**listUserConsentSessions**](docs/AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a user
 *AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
-*AdminApi* | [**revokeAllUserConsentSessions**](docs/AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-*AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
-*AdminApi* | [**revokeUserClientConsentSessions**](docs/AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
+*AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login | Invalidates a user&#39;s authentication session
+*AdminApi* | [**revokeConsentSessions**](docs/AdminApi.md#revokeConsentSessions) | **DELETE** /oauth2/auth/sessions/consent | Revokes consent sessions of a user for a specific OAuth 2.0 Client
 *AdminApi* | [**updateJsonWebKey**](docs/AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**updateJsonWebKeySet**](docs/AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**updateOAuth2Client**](docs/AdminApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
@@ -142,6 +141,7 @@ Class | Method | HTTP request | Description
  - [EmptyResponse](docs/EmptyResponse.md)
  - [FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [GenericError](docs/GenericError.md)
+ - [HandledAuthenticationRequest](docs/HandledAuthenticationRequest.md)
  - [HandledConsentRequest](docs/HandledConsentRequest.md)
  - [HandledLoginRequest](docs/HandledLoginRequest.md)
  - [HealthNotReadyStatus](docs/HealthNotReadyStatus.md)
@@ -163,7 +163,6 @@ Class | Method | HTTP request | Description
  - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
  - [SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
- - [SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
  - [SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)

@@ -65,44 +65,14 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.PUT(ConsentPath+"/accept", h.AcceptConsentRequest)
 	admin.PUT(ConsentPath+"/reject", h.RejectConsentRequest)
 
-	admin.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
-	admin.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
-	admin.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
-	admin.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
+	admin.DELETE(SessionsPath+"/login", h.DeleteLoginSession)
+	admin.GET(SessionsPath+"/consent", h.GetConsentSessions)
+	admin.DELETE(SessionsPath+"/consent", h.DeleteConsentSession)
 
 	public.GET(SessionsPath+"/login/revoke", h.LogoutUser)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/consent/{user} admin revokeAllUserConsentSessions
-//
-// Revokes all previous consent sessions of a user
-//
-// This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-//
-//
-//     Consumes:
-//     - application/json
-//
-//     Produces:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       404: genericError
-//       500: genericError
-func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user := ps.ByName("user")
-	if err := h.r.ConsentManager().RevokeUserConsentSession(r.Context(), user); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// swagger:route DELETE /oauth2/auth/sessions/consent/{user}/{client} admin revokeUserClientConsentSessions
+// swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
 //
 // Revokes consent sessions of a user for a specific OAuth 2.0 Client
 //
@@ -120,25 +90,33 @@ func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Reques
 //
 //     Responses:
 //       204: emptyResponse
+//       400: genericError
 //       404: genericError
 //       500: genericError
-func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client := ps.ByName("client")
-	user := ps.ByName("user")
-	if client == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter client is not defined")))
+func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	user := r.URL.Query().Get("user")
+	client := r.URL.Query().Get("client")
+	if user == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "user" is not defined but should have been.`)))
 		return
 	}
 
-	if err := h.r.ConsentManager().RevokeUserClientConsentSession(r.Context(), user, client); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
+	if len(client) > 0 {
+		if err := h.r.ConsentManager().RevokeUserClientConsentSession(r.Context(), user, client); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+	} else {
+		if err := h.r.ConsentManager().RevokeUserConsentSession(r.Context(), user); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/sessions/consent/{user} admin listUserConsentSessions
+// swagger:route GET /oauth2/auth/sessions/consent admin listUserConsentSessions
 //
 // Lists all consent sessions of a user
 //
@@ -156,12 +134,13 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 //
 //     Responses:
 //       200: handledConsentRequestList
+//       400: genericError
 //       404: genericError
 //       500: genericError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user := ps.ByName("user")
+	user := r.URL.Query().Get("user")
 	if user == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "user" is not defined but should have been.`)))
 		return
 	}
 
@@ -197,7 +176,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	h.r.Writer().Write(w, r, a)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/login/{user} admin revokeAuthenticationSession
+// swagger:route DELETE /oauth2/auth/sessions/login admin revokeAuthenticationSession
 //
 // Invalidates a user's authentication session
 //
@@ -215,10 +194,15 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       204: emptyResponse
+//       400: genericError
 //       404: genericError
 //       500: genericError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user := ps.ByName("user")
+	user := r.URL.Query().Get("user")
+	if user == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "user" is not defined but should have been.`)))
+		return
+	}
 
 	if err := h.r.ConsentManager().RevokeUserAuthenticationSession(r.Context(), user); err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -251,11 +235,17 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: loginRequest
+//       400: genericError
 //       404: genericError
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
+
 	request, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -303,6 +293,10 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //       500: genericError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var p HandledLoginRequest
 	d := json.NewDecoder(r.Body)
@@ -382,6 +376,10 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       500: genericError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var p RequestDeniedError
 	d := json.NewDecoder(r.Body)
@@ -448,6 +446,10 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
@@ -498,6 +500,10 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //       500: genericError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var p HandledConsentRequest
 	d := json.NewDecoder(r.Body)
@@ -569,6 +575,10 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       500: genericError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var p RequestDeniedError
 	d := json.NewDecoder(r.Body)

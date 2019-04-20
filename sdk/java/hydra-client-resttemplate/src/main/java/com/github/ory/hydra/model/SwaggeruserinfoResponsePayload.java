@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * SwaggeruserinfoResponsePayload The userinfo response
  */
 @ApiModel(description = "SwaggeruserinfoResponsePayload The userinfo response")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T10:32:55.035+02:00")
 public class SwaggeruserinfoResponsePayload {
   @JsonProperty("birthdate")
   private String birthdate = null;

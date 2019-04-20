@@ -4,8 +4,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **challenge** | **string** | Challenge is the identifier (\&quot;authentication challenge\&quot;) of the consent authentication request. It is used to identify the session. | [optional] 
-**client** | [**\Hydra\SDK\Model\OAuth2Client**](OAuth2Client.md) |  | [optional] 
-**oidc_context** | [**\Hydra\SDK\Model\OpenIDConnectContext**](OpenIDConnectContext.md) |  | [optional] 
+**client** | [**\HydraSDK\Model\OAuth2Client**](OAuth2Client.md) |  | [optional] 
+**oidc_context** | [**\HydraSDK\Model\OpenIDConnectContext**](OpenIDConnectContext.md) |  | [optional] 
 **request_url** | **string** | RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters. | [optional] 
 **requested_access_token_audience** | **string[]** | RequestedScope contains the access token audience as requested by the OAuth 2.0 Client. | [optional] 
 **requested_scope** | **string[]** | RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client. | [optional] 

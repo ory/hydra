@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **contacts** | **string[]** | Contacts is a array of strings representing ways to contact people responsible for this client, typically email addresses. | [optional] 
 **created_at** | [**\DateTime**](\DateTime.md) | CreatedAt returns the timestamp of the client&#39;s creation. | [optional] 
 **grant_types** | **string[]** | GrantTypes is an array of grant types the client is allowed to use. | [optional] 
-**jwks** | [**\Hydra\SDK\Model\JSONWebKeySet**](JSONWebKeySet.md) |  | [optional] 
+**jwks** | [**\HydraSDK\Model\JSONWebKeySet**](JSONWebKeySet.md) |  | [optional] 
 **jwks_uri** | **string** | URL for the Client&#39;s JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the Client&#39;s encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | [optional] 
 **logo_uri** | **string** | LogoURI is an URL string that references a logo for the client. | [optional] 
 **owner** | **string** | Owner is a string identifying the owner of the OAuth 2.0 Client. | [optional] 

@@ -26,6 +26,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/pointerx"
+
 	"github.com/ory/hydra/sdk/go/hydra/client"
 	"github.com/ory/hydra/sdk/go/hydra/client/admin"
 	"github.com/ory/hydra/sdk/go/hydra/models"
@@ -102,7 +104,7 @@ func TestSDK(t *testing.T) {
 	_, err = sdk.Admin.RevokeAuthenticationSession(admin.NewRevokeAuthenticationSessionParams().WithUser("subject1"))
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.RevokeAllUserConsentSessions(admin.NewRevokeAllUserConsentSessionsParams().WithUser("subject1"))
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithUser("subject1"))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
@@ -112,7 +114,7 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
-	_, err = sdk.Admin.RevokeUserClientConsentSessions(admin.NewRevokeUserClientConsentSessionsParams().WithUser("subject2").WithClient("fk-client-2"))
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithUser("subject1").WithUser("subject2").WithClient(pointerx.String("fk-client-2")))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))

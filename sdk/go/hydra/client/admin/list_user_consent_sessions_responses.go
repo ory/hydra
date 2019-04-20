@@ -65,7 +65,7 @@ type ListUserConsentSessionsOK struct {
 }
 
 func (o *ListUserConsentSessionsOK) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent/{user}][%d] listUserConsentSessionsOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listUserConsentSessionsOK  %+v", 200, o.Payload)
 }
 
 func (o *ListUserConsentSessionsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -92,7 +92,7 @@ type ListUserConsentSessionsNotFound struct {
 }
 
 func (o *ListUserConsentSessionsNotFound) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent/{user}][%d] listUserConsentSessionsNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listUserConsentSessionsNotFound  %+v", 404, o.Payload)
 }
 
 func (o *ListUserConsentSessionsNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -121,7 +121,7 @@ type ListUserConsentSessionsInternalServerError struct {
 }
 
 func (o *ListUserConsentSessionsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent/{user}][%d] listUserConsentSessionsInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listUserConsentSessionsInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *ListUserConsentSessionsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

@@ -719,7 +719,7 @@
 
     /**
      * List OAuth 2.0 Clients
-     * This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+     * This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components. The \&quot;Link\&quot; header is also included in successful responses, which contains one or more links for pagination, formatted like so: &#39;&lt;https://hydra-url/admin/clients?limit&#x3D;{limit}&amp;offset&#x3D;{offset}&gt;; rel&#x3D;\&quot;{page}\&quot;&#39;, where page is one of the following applicable pages: &#39;first&#39;, &#39;next&#39;, &#39;last&#39;, and &#39;previous&#39;. Multiple links can be included in this header, and will be separated by a comma.
      * @param {Object} opts Optional parameters
      * @param {Number} opts.limit The maximum amount of policies returned.
      * @param {Number} opts.offset The offset from where to start looking.
@@ -764,7 +764,7 @@
 
     /**
      * Lists all consent sessions of a user
-     * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope
+     * This endpoint lists all user&#39;s granted consent sessions, including client and granted scope. The \&quot;Link\&quot; header is also included in successful responses, which contains one or more links for pagination, formatted like so: &#39;&lt;https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit&#x3D;{limit}&amp;offset&#x3D;{offset}&gt;; rel&#x3D;\&quot;{page}\&quot;&#39;, where page is one of the following applicable pages: &#39;first&#39;, &#39;next&#39;, &#39;last&#39;, and &#39;previous&#39;. Multiple links can be included in this header, and will be separated by a comma.
      * @param {String} user 
      * @param {module:api/AdminApi~listUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/PreviousConsentSession>}
@@ -779,9 +779,9 @@
 
 
       var pathParams = {
-        'user': user
       };
       var queryParams = {
+        'user': user
       };
       var headerParams = {
       };
@@ -794,7 +794,7 @@
       var returnType = [PreviousConsentSession];
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/consent/{user}', 'GET',
+        '/oauth2/auth/sessions/consent', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -899,51 +899,6 @@
     }
 
     /**
-     * Callback function to receive the result of the revokeAllUserConsentSessions operation.
-     * @callback module:api/AdminApi~revokeAllUserConsentSessionsCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * Revokes all previous consent sessions of a user
-     * This endpoint revokes a user&#39;s granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-     * @param {String} user 
-     * @param {module:api/AdminApi~revokeAllUserConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-    this.revokeAllUserConsentSessions = function(user, callback) {
-      var postBody = null;
-
-      // verify the required parameter 'user' is set
-      if (user === undefined || user === null) {
-        throw new Error("Missing the required parameter 'user' when calling revokeAllUserConsentSessions");
-      }
-
-
-      var pathParams = {
-        'user': user
-      };
-      var queryParams = {
-      };
-      var headerParams = {
-      };
-      var formParams = {
-      };
-
-      var authNames = [];
-      var contentTypes = ['application/json'];
-      var accepts = ['application/json'];
-      var returnType = null;
-
-      return this.apiClient.callApi(
-        '/oauth2/auth/sessions/consent/{user}', 'DELETE',
-        pathParams, queryParams, headerParams, formParams, postBody,
-        authNames, contentTypes, accepts, returnType, callback
-      );
-    }
-
-    /**
      * Callback function to receive the result of the revokeAuthenticationSession operation.
      * @callback module:api/AdminApi~revokeAuthenticationSessionCallback
      * @param {String} error Error message, if any.
@@ -967,9 +922,9 @@
 
 
       var pathParams = {
-        'user': user
       };
       var queryParams = {
+        'user': user
       };
       var headerParams = {
       };
@@ -982,15 +937,15 @@
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/login/{user}', 'DELETE',
+        '/oauth2/auth/sessions/login', 'DELETE',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
     }
 
     /**
-     * Callback function to receive the result of the revokeUserClientConsentSessions operation.
-     * @callback module:api/AdminApi~revokeUserClientConsentSessionsCallback
+     * Callback function to receive the result of the revokeConsentSessions operation.
+     * @callback module:api/AdminApi~revokeConsentSessionsCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
@@ -999,29 +954,26 @@
     /**
      * Revokes consent sessions of a user for a specific OAuth 2.0 Client
      * This endpoint revokes a user&#39;s granted consent sessions for a specific OAuth 2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
-     * @param {String} user 
-     * @param {String} client 
-     * @param {module:api/AdminApi~revokeUserClientConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
+     * @param {String} user The user who&#39;s consent sessions should be deleted.
+     * @param {Object} opts Optional parameters
+     * @param {String} opts.client If set, deletes only those consent sessions by the user that have been granted to the specified OAuth 2.0 Client ID
+     * @param {module:api/AdminApi~revokeConsentSessionsCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.revokeUserClientConsentSessions = function(user, client, callback) {
+    this.revokeConsentSessions = function(user, opts, callback) {
+      opts = opts || {};
       var postBody = null;
 
       // verify the required parameter 'user' is set
       if (user === undefined || user === null) {
-        throw new Error("Missing the required parameter 'user' when calling revokeUserClientConsentSessions");
-      }
-
-      // verify the required parameter 'client' is set
-      if (client === undefined || client === null) {
-        throw new Error("Missing the required parameter 'client' when calling revokeUserClientConsentSessions");
+        throw new Error("Missing the required parameter 'user' when calling revokeConsentSessions");
       }
 
 
       var pathParams = {
-        'user': user,
-        'client': client
       };
       var queryParams = {
+        'user': user,
+        'client': opts['client']
       };
       var headerParams = {
       };
@@ -1034,7 +986,7 @@
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/auth/sessions/consent/{user}/{client}', 'DELETE',
+        '/oauth2/auth/sessions/consent', 'DELETE',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

@@ -147,13 +147,13 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
 				require.NoError(t, clientManager.CreateClient(context.TODO(), &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)}))
 
-				require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+				require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
 					ID:              fmt.Sprintf("fk-login-session-%s", k),
 					AuthenticatedAt: time.Now().Round(time.Second).UTC(),
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}))
 
-				require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), &LoginRequest{
+				require.NoError(t, m.CreateLoginRequest(context.TODO(), &LoginRequest{
 					Challenge:       fmt.Sprintf("fk-login-challenge-%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)},
@@ -165,17 +165,17 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 		t.Run("case=auth-session", func(t *testing.T) {
 			for _, tc := range []struct {
-				s AuthenticationSession
+				s SubjectSession
 			}{
 				{
-					s: AuthenticationSession{
+					s: SubjectSession{
 						ID:              "session1",
 						AuthenticatedAt: time.Now().Round(time.Second).UTC(),
 						Subject:         "subject1",
 					},
 				},
 				{
-					s: AuthenticationSession{
+					s: SubjectSession{
 						ID:              "session2",
 						AuthenticatedAt: time.Now().Round(time.Minute).UTC(),
 						Subject:         "subject2",
@@ -183,13 +183,13 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				},
 			} {
 				t.Run("case=create-get-"+tc.s.ID, func(t *testing.T) {
-					_, err := m.GetAuthenticationSession(context.TODO(), tc.s.ID)
+					_, err := m.GetLoginSession(context.TODO(), tc.s.ID)
 					require.EqualError(t, err, x.ErrNotFound.Error())
 
-					err = m.CreateAuthenticationSession(context.TODO(), &tc.s)
+					err = m.CreateLoginSession(context.TODO(), &tc.s)
 					require.NoError(t, err)
 
-					got, err := m.GetAuthenticationSession(context.TODO(), tc.s.ID)
+					got, err := m.GetLoginSession(context.TODO(), tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got.ID)
 					assert.EqualValues(t, tc.s.AuthenticatedAt.Unix(), got.AuthenticatedAt.Unix())
@@ -207,10 +207,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				},
 			} {
 				t.Run("case=delete-get-"+tc.id, func(t *testing.T) {
-					err := m.DeleteAuthenticationSession(context.TODO(), tc.id)
+					err := m.DeleteLoginSession(context.TODO(), tc.id)
 					require.NoError(t, err)
 
-					_, err = m.GetAuthenticationSession(context.TODO(), tc.id)
+					_, err = m.GetLoginSession(context.TODO(), tc.id)
 					require.Error(t, err)
 				})
 			}
@@ -232,29 +232,29 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					c, h := MockAuthRequest(tc.key, tc.authAt)
 					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
 
-					_, err := m.GetAuthenticationRequest(context.TODO(), "challenge"+tc.key)
+					_, err := m.GetLoginRequest(context.TODO(), "challenge"+tc.key)
 					require.Error(t, err)
 
-					require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), c))
+					require.NoError(t, m.CreateLoginRequest(context.TODO(), c))
 
-					got1, err := m.GetAuthenticationRequest(context.TODO(), "challenge"+tc.key)
+					got1, err := m.GetLoginRequest(context.TODO(), "challenge"+tc.key)
 					require.NoError(t, err)
 					assert.False(t, got1.WasHandled)
 					compareAuthenticationRequest(t, c, got1)
 
-					got1, err = m.HandleAuthenticationRequest(context.TODO(), "challenge"+tc.key, h)
+					got1, err = m.HandleLoginRequest(context.TODO(), "challenge"+tc.key, h)
 					require.NoError(t, err)
 					compareAuthenticationRequest(t, c, got1)
 
-					got2, err := m.VerifyAndInvalidateAuthenticationRequest(context.TODO(), "verifier"+tc.key)
+					got2, err := m.VerifyAndInvalidateLoginRequest(context.TODO(), "verifier"+tc.key)
 					require.NoError(t, err)
 					compareAuthenticationRequest(t, c, got2.LoginRequest)
 					assert.Equal(t, c.Challenge, got2.Challenge)
 
-					_, err = m.VerifyAndInvalidateAuthenticationRequest(context.TODO(), "verifier"+tc.key)
+					_, err = m.VerifyAndInvalidateLoginRequest(context.TODO(), "verifier"+tc.key)
 					require.Error(t, err)
 
-					got1, err = m.GetAuthenticationRequest(context.TODO(), "challenge"+tc.key)
+					got1, err = m.GetLoginRequest(context.TODO(), "challenge"+tc.key)
 					require.NoError(t, err)
 					assert.True(t, got1.WasHandled)
 				})
@@ -340,19 +340,19 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		})
 
 		t.Run("case=revoke-auth-request", func(t *testing.T) {
-			require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+			require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
 				ID:              "rev-session-1",
 				AuthenticatedAt: time.Now(),
 				Subject:         "subject-1",
 			}))
 
-			require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+			require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
 				ID:              "rev-session-2",
 				AuthenticatedAt: time.Now(),
 				Subject:         "subject-2",
 			}))
 
-			require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+			require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
 				ID:              "rev-session-3",
 				AuthenticatedAt: time.Now(),
 				Subject:         "subject-1",
@@ -372,11 +372,11 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-					require.NoError(t, m.RevokeUserAuthenticationSession(context.TODO(), tc.subject))
+					require.NoError(t, m.RevokeSubjectLoginSession(context.TODO(), tc.subject))
 
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
-							_, err := m.GetAuthenticationSession(context.TODO(), id)
+							_, err := m.GetLoginSession(context.TODO(), id)
 							assert.EqualError(t, err, x.ErrNotFound.Error())
 						})
 					}
@@ -429,9 +429,9 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					assert.NoError(t, err)
 
 					if tc.client == "" {
-						require.NoError(t, m.RevokeUserConsentSession(context.TODO(), tc.subject))
+						require.NoError(t, m.RevokeSubjectConsentSession(context.TODO(), tc.subject))
 					} else {
-						require.NoError(t, m.RevokeUserClientConsentSession(context.TODO(), tc.subject, tc.client))
+						require.NoError(t, m.RevokeSubjectClientConsentSession(context.TODO(), tc.subject, tc.client))
 					}
 
 					for _, id := range tc.ids {
@@ -505,32 +505,32 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			}
 
 			t.Run("case=obfuscated", func(t *testing.T) {
-				got, err := m.GetForcedObfuscatedAuthenticationSession(context.TODO(), "fk-client-1", "obfuscated-1")
+				got, err := m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
 				require.EqualError(t, err, x.ErrNotFound.Error())
 
-				expect := &ForcedObfuscatedAuthenticationSession{
+				expect := &ForcedObfuscatedLoginSession{
 					ClientID:          "fk-client-1",
 					Subject:           "subject-1",
 					SubjectObfuscated: "obfuscated-1",
 				}
-				require.NoError(t, m.CreateForcedObfuscatedAuthenticationSession(context.TODO(), expect))
+				require.NoError(t, m.CreateForcedObfuscatedLoginSession(context.TODO(), expect))
 
-				got, err = m.GetForcedObfuscatedAuthenticationSession(context.TODO(), "fk-client-1", "obfuscated-1")
+				got, err = m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
 				require.NoError(t, err)
 				assert.EqualValues(t, expect, got)
 
-				expect = &ForcedObfuscatedAuthenticationSession{
+				expect = &ForcedObfuscatedLoginSession{
 					ClientID:          "fk-client-1",
 					Subject:           "subject-1",
 					SubjectObfuscated: "obfuscated-2",
 				}
-				require.NoError(t, m.CreateForcedObfuscatedAuthenticationSession(context.TODO(), expect))
+				require.NoError(t, m.CreateForcedObfuscatedLoginSession(context.TODO(), expect))
 
-				got, err = m.GetForcedObfuscatedAuthenticationSession(context.TODO(), "fk-client-1", "obfuscated-2")
+				got, err = m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-2")
 				require.NoError(t, err)
 				assert.EqualValues(t, expect, got)
 
-				got, err = m.GetForcedObfuscatedAuthenticationSession(context.TODO(), "fk-client-1", "obfuscated-1")
+				got, err = m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
 				require.EqualError(t, err, x.ErrNotFound.Error())
 			})
 

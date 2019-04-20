@@ -62,15 +62,15 @@ func TestSDK(t *testing.T) {
 
 	m := reg.ConsentManager()
 
-	require.NoError(t, m.CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+	require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
 		ID:      "session1",
 		Subject: "subject1",
 	}))
 
 	ar1, _ := MockAuthRequest("1", false)
 	ar2, _ := MockAuthRequest("2", false)
-	require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), ar1))
-	require.NoError(t, m.CreateAuthenticationRequest(context.TODO(), ar2))
+	require.NoError(t, m.CreateLoginRequest(context.TODO(), ar1))
+	require.NoError(t, m.CreateLoginRequest(context.TODO(), ar2))
 
 	cr1, hcr1 := MockConsentRequest("1", false, 0, false, false, false)
 	cr2, hcr2 := MockConsentRequest("2", false, 0, false, false, false)
@@ -101,10 +101,10 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar2, *arGot.Payload)
 
-	_, err = sdk.Admin.RevokeAuthenticationSession(admin.NewRevokeAuthenticationSessionParams().WithUser("subject1"))
+	_, err = sdk.Admin.RevokeAuthenticationSession(admin.NewRevokeAuthenticationSessionParams().WithSubject("subject1"))
 	require.NoError(t, err)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithUser("subject1"))
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1"))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge1"))
@@ -114,19 +114,19 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithUser("subject1").WithUser("subject2").WithClient(pointerx.String("fk-client-2")))
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithSubject("subject2").WithClient(pointerx.String("fk-client-2")))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithChallenge("challenge2"))
 	require.Error(t, err)
 
-	csGot, err := sdk.Admin.ListUserConsentSessions(admin.NewListUserConsentSessionsParams().WithUser("subject3"))
+	csGot, err := sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject3"))
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot.Payload))
 	cs := csGot.Payload[0]
 	assert.Equal(t, "challenge3", cs.ConsentRequest.Challenge)
 
-	csGot, err = sdk.Admin.ListUserConsentSessions(admin.NewListUserConsentSessionsParams().WithUser("subject2"))
+	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject2"))
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot.Payload))
 }

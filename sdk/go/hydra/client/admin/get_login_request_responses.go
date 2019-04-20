@@ -32,6 +32,13 @@ func (o *GetLoginRequestReader) ReadResponse(response runtime.ClientResponse, co
 		}
 		return result, nil
 
+	case 400:
+		result := NewGetLoginRequestBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	case 404:
 		result := NewGetLoginRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -78,6 +85,35 @@ func (o *GetLoginRequestOK) Error() string {
 func (o *GetLoginRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.LoginRequest)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetLoginRequestBadRequest creates a GetLoginRequestBadRequest with default headers values
+func NewGetLoginRequestBadRequest() *GetLoginRequestBadRequest {
+	return &GetLoginRequestBadRequest{}
+}
+
+/*GetLoginRequestBadRequest handles this case with default header values.
+
+genericError
+*/
+type GetLoginRequestBadRequest struct {
+	Payload *models.GenericError
+}
+
+func (o *GetLoginRequestBadRequest) Error() string {
+	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *GetLoginRequestBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

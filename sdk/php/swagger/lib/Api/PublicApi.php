@@ -454,32 +454,32 @@ class PublicApi
     }
 
     /**
-     * Operation revokeUserLoginCookie
+     * Operation revokeSubjectLoginCookie
      *
-     * Logs user out by deleting the session cookie
+     * Logs subject out by deleting the session cookie
      *
      * Client for Hydra
      *
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return void
      */
-    public function revokeUserLoginCookie()
+    public function revokeSubjectLoginCookie()
     {
-        list($response) = $this->revokeUserLoginCookieWithHttpInfo();
+        list($response) = $this->revokeSubjectLoginCookieWithHttpInfo();
         return $response;
     }
 
     /**
-     * Operation revokeUserLoginCookieWithHttpInfo
+     * Operation revokeSubjectLoginCookieWithHttpInfo
      *
-     * Logs user out by deleting the session cookie
+     * Logs subject out by deleting the session cookie
      *
      * Client for Hydra
      *
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
-    public function revokeUserLoginCookieWithHttpInfo()
+    public function revokeSubjectLoginCookieWithHttpInfo()
     {
         // parse inputs
         $resourcePath = "/oauth2/auth/sessions/login/revoke";

@@ -35,7 +35,6 @@ use \ArrayAccess;
  * SwaggerJwkCreateSet Class Doc Comment
  *
  * @category    Class
- * @description SwaggerJwkCreateSet swagger jwk create set
  * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
@@ -55,7 +54,7 @@ class SwaggerJwkCreateSet implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'body' => '\HydraSDK\Model\CreateRequest',
+        'body' => '\HydraSDK\Model\JsonWebKeySetGeneratorRequest',
         'set' => 'string'
     ];
 
@@ -175,7 +174,7 @@ class SwaggerJwkCreateSet implements ArrayAccess
 
     /**
      * Gets body
-     * @return \HydraSDK\Model\CreateRequest
+     * @return \HydraSDK\Model\JsonWebKeySetGeneratorRequest
      */
     public function getBody()
     {
@@ -184,7 +183,7 @@ class SwaggerJwkCreateSet implements ArrayAccess
 
     /**
      * Sets body
-     * @param \HydraSDK\Model\CreateRequest $body
+     * @param \HydraSDK\Model\JsonWebKeySetGeneratorRequest $body
      * @return $this
      */
     public function setBody($body)

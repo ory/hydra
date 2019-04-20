@@ -32,6 +32,13 @@ func (o *RevokeAuthenticationSessionReader) ReadResponse(response runtime.Client
 		}
 		return result, nil
 
+	case 400:
+		result := NewRevokeAuthenticationSessionBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	case 404:
 		result := NewRevokeAuthenticationSessionNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -69,6 +76,35 @@ func (o *RevokeAuthenticationSessionNoContent) Error() string {
 }
 
 func (o *RevokeAuthenticationSessionNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewRevokeAuthenticationSessionBadRequest creates a RevokeAuthenticationSessionBadRequest with default headers values
+func NewRevokeAuthenticationSessionBadRequest() *RevokeAuthenticationSessionBadRequest {
+	return &RevokeAuthenticationSessionBadRequest{}
+}
+
+/*RevokeAuthenticationSessionBadRequest handles this case with default header values.
+
+genericError
+*/
+type RevokeAuthenticationSessionBadRequest struct {
+	Payload *models.GenericError
+}
+
+func (o *RevokeAuthenticationSessionBadRequest) Error() string {
+	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *RevokeAuthenticationSessionBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

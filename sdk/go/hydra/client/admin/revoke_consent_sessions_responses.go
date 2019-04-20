@@ -32,6 +32,13 @@ func (o *RevokeConsentSessionsReader) ReadResponse(response runtime.ClientRespon
 		}
 		return result, nil
 
+	case 400:
+		result := NewRevokeConsentSessionsBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	case 404:
 		result := NewRevokeConsentSessionsNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -69,6 +76,35 @@ func (o *RevokeConsentSessionsNoContent) Error() string {
 }
 
 func (o *RevokeConsentSessionsNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	return nil
+}
+
+// NewRevokeConsentSessionsBadRequest creates a RevokeConsentSessionsBadRequest with default headers values
+func NewRevokeConsentSessionsBadRequest() *RevokeConsentSessionsBadRequest {
+	return &RevokeConsentSessionsBadRequest{}
+}
+
+/*RevokeConsentSessionsBadRequest handles this case with default header values.
+
+genericError
+*/
+type RevokeConsentSessionsBadRequest struct {
+	Payload *models.GenericError
+}
+
+func (o *RevokeConsentSessionsBadRequest) Error() string {
+	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *RevokeConsentSessionsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
 
 	return nil
 }

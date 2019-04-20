@@ -57,7 +57,7 @@ func TestLogout(t *testing.T) {
 
 	r.Handle("GET", "/login", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		cookie, _ := reg.CookieStore().Get(r, CookieAuthenticationName)
-		require.NoError(t, reg.ConsentManager().CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+		require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &SubjectSession{
 			ID:              sid,
 			Subject:         "foo",
 			AuthenticatedAt: time.Now(),
@@ -115,7 +115,7 @@ func TestGetLoginRequest(t *testing.T) {
 			reg := internal.NewRegistry(conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateAuthenticationRequest(context.TODO(), &LoginRequest{
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.TODO(), &LoginRequest{
 					Client:     &client.Client{ClientID: "client" + key},
 					Challenge:  challenge,
 					WasHandled: tc.handled,

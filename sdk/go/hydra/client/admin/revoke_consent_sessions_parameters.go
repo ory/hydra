@@ -62,15 +62,15 @@ for the revoke consent sessions operation typically these are written to a http.
 type RevokeConsentSessionsParams struct {
 
 	/*Client
-	  If set, deletes only those consent sessions by the user that have been granted to the specified OAuth 2.0 Client ID
+	  If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 
 	*/
 	Client *string
-	/*User
-	  The user who's consent sessions should be deleted.
+	/*Subject
+	  The subject (Subject) who's consent sessions should be deleted.
 
 	*/
-	User string
+	Subject string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -121,15 +121,15 @@ func (o *RevokeConsentSessionsParams) SetClient(client *string) {
 	o.Client = client
 }
 
-// WithUser adds the user to the revoke consent sessions params
-func (o *RevokeConsentSessionsParams) WithUser(user string) *RevokeConsentSessionsParams {
-	o.SetUser(user)
+// WithSubject adds the subject to the revoke consent sessions params
+func (o *RevokeConsentSessionsParams) WithSubject(subject string) *RevokeConsentSessionsParams {
+	o.SetSubject(subject)
 	return o
 }
 
-// SetUser adds the user to the revoke consent sessions params
-func (o *RevokeConsentSessionsParams) SetUser(user string) {
-	o.User = user
+// SetSubject adds the subject to the revoke consent sessions params
+func (o *RevokeConsentSessionsParams) SetSubject(subject string) {
+	o.Subject = subject
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -156,11 +156,11 @@ func (o *RevokeConsentSessionsParams) WriteToRequest(r runtime.ClientRequest, re
 
 	}
 
-	// query param user
-	qrUser := o.User
-	qUser := qrUser
-	if qUser != "" {
-		if err := r.SetQueryParam("user", qUser); err != nil {
+	// query param subject
+	qrSubject := o.Subject
+	qSubject := qrSubject
+	if qSubject != "" {
+		if err := r.SetQueryParam("subject", qSubject); err != nil {
 			return err
 		}
 	}

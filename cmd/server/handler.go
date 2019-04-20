@@ -36,7 +36,7 @@ import (
 	"github.com/ory/x/logrusx"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/meatballhat/negroni-logrus"
+	negronilogrus "github.com/meatballhat/negroni-logrus"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"

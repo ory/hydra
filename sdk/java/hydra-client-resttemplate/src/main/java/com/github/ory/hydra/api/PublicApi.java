@@ -27,7 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T10:32:55.035+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
 @Component("com.github.ory.hydra.api.PublicApi")
 public class PublicApi {
     private ApiClient apiClient;
@@ -203,14 +203,14 @@ public class PublicApi {
         apiClient.invokeAPI(path, HttpMethod.POST, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
-     * Logs user out by deleting the session cookie
-     * This endpoint deletes ths user&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the user&#39;s browser.
+     * Logs subject out by deleting the session cookie
+     * This endpoint deletes ths subject&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the subject&#39;s browser.
      * <p><b>302</b> - Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public void revokeUserLoginCookie() throws RestClientException {
+    public void revokeSubjectLoginCookie() throws RestClientException {
         Object postBody = null;
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/sessions/login/revoke").build().toUriString();

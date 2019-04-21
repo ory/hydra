@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerJSONWebKeyQuery SwaggerJSONWebKeyQuery swagger Json web key query
+// SwaggerJSONWebKeyQuery swagger JSON web key query
 // swagger:model SwaggerJSONWebKeyQuery
 type SwaggerJSONWebKeyQuery struct {
 

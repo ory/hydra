@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/ConsentRequest', 'model/ConsentRequestSessionData'], factory);
+    define(['ApiClient', 'model/ConsentRequest', 'model/ConsentRequestSession'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./ConsentRequest'), require('./ConsentRequestSessionData'));
+    module.exports = factory(require('../ApiClient'), require('./ConsentRequest'), require('./ConsentRequestSession'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.PreviousConsentSession = factory(root.OryHydra.ApiClient, root.OryHydra.ConsentRequest, root.OryHydra.ConsentRequestSessionData);
+    root.OryHydra.PreviousConsentSession = factory(root.OryHydra.ApiClient, root.OryHydra.ConsentRequest, root.OryHydra.ConsentRequestSession);
   }
-}(this, function(ApiClient, ConsentRequest, ConsentRequestSessionData) {
+}(this, function(ApiClient, ConsentRequest, ConsentRequestSession) {
   'use strict';
 
 
@@ -41,7 +41,7 @@
 
   /**
    * Constructs a new <code>PreviousConsentSession</code>.
-   * PreviousConsentSession PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
+   * The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
    * @alias module:model/PreviousConsentSession
    * @class
    */
@@ -83,7 +83,7 @@
         obj['remember_for'] = ApiClient.convertToType(data['remember_for'], 'Number');
       }
       if (data.hasOwnProperty('session')) {
-        obj['session'] = ConsentRequestSessionData.constructFromObject(data['session']);
+        obj['session'] = ConsentRequestSession.constructFromObject(data['session']);
       }
     }
     return obj;
@@ -114,7 +114,7 @@
    */
   exports.prototype['remember_for'] = undefined;
   /**
-   * @member {module:model/ConsentRequestSessionData} session
+   * @member {module:model/ConsentRequestSession} session
    */
   exports.prototype['session'] = undefined;
 

@@ -92,6 +92,21 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 	return c, h
 }
 
+func MockLogoutRequest(key string) (c *LogoutRequest) {
+	return &LogoutRequest{
+		Subject:               "subject" + key,
+		Challenge:             "challenge" + key,
+		Verifier:              "verifier" + key,
+		SessionID:             "session" + key,
+		RPInitiated:           true,
+		RequestURL:            "http://request-me/",
+		PostLogoutRedirectURI: "http://redirect-me/",
+		WasUsed:               false,
+		Accepted:              false,
+		Client:                &client.Client{ClientID: "fk-client-" + key},
+	}
+}
+
 func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginRequest) {
 	c = &LoginRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
@@ -105,8 +120,8 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		RequestURL:     "https://request-url/path" + key,
 		Skip:           true,
 		Challenge:      "challenge" + key,
-		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		Verifier:       "verifier" + key,
+		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		CSRF:           "csrf" + key,
 		SessionID:      "fk-login-session-" + key,
 	}
@@ -121,7 +136,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 
 	var authenticatedAt time.Time
 	if authAt {
-		time.Now().UTC().Add(-time.Minute)
+		authenticatedAt = time.Now().UTC().Add(-time.Minute)
 	}
 
 	h = &HandledLoginRequest{
@@ -534,8 +549,117 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				require.EqualError(t, err, x.ErrNotFound.Error())
 			})
 
+			t.Run("case=ListUserAuthenticatedClientsWithFrontChannelLogout", func(t *testing.T) {
+				for i := 0; i <= 10; i++ {
+					c, h := MockConsentRequest(fmt.Sprintf("ListUserAuthenticatedClientsWithFrontChannelLogout-%d", i), false, 0, false, false, false)
+					if i == 5 {
+						c.Client.FrontChannelLogoutURI = "http://some-url.com/"
+					}
+					c.Subject = "subjectListUserAuthenticatedClientsWithFrontChannelLogout"
+					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+
+					require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
+					_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
+					require.NoError(t, err)
+				}
+
+				clients, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), "subjectListUserAuthenticatedClientsWithFrontChannelLogout")
+				require.NoError(t, err)
+
+				require.Len(t, clients, 1)
+				assert.EqualValues(t, "http://some-url.com/", clients[0].FrontChannelLogoutURI)
+				assert.EqualValues(t, "fk-client-ListUserAuthenticatedClientsWithFrontChannelLogout-5", clients[0].ClientID)
+			})
+
+			t.Run("case=ListUserAuthenticatedClientsWithBackChannelLogout", func(t *testing.T) {
+				for i := 0; i <= 10; i++ {
+					c, h := MockConsentRequest(fmt.Sprintf("ListUserAuthenticatedClientsWithBackChannelLogout-%d", i), false, 0, false, false, false)
+					if i == 5 {
+						c.Client.BackChannelLogoutURI = "http://some-url.com/"
+					}
+					c.Subject = "subjectListUserAuthenticatedClientsWithBackChannelLogout"
+					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+
+					require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
+					_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
+					require.NoError(t, err)
+				}
+
+				clients, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), "subjectListUserAuthenticatedClientsWithBackChannelLogout")
+				require.NoError(t, err)
+
+				require.Len(t, clients, 1)
+				assert.EqualValues(t, "http://some-url.com/", clients[0].BackChannelLogoutURI)
+				assert.EqualValues(t, "fk-client-ListUserAuthenticatedClientsWithBackChannelLogout-5", clients[0].ClientID)
+			})
+
+			t.Run("case=LogoutRequest", func(t *testing.T) {
+				for k, tc := range []struct {
+					key    string
+					authAt bool
+				}{
+					{"LogoutRequest-1", true},
+					{"LogoutRequest-2", true},
+					{"LogoutRequest-3", true},
+					{"LogoutRequest-4", true},
+					{"LogoutRequest-5", true},
+					{"LogoutRequest-6", false},
+				} {
+					t.Run("key="+tc.key, func(t *testing.T) {
+						c := MockLogoutRequest(tc.key)
+						clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+
+						_, err := m.GetLogoutRequest(context.TODO(), "challenge"+tc.key)
+						require.Error(t, err)
+
+						require.NoError(t, m.CreateLogoutRequest(context.TODO(), c))
+
+						got2, err := m.GetLogoutRequest(context.TODO(), "challenge"+tc.key)
+						require.NoError(t, err)
+						assert.False(t, got2.WasUsed)
+						assert.False(t, got2.Accepted)
+						assert.EqualValues(t, c, got2)
+
+						if k%2 == 0 {
+							got2, err = m.AcceptLogoutRequest(context.TODO(), "challenge"+tc.key)
+							require.NoError(t, err)
+							assert.True(t, got2.Accepted)
+							compareLogoutRequest(t, c, got2)
+
+							got3, err := m.VerifyAndInvalidateLogoutRequest(context.TODO(), "verifier"+tc.key)
+							require.NoError(t, err)
+							assert.True(t, got3.Accepted)
+							assert.True(t, got3.WasUsed)
+							compareLogoutRequest(t, c, got3)
+
+							_, err = m.VerifyAndInvalidateLogoutRequest(context.TODO(), "verifier"+tc.key)
+							require.Error(t, err)
+
+							got2, err = m.GetLogoutRequest(context.TODO(), "challenge"+tc.key)
+							require.NoError(t, err)
+							compareLogoutRequest(t, got3, got2)
+							assert.True(t, got2.WasUsed)
+						} else {
+							require.NoError(t, m.RejectLogoutRequest(context.TODO(), "challenge"+tc.key))
+							_, err = m.GetLogoutRequest(context.TODO(), "challenge"+tc.key)
+							require.Error(t, err)
+						}
+					})
+				}
+			})
 		})
 	}
+}
+
+func compareLogoutRequest(t *testing.T, a, b *LogoutRequest) {
+	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
+	assert.EqualValues(t, a.Challenge, b.Challenge)
+	assert.EqualValues(t, a.Subject, b.Subject)
+	assert.EqualValues(t, a.Verifier, b.Verifier)
+	assert.EqualValues(t, a.RequestURL, b.RequestURL)
+	assert.EqualValues(t, a.PostLogoutRedirectURI, b.PostLogoutRedirectURI)
+	assert.EqualValues(t, a.RPInitiated, b.RPInitiated)
+	assert.EqualValues(t, a.SessionID, b.SessionID)
 }
 
 func compareAuthenticationRequest(t *testing.T, a, b *LoginRequest) {

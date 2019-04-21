@@ -93,6 +93,13 @@ type swaggerAcceptConsentRequest struct {
 	Body HandledConsentRequest
 }
 
+// swagger:parameters acceptLogoutRequest
+type swaggerAcceptLogoutRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"logout_challenge"`
+}
+
 // swagger:parameters rejectConsentRequest
 type swaggerRejectConsentRequest struct {
 	// in: query

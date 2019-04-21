@@ -3,12 +3,7 @@ SHELL=/bin/bash -o pipefail
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:
-		docker kill hydra_test_database_mysql || true
-		docker kill hydra_test_database_postgres || true
-		docker rm -f hydra_test_database_mysql || true
-		docker rm -f hydra_test_database_postgres || true
-		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		make test-resetdb
 		make sqlbin
 		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
 			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
@@ -25,6 +20,13 @@ test-resetdb:
 		docker rm -f hydra_test_database_postgres || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+
+# Resets the test databases
+.PHONY: test-e2e
+test-e2e:
+		make test-resetdb
+		npm i
+		npm run test
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

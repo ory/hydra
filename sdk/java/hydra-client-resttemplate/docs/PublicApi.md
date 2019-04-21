@@ -9,7 +9,6 @@ Method | HTTP request | Description
 [**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-[**userLogout**](PublicApi.md#userLogout) | **GET** /oauth2/auth/sessions/logout | Get a logout request
 [**userinfo**](PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 
@@ -254,47 +253,6 @@ null (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: application/x-www-form-urlencoded
- - **Accept**: application/json
-
-<a name="userLogout"></a>
-# **userLogout**
-> LogoutRequest userLogout()
-
-Get a logout request
-
-Use this endpoint to fetch a logout request.
-
-### Example
-```java
-// Import classes:
-//import com.github.ory.hydra.ApiException;
-//import com.github.ory.hydra.api.PublicApi;
-
-
-PublicApi apiInstance = new PublicApi();
-try {
-    LogoutRequest result = apiInstance.userLogout();
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling PublicApi#userLogout");
-    e.printStackTrace();
-}
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-[**LogoutRequest**](LogoutRequest.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="userinfo"></a>

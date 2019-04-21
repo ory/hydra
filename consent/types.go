@@ -39,6 +39,7 @@ type RequestHandlerResponse struct {
 	RedirectTo string `json:"redirect_to"`
 }
 
+// swagger:ignore
 type AuthenticationSession struct {
 	ID              string    `db:"id"`
 	AuthenticatedAt time.Time `db:"authenticated_at"`
@@ -257,7 +258,7 @@ type LogoutRequest struct {
 // Returned when the log out request was used.
 //
 // swagger:ignore
-type HandledLogoutRequest struct {
+type LogoutResult struct {
 	RedirectTo             string
 	FrontChannelLogoutURLs []string
 }

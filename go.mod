@@ -25,7 +25,6 @@ require (
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/gorilla/context v1.1.1
 	github.com/gorilla/handlers v1.4.0 // indirect
-	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.3
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
@@ -47,7 +46,7 @@ require (
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
-	github.com/ory/x v0.0.48
+	github.com/ory/x v0.0.50
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1

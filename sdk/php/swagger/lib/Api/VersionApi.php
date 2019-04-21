@@ -4,7 +4,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -26,18 +26,18 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Api;
+namespace HydraSDK\Api;
 
-use \Hydra\SDK\ApiClient;
-use \Hydra\SDK\ApiException;
-use \Hydra\SDK\Configuration;
-use \Hydra\SDK\ObjectSerializer;
+use \HydraSDK\ApiClient;
+use \HydraSDK\ApiException;
+use \HydraSDK\Configuration;
+use \HydraSDK\ObjectSerializer;
 
 /**
  * VersionApi Class Doc Comment
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -46,16 +46,16 @@ class VersionApi
     /**
      * API Client
      *
-     * @var \Hydra\SDK\ApiClient instance of the ApiClient
+     * @var \HydraSDK\ApiClient instance of the ApiClient
      */
     protected $apiClient;
 
     /**
      * Constructor
      *
-     * @param \Hydra\SDK\ApiClient|null $apiClient The api client to use
+     * @param \HydraSDK\ApiClient|null $apiClient The api client to use
      */
-    public function __construct(\Hydra\SDK\ApiClient $apiClient = null)
+    public function __construct(\HydraSDK\ApiClient $apiClient = null)
     {
         if ($apiClient === null) {
             $apiClient = new ApiClient();
@@ -67,7 +67,7 @@ class VersionApi
     /**
      * Get API client
      *
-     * @return \Hydra\SDK\ApiClient get the API client
+     * @return \HydraSDK\ApiClient get the API client
      */
     public function getApiClient()
     {
@@ -77,11 +77,11 @@ class VersionApi
     /**
      * Set the API client
      *
-     * @param \Hydra\SDK\ApiClient $apiClient set the API client
+     * @param \HydraSDK\ApiClient $apiClient set the API client
      *
      * @return VersionApi
      */
-    public function setApiClient(\Hydra\SDK\ApiClient $apiClient)
+    public function setApiClient(\HydraSDK\ApiClient $apiClient)
     {
         $this->apiClient = $apiClient;
         return $this;
@@ -94,8 +94,8 @@ class VersionApi
      *
      * Client for Hydra
      *
-     * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return \Hydra\SDK\Model\Version
+     * @throws \HydraSDK\ApiException on non-2xx response
+     * @return \HydraSDK\Model\Version
      */
     public function getVersion()
     {
@@ -110,8 +110,8 @@ class VersionApi
      *
      * Client for Hydra
      *
-     * @throws \Hydra\SDK\ApiException on non-2xx response
-     * @return array of \Hydra\SDK\Model\Version, HTTP status code, HTTP response headers (array of strings)
+     * @throws \HydraSDK\ApiException on non-2xx response
+     * @return array of \HydraSDK\Model\Version, HTTP status code, HTTP response headers (array of strings)
      */
     public function getVersionWithHttpInfo()
     {
@@ -142,15 +142,15 @@ class VersionApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\Hydra\SDK\Model\Version',
+                '\HydraSDK\Model\Version',
                 '/version'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\Version', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\Version', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\Version', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\Version', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }

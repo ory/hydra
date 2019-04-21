@@ -26,6 +26,8 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory/hydra/driver"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -44,7 +46,6 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/gorilla/securecookie"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -85,8 +86,9 @@ func noopHandler(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func newCookieJar() *cookiejar.Jar {
-	c, _ := cookiejar.New(&cookiejar.Options{})
+func newCookieJar(t *testing.T) *cookiejar.Jar {
+	c, err := cookiejar.New(&cookiejar.Options{})
+	require.NoError(t, err)
 	return c
 }
 
@@ -108,7 +110,167 @@ func acceptRequest(apiClient *hydra.OryHydra, consent *models.HandledConsentRequ
 	}
 }
 
-func TestStrategy(t *testing.T) {
+func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID string) http.CookieJar {
+	cj, err := cookiejar.New(&cookiejar.Options{})
+	require.NoError(t, err)
+	secrets := viper.GetStringSlice(configuration.ViperKeyGetCookieSecrets)
+	bs := make([][]byte, len(secrets))
+	for k, s := range secrets {
+		bs[k] = []byte(s)
+	}
+
+	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
+	cookie, _ := reg.CookieStore().Get(hr, CookieAuthenticationName)
+
+	cookie.Values[CookieAuthenticationSIDName] = sessionID
+	cookie.Options.HttpOnly = true
+
+	rw := httptest.NewRecorder()
+	require.NoError(t, cookie.Save(hr, rw))
+
+	cj.SetCookies(urlx.ParseOrPanic(u), rw.Result().Cookies())
+	return cj
+}
+
+func newValidAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID, subject string) http.CookieJar {
+	cj := newAuthCookieJar(t, reg, u, sessionID)
+	require.NoError(t, reg.ConsentManager().CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+		ID:              sessionID,
+		Subject:         subject,
+		AuthenticatedAt: time.Now(),
+	}))
+	return cj
+}
+
+func TestStrategyLogout(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistry(conf)
+
+	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
+	// jwts := reg.OpenIDJWTStrategy()
+
+	var lph func(w http.ResponseWriter, r *http.Request)
+	logoutProviderServer := mockProvider(&lph)
+
+	writer := reg.Writer()
+	handler := reg.ConsentHandler()
+	router := x.NewRouterAdmin()
+	handler.SetRoutes(router)
+	logoutApi := httptest.NewServer(router)
+	defer logoutApi.Close()
+
+	defaultRedirServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("redirected to default server"))
+	}))
+	defer defaultRedirServer.Close()
+
+	strategy := reg.ConsentStrategy()
+	logoutRouter := x.NewRouterPublic()
+	logoutRouter.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		res, err := strategy.HandleOpenIDConnectLogout(w, r)
+		if errors.Cause(err) == ErrAbortOAuth2Request {
+			// Do nothing
+			return
+		} else if err != nil {
+			writer.WriteError(w, r, err)
+			return
+		}
+		writer.Write(w, r, res)
+	})
+	logoutServer := httptest.NewServer(logoutRouter)
+	defer logoutServer.Close()
+
+	viper.Set(configuration.ViperKeyLogoutURL, logoutProviderServer.URL)
+	viper.Set(configuration.ViperKeyLogoutRedirectURL, defaultRedirServer.URL)
+
+	jar1 := newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-1", "logout-subject-1")
+	//jar2 := newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-2", "logout-subject-2")
+	//nonexistentCJ := newAuthCookieJar(t, logoutServer.URL, "i-do-not-exist")
+
+	apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(logoutServer.URL).Host})
+
+	for k, tc := range []struct {
+		d                string
+		params           url.Values
+		lph              func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
+		expectSession    *HandledConsentRequest
+		expectBody       string
+		expectStatusCode int
+		jar              http.CookieJar
+	}{
+		//{
+		//	d:                "should ignore / redirect non-rp initiated logout if no session exists",
+		//	lph:              noopHandler,
+		//	expectBody:       "redirected to default server",
+		//	expectStatusCode: http.StatusOK,
+		//},
+		//{
+		//	d:                "should fail if non-rp initiated logout is initiated with state (indicating rp-flow)",
+		//	params:           url.Values{"state": {"foobar"}},
+		//	lph:              noopHandler,
+		//	expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+		//	expectStatusCode: http.StatusBadRequest,
+		//},
+		//{
+		//	d:                "should fail if non-rp initiated logout is initiated with post_logout_redirect_uri (indicating rp-flow)",
+		//	params:           url.Values{"post_logout_redirect_uri": {"foobar"}},
+		//	lph:              noopHandler,
+		//	expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+		//	expectStatusCode: http.StatusBadRequest,
+		//},
+		//{
+		//	d:                "should ignore / redirect non-rp initiated logout if a session cookie exists but the session itself is no longer active",
+		//	lph:              noopHandler,
+		//	expectBody:       "redirected to default server",
+		//	expectStatusCode: http.StatusOK,
+		//	jar:              nonexistentCJ,
+		//},
+		{
+			d: "should redirect to logout provider if session exists and it's not rp-flow",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					c := r.URL.Query().Get("logout_challenge")
+					assert.NotEmpty(t, c)
+					logout, err := apiClient.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge(c))
+					require.NoError(t, err)
+					assert.Equal(t, "logout-subject-1", logout.Payload.Subject)
+					assert.Equal(t, "logout-session-1", logout.Payload.SessionID)
+
+					redir, err := apiClient.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge(c))
+					require.NoError(t, err)
+					require.NoError(t, json.NewEncoder(w).Encode(redir.Payload))
+				}
+			},
+			expectBody:       "redirected to logout provider",
+			expectStatusCode: http.StatusOK,
+			jar:              jar1,
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
+			if tc.lph != nil {
+				lph = tc.lph(t)
+			} else {
+				lph = noopHandler(t)
+			}
+
+			cl := &http.Client{
+				Jar: tc.jar,
+			}
+			resp, err := cl.Get(
+				logoutServer.URL + "?" + tc.params.Encode(),
+			)
+			require.NoError(t, err)
+			out, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+
+			assert.EqualValues(t, tc.expectStatusCode, resp.StatusCode, "%s\n%s", resp.Request.URL.String(), out)
+			assert.EqualValues(t, tc.expectBody, strings.Trim(string(out), "\n"), "%s\n%s", resp.Request.URL.String(), out)
+		})
+	}
+}
+
+func TestStrategyLoginConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
@@ -153,6 +315,7 @@ func TestStrategy(t *testing.T) {
 	router := x.NewRouterAdmin()
 	handler.SetRoutes(router, router.RouterPublic())
 	api := httptest.NewServer(router)
+	defer api.Close()
 
 	strategy := reg.ConsentStrategy()
 
@@ -166,15 +329,11 @@ func TestStrategy(t *testing.T) {
 
 	apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(api.URL).Host})
 
-	persistentCJ := newCookieJar()
-	persistentCJ2 := newCookieJar()
-	persistentCJ3 := newCookieJar()
-	persistentCJ4 := newCookieJar()
-
-	nonexistentCJ, _ := cookiejar.New(&cookiejar.Options{})
-	apURL, _ := url.Parse(ap.URL)
-	encoded, _ := securecookie.EncodeMulti(CookieAuthenticationName, map[interface{}]interface{}{CookieAuthenticationSIDName: "i-do-not-exist"}, securecookie.CodecsFromPairs([]byte("dummy-secret-yay"))...)
-	nonexistentCJ.SetCookies(apURL, []*http.Cookie{{Name: CookieAuthenticationName, Value: encoded}})
+	persistentCJ := newCookieJar(t)
+	persistentCJ2 := newCookieJar(t)
+	persistentCJ3 := newCookieJar(t)
+	persistentCJ4 := newCookieJar(t)
+	nonexistentCJ := newAuthCookieJar(t, reg, ap.URL, "i-do-not-exist")
 
 	for k, tc := range []struct {
 		setup                 func()
@@ -281,7 +440,7 @@ func TestStrategy(t *testing.T) {
 		},
 		{
 			d:     "This should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists",
-			jar:   newCookieJar(),
+			jar:   newCookieJar(t),
 			req:   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			lph:   passAuthentication(apiClient, false),
 			other: "display=page&ui_locales=de+en&acr_values=1+2",
@@ -310,7 +469,7 @@ func TestStrategy(t *testing.T) {
 		},
 		{
 			d:                     "This should fail because consent verifier was set but does not exist",
-			jar:                   newCookieJar(),
+			jar:                   newCookieJar(t),
 			cv:                    "invalid",
 			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			expectFinalStatusCode: http.StatusForbidden,
@@ -320,7 +479,7 @@ func TestStrategy(t *testing.T) {
 		{
 			d:   "This should fail because consent endpoints denies the request after login was granted",
 			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
-			jar: newCookieJar(),
+			jar: newCookieJar(t),
 			lph: passAuthentication(apiClient, false),
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -348,7 +507,7 @@ func TestStrategy(t *testing.T) {
 		{
 			d:                     "This should pass because login and consent have been granted",
 			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
-			jar:                   newCookieJar(),
+			jar:                   newCookieJar(t),
 			lph:                   passAuthentication(apiClient, false),
 			cph:                   passAuthorization(apiClient, false),
 			expectFinalStatusCode: http.StatusOK,
@@ -368,7 +527,7 @@ func TestStrategy(t *testing.T) {
 		{
 			d:                     "This should pass and set acr values properly",
 			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
-			jar:                   newCookieJar(),
+			jar:                   newCookieJar(t),
 			lph:                   passAuthentication(apiClient, false),
 			cph:                   passAuthorization(apiClient, false),
 			expectFinalStatusCode: http.StatusOK,
@@ -801,7 +960,7 @@ func TestStrategy(t *testing.T) {
 			d:                     "This should fail because prompt is none but no auth session exists",
 			prompt:                "none",
 			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
-			jar:                   newCookieJar(),
+			jar:                   newCookieJar(t),
 			expectFinalStatusCode: http.StatusBadRequest,
 			expectErrType:         []error{fosite.ErrLoginRequired},
 			expectErr:             []bool{true},
@@ -1004,7 +1163,7 @@ func TestStrategy(t *testing.T) {
 		{
 			d:                     "This should pass as regularly even though id_token_hint is expired",
 			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
-			jar:                   newCookieJar(),
+			jar:                   newCookieJar(t),
 			idTokenHint:           expiredAuthUserToken,
 			lph:                   passAuthentication(apiClient, false),
 			cph:                   passAuthorization(apiClient, false),
@@ -1261,7 +1420,7 @@ func TestStrategy(t *testing.T) {
 		{
 			d:           "This should fail because the user from the ID token does not match the user from the accept login request",
 			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
-			jar:         newCookieJar(),
+			jar:         newCookieJar(t),
 			idTokenHint: fooUserIDToken,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {

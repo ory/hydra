@@ -1181,6 +1181,52 @@
         }
       }
     },
+    "/oauth2/auth/requests/logout": {
+      "get": {
+        "description": "Use this endpoint to fetch a logout request.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get a logout request",
+        "operationId": "getLogoutRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Challenge",
+            "name": "logout_challenge",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "logoutRequest",
+            "schema": {
+              "$ref": "#/definitions/logoutRequest"
+            }
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
     "/oauth2/auth/requests/logout/accept": {
       "put": {
         "description": "When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.\nNo body is required.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
@@ -1196,6 +1242,22 @@
         ],
         "summary": "Accept a logout request",
         "operationId": "acceptLogoutRequest",
+        "parameters": [
+          {
+            "type": "string",
+            "x-go-name": "Challenge",
+            "name": "logout_challenge",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/acceptConsentRequest"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "completedRequest",
@@ -1441,43 +1503,6 @@
         "responses": {
           "204": {
             "$ref": "#/responses/emptyResponse"
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      }
-    },
-    "/oauth2/auth/sessions/logout": {
-      "get": {
-        "description": "Use this endpoint to fetch a logout request.",
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Get a logout request",
-        "operationId": "userLogout",
-        "responses": {
-          "201": {
-            "description": "logoutRequest",
-            "schema": {
-              "$ref": "#/definitions/logoutRequest"
-            }
           },
           "404": {
             "description": "genericError",
@@ -1814,7 +1839,7 @@
   "definitions": {
     "AuthenticationRequest": {
       "type": "object",
-      "title": "AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest Contains information on an ongoing login request.",
+      "title": "AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest AuthenticationRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"authentication challenge\") of the consent authentication request. It is used to\nidentify the session.",
@@ -1867,11 +1892,11 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "AuthenticationSession": {
-      "description": "AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession authentication session",
+      "description": "AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession authentication session",
       "type": "object",
       "properties": {
         "AuthenticatedAt": {
-          "description": "authenticated at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+          "description": "authenticated at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -1884,7 +1909,7 @@
           "type": "string"
         }
       },
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/consent"
     },
     "Client": {
       "type": "object",
@@ -2078,7 +2103,7 @@
     },
     "ConsentRequest": {
       "type": "object",
-      "title": "ConsentRequest Contains information on an ongoing consent request.",
+      "title": "ConsentRequest ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2150,7 +2175,7 @@
     },
     "ConsentRequestSessionData": {
       "type": "object",
-      "title": "ConsentRequestSessionData Used to pass session data to a consent request.",
+      "title": "ConsentRequestSessionData ConsentRequestSessionData ConsentRequestSessionData Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2172,11 +2197,11 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "FlushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
+      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time",
           "x-go-name": "NotAfter"
@@ -2186,7 +2211,7 @@
     },
     "HandledConsentRequest": {
       "type": "object",
-      "title": "HandledConsentRequest HandledConsentRequest HandledConsentRequest HandledConsentRequest The request payload used to accept a consent request.",
+      "title": "HandledConsentRequest HandledConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2223,7 +2248,7 @@
     },
     "HandledLoginRequest": {
       "type": "object",
-      "title": "HandledLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "HandledLoginRequest HandledLoginRequest HandledLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2472,7 +2497,7 @@
     },
     "LoginRequest": {
       "type": "object",
-      "title": "LoginRequest Contains information on an ongoing login request.",
+      "title": "LoginRequest LoginRequest LoginRequest LoginRequest LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2593,11 +2618,11 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
-          "$ref": "#/definitions/ConsentRequest"
+          "$ref": "#/definitions/consentRequest"
         },
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2627,14 +2652,14 @@
           "x-go-name": "RememberFor"
         },
         "session": {
-          "$ref": "#/definitions/ConsentRequestSessionData"
+          "$ref": "#/definitions/consentRequestSession"
         }
       },
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/consent"
     },
     "RequestDeniedError": {
       "type": "object",
-      "title": "RequestDeniedError RequestDeniedError RequestDeniedError RequestDeniedError RequestDeniedError The request payload used to accept a login or consent request.",
+      "title": "RequestDeniedError RequestDeniedError The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "name",
@@ -2667,7 +2692,7 @@
     },
     "RequestHandlerResponse": {
       "type": "object",
-      "title": "RequestHandlerResponse The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "RequestHandlerResponse RequestHandlerResponse The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -3068,10 +3093,10 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "emptyResponse": {
-      "description": "EmptyResponse Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201.",
+      "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201.",
       "type": "object",
       "x-go-name": "EmptyResponse",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra"
     },
     "flushInactiveOAuth2TokensRequest": {
       "type": "object",
@@ -3089,7 +3114,7 @@
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "GenericError Error response",
+      "title": "Error response",
       "required": [
         "error"
       ],
@@ -3121,7 +3146,7 @@
         }
       },
       "x-go-name": "GenericError",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra"
     },
     "healthNotReadyStatus": {
       "type": "object",
@@ -3816,7 +3841,6 @@
       "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
     },
     "swaggerJsonWebKeyQuery": {
-      "description": "SwaggerJSONWebKeyQuery swagger Json web key query",
       "type": "object",
       "required": [
         "kid",
@@ -3835,17 +3859,16 @@
         }
       },
       "x-go-name": "SwaggerJSONWebKeyQuery",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "swaggerJwkCreateSet": {
-      "description": "SwaggerJwkCreateSet swagger jwk create set",
       "type": "object",
       "required": [
         "set"
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/createRequest"
+          "$ref": "#/definitions/jsonWebKeySetGeneratorRequest"
         },
         "set": {
           "description": "The set\nin: path",
@@ -3854,10 +3877,9 @@
         }
       },
       "x-go-name": "SwaggerJwkCreateSet",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "swaggerJwkSetQuery": {
-      "description": "SwaggerJwkSetQuery swagger jwk set query",
       "type": "object",
       "required": [
         "set"
@@ -3870,17 +3892,16 @@
         }
       },
       "x-go-name": "SwaggerJwkSetQuery",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "swaggerJwkUpdateSet": {
-      "description": "SwaggerJwkUpdateSet swagger jwk update set",
       "type": "object",
       "required": [
         "set"
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/swaggerJSONWebKeySet"
+          "$ref": "#/definitions/JSONWebKeySet"
         },
         "set": {
           "description": "The set\nin: path",
@@ -3889,10 +3910,9 @@
         }
       },
       "x-go-name": "SwaggerJwkUpdateSet",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "swaggerJwkUpdateSetKey": {
-      "description": "SwaggerJwkUpdateSetKey swagger jwk update set key",
       "type": "object",
       "required": [
         "kid",
@@ -3900,7 +3920,7 @@
       ],
       "properties": {
         "Body": {
-          "$ref": "#/definitions/swaggerJSONWebKey"
+          "$ref": "#/definitions/JSONWebKey"
         },
         "kid": {
           "description": "The kid of the desired key\nin: path",
@@ -3914,7 +3934,7 @@
         }
       },
       "x-go-name": "SwaggerJwkUpdateSetKey",
-      "x-go-package": "github.com/ory/hydra/sdk/go/hydra/models"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "swaggerNotReadyStatus": {
       "description": "SwaggerNotReadyStatus swagger not ready status",

@@ -489,29 +489,28 @@ func (m *MemoryManager) GetLogoutRequest(ctx context.Context, challenge string) 
 
 func (m *MemoryManager) AcceptLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
 	m.m["logoutRequests"].Lock()
-	defer m.m["logoutRequests"].Unlock()
 	lr, ok := m.logoutRequests[challenge]
 	if !ok {
+		m.m["logoutRequests"].Unlock()
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	lr.Accepted = true
 	m.logoutRequests[challenge] = lr
 
+	m.m["logoutRequests"].Unlock()
 	return m.GetLogoutRequest(ctx, challenge)
 }
 
 func (m *MemoryManager) RejectLogoutRequest(ctx context.Context, challenge string) error {
 	m.m["logoutRequests"].Lock()
 	defer m.m["logoutRequests"].Unlock()
-	lr, ok := m.logoutRequests[challenge]
-	if !ok {
+
+	if _, ok := m.logoutRequests[challenge]; !ok {
 		return errors.WithStack(x.ErrNotFound)
 	}
 
-	lr.WasUsed = true
-	m.logoutRequests[challenge] = lr
-
+	delete(m.logoutRequests, challenge)
 	return nil
 }
 

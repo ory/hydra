@@ -115,7 +115,7 @@ func TestGetLogoutRequest(t *testing.T) {
 
 			h := NewHandler(reg, conf)
 			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic())
+			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 
@@ -154,7 +154,7 @@ func TestGetLoginRequest(t *testing.T) {
 
 			h := NewHandler(reg, conf)
 			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic())
+			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 
@@ -194,7 +194,7 @@ func TestGetConsentRequest(t *testing.T) {
 			h := NewHandler(reg, conf)
 
 			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic())
+			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
 

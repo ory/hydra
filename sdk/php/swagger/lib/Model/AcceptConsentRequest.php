@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * AcceptConsentRequest Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -58,7 +58,7 @@ class AcceptConsentRequest implements ArrayAccess
         'grant_scope' => 'string[]',
         'remember' => 'bool',
         'remember_for' => 'int',
-        'session' => '\Hydra\SDK\Model\ConsentRequestSession'
+        'session' => '\HydraSDK\Model\ConsentRequestSession'
     ];
 
     /**
@@ -270,7 +270,7 @@ class AcceptConsentRequest implements ArrayAccess
 
     /**
      * Gets session
-     * @return \Hydra\SDK\Model\ConsentRequestSession
+     * @return \HydraSDK\Model\ConsentRequestSession
      */
     public function getSession()
     {
@@ -279,7 +279,7 @@ class AcceptConsentRequest implements ArrayAccess
 
     /**
      * Sets session
-     * @param \Hydra\SDK\Model\ConsentRequestSession $session
+     * @param \HydraSDK\Model\ConsentRequestSession $session
      * @return $this
      */
     public function setSession($session)
@@ -340,10 +340,10 @@ class AcceptConsentRequest implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

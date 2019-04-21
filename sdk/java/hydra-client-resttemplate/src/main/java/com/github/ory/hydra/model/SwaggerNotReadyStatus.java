@@ -27,7 +27,7 @@ import java.util.Map;
  * SwaggerNotReadyStatus swagger not ready status
  */
 @ApiModel(description = "SwaggerNotReadyStatus swagger not ready status")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:51:30.376+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T17:21:35.197+02:00")
 public class SwaggerNotReadyStatus {
   @JsonProperty("errors")
   private Map<String, String> errors = null;

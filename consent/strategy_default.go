@@ -143,7 +143,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second * time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
 		}
@@ -879,11 +879,19 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 			return nil, err
 		}
 
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+
 		if session.Subject != lr.Subject {
 			// Seems like the session changed mid-flight, so we won't revoke the login cookie...
 			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
 			return nil, errors.WithStack(ErrAbortOAuth2Request)
 		}
+	}
+
+	if err := s.revokeAuthenticationSession(w, r); err != nil {
+		return nil, err
 	}
 
 	if err := s.executeBackChannelLogout(r.Context(), lr.Subject, lr.SessionID); err != nil {

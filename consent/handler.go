@@ -671,14 +671,8 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 		return
 	}
 
-	ru, err := url.Parse(c.RequestURL)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
-		RedirectTo: urlx.SetQuery(ru, url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(h.c.IssuerURL(), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
 

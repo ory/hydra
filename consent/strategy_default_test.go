@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/hydra/driver"
+	"github.com/urfave/negroni"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -156,7 +157,9 @@ func TestStrategyLogout(t *testing.T) {
 	handler := reg.ConsentHandler()
 	router := x.NewRouterAdmin()
 	handler.SetRoutes(router)
-	logoutApi := httptest.NewServer(router)
+	n := negroni.Classic()
+	n.UseHandler(router)
+	logoutApi := httptest.NewServer(n)
 	defer logoutApi.Close()
 
 	defaultRedirServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -175,19 +178,27 @@ func TestStrategyLogout(t *testing.T) {
 			writer.WriteError(w, r, err)
 			return
 		}
-		writer.Write(w, r, res)
+
+		http.Redirect(w, r,
+			urlx.CopyWithQuery(
+				urlx.ParseOrPanic(res.RedirectTo),
+				url.Values{"front_channel_logout_urls": {fmt.Sprintf("%s", res.FrontChannelLogoutURLs)}},
+			).String(),
+			http.StatusFound,
+		)
 	})
 	logoutServer := httptest.NewServer(logoutRouter)
 	defer logoutServer.Close()
 
+	viper.Set(configuration.ViperKeyIssuerURL, logoutServer.URL)
 	viper.Set(configuration.ViperKeyLogoutURL, logoutProviderServer.URL)
 	viper.Set(configuration.ViperKeyLogoutRedirectURL, defaultRedirServer.URL)
 
 	jar1 := newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-1", "logout-subject-1")
 	//jar2 := newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-2", "logout-subject-2")
-	//nonexistentCJ := newAuthCookieJar(t, logoutServer.URL, "i-do-not-exist")
+	nonexistentCJ := newAuthCookieJar(t, reg, logoutServer.URL, "i-do-not-exist")
 
-	apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(logoutServer.URL).Host})
+	apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(logoutApi.URL).Host})
 
 	for k, tc := range []struct {
 		d                string
@@ -198,33 +209,33 @@ func TestStrategyLogout(t *testing.T) {
 		expectStatusCode int
 		jar              http.CookieJar
 	}{
-		//{
-		//	d:                "should ignore / redirect non-rp initiated logout if no session exists",
-		//	lph:              noopHandler,
-		//	expectBody:       "redirected to default server",
-		//	expectStatusCode: http.StatusOK,
-		//},
-		//{
-		//	d:                "should fail if non-rp initiated logout is initiated with state (indicating rp-flow)",
-		//	params:           url.Values{"state": {"foobar"}},
-		//	lph:              noopHandler,
-		//	expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
-		//	expectStatusCode: http.StatusBadRequest,
-		//},
-		//{
-		//	d:                "should fail if non-rp initiated logout is initiated with post_logout_redirect_uri (indicating rp-flow)",
-		//	params:           url.Values{"post_logout_redirect_uri": {"foobar"}},
-		//	lph:              noopHandler,
-		//	expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
-		//	expectStatusCode: http.StatusBadRequest,
-		//},
-		//{
-		//	d:                "should ignore / redirect non-rp initiated logout if a session cookie exists but the session itself is no longer active",
-		//	lph:              noopHandler,
-		//	expectBody:       "redirected to default server",
-		//	expectStatusCode: http.StatusOK,
-		//	jar:              nonexistentCJ,
-		//},
+		{
+			d:                "should ignore / redirect non-rp initiated logout if no session exists",
+			lph:              noopHandler,
+			expectBody:       "redirected to default server",
+			expectStatusCode: http.StatusOK,
+		},
+		{
+			d:                "should fail if non-rp initiated logout is initiated with state (indicating rp-flow)",
+			params:           url.Values{"state": {"foobar"}},
+			lph:              noopHandler,
+			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+			expectStatusCode: http.StatusBadRequest,
+		},
+		{
+			d:                "should fail if non-rp initiated logout is initiated with post_logout_redirect_uri (indicating rp-flow)",
+			params:           url.Values{"post_logout_redirect_uri": {"foobar"}},
+			lph:              noopHandler,
+			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+			expectStatusCode: http.StatusBadRequest,
+		},
+		{
+			d:                "should ignore / redirect non-rp initiated logout if a session cookie exists but the session itself is no longer active",
+			lph:              noopHandler,
+			expectBody:       "redirected to default server",
+			expectStatusCode: http.StatusOK,
+			jar:              nonexistentCJ,
+		},
 		{
 			d: "should redirect to logout provider if session exists and it's not rp-flow",
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -238,10 +249,39 @@ func TestStrategyLogout(t *testing.T) {
 
 					redir, err := apiClient.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge(c))
 					require.NoError(t, err)
-					require.NoError(t, json.NewEncoder(w).Encode(redir.Payload))
+					assert.Contains(t, redir.Payload.RedirectTo, "?logout_verifier")
+					http.Redirect(w, r, redir.Payload.RedirectTo, http.StatusFound)
 				}
 			},
-			expectBody:       "redirected to logout provider",
+			expectBody:       "redirected to default server",
+			expectStatusCode: http.StatusOK,
+			jar:              jar1,
+		},
+		{
+			d: "should redirect to logout provider because the session has been removed previously",
+			lph:              noopHandler,
+			expectBody:       "redirected to default server",
+			expectStatusCode: http.StatusOK,
+			jar:              jar1,
+		},
+		{
+			d: "should redirect to logout provider if session exists and it's rp-flow",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					c := r.URL.Query().Get("logout_challenge")
+					assert.NotEmpty(t, c)
+					logout, err := apiClient.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge(c))
+					require.NoError(t, err)
+					assert.Equal(t, "logout-subject-1", logout.Payload.Subject)
+					assert.Equal(t, "logout-session-1", logout.Payload.SessionID)
+
+					redir, err := apiClient.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge(c))
+					require.NoError(t, err)
+					assert.Contains(t, redir.Payload.RedirectTo, "?logout_verifier")
+					http.Redirect(w, r, redir.Payload.RedirectTo, http.StatusFound)
+				}
+			},
+			expectBody:       "redirected to default server",
 			expectStatusCode: http.StatusOK,
 			jar:              jar1,
 		},

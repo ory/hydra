@@ -84,7 +84,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	}
 
 	var forcedObfuscatedUserID string
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedAuthenticationSession(ctx, c.GetID(), hintSubject); errors.Cause(err) == x.ErrNotFound {
+	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Cause(err) == x.ErrNotFound {
 		// do nothing
 	} else if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	return nil
 }
 
-func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*AuthenticationSession, error) {
+func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*SubjectSession, error) {
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
 	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	if err != nil {
@@ -831,7 +831,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	session, err := s.r.ConsentManager().GetAuthenticationSession(r.Context(), hintSid)
+	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), hintSid)
 	if errors.Cause(err) == sqlcon.ErrNoRows {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.

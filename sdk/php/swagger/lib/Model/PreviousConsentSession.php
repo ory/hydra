@@ -35,7 +35,7 @@ use \ArrayAccess;
  * PreviousConsentSession Class Doc Comment
  *
  * @category    Class
- * @description The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
+ * @description PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
  * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
@@ -60,7 +60,7 @@ class PreviousConsentSession implements ArrayAccess
         'grant_scope' => 'string[]',
         'remember' => 'bool',
         'remember_for' => 'int',
-        'session' => '\HydraSDK\Model\ConsentRequestSession'
+        'session' => '\HydraSDK\Model\ConsentRequestSessionData'
     ];
 
     /**
@@ -298,7 +298,7 @@ class PreviousConsentSession implements ArrayAccess
 
     /**
      * Gets session
-     * @return \HydraSDK\Model\ConsentRequestSession
+     * @return \HydraSDK\Model\ConsentRequestSessionData
      */
     public function getSession()
     {
@@ -307,7 +307,7 @@ class PreviousConsentSession implements ArrayAccess
 
     /**
      * Sets session
-     * @param \HydraSDK\Model\ConsentRequestSession $session
+     * @param \HydraSDK\Model\ConsentRequestSessionData $session
      * @return $this
      */
     public function setSession($session)

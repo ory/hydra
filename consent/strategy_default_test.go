@@ -134,7 +134,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID str
 
 func newValidAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID, subject string) http.CookieJar {
 	cj := newAuthCookieJar(t, reg, u, sessionID)
-	require.NoError(t, reg.ConsentManager().CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &SubjectSession{
 		ID:              sessionID,
 		Subject:         subject,
 		AuthenticatedAt: time.Now(),
@@ -313,7 +313,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 	writer := reg.Writer()
 	handler := reg.ConsentHandler()
 	router := x.NewRouterAdmin()
-	handler.SetRoutes(router, router.RouterPublic())
+	handler.SetRoutes(router)
 	api := httptest.NewServer(router)
 	defer api.Close()
 

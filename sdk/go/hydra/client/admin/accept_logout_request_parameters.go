@@ -15,8 +15,6 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 
 	strfmt "github.com/go-openapi/strfmt"
-
-	models "github.com/ory/hydra/sdk/go/hydra/models"
 )
 
 // NewAcceptLogoutRequestParams creates a new AcceptLogoutRequestParams object
@@ -63,8 +61,6 @@ for the accept logout request operation typically these are written to a http.Re
 */
 type AcceptLogoutRequestParams struct {
 
-	/*Body*/
-	Body *models.HandledConsentRequest
 	/*LogoutChallenge*/
 	LogoutChallenge string
 
@@ -106,17 +102,6 @@ func (o *AcceptLogoutRequestParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithBody adds the body to the accept logout request params
-func (o *AcceptLogoutRequestParams) WithBody(body *models.HandledConsentRequest) *AcceptLogoutRequestParams {
-	o.SetBody(body)
-	return o
-}
-
-// SetBody adds the body to the accept logout request params
-func (o *AcceptLogoutRequestParams) SetBody(body *models.HandledConsentRequest) {
-	o.Body = body
-}
-
 // WithLogoutChallenge adds the logoutChallenge to the accept logout request params
 func (o *AcceptLogoutRequestParams) WithLogoutChallenge(logoutChallenge string) *AcceptLogoutRequestParams {
 	o.SetLogoutChallenge(logoutChallenge)
@@ -135,12 +120,6 @@ func (o *AcceptLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg 
 		return err
 	}
 	var res []error
-
-	if o.Body != nil {
-		if err := r.SetBodyParam(o.Body); err != nil {
-			return err
-		}
-	}
 
 	// query param logout_challenge
 	qrLogoutChallenge := o.LogoutChallenge

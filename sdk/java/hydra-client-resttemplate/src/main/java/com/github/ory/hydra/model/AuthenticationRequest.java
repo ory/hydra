@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * AuthenticationRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T17:21:35.197+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T19:54:17.304+02:00")
 public class AuthenticationRequest {
   @JsonProperty("challenge")
   private String challenge = null;

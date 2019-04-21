@@ -26,7 +26,7 @@ import java.util.List;
  * SwaggerJSONWebKey swagger JSON web key
  */
 @ApiModel(description = "SwaggerJSONWebKey swagger JSON web key")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T17:21:35.197+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T19:54:17.304+02:00")
 public class SwaggerJSONWebKey {
   @JsonProperty("alg")
   private String alg = null;

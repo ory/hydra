@@ -35,7 +35,6 @@ use \ArrayAccess;
  * SwaggerRevokeOAuth2TokenParameters Class Doc Comment
  *
  * @category    Class
- * @description SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters
  * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen

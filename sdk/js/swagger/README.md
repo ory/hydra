@@ -137,13 +137,12 @@ Class | Method | HTTP request | Description
 *OryHydra.AdminApi* | [**getOAuth2Client**](docs/AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 *OryHydra.AdminApi* | [**introspectOAuth2Token**](docs/AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *OryHydra.AdminApi* | [**listOAuth2Clients**](docs/AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
-*OryHydra.AdminApi* | [**listUserConsentSessions**](docs/AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+*OryHydra.AdminApi* | [**listSubjectConsentSessions**](docs/AdminApi.md#listSubjectConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
 *OryHydra.AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *OryHydra.AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
 *OryHydra.AdminApi* | [**rejectLogoutRequest**](docs/AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
-*OryHydra.AdminApi* | [**revokeAllUserConsentSessions**](docs/AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-*OryHydra.AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates all login sessions of a certain user
-*OryHydra.AdminApi* | [**revokeUserClientConsentSessions**](docs/AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
+*OryHydra.AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login | Invalidates all login sessions of a certain user Invalidates a subject&#39;s authentication session
+*OryHydra.AdminApi* | [**revokeConsentSessions**](docs/AdminApi.md#revokeConsentSessions) | **DELETE** /oauth2/auth/sessions/consent | Revokes consent sessions of a subject for a specific OAuth 2.0 Client
 *OryHydra.AdminApi* | [**updateJsonWebKey**](docs/AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *OryHydra.AdminApi* | [**updateJsonWebKeySet**](docs/AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *OryHydra.AdminApi* | [**updateOAuth2Client**](docs/AdminApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
@@ -174,6 +173,7 @@ Class | Method | HTTP request | Description
  - [OryHydra.EmptyResponse](docs/EmptyResponse.md)
  - [OryHydra.FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [OryHydra.GenericError](docs/GenericError.md)
+ - [OryHydra.HandledAuthenticationRequest](docs/HandledAuthenticationRequest.md)
  - [OryHydra.HandledConsentRequest](docs/HandledConsentRequest.md)
  - [OryHydra.HandledLoginRequest](docs/HandledLoginRequest.md)
  - [OryHydra.HealthNotReadyStatus](docs/HealthNotReadyStatus.md)
@@ -196,6 +196,7 @@ Class | Method | HTTP request | Description
  - [OryHydra.SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
  - [OryHydra.SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
  - [OryHydra.SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
+ - [OryHydra.SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
  - [OryHydra.SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [OryHydra.SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [OryHydra.SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)

@@ -35,7 +35,6 @@ use \ArrayAccess;
  * SwaggerOAuthIntrospectionRequest Class Doc Comment
  *
  * @category    Class
- * @description SwaggerOAuthIntrospectionRequest swagger o auth introspection request
  * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen

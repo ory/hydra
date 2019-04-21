@@ -28,17 +28,17 @@ type Client struct {
 AcceptConsentRequest accepts an consent request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.
+to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to
+The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 
-The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted
+The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 or rejected the request.
 
-This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf.
+This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
 The consent provider includes additional information, such as session data for access and ID tokens, and if the
 consent request should be used as basis for future requests.
 
@@ -73,15 +73,15 @@ func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*Acce
 AcceptLoginRequest accepts an login request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the user a login screen")
-a user (in OAuth2 the proper name for user is "resource owner").
+(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+a subject (in OAuth2 the proper name for subject is "resource owner").
 
-The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login
+The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 
-This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as
-the user's ID and if ORY Hydra should remember the user's user agent for future authentication attempts by setting
+This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as
+the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting
 a cookie.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
@@ -340,14 +340,14 @@ func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensPara
 GetConsentRequest gets consent request information
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.
+to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to
+The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 
-The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted
+The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 or rejected the request.
 */
 func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsentRequestOK, error) {
@@ -441,11 +441,11 @@ func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKe
 GetLoginRequest gets an login request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the user a login screen")
-a user (in OAuth2 the proper name for user is "resource owner").
+(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+a subject (in OAuth2 the proper name for subject is "resource owner").
 
-The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login
+The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 */
 func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginRequestOK, error) {
@@ -603,34 +603,34 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2
 }
 
 /*
-ListUserConsentSessions lists all consent sessions of a user
+ListSubjectConsentSessions lists all consent sessions of a subject
 
-This endpoint lists all user's granted consent sessions, including client and granted scope.
-The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+This endpoint lists all subject's granted consent sessions, including client and granted scope.
+The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 */
-func (a *Client) ListUserConsentSessions(params *ListUserConsentSessionsParams) (*ListUserConsentSessionsOK, error) {
+func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams) (*ListSubjectConsentSessionsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewListUserConsentSessionsParams()
+		params = NewListSubjectConsentSessionsParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "listUserConsentSessions",
+		ID:                 "listSubjectConsentSessions",
 		Method:             "GET",
-		PathPattern:        "/oauth2/auth/sessions/consent/{user}",
+		PathPattern:        "/oauth2/auth/sessions/consent",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &ListUserConsentSessionsReader{formats: a.formats},
+		Reader:             &ListSubjectConsentSessionsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*ListUserConsentSessionsOK), nil
+	return result.(*ListSubjectConsentSessionsOK), nil
 
 }
 
@@ -638,17 +638,17 @@ func (a *Client) ListUserConsentSessions(params *ListUserConsentSessionsParams) 
 RejectConsentRequest rejects an consent request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.
+to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to
+The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 
-The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted
+The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 or rejected the request.
 
-This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf.
+This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
 The consent provider must include a reason why the consent was not granted.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
@@ -682,14 +682,14 @@ func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams) (*Reje
 RejectLoginRequest rejects a login request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the user a login screen")
-a user (in OAuth2 the proper name for user is "resource owner").
+(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+a subject (in OAuth2 the proper name for subject is "resource owner").
 
-The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login
+The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 
-This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication
+This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
 was be denied.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
@@ -753,39 +753,9 @@ func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*Reject
 }
 
 /*
-RevokeAllUserConsentSessions revokes all previous consent sessions of a user
+RevokeAuthenticationSession invalidates all login sessions of a certain user invalidates a subject s authentication session
 
-This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-*/
-func (a *Client) RevokeAllUserConsentSessions(params *RevokeAllUserConsentSessionsParams) (*RevokeAllUserConsentSessionsNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRevokeAllUserConsentSessionsParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "revokeAllUserConsentSessions",
-		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/consent/{user}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RevokeAllUserConsentSessionsReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*RevokeAllUserConsentSessionsNoContent), nil
-
-}
-
-/*
-RevokeAuthenticationSession invalidates all login sessions of a certain user
-
-This endpoint invalidates a user's authentication session. After revoking the authentication session, the user
+This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
 */
 func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams) (*RevokeAuthenticationSessionNoContent, error) {
@@ -797,7 +767,7 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "revokeAuthenticationSession",
 		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/login/{user}",
+		PathPattern:        "/oauth2/auth/sessions/login",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -814,33 +784,33 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
 }
 
 /*
-RevokeUserClientConsentSessions revokes consent sessions of a user for a specific o auth 2 0 client
+RevokeConsentSessions revokes consent sessions of a subject for a specific o auth 2 0 client
 
-This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
+This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 associated OAuth 2.0 Access Tokens.
 */
-func (a *Client) RevokeUserClientConsentSessions(params *RevokeUserClientConsentSessionsParams) (*RevokeUserClientConsentSessionsNoContent, error) {
+func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*RevokeConsentSessionsNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewRevokeUserClientConsentSessionsParams()
+		params = NewRevokeConsentSessionsParams()
 	}
 
 	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "revokeUserClientConsentSessions",
+		ID:                 "revokeConsentSessions",
 		Method:             "DELETE",
-		PathPattern:        "/oauth2/auth/sessions/consent/{user}/{client}",
+		PathPattern:        "/oauth2/auth/sessions/consent",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &RevokeUserClientConsentSessionsReader{formats: a.formats},
+		Reader:             &RevokeConsentSessionsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RevokeUserClientConsentSessionsNoContent), nil
+	return result.(*RevokeConsentSessionsNoContent), nil
 
 }
 

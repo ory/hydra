@@ -55,7 +55,7 @@ func TestSDK(t *testing.T) {
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)
 
-	h.SetRoutes(router.RouterAdmin(), router)
+	h.SetRoutes(router.RouterAdmin())
 	ts := httptest.NewServer(router)
 
 	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})

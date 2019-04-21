@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Swaggeroauth2TokenParameters Swaggeroauth2TokenParameters swaggeroauth2 token parameters
-// swagger:model Swaggeroauth2TokenParameters
+// Swaggeroauth2TokenParameters swaggeroauth2 token parameters
+// swagger:model swaggeroauth2TokenParameters
 type Swaggeroauth2TokenParameters struct {
 
 	// in: formData

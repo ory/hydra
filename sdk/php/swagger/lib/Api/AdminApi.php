@@ -293,13 +293,12 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $logout_challenge  (required)
-     * @param \HydraSDK\Model\AcceptConsentRequest $body  (optional)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return \HydraSDK\Model\CompletedRequest
      */
-    public function acceptLogoutRequest($logout_challenge, $body = null)
+    public function acceptLogoutRequest($logout_challenge)
     {
-        list($response) = $this->acceptLogoutRequestWithHttpInfo($logout_challenge, $body);
+        list($response) = $this->acceptLogoutRequestWithHttpInfo($logout_challenge);
         return $response;
     }
 
@@ -311,11 +310,10 @@ class AdminApi
      * Client for Hydra
      *
      * @param string $logout_challenge  (required)
-     * @param \HydraSDK\Model\AcceptConsentRequest $body  (optional)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return array of \HydraSDK\Model\CompletedRequest, HTTP status code, HTTP response headers (array of strings)
      */
-    public function acceptLogoutRequestWithHttpInfo($logout_challenge, $body = null)
+    public function acceptLogoutRequestWithHttpInfo($logout_challenge)
     {
         // verify the required parameter 'logout_challenge' is set
         if ($logout_challenge === null) {
@@ -336,11 +334,6 @@ class AdminApi
         // query params
         if ($logout_challenge !== null) {
             $queryParams['logout_challenge'] = $this->apiClient->getSerializer()->toQueryValue($logout_challenge);
-        }
-        // body params
-        $_tempBody = null;
-        if (isset($body)) {
-            $_tempBody = $body;
         }
 
         // for model (json/xml)
@@ -1329,6 +1322,10 @@ class AdminApi
                     $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\LoginRequest', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
+                case 400:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
                 case 404:
                     $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
@@ -1724,41 +1721,41 @@ class AdminApi
     }
 
     /**
-     * Operation listUserConsentSessions
+     * Operation listSubjectConsentSessions
      *
-     * Lists all consent sessions of a user
+     * Lists all consent sessions of a subject
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
+     * @param string $subject  (required)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return \HydraSDK\Model\PreviousConsentSession[]
      */
-    public function listUserConsentSessions($user)
+    public function listSubjectConsentSessions($subject)
     {
-        list($response) = $this->listUserConsentSessionsWithHttpInfo($user);
+        list($response) = $this->listSubjectConsentSessionsWithHttpInfo($subject);
         return $response;
     }
 
     /**
-     * Operation listUserConsentSessionsWithHttpInfo
+     * Operation listSubjectConsentSessionsWithHttpInfo
      *
-     * Lists all consent sessions of a user
+     * Lists all consent sessions of a subject
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
+     * @param string $subject  (required)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return array of \HydraSDK\Model\PreviousConsentSession[], HTTP status code, HTTP response headers (array of strings)
      */
-    public function listUserConsentSessionsWithHttpInfo($user)
+    public function listSubjectConsentSessionsWithHttpInfo($subject)
     {
-        // verify the required parameter 'user' is set
-        if ($user === null) {
-            throw new \InvalidArgumentException('Missing the required parameter $user when calling listUserConsentSessions');
+        // verify the required parameter 'subject' is set
+        if ($subject === null) {
+            throw new \InvalidArgumentException('Missing the required parameter $subject when calling listSubjectConsentSessions');
         }
         // parse inputs
-        $resourcePath = "/oauth2/auth/sessions/consent/{user}";
+        $resourcePath = "/oauth2/auth/sessions/consent";
         $httpBody = '';
         $queryParams = [];
         $headerParams = [];
@@ -1769,13 +1766,9 @@ class AdminApi
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
-        // path params
-        if ($user !== null) {
-            $resourcePath = str_replace(
-                "{" . "user" . "}",
-                $this->apiClient->getSerializer()->toPathValue($user),
-                $resourcePath
-            );
+        // query params
+        if ($subject !== null) {
+            $queryParams['subject'] = $this->apiClient->getSerializer()->toQueryValue($subject);
         }
 
         // for model (json/xml)
@@ -1793,7 +1786,7 @@ class AdminApi
                 $httpBody,
                 $headerParams,
                 '\HydraSDK\Model\PreviousConsentSession[]',
-                '/oauth2/auth/sessions/consent/{user}'
+                '/oauth2/auth/sessions/consent'
             );
 
             return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\PreviousConsentSession[]', $httpHeader), $statusCode, $httpHeader];
@@ -1801,6 +1794,10 @@ class AdminApi
             switch ($e->getCode()) {
                 case 200:
                     $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\PreviousConsentSession[]', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+                case 400:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 404:
@@ -2109,131 +2106,41 @@ class AdminApi
     }
 
     /**
-     * Operation revokeAllUserConsentSessions
-     *
-     * Revokes all previous consent sessions of a user
-     *
-     * Client for Hydra
-     *
-     * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return void
-     */
-    public function revokeAllUserConsentSessions($user)
-    {
-        list($response) = $this->revokeAllUserConsentSessionsWithHttpInfo($user);
-        return $response;
-    }
-
-    /**
-     * Operation revokeAllUserConsentSessionsWithHttpInfo
-     *
-     * Revokes all previous consent sessions of a user
-     *
-     * Client for Hydra
-     *
-     * @param string $user  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of null, HTTP status code, HTTP response headers (array of strings)
-     */
-    public function revokeAllUserConsentSessionsWithHttpInfo($user)
-    {
-        // verify the required parameter 'user' is set
-        if ($user === null) {
-            throw new \InvalidArgumentException('Missing the required parameter $user when calling revokeAllUserConsentSessions');
-        }
-        // parse inputs
-        $resourcePath = "/oauth2/auth/sessions/consent/{user}";
-        $httpBody = '';
-        $queryParams = [];
-        $headerParams = [];
-        $formParams = [];
-        $_header_accept = $this->apiClient->selectHeaderAccept(['application/json']);
-        if (!is_null($_header_accept)) {
-            $headerParams['Accept'] = $_header_accept;
-        }
-        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
-
-        // path params
-        if ($user !== null) {
-            $resourcePath = str_replace(
-                "{" . "user" . "}",
-                $this->apiClient->getSerializer()->toPathValue($user),
-                $resourcePath
-            );
-        }
-
-        // for model (json/xml)
-        if (isset($_tempBody)) {
-            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
-        } elseif (count($formParams) > 0) {
-            $httpBody = $formParams; // for HTTP post (form)
-        }
-        // make the API Call
-        try {
-            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
-                $resourcePath,
-                'DELETE',
-                $queryParams,
-                $httpBody,
-                $headerParams,
-                null,
-                '/oauth2/auth/sessions/consent/{user}'
-            );
-
-            return [null, $statusCode, $httpHeader];
-        } catch (ApiException $e) {
-            switch ($e->getCode()) {
-                case 404:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
-                    $e->setResponseObject($data);
-                    break;
-                case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
-                    $e->setResponseObject($data);
-                    break;
-            }
-
-            throw $e;
-        }
-    }
-
-    /**
      * Operation revokeAuthenticationSession
      *
-     * Invalidates all login sessions of a certain user
+     * Invalidates all login sessions of a certain user Invalidates a subject's authentication session
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
+     * @param string $subject  (required)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return void
      */
-    public function revokeAuthenticationSession($user)
+    public function revokeAuthenticationSession($subject)
     {
-        list($response) = $this->revokeAuthenticationSessionWithHttpInfo($user);
+        list($response) = $this->revokeAuthenticationSessionWithHttpInfo($subject);
         return $response;
     }
 
     /**
      * Operation revokeAuthenticationSessionWithHttpInfo
      *
-     * Invalidates all login sessions of a certain user
+     * Invalidates all login sessions of a certain user Invalidates a subject's authentication session
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
+     * @param string $subject  (required)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
-    public function revokeAuthenticationSessionWithHttpInfo($user)
+    public function revokeAuthenticationSessionWithHttpInfo($subject)
     {
-        // verify the required parameter 'user' is set
-        if ($user === null) {
-            throw new \InvalidArgumentException('Missing the required parameter $user when calling revokeAuthenticationSession');
+        // verify the required parameter 'subject' is set
+        if ($subject === null) {
+            throw new \InvalidArgumentException('Missing the required parameter $subject when calling revokeAuthenticationSession');
         }
         // parse inputs
-        $resourcePath = "/oauth2/auth/sessions/login/{user}";
+        $resourcePath = "/oauth2/auth/sessions/login";
         $httpBody = '';
         $queryParams = [];
         $headerParams = [];
@@ -2244,13 +2151,9 @@ class AdminApi
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
-        // path params
-        if ($user !== null) {
-            $resourcePath = str_replace(
-                "{" . "user" . "}",
-                $this->apiClient->getSerializer()->toPathValue($user),
-                $resourcePath
-            );
+        // query params
+        if ($subject !== null) {
+            $queryParams['subject'] = $this->apiClient->getSerializer()->toQueryValue($subject);
         }
 
         // for model (json/xml)
@@ -2268,12 +2171,16 @@ class AdminApi
                 $httpBody,
                 $headerParams,
                 null,
-                '/oauth2/auth/sessions/login/{user}'
+                '/oauth2/auth/sessions/login'
             );
 
             return [null, $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
+                case 400:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
                 case 404:
                     $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
@@ -2289,47 +2196,43 @@ class AdminApi
     }
 
     /**
-     * Operation revokeUserClientConsentSessions
+     * Operation revokeConsentSessions
      *
-     * Revokes consent sessions of a user for a specific OAuth 2.0 Client
+     * Revokes consent sessions of a subject for a specific OAuth 2.0 Client
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
-     * @param string $client  (required)
+     * @param string $subject The subject (Subject) who&#39;s consent sessions should be deleted. (required)
+     * @param string $client If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID (optional)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return void
      */
-    public function revokeUserClientConsentSessions($user, $client)
+    public function revokeConsentSessions($subject, $client = null)
     {
-        list($response) = $this->revokeUserClientConsentSessionsWithHttpInfo($user, $client);
+        list($response) = $this->revokeConsentSessionsWithHttpInfo($subject, $client);
         return $response;
     }
 
     /**
-     * Operation revokeUserClientConsentSessionsWithHttpInfo
+     * Operation revokeConsentSessionsWithHttpInfo
      *
-     * Revokes consent sessions of a user for a specific OAuth 2.0 Client
+     * Revokes consent sessions of a subject for a specific OAuth 2.0 Client
      *
      * Client for Hydra
      *
-     * @param string $user  (required)
-     * @param string $client  (required)
+     * @param string $subject The subject (Subject) who&#39;s consent sessions should be deleted. (required)
+     * @param string $client If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID (optional)
      * @throws \HydraSDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
-    public function revokeUserClientConsentSessionsWithHttpInfo($user, $client)
+    public function revokeConsentSessionsWithHttpInfo($subject, $client = null)
     {
-        // verify the required parameter 'user' is set
-        if ($user === null) {
-            throw new \InvalidArgumentException('Missing the required parameter $user when calling revokeUserClientConsentSessions');
-        }
-        // verify the required parameter 'client' is set
-        if ($client === null) {
-            throw new \InvalidArgumentException('Missing the required parameter $client when calling revokeUserClientConsentSessions');
+        // verify the required parameter 'subject' is set
+        if ($subject === null) {
+            throw new \InvalidArgumentException('Missing the required parameter $subject when calling revokeConsentSessions');
         }
         // parse inputs
-        $resourcePath = "/oauth2/auth/sessions/consent/{user}/{client}";
+        $resourcePath = "/oauth2/auth/sessions/consent";
         $httpBody = '';
         $queryParams = [];
         $headerParams = [];
@@ -2340,21 +2243,13 @@ class AdminApi
         }
         $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json']);
 
-        // path params
-        if ($user !== null) {
-            $resourcePath = str_replace(
-                "{" . "user" . "}",
-                $this->apiClient->getSerializer()->toPathValue($user),
-                $resourcePath
-            );
+        // query params
+        if ($subject !== null) {
+            $queryParams['subject'] = $this->apiClient->getSerializer()->toQueryValue($subject);
         }
-        // path params
+        // query params
         if ($client !== null) {
-            $resourcePath = str_replace(
-                "{" . "client" . "}",
-                $this->apiClient->getSerializer()->toPathValue($client),
-                $resourcePath
-            );
+            $queryParams['client'] = $this->apiClient->getSerializer()->toQueryValue($client);
         }
 
         // for model (json/xml)
@@ -2372,12 +2267,16 @@ class AdminApi
                 $httpBody,
                 $headerParams,
                 null,
-                '/oauth2/auth/sessions/consent/{user}/{client}'
+                '/oauth2/auth/sessions/consent'
             );
 
             return [null, $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
+                case 400:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
                 case 404:
                     $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);

@@ -4,7 +4,6 @@ import com.github.ory.hydra.ApiClient;
 
 import com.github.ory.hydra.model.GenericError;
 import com.github.ory.hydra.model.JSONWebKeySet;
-import com.github.ory.hydra.model.LogoutRequest;
 import com.github.ory.hydra.model.Oauth2TokenResponse;
 import com.github.ory.hydra.model.UserinfoResponse;
 import com.github.ory.hydra.model.WellKnown;
@@ -28,7 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:51:30.376+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T17:21:35.197+02:00")
 @Component("com.github.ory.hydra.api.PublicApi")
 public class PublicApi {
     private ApiClient apiClient;
@@ -231,38 +230,6 @@ public class PublicApi {
 
         ParameterizedTypeReference<Void> returnType = new ParameterizedTypeReference<Void>() {};
         apiClient.invokeAPI(path, HttpMethod.POST, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
-    }
-    /**
-     * Get a logout request
-     * Use this endpoint to fetch a logout request.
-     * <p><b>201</b> - logoutRequest
-     * <p><b>404</b> - genericError
-     * <p><b>500</b> - genericError
-     * @return LogoutRequest
-     * @throws RestClientException if an error occurs while attempting to invoke the API
-     */
-    public LogoutRequest userLogout() throws RestClientException {
-        Object postBody = null;
-        
-        String path = UriComponentsBuilder.fromPath("/oauth2/auth/sessions/logout").build().toUriString();
-        
-        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
-        final HttpHeaders headerParams = new HttpHeaders();
-        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
-
-        final String[] accepts = { 
-            "application/json"
-        };
-        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
-        final String[] contentTypes = { 
-            "application/json", "application/x-www-form-urlencoded"
-        };
-        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
-
-        String[] authNames = new String[] {  };
-
-        ParameterizedTypeReference<LogoutRequest> returnType = new ParameterizedTypeReference<LogoutRequest>() {};
-        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
      * OpenID Connect Userinfo

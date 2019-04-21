@@ -85,6 +85,12 @@ func TestSDK(t *testing.T) {
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
 	require.NoError(t, err)
 
+	lur1 := MockLogoutRequest("testsdk-1")
+	require.NoError(t, m.CreateLogoutRequest(context.TODO(), lur1))
+
+	lur2 := MockLogoutRequest("testsdk-2")
+	require.NoError(t, m.CreateLogoutRequest(context.TODO(), lur2))
+
 	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr1, *crGot.Payload)
@@ -129,6 +135,20 @@ func TestSDK(t *testing.T) {
 	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject2"))
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot.Payload))
+
+	luGot, err := sdk.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
+	require.NoError(t, err)
+	compareSDKLogoutRequest(t, lur1, luGot.Payload)
+
+	luaGot, err := sdk.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
+	require.NoError(t, err)
+	assert.EqualValues(t, "http://request-me/?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
+
+	_, err = sdk.Admin.RejectLogoutRequest(admin.NewRejectLogoutRequestParams().WithLogoutChallenge("challengetestsdk-2"))
+	require.NoError(t, err)
+
+	_, err = sdk.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge("challengetestsdk-2"))
+	require.Error(t, err)
 }
 
 func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
@@ -143,4 +163,12 @@ func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
+}
+
+func compareSDKLogoutRequest(t *testing.T, expected *LogoutRequest, got *models.LogoutRequest) {
+	assert.EqualValues(t, expected.Subject, got.Subject)
+	assert.EqualValues(t, expected.SessionID, got.SessionID)
+	assert.EqualValues(t, expected.SessionID, got.SessionID)
+	assert.EqualValues(t, expected.RequestURL, got.RequestURL)
+	assert.EqualValues(t, expected.RPInitiated, got.RPInitiated)
 }

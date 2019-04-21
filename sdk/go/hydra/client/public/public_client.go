@@ -195,36 +195,6 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 }
 
 /*
-UserLogout gets a logout request
-
-Use this endpoint to fetch a logout request.
-*/
-func (a *Client) UserLogout(params *UserLogoutParams) (*UserLogoutCreated, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUserLogoutParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "userLogout",
-		Method:             "GET",
-		PathPattern:        "/oauth2/auth/sessions/logout",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &UserLogoutReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	return result.(*UserLogoutCreated), nil
-
-}
-
-/*
 Userinfo opens ID connect userinfo
 
 This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token.

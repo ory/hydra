@@ -258,7 +258,7 @@ type LogoutRequest struct {
 // Returned when the log out request was used.
 //
 // swagger:ignore
-type HandledLogoutRequest struct {
+type LogoutResult struct {
 	RedirectTo             string
 	FrontChannelLogoutURLs []string
 }

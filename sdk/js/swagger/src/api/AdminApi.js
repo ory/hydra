@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/PreviousConsentSession', 'model/RejectRequest'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/LogoutRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/PreviousConsentSession', 'model/RejectRequest'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequest'), require('../model/AcceptLoginRequest'), require('../model/CompletedRequest'), require('../model/ConsentRequest'), require('../model/FlushInactiveOAuth2TokensRequest'), require('../model/GenericError'), require('../model/JSONWebKey'), require('../model/JSONWebKeySet'), require('../model/JsonWebKeySetGeneratorRequest'), require('../model/LoginRequest'), require('../model/OAuth2Client'), require('../model/OAuth2TokenIntrospection'), require('../model/PreviousConsentSession'), require('../model/RejectRequest'));
+    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequest'), require('../model/AcceptLoginRequest'), require('../model/CompletedRequest'), require('../model/ConsentRequest'), require('../model/FlushInactiveOAuth2TokensRequest'), require('../model/GenericError'), require('../model/JSONWebKey'), require('../model/JSONWebKeySet'), require('../model/JsonWebKeySetGeneratorRequest'), require('../model/LoginRequest'), require('../model/LogoutRequest'), require('../model/OAuth2Client'), require('../model/OAuth2TokenIntrospection'), require('../model/PreviousConsentSession'), require('../model/RejectRequest'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.AdminApi = factory(root.OryHydra.ApiClient, root.OryHydra.AcceptConsentRequest, root.OryHydra.AcceptLoginRequest, root.OryHydra.CompletedRequest, root.OryHydra.ConsentRequest, root.OryHydra.FlushInactiveOAuth2TokensRequest, root.OryHydra.GenericError, root.OryHydra.JSONWebKey, root.OryHydra.JSONWebKeySet, root.OryHydra.JsonWebKeySetGeneratorRequest, root.OryHydra.LoginRequest, root.OryHydra.OAuth2Client, root.OryHydra.OAuth2TokenIntrospection, root.OryHydra.PreviousConsentSession, root.OryHydra.RejectRequest);
+    root.OryHydra.AdminApi = factory(root.OryHydra.ApiClient, root.OryHydra.AcceptConsentRequest, root.OryHydra.AcceptLoginRequest, root.OryHydra.CompletedRequest, root.OryHydra.ConsentRequest, root.OryHydra.FlushInactiveOAuth2TokensRequest, root.OryHydra.GenericError, root.OryHydra.JSONWebKey, root.OryHydra.JSONWebKeySet, root.OryHydra.JsonWebKeySetGeneratorRequest, root.OryHydra.LoginRequest, root.OryHydra.LogoutRequest, root.OryHydra.OAuth2Client, root.OryHydra.OAuth2TokenIntrospection, root.OryHydra.PreviousConsentSession, root.OryHydra.RejectRequest);
   }
-}(this, function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, FlushInactiveOAuth2TokensRequest, GenericError, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, OAuth2Client, OAuth2TokenIntrospection, PreviousConsentSession, RejectRequest) {
+}(this, function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, FlushInactiveOAuth2TokensRequest, GenericError, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, LogoutRequest, OAuth2Client, OAuth2TokenIntrospection, PreviousConsentSession, RejectRequest) {
   'use strict';
 
   /**
@@ -156,16 +156,26 @@
     /**
      * Accept a logout request
      * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request. No body is required.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+     * @param {String} logoutChallenge 
+     * @param {Object} opts Optional parameters
+     * @param {module:model/AcceptConsentRequest} opts.body 
      * @param {module:api/AdminApi~acceptLogoutRequestCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/CompletedRequest}
      */
-    this.acceptLogoutRequest = function(callback) {
-      var postBody = null;
+    this.acceptLogoutRequest = function(logoutChallenge, opts, callback) {
+      opts = opts || {};
+      var postBody = opts['body'];
+
+      // verify the required parameter 'logoutChallenge' is set
+      if (logoutChallenge === undefined || logoutChallenge === null) {
+        throw new Error("Missing the required parameter 'logoutChallenge' when calling acceptLogoutRequest");
+      }
 
 
       var pathParams = {
       };
       var queryParams = {
+        'logout_challenge': logoutChallenge
       };
       var headerParams = {
       };
@@ -647,6 +657,52 @@
 
       return this.apiClient.callApi(
         '/oauth2/auth/requests/login', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getLogoutRequest operation.
+     * @callback module:api/AdminApi~getLogoutRequestCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/LogoutRequest} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get a logout request
+     * Use this endpoint to fetch a logout request.
+     * @param {String} logoutChallenge 
+     * @param {module:api/AdminApi~getLogoutRequestCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/LogoutRequest}
+     */
+    this.getLogoutRequest = function(logoutChallenge, callback) {
+      var postBody = null;
+
+      // verify the required parameter 'logoutChallenge' is set
+      if (logoutChallenge === undefined || logoutChallenge === null) {
+        throw new Error("Missing the required parameter 'logoutChallenge' when calling getLogoutRequest");
+      }
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+        'logout_challenge': logoutChallenge
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = LogoutRequest;
+
+      return this.apiClient.callApi(
+        '/oauth2/auth/requests/logout', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

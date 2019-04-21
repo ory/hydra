@@ -17,6 +17,7 @@ Method | HTTP request | Description
 [**getJsonWebKey**](AdminApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Fetch a JSON Web Key
 [**getJsonWebKeySet**](AdminApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 [**getLoginRequest**](AdminApi.md#getLoginRequest) | **GET** /oauth2/auth/requests/login | Get an login request
+[**getLogoutRequest**](AdminApi.md#getLogoutRequest) | **GET** /oauth2/auth/requests/logout | Get a logout request
 [**getOAuth2Client**](AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 [**introspectOAuth2Token**](AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 [**listOAuth2Clients**](AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
@@ -134,7 +135,7 @@ No authorization required
 
 <a name="acceptLogoutRequest"></a>
 # **acceptLogoutRequest**
-> CompletedRequest acceptLogoutRequest()
+> CompletedRequest acceptLogoutRequest(logoutChallenge, opts)
 
 Accept a logout request
 
@@ -146,6 +147,12 @@ var OryHydra = require('ory_hydra');
 
 var apiInstance = new OryHydra.AdminApi();
 
+var logoutChallenge = "logoutChallenge_example"; // String | 
+
+var opts = { 
+  'body': new OryHydra.AcceptConsentRequest() // AcceptConsentRequest | 
+};
+
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -153,11 +160,15 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-apiInstance.acceptLogoutRequest(callback);
+apiInstance.acceptLogoutRequest(logoutChallenge, opts, callback);
 ```
 
 ### Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **String**|  | 
+ **body** | [**AcceptConsentRequest**](AcceptConsentRequest.md)|  | [optional] 
 
 ### Return type
 
@@ -641,6 +652,52 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="getLogoutRequest"></a>
+# **getLogoutRequest**
+> LogoutRequest getLogoutRequest(logoutChallenge)
+
+Get a logout request
+
+Use this endpoint to fetch a logout request.
+
+### Example
+```javascript
+var OryHydra = require('ory_hydra');
+
+var apiInstance = new OryHydra.AdminApi();
+
+var logoutChallenge = "logoutChallenge_example"; // String | 
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getLogoutRequest(logoutChallenge, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **logoutChallenge** | **String**|  | 
+
+### Return type
+
+[**LogoutRequest**](LogoutRequest.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="getOAuth2Client"></a>

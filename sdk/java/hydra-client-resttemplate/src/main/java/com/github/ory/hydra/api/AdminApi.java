@@ -12,6 +12,7 @@ import com.github.ory.hydra.model.JSONWebKey;
 import com.github.ory.hydra.model.JSONWebKeySet;
 import com.github.ory.hydra.model.JsonWebKeySetGeneratorRequest;
 import com.github.ory.hydra.model.LoginRequest;
+import com.github.ory.hydra.model.LogoutRequest;
 import com.github.ory.hydra.model.OAuth2Client;
 import com.github.ory.hydra.model.OAuth2TokenIntrospection;
 import com.github.ory.hydra.model.PreviousConsentSession;
@@ -36,7 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-17T17:51:30.376+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T17:21:35.197+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -147,17 +148,26 @@ public class AdminApi {
      * <p><b>200</b> - completedRequest
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
+     * @param logoutChallenge The logoutChallenge parameter
+     * @param body The body parameter
      * @return CompletedRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public CompletedRequest acceptLogoutRequest() throws RestClientException {
-        Object postBody = null;
+    public CompletedRequest acceptLogoutRequest(String logoutChallenge, AcceptConsentRequest body) throws RestClientException {
+        Object postBody = body;
+        
+        // verify the required parameter 'logoutChallenge' is set
+        if (logoutChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'logoutChallenge' when calling acceptLogoutRequest");
+        }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/logout/accept").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "logout_challenge", logoutChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -585,6 +595,46 @@ public class AdminApi {
         String[] authNames = new String[] {  };
 
         ParameterizedTypeReference<LoginRequest> returnType = new ParameterizedTypeReference<LoginRequest>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * Get a logout request
+     * Use this endpoint to fetch a logout request.
+     * <p><b>200</b> - logoutRequest
+     * <p><b>404</b> - genericError
+     * <p><b>500</b> - genericError
+     * @param logoutChallenge The logoutChallenge parameter
+     * @return LogoutRequest
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public LogoutRequest getLogoutRequest(String logoutChallenge) throws RestClientException {
+        Object postBody = null;
+        
+        // verify the required parameter 'logoutChallenge' is set
+        if (logoutChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'logoutChallenge' when calling getLogoutRequest");
+        }
+        
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/logout").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "logout_challenge", logoutChallenge));
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<LogoutRequest> returnType = new ParameterizedTypeReference<LogoutRequest>() {};
         return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**

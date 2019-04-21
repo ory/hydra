@@ -13,11 +13,17 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession authentication session
+// AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession AuthenticationSession authentication session
 // swagger:model AuthenticationSession
 type AuthenticationSession struct {
 
 	// authenticated at
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	// Format: date-time

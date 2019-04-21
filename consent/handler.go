@@ -59,7 +59,7 @@ func NewHandler(
 	}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.GET(LoginPath, h.GetLoginRequest)
 	admin.PUT(LoginPath+"/accept", h.AcceptLoginRequest)
 	admin.PUT(LoginPath+"/reject", h.RejectLoginRequest)
@@ -714,7 +714,7 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/sessions/logout public userLogout
+// swagger:route GET /oauth2/auth/requests/logout admin getLogoutRequest
 //
 // Get a logout request
 //
@@ -726,7 +726,7 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //     Schemes: http, https
 //
 //     Responses:
-//       201: logoutRequest
+//       200: logoutRequest
 //       404: genericError
 //       500: genericError
 func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

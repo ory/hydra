@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerJwkUpdateSet SwaggerJwkUpdateSet swagger jwk update set
+// SwaggerJwkUpdateSet swagger jwk update set
 // swagger:model SwaggerJwkUpdateSet
 type SwaggerJwkUpdateSet struct {
 

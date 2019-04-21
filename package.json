@@ -7,6 +7,9 @@
   "browser": {
     "fs": false
   },
+  "scripts": {
+    "test": "cypress open"
+  },
   "dependencies": {
     "superagent": "3.7.0"
   },

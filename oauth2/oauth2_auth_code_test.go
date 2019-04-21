@@ -173,7 +173,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					defer ts.Close()
 
 					apiRouter := x.NewRouterAdmin()
-					reg.ConsentHandler().SetRoutes(apiRouter, apiRouter.RouterPublic())
+					reg.ConsentHandler().SetRoutes(apiRouter)
 					api := httptest.NewServer(apiRouter)
 					defer api.Close()
 

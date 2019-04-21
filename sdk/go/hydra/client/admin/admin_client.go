@@ -474,6 +474,36 @@ func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginReques
 }
 
 /*
+GetLogoutRequest gets a logout request
+
+Use this endpoint to fetch a logout request.
+*/
+func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetLogoutRequestParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getLogoutRequest",
+		Method:             "GET",
+		PathPattern:        "/oauth2/auth/requests/logout",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetLogoutRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetLogoutRequestOK), nil
+
+}
+
+/*
 GetOAuth2Client gets an o auth 2 0 client
 
 Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.

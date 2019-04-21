@@ -15,12 +15,14 @@ import (
 	cr "github.com/go-openapi/runtime/client"
 
 	strfmt "github.com/go-openapi/strfmt"
+
+	models "github.com/ory/hydra/sdk/go/hydra/models"
 )
 
 // NewAcceptLogoutRequestParams creates a new AcceptLogoutRequestParams object
 // with the default values initialized.
 func NewAcceptLogoutRequestParams() *AcceptLogoutRequestParams {
-
+	var ()
 	return &AcceptLogoutRequestParams{
 
 		timeout: cr.DefaultTimeout,
@@ -30,7 +32,7 @@ func NewAcceptLogoutRequestParams() *AcceptLogoutRequestParams {
 // NewAcceptLogoutRequestParamsWithTimeout creates a new AcceptLogoutRequestParams object
 // with the default values initialized, and the ability to set a timeout on a request
 func NewAcceptLogoutRequestParamsWithTimeout(timeout time.Duration) *AcceptLogoutRequestParams {
-
+	var ()
 	return &AcceptLogoutRequestParams{
 
 		timeout: timeout,
@@ -40,7 +42,7 @@ func NewAcceptLogoutRequestParamsWithTimeout(timeout time.Duration) *AcceptLogou
 // NewAcceptLogoutRequestParamsWithContext creates a new AcceptLogoutRequestParams object
 // with the default values initialized, and the ability to set a context for a request
 func NewAcceptLogoutRequestParamsWithContext(ctx context.Context) *AcceptLogoutRequestParams {
-
+	var ()
 	return &AcceptLogoutRequestParams{
 
 		Context: ctx,
@@ -50,7 +52,7 @@ func NewAcceptLogoutRequestParamsWithContext(ctx context.Context) *AcceptLogoutR
 // NewAcceptLogoutRequestParamsWithHTTPClient creates a new AcceptLogoutRequestParams object
 // with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewAcceptLogoutRequestParamsWithHTTPClient(client *http.Client) *AcceptLogoutRequestParams {
-
+	var ()
 	return &AcceptLogoutRequestParams{
 		HTTPClient: client,
 	}
@@ -60,6 +62,12 @@ func NewAcceptLogoutRequestParamsWithHTTPClient(client *http.Client) *AcceptLogo
 for the accept logout request operation typically these are written to a http.Request
 */
 type AcceptLogoutRequestParams struct {
+
+	/*Body*/
+	Body *models.HandledConsentRequest
+	/*LogoutChallenge*/
+	LogoutChallenge string
+
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
@@ -98,6 +106,28 @@ func (o *AcceptLogoutRequestParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithBody adds the body to the accept logout request params
+func (o *AcceptLogoutRequestParams) WithBody(body *models.HandledConsentRequest) *AcceptLogoutRequestParams {
+	o.SetBody(body)
+	return o
+}
+
+// SetBody adds the body to the accept logout request params
+func (o *AcceptLogoutRequestParams) SetBody(body *models.HandledConsentRequest) {
+	o.Body = body
+}
+
+// WithLogoutChallenge adds the logoutChallenge to the accept logout request params
+func (o *AcceptLogoutRequestParams) WithLogoutChallenge(logoutChallenge string) *AcceptLogoutRequestParams {
+	o.SetLogoutChallenge(logoutChallenge)
+	return o
+}
+
+// SetLogoutChallenge adds the logoutChallenge to the accept logout request params
+func (o *AcceptLogoutRequestParams) SetLogoutChallenge(logoutChallenge string) {
+	o.LogoutChallenge = logoutChallenge
+}
+
 // WriteToRequest writes these params to a swagger request
 func (o *AcceptLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
@@ -105,6 +135,21 @@ func (o *AcceptLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg 
 		return err
 	}
 	var res []error
+
+	if o.Body != nil {
+		if err := r.SetBodyParam(o.Body); err != nil {
+			return err
+		}
+	}
+
+	// query param logout_challenge
+	qrLogoutChallenge := o.LogoutChallenge
+	qLogoutChallenge := qrLogoutChallenge
+	if qLogoutChallenge != "" {
+		if err := r.SetQueryParam("logout_challenge", qLogoutChallenge); err != nil {
+			return err
+		}
+	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)

@@ -103,17 +103,17 @@ func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.R
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
 	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	if err != nil {
-		return nil, ErrNoAuthenticationSessionFound
+		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
 	sessionID := mapx.GetStringDefault(cookie.Values, CookieAuthenticationSIDName, "")
 	if sessionID == "" {
-		return nil, ErrNoAuthenticationSessionFound
+		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
 	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), sessionID)
 	if errors.Cause(err) == x.ErrNotFound {
-		return nil, ErrNoAuthenticationSessionFound
+		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	} else if err != nil {
 		return nil, err
 	}
@@ -696,7 +696,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, subject,
 	return nil
 }
 
-func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Request) (*HandledLogoutRequest, error) {
+func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	// There are two types of log out flows:
 	//
 	// - RP initiated logout
@@ -749,7 +749,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 			return nil, err
 		}
 
-		http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"challenge": {challenge}}).String(), http.StatusFound)
+		http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
 		return nil, errors.WithStack(ErrAbortOAuth2Request)
 	}
 
@@ -857,11 +857,11 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		return nil, err
 	}
 
-	http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"challenge": {challenge}}).String(), http.StatusFound)
+	http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
 	return nil, errors.WithStack(ErrAbortOAuth2Request)
 }
 
-func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request) (*HandledLogoutRequest, error) {
+func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	verifier := r.URL.Query().Get("logout_verifier")
 
 	lr, err := s.r.ConsentManager().VerifyAndInvalidateLogoutRequest(r.Context(), verifier)
@@ -895,13 +895,13 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		return nil, err
 	}
 
-	return &HandledLogoutRequest{
+	return &LogoutResult{
 		RedirectTo:             lr.PostLogoutRedirectURI,
 		FrontChannelLogoutURLs: urls,
 	}, nil
 }
 
-func (s *DefaultStrategy) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*HandledLogoutRequest, error) {
+func (s *DefaultStrategy) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
 	verifier := r.URL.Query().Get("logout_verifier")
 	if verifier == "" {
 		return s.issueLogoutVerifier(w, r)

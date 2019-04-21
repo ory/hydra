@@ -30,5 +30,5 @@ var _ Strategy = new(DefaultStrategy)
 
 type Strategy interface {
 	HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*HandledConsentRequest, error)
-	HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*HandledLogoutRequest, error)
+	HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error)
 }

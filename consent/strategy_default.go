@@ -30,13 +30,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/x/httpx"
-	"github.com/ory/x/sqlcon"
-
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+
+	"github.com/ory/x/httpx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
@@ -143,7 +142,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second * time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
 		}
@@ -172,7 +171,7 @@ func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint 
 	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); errors.Cause(err) == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
 		// Expired is ok
 	} else {
-		return nil, err
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint(err.Error()))
 	}
 
 	claims, ok := token.Claims.(jwtgo.MapClaims)
@@ -363,7 +362,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
 		State:         req.GetState(),
-		//HandledResponseTypes, this can be safely ignored because it's not being used by validation
+		// HandledResponseTypes, this can be safely ignored because it's not being used by validation
 		Request: fosite.Request{
 			ID:                req.GetID(),
 			RequestedAt:       req.GetRequestedAt(),
@@ -479,7 +478,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	// This breaks OIDC Conformity Tests and is probably a bit paranoid.
 	//
 	// if ar.GetResponseTypes().Has("token") {
-	//	 // We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
+	// 	 // We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
@@ -639,6 +638,13 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, subject,
 
 	var tasks []task
 	for _, c := range clients {
+		// Getting the forced obfuscated login session is tricky because the user id could be obfuscated with a new
+		// ID every time the algorithm is used. Thus, we would only get the most recent version. It therefore makes
+		// sense to just use the sid.
+		//
+		// s.r.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), subject, <missing>)
+		// sub := s.obfuscateSubjectIdentifier(c, subject, )
+
 		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwtgo.MapClaims{
 			"iss":    s.c.IssuerURL().String(),
 			"aud":    []string{c.ClientID},
@@ -763,9 +769,22 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.
 			WithHint(
 				fmt.Sprintf(
-					`Logout failed because issuer claim "%s" from query parameter id_token_hint does not match with issuer value from configuration "%s"`,
-					mapx.GetStringDefault(mksi, "sid", ""),
+					`Logout failed because issuer claim value "%s" from query parameter id_token_hint does not match with issuer value from configuration "%s"`,
+					mapx.GetStringDefault(mksi, "iss", ""),
 					s.c.IssuerURL().String(),
+				),
+			),
+		)
+	}
+
+	now := time.Now().UTC().Unix()
+	if !claims.VerifyIssuedAt(now, true) {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.
+			WithHint(
+				fmt.Sprintf(
+					`Logout failed because iat claim value "%.0f" from query parameter id_token_hint is before now ("%d")`,
+					mapx.GetFloat64Default(mksi, "iat", float64(0)),
+					now,
 				),
 			),
 		)
@@ -791,7 +810,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		},
 	) {
 		c, err := s.r.ClientManager().GetConcreteClient(r.Context(), aud)
-		if errors.Cause(err) == sqlcon.ErrNoRows {
+		if errors.Cause(err) == x.ErrNotFound {
 			continue
 		} else if err != nil {
 			return nil, err
@@ -832,7 +851,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
 	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), hintSid)
-	if errors.Cause(err) == sqlcon.ErrNoRows {
+	if errors.Cause(err) == x.ErrNotFound {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
 		http.Redirect(w, r, redir, http.StatusFound)

@@ -22,6 +22,7 @@ package consent
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -248,6 +249,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 
 	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
+		log.Println(err)
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -298,13 +300,21 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	var p HandledLoginRequest
+	var (
+		p   HandledLoginRequest
+		err error
+	)
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
+
+	defer func(p *HandledLoginRequest, err error) {
+		recordAcceptLoginRequest(h.r.PrometheusManager(), p, err)
+	}(&p, err)
+
 	if p.Subject == "" {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
 	}
@@ -505,13 +515,20 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	var p HandledConsentRequest
+	var (
+		p   HandledConsentRequest
+		err error
+	)
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
+
+	defer func(p *HandledConsentRequest, err error) {
+		recordAcceptConsentRequest(h.r.PrometheusManager(), p, err)
+	}(&p, err)
 
 	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
@@ -535,7 +552,6 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {hr.Verifier}}).String(),
 	})
@@ -587,6 +603,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
+	// defer recordAcceptConsentRequest(h.r.PrometheusManager(), &p)
 
 	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {

@@ -118,39 +118,3 @@ func NewMetrics(version, hash, date string) *Metrics {
 	)
 	return pm
 }
-
-// IncreaseCounterWithLabels increases a single metric with multiple label combinations by "value". Be cautious of using an oversized map in this function. High degrees of cardinality can slow down Prometheus queries significantly.
-// Examples:
-//    IncreaseCounterWithLabels(c, map[string][]string{"accepted": []string{"true"}, "scope": []string{"scope:1", "scope:2"}}, 4)
-// will produce:
-//    metric_name{accepted="true", scope="scope:1"}    4
-//    metric_name{accepted="true", scope="scope:2"}    4
-// ---
-//    IncreaseCounterWithLabels(c, map[string][]string{"accepted": []string{"true"}, "scope": []string{"scope:1", "scope:2"}, "other_value": []string{"other", "label", "value"}}, 4)
-// will produce:
-//    metric_name{accepted="true", scope="scope:1", other_value="other"}    4
-//    metric_name{accepted="true", scope="scope:2", other_value="other"}    4
-//    metric_name{accepted="true", scope="scope:1", other_value="label"}    4
-//    metric_name{accepted="true", scope="scope:2", other_value="label"}    4
-//    metric_name{accepted="true", scope="scope:1", other_value="value"}    4
-//    metric_name{accepted="true", scope="scope:2", other_value="value"}    4
-func IncreaseCounterWithLabels(c *prometheus.CounterVec, labels map[string][]string, value float64) {
-	for k, values := range labels {
-		for _, v := range values {
-			c.With(prometheus.Labels{
-				k: v,
-			}).Add(value)
-		}
-	}
-}
-
-// SetGaugeWithLabels increases a single metric with multiple label combinations by "value".
-func SetGaugeWithLabels(c *prometheus.GaugeVec, labels map[string][]string, value float64) {
-	for k, values := range labels {
-		for _, v := range values {
-			c.With(prometheus.Labels{
-				k: v,
-			}).Set(value)
-		}
-	}
-}

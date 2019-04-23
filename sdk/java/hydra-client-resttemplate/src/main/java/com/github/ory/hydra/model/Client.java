@@ -27,7 +27,7 @@ import org.joda.time.DateTime;
 /**
  * Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
 public class Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
@@ -219,10 +219,10 @@ public class Client {
   }
 
    /**
-   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.
+   * SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it&#39;s value will always be set to 0.
    * @return clientSecretExpiresAt
   **/
-  @ApiModelProperty(value = "SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.")
+  @ApiModelProperty(value = "SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it's value will always be set to 0.")
   public Long getClientSecretExpiresAt() {
     return clientSecretExpiresAt;
   }
@@ -281,10 +281,10 @@ public class Client {
   }
 
    /**
-   * CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+   * CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time
    * @return createdAt
   **/
-  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time")
+  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time")
   public DateTime getCreatedAt() {
     return createdAt;
   }
@@ -601,10 +601,10 @@ public class Client {
   }
 
    /**
-   * UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time
+   * UpdatedAt returns the timestamp of the last update. Format: date-time
    * @return updatedAt
   **/
-  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time Format: date-time")
+  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time")
   public DateTime getUpdatedAt() {
     return updatedAt;
   }

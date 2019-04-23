@@ -1,4 +1,4 @@
-# Hydra\SDK\AdminApi
+# HydraSDK\AdminApi
 Client for Hydra
 
 All URIs are relative to *http://localhost*
@@ -20,32 +20,31 @@ Method | HTTP request | Description
 [**getOAuth2Client**](AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 [**introspectOAuth2Token**](AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 [**listOAuth2Clients**](AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
-[**listUserConsentSessions**](AdminApi.md#listUserConsentSessions) | **GET** /oauth2/auth/sessions/consent/{user} | Lists all consent sessions of a user
+[**listSubjectConsentSessions**](AdminApi.md#listSubjectConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
 [**rejectConsentRequest**](AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 [**rejectLoginRequest**](AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
-[**revokeAllUserConsentSessions**](AdminApi.md#revokeAllUserConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user} | Revokes all previous consent sessions of a user
-[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login/{user} | Invalidates a user&#39;s authentication session
-[**revokeUserClientConsentSessions**](AdminApi.md#revokeUserClientConsentSessions) | **DELETE** /oauth2/auth/sessions/consent/{user}/{client} | Revokes consent sessions of a user for a specific OAuth 2.0 Client
+[**revokeAuthenticationSession**](AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login | Invalidates a subject&#39;s authentication session
+[**revokeConsentSessions**](AdminApi.md#revokeConsentSessions) | **DELETE** /oauth2/auth/sessions/consent | Revokes consent sessions of a subject for a specific OAuth 2.0 Client
 [**updateJsonWebKey**](AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 [**updateJsonWebKeySet**](AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 [**updateOAuth2Client**](AdminApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 
 
 # **acceptConsentRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptConsentRequest($challenge, $body)
+> \HydraSDK\Model\CompletedRequest acceptConsentRequest($challenge, $body)
 
 Accept an consent request
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").  The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider includes additional information, such as session data for access and ID tokens, and if the consent request should be used as basis for future requests.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to grant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").  The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted or rejected the request.  This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider includes additional information, such as session data for access and ID tokens, and if the consent request should be used as basis for future requests.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
+$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
 
 try {
     $result = $api_instance->acceptConsentRequest($challenge, $body);
@@ -61,11 +60,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\AcceptConsentRequest**](../Model/AcceptConsentRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\AcceptConsentRequest**](../Model/AcceptConsentRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -79,20 +78,20 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **acceptLoginRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptLoginRequest($challenge, $body)
+> \HydraSDK\Model\CompletedRequest acceptLoginRequest($challenge, $body)
 
 Accept an login request
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the user a login screen\") a user (in OAuth2 the proper name for user is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as the user's ID and if ORY Hydra should remember the user's user agent for future authentication attempts by setting a cookie.  The response contains a redirect URL which the login provider should redirect the user-agent to.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\") a subject (in OAuth2 the proper name for subject is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting a cookie.  The response contains a redirect URL which the login provider should redirect the user-agent to.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\AcceptLoginRequest(); // \Hydra\SDK\Model\AcceptLoginRequest | 
+$body = new \HydraSDK\Model\AcceptLoginRequest(); // \HydraSDK\Model\AcceptLoginRequest | 
 
 try {
     $result = $api_instance->acceptLoginRequest($challenge, $body);
@@ -108,11 +107,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\AcceptLoginRequest**](../Model/AcceptLoginRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\AcceptLoginRequest**](../Model/AcceptLoginRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -126,7 +125,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **createJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
+> \HydraSDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
 
 Generate a new JSON Web Key
 
@@ -137,9 +136,9 @@ This endpoint is capable of generating JSON Web Key Sets for you. There a differ
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest(); // \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest | 
+$body = new \HydraSDK\Model\JsonWebKeySetGeneratorRequest(); // \HydraSDK\Model\JsonWebKeySetGeneratorRequest | 
 
 try {
     $result = $api_instance->createJsonWebKeySet($set, $body);
@@ -155,11 +154,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JsonWebKeySetGeneratorRequest**](../Model/JsonWebKeySetGeneratorRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JsonWebKeySetGeneratorRequest**](../Model/JsonWebKeySetGeneratorRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -173,7 +172,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **createOAuth2Client**
-> \Hydra\SDK\Model\OAuth2Client createOAuth2Client($body)
+> \HydraSDK\Model\OAuth2Client createOAuth2Client($body)
 
 Create an OAuth 2.0 client
 
@@ -184,8 +183,8 @@ Create a new OAuth 2.0 client If you pass `client_secret` the secret will be use
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
-$body = new \Hydra\SDK\Model\OAuth2Client(); // \Hydra\SDK\Model\OAuth2Client | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$body = new \HydraSDK\Model\OAuth2Client(); // \HydraSDK\Model\OAuth2Client | 
 
 try {
     $result = $api_instance->createOAuth2Client($body);
@@ -200,11 +199,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
+ **body** | [**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
 
 ### Authorization
 
@@ -229,7 +228,7 @@ Use this endpoint to delete a single JSON Web Key.  A JSON Web Key (JWK) is a Ja
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
 
@@ -275,7 +274,7 @@ Use this endpoint to delete a complete JSON Web Key Set and all the keys in that
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
 
 try {
@@ -319,7 +318,7 @@ Delete an existing OAuth 2.0 Client by its ID.  OAuth 2.0 clients are used to pe
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $id = "id_example"; // string | The id of the OAuth 2.0 Client.
 
 try {
@@ -363,8 +362,8 @@ This endpoint flushes expired OAuth2 access tokens from the database. You can se
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
-$body = new \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest(); // \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$body = new \HydraSDK\Model\FlushInactiveOAuth2TokensRequest(); // \HydraSDK\Model\FlushInactiveOAuth2TokensRequest | 
 
 try {
     $api_instance->flushInactiveOAuth2Tokens($body);
@@ -378,7 +377,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**\Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest**](../Model/FlushInactiveOAuth2TokensRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\FlushInactiveOAuth2TokensRequest**](../Model/FlushInactiveOAuth2TokensRequest.md)|  | [optional]
 
 ### Return type
 
@@ -396,18 +395,18 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getConsentRequest**
-> \Hydra\SDK\Model\ConsentRequest getConsentRequest($challenge)
+> \HydraSDK\Model\ConsentRequest getConsentRequest($challenge)
 
 Get consent request information
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").  The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to grant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").  The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted or rejected the request.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
 
 try {
@@ -427,7 +426,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\ConsentRequest**](../Model/ConsentRequest.md)
+[**\HydraSDK\Model\ConsentRequest**](../Model/ConsentRequest.md)
 
 ### Authorization
 
@@ -441,7 +440,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKey**
-> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
+> \HydraSDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
 
 Fetch a JSON Web Key
 
@@ -452,7 +451,7 @@ This endpoint returns a singular JSON Web Key, identified by the set and the spe
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
 
@@ -474,7 +473,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -488,7 +487,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKeySet($set)
+> \HydraSDK\Model\JSONWebKeySet getJsonWebKeySet($set)
 
 Retrieve a JSON Web Key Set
 
@@ -499,7 +498,7 @@ This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.  A JSON Web 
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
 
 try {
@@ -519,7 +518,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -533,18 +532,18 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getLoginRequest**
-> \Hydra\SDK\Model\LoginRequest getLoginRequest($challenge)
+> \HydraSDK\Model\LoginRequest getLoginRequest($challenge)
 
 Get an login request
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the user a login screen\") a user (in OAuth2 the proper name for user is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\") a subject (in OAuth2 the proper name for subject is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
 
 try {
@@ -564,7 +563,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\LoginRequest**](../Model/LoginRequest.md)
+[**\HydraSDK\Model\LoginRequest**](../Model/LoginRequest.md)
 
 ### Authorization
 
@@ -578,7 +577,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getOAuth2Client**
-> \Hydra\SDK\Model\OAuth2Client getOAuth2Client($id)
+> \HydraSDK\Model\OAuth2Client getOAuth2Client($id)
 
 Get an OAuth 2.0 Client.
 
@@ -589,7 +588,7 @@ Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.  OAuth
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $id = "id_example"; // string | The id of the OAuth 2.0 Client.
 
 try {
@@ -609,7 +608,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
 
 ### Authorization
 
@@ -623,7 +622,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **introspectOAuth2Token**
-> \Hydra\SDK\Model\OAuth2TokenIntrospection introspectOAuth2Token($token, $scope)
+> \HydraSDK\Model\OAuth2TokenIntrospection introspectOAuth2Token($token, $scope)
 
 Introspect OAuth2 tokens
 
@@ -635,12 +634,12 @@ The introspection endpoint allows to check if a token (both refresh and access) 
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure HTTP basic authorization: basic
-Hydra\SDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
-Hydra\SDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
+HydraSDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
+HydraSDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
 // Configure OAuth2 access token for authorization: oauth2
-Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+HydraSDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $token = "token_example"; // string | The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
 $scope = "scope_example"; // string | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
 
@@ -662,7 +661,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2TokenIntrospection**](../Model/OAuth2TokenIntrospection.md)
+[**\HydraSDK\Model\OAuth2TokenIntrospection**](../Model/OAuth2TokenIntrospection.md)
 
 ### Authorization
 
@@ -676,18 +675,18 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **listOAuth2Clients**
-> \Hydra\SDK\Model\OAuth2Client[] listOAuth2Clients($limit, $offset)
+> \HydraSDK\Model\OAuth2Client[] listOAuth2Clients($limit, $offset)
 
 List OAuth 2.0 Clients
 
-This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+This endpoint lists all clients in the database, and never returns client secrets.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components. The \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can be included in this header, and will be separated by a comma.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $limit = 789; // int | The maximum amount of policies returned.
 $offset = 789; // int | The offset from where to start looking.
 
@@ -709,7 +708,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client[]**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client[]**](../Model/OAuth2Client.md)
 
 ### Authorization
 
@@ -722,26 +721,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
-# **listUserConsentSessions**
-> \Hydra\SDK\Model\PreviousConsentSession[] listUserConsentSessions($user)
+# **listSubjectConsentSessions**
+> \HydraSDK\Model\PreviousConsentSession[] listSubjectConsentSessions($subject)
 
-Lists all consent sessions of a user
+Lists all consent sessions of a subject
 
-This endpoint lists all user's granted consent sessions, including client and granted scope
+This endpoint lists all subject's granted consent sessions, including client and granted scope. The \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can be included in this header, and will be separated by a comma.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
-$user = "user_example"; // string | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$subject = "subject_example"; // string | 
 
 try {
-    $result = $api_instance->listUserConsentSessions($user);
+    $result = $api_instance->listSubjectConsentSessions($subject);
     print_r($result);
 } catch (Exception $e) {
-    echo 'Exception when calling AdminApi->listUserConsentSessions: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling AdminApi->listSubjectConsentSessions: ', $e->getMessage(), PHP_EOL;
 }
 ?>
 ```
@@ -750,11 +749,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **user** | **string**|  |
+ **subject** | **string**|  |
 
 ### Return type
 
-[**\Hydra\SDK\Model\PreviousConsentSession[]**](../Model/PreviousConsentSession.md)
+[**\HydraSDK\Model\PreviousConsentSession[]**](../Model/PreviousConsentSession.md)
 
 ### Authorization
 
@@ -768,20 +767,20 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **rejectConsentRequest**
-> \Hydra\SDK\Model\CompletedRequest rejectConsentRequest($challenge, $body)
+> \HydraSDK\Model\CompletedRequest rejectConsentRequest($challenge, $body)
 
 Reject an consent request
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to grant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").  The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted or rejected the request.  This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider must include a reason why the consent was not granted.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.  The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to grant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").  The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted or rejected the request.  This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf. The consent provider must include a reason why the consent was not granted.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
+$body = new \HydraSDK\Model\RejectRequest(); // \HydraSDK\Model\RejectRequest | 
 
 try {
     $result = $api_instance->rejectConsentRequest($challenge, $body);
@@ -797,11 +796,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -815,20 +814,20 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **rejectLoginRequest**
-> \Hydra\SDK\Model\CompletedRequest rejectLoginRequest($challenge, $body)
+> \HydraSDK\Model\CompletedRequest rejectLoginRequest($challenge, $body)
 
 Reject a login request
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the user and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the user a login screen\") a user (in OAuth2 the proper name for user is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider (sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login provider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\") a subject (in OAuth2 the proper name for subject is \"resource owner\").  The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.  This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication was be denied.  The response contains a redirect URL which the login provider should redirect the user-agent to.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $challenge = "challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
+$body = new \HydraSDK\Model\RejectRequest(); // \HydraSDK\Model\RejectRequest | 
 
 try {
     $result = $api_instance->rejectLoginRequest($challenge, $body);
@@ -844,55 +843,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
-
-# **revokeAllUserConsentSessions**
-> revokeAllUserConsentSessions($user)
-
-Revokes all previous consent sessions of a user
-
-This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-
-### Example
-```php
-<?php
-require_once(__DIR__ . '/vendor/autoload.php');
-
-$api_instance = new Hydra\SDK\Api\AdminApi();
-$user = "user_example"; // string | 
-
-try {
-    $api_instance->revokeAllUserConsentSessions($user);
-} catch (Exception $e) {
-    echo 'Exception when calling AdminApi->revokeAllUserConsentSessions: ', $e->getMessage(), PHP_EOL;
-}
-?>
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **user** | **string**|  |
-
-### Return type
-
-void (empty response body)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -906,22 +861,22 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **revokeAuthenticationSession**
-> revokeAuthenticationSession($user)
+> revokeAuthenticationSession($subject)
 
-Invalidates a user's authentication session
+Invalidates a subject's authentication session
 
-This endpoint invalidates a user's authentication session. After revoking the authentication session, the user has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
-$user = "user_example"; // string | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$subject = "subject_example"; // string | 
 
 try {
-    $api_instance->revokeAuthenticationSession($user);
+    $api_instance->revokeAuthenticationSession($subject);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->revokeAuthenticationSession: ', $e->getMessage(), PHP_EOL;
 }
@@ -932,7 +887,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **user** | **string**|  |
+ **subject** | **string**|  |
 
 ### Return type
 
@@ -949,26 +904,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
-# **revokeUserClientConsentSessions**
-> revokeUserClientConsentSessions($user, $client)
+# **revokeConsentSessions**
+> revokeConsentSessions($subject, $client)
 
-Revokes consent sessions of a user for a specific OAuth 2.0 Client
+Revokes consent sessions of a subject for a specific OAuth 2.0 Client
 
-This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
+This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
 
 ### Example
 ```php
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
-$user = "user_example"; // string | 
-$client = "client_example"; // string | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$subject = "subject_example"; // string | The subject (Subject) who's consent sessions should be deleted.
+$client = "client_example"; // string | If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 
 try {
-    $api_instance->revokeUserClientConsentSessions($user, $client);
+    $api_instance->revokeConsentSessions($subject, $client);
 } catch (Exception $e) {
-    echo 'Exception when calling AdminApi->revokeUserClientConsentSessions: ', $e->getMessage(), PHP_EOL;
+    echo 'Exception when calling AdminApi->revokeConsentSessions: ', $e->getMessage(), PHP_EOL;
 }
 ?>
 ```
@@ -977,8 +932,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **user** | **string**|  |
- **client** | **string**|  |
+ **subject** | **string**| The subject (Subject) who&#39;s consent sessions should be deleted. |
+ **client** | **string**| If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID | [optional]
 
 ### Return type
 
@@ -996,7 +951,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKey**
-> \Hydra\SDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
+> \HydraSDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
 
 Update a JSON Web Key
 
@@ -1007,10 +962,10 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JSONWebKey(); // \Hydra\SDK\Model\JSONWebKey | 
+$body = new \HydraSDK\Model\JSONWebKey(); // \HydraSDK\Model\JSONWebKey | 
 
 try {
     $result = $api_instance->updateJsonWebKey($kid, $set, $body);
@@ -1027,11 +982,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **kid** | **string**| The kid of the desired key |
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
+[**\HydraSDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
 
 ### Authorization
 
@@ -1045,7 +1000,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
+> \HydraSDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
 
 Update a JSON Web Key Set
 
@@ -1056,9 +1011,9 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JSONWebKeySet(); // \Hydra\SDK\Model\JSONWebKeySet | 
+$body = new \HydraSDK\Model\JSONWebKeySet(); // \HydraSDK\Model\JSONWebKeySet | 
 
 try {
     $result = $api_instance->updateJsonWebKeySet($set, $body);
@@ -1074,11 +1029,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -1092,7 +1047,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateOAuth2Client**
-> \Hydra\SDK\Model\OAuth2Client updateOAuth2Client($id, $body)
+> \HydraSDK\Model\OAuth2Client updateOAuth2Client($id, $body)
 
 Update an OAuth 2.0 Client
 
@@ -1103,9 +1058,9 @@ Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\AdminApi();
+$api_instance = new HydraSDK\Api\AdminApi();
 $id = "id_example"; // string | 
-$body = new \Hydra\SDK\Model\OAuth2Client(); // \Hydra\SDK\Model\OAuth2Client | 
+$body = new \HydraSDK\Model\OAuth2Client(); // \HydraSDK\Model\OAuth2Client | 
 
 try {
     $result = $api_instance->updateOAuth2Client($id, $body);
@@ -1121,11 +1076,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **string**|  |
- **body** | [**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
+ **body** | [**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
 
 ### Authorization
 

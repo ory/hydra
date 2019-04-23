@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// RequestDeniedError RequestDeniedError RequestDeniedError The request payload used to accept a login or consent request.
+// RequestDeniedError RequestDeniedError The request payload used to accept a login or consent request.
 // swagger:model RequestDeniedError
 type RequestDeniedError struct {
 

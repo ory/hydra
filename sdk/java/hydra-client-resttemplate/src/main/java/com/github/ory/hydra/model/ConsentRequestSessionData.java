@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * ConsentRequestSessionData
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
 public class ConsentRequestSessionData {
   @JsonProperty("access_token")
   private Map<String, Object> accessToken = null;

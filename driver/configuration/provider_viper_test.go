@@ -34,6 +34,15 @@ func TestSubjectTypesSupported(t *testing.T) {
 			c: setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), ""),
 			e: []string{"public", "pairwise"},
 		},
+		{
+			d: "Load legacy environment variable in legacy format",
+			p: func(t *testing.T) {
+				setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), "public,pairwise,foobar")(t)
+				setEnv(strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)), "jwt")(t)
+			},
+			c: setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), ""),
+			e: []string{"public"},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			tc.p(t)

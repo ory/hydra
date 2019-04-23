@@ -100,14 +100,14 @@ func TestXXMigrations(t *testing.T) {
 				}
 
 				s := consent.NewSQLManager(db, reg)
-				_, err := s.GetAuthenticationRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
+				_, err := s.GetLoginRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)
-				_, err = s.GetAuthenticationSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))
+				_, err = s.GetLoginSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))
 				require.NoError(t, err, "%d-login-session-id", kk)
 				_, err = s.GetConsentRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)
 				if step > 1 {
-					_, err = s.GetForcedObfuscatedAuthenticationSession(context.TODO(), fmt.Sprintf("%d-client", kk), fmt.Sprintf("%d-obfuscated", kk))
+					_, err = s.GetForcedObfuscatedLoginSession(context.TODO(), fmt.Sprintf("%d-client", kk), fmt.Sprintf("%d-obfuscated", kk))
 					require.NoError(t, err, "%d-client", kk)
 				}
 			})

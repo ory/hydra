@@ -18,17 +18,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.ory.hydra.model.ConsentRequest;
-import com.github.ory.hydra.model.ConsentRequestSessionData;
+import com.github.ory.hydra.model.ConsentRequestSession;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * PreviousConsentSession The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json
+ * The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json
  */
-@ApiModel(description = "PreviousConsentSession The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-11T20:30:02.841+02:00")
+@ApiModel(description = "The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
 public class PreviousConsentSession {
   @JsonProperty("consent_request")
   private ConsentRequest consentRequest = null;
@@ -46,7 +46,7 @@ public class PreviousConsentSession {
   private Long rememberFor = null;
 
   @JsonProperty("session")
-  private ConsentRequestSessionData session = null;
+  private ConsentRequestSession session = null;
 
   public PreviousConsentSession consentRequest(ConsentRequest consentRequest) {
     this.consentRequest = consentRequest;
@@ -154,7 +154,7 @@ public class PreviousConsentSession {
     this.rememberFor = rememberFor;
   }
 
-  public PreviousConsentSession session(ConsentRequestSessionData session) {
+  public PreviousConsentSession session(ConsentRequestSession session) {
     this.session = session;
     return this;
   }
@@ -164,11 +164,11 @@ public class PreviousConsentSession {
    * @return session
   **/
   @ApiModelProperty(value = "")
-  public ConsentRequestSessionData getSession() {
+  public ConsentRequestSession getSession() {
     return session;
   }
 
-  public void setSession(ConsentRequestSessionData session) {
+  public void setSession(ConsentRequestSession session) {
     this.session = session;
   }
 

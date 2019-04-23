@@ -35,7 +35,6 @@ import (
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/logrusx"
 
-	"github.com/gorilla/context"
 	"github.com/julienschmidt/httprouter"
 	negronilogrus "github.com/meatballhat/negroni-logrus"
 	"github.com/rs/cors"
@@ -63,9 +62,9 @@ func EnhanceMiddleware(d driver.Driver, n *negroni.Negroni, address string, rout
 		d.Registry().Logger().
 			WithField("options", fmt.Sprintf("%+v", options)).
 			Infof("Enabling CORS on interface: %s", address)
-		return context.ClearHandler(cors.New(options).Handler(n))
+		return cors.New(options).Handler(n)
 	}
-	return context.ClearHandler(n)
+	return n
 }
 
 func isDSNAllowed(d driver.Driver) {

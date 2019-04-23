@@ -61,8 +61,8 @@ for the revoke authentication session operation typically these are written to a
 */
 type RevokeAuthenticationSessionParams struct {
 
-	/*User*/
-	User string
+	/*Subject*/
+	Subject string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -102,15 +102,15 @@ func (o *RevokeAuthenticationSessionParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
-// WithUser adds the user to the revoke authentication session params
-func (o *RevokeAuthenticationSessionParams) WithUser(user string) *RevokeAuthenticationSessionParams {
-	o.SetUser(user)
+// WithSubject adds the subject to the revoke authentication session params
+func (o *RevokeAuthenticationSessionParams) WithSubject(subject string) *RevokeAuthenticationSessionParams {
+	o.SetSubject(subject)
 	return o
 }
 
-// SetUser adds the user to the revoke authentication session params
-func (o *RevokeAuthenticationSessionParams) SetUser(user string) {
-	o.User = user
+// SetSubject adds the subject to the revoke authentication session params
+func (o *RevokeAuthenticationSessionParams) SetSubject(subject string) {
+	o.Subject = subject
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -121,9 +121,13 @@ func (o *RevokeAuthenticationSessionParams) WriteToRequest(r runtime.ClientReque
 	}
 	var res []error
 
-	// path param user
-	if err := r.SetPathParam("user", o.User); err != nil {
-		return err
+	// query param subject
+	qrSubject := o.Subject
+	qSubject := qrSubject
+	if qSubject != "" {
+		if err := r.SetQueryParam("subject", qSubject); err != nil {
+			return err
+		}
 	}
 
 	if len(res) > 0 {

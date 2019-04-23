@@ -224,19 +224,19 @@
     }
 
     /**
-     * Callback function to receive the result of the revokeUserLoginCookie operation.
-     * @callback module:api/PublicApi~revokeUserLoginCookieCallback
+     * Callback function to receive the result of the revokeSubjectLoginCookie operation.
+     * @callback module:api/PublicApi~revokeSubjectLoginCookieCallback
      * @param {String} error Error message, if any.
      * @param data This operation does not return a value.
      * @param {String} response The complete HTTP response.
      */
 
     /**
-     * Logs user out by deleting the session cookie
-     * This endpoint deletes ths user&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the user&#39;s browser.
-     * @param {module:api/PublicApi~revokeUserLoginCookieCallback} callback The callback function, accepting three arguments: error, data, response
+     * Logs subject out by deleting the session cookie
+     * This endpoint deletes ths subject&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the subject&#39;s browser.
+     * @param {module:api/PublicApi~revokeSubjectLoginCookieCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.revokeUserLoginCookie = function(callback) {
+    this.revokeSubjectLoginCookie = function(callback) {
       var postBody = null;
 
 

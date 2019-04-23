@@ -32,13 +32,12 @@ services:
       - OAUTH2_SHARE_ERROR_DEBUG=1
       - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
       - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
-#      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
     restart: unless-stopped
 
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.0.0-rc.6
+    image: oryd/hydra-login-consent-node:v1.0.0-rc.9
     ports:
       - "3000:3000"
     restart: unless-stopped

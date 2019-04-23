@@ -66,48 +66,18 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.PUT(ConsentPath+"/accept", h.AcceptConsentRequest)
 	admin.PUT(ConsentPath+"/reject", h.RejectConsentRequest)
 
-	admin.DELETE(SessionsPath+"/login/:user", h.DeleteLoginSession)
-	admin.GET(SessionsPath+"/consent/:user", h.GetConsentSessions)
-	admin.DELETE(SessionsPath+"/consent/:user", h.DeleteUserConsentSession)
-	admin.DELETE(SessionsPath+"/consent/:user/:client", h.DeleteUserClientConsentSession)
+	admin.DELETE(SessionsPath+"/login", h.DeleteLoginSession)
+	admin.GET(SessionsPath+"/consent", h.GetConsentSessions)
+	admin.DELETE(SessionsPath+"/consent", h.DeleteConsentSession)
 
-	public.GET(SessionsPath+"/login/revoke", h.LogoutUser)
+	public.GET(SessionsPath+"/login/revoke", h.LogoutSubject)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/consent/{user} admin revokeAllUserConsentSessions
+// swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
 //
-// Revokes all previous consent sessions of a user
+// Revokes consent sessions of a subject for a specific OAuth 2.0 Client
 //
-// This endpoint revokes a user's granted consent sessions and invalidates all associated OAuth 2.0 Access Tokens.
-//
-//
-//     Consumes:
-//     - application/json
-//
-//     Produces:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       404: genericError
-//       500: genericError
-func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user := ps.ByName("user")
-	if err := h.r.ConsentManager().RevokeUserConsentSession(r.Context(), user); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// swagger:route DELETE /oauth2/auth/sessions/consent/{user}/{client} admin revokeUserClientConsentSessions
-//
-// Revokes consent sessions of a user for a specific OAuth 2.0 Client
-//
-// This endpoint revokes a user's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
+// This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
 //
 //
@@ -121,30 +91,38 @@ func (h *Handler) DeleteUserConsentSession(w http.ResponseWriter, r *http.Reques
 //
 //     Responses:
 //       204: emptyResponse
+//       400: genericError
 //       404: genericError
 //       500: genericError
-func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client := ps.ByName("client")
-	user := ps.ByName("user")
-	if client == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter client is not defined")))
+func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	subject := r.URL.Query().Get("subject")
+	client := r.URL.Query().Get("client")
+	if subject == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "subject" is not defined but should have been.`)))
 		return
 	}
 
-	if err := h.r.ConsentManager().RevokeUserClientConsentSession(r.Context(), user, client); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
+	if len(client) > 0 {
+		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+	} else {
+		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/sessions/consent/{user} admin listUserConsentSessions
+// swagger:route GET /oauth2/auth/sessions/consent admin listSubjectConsentSessions
 //
-// Lists all consent sessions of a user
+// Lists all consent sessions of a subject
 //
-// This endpoint lists all user's granted consent sessions, including client and granted scope.
-// The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent/{user}?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
+// This endpoint lists all subject's granted consent sessions, including client and granted scope.
+// The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
 //
 //     Consumes:
@@ -157,17 +135,18 @@ func (h *Handler) DeleteUserClientConsentSession(w http.ResponseWriter, r *http.
 //
 //     Responses:
 //       200: handledConsentRequestList
+//       400: genericError
 //       404: genericError
 //       500: genericError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user := ps.ByName("user")
-	if user == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Parameter user is not defined")))
+	subject := r.URL.Query().Get("subject")
+	if subject == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "subject" is not defined but should have been.`)))
 		return
 	}
 
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), user, limit, offset)
+	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, limit, offset)
 	if errors.Cause(err) == ErrNoPreviousConsentFound {
 		h.r.Writer().Write(w, r, []PreviousConsentSession{})
 		return
@@ -187,7 +166,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		a = []PreviousConsentSession{}
 	}
 
-	n, err := h.r.ConsentManager().CountSubjectsGrantedConsentRequests(r.Context(), user)
+	n, err := h.r.ConsentManager().CountSubjectsGrantedConsentRequests(r.Context(), subject)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -198,11 +177,11 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	h.r.Writer().Write(w, r, a)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/login/{user} admin revokeAuthenticationSession
+// swagger:route DELETE /oauth2/auth/sessions/login admin revokeAuthenticationSession
 //
-// Invalidates a user's authentication session
+// Invalidates a subject's authentication session
 //
-// This endpoint invalidates a user's authentication session. After revoking the authentication session, the user
+// This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
 //
 //
@@ -216,12 +195,17 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       204: emptyResponse
+//       400: genericError
 //       404: genericError
 //       500: genericError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user := ps.ByName("user")
+	subject := r.URL.Query().Get("subject")
+	if subject == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "subject" is not defined but should have been.`)))
+		return
+	}
 
-	if err := h.r.ConsentManager().RevokeUserAuthenticationSession(r.Context(), user); err != nil {
+	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -234,11 +218,11 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 // Get an login request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// (sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login
-// provider is an web-app you write and host, and it must be able to authenticate ("show the user a login screen")
-// a user (in OAuth2 the proper name for user is "resource owner").
+// (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+// provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+// a subject (in OAuth2 the proper name for subject is "resource owner").
 //
-// The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login
+// The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
 //
@@ -252,12 +236,18 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: loginRequest
+//       400: genericError
 //       404: genericError
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
-	request, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
+
+	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		log.Println(err)
 		h.r.Writer().WriteError(w, r, err)
@@ -277,15 +267,15 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 // Accept an login request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// (sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login
-// provider is an web-app you write and host, and it must be able to authenticate ("show the user a login screen")
-// a user (in OAuth2 the proper name for user is "resource owner").
+// (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+// provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+// a subject (in OAuth2 the proper name for subject is "resource owner").
 //
-// The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login
+// The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
-// This endpoint tells ORY Hydra that the user has successfully authenticated and includes additional information such as
-// the user's ID and if ORY Hydra should remember the user's user agent for future authentication attempts by setting
+// This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as
+// the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting
 // a cookie.
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
@@ -305,6 +295,10 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //       500: genericError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var (
 		p   HandledLoginRequest
@@ -326,7 +320,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	p.Challenge = challenge
-	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
+	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -343,7 +337,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	}
 	p.RequestedAt = ar.RequestedAt
 
-	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), challenge, &p)
+	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
 		return
@@ -365,14 +359,14 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 // Reject a login request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// (sometimes called "identity provider") to authenticate the user and then tell ORY Hydra now about it. The login
-// provider is an web-app you write and host, and it must be able to authenticate ("show the user a login screen")
-// a user (in OAuth2 the proper name for user is "resource owner").
+// (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+// provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
+// a subject (in OAuth2 the proper name for subject is "resource owner").
 //
-// The authentication challenge is appended to the login provider URL to which the user's user-agent (browser) is redirected to. The login
+// The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
-// This endpoint tells ORY Hydra that the user has not authenticated and includes a reason why the authentication
+// This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
 // was be denied.
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
@@ -392,6 +386,10 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       500: genericError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var p RequestDeniedError
 	d := json.NewDecoder(r.Body)
@@ -401,13 +399,13 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	ar, err := h.r.ConsentManager().GetAuthenticationRequest(r.Context(), challenge)
+	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleAuthenticationRequest(r.Context(), challenge, &HandledLoginRequest{
+	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &HandledLoginRequest{
 		Error:       &p,
 		Challenge:   challenge,
 		RequestedAt: ar.RequestedAt,
@@ -433,14 +431,14 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 // Get consent request information
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if
-// the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.
+// to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+// the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 //
-// The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to
+// The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 // grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 //
-// The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent
-// provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted
+// The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+// provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 // or rejected the request.
 //
 //     Consumes:
@@ -458,6 +456,10 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
@@ -478,17 +480,17 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 // Accept an consent request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if
-// the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.
+// to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+// the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 //
-// The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to
+// The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 // grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 //
-// The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent
-// provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted
+// The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+// provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 // or rejected the request.
 //
-// This endpoint tells ORY Hydra that the user has authorized the OAuth 2.0 client to access resources on his/her behalf.
+// This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
 // The consent provider includes additional information, such as session data for access and ID tokens, and if the
 // consent request should be used as basis for future requests.
 //
@@ -508,6 +510,10 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //       500: genericError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var (
 		p   HandledConsentRequest
@@ -556,17 +562,17 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 // Reject an consent request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// to authenticate the user and then tell ORY Hydra now about it. If the user authenticated, he/she must now be asked if
-// the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the user's behalf.
+// to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+// the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 //
-// The consent provider which handles this request and is a web app implemented and hosted by you. It shows a user interface which asks the user to
+// The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 // grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 //
-// The consent challenge is appended to the consent provider's URL to which the user's user-agent (browser) is redirected to. The consent
-// provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the user accepted
+// The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
+// provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 // or rejected the request.
 //
-// This endpoint tells ORY Hydra that the user has not authorized the OAuth 2.0 client to access resources on his/her behalf.
+// This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
 // The consent provider must include a reason why the consent was not granted.
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
@@ -585,6 +591,10 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       500: genericError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := r.URL.Query().Get("challenge")
+	if challenge == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
+		return
+	}
 
 	var p RequestDeniedError
 	d := json.NewDecoder(r.Body)
@@ -622,13 +632,13 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	})
 }
 
-// swagger:route GET /oauth2/auth/sessions/login/revoke public revokeUserLoginCookie
+// swagger:route GET /oauth2/auth/sessions/login/revoke public revokeSubjectLoginCookie
 //
-// Logs user out by deleting the session cookie
+// Logs subject out by deleting the session cookie
 //
-// This endpoint deletes ths user's login session cookie and redirects the browser to the url
+// This endpoint deletes ths subject's login session cookie and redirects the browser to the url
 // listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to
-// be called from the user's browser.
+// be called from the subject's browser.
 //
 //     Produces:
 //     - application/json
@@ -639,7 +649,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       302: emptyResponse
 //       404: genericError
 //       500: genericError
-func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) LogoutSubject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	sid, err := revokeAuthenticationCookie(w, r, h.r.CookieStore())
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -647,7 +657,7 @@ func (h *Handler) LogoutUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if sid != "" {
-		if err := h.r.ConsentManager().DeleteAuthenticationSession(r.Context(), sid); err != nil {
+		if err := h.r.ConsentManager().DeleteLoginSession(r.Context(), sid); err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}

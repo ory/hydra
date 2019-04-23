@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  Hydra\SDK
+ * @package  HydraSDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace Hydra\SDK\Model;
+namespace HydraSDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * OAuth2Client Class Doc Comment
  *
  * @category    Class
- * @package     Hydra\SDK
+ * @package     HydraSDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -64,7 +64,7 @@ class OAuth2Client implements ArrayAccess
         'contacts' => 'string[]',
         'created_at' => '\DateTime',
         'grant_types' => 'string[]',
-        'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
+        'jwks' => '\HydraSDK\Model\JSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
@@ -529,7 +529,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Gets jwks
-     * @return \Hydra\SDK\Model\JSONWebKeySet
+     * @return \HydraSDK\Model\JSONWebKeySet
      */
     public function getJwks()
     {
@@ -538,7 +538,7 @@ class OAuth2Client implements ArrayAccess
 
     /**
      * Sets jwks
-     * @param \Hydra\SDK\Model\JSONWebKeySet $jwks
+     * @param \HydraSDK\Model\JSONWebKeySet $jwks
      * @return $this
      */
     public function setJwks($jwks)
@@ -919,10 +919,10 @@ class OAuth2Client implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

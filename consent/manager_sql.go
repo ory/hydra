@@ -58,11 +58,11 @@ func (m *SQLManager) CreateSchemas() (int, error) {
 	return n, nil
 }
 
-func (m *SQLManager) RevokeUserConsentSession(ctx context.Context, user string) error {
+func (m *SQLManager) RevokeSubjectConsentSession(ctx context.Context, user string) error {
 	return m.revokeConsentSession(ctx, user, "")
 }
 
-func (m *SQLManager) RevokeUserClientConsentSession(ctx context.Context, user, client string) error {
+func (m *SQLManager) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error {
 	return m.revokeConsentSession(ctx, user, client)
 }
 
@@ -131,7 +131,7 @@ WHERE challenge IN (SELECT r.challenge FROM hydra_oauth2_consent_request as r WH
 	return nil
 }
 
-func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user string) error {
+func (m *SQLManager) RevokeSubjectLoginSession(ctx context.Context, user string) error {
 	_, err := m.DB.ExecContext(
 		ctx,
 		m.DB.Rebind("DELETE FROM hydra_oauth2_authentication_session WHERE subject=?"),
@@ -154,7 +154,7 @@ func (m *SQLManager) RevokeUserAuthenticationSession(ctx context.Context, user s
 	return nil
 }
 
-func (m *SQLManager) CreateForcedObfuscatedAuthenticationSession(ctx context.Context, s *ForcedObfuscatedAuthenticationSession) error {
+func (m *SQLManager) CreateForcedObfuscatedLoginSession(ctx context.Context, s *ForcedObfuscatedLoginSession) error {
 	tx, err := m.DB.BeginTxx(ctx, nil)
 	if err != nil {
 		return sqlcon.HandleError(err)
@@ -188,8 +188,8 @@ func (m *SQLManager) CreateForcedObfuscatedAuthenticationSession(ctx context.Con
 	return nil
 }
 
-func (m *SQLManager) GetForcedObfuscatedAuthenticationSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedAuthenticationSession, error) {
-	var d ForcedObfuscatedAuthenticationSession
+func (m *SQLManager) GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedLoginSession, error) {
+	var d ForcedObfuscatedLoginSession
 
 	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_obfuscated_authentication_session WHERE client_id=? AND subject_obfuscated=?"), client, obfuscated); err != nil {
 		if err == sql.ErrNoRows {
@@ -237,7 +237,7 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 	return d.toConsentRequest(c)
 }
 
-func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *LoginRequest) error {
+func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) error {
 	d, err := newSQLAuthenticationRequest(c)
 	if err != nil {
 		return err
@@ -254,7 +254,7 @@ func (m *SQLManager) CreateAuthenticationRequest(ctx context.Context, c *LoginRe
 	return nil
 }
 
-func (m *SQLManager) GetAuthenticationRequest(ctx context.Context, challenge string) (*LoginRequest, error) {
+func (m *SQLManager) GetLoginRequest(ctx context.Context, challenge string) (*LoginRequest, error) {
 	var d sqlAuthenticationRequest
 	err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_authentication_request r "+
 		"LEFT JOIN hydra_oauth2_authentication_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
@@ -335,7 +335,7 @@ func (m *SQLManager) VerifyAndInvalidateConsentRequest(ctx context.Context, veri
 	return d.toHandledConsentRequest(r)
 }
 
-func (m *SQLManager) HandleAuthenticationRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
+func (m *SQLManager) HandleLoginRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
 	d, err := newSQLHandledLoginRequest(r)
 	if err != nil {
 		return nil, err
@@ -349,10 +349,10 @@ func (m *SQLManager) HandleAuthenticationRequest(ctx context.Context, challenge 
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.GetAuthenticationRequest(ctx, challenge)
+	return m.GetLoginRequest(ctx, challenge)
 }
 
-func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
+func (m *SQLManager) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
 	var d sqlHandledLoginRequest
 	var challenge string
 
@@ -374,7 +374,7 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Contex
 		return nil, sqlcon.HandleError(err)
 	}
 
-	r, err := m.GetAuthenticationRequest(ctx, challenge)
+	r, err := m.GetLoginRequest(ctx, challenge)
 	if err != nil {
 		return nil, err
 	}
@@ -382,8 +382,8 @@ func (m *SQLManager) VerifyAndInvalidateAuthenticationRequest(ctx context.Contex
 	return d.toHandledLoginRequest(r)
 }
 
-func (m *SQLManager) GetAuthenticationSession(ctx context.Context, id string) (*AuthenticationSession, error) {
-	var a AuthenticationSession
+func (m *SQLManager) GetLoginSession(ctx context.Context, id string) (*SubjectSession, error) {
+	var a SubjectSession
 	if err := m.DB.GetContext(ctx, &a, m.DB.Rebind("SELECT * FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
@@ -394,7 +394,7 @@ func (m *SQLManager) GetAuthenticationSession(ctx context.Context, id string) (*
 	return &a, nil
 }
 
-func (m *SQLManager) CreateAuthenticationSession(ctx context.Context, a *AuthenticationSession) error {
+func (m *SQLManager) CreateLoginSession(ctx context.Context, a *SubjectSession) error {
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_session (%s) VALUES (%s)",
 		strings.Join(sqlParamsAuthSession, ", "),
@@ -406,7 +406,7 @@ func (m *SQLManager) CreateAuthenticationSession(ctx context.Context, a *Authent
 	return nil
 }
 
-func (m *SQLManager) DeleteAuthenticationSession(ctx context.Context, id string) error {
+func (m *SQLManager) DeleteLoginSession(ctx context.Context, id string) error {
 	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("DELETE FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
 		return sqlcon.HandleError(err)
 	}

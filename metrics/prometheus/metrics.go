@@ -95,7 +95,7 @@ func NewMetrics(version, hash, date string, registry *prometheus.Registry) *Metr
 			Subsystem: "consent",
 			Name:      "requests_rejected",
 			Help:      "incremented when consent.RejectConsentRequest is successful",
-		}, []string{}),
+		}, []string{"error"}),
 		LoginRequests: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: "hydra",
 			Subsystem: "login",
@@ -107,7 +107,7 @@ func NewMetrics(version, hash, date string, registry *prometheus.Registry) *Metr
 			Subsystem: "login",
 			Name:      "requests_rejected",
 			Help:      "incremented when a request to consent.RejectLoginRequest is successful",
-		}, []string{}),
+		}, []string{"error"}),
 	}
 
 	if pm.Registry != nil {

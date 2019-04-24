@@ -19,20 +19,19 @@ test-resetdb:
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.
+		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
+		make sqlbin
 		GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:latest .
 		rm hydra
 
 # Resets the test databases
 .PHONY: test-e2e
 test-e2e:
-		make test-resetdb
-		npm i
-		npm run test
+		./scripts/test.sh
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
@@ -48,9 +47,6 @@ format:
 .PHONY: mocks
 mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-		mockgen -mock_names Provider=MockConfiguration -package internal -destination internal/configuration_provider_mock.go github.com/ory/hydra/driver/configuration Provider
-		mockgen -mock_names Registry=MockRegistry -package internal -destination internal/registry_mock.go github.com/ory/hydra/driver Registry
-
 
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin

@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * Client Class Doc Comment
  *
  * @category    Class
- * @package     HydraSDK
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -68,7 +68,7 @@ class Client implements ArrayAccess
         'frontchannel_logout_session_required' => 'bool',
         'frontchannel_logout_uri' => 'string',
         'grant_types' => 'string[]',
-        'jwks' => '\HydraSDK\Model\SwaggerJSONWebKeySet',
+        'jwks' => '\Hydra\SDK\Model\SwaggerJSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
         'owner' => 'string',
@@ -568,7 +568,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets created_at
-     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time
+     * @param \DateTime $created_at CreatedAt returns the timestamp of the client's creation. Format: date-time
      * @return $this
      */
     public function setCreatedAt($created_at)
@@ -643,7 +643,7 @@ class Client implements ArrayAccess
 
     /**
      * Gets jwks
-     * @return \HydraSDK\Model\SwaggerJSONWebKeySet
+     * @return \Hydra\SDK\Model\SwaggerJSONWebKeySet
      */
     public function getJwks()
     {
@@ -652,7 +652,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets jwks
-     * @param \HydraSDK\Model\SwaggerJSONWebKeySet $jwks
+     * @param \Hydra\SDK\Model\SwaggerJSONWebKeySet $jwks
      * @return $this
      */
     public function setJwks($jwks)
@@ -972,7 +972,7 @@ class Client implements ArrayAccess
 
     /**
      * Sets updated_at
-     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time
+     * @param \DateTime $updated_at UpdatedAt returns the timestamp of the last update. Format: date-time
      * @return $this
      */
     public function setUpdatedAt($updated_at)
@@ -1054,10 +1054,10 @@ class Client implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

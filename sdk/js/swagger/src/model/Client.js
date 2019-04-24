@@ -239,7 +239,7 @@
    */
   exports.prototype['contacts'] = undefined;
   /**
-   * CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time
+   * CreatedAt returns the timestamp of the client's creation. Format: date-time
    * @member {Date} created_at
    */
   exports.prototype['created_at'] = undefined;
@@ -333,7 +333,7 @@
    */
   exports.prototype['tos_uri'] = undefined;
   /**
-   * UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time
+   * UpdatedAt returns the timestamp of the last update. Format: date-time
    * @member {Date} updated_at
    */
   exports.prototype['updated_at'] = undefined;

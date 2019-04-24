@@ -1,0 +1,19 @@
+{
+  "name": "ory-hydra-mock-oauth2-client",
+  "version": "0.0.0",
+  "main": "./src/index.js",
+  "private": true,
+  "scripts": {
+    "start": "DEBUG=* node ./src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "express": "^4.16.4",
+    "express-session": "^1.16.1",
+    "express-winston": "^3.1.0",
+    "node-fetch": "^2.3.0",
+    "node-uuid": "^1.4.8",
+    "simple-oauth2": "^2.2.1",
+    "winston": "^3.2.1"
+  }
+}

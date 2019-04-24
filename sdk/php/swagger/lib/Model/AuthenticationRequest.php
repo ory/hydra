@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * AuthenticationRequest Class Doc Comment
  *
  * @category    Class
- * @package     HydraSDK
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,8 +55,8 @@ class AuthenticationRequest implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'challenge' => 'string',
-        'client' => '\HydraSDK\Model\Client',
-        'oidc_context' => '\HydraSDK\Model\OpenIDConnectContext',
+        'client' => '\Hydra\SDK\Model\Client',
+        'oidc_context' => '\Hydra\SDK\Model\OpenIDConnectContext',
         'request_url' => 'string',
         'requested_access_token_audience' => 'string[]',
         'requested_scope' => 'string[]',
@@ -231,7 +231,7 @@ class AuthenticationRequest implements ArrayAccess
 
     /**
      * Gets client
-     * @return \HydraSDK\Model\Client
+     * @return \Hydra\SDK\Model\Client
      */
     public function getClient()
     {
@@ -240,7 +240,7 @@ class AuthenticationRequest implements ArrayAccess
 
     /**
      * Sets client
-     * @param \HydraSDK\Model\Client $client
+     * @param \Hydra\SDK\Model\Client $client
      * @return $this
      */
     public function setClient($client)
@@ -252,7 +252,7 @@ class AuthenticationRequest implements ArrayAccess
 
     /**
      * Gets oidc_context
-     * @return \HydraSDK\Model\OpenIDConnectContext
+     * @return \Hydra\SDK\Model\OpenIDConnectContext
      */
     public function getOidcContext()
     {
@@ -261,7 +261,7 @@ class AuthenticationRequest implements ArrayAccess
 
     /**
      * Sets oidc_context
-     * @param \HydraSDK\Model\OpenIDConnectContext $oidc_context
+     * @param \Hydra\SDK\Model\OpenIDConnectContext $oidc_context
      * @return $this
      */
     public function setOidcContext($oidc_context)
@@ -448,10 +448,10 @@ class AuthenticationRequest implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/JsonWebKeySetGeneratorRequest'], factory);
+    define(['ApiClient', 'model/CreateRequest'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./JsonWebKeySetGeneratorRequest'));
+    module.exports = factory(require('../ApiClient'), require('./CreateRequest'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.SwaggerJwkCreateSet = factory(root.OryHydra.ApiClient, root.OryHydra.JsonWebKeySetGeneratorRequest);
+    root.OryHydra.SwaggerJwkCreateSet = factory(root.OryHydra.ApiClient, root.OryHydra.CreateRequest);
   }
-}(this, function(ApiClient, JsonWebKeySetGeneratorRequest) {
+}(this, function(ApiClient, CreateRequest) {
   'use strict';
 
 
@@ -41,6 +41,7 @@
 
   /**
    * Constructs a new <code>SwaggerJwkCreateSet</code>.
+   * SwaggerJwkCreateSet swagger jwk create set
    * @alias module:model/SwaggerJwkCreateSet
    * @class
    * @param set {String} The set in: path
@@ -64,7 +65,7 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('Body')) {
-        obj['Body'] = JsonWebKeySetGeneratorRequest.constructFromObject(data['Body']);
+        obj['Body'] = CreateRequest.constructFromObject(data['Body']);
       }
       if (data.hasOwnProperty('set')) {
         obj['set'] = ApiClient.convertToType(data['set'], 'String');
@@ -74,7 +75,7 @@
   }
 
   /**
-   * @member {module:model/JsonWebKeySetGeneratorRequest} Body
+   * @member {module:model/CreateRequest} Body
    */
   exports.prototype['Body'] = undefined;
   /**

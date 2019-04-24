@@ -1,0 +1,7 @@
+{
+  "env": {
+    "publicUrl": "http://127.0.0.1:4444",
+    "adminUrl": "http://127.0.0.1:4445"
+  },
+  "chromeWebSecurity": false
+}

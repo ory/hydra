@@ -56,9 +56,9 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\AdminApi();
+$api_instance = new Hydra\SDK\Api\AdminApi();
 $consent_challenge = "consent_challenge_example"; // string | 
-$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
+$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
 
 try {
     $result = $api_instance->acceptConsentRequest($consent_challenge, $body);
@@ -152,7 +152,6 @@ Class | Method | HTTP request | Description
  - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
  - [SwaggerHealthStatus](docs/Model/SwaggerHealthStatus.md)
  - [SwaggerJSONWebKey](docs/Model/SwaggerJSONWebKey.md)
- - [SwaggerJSONWebKeyQuery](docs/Model/SwaggerJSONWebKeyQuery.md)
  - [SwaggerJSONWebKeySet](docs/Model/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)

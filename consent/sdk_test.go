@@ -62,7 +62,7 @@ func TestSDK(t *testing.T) {
 
 	m := reg.ConsentManager()
 
-	require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
+	require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
 		ID:      "session1",
 		Subject: "subject1",
 	}))
@@ -142,7 +142,7 @@ func TestSDK(t *testing.T) {
 
 	luaGot, err := sdk.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
 	require.NoError(t, err)
-	assert.EqualValues(t, "http://request-me/?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
+	assert.EqualValues(t,  "https://www.ory.sh?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
 
 	_, err = sdk.Admin.RejectLogoutRequest(admin.NewRejectLogoutRequestParams().WithLogoutChallenge("challengetestsdk-2"))
 	require.NoError(t, err)

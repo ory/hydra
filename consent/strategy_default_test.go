@@ -141,10 +141,11 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID str
 
 func newValidAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID, subject string) http.CookieJar {
 	cj := newAuthCookieJar(t, reg, u, sessionID)
-	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &SubjectSession{
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &LoginSession{
 		ID:              sessionID,
 		Subject:         subject,
 		AuthenticatedAt: time.Now(),
+		Remember:        true,
 	}))
 	return cj
 }

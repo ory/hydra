@@ -162,7 +162,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
 				require.NoError(t, clientManager.CreateClient(context.TODO(), &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)}))
 
-				require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
+				require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
 					ID:              fmt.Sprintf("fk-login-session-%s", k),
 					AuthenticatedAt: time.Now().Round(time.Second).UTC(),
 					Subject:         fmt.Sprintf("subject-%s", k),
@@ -180,35 +180,50 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 		t.Run("case=auth-session", func(t *testing.T) {
 			for _, tc := range []struct {
-				s SubjectSession
+				s LoginSession
 			}{
 				{
-					s: SubjectSession{
+					s: LoginSession{
 						ID:              "session1",
-						AuthenticatedAt: time.Now().Round(time.Second).UTC(),
+						AuthenticatedAt: time.Now().Round(time.Second).Add(-time.Minute).UTC(),
 						Subject:         "subject1",
 					},
 				},
 				{
-					s: SubjectSession{
+					s: LoginSession{
 						ID:              "session2",
-						AuthenticatedAt: time.Now().Round(time.Minute).UTC(),
+						AuthenticatedAt: time.Now().Round(time.Minute).Add(-time.Minute).UTC(),
 						Subject:         "subject2",
 					},
 				},
 			} {
 				t.Run("case=create-get-"+tc.s.ID, func(t *testing.T) {
-					_, err := m.GetLoginSession(context.TODO(), tc.s.ID)
+					_, err := m.GetRememberedLoginSession(context.TODO(), tc.s.ID)
 					require.EqualError(t, err, x.ErrNotFound.Error())
 
 					err = m.CreateLoginSession(context.TODO(), &tc.s)
 					require.NoError(t, err)
 
-					got, err := m.GetLoginSession(context.TODO(), tc.s.ID)
+					_, err = m.GetRememberedLoginSession(context.TODO(), tc.s.ID)
+					require.EqualError(t, err, x.ErrNotFound.Error())
+
+					require.NoError(t, m.ConfirmLoginSession(context.TODO(), tc.s.ID, tc.s.Subject, true))
+
+					got, err := m.GetRememberedLoginSession(context.TODO(), tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got.ID)
-					assert.EqualValues(t, tc.s.AuthenticatedAt.Unix(), got.AuthenticatedAt.Unix())
+					assert.NotEqual(t, tc.s.AuthenticatedAt.Unix(), got.AuthenticatedAt.Unix()) // this was updated from confirm...
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
+
+					time.Sleep(time.Second) // Make sure AuthAt does not equal...
+					require.NoError(t, m.ConfirmLoginSession(context.TODO(), tc.s.ID, "some-other-subject", true))
+
+					got2, err := m.GetRememberedLoginSession(context.TODO(), tc.s.ID)
+					require.NoError(t, err)
+					assert.EqualValues(t, tc.s.ID, got2.ID)
+					assert.NotEqual(t, tc.s.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix()) // this was updated from confirm...
+					assert.NotEqual(t, got.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix()) // this was updated from confirm...
+					assert.EqualValues(t, "some-other-subject", got2.Subject)
 				})
 			}
 			for _, tc := range []struct {
@@ -225,7 +240,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					err := m.DeleteLoginSession(context.TODO(), tc.id)
 					require.NoError(t, err)
 
-					_, err = m.GetLoginSession(context.TODO(), tc.id)
+					_, err = m.GetRememberedLoginSession(context.TODO(), tc.id)
 					require.Error(t, err)
 				})
 			}
@@ -355,19 +370,19 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		})
 
 		t.Run("case=revoke-auth-request", func(t *testing.T) {
-			require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
+			require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
 				ID:              "rev-session-1",
 				AuthenticatedAt: time.Now(),
 				Subject:         "subject-1",
 			}))
 
-			require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
+			require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
 				ID:              "rev-session-2",
 				AuthenticatedAt: time.Now(),
 				Subject:         "subject-2",
 			}))
 
-			require.NoError(t, m.CreateLoginSession(context.TODO(), &SubjectSession{
+			require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
 				ID:              "rev-session-3",
 				AuthenticatedAt: time.Now(),
 				Subject:         "subject-1",
@@ -391,7 +406,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
-							_, err := m.GetLoginSession(context.TODO(), id)
+							_, err := m.GetRememberedLoginSession(context.TODO(), id)
 							assert.EqualError(t, err, x.ErrNotFound.Error())
 						})
 					}
@@ -551,46 +566,58 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			t.Run("case=ListUserAuthenticatedClientsWithFrontChannelLogout", func(t *testing.T) {
 				for i := 0; i <= 10; i++ {
-					c, h := MockConsentRequest(fmt.Sprintf("ListUserAuthenticatedClientsWithFrontChannelLogout-%d", i), false, 0, false, false, false)
+					c, h := MockConsentRequest(fmt.Sprintf("LUACWFCL-%d", i), false, 0, false, false, false)
 					if i == 5 {
 						c.Client.FrontChannelLogoutURI = "http://some-url.com/"
 					}
-					c.Subject = "subjectListUserAuthenticatedClientsWithFrontChannelLogout"
+					c.LoginSessionID = "" // otherwise we had to create the login session as well..
+					c.Subject = "subjectLUACWFCL"
 					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+
+					lc, _ := MockAuthRequest(fmt.Sprintf("LUACWFCL-%d", i), true)
+					lc.Challenge = fmt.Sprintf("fk-login-challenge-LUACWFCL-%d", i)
+					lc.SessionID = ""
+					require.NoError(t, m.CreateLoginRequest(context.TODO(), lc))
 
 					require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
 					_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
 					require.NoError(t, err)
 				}
 
-				clients, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), "subjectListUserAuthenticatedClientsWithFrontChannelLogout")
+				clients, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), "subjectLUACWFCL")
 				require.NoError(t, err)
 
 				require.Len(t, clients, 1)
 				assert.EqualValues(t, "http://some-url.com/", clients[0].FrontChannelLogoutURI)
-				assert.EqualValues(t, "fk-client-ListUserAuthenticatedClientsWithFrontChannelLogout-5", clients[0].ClientID)
+				assert.EqualValues(t, "fk-client-LUACWFCL-5", clients[0].ClientID)
 			})
 
 			t.Run("case=ListUserAuthenticatedClientsWithBackChannelLogout", func(t *testing.T) {
 				for i := 0; i <= 10; i++ {
-					c, h := MockConsentRequest(fmt.Sprintf("ListUserAuthenticatedClientsWithBackChannelLogout-%d", i), false, 0, false, false, false)
+					c, h := MockConsentRequest(fmt.Sprintf("LUACWFBL-%d", i), false, 0, false, false, false)
 					if i == 5 {
 						c.Client.BackChannelLogoutURI = "http://some-url.com/"
 					}
-					c.Subject = "subjectListUserAuthenticatedClientsWithBackChannelLogout"
+					c.LoginSessionID = "" // otherwise we had to create the login session as well..
+					c.Subject = "subjectLUACWFBL" // otherwise we had to create the login session as well..
 					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+
+					lc, _ := MockAuthRequest(fmt.Sprintf("LUACWFBL-%d", i), true)
+					lc.Challenge = fmt.Sprintf("fk-login-challenge-LUACWFBL-%d", i)
+					lc.SessionID = ""
+					require.NoError(t, m.CreateLoginRequest(context.TODO(), lc))
 
 					require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
 					_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
 					require.NoError(t, err)
 				}
 
-				clients, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), "subjectListUserAuthenticatedClientsWithBackChannelLogout")
+				clients, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), "subjectLUACWFBL")
 				require.NoError(t, err)
 
 				require.Len(t, clients, 1)
 				assert.EqualValues(t, "http://some-url.com/", clients[0].BackChannelLogoutURI)
-				assert.EqualValues(t, "fk-client-ListUserAuthenticatedClientsWithBackChannelLogout-5", clients[0].ClientID)
+				assert.EqualValues(t, "fk-client-LUACWFBL-5", clients[0].ClientID)
 			})
 
 			t.Run("case=LogoutRequest", func(t *testing.T) {
@@ -618,7 +645,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 						require.NoError(t, err)
 						assert.False(t, got2.WasUsed)
 						assert.False(t, got2.Accepted)
-						assert.EqualValues(t, c, got2)
+						compareLogoutRequest(t, c, got2)
 
 						if k%2 == 0 {
 							got2, err = m.AcceptLogoutRequest(context.TODO(), "challenge"+tc.key)

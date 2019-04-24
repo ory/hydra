@@ -108,6 +108,7 @@ var sqlParamsAuthSession = []string{
 	"id",
 	"authenticated_at",
 	"subject",
+	"remember",
 }
 
 var sqlParamsLogoutRequest = []string{
@@ -119,6 +120,7 @@ var sqlParamsLogoutRequest = []string{
 	"redir_url",
 	"was_used",
 	"accepted",
+	"rejected",
 	"client_id",
 	"rp_initiated",
 }
@@ -132,6 +134,7 @@ type sqlLogoutRequest struct {
 	PostLogoutRedirectURI string `db:"redir_url"`
 	WasUsed               bool   `db:"was_used"`
 	Accepted              bool   `db:"accepted"`
+	Rejected              bool   `db:"rejected"`
 	Client                string `db:"client_id"`
 	RPInitiated           bool   `db:"rp_initiated"`
 }

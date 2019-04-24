@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -35,8 +35,8 @@ use \ArrayAccess;
  * PreviousConsentSession Class Doc Comment
  *
  * @category    Class
- * @description PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
- * @package     HydraSDK
+ * @description PreviousConsentSession PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,12 +55,12 @@ class PreviousConsentSession implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'consent_request' => '\HydraSDK\Model\ConsentRequest',
+        'consent_request' => '\Hydra\SDK\Model\ConsentRequest',
         'grant_access_token_audience' => 'string[]',
         'grant_scope' => 'string[]',
         'remember' => 'bool',
         'remember_for' => 'int',
-        'session' => '\HydraSDK\Model\ConsentRequestSessionData'
+        'session' => '\Hydra\SDK\Model\ConsentRequestSessionData'
     ];
 
     /**
@@ -193,7 +193,7 @@ class PreviousConsentSession implements ArrayAccess
 
     /**
      * Gets consent_request
-     * @return \HydraSDK\Model\ConsentRequest
+     * @return \Hydra\SDK\Model\ConsentRequest
      */
     public function getConsentRequest()
     {
@@ -202,7 +202,7 @@ class PreviousConsentSession implements ArrayAccess
 
     /**
      * Sets consent_request
-     * @param \HydraSDK\Model\ConsentRequest $consent_request
+     * @param \Hydra\SDK\Model\ConsentRequest $consent_request
      * @return $this
      */
     public function setConsentRequest($consent_request)
@@ -298,7 +298,7 @@ class PreviousConsentSession implements ArrayAccess
 
     /**
      * Gets session
-     * @return \HydraSDK\Model\ConsentRequestSessionData
+     * @return \Hydra\SDK\Model\ConsentRequestSessionData
      */
     public function getSession()
     {
@@ -307,7 +307,7 @@ class PreviousConsentSession implements ArrayAccess
 
     /**
      * Sets session
-     * @param \HydraSDK\Model\ConsentRequestSessionData $session
+     * @param \Hydra\SDK\Model\ConsentRequestSessionData $session
      * @return $this
      */
     public function setSession($session)
@@ -368,10 +368,10 @@ class PreviousConsentSession implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

@@ -22,6 +22,7 @@ package consent_test
 
 import (
 	"flag"
+	"github.com/ory/hydra/x"
 	"sync"
 	"testing"
 	"time"
@@ -48,7 +49,7 @@ func connectToPostgres(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	require.NoError(t, err)
 	t.Logf("Cleaning postgres db...")
-	cleanDB(t, db)
+	x.CleanSQL(t, db)
 	t.Logf("Cleaned postgres db")
 	return db
 }
@@ -57,7 +58,7 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestMySQL()
 	require.NoError(t, err)
 	t.Logf("Cleaning mysql db...")
-	cleanDB(t, db)
+	x.CleanSQL(t, db)
 	t.Logf("Cleaned mysql db")
 	return db
 }
@@ -102,7 +103,7 @@ func TestManagers(t *testing.T) {
 
 	for _, m := range regs {
 		if mm, ok := m.ConsentManager().(*SQLManager); ok {
-			cleanDB(t, mm.DB)
+			x.CleanSQL(t, mm.DB)
 		}
 	}
 }

@@ -27,7 +27,6 @@ services:
       - hydra-migrate
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql&max_conns=20&max_idle_conns=4
-    restart: unless-stopped
 
   mysqld:
     image: mysql:5.7

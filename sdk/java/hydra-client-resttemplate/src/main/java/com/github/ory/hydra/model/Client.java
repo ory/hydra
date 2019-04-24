@@ -27,7 +27,7 @@ import org.joda.time.DateTime;
 /**
  * Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T19:54:17.304+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
 public class Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
@@ -332,10 +332,10 @@ public class Client {
   }
 
    /**
-   * CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time Format: date-time
+   * CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time
    * @return createdAt
   **/
-  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time")
+  @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time")
   public DateTime getCreatedAt() {
     return createdAt;
   }
@@ -714,10 +714,10 @@ public class Client {
   }
 
    /**
-   * UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time
+   * UpdatedAt returns the timestamp of the last update. Format: date-time
    * @return updatedAt
   **/
-  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time")
+  @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time")
   public DateTime getUpdatedAt() {
     return updatedAt;
   }

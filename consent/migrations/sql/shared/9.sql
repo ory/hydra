@@ -9,6 +9,7 @@ CREATE TABLE hydra_oauth2_logout_request (
 	redir_url 		  	      text NOT NULL,
 	was_used                bool NOT NULL default false,
   accepted                bool NOT NULL default false,
+  rejected                bool NOT NULL default false,
 	rp_initiated            bool NOT NULL default false
 );
 

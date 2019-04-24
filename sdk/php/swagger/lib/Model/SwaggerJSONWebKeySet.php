@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -36,7 +36,7 @@ use \ArrayAccess;
  *
  * @category    Class
  * @description SwaggerJSONWebKeySet swagger JSON web key set
- * @package     HydraSDK
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,7 +55,7 @@ class SwaggerJSONWebKeySet implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'keys' => '\HydraSDK\Model\SwaggerJSONWebKey[]'
+        'keys' => '\Hydra\SDK\Model\SwaggerJSONWebKey[]'
     ];
 
     /**
@@ -163,7 +163,7 @@ class SwaggerJSONWebKeySet implements ArrayAccess
 
     /**
      * Gets keys
-     * @return \HydraSDK\Model\SwaggerJSONWebKey[]
+     * @return \Hydra\SDK\Model\SwaggerJSONWebKey[]
      */
     public function getKeys()
     {
@@ -172,7 +172,7 @@ class SwaggerJSONWebKeySet implements ArrayAccess
 
     /**
      * Sets keys
-     * @param \HydraSDK\Model\SwaggerJSONWebKey[] $keys The value of the \"keys\" parameter is an array of JWK values.  By default, the order of the JWK values within the array does not imply an order of preference among them, although applications of JWK Sets can choose to assign a meaning to the order for their purposes, if desired.
+     * @param \Hydra\SDK\Model\SwaggerJSONWebKey[] $keys The value of the \"keys\" parameter is an array of JWK values.  By default, the order of the JWK values within the array does not imply an order of preference among them, although applications of JWK Sets can choose to assign a meaning to the order for their purposes, if desired.
      * @return $this
      */
     public function setKeys($keys)
@@ -233,10 +233,10 @@ class SwaggerJSONWebKeySet implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

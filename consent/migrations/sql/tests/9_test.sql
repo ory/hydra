@@ -34,8 +34,8 @@ VALUES
 	('9-sub', '9-client', '9-obfuscated');
 
 INSERT INTO
-	hydra_oauth2_logout_request (challenge, verifier, subject, sid, client_id, request_url, redir_url, was_used, accepted, rp_initiated)
+	hydra_oauth2_logout_request (challenge, verifier, subject, sid, client_id, request_url, redir_url, was_used, accepted, rejected, rp_initiated)
 VALUES
-	('9-challenge', '9-verifier', '9-subject', '9-session-id', '9-client', 'https://request-url/', 'https://redirect-url', false, false, false);
+	('9-challenge', '9-verifier', '9-subject', '9-session-id', '9-client', 'https://request-url/', 'https://redirect-url', false, false, false, false);
 
 -- +migrate Down

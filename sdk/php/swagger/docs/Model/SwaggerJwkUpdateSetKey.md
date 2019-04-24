@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**body** | [**\HydraSDK\Model\JSONWebKey**](JSONWebKey.md) |  | [optional] 
+**body** | [**\Hydra\SDK\Model\SwaggerJSONWebKey**](SwaggerJSONWebKey.md) |  | [optional] 
 **kid** | **string** | The kid of the desired key in: path | 
 **set** | **string** | The set in: path | 
 

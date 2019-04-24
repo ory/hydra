@@ -47,10 +47,11 @@ type Manager interface {
 	CountSubjectsGrantedConsentRequests(ctx context.Context, user string) (int, error)
 
 	// Cookie management
-	GetLoginSession(ctx context.Context, id string) (*SubjectSession, error)
-	CreateLoginSession(ctx context.Context, session *SubjectSession) error
+	GetRememberedLoginSession(ctx context.Context, id string) (*LoginSession, error)
+	CreateLoginSession(ctx context.Context, session *LoginSession) error
 	DeleteLoginSession(ctx context.Context, id string) error
 	RevokeSubjectLoginSession(ctx context.Context, user string) error
+	ConfirmLoginSession(ctx context.Context, id string, subject string, remember bool) error
 
 	CreateLoginRequest(ctx context.Context, req *LoginRequest) error
 	GetLoginRequest(ctx context.Context, challenge string) (*LoginRequest, error)

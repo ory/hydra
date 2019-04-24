@@ -18,4 +18,3 @@ services:
     environment:
       - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
       - OIDC_SUBJECT_IDENTIFIERS_ENABLED=public
-    restart: unless-stopped

@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * HandledAuthenticationRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-21T19:54:17.304+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
 public class HandledAuthenticationRequest {
   @JsonProperty("acr")
   private String acr = null;

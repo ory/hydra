@@ -40,10 +40,11 @@ type RequestHandlerResponse struct {
 }
 
 // swagger:ignore
-type SubjectSession struct {
+type LoginSession struct {
 	ID              string    `db:"id"`
 	AuthenticatedAt time.Time `db:"authenticated_at"`
 	Subject         string    `db:"subject"`
+	Remember        bool      `db:"remember"`
 }
 
 // The request payload used to accept a login or consent request.

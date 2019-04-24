@@ -98,7 +98,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	return nil
 }
 
-func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*SubjectSession, error) {
+func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*LoginSession, error) {
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
 	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	if err != nil {
@@ -110,7 +110,7 @@ func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.R
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
-	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), sessionID)
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionID)
 	if errors.Cause(err) == x.ErrNotFound {
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	} else if err != nil {
@@ -142,7 +142,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second * time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
 			return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
 		}
@@ -196,7 +196,7 @@ func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idToken
 	return sub, nil
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *SubjectSession) error {
+func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *LoginSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
 	}
@@ -234,6 +234,15 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	sessionID := uuid.New()
 	if session != nil {
 		sessionID = session.ID
+	} else {
+		if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &LoginSession{
+			ID:              sessionID,
+			Subject:         "",
+			AuthenticatedAt: time.Now().UTC(),
+			Remember:        false,
+		}); err != nil {
+			return err
+		}
 	}
 
 	// Set the session
@@ -358,6 +367,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
+	sessionID := session.LoginRequest.SessionID
+
 	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
@@ -405,6 +416,10 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		}
 	}
 
+	if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, session.Subject, session.Remember); err != nil {
+		return nil, err
+	}
+
 	if !session.Remember {
 		if !session.LoginRequest.Skip {
 			// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
@@ -418,17 +433,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	cookie, _ := s.r.CookieStore().Get(r, CookieAuthenticationName)
-	sid := uuid.New()
-
-	if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &SubjectSession{
-		ID:              sid,
-		Subject:         session.Subject,
-		AuthenticatedAt: session.AuthenticatedAt,
-	}); err != nil {
-		return nil, err
-	}
-
-	cookie.Values[CookieAuthenticationSIDName] = sid
+	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
@@ -850,7 +855,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
-	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), hintSid)
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), hintSid)
 	if errors.Cause(err) == x.ErrNotFound {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.

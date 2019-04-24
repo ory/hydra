@@ -40,7 +40,7 @@ type MemoryManager struct {
 	handledConsentRequests map[string]HandledConsentRequest
 	authRequests           map[string]LoginRequest
 	handledAuthRequests    map[string]HandledLoginRequest
-	authSessions           map[string]SubjectSession
+	authSessions           map[string]LoginSession
 	pairwise               []ForcedObfuscatedLoginSession
 	m                      map[string]*sync.RWMutex
 	r                      InternalRegistry
@@ -53,7 +53,7 @@ func NewMemoryManager(r InternalRegistry) *MemoryManager {
 		handledConsentRequests: map[string]HandledConsentRequest{},
 		authRequests:           map[string]LoginRequest{},
 		handledAuthRequests:    map[string]HandledLoginRequest{},
-		authSessions:           map[string]SubjectSession{},
+		authSessions:           map[string]LoginSession{},
 		pairwise:               []ForcedObfuscatedLoginSession{},
 		r:                      r,
 		m: map[string]*sync.RWMutex{
@@ -255,7 +255,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 
@@ -296,7 +296,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 
@@ -338,7 +338,7 @@ func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context,
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 
@@ -350,16 +350,32 @@ func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context,
 	return len(rs), nil
 }
 
-func (m *MemoryManager) GetLoginSession(ctx context.Context, id string) (*SubjectSession, error) {
+func (m *MemoryManager) ConfirmLoginSession(ctx context.Context, id string, subject string, remember bool) error {
+	m.m["authSessions"].Lock()
+	defer m.m["authSessions"].Unlock()
+	if c, ok := m.authSessions[id]; ok {
+		c.Remember = true
+		c.Subject = subject
+		c.AuthenticatedAt = time.Now().UTC()
+		m.authSessions[id] = c
+		return nil
+	}
+	return errors.WithStack(x.ErrNotFound)
+}
+
+func (m *MemoryManager) GetRememberedLoginSession(ctx context.Context, id string) (*LoginSession, error) {
 	m.m["authSessions"].RLock()
 	defer m.m["authSessions"].RUnlock()
 	if c, ok := m.authSessions[id]; ok {
-		return &c, nil
+		if c.Remember {
+			return &c, nil
+		}
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 	return nil, errors.WithStack(x.ErrNotFound)
 }
 
-func (m *MemoryManager) CreateLoginSession(ctx context.Context, a *SubjectSession) error {
+func (m *MemoryManager) CreateLoginSession(ctx context.Context, a *LoginSession) error {
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
 	if _, ok := m.authSessions[a.ID]; ok {

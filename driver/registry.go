@@ -2,6 +2,7 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
+	prom "github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/metrics/prometheus"
@@ -25,6 +26,7 @@ type Registry interface {
 
 	WithConfig(c configuration.Provider) Registry
 	WithLogger(l logrus.FieldLogger) Registry
+	WithPrometheusRegistry(r *prom.Registry) Registry
 
 	WithBuildInfo(version, hash, date string) Registry
 	BuildVersion() string

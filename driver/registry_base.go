@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/serverx"
 
 	"github.com/gorilla/sessions"
+	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/fosite"
@@ -38,6 +38,7 @@ const (
 
 type RegistryBase struct {
 	l            logrus.FieldLogger
+	pr           *prom.Registry
 	c            configuration.Provider
 	cm           client.Manager
 	ch           *client.Handler
@@ -99,7 +100,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
 	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))
 
-	admin.Handler("GET", MetricsPrometheusPath, promhttp.Handler())
+	admin.Handler("GET", MetricsPrometheusPath, promhttp.HandlerFor(m.pmm.PrometheusMetrics.Registry, promhttp.HandlerOpts{}))
 
 	m.ConsentHandler().SetRoutes(admin, public)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
@@ -135,6 +136,11 @@ func (m *RegistryBase) Writer() herodot.Writer {
 
 func (m *RegistryBase) WithLogger(l logrus.FieldLogger) Registry {
 	m.l = l
+	return m.r
+}
+
+func (m *RegistryBase) WithPrometheusRegistry(r *prom.Registry) Registry {
+	m.pr = r
 	return m.r
 }
 
@@ -407,7 +413,7 @@ func (m *RegistryBase) Tracer() *tracing.Tracer {
 
 func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate)
+		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate, m.pr)
 	}
 	return m.pmm
 }

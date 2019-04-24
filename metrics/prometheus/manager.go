@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	// "github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/negroni"
 )
@@ -13,9 +14,9 @@ type MetricsManager struct {
 	PrometheusMetrics *Metrics
 }
 
-func NewMetricsManager(version, hash, buildTime string) *MetricsManager {
+func NewMetricsManager(version, hash, buildTime string, r *prometheus.Registry) *MetricsManager {
 	return &MetricsManager{
-		PrometheusMetrics: NewMetrics(version, hash, buildTime),
+		PrometheusMetrics: NewMetrics(version, hash, buildTime, r),
 	}
 }
 

@@ -23,6 +23,8 @@ import (
 // Some of these values will be populated by HTTP middleware, while others
 // will be populated elsewhere throughout the project
 type Metrics struct {
+	Registry *prometheus.Registry
+
 	HTTPRequestCount      *prometheus.CounterVec
 	HTTPRequestDuration   *prometheus.HistogramVec
 	HTTPResponseSizeBytes *prometheus.HistogramVec
@@ -47,8 +49,9 @@ type Metrics struct {
 }
 
 // NewMetrics registers our metrics and their labels to the prometheus Registry.
-func NewMetrics(version, hash, date string) *Metrics {
+func NewMetrics(version, hash, date string, registry *prometheus.Registry) *Metrics {
 	pm := &Metrics{
+		Registry: registry,
 		HTTPRequestCount: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: "http_request_count",
 			Help: "",
@@ -107,14 +110,17 @@ func NewMetrics(version, hash, date string) *Metrics {
 		}, []string{"subject"}),
 	}
 
-	prometheus.MustRegister(
-		pm.HTTPRequestCount,
-		pm.HTTPRequestDuration,
-		pm.HTTPResponseSizeBytes,
-		pm.ConsentRequests,
-		pm.ConsentRequestScopes,
-		pm.ConsentRequestAudiences,
-		pm.ConsentRequestsRejected,
-	)
+	if pm.Registry != nil {
+		pm.Registry.MustRegister(
+			prometheus.NewGoCollector(),
+			pm.HTTPRequestCount,
+			pm.HTTPRequestDuration,
+			pm.HTTPResponseSizeBytes,
+			pm.ConsentRequests,
+			pm.ConsentRequestScopes,
+			pm.ConsentRequestAudiences,
+			pm.ConsentRequestsRejected,
+		)
+	}
 	return pm
 }

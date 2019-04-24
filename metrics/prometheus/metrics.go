@@ -34,8 +34,8 @@ type Metrics struct {
 	ConsentRequestAudiences *prometheus.CounterVec
 	ConsentRequestsRejected *prometheus.CounterVec
 
-	LoginRequests        *prometheus.CounterVec
-	LoginRequestSubjects *prometheus.CounterVec
+	LoginRequests         *prometheus.CounterVec
+	LoginRequestsRejected *prometheus.CounterVec
 
 	AccessTokensIssued   *prometheus.CounterVec
 	AccessTokensRevoked  *prometheus.CounterVec
@@ -101,13 +101,13 @@ func NewMetrics(version, hash, date string, registry *prometheus.Registry) *Metr
 			Subsystem: "login",
 			Name:      "requests",
 			Help:      "incremented when a request is sent to consent.AcceptLoginRequest",
-		}, []string{"error"}),
-		LoginRequestSubjects: prometheus.NewCounterVec(prometheus.CounterOpts{
+		}, []string{"remember", "error"}),
+		LoginRequestsRejected: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Namespace: "hydra",
 			Subsystem: "login",
-			Name:      "request_subjects",
-			Help:      "incremented when consent.RejectConsentRequest is successful",
-		}, []string{"subject"}),
+			Name:      "requests_rejected",
+			Help:      "incremented when a request to consent.RejectLoginRequest is successful",
+		}, []string{}),
 	}
 
 	if pm.Registry != nil {
@@ -120,6 +120,8 @@ func NewMetrics(version, hash, date string, registry *prometheus.Registry) *Metr
 			pm.ConsentRequestScopes,
 			pm.ConsentRequestAudiences,
 			pm.ConsentRequestsRejected,
+			pm.LoginRequests,
+			pm.LoginRequestsRejected,
 		)
 	}
 	return pm

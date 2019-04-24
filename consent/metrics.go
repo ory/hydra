@@ -47,23 +47,21 @@ func recordAcceptConsentRequest(
 	}
 }
 
-func recordAcceptLoginRequest(
-	m *prometheus.MetricsManager,
-	lr *HandledLoginRequest,
-	err error,
-) {
+func recordAcceptLoginRequest(m *prometheus.MetricsManager, lr *HandledLoginRequest, err error) {
 	m.PrometheusMetrics.LoginRequests.With(prom.Labels{
-		"error": strconv.FormatBool(err != nil),
-	}).Inc()
-
-	m.PrometheusMetrics.LoginRequestSubjects.With(prom.Labels{
-		"subject": lr.Subject,
+		"error":    strconv.FormatBool(err != nil),
+		"remember": strconv.FormatBool(lr.Remember),
 	}).Inc()
 }
 
-// func recordRejectConsentRequest(
-// 	m *prometheus.MetricManager,
-// 	cr *handledConsentRequest,
-// ) {
-//
-// }
+func recordRejectLoginRequest(m *prometheus.MetricsManager, err error) {
+	m.PrometheusMetrics.LoginRequestsRejected.With(prom.Labels{
+		"error": strconv.FormatBool(err != nil),
+	}).Inc()
+}
+
+func recordRejectConsentRequest(m *prometheus.MetricsManager, err error) {
+	m.PrometheusMetrics.ConsentRequestsRejected.With(prom.Labels{
+		"error": strconv.FormatBool(err != nil),
+	}).Inc()
+}

@@ -28,6 +28,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
@@ -302,16 +303,17 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		p   HandledLoginRequest
 		err error
 	)
+
+	defer func(p *HandledLoginRequest, err error) {
+		recordAcceptLoginRequest(h.r.PrometheusManager(), p, err)
+	}(&p, err)
+
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
-
-	defer func(p *HandledLoginRequest, err error) {
-		recordAcceptLoginRequest(h.r.PrometheusManager(), p, err)
-	}(&p, err)
 
 	if p.Subject == "" {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
@@ -389,10 +391,18 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	var p RequestDeniedError
+	var (
+		p   RequestDeniedError
+		err error
+	)
+
+	defer func(err error) {
+		recordRejectLoginRequest(h.r.PrometheusManager(), err)
+	}(err)
+
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
@@ -517,16 +527,17 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		p   HandledConsentRequest
 		err error
 	)
+
+	defer func(p *HandledConsentRequest, err error) {
+		recordAcceptConsentRequest(h.r.PrometheusManager(), p, err)
+	}(&p, err)
+
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
-
-	defer func(p *HandledConsentRequest, err error) {
-		recordAcceptConsentRequest(h.r.PrometheusManager(), p, err)
-	}(&p, err)
 
 	cr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
@@ -595,14 +606,21 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	var p RequestDeniedError
+	var (
+		p   RequestDeniedError
+		err error
+	)
+
+	defer func(err error) {
+		recordRejectConsentRequest(h.r.PrometheusManager(), err)
+	}(err)
+
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&p); err != nil {
+	if err = d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
-	// defer recordAcceptConsentRequest(h.r.PrometheusManager(), &p)
 
 	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
@@ -626,6 +644,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
+	h.r.PrometheusManager().PrometheusMetrics.ConsentRequestsRejected.With(prometheus.Labels{}).Inc()
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
 	})

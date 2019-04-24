@@ -481,6 +481,14 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 
+	if request.RequestedScope == nil {
+		request.RequestedScope = []string{}
+	}
+
+	if request.RequestedAudience == nil {
+		request.RequestedAudience = []string{}
+	}
+
 	request.Client = sanitizeClient(request.Client)
 	h.r.Writer().Write(w, r, request)
 }
@@ -672,7 +680,7 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
-		RedirectTo: urlx.SetQuery(h.c.IssuerURL(), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.IssuerURL(), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
 

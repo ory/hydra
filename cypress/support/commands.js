@@ -23,57 +23,65 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
-import { createClient } from '../helpers'
+import { createClient } from '../helpers';
 
-Cypress.Commands.add('authCodeFlow', (client, {
-  override: {
-    scope,
-    client_id,
-    client_secret
-  } = {},
-  consent: {
-    accept: acceptConsent = true,
-    skip: skipConsent = false,
-    remember: rememberConsent = false,
-    scope: acceptScope = []
-  } = {},
-  login: {
-    skip: skipLogin = false,
-    remember: rememberLogin = false,
-    username = 'foo@bar.com',
-    password = 'foobar'
-  } = {},
-  prompt = '',
-} = {}, path = 'oauth2') => {
-  cy.wrap(createClient(client))
+Cypress.Commands.add(
+  'authCodeFlow',
+  (
+    client,
+    {
+      override: { scope, client_id, client_secret } = {},
+      consent: {
+        accept: acceptConsent = true,
+        skip: skipConsent = false,
+        remember: rememberConsent = false,
+        scope: acceptScope = []
+      } = {},
+      login: {
+        skip: skipLogin = false,
+        remember: rememberLogin = false,
+        username = 'foo@bar.com',
+        password = 'foobar'
+      } = {},
+      prompt = ''
+    } = {},
+    path = 'oauth2'
+  ) => {
+    cy.wrap(createClient(client));
 
-  cy.visit(
-    `http://127.0.0.1:4000/${path}/code?client_id=${client_id || client.client_id}&client_secret=${client_secret || client.client_secret}&scope=${(scope || client.scope).replace(' ', '+')}&prompt=${prompt}`,
-    { failOnStatusCode: false },
-  )
+    cy.visit(
+      `${Cypress.env('client_url')}/${path}/code?client_id=${client_id ||
+        client.client_id}&client_secret=${client_secret ||
+        client.client_secret}&scope=${(scope || client.scope).replace(
+        ' ',
+        '+'
+      )}&prompt=${prompt}`,
+      { failOnStatusCode: false }
+    );
 
-  if (!skipLogin) {
-    cy.get('input[name="email"]').type(username)
-    cy.get('input[name="password"]').type(password)
-    if (rememberLogin) {
-      cy.get('#remember').click()
+    if (!skipLogin) {
+      cy.get('#email').type(username);
+      cy.get('#password').type(password);
+      if (rememberLogin) {
+        cy.get('#remember').click();
+      }
+      cy.get('#accept').click();
     }
-    cy.get('input[type="submit"]').click()
+
+    if (!skipConsent) {
+      acceptScope.forEach(s => {
+        cy.get(`#${s}`).click();
+      });
+
+      if (rememberConsent) {
+        cy.get('#remember').click();
+      }
+
+      if (acceptConsent) {
+        cy.get('#accept').click();
+      } else {
+        cy.get('#reject').click();
+      }
+    }
   }
-
-  if (!skipConsent) {
-    acceptScope.forEach((s) => {
-      cy.get(`#${s}`).click()
-    })
-
-    if (rememberConsent) {
-      cy.get('#remember').click()
-    }
-
-    if (acceptConsent) {
-      cy.get('input[value="Allow access"]').click()
-    } else {
-      cy.get('input[value="Deny access"]').click()
-    }
-  }
-})
+);

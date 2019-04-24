@@ -25,13 +25,62 @@ test-resetdb:
 .PHONY: docker
 docker:
 		make sqlbin
-		GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:latest .
+		GO111MODULE=on GOOS=linux GOARCH=amd64 go build
+		docker build -t oryd/hydra:latest .
 		rm hydra
 
-# Resets the test databases
-.PHONY: test-e2e
-test-e2e:
-		./scripts/test.sh
+.PHONY: e2e
+e2e:
+		make e2e-memory
+
+.PHONY: e2e-prepare-memory
+e2e-prepare-memory:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-jwt
+e2e-prepare-jwt:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-postgres
+e2e-prepare-postgres:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-mysql
+e2e-prepare-mysql:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-reset
+e2e-prepare-reset:
+		docker-compose \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			-f ./test/e2e/docker-compose.plugin.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			-f ./test/e2e/docker-compose.yml \
+			kill
+		docker-compose \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			-f ./test/e2e/docker-compose.plugin.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			-f ./test/e2e/docker-compose.yml \
+			rm -f
+		make docker
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
@@ -42,6 +91,7 @@ quicktest:
 .PHONY: format
 format:
 		goreturns -w -local github.com/ory $$(listx .)
+		npm run format
 
 # Generates mocks
 .PHONY: mocks

@@ -32,8 +32,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/consent"
-
 	"github.com/go-openapi/strfmt"
 
 	"github.com/ory/hydra/sdk/go/hydra/client/admin"
@@ -415,7 +413,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		BackChannelLogoutSessionSupported:  true,
 		FrontChannelLogoutSupported:        true,
 		FrontChannelLogoutSessionSupported: true,
-		EndSessionEndpoint:                 urlx.AppendPaths(conf.IssuerURL(), consent.LogoutPath).String(),
+		EndSessionEndpoint:                 urlx.AppendPaths(conf.IssuerURL(), oauth2.LogoutPath).String(),
 	}
 	var wellKnownResp oauth2.WellKnown
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)

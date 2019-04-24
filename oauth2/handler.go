@@ -138,7 +138,7 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 	// TODO How are we supposed to test this? Maybe with cypress? #1368
 	t, err := template.New("logout").Parse(`<html>
 <head>
-    <meta http-equiv="refresh" content="4; URL={{ .RedirectTo }}">
+    <meta http-equiv="refresh" content="7; URL={{ .RedirectTo }}">
 </head>
 <style type="text/css">
     iframe { position: absolute; left: 0; top: 0; height: 0; width: 0; border: none; }
@@ -153,23 +153,22 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 		// In case replace failed try href
 		setTimeout(function () {
 			window.location.href = redir;
-		}, 250) // Show message after http-equiv="refresh"
+		}, 250); // Show message after http-equiv="refresh"
 	}
 
     function done() {
         total--;
         if (total < 1) {
-			redirect();
+			setTimeout(redirect, 500);
         }
     }
 
-	setTimeout(redirect, 2500); // redirect after 2.5 seconds if e.g. an iframe doesn't load
+	setTimeout(redirect, 7000); // redirect after 5 seconds if e.g. an iframe doesn't load
 
 	// If the redirect takes unusually long, show a message
 	setTimeout(function () {
 		document.getElementById("redir").style.display = "block";
-	}, 1500);
-
+	}, 2000);
 </script>
 <body>
 <noscript>
@@ -242,7 +241,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		BackChannelLogoutSessionSupported:  true,
 		FrontChannelLogoutSupported:        true,
 		FrontChannelLogoutSessionSupported: true,
-		EndSessionEndpoint:                 urlx.AppendPaths(h.c.IssuerURL(), consent.LogoutPath).String(),
+		EndSessionEndpoint:                 urlx.AppendPaths(h.c.IssuerURL(), LogoutPath).String(),
 	})
 }
 

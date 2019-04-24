@@ -73,3 +73,10 @@ func MustValidate(l logrus.FieldLogger, p Provider) {
 		}
 	}
 }
+
+func urlRoot(u *url.URL) *url.URL {
+	if u.Path == "" {
+		u.Path = "/"
+	}
+	return u
+}

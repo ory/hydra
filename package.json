@@ -8,10 +8,9 @@
     "fs": false
   },
   "scripts": {
-    "start:client": "cd test/oauth2-client; npm run start",
-    "test:cypress": "cypress open",
-    "test": "npm-run-all -p start:* test:cypress",
-    "format": "standard \"test/**/*.js\" \"cypress/**/*.js\""
+    "format": "prettier --single-quote --trailing-comma none --write \"{test,cypress}/**/*.js",
+    "test": "cypress open",
+    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\""
   },
   "dependencies": {
     "express-cli": "0.0.1",
@@ -21,6 +20,7 @@
     "cypress": "^3.2.0",
     "npm-run-all": "^4.1.5",
     "openid-client": "^2.4.5",
+    "prettier": "^1.17.0",
     "standard": "^12.0.1"
   }
 }

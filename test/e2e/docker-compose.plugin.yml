@@ -1,0 +1,8 @@
+version: '3'
+
+#services:
+#  hydra:
+#    depends_on:
+#      - hydra-migrate
+#    environment:
+#      - DSN=plugin...

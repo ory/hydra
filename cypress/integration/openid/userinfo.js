@@ -5,21 +5,25 @@ describe('OpenID Connect Userinfo', () => {
     client_id: prng(),
     client_secret: prng(),
     scope: 'openid',
-    subject_type: 'public',
-    token_endpoint_auth_method: 'client_secret_basic',
-    redirect_uris: ['http://127.0.0.1:4000/callback'],
+    redirect_uris: ['http://127.0.0.1:4000/openid/callback'],
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should successfully call the userinfo endpoint after authorization and return a sid', function () {
+  it('should return a proper userinfo response', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, {
-      consent: { scope: ['openid'] }
-    })
+    cy.authCodeFlow(client, { consent: { scope: ['openid'] } }, 'openid')
 
-    cy.request('http://127.0.0.1:4000/userinfo').its('body').then((body) => {
-      expect(body.sub).to.eq('foo@bar.com')
-      expect(body.sid).to.not.be.empty
+    cy.get('body')
+      .invoke('text')
+      .then((content) => {
+        const { result } = JSON.parse(content)
+        expect(result).to.equal('success')
+      })
+
+    cy.request('http://127.0.0.1:4000/openid/userinfo').its('body').then(({ sub, sid } = {}) => {
+      expect(sub).to.eq('foo@bar.com')
+      expect(sid).to.not.be.empty
     })
   })
 })
+

@@ -25,7 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 import { createClient } from '../helpers'
 
-Cypress.Commands.add('oAuth2AuthCodeFlow', (client, {
+Cypress.Commands.add('authCodeFlow', (client, {
   override: {
     scope,
     client_id,
@@ -43,11 +43,12 @@ Cypress.Commands.add('oAuth2AuthCodeFlow', (client, {
     username = 'foo@bar.com',
     password = 'foobar'
   } = {},
-} = {}) => {
+  prompt = '',
+} = {}, path = 'oauth2') => {
   cy.wrap(createClient(client))
 
   cy.visit(
-    `http://127.0.0.1:4000/oauth2/code?client_id=${client_id || client.client_id}&client_secret=${client_secret || client.client_secret}&scope=${(scope || client.scope).replace(' ', '+')}`,
+    `http://127.0.0.1:4000/${path}/code?client_id=${client_id || client.client_id}&client_secret=${client_secret || client.client_secret}&scope=${(scope || client.scope).replace(' ', '+')}&prompt=${prompt}`,
     { failOnStatusCode: false },
   )
 
@@ -61,7 +62,6 @@ Cypress.Commands.add('oAuth2AuthCodeFlow', (client, {
   }
 
   if (!skipConsent) {
-
     acceptScope.forEach((s) => {
       cy.get(`#${s}`).click()
     })

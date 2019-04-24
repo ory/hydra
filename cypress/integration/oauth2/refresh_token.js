@@ -11,7 +11,7 @@ describe('The OAuth 2.0 Refresh Token Grant', function () {
 
   it('should return an Access and Refresh Token and refresh the Access Token', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, { consent: { scope: ['offline_access'] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access'] } })
 
     cy.request('http://127.0.0.1:4000/oauth2/refresh').its('body').then((body) => {
       const { result, token } = body
@@ -23,7 +23,7 @@ describe('The OAuth 2.0 Refresh Token Grant', function () {
 
   it('should return an Access, ID, and Refresh Token and refresh the Access Token and ID Token', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, { consent: { scope: ['offline_access', 'openid'] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access', 'openid'] } })
 
     cy.request('http://127.0.0.1:4000/oauth2/refresh').its('body').then((body) => {
       const { result, token } = body

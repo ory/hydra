@@ -8,6 +8,7 @@ const ew = require('express-winston')
 const winston = require('winston')
 const qs = require('querystring')
 const { Issuer } = require('openid-client')
+const { URLSearchParams } = require('url')
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ const isStatusOk = (res) => res.ok ? Promise.resolve(res) : Promise.reject(new E
 
 const config = {
   url: process.env.AUTHORIZATION_SERVER_URL,
+  admin: process.env.ADMIN_URL,
   port: parseInt(process.env.PORT)
 }
 const redirect_uri = `http://127.0.0.1:${config.port}`
@@ -39,7 +41,7 @@ app.use(session({
   }
 }))
 
-const nc = (req) => Issuer.discover(config.url).then((issuer) => Promise.resolve(new issuer.Client(req.session.credentials)))
+const nc = (req) => Issuer.discover(config.url).then((issuer) => Promise.resolve(new issuer.Client(req.session.oidc_credentials)))
 
 app.get('/oauth2/code', async (req, res) => {
   const credentials = {
@@ -102,7 +104,6 @@ app.get('/oauth2/callback', async (req, res) => {
 
 app.get('/oauth2/refresh', function (req, res) {
   oauth2.create(req.session.credentials).accessToken.create(req.session.token).refresh().then((token) => {
-    console.log(token)
     req.session.token = token
     res.send({ result: 'success', token: token.token })
   }).catch((err) => {
@@ -116,6 +117,35 @@ app.get('/oauth2/revoke', (req, res) => {
   }).catch((err) => {
     res.send(JSON.stringify({ error: err.toString() }))
   })
+})
+
+app.get('/oauth2/introspect/at', (req, res) => {
+  const params = new URLSearchParams()
+  params.append('token', req.session.token.access_token)
+
+  fetch(new URL('/oauth2/introspect', config.admin).toString(), {
+    method: 'POST',
+    body: params
+  }).then(isStatusOk).then((res) => res.json())
+    .then((body) => res.json({ result: 'success', body }))
+    .catch((err) => {
+      console.log(err)
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
+})
+
+app.get('/oauth2/introspect/rt', async (req, res) => {
+  const params = new URLSearchParams()
+  params.append('token', req.session.token.refresh_token)
+
+  fetch(new URL('/oauth2/introspect', config.admin).toString(), {
+    method: 'POST',
+    body: params
+  }).then(isStatusOk).then((res) => res.json())
+    .then((body) => res.json({ result: 'success', body }))
+    .catch((err) => {
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
 })
 
 // client credentials
@@ -159,17 +189,18 @@ app.get('/openid/code', async (req, res) => {
   const nonce = uuid.v4()
   const scope = req.query.scope || ''
 
-  req.session.credentials = credentials
+  req.session.oidc_credentials = credentials
   req.session.state = state
   req.session.nonce = nonce
   req.session.scope = scope.split(' ')
 
   const client = await nc(req)
   const url = client.authorizationUrl({
-    redirect_uri,
+    redirect_uri: `${redirect_uri}/openid/callback`,
     scope: scope,
     state: state,
-    nonce: nonce
+    nonce: nonce,
+    prompt: req.query.prompt
   })
   res.redirect(url)
 })
@@ -191,32 +222,44 @@ app.get('/openid/callback', async (req, res) => {
   }
 
   const client = await nc(req)
-  client.authorizationCallback(redirect_uri, req.query, {
+  client.authorizationCallback(`${redirect_uri}/openid/callback`, req.query, {
     state: req.session.state,
     nonce: req.session.nonce,
     response_type: 'code'
-  }).then(function (tokenSet) {
-    console.log(tokenSet)
-
-    req.session.token = token
-    res.send({ result: 'success', token })
-
-    console.log('received and validated tokens %j', tokenSet)
-    console.log('validated id_token claims %j', tokenSet.claims)
+  }).then((ts) => {
+    req.session.openid_token = ts
+    res.send({ result: 'success', token: ts, claims: ts.claims })
   }).catch((err) => {
     console.log(err)
     res.send(JSON.stringify({ error: err.toString() }))
   })
 })
 
-app.get('/openid/userinfo', function (req, res) {
-  fetch(new URL('/userinfo', config.url).toString(), {
-    headers: { 'Authorization': `Bearer ${req.session.token.access_token}` },
-  }).then(isStatusOk).then((res) => res.json()).then((body) => {
-    res.send(body)
-  }).catch((err) => {
-    res.send(JSON.stringify({ error: err.toString() }))
-  })
+app.get('/openid/userinfo', async (req, res) => {
+  const client = await nc(req)
+  client.userinfo(req.session.openid_token.access_token)
+    .then((ui) => res.json(ui))
+    .catch((err) => {
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
+})
+
+app.get('/openid/revoke/at', async (req, res) => {
+  const client = await nc(req)
+  client.revoke(req.session.openid_token.access_token)
+    .then(() => res.json({result: 'success'}))
+    .catch((err) => {
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
+})
+
+app.get('/openid/revoke/rt', async (req, res) => {
+  const client = await nc(req)
+  client.revoke(req.session.openid_token.refresh_token)
+    .then(() => res.json({result: 'success'}))
+    .catch((err) => {
+      res.send(JSON.stringify({ error: err.toString() }))
+    })
 })
 
 app.listen(config.port, function () {

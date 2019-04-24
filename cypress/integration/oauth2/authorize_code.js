@@ -13,7 +13,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
   it('should return an Access, Refresh, and ID Token when scope offline_access and openid are granted', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, { consent: { scope: ['offline_access', 'openid'] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access', 'openid'] } })
 
     cy.get('body')
       .invoke('text')
@@ -29,7 +29,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
   it('should return an Access and Refresh Token when scope offline_access is granted', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, { consent: { scope: ['offline_access'] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access'] } })
 
     cy.get('body')
       .invoke('text')
@@ -45,7 +45,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
   it('should return an Access and ID Token when scope offline_access is granted', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, { consent: { scope: ['openid'] } })
+    cy.authCodeFlow(client, { consent: { scope: ['openid'] } })
 
     cy.get('body')
       .invoke('text')
@@ -61,7 +61,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
   it('should return an Access Token when no scope is granted', function () {
     const client = nc()
-    cy.oAuth2AuthCodeFlow(client, { consent: { scope: [] } })
+    cy.authCodeFlow(client, { consent: { scope: [] } })
 
     cy.get('body')
       .invoke('text')

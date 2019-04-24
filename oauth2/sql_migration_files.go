@@ -1070,7 +1070,7 @@ func bindataMigrationsSqlTests9testsql() (*asset, error) {
 		size:        3967,
 		md5checksum: "",
 		mode:        os.FileMode(420),
-		modTime:     time.Unix(1555175700, 0),
+		modTime:     time.Unix(1555336768, 0),
 	}
 
 	a := &asset{bytes: bytes, info: info}

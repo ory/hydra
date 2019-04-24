@@ -22,7 +22,6 @@ package consent
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -249,7 +248,6 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 
 	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
-		log.Println(err)
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -538,6 +536,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 	p.Challenge = challenge
 	p.RequestedAt = cr.RequestedAt
+	p.ConsentRequest = cr
 
 	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &p)
 	if err != nil {

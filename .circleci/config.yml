@@ -59,7 +59,7 @@ jobs:
 
   e2e-memory:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -68,7 +68,7 @@ jobs:
 
   e2e-memory-jwt:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -77,7 +77,7 @@ jobs:
 
   e2e-mysql:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -86,7 +86,7 @@ jobs:
 
   e2e-mysql-jwt:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -95,7 +95,7 @@ jobs:
 
   e2e-plugin:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -104,7 +104,7 @@ jobs:
 
   e2e-plugin-jwt:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -113,7 +113,7 @@ jobs:
 
   e2e-postgres:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker
@@ -122,7 +122,7 @@ jobs:
 
   e2e-postgres-jwt:
     docker:
-    - image: circleci/node:11.10.0
+    - image: circleci/golang:1.12-node
     steps:
     - checkout
     - setup_remote_docker

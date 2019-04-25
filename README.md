@@ -253,7 +253,7 @@ article: [Hydra: Run your own Identity and Access Management service in <5 Minut
 ## Contributors
 
 This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
-<a href="graphs/contributors"><img src="https://opencollective.com/ory/contributors.svg?width=890&button=false" /></a>
+<a href="https://github.com/ory/hydra/graphs/contributors"><img src="https://opencollective.com/ory/contributors.svg?width=890&button=false" /></a>
 
 ## Backers
 

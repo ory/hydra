@@ -20,6 +20,7 @@ func CleanSQL(t *testing.T, db *sqlx.DB) {
 		"hydra_oauth2_authentication_request",
 		"hydra_oauth2_authentication_session",
 		"hydra_oauth2_obfuscated_authentication_session",
+		"hydra_oauth2_logout_request",
 		"hydra_jwk",
 		"hydra_client",
 		// Migrations

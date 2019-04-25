@@ -5,9 +5,7 @@ services:
   hydra:
     depends_on:
       - jaeger
-    build:
-      context: ../../
-      dockerfile: Dockerfile-e2e
+    image: oryd/hydra:e2e
     ports:
       - "5000:4444" # Public port
       - "5001:4445" # Admin port

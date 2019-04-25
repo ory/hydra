@@ -61,6 +61,7 @@ jobs:
     machine: true
     steps:
     - checkout
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
     - run: make tools
     - run: make e2e-memory
     - run: make e2e-memory-jwt

@@ -37,6 +37,7 @@ docker:
 
 .PHONY: e2e
 e2e:
+		docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
 		make e2e-memory
 		make e2e-memory-jwt
 		make e2e-postgres

@@ -17,7 +17,7 @@ services:
   hydra-migrate:
     image: oryd/hydra:latest
     environment:
-      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql&max_conns=20&max_idle_conns=4
+      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
     command:
       migrate sql -e
     restart: on-failure
@@ -26,7 +26,7 @@ services:
     depends_on:
       - hydra-migrate
     environment:
-      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql&max_conns=20&max_idle_conns=4
+      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
 
   mysqld:
     image: mysql:5.7

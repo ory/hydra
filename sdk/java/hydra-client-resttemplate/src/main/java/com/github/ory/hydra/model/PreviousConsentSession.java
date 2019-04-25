@@ -14,21 +14,22 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.ory.hydra.model.ConsentRequest;
-import com.github.ory.hydra.model.ConsentRequestSession;
+import com.github.ory.hydra.model.ConsentRequestSessionData;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json
+ * PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
  */
-@ApiModel(description = "The response used to return handled consent requests same as HandledLoginRequest, just with consent_request exposed as json")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@ApiModel(description = "PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class PreviousConsentSession {
   @JsonProperty("consent_request")
   private ConsentRequest consentRequest = null;
@@ -46,7 +47,7 @@ public class PreviousConsentSession {
   private Long rememberFor = null;
 
   @JsonProperty("session")
-  private ConsentRequestSession session = null;
+  private ConsentRequestSessionData session = null;
 
   public PreviousConsentSession consentRequest(ConsentRequest consentRequest) {
     this.consentRequest = consentRequest;
@@ -128,7 +129,7 @@ public class PreviousConsentSession {
    * @return remember
   **/
   @ApiModelProperty(value = "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same client asks the same user for the same, or a subset of, scope.")
-  public Boolean getRemember() {
+  public Boolean isRemember() {
     return remember;
   }
 
@@ -154,7 +155,7 @@ public class PreviousConsentSession {
     this.rememberFor = rememberFor;
   }
 
-  public PreviousConsentSession session(ConsentRequestSession session) {
+  public PreviousConsentSession session(ConsentRequestSessionData session) {
     this.session = session;
     return this;
   }
@@ -164,11 +165,11 @@ public class PreviousConsentSession {
    * @return session
   **/
   @ApiModelProperty(value = "")
-  public ConsentRequestSession getSession() {
+  public ConsentRequestSessionData getSession() {
     return session;
   }
 
-  public void setSession(ConsentRequestSession session) {
+  public void setSession(ConsentRequestSessionData session) {
     this.session = session;
   }
 
@@ -221,6 +222,6 @@ public class PreviousConsentSession {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

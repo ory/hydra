@@ -27,8 +27,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/go-convenience/mapx"
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/mapx"
 )
 
 func sanitizeClientFromRequest(ar fosite.AuthorizeRequester) *client.Client {

@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -24,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
  * SwaggeruserinfoResponsePayload The userinfo response
  */
 @ApiModel(description = "SwaggeruserinfoResponsePayload The userinfo response")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class SwaggeruserinfoResponsePayload {
   @JsonProperty("birthdate")
   private String birthdate = null;
@@ -129,7 +130,7 @@ public class SwaggeruserinfoResponsePayload {
    * @return emailVerified
   **/
   @ApiModelProperty(value = "True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.")
-  public Boolean getEmailVerified() {
+  public Boolean isEmailVerified() {
     return emailVerified;
   }
 
@@ -291,7 +292,7 @@ public class SwaggeruserinfoResponsePayload {
    * @return phoneNumberVerified
   **/
   @ApiModelProperty(value = "True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any extensions MUST be represented in RFC 3966 format.")
-  public Boolean getPhoneNumberVerified() {
+  public Boolean isPhoneNumberVerified() {
     return phoneNumberVerified;
   }
 
@@ -500,6 +501,6 @@ public class SwaggeruserinfoResponsePayload {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

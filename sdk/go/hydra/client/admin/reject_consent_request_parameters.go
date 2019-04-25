@@ -65,8 +65,8 @@ type RejectConsentRequestParams struct {
 
 	/*Body*/
 	Body *models.RequestDeniedError
-	/*Challenge*/
-	Challenge string
+	/*ConsentChallenge*/
+	ConsentChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -117,15 +117,15 @@ func (o *RejectConsentRequestParams) SetBody(body *models.RequestDeniedError) {
 	o.Body = body
 }
 
-// WithChallenge adds the challenge to the reject consent request params
-func (o *RejectConsentRequestParams) WithChallenge(challenge string) *RejectConsentRequestParams {
-	o.SetChallenge(challenge)
+// WithConsentChallenge adds the consentChallenge to the reject consent request params
+func (o *RejectConsentRequestParams) WithConsentChallenge(consentChallenge string) *RejectConsentRequestParams {
+	o.SetConsentChallenge(consentChallenge)
 	return o
 }
 
-// SetChallenge adds the challenge to the reject consent request params
-func (o *RejectConsentRequestParams) SetChallenge(challenge string) {
-	o.Challenge = challenge
+// SetConsentChallenge adds the consentChallenge to the reject consent request params
+func (o *RejectConsentRequestParams) SetConsentChallenge(consentChallenge string) {
+	o.ConsentChallenge = consentChallenge
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -142,11 +142,11 @@ func (o *RejectConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg
 		}
 	}
 
-	// query param challenge
-	qrChallenge := o.Challenge
-	qChallenge := qrChallenge
-	if qChallenge != "" {
-		if err := r.SetQueryParam("challenge", qChallenge); err != nil {
+	// query param consent_challenge
+	qrConsentChallenge := o.ConsentChallenge
+	qConsentChallenge := qrConsentChallenge
+	if qConsentChallenge != "" {
+		if err := r.SetQueryParam("consent_challenge", qConsentChallenge); err != nil {
 			return err
 		}
 	}

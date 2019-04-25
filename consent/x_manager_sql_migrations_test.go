@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/ory/hydra/internal"
 
 	"github.com/jmoiron/sqlx"
@@ -22,47 +24,6 @@ var createMigrations = map[string]*dbal.PackrMigrationSource{
 	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
 }
 
-func cleanDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_oauth2_access")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_refresh")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_code")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_oidc")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_pkce")
-	t.Logf("Unable to execute clean up query: %s", err)
-
-	// hydra_oauth2_consent_request_handled depends on hydra_oauth2_consent_request
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request_handled")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_consent_request")
-	t.Logf("Unable to execute clean up query: %s", err)
-
-	// hydra_oauth2_authentication_request_handled depends on hydra_oauth2_authentication_request
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request_handled")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_request")
-	t.Logf("Unable to execute clean up query: %s", err)
-
-	// everything depends on hydra_oauth2_authentication_session
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_session")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_obfuscated_authentication_session")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	t.Logf("Unable to execute clean up query: %s", err)
-
-	// clean up migration tables
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_authentication_consent_migration")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_oauth2_migration")
-	t.Logf("Unable to execute clean up query: %s", err)
-}
-
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -76,13 +37,11 @@ func TestXXMigrations(t *testing.T) {
 		clients = append(clients, client.Client{ClientID: fmt.Sprintf("%d-client", k+1)})
 	}
 
-	var clean = cleanDB
-
 	migratest.RunPackrMigrationTests(
 		t,
 		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
 		migratest.MigrationSchemas{nil, createMigrations},
-		clean, clean,
+		x.CleanSQL, x.CleanSQL,
 		func(t *testing.T, db *sqlx.DB, sk, step, steps int) {
 			if sk == 0 {
 				t.Skip("Nothing to do...")
@@ -102,7 +61,7 @@ func TestXXMigrations(t *testing.T) {
 				s := consent.NewSQLManager(db, reg)
 				_, err := s.GetLoginRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)
-				_, err = s.GetLoginSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))
+				_, err = s.GetRememberedLoginSession(context.TODO(), fmt.Sprintf("%d-login-session-id", kk))
 				require.NoError(t, err, "%d-login-session-id", kk)
 				_, err = s.GetConsentRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)

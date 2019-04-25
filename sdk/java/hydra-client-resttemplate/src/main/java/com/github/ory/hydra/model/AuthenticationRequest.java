@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * AuthenticationRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class AuthenticationRequest {
   @JsonProperty("challenge")
   private String challenge = null;
@@ -208,7 +209,7 @@ public class AuthenticationRequest {
    * @return skip
   **/
   @ApiModelProperty(value = "Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.  This feature allows you to update / set session information.")
-  public Boolean getSkip() {
+  public Boolean isSkip() {
     return skip;
   }
 
@@ -289,6 +290,6 @@ public class AuthenticationRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

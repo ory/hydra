@@ -55,6 +55,7 @@ type Provider interface {
 	GetSystemSecret() []byte
 	LogoutRedirectURL() *url.URL
 	LoginURL() *url.URL
+	LogoutURL() *url.URL
 }
 
 func MustValidate(l logrus.FieldLogger, p Provider) {
@@ -71,4 +72,11 @@ func MustValidate(l logrus.FieldLogger, p Provider) {
 			l.Fatal(`Flag --dangerous-allow-insecure-redirect-urls can only be used in combination with flag --dangerous-force-http`)
 		}
 	}
+}
+
+func urlRoot(u *url.URL) *url.URL {
+	if u.Path == "" {
+		u.Path = "/"
+	}
+	return u
 }

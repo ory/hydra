@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -27,7 +28,7 @@ import java.util.List;
 /**
  * LoginRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class LoginRequest {
   @JsonProperty("challenge")
   private String challenge = null;
@@ -62,10 +63,10 @@ public class LoginRequest {
   }
 
    /**
-   * Challenge is the identifier (\&quot;authentication challenge\&quot;) of the consent authentication request. It is used to identify the session.
+   * Challenge is the identifier (\&quot;login challenge\&quot;) of the login request. It is used to identify the session.
    * @return challenge
   **/
-  @ApiModelProperty(value = "Challenge is the identifier (\"authentication challenge\") of the consent authentication request. It is used to identify the session.")
+  @ApiModelProperty(value = "Challenge is the identifier (\"login challenge\") of the login request. It is used to identify the session.")
   public String getChallenge() {
     return challenge;
   }
@@ -186,10 +187,10 @@ public class LoginRequest {
   }
 
    /**
-   * SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+   * SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \&quot;sid\&quot; parameter in the ID Token and in OIDC Front-/Back- channel logout. It&#39;s value can generally be used to associate consecutive login requests by a certain user.
    * @return sessionId
   **/
-  @ApiModelProperty(value = "SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.")
+  @ApiModelProperty(value = "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back- channel logout. It's value can generally be used to associate consecutive login requests by a certain user.")
   public String getSessionId() {
     return sessionId;
   }
@@ -208,7 +209,7 @@ public class LoginRequest {
    * @return skip
   **/
   @ApiModelProperty(value = "Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.  This feature allows you to update / set session information.")
-  public Boolean getSkip() {
+  public Boolean isSkip() {
     return skip;
   }
 
@@ -289,6 +290,6 @@ public class LoginRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

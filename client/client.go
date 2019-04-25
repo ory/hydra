@@ -163,6 +163,29 @@ type Client struct {
 
 	// UpdatedAt returns the timestamp of the last update.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+
+	// RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query
+	// parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the
+	// request and to determine which of the potentially multiple sessions is to be logged out; if either is
+	// included, both MUST be.
+	FrontChannelLogoutURI string `json:"frontchannel_logout_uri,omitempty"`
+
+	// Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be
+	// included to identify the RP session with the OP when the frontchannel_logout_uri is used.
+	// If omitted, the default value is false.
+	FrontChannelLogoutSessionRequired bool `json:"frontchannel_logout_session_required,omitempty"`
+
+	// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the
+	// post_logout_redirect_uri parameter after a logout has been performed.
+	PostLogoutRedirectURIs []string `json:"post_logout_redirect_uris,omitempty"`
+
+	// RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
+	BackChannelLogoutURI string `json:"backchannel_logout_uri,omitempty"`
+
+	// Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
+	// Token to identify the RP session with the OP when the backchannel_logout_uri is used.
+	// If omitted, the default value is false.
+	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty"`
 }
 
 func (c *Client) GetID() string {

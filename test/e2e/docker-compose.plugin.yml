@@ -1,0 +1,6 @@
+version: '3'
+
+services:
+  hydra:
+    environment:
+      - DSN=plugin:///memtest.so

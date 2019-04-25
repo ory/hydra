@@ -49,7 +49,7 @@ func (m *RegistryPlugin) Init() error {
 	path := strings.Replace(m.c.DSN(), "plugin://", "", 1)
 	p, err := plugin.Open(path)
 	if err != nil {
-		return errors.WithStack(err)
+		return errors.Wrapf(err, "unable to open plugin path: %s", path)
 	}
 
 	l, err := p.Lookup("NewRegistry")

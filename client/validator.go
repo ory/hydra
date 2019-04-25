@@ -31,8 +31,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/go-convenience/stringslice"
-	"github.com/ory/go-convenience/stringsx"
+	"github.com/ory/x/stringslice"
+	"github.com/ory/x/stringsx"
 )
 
 type Validator struct {
@@ -117,7 +117,14 @@ func (v *Validator) Validate(c *Client) error {
 		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field userinfo_signed_response_alg can either be \"none\" or \"RS256\"."))
 	}
 
+	var redirs []url.URL
 	for _, r := range c.RedirectURIs {
+		u, err := url.ParseRequestURI(r)
+		if err != nil {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Unable to parse redirect URL: %s", r))
+		}
+		redirs = append(redirs, *u)
+
 		if strings.Contains(r, "#") {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)"))
 		}
@@ -132,6 +139,28 @@ func (v *Validator) Validate(c *Client) error {
 			c.SubjectType = "public"
 		} else {
 			c.SubjectType = v.conf.SubjectTypesSupported()[0]
+		}
+	}
+
+	for _, l := range c.PostLogoutRedirectURIs {
+		u, err := url.ParseRequestURI(l)
+		if err != nil {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Unable to parse post_logout_redirect_uri: %s", l))
+		}
+
+		var found bool
+		for _, r := range redirs {
+			if r.Hostname() == u.Hostname() &&
+				r.Port() == u.Port() &&
+				r.Scheme == u.Scheme {
+				found = true
+			}
+		}
+
+		if !found {
+			return errors.WithStack(fosite.ErrInvalidRequest.
+				WithHintf(`post_logout_redirect_uri "%s" must match the domain, port, scheme of at least one of the registered redirect URIs but did not'`, l),
+			)
 		}
 	}
 

@@ -308,10 +308,12 @@ urls:
   login: https://my-login.app/login
   # Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
   consent: https://my-consent.app/consent
+  # Sets the logout endpoint. Defaults to an internal fallback URL.
+  logout: https://my-logout.app/logout
   # Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back
   # to the client. Defaults to an internal fallback URL.
   error: https://my-error.app/error
-  # When a user agent requests to remove the authentication session, it will be redirected to this url afterwards.
+  # When a user agent requests to logout, it will be redirected to this url afterwards per default.
   post_logout_redirect: https://my-example.app/logout-successful
 
 strategies:

@@ -12,6 +12,7 @@ import com.github.ory.hydra.model.JSONWebKey;
 import com.github.ory.hydra.model.JSONWebKeySet;
 import com.github.ory.hydra.model.JsonWebKeySetGeneratorRequest;
 import com.github.ory.hydra.model.LoginRequest;
+import com.github.ory.hydra.model.LogoutRequest;
 import com.github.ory.hydra.model.OAuth2Client;
 import com.github.ory.hydra.model.OAuth2TokenIntrospection;
 import com.github.ory.hydra.model.PreviousConsentSession;
@@ -36,7 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-20T11:10:34.919+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -64,17 +65,17 @@ public class AdminApi {
      * <p><b>200</b> - completedRequest
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
-     * @param challenge The challenge parameter
+     * @param consentChallenge The consentChallenge parameter
      * @param body The body parameter
      * @return CompletedRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public CompletedRequest acceptConsentRequest(String challenge, AcceptConsentRequest body) throws RestClientException {
+    public CompletedRequest acceptConsentRequest(String consentChallenge, AcceptConsentRequest body) throws RestClientException {
         Object postBody = body;
         
-        // verify the required parameter 'challenge' is set
-        if (challenge == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling acceptConsentRequest");
+        // verify the required parameter 'consentChallenge' is set
+        if (consentChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'consentChallenge' when calling acceptConsentRequest");
         }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/accept").build().toUriString();
@@ -83,7 +84,7 @@ public class AdminApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         
-        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "consent_challenge", consentChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -106,17 +107,17 @@ public class AdminApi {
      * <p><b>401</b> - genericError
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
-     * @param challenge The challenge parameter
+     * @param loginChallenge The loginChallenge parameter
      * @param body The body parameter
      * @return CompletedRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public CompletedRequest acceptLoginRequest(String challenge, AcceptLoginRequest body) throws RestClientException {
+    public CompletedRequest acceptLoginRequest(String loginChallenge, AcceptLoginRequest body) throws RestClientException {
         Object postBody = body;
         
-        // verify the required parameter 'challenge' is set
-        if (challenge == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling acceptLoginRequest");
+        // verify the required parameter 'loginChallenge' is set
+        if (loginChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'loginChallenge' when calling acceptLoginRequest");
         }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/accept").build().toUriString();
@@ -125,7 +126,7 @@ public class AdminApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         
-        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "login_challenge", loginChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -133,6 +134,46 @@ public class AdminApi {
         final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
         final String[] contentTypes = { 
             "application/json"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<CompletedRequest> returnType = new ParameterizedTypeReference<CompletedRequest>() {};
+        return apiClient.invokeAPI(path, HttpMethod.PUT, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * Accept a logout request
+     * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request. No body is required.  The response contains a redirect URL which the consent provider should redirect the user-agent to.
+     * <p><b>200</b> - completedRequest
+     * <p><b>404</b> - genericError
+     * <p><b>500</b> - genericError
+     * @param logoutChallenge The logoutChallenge parameter
+     * @return CompletedRequest
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public CompletedRequest acceptLogoutRequest(String logoutChallenge) throws RestClientException {
+        Object postBody = null;
+        
+        // verify the required parameter 'logoutChallenge' is set
+        if (logoutChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'logoutChallenge' when calling acceptLogoutRequest");
+        }
+        
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/logout/accept").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "logout_challenge", logoutChallenge));
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
         };
         final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
 
@@ -390,16 +431,16 @@ public class AdminApi {
      * <p><b>404</b> - genericError
      * <p><b>409</b> - genericError
      * <p><b>500</b> - genericError
-     * @param challenge The challenge parameter
+     * @param consentChallenge The consentChallenge parameter
      * @return ConsentRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public ConsentRequest getConsentRequest(String challenge) throws RestClientException {
+    public ConsentRequest getConsentRequest(String consentChallenge) throws RestClientException {
         Object postBody = null;
         
-        // verify the required parameter 'challenge' is set
-        if (challenge == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling getConsentRequest");
+        // verify the required parameter 'consentChallenge' is set
+        if (consentChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'consentChallenge' when calling getConsentRequest");
         }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent").build().toUriString();
@@ -408,7 +449,7 @@ public class AdminApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         
-        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "consent_challenge", consentChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -522,16 +563,16 @@ public class AdminApi {
      * <p><b>404</b> - genericError
      * <p><b>409</b> - genericError
      * <p><b>500</b> - genericError
-     * @param challenge The challenge parameter
+     * @param loginChallenge The loginChallenge parameter
      * @return LoginRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public LoginRequest getLoginRequest(String challenge) throws RestClientException {
+    public LoginRequest getLoginRequest(String loginChallenge) throws RestClientException {
         Object postBody = null;
         
-        // verify the required parameter 'challenge' is set
-        if (challenge == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling getLoginRequest");
+        // verify the required parameter 'loginChallenge' is set
+        if (loginChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'loginChallenge' when calling getLoginRequest");
         }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login").build().toUriString();
@@ -540,7 +581,7 @@ public class AdminApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         
-        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "login_challenge", loginChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -554,6 +595,46 @@ public class AdminApi {
         String[] authNames = new String[] {  };
 
         ParameterizedTypeReference<LoginRequest> returnType = new ParameterizedTypeReference<LoginRequest>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * Get a logout request
+     * Use this endpoint to fetch a logout request.
+     * <p><b>200</b> - logoutRequest
+     * <p><b>404</b> - genericError
+     * <p><b>500</b> - genericError
+     * @param logoutChallenge The logoutChallenge parameter
+     * @return LogoutRequest
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public LogoutRequest getLogoutRequest(String logoutChallenge) throws RestClientException {
+        Object postBody = null;
+        
+        // verify the required parameter 'logoutChallenge' is set
+        if (logoutChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'logoutChallenge' when calling getLogoutRequest");
+        }
+        
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/logout").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "logout_challenge", logoutChallenge));
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<LogoutRequest> returnType = new ParameterizedTypeReference<LogoutRequest>() {};
         return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
@@ -680,7 +761,7 @@ public class AdminApi {
     /**
      * Lists all consent sessions of a subject
      * This endpoint lists all subject&#39;s granted consent sessions, including client and granted scope. The \&quot;Link\&quot; header is also included in successful responses, which contains one or more links for pagination, formatted like so: &#39;&lt;https://hydra-url/admin/oauth2/auth/sessions/consent?subject&#x3D;{user}&amp;limit&#x3D;{limit}&amp;offset&#x3D;{offset}&gt;; rel&#x3D;\&quot;{page}\&quot;&#39;, where page is one of the following applicable pages: &#39;first&#39;, &#39;next&#39;, &#39;last&#39;, and &#39;previous&#39;. Multiple links can be included in this header, and will be separated by a comma.
-     * <p><b>200</b> - A list of handled consent requests.
+     * <p><b>200</b> - A list of used consent requests.
      * <p><b>400</b> - genericError
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
@@ -724,17 +805,17 @@ public class AdminApi {
      * <p><b>200</b> - completedRequest
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
-     * @param challenge The challenge parameter
+     * @param consentChallenge The consentChallenge parameter
      * @param body The body parameter
      * @return CompletedRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public CompletedRequest rejectConsentRequest(String challenge, RejectRequest body) throws RestClientException {
+    public CompletedRequest rejectConsentRequest(String consentChallenge, RejectRequest body) throws RestClientException {
         Object postBody = body;
         
-        // verify the required parameter 'challenge' is set
-        if (challenge == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling rejectConsentRequest");
+        // verify the required parameter 'consentChallenge' is set
+        if (consentChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'consentChallenge' when calling rejectConsentRequest");
         }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/consent/reject").build().toUriString();
@@ -743,7 +824,7 @@ public class AdminApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         
-        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "consent_challenge", consentChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -766,17 +847,17 @@ public class AdminApi {
      * <p><b>401</b> - genericError
      * <p><b>404</b> - genericError
      * <p><b>500</b> - genericError
-     * @param challenge The challenge parameter
+     * @param loginChallenge The loginChallenge parameter
      * @param body The body parameter
      * @return CompletedRequest
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public CompletedRequest rejectLoginRequest(String challenge, RejectRequest body) throws RestClientException {
+    public CompletedRequest rejectLoginRequest(String loginChallenge, RejectRequest body) throws RestClientException {
         Object postBody = body;
         
-        // verify the required parameter 'challenge' is set
-        if (challenge == null) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'challenge' when calling rejectLoginRequest");
+        // verify the required parameter 'loginChallenge' is set
+        if (loginChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'loginChallenge' when calling rejectLoginRequest");
         }
         
         String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/login/reject").build().toUriString();
@@ -785,7 +866,7 @@ public class AdminApi {
         final HttpHeaders headerParams = new HttpHeaders();
         final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
         
-        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "challenge", challenge));
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "login_challenge", loginChallenge));
 
         final String[] accepts = { 
             "application/json"
@@ -802,7 +883,47 @@ public class AdminApi {
         return apiClient.invokeAPI(path, HttpMethod.PUT, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
-     * Invalidates a subject&#39;s authentication session
+     * Reject a logout request
+     * When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request. No body is required.  The response is empty as the logout provider has to chose what action to perform next.
+     * <p><b>204</b> - Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
+     * <p><b>404</b> - genericError
+     * <p><b>500</b> - genericError
+     * @param logoutChallenge The logoutChallenge parameter
+     * @param body The body parameter
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public void rejectLogoutRequest(String logoutChallenge, RejectRequest body) throws RestClientException {
+        Object postBody = body;
+        
+        // verify the required parameter 'logoutChallenge' is set
+        if (logoutChallenge == null) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Missing the required parameter 'logoutChallenge' when calling rejectLogoutRequest");
+        }
+        
+        String path = UriComponentsBuilder.fromPath("/oauth2/auth/requests/logout/reject").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        
+        queryParams.putAll(apiClient.parameterToMultiValueMap(null, "logout_challenge", logoutChallenge));
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<Void> returnType = new ParameterizedTypeReference<Void>() {};
+        apiClient.invokeAPI(path, HttpMethod.PUT, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * Invalidates all login sessions of a certain user Invalidates a subject&#39;s authentication session
      * This endpoint invalidates a subject&#39;s authentication session. After revoking the authentication session, the subject has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
      * <p><b>204</b> - Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
      * <p><b>400</b> - genericError

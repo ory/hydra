@@ -112,6 +112,39 @@ func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLo
 }
 
 /*
+AcceptLogoutRequest accepts a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
+No body is required.
+
+The response contains a redirect URL which the consent provider should redirect the user-agent to.
+*/
+func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*AcceptLogoutRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAcceptLogoutRequestParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "acceptLogoutRequest",
+		Method:             "PUT",
+		PathPattern:        "/oauth2/auth/requests/logout/accept",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AcceptLogoutRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*AcceptLogoutRequestOK), nil
+
+}
+
+/*
 CreateJSONWebKeySet generates a new JSON web key
 
 This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
@@ -441,6 +474,36 @@ func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginReques
 }
 
 /*
+GetLogoutRequest gets a logout request
+
+Use this endpoint to fetch a logout request.
+*/
+func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutRequestOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetLogoutRequestParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getLogoutRequest",
+		Method:             "GET",
+		PathPattern:        "/oauth2/auth/requests/logout",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetLogoutRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetLogoutRequestOK), nil
+
+}
+
+/*
 GetOAuth2Client gets an o auth 2 0 client
 
 Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
@@ -657,7 +720,40 @@ func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLo
 }
 
 /*
-RevokeAuthenticationSession invalidates a subject s authentication session
+RejectLogoutRequest rejects a logout request
+
+When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
+No body is required.
+
+The response is empty as the logout provider has to chose what action to perform next.
+*/
+func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*RejectLogoutRequestNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRejectLogoutRequestParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "rejectLogoutRequest",
+		Method:             "PUT",
+		PathPattern:        "/oauth2/auth/requests/logout/reject",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &RejectLogoutRequestReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*RejectLogoutRequestNoContent), nil
+
+}
+
+/*
+RevokeAuthenticationSession invalidates all login sessions of a certain user invalidates a subject s authentication session
 
 This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.

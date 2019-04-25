@@ -26,6 +26,8 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 )
 
+var _, _ Manager = new(SQLManager), new(MemoryManager)
+
 type Manager interface {
 	AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error
 

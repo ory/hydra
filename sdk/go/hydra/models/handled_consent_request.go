@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// HandledConsentRequest The request payload used to accept a consent request.
+// HandledConsentRequest HandledConsentRequest The request payload used to accept a consent request.
 // swagger:model HandledConsentRequest
 type HandledConsentRequest struct {
 

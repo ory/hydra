@@ -1,14 +1,15 @@
 SHELL=/bin/bash -o pipefail
 
+.PHONY: tools
+tools:
+		npm i
+		go get github.com/go-bindata/go-bindata/go-bindata
+		go install github.com/go-bindata/go-bindata/go-bindata
+
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:
-		docker kill hydra_test_database_mysql || true
-		docker kill hydra_test_database_postgres || true
-		docker rm -f hydra_test_database_mysql || true
-		docker rm -f hydra_test_database_postgres || true
-		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		make test-resetdb
 		make sqlbin
 		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
 			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
@@ -24,13 +25,163 @@ test-resetdb:
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.
+		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
-		GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:latest .
+		make sqlbin
+		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
+		docker build -t oryd/hydra:latest .
 		rm hydra
+
+.PHONY: e2e
+e2e:
+		docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+		make e2e-memory
+		make e2e-memory-jwt
+		make e2e-postgres
+		make e2e-postgres-jwt
+		make e2e-mysql
+		make e2e-mysql-jwt
+
+.PHONY: e2e-memory
+e2e-memory:
+		make e2e-prepare-memory
+		make e2e-waiton
+		npm run test
+
+.PHONY: e2e-memory-jwt
+e2e-memory-jwt:
+		make e2e-prepare-memory-jwt
+		make e2e-waiton
+		CYPRESS_jwt_enabled=true npm run test
+
+.PHONY: e2e-postgres
+e2e-postgres:
+		make e2e-prepare-postgres
+		make e2e-waiton
+		npm run test
+
+.PHONY: e2e-postgres-jwt
+e2e-postgres-jwt:
+		make e2e-prepare-postgres-jwt
+		make e2e-waiton
+		CYPRESS_jwt_enabled=true npm run test
+
+.PHONY: e2e-mysql
+e2e-mysql:
+		make e2e-prepare-mysql
+		make e2e-waiton
+		npm run test
+
+.PHONY: e2e-mysql-jwt
+e2e-mysql-jwt:
+		make e2e-prepare-mysql-jwt
+		make e2e-waiton
+		CYPRESS_jwt_enabled=true npm run test
+
+.PHONY: e2e-plugin
+e2e-plugin:
+		make e2e-prepare-plugin
+		make e2e-waiton
+		npm run test
+
+.PHONY: e2e-plugin-jwt
+e2e-plugin-jwt:
+		make e2e-prepare-plugin-jwt
+		make e2e-waiton
+		CYPRESS_jwt_enabled=true npm run test
+
+.PHONY: e2e-waiton
+e2e-waiton:
+		npm run wait-on -- -t 6000000 http-get://localhost:5000/health/ready
+		npm run wait-on -- -t 6000000 http-get://localhost:5001/health/ready
+		npm run wait-on -- -t 6000000 http-get://localhost:5002/
+		npm run wait-on -- -t 6000000 http-get://localhost:5003/oauth2/callback
+
+.PHONY: e2e-prepare-memory
+e2e-prepare-memory:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-memory-jwt
+e2e-prepare-memory-jwt:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-postgres
+e2e-prepare-postgres:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-postgres-jwt
+e2e-prepare-postgres-jwt:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-mysql
+e2e-prepare-mysql:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			up --build -d
+			
+.PHONY: e2e-prepare-mysql-jwt
+e2e-prepare-mysql-jwt:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-plugin
+e2e-prepare-plugin:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.plugin.yml \
+			up --build -d
+			
+.PHONY: e2e-prepare-plugin-jwt
+e2e-prepare-plugin-jwt:
+		make e2e-prepare-reset
+		docker-compose \
+			-f ./test/e2e/docker-compose.yml \
+			-f ./test/e2e/docker-compose.plugin.yml \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			up --build -d
+
+.PHONY: e2e-prepare-reset
+e2e-prepare-reset:
+		docker-compose \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			-f ./test/e2e/docker-compose.plugin.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			-f ./test/e2e/docker-compose.yml \
+			kill
+		docker-compose \
+			-f ./test/e2e/docker-compose.jwt.yml \
+			-f ./test/e2e/docker-compose.mysql.yml \
+			-f ./test/e2e/docker-compose.plugin.yml \
+			-f ./test/e2e/docker-compose.postgres.yml \
+			-f ./test/e2e/docker-compose.yml \
+			rm -f
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
@@ -41,14 +192,12 @@ quicktest:
 .PHONY: format
 format:
 		goreturns -w -local github.com/ory $$(listx .)
+		npm run format
 
 # Generates mocks
 .PHONY: mocks
 mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-		mockgen -mock_names Provider=MockConfiguration -package internal -destination internal/configuration_provider_mock.go github.com/ory/hydra/driver/configuration Provider
-		mockgen -mock_names Registry=MockRegistry -package internal -destination internal/registry_mock.go github.com/ory/hydra/driver Registry
-
 
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin
@@ -65,6 +214,7 @@ gen: mocks sqlbin sdk
 # Generates the SDKs
 .PHONY: sdk
 sdk:
+		rm -rf ./vendor/
 		GO111MODULE=on go mod tidy
 		GO111MODULE=on go mod vendor
 		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json

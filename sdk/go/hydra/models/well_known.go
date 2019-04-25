@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// WellKnown WellKnown represents important OpenID Connect discovery metadata
+// WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata
 //
 // It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms
 // among others.
@@ -24,12 +24,30 @@ type WellKnown struct {
 	// Required: true
 	AuthURL *string `json:"authorization_endpoint"`
 
+	// Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP
+	// session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
+	BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported,omitempty"`
+
+	// Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
+	BackChannelLogoutSupported bool `json:"backchannel_logout_supported,omitempty"`
+
 	// Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.
 	ClaimsParameterSupported bool `json:"claims_parameter_supported,omitempty"`
 
 	// JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply
 	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported"`
+
+	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
+	EndSessionEndpoint string `json:"end_session_endpoint,omitempty"`
+
+	// Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify
+	// the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also
+	// included in ID Tokens issued by the OP.
+	FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported,omitempty"`
+
+	// Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
+	FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported,omitempty"`
 
 	// JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
 	GrantTypesSupported []string `json:"grant_types_supported"`

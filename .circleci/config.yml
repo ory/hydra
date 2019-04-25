@@ -57,83 +57,57 @@ jobs:
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-  test-e2e-opaque:
-    docker:
-    - image: circleci/golang:1.12
-      environment:
-      - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
-      - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
-    - image: postgres:9.5
-      environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=hydra
-    - image: mysql:5.7
-      environment:
-      - MYSQL_ROOT_PASSWORD=test
-    working_directory: /go/src/github.com/ory/hydra
+#  test-e2e:
+#    docker:
+#      - image: circleci/golang:1.12
+#        environment:
+#          - DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+#          - DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
+#      - image: postgres:9.6
+#        environment:
+#          - POSTGRES_USER=test
+#          - POSTGRES_PASSWORD=test
+#          - POSTGRES_DB=hydra
+#      - image: mysql:5.7
+#        environment:
+#          - MYSQL_ROOT_PASSWORD=test
+#    steps:
+#    - checkout
+#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+#    - run: make tools
+#    - run: make e2e-memory
+
+  test-e2e-memory:
+    machine: true
     steps:
-    - run:
-        name: Enable go1.12 modules
-        command: |
-          echo 'export GO111MODULE=on' >> $BASH_ENV
-          source $BASH_ENV
     - checkout
-    - run: go mod verify
-    - run: go install github.com/ory/hydra
-    - run: hydra migrate sql $DATABASE_URL_POSTGRES
-    - run: hydra migrate sql $DATABASE_URL_MYSQL
-    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e.sh
-    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e.sh
-#    See https://github.com/ory/hydra/issues/1179
-#    - run: DATABASE_URL=memory ./scripts/test-e2e.sh
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
+    - run: make e2e-memory
 
   test-e2e-plugin:
-    docker:
-    - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/ory/hydra
+    machine: true
     steps:
-    - run:
-        name: Enable go1.12 modules
-        command: |
-          echo 'export GO111MODULE=on' >> $BASH_ENV
-          source $BASH_ENV
     - checkout
-    - run: go mod verify
-    - run: go install github.com/ory/hydra
-    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt ./scripts/test-e2e-plugin.sh
-    - run: ./scripts/test-e2e-plugin.sh
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
+    - run: make e2e-plugin
 
-  test-e2e-jwt:
-    docker:
-    - image: circleci/golang:1.12
-      environment:
-      - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
-      - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
-    - image: postgres:9.5
-      environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=hydra
-    - image: mysql:5.7
-      environment:
-      - MYSQL_ROOT_PASSWORD=test
-    working_directory: /go/src/github.com/ory/hydra
+  test-e2e-mysql:
+    machine: true
     steps:
-    - run:
-        name: Enable go1.12 modules
-        command: |
-          echo 'export GO111MODULE=on' >> $BASH_ENV
-          source $BASH_ENV
     - checkout
-    - run: go mod verify
-    - run: go install github.com/ory/hydra
-    - run: hydra migrate sql $DATABASE_URL_POSTGRES
-    - run: hydra migrate sql $DATABASE_URL_MYSQL
-    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e.sh
-    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e.sh
-#    See https://github.com/ory/hydra/issues/1179
-#    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=memory ./scripts/test-e2e.sh
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
+    - run: make e2e-mysql
+
+  test-e2e-postgres:
+    machine: true
+    steps:
+    - checkout
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
+    - run: make e2e-postgres
 
   release-npm:
     docker:
@@ -228,15 +202,19 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-opaque:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-jwt:
+      - test-e2e-memory:
           filters:
             tags:
               only: /.*/
       - test-e2e-plugin:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-postgres:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-mysql:
           filters:
             tags:
               only: /.*/
@@ -257,9 +235,10 @@ workflows:
           requires:
             - test
             - format
-            - test-e2e-opaque
+            - test-e2e-memory
             - test-e2e-plugin
-            - test-e2e-jwt
+            - test-e2e-postgres
+            - test-e2e-mysql
           filters:
             tags:
               only: /.*/

@@ -98,10 +98,12 @@ and the OpenID Foundation:
 * [OpenID Connect Core 1.0](http://openid.net/specs/openid-connect-core-1_0.html)
 * [OpenID Connect Discovery 1.0](https://openid.net/specs/openid-connect-discovery-1_0.html)
 * [OpenID Connect Dynamic Client Registration 1.0](https://openid.net/specs/openid-connect-registration-1_0.html)
+* [OpenID Connect Front-Channel Logout 1.0](https://openid.net/specs/openid-connect-frontchannel-1_0.html)
+* [OpenID Connect Back-Channel Logout 1.0](https://openid.net/specs/openid-connect-backchannel-1_0.html)
 
 ### OpenID Connect Certified
 
-ORY Hydra is an OpenID Foundation [certified OpenID Provider](http://openid.net/certification/#OPs).
+ORY Hydra is an OpenID Foundation [certified OpenID Provider (OP)](http://openid.net/certification/#OPs).
 
 <p align="center">
     <img src="./docs/images/oidc-cert.png" alt="ORY Hydra is a certified OpenID Providier" width="256px">

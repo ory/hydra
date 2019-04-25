@@ -4,7 +4,6 @@ require (
 	cloud.google.com/go v0.37.2 // indirect
 	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/go-errors/errors v1.0.1
 	github.com/go-openapi/analysis v0.19.0 // indirect
 	github.com/go-openapi/errors v0.19.0
 	github.com/go-openapi/inflect v0.19.0 // indirect
@@ -24,7 +23,6 @@ require (
 	github.com/golang/mock v1.2.0
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/gorilla/handlers v1.4.0 // indirect
-	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.4-0.20181208214519-12bd4761fc66
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
@@ -42,12 +40,11 @@ require (
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.0
-	github.com/ory/fosite v0.29.2
+	github.com/ory/fosite v0.29.3
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
-	github.com/ory/go-convenience v0.1.0
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
-	github.com/ory/x v0.0.49
+	github.com/ory/x v0.0.53
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1

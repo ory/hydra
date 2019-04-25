@@ -94,10 +94,10 @@ e2e-plugin-jwt:
 
 .PHONY: e2e-waiton
 e2e-waiton:
-		npm run wait-on -- -t 120000 http-get://localhost:5000/health/ready
-		npm run wait-on -- -t 120000 http-get://localhost:5001/health/ready
-		npm run wait-on -- -t 120000 http-get://localhost:5002/
-		npm run wait-on -- -t 120000 http-get://localhost:5003/oauth2/callback
+		npm run wait-on -- -t 6000000 http-get://localhost:5000/health/ready
+		npm run wait-on -- -t 6000000 http-get://localhost:5001/health/ready
+		npm run wait-on -- -t 6000000 http-get://localhost:5002/
+		npm run wait-on -- -t 6000000 http-get://localhost:5003/oauth2/callback
 
 .PHONY: e2e-prepare-memory
 e2e-prepare-memory:

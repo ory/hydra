@@ -4,7 +4,6 @@ require (
 	cloud.google.com/go v0.37.2 // indirect
 	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/go-errors/errors v1.0.1
 	github.com/go-openapi/analysis v0.19.0 // indirect
 	github.com/go-openapi/errors v0.19.0
 	github.com/go-openapi/inflect v0.19.0 // indirect

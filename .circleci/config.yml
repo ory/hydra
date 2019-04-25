@@ -58,74 +58,66 @@ jobs:
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
   e2e-memory:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-memory
 
   e2e-memory-jwt:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-memory-jwt
 
   e2e-mysql:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-mysql
 
   e2e-mysql-jwt:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-mysql-jwt
 
   e2e-plugin:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-plugin
 
   e2e-plugin-jwt:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-plugin-jwt
 
   e2e-postgres:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-postgres
 
   e2e-postgres-jwt:
-    docker:
-    - image: circleci/golang:1.12-node
+    machine:
+      - image: circleci/golang:1.12-node
     steps:
     - checkout
-    - setup_remote_docker
     - run: make tools
     - run: make e2e-postgres-jwt
 

@@ -61,10 +61,13 @@ describe('OpenID Connect Logout', () => {
 
   describe('Back-Channel', () => {
     beforeEach(() => {
-      Cypress.Cookies.preserveOnce('oauth2_authentication_session', 'connect.sid')
-    })
+      Cypress.Cookies.preserveOnce(
+        'oauth2_authentication_session',
+        'connect.sid'
+      );
+    });
 
-    it('should log in and remember login with back-channel', function () {
+    it('should log in and remember login with back-channel', function() {
       const client = {
         backchannel_logout_uri: `${Cypress.env(
           'client_url'
@@ -75,30 +78,33 @@ describe('OpenID Connect Logout', () => {
       cy.authCodeFlow(
         client,
         {
-          login: {remember: true},
-          consent: {scope: ['openid'], remember: true}
+          login: { remember: true },
+          consent: { scope: ['openid'], remember: true }
         },
         'openid'
       );
 
-      cy.request(`${Cypress.env('client_url')}/openid/session/check`).its('body').then(({has_session})=>{
-        expect(has_session).to.be.true
-      })
+      cy.request(`${Cypress.env('client_url')}/openid/session/check`)
+        .its('body')
+        .then(({ has_session }) => {
+          expect(has_session).to.be.true;
+        });
     });
 
     it('should show the logout page and complete logout with back-channel', () => {
-      cy.visit(
-        `${Cypress.env('client_url')}/openid/session/end`,
-        {failOnStatusCode: false}
-      );
+      cy.visit(`${Cypress.env('client_url')}/openid/session/end`, {
+        failOnStatusCode: false
+      });
 
       cy.get('#accept').click();
 
-      cy.get('h1').should('contain', 'Your log out request however succeeded.')
+      cy.get('h1').should('contain', 'Your log out request however succeeded.');
 
-      cy.request(`${Cypress.env('client_url')}/openid/session/check`).its('body').then(({has_session})=>{
-        expect(has_session).to.be.false
-      })
-    })
+      cy.request(`${Cypress.env('client_url')}/openid/session/check`)
+        .its('body')
+        .then(({ has_session }) => {
+          expect(has_session).to.be.false;
+        });
+    });
   });
 });

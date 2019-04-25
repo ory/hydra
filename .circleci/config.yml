@@ -59,7 +59,7 @@ jobs:
 
   e2e-memory:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -67,7 +67,7 @@ jobs:
 
   e2e-memory-jwt:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -75,7 +75,7 @@ jobs:
 
   e2e-mysql:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -83,7 +83,7 @@ jobs:
 
   e2e-mysql-jwt:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -91,7 +91,7 @@ jobs:
 
   e2e-plugin:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -99,7 +99,7 @@ jobs:
 
   e2e-plugin-jwt:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -107,7 +107,7 @@ jobs:
 
   e2e-postgres:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools
@@ -115,7 +115,7 @@ jobs:
 
   e2e-postgres-jwt:
     machine:
-      - image: circleci/golang:1.12-node
+      image: circleci/golang:1.12-node
     steps:
     - checkout
     - run: make tools

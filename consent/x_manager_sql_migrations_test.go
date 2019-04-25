@@ -3,8 +3,9 @@ package consent_test
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/x"
 	"testing"
+
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/hydra/internal"
 

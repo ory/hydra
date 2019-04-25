@@ -142,7 +142,7 @@ func TestSDK(t *testing.T) {
 
 	luaGot, err := sdk.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
 	require.NoError(t, err)
-	assert.EqualValues(t,  "https://www.ory.sh?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
+	assert.EqualValues(t, "https://www.ory.sh?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
 
 	_, err = sdk.Admin.RejectLogoutRequest(admin.NewRejectLogoutRequestParams().WithLogoutChallenge("challengetestsdk-2"))
 	require.NoError(t, err)

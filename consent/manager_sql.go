@@ -31,7 +31,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	"github.com/rubenv/sql-migrate"
+	migrate "github.com/rubenv/sql-migrate"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
@@ -493,7 +493,7 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		}
 
-		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor) * time.Second).Before(time.Now().UTC()) {
+		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 

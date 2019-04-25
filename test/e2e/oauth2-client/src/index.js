@@ -5,22 +5,22 @@ const oauth2 = require('simple-oauth2');
 const fetch = require('node-fetch');
 const ew = require('express-winston');
 const winston = require('winston');
-const {Issuer} = require('openid-client');
-const {URLSearchParams} = require('url');
+const { Issuer } = require('openid-client');
+const { URLSearchParams } = require('url');
 const bodyParser = require('body-parser');
 const jwksClient = require('jwks-rsa');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const isStatusOk = res =>
   res.ok
     ? Promise.resolve(res)
     : Promise.reject(
-    new Error(`Received unexpected status code ${res.statusCode}`)
-    );
+        new Error(`Received unexpected status code ${res.statusCode}`)
+      );
 
 const config = {
   url: process.env.AUTHORIZATION_SERVER_URL || 'http://127.0.0.1:5000/',
@@ -56,12 +56,24 @@ app.use(
 const nc = req =>
   Issuer.discover(config.public).then(issuer => {
     // This is neccessary when working with docker...
-    issuer.metadata.token_endpoint = new URL('/oauth2/token', config.public).toString()
-    issuer.metadata.jwks_uri = new URL('/.well-known/jwks.json', config.public).toString()
-    issuer.metadata.revocation_endpoint = new URL('/oauth2/revoke', config.public).toString()
-    issuer.metadata.introspection_endpoint = new URL('/oauth2/introspect', config.admin).toString()
+    issuer.metadata.token_endpoint = new URL(
+      '/oauth2/token',
+      config.public
+    ).toString();
+    issuer.metadata.jwks_uri = new URL(
+      '/.well-known/jwks.json',
+      config.public
+    ).toString();
+    issuer.metadata.revocation_endpoint = new URL(
+      '/oauth2/revoke',
+      config.public
+    ).toString();
+    issuer.metadata.introspection_endpoint = new URL(
+      '/oauth2/introspect',
+      config.admin
+    ).toString();
 
-    return Promise.resolve(new issuer.Client(req.session.oidc_credentials))
+    return Promise.resolve(new issuer.Client(req.session.oidc_credentials));
   });
 
 app.get('/oauth2/code', async (req, res) => {
@@ -96,51 +108,51 @@ app.get('/oauth2/code', async (req, res) => {
 
 app.get('/oauth2/callback', async (req, res) => {
   if (req.query.error) {
-    res.send(JSON.stringify(Object.assign({result: 'error'}, req.query)));
+    res.send(JSON.stringify(Object.assign({ result: 'error' }, req.query)));
     return;
   }
 
   if (req.query.state !== req.session.state) {
-    res.send(JSON.stringify({result: 'error', error: 'states mismatch'}));
+    res.send(JSON.stringify({ result: 'error', error: 'states mismatch' }));
     return;
   }
 
   if (!req.query.code) {
-    res.send(JSON.stringify({result: 'error', error: 'no code given'}));
+    res.send(JSON.stringify({ result: 'error', error: 'no code given' }));
     return;
   }
 
   oauth2
     .create(req.session.credentials)
     .authorizationCode.getToken({
-    redirect_uri: `${redirect_uri}/oauth2/callback`,
-    scope: req.session.scope,
-    code: req.query.code
-  })
+      redirect_uri: `${redirect_uri}/oauth2/callback`,
+      scope: req.session.scope,
+      code: req.query.code
+    })
     .then(token => {
       req.session.token = token;
-      res.send({result: 'success', token});
+      res.send({ result: 'success', token });
     })
     .catch(err => {
       if (err.data.payload) {
         res.send(JSON.stringify(err.data.payload));
         return;
       }
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
-app.get('/oauth2/refresh', function (req, res) {
+app.get('/oauth2/refresh', function(req, res) {
   oauth2
     .create(req.session.credentials)
     .accessToken.create(req.session.token)
     .refresh()
     .then(token => {
       req.session.token = token;
-      res.send({result: 'success', token: token.token});
+      res.send({ result: 'success', token: token.token });
     })
     .catch(err => {
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -151,7 +163,7 @@ app.get('/oauth2/revoke', (req, res) => {
       res.status(201);
     })
     .catch(err => {
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -165,10 +177,10 @@ app.get('/oauth2/introspect/at', (req, res) => {
   })
     .then(isStatusOk)
     .then(res => res.json())
-    .then(body => res.json({result: 'success', body}))
+    .then(body => res.json({ result: 'success', body }))
     .catch(err => {
       console.log(err);
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -182,9 +194,9 @@ app.get('/oauth2/introspect/rt', async (req, res) => {
   })
     .then(isStatusOk)
     .then(res => res.json())
-    .then(body => res.json({result: 'success', body}))
+    .then(body => res.json({ result: 'success', body }))
     .catch(err => {
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -207,9 +219,9 @@ app.get('/oauth2/cc', (req, res) => {
 
   oauth2
     .create(credentials)
-    .clientCredentials.getToken({scope: req.query.scope.split(' ')})
+    .clientCredentials.getToken({ scope: req.query.scope.split(' ') })
     .then(token => {
-      res.send({result: 'success', token});
+      res.send({ result: 'success', token });
     })
     .catch(err => {
       if (err.data.payload) {
@@ -217,7 +229,7 @@ app.get('/oauth2/cc', (req, res) => {
         return;
       }
 
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -251,17 +263,17 @@ app.get('/openid/code', async (req, res) => {
 
 app.get('/openid/callback', async (req, res) => {
   if (req.query.error) {
-    res.send(JSON.stringify(Object.assign({result: 'error'}, req.query)));
+    res.send(JSON.stringify(Object.assign({ result: 'error' }, req.query)));
     return;
   }
 
   if (req.query.state !== req.session.state) {
-    res.send(JSON.stringify({result: 'error', error: 'states mismatch'}));
+    res.send(JSON.stringify({ result: 'error', error: 'states mismatch' }));
     return;
   }
 
   if (!req.query.code) {
-    res.send(JSON.stringify({result: 'error', error: 'no code given'}));
+    res.send(JSON.stringify({ result: 'error', error: 'no code given' }));
     return;
   }
 
@@ -275,11 +287,11 @@ app.get('/openid/callback', async (req, res) => {
     .then(ts => {
       req.session.openid_token = ts;
       req.session.openid_claims = ts.claims;
-      res.send({result: 'success', token: ts, claims: ts.claims});
+      res.send({ result: 'success', token: ts, claims: ts.claims });
     })
     .catch(err => {
       console.log(err);
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -289,7 +301,7 @@ app.get('/openid/userinfo', async (req, res) => {
     .userinfo(req.session.openid_token.access_token)
     .then(ui => res.json(ui))
     .catch(err => {
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -297,9 +309,9 @@ app.get('/openid/revoke/at', async (req, res) => {
   const client = await nc(req);
   client
     .revoke(req.session.openid_token.access_token)
-    .then(() => res.json({result: 'success'}))
+    .then(() => res.json({ result: 'success' }))
     .catch(err => {
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -307,9 +319,9 @@ app.get('/openid/revoke/rt', async (req, res) => {
   const client = await nc(req);
   client
     .revoke(req.session.openid_token.refresh_token)
-    .then(() => res.json({result: 'success'}))
+    .then(() => res.json({ result: 'success' }))
     .catch(err => {
-      res.send(JSON.stringify({error: err.toString()}));
+      res.send(JSON.stringify({ error: err.toString() }));
     });
 });
 
@@ -340,51 +352,61 @@ app.get('/openid/session/end/fc', async (req, res) => {
 
   setTimeout(() => {
     req.session.destroy(() => {
-      res.send('ok')
+      res.send('ok');
     });
-  }, 2000)
+  }, 2000);
 });
 
 app.post('/openid/session/end/bc', async (req, res) => {
-  const client = jwksClient({jwksUri: new URL('/.well-known/jwks.json', config.public).toString()});
-
-  jwt.verify(token, (header, callback) => {
-    client.getSigningKey(header.kid, function (err, key) {
-      const signingKey = key.publicKey || key.rsaPublicKey;
-      callback(null, signingKey);
-    });
-  }, options, function (err, decoded) {
-    if (err) {
-      console.error(err)
-      res.send(400)
-      return
-    }
-
-    if (decoded.nonce) {
-      res.send(400)
-      return
-    }
-
-    if (req.session.openid_claims.sid !== decoded.sid) {
-      res.send(400)
-      return
-    }
-
-    if (req.session.openid_claims.iss !== decoded.iss) {
-      res.status(400);
-      return;
-    }
-
-    res.send('ok')
+  const client = jwksClient({
+    jwksUri: new URL('/.well-known/jwks.json', config.public).toString()
   });
+
+  jwt.verify(
+    token,
+    (header, callback) => {
+      client.getSigningKey(header.kid, function(err, key) {
+        const signingKey = key.publicKey || key.rsaPublicKey;
+        callback(null, signingKey);
+      });
+    },
+    options,
+    function(err, decoded) {
+      if (err) {
+        console.error(err);
+        res.send(400);
+        return;
+      }
+
+      if (decoded.nonce) {
+        res.send(400);
+        return;
+      }
+
+      if (req.session.openid_claims.sid !== decoded.sid) {
+        res.send(400);
+        return;
+      }
+
+      if (req.session.openid_claims.iss !== decoded.iss) {
+        res.status(400);
+        return;
+      }
+
+      res.send('ok');
+    }
+  );
 });
 
 app.get('/openid/session/check', async (req, res) => {
   res.json({
-    has_session: Boolean(req.session) && Boolean(req.session.openid_token) && Boolean(req.session.openid_claims)
+    has_session:
+      Boolean(req.session) &&
+      Boolean(req.session.openid_token) &&
+      Boolean(req.session.openid_claims)
   });
 });
 
-app.listen(config.port, function () {
+app.listen(config.port, function() {
   console.log(`Listening on port ${config.port}!`);
 });

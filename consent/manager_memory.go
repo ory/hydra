@@ -255,7 +255,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 
@@ -296,7 +296,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 
@@ -338,7 +338,7 @@ func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context,
 			continue
 		}
 
-		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor) * time.Second).Before(time.Now().UTC()) {
+		if c.RememberFor > 0 && c.RequestedAt.Add(time.Duration(c.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
 

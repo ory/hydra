@@ -22,10 +22,11 @@ package consent_test
 
 import (
 	"flag"
-	"github.com/ory/hydra/x"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/x"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"

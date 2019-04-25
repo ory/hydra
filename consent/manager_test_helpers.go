@@ -222,7 +222,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got2.ID)
 					assert.NotEqual(t, tc.s.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix()) // this was updated from confirm...
-					assert.NotEqual(t, got.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix()) // this was updated from confirm...
+					assert.NotEqual(t, got.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix())  // this was updated from confirm...
 					assert.EqualValues(t, "some-other-subject", got2.Subject)
 				})
 			}
@@ -598,8 +598,8 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					if i == 5 {
 						c.Client.BackChannelLogoutURI = "http://some-url.com/"
 					}
-					c.LoginSessionID = "" // otherwise we had to create the login session as well..
-					c.Subject = "subjectLUACWFBL" // otherwise we had to create the login session as well..
+					c.LoginSessionID = ""                                // otherwise we had to create the login session as well..
+					c.Subject = "subjectLUACWFBL"                        // otherwise we had to create the login session as well..
 					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
 
 					lc, _ := MockAuthRequest(fmt.Sprintf("LUACWFBL-%d", i), true)

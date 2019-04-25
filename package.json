@@ -8,7 +8,7 @@
     "fs": false
   },
   "scripts": {
-    "format": "prettier --single-quote --trailing-comma none --write \"{test,cypress}/**/*.js",
+    "format": "prettier --single-quote --trailing-comma none --write \"{test,cypress}/**/*.js\"",
     "test": "cypress run",
     "test:watch": "cypress open",
     "wait-on": "wait-on",

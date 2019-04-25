@@ -26,10 +26,14 @@ This endpoint initiates and completes user logout at ORY Hydra and initiates Ope
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $api_instance->disconnectUser();
+    $apiInstance->disconnectUser();
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->disconnectUser: ', $e->getMessage(), PHP_EOL;
 }
@@ -66,10 +70,14 @@ The well known endpoint an be used to retrieve information for OpenID Connect cl
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $result = $api_instance->discoverOpenIDConfiguration();
+    $result = $apiInstance->discoverOpenIDConfiguration();
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->discoverOpenIDConfiguration: ', $e->getMessage(), PHP_EOL;
@@ -108,19 +116,26 @@ The client makes a request to the token endpoint by sending the following parame
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure HTTP basic authorization: basic
-Hydra\SDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
-Hydra\SDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
-// Configure OAuth2 access token for authorization: oauth2
-Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+$config = Hydra\SDK\Configuration::getDefaultConfiguration()
+              ->setUsername('YOUR_USERNAME')
+              ->setPassword('YOUR_PASSWORD');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+// Configure OAuth2 access token for authorization: oauth2
+$config = Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client(),
+    $config
+);
 $grant_type = "grant_type_example"; // string | 
 $code = "code_example"; // string | 
 $redirect_uri = "redirect_uri_example"; // string | 
 $client_id = "client_id_example"; // string | 
 
 try {
-    $result = $api_instance->oauth2Token($grant_type, $code, $redirect_uri, $client_id);
+    $result = $apiInstance->oauth2Token($grant_type, $code, $redirect_uri, $client_id);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->oauth2Token: ', $e->getMessage(), PHP_EOL;
@@ -164,10 +179,14 @@ This endpoint is not documented here because you should never use your own imple
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $api_instance->oauthAuth();
+    $apiInstance->oauthAuth();
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->oauthAuth: ', $e->getMessage(), PHP_EOL;
 }
@@ -205,16 +224,23 @@ Revoking a token (both access and refresh) means that the tokens will be invalid
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure HTTP basic authorization: basic
-Hydra\SDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
-Hydra\SDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
-// Configure OAuth2 access token for authorization: oauth2
-Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+$config = Hydra\SDK\Configuration::getDefaultConfiguration()
+              ->setUsername('YOUR_USERNAME')
+              ->setPassword('YOUR_PASSWORD');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+// Configure OAuth2 access token for authorization: oauth2
+$config = Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client(),
+    $config
+);
 $token = "token_example"; // string | 
 
 try {
-    $api_instance->revokeOAuth2Token($token);
+    $apiInstance->revokeOAuth2Token($token);
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->revokeOAuth2Token: ', $e->getMessage(), PHP_EOL;
 }
@@ -255,12 +281,17 @@ This endpoint returns the payload of the ID Token, including the idTokenExtra va
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure OAuth2 access token for authorization: oauth2
-Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+$config = Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client(),
+    $config
+);
 
 try {
-    $result = $api_instance->userinfo();
+    $result = $apiInstance->userinfo();
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->userinfo: ', $e->getMessage(), PHP_EOL;
@@ -298,10 +329,14 @@ This endpoint returns JSON Web Keys to be used as public keys for verifying Open
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\PublicApi();
+$apiInstance = new Hydra\SDK\Api\PublicApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $result = $api_instance->wellKnown();
+    $result = $apiInstance->wellKnown();
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->wellKnown: ', $e->getMessage(), PHP_EOL;

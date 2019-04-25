@@ -21,10 +21,14 @@ This endpoint returns a 200 status code when the HTTP server is up running. This
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\HealthApi();
+$apiInstance = new Hydra\SDK\Api\HealthApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $result = $api_instance->isInstanceAlive();
+    $result = $apiInstance->isInstanceAlive();
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling HealthApi->isInstanceAlive: ', $e->getMessage(), PHP_EOL;
@@ -62,10 +66,14 @@ This endpoint returns a 200 status code when the HTTP server is up running and t
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\HealthApi();
+$apiInstance = new Hydra\SDK\Api\HealthApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $result = $api_instance->isInstanceReady();
+    $result = $apiInstance->isInstanceReady();
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling HealthApi->isInstanceReady: ', $e->getMessage(), PHP_EOL;

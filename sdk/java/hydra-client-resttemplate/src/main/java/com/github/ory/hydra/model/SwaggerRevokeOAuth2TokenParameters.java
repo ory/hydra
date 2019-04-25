@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -21,10 +22,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters
+ * SwaggerRevokeOAuth2TokenParameters
  */
-@ApiModel(description = "SwaggerRevokeOAuth2TokenParameters swagger revoke o auth2 token parameters")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class SwaggerRevokeOAuth2TokenParameters {
   @JsonProperty("token")
   private String token = null;
@@ -86,6 +86,6 @@ public class SwaggerRevokeOAuth2TokenParameters {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

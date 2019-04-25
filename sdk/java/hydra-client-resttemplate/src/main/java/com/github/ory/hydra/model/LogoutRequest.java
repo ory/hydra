@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -23,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * LogoutRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class LogoutRequest {
   @JsonProperty("request_url")
   private String requestUrl = null;
@@ -65,7 +66,7 @@ public class LogoutRequest {
    * @return rpInitiated
   **/
   @ApiModelProperty(value = "RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.")
-  public Boolean getRpInitiated() {
+  public Boolean isRpInitiated() {
     return rpInitiated;
   }
 
@@ -154,6 +155,6 @@ public class LogoutRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

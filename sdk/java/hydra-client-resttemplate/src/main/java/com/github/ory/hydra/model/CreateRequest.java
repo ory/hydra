@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -24,7 +25,7 @@ import io.swagger.annotations.ApiModelProperty;
  * CreateRequest create request
  */
 @ApiModel(description = "CreateRequest create request")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class CreateRequest {
   @JsonProperty("alg")
   private String alg = null;
@@ -132,6 +133,6 @@ public class CreateRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

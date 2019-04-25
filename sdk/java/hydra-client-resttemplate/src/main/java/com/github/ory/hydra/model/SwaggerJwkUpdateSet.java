@@ -14,26 +14,26 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.github.ory.hydra.model.SwaggerJSONWebKeySet;
+import com.github.ory.hydra.model.JSONWebKeySet;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerJwkUpdateSet swagger jwk update set
+ * SwaggerJwkUpdateSet
  */
-@ApiModel(description = "SwaggerJwkUpdateSet swagger jwk update set")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class SwaggerJwkUpdateSet {
   @JsonProperty("Body")
-  private SwaggerJSONWebKeySet body = null;
+  private JSONWebKeySet body = null;
 
   @JsonProperty("set")
   private String set = null;
 
-  public SwaggerJwkUpdateSet body(SwaggerJSONWebKeySet body) {
+  public SwaggerJwkUpdateSet body(JSONWebKeySet body) {
     this.body = body;
     return this;
   }
@@ -43,11 +43,11 @@ public class SwaggerJwkUpdateSet {
    * @return body
   **/
   @ApiModelProperty(value = "")
-  public SwaggerJSONWebKeySet getBody() {
+  public JSONWebKeySet getBody() {
     return body;
   }
 
-  public void setBody(SwaggerJSONWebKeySet body) {
+  public void setBody(JSONWebKeySet body) {
     this.body = body;
   }
 
@@ -110,6 +110,6 @@ public class SwaggerJwkUpdateSet {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

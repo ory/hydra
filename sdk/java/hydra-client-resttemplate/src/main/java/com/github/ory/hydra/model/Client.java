@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -22,12 +23,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.joda.time.DateTime;
+import org.threeten.bp.OffsetDateTime;
 
 /**
  * Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
@@ -60,7 +61,7 @@ public class Client {
   private List<String> contacts = null;
 
   @JsonProperty("created_at")
-  private DateTime createdAt = null;
+  private OffsetDateTime createdAt = null;
 
   @JsonProperty("frontchannel_logout_session_required")
   private Boolean frontchannelLogoutSessionRequired = null;
@@ -117,7 +118,7 @@ public class Client {
   private String tosUri = null;
 
   @JsonProperty("updated_at")
-  private DateTime updatedAt = null;
+  private OffsetDateTime updatedAt = null;
 
   @JsonProperty("userinfo_signed_response_alg")
   private String userinfoSignedResponseAlg = null;
@@ -184,7 +185,7 @@ public class Client {
    * @return backchannelLogoutSessionRequired
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.")
-  public Boolean getBackchannelLogoutSessionRequired() {
+  public Boolean isBackchannelLogoutSessionRequired() {
     return backchannelLogoutSessionRequired;
   }
 
@@ -326,7 +327,7 @@ public class Client {
     this.contacts = contacts;
   }
 
-  public Client createdAt(DateTime createdAt) {
+  public Client createdAt(OffsetDateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -336,11 +337,11 @@ public class Client {
    * @return createdAt
   **/
   @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation. Format: date-time")
-  public DateTime getCreatedAt() {
+  public OffsetDateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(DateTime createdAt) {
+  public void setCreatedAt(OffsetDateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -354,7 +355,7 @@ public class Client {
    * @return frontchannelLogoutSessionRequired
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.")
-  public Boolean getFrontchannelLogoutSessionRequired() {
+  public Boolean isFrontchannelLogoutSessionRequired() {
     return frontchannelLogoutSessionRequired;
   }
 
@@ -708,7 +709,7 @@ public class Client {
     this.tosUri = tosUri;
   }
 
-  public Client updatedAt(DateTime updatedAt) {
+  public Client updatedAt(OffsetDateTime updatedAt) {
     this.updatedAt = updatedAt;
     return this;
   }
@@ -718,11 +719,11 @@ public class Client {
    * @return updatedAt
   **/
   @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update. Format: date-time")
-  public DateTime getUpdatedAt() {
+  public OffsetDateTime getUpdatedAt() {
     return updatedAt;
   }
 
-  public void setUpdatedAt(DateTime updatedAt) {
+  public void setUpdatedAt(OffsetDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
 
@@ -843,6 +844,6 @@ public class Client {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

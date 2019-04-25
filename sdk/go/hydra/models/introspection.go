@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Introspection Introspection Introspection Introspection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
+// Introspection Introspection Introspection Introspection Introspection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 //
 // https://tools.ietf.org/html/rfc7662
 // swagger:model Introspection

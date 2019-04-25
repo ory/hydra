@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -25,7 +26,7 @@ import java.util.List;
 /**
  * JSONWebKey
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class JSONWebKey {
   @JsonProperty("alg")
   private String alg = null;
@@ -463,6 +464,6 @@ public class JSONWebKey {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

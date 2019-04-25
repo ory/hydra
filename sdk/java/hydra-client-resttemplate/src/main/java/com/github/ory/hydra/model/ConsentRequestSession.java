@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -26,7 +27,7 @@ import java.util.Map;
 /**
  * ConsentRequestSession
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class ConsentRequestSession {
   @JsonProperty("access_token")
   private Map<String, Object> accessToken = null;
@@ -127,6 +128,6 @@ public class ConsentRequestSession {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

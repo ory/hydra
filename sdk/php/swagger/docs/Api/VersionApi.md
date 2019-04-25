@@ -20,10 +20,14 @@ This endpoint returns the service version typically notated using semantic versi
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new Hydra\SDK\Api\VersionApi();
+$apiInstance = new Hydra\SDK\Api\VersionApi(
+    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
+    // This is optional, `GuzzleHttp\Client` will be used as default.
+    new GuzzleHttp\Client()
+);
 
 try {
-    $result = $api_instance->getVersion();
+    $result = $apiInstance->getVersion();
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling VersionApi->getVersion: ', $e->getMessage(), PHP_EOL;

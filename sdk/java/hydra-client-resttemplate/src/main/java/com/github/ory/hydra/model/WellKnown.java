@@ -14,6 +14,7 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -26,7 +27,7 @@ import java.util.List;
  * It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.
  */
 @ApiModel(description = "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms among others.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-23T14:18:08.070+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
 public class WellKnown {
   @JsonProperty("authorization_endpoint")
   private String authorizationEndpoint = null;
@@ -131,7 +132,7 @@ public class WellKnown {
    * @return backchannelLogoutSessionSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP")
-  public Boolean getBackchannelLogoutSessionSupported() {
+  public Boolean isBackchannelLogoutSessionSupported() {
     return backchannelLogoutSessionSupported;
   }
 
@@ -149,7 +150,7 @@ public class WellKnown {
    * @return backchannelLogoutSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP supports back-channel logout, with true indicating support.")
-  public Boolean getBackchannelLogoutSupported() {
+  public Boolean isBackchannelLogoutSupported() {
     return backchannelLogoutSupported;
   }
 
@@ -167,7 +168,7 @@ public class WellKnown {
    * @return claimsParameterSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.")
-  public Boolean getClaimsParameterSupported() {
+  public Boolean isClaimsParameterSupported() {
     return claimsParameterSupported;
   }
 
@@ -229,7 +230,7 @@ public class WellKnown {
    * @return frontchannelLogoutSessionSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP.")
-  public Boolean getFrontchannelLogoutSessionSupported() {
+  public Boolean isFrontchannelLogoutSessionSupported() {
     return frontchannelLogoutSessionSupported;
   }
 
@@ -247,7 +248,7 @@ public class WellKnown {
    * @return frontchannelLogoutSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.")
-  public Boolean getFrontchannelLogoutSupported() {
+  public Boolean isFrontchannelLogoutSupported() {
     return frontchannelLogoutSupported;
   }
 
@@ -368,7 +369,7 @@ public class WellKnown {
    * @return requestParameterSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.")
-  public Boolean getRequestParameterSupported() {
+  public Boolean isRequestParameterSupported() {
     return requestParameterSupported;
   }
 
@@ -386,7 +387,7 @@ public class WellKnown {
    * @return requestUriParameterSupported
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.")
-  public Boolean getRequestUriParameterSupported() {
+  public Boolean isRequestUriParameterSupported() {
     return requestUriParameterSupported;
   }
 
@@ -404,7 +405,7 @@ public class WellKnown {
    * @return requireRequestUriRegistration
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the OP requires any request_uri values used to be pre-registered using the request_uris registration parameter.")
-  public Boolean getRequireRequestUriRegistration() {
+  public Boolean isRequireRequestUriRegistration() {
     return requireRequestUriRegistration;
   }
 
@@ -703,6 +704,6 @@ public class WellKnown {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
+
 }
 

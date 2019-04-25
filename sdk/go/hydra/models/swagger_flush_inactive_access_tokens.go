@@ -12,8 +12,8 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// SwaggerFlushInactiveAccessTokens SwaggerFlushInactiveAccessTokens swagger flush inactive access tokens
-// swagger:model SwaggerFlushInactiveAccessTokens
+// SwaggerFlushInactiveAccessTokens swagger flush inactive access tokens
+// swagger:model swaggerFlushInactiveAccessTokens
 type SwaggerFlushInactiveAccessTokens struct {
 
 	// body

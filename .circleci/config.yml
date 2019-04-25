@@ -63,7 +63,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-memory
 
   e2e-memory-jwt:
@@ -72,7 +72,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-memory-jwt
 
   e2e-mysql:
@@ -81,7 +81,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-mysql
 
   e2e-mysql-jwt:
@@ -90,7 +90,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-mysql-jwt
 
   e2e-plugin:
@@ -99,7 +99,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-plugin
 
   e2e-plugin-jwt:
@@ -108,7 +108,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-plugin-jwt
 
   e2e-postgres:
@@ -117,7 +117,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-postgres
 
   e2e-postgres-jwt:
@@ -126,7 +126,7 @@ jobs:
     steps:
     - checkout
     - setup_remote_docker
-    - run: npm i
+    - run: make tools
     - run: make e2e-postgres-jwt
 
   release-npm:

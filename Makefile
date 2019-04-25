@@ -1,5 +1,10 @@
 SHELL=/bin/bash -o pipefail
 
+.PHONY: tools
+tools:
+		npm i
+		go install github.com/go-bindata/go-bindata/go-bindata
+
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:

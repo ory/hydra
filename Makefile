@@ -3,6 +3,7 @@ SHELL=/bin/bash -o pipefail
 .PHONY: tools
 tools:
 		npm i
+		go get github.com/go-bindata/go-bindata/go-bindata
 		go install github.com/go-bindata/go-bindata/go-bindata
 
 # Runs full test suite including tests where databases are enabled

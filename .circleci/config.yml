@@ -64,8 +64,8 @@ jobs:
     - run: make tools
     - run: make e2e-memory
     - run: make e2e-memory-jwt
-   - run: make e2e-plugin
-   - run: make e2e-plugin-jwt
+    - run: make e2e-plugin
+    - run: make e2e-plugin-jwt
     - run: make e2e-mysql
     - run: make e2e-mysql-jwt
     - run: make e2e-postgres

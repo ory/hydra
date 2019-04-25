@@ -162,6 +162,7 @@ func acceptLogoutChallenge(api *hydra.OryHydra, key string) func(t *testing.T) f
 
 			redir, err := api.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge(c))
 			require.NoError(t, err)
+
 			assert.Contains(t, redir.Payload.RedirectTo, "?logout_verifier")
 			http.Redirect(w, r, redir.Payload.RedirectTo, http.StatusFound)
 		}
@@ -200,7 +201,8 @@ func TestStrategyLogout(t *testing.T) {
 
 	strategy := reg.ConsentStrategy()
 	logoutRouter := x.NewRouterPublic()
-	logoutRouter.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	logoutRouter.GET("/oauth2/sessions/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		res, err := strategy.HandleOpenIDConnectLogout(w, r)
 		if errors.Cause(err) == ErrAbortOAuth2Request {
 			// Do nothing
@@ -483,14 +485,13 @@ func TestStrategyLogout(t *testing.T) {
 				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.Challenge, hc)
 				require.NoError(t, err)
 				require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c.Client))
-				defer servers[k].Close()
 			}
 
 			cl := &http.Client{
 				Jar: tc.jar,
 			}
 			resp, err := cl.Get(
-				logoutServer.URL + "?" + tc.params.Encode(),
+				logoutServer.URL + "/oauth2/sessions/logout?" + tc.params.Encode(),
 			)
 			require.NoError(t, err)
 			out, err := ioutil.ReadAll(resp.Body)
@@ -498,6 +499,10 @@ func TestStrategyLogout(t *testing.T) {
 			defer resp.Body.Close()
 
 			bcWg.Wait()
+
+			for _, s := range servers {
+				s.Close()
+			}
 
 			assert.EqualValues(t, tc.expectStatusCode, resp.StatusCode, "%s\n%s", resp.Request.URL.String(), out)
 			assert.EqualValues(t, tc.expectBody, strings.Trim(string(out), "\n"), "%s\n%s", resp.Request.URL.String(), out)

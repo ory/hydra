@@ -57,20 +57,57 @@ jobs:
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-  test-e2e:
+#  test-e2e:
+#    docker:
+#      - image: circleci/golang:1.12
+#        environment:
+#          - DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+#          - DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
+#      - image: postgres:9.6
+#        environment:
+#          - POSTGRES_USER=test
+#          - POSTGRES_PASSWORD=test
+#          - POSTGRES_DB=hydra
+#      - image: mysql:5.7
+#        environment:
+#          - MYSQL_ROOT_PASSWORD=test
+#    steps:
+#    - checkout
+#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+#    - run: make tools
+#    - run: make e2e-memory
+
+  test-e2e-memory:
     machine: true
     steps:
     - checkout
     - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
     - run: make tools
     - run: make e2e-memory
-    - run: make e2e-memory-jwt
+
+  test-e2e-plugin:
+    machine: true
+    steps:
+    - checkout
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
     - run: make e2e-plugin
-    - run: make e2e-plugin-jwt
+
+  test-e2e-mysql:
+    machine: true
+    steps:
+    - checkout
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
     - run: make e2e-mysql
-    - run: make e2e-mysql-jwt
+
+  test-e2e-postgres:
+    machine: true
+    steps:
+    - checkout
+    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+    - run: make tools
     - run: make e2e-postgres
-    - run: make e2e-postgres-jwt
 
   release-npm:
     docker:
@@ -165,7 +202,19 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e:
+      - test-e2e-memory:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-plugin:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-postgres:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-mysql:
           filters:
             tags:
               only: /.*/
@@ -186,7 +235,10 @@ workflows:
           requires:
             - test
             - format
-            - test-e2e
+            - test-e2e-memory
+            - test-e2e-plugin
+            - test-e2e-postgres
+            - test-e2e-mysql
           filters:
             tags:
               only: /.*/

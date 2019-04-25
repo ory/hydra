@@ -59,6 +59,7 @@ const nc = req =>
     issuer.metadata.token_endpoint = new URL('/oauth2/token', config.public).toString()
     issuer.metadata.jwks_uri = new URL('/.well-known/jwks.json', config.public).toString()
     issuer.metadata.revocation_endpoint = new URL('/oauth2/revoke', config.public).toString()
+    issuer.metadata.introspection_endpoint = new URL('/oauth2/introspect', config.admin).toString()
 
     return Promise.resolve(new issuer.Client(req.session.oidc_credentials))
   });

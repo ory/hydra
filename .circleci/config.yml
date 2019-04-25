@@ -57,83 +57,77 @@ jobs:
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-  test-e2e-opaque:
+  test-e2e-memory:
     docker:
-    - image: circleci/golang:1.12
-      environment:
-      - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
-      - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
-    - image: postgres:9.5
-      environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=hydra
-    - image: mysql:5.7
-      environment:
-      - MYSQL_ROOT_PASSWORD=test
-    working_directory: /go/src/github.com/ory/hydra
+    - image: circleci/node:11.10.0
     steps:
-    - run:
-        name: Enable go1.12 modules
-        command: |
-          echo 'export GO111MODULE=on' >> $BASH_ENV
-          source $BASH_ENV
     - checkout
-    - run: go mod verify
-    - run: go install github.com/ory/hydra
-    - run: hydra migrate sql $DATABASE_URL_POSTGRES
-    - run: hydra migrate sql $DATABASE_URL_MYSQL
-    - run: DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e.sh
-    - run: DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e.sh
-#    See https://github.com/ory/hydra/issues/1179
-#    - run: DATABASE_URL=memory ./scripts/test-e2e.sh
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-memory
+
+  test-e2e-memory-jwt:
+    docker:
+    - image: circleci/node:11.10.0
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-memory-jwt
+
+  test-e2e-mysql:
+    docker:
+    - image: circleci/node:11.10.0
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-mysql
+
+  test-e2e-mysql-jwt:
+    docker:
+    - image: circleci/node:11.10.0
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-mysql-jwt
 
   test-e2e-plugin:
     docker:
-    - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/ory/hydra
+    - image: circleci/node:11.10.0
     steps:
-    - run:
-        name: Enable go1.12 modules
-        command: |
-          echo 'export GO111MODULE=on' >> $BASH_ENV
-          source $BASH_ENV
     - checkout
-    - run: go mod verify
-    - run: go install github.com/ory/hydra
-    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt ./scripts/test-e2e-plugin.sh
-    - run: ./scripts/test-e2e-plugin.sh
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-plugin
 
-  test-e2e-jwt:
+  test-e2e-plugin-jwt:
     docker:
-    - image: circleci/golang:1.12
-      environment:
-      - DATABASE_URL_POSTGRES=postgres://test:test@localhost:5432/hydra?sslmode=disable
-      - DATABASE_URL_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
-    - image: postgres:9.5
-      environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=hydra
-    - image: mysql:5.7
-      environment:
-      - MYSQL_ROOT_PASSWORD=test
-    working_directory: /go/src/github.com/ory/hydra
+    - image: circleci/node:11.10.0
     steps:
-    - run:
-        name: Enable go1.12 modules
-        command: |
-          echo 'export GO111MODULE=on' >> $BASH_ENV
-          source $BASH_ENV
     - checkout
-    - run: go mod verify
-    - run: go install github.com/ory/hydra
-    - run: hydra migrate sql $DATABASE_URL_POSTGRES
-    - run: hydra migrate sql $DATABASE_URL_MYSQL
-    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=$DATABASE_URL_POSTGRES ./scripts/test-e2e.sh
-    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=$DATABASE_URL_MYSQL ./scripts/test-e2e.sh
-#    See https://github.com/ory/hydra/issues/1179
-#    - run: OAUTH2_ACCESS_TOKEN_STRATEGY=jwt DATABASE_URL=memory ./scripts/test-e2e.sh
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-plugin-jwt
+
+  test-e2e-postgres:
+    docker:
+    - image: circleci/node:11.10.0
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-postgres
+
+  test-e2e-postgres-jwt:
+    docker:
+    - image: circleci/node:11.10.0
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run: npm i
+    - run: make test-e2e-postgres-jwt
 
   release-npm:
     docker:
@@ -228,15 +222,35 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-opaque:
+      - test-e2e-memory:
           filters:
             tags:
               only: /.*/
-      - test-e2e-jwt:
+      - test-e2e-memory-jwt:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-mysql:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-mysql-jwt:
           filters:
             tags:
               only: /.*/
       - test-e2e-plugin:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-plugin-jwt:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-postgres:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-postgres-jwt:
           filters:
             tags:
               only: /.*/
@@ -257,9 +271,14 @@ workflows:
           requires:
             - test
             - format
-            - test-e2e-opaque
+            - test-e2e-memory
+            - test-e2e-memory-jwt
+            - test-e2e-mysql
+            - test-e2e-mysql-jwt
             - test-e2e-plugin
-            - test-e2e-jwt
+            - test-e2e-plugin-jwt
+            - test-e2e-postgres
+            - test-e2e-postgres-jwt
           filters:
             tags:
               only: /.*/

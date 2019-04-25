@@ -5,9 +5,8 @@ node_modules/
 .circleci/
 .docker-home/
 .github/
-test/
 scripts/
 sdk/js
 sdk/php
-docs/
 vendor/
+dist/

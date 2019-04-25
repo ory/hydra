@@ -1,8 +1,9 @@
 version: '3'
 
-#services:
-#  hydra:
-#    depends_on:
-#      - hydra-migrate
-#    environment:
-#      - DSN=plugin...
+services:
+  hydra:
+    build:
+      context: ../../
+      dockerfile: Dockerfile-e2e
+    environment:
+      - DSN=plugin:///memtest.so

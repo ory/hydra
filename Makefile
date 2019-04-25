@@ -181,7 +181,6 @@ e2e-prepare-reset:
 			-f ./test/e2e/docker-compose.postgres.yml \
 			-f ./test/e2e/docker-compose.yml \
 			rm -f
-		make docker
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

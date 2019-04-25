@@ -1,6 +1,6 @@
 import { prng } from '../../helpers';
 
-describe('The OAuth 2.0 Refresh Token Grant', function() {
+describe('OAuth 2.0 JSON Web Token Access Tokens', function() {
   const nc = () => ({
     client_id: prng(),
     client_secret: prng(),

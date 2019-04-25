@@ -130,7 +130,7 @@ app.get('/oauth2/callback', async (req, res) => {
       code: req.query.code
     })
     .then(token => {
-      req.session.token = token;
+      req.session.oauth2_flow = token;
       res.send({ result: 'success', token });
     })
     .catch(err => {
@@ -145,10 +145,10 @@ app.get('/oauth2/callback', async (req, res) => {
 app.get('/oauth2/refresh', function(req, res) {
   oauth2
     .create(req.session.credentials)
-    .accessToken.create(req.session.token)
+    .accessToken.create(req.session.oauth2_flow)
     .refresh()
     .then(token => {
-      req.session.token = token;
+      req.session.oauth2_flow = token;
       res.send({ result: 'success', token: token.token });
     })
     .catch(err => {
@@ -157,7 +157,7 @@ app.get('/oauth2/refresh', function(req, res) {
 });
 
 app.get('/oauth2/revoke', (req, res) => {
-  req.session.token
+  req.session.oauth2_flow
     .revoke(req.query.type || 'access_token')
     .then(() => {
       res.status(201);
@@ -167,9 +167,34 @@ app.get('/oauth2/revoke', (req, res) => {
     });
 });
 
+app.get('/oauth2/validate-jwt', (req, res) => {
+  const client = jwksClient({
+    jwksUri: new URL('/.well-known/jwks.json', config.public).toString()
+  });
+
+  jwt.verify(
+    req.session.oauth2_flow.token.access_token,
+    (header, callback) => {
+      client.getSigningKey(header.kid, function(err, key) {
+        const signingKey = key.publicKey || key.rsaPublicKey;
+        callback(null, signingKey);
+      });
+    },
+    (err, decoded) => {
+      if (err) {
+        console.error(err);
+        res.send(400);
+        return;
+      }
+
+      res.send(decoded);
+    }
+  );
+});
+
 app.get('/oauth2/introspect/at', (req, res) => {
   const params = new URLSearchParams();
-  params.append('token', req.session.token.access_token);
+  params.append('token', req.session.oauth2_flow.token.access_token);
 
   fetch(new URL('/oauth2/introspect', config.admin).toString(), {
     method: 'POST',
@@ -186,7 +211,7 @@ app.get('/oauth2/introspect/at', (req, res) => {
 
 app.get('/oauth2/introspect/rt', async (req, res) => {
   const params = new URLSearchParams();
-  params.append('token', req.session.token.refresh_token);
+  params.append('token', req.session.oauth2_flow.refresh_token);
 
   fetch(new URL('/oauth2/introspect', config.admin).toString(), {
     method: 'POST',
@@ -370,7 +395,6 @@ app.post('/openid/session/end/bc', async (req, res) => {
         callback(null, signingKey);
       });
     },
-    options,
     function(err, decoded) {
       if (err) {
         console.error(err);

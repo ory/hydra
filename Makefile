@@ -53,7 +53,7 @@ e2e-memory:
 e2e-memory-jwt:
 		make e2e-prepare-memory-jwt
 		make e2e-waiton
-		npm run test
+		CYPRESS_jwt_enabled=true npm run test
 
 .PHONY: e2e-postgres
 e2e-postgres:
@@ -65,7 +65,7 @@ e2e-postgres:
 e2e-postgres-jwt:
 		make e2e-prepare-postgres-jwt
 		make e2e-waiton
-		npm run test
+		CYPRESS_jwt_enabled=true npm run test
 
 .PHONY: e2e-mysql
 e2e-mysql:
@@ -77,7 +77,7 @@ e2e-mysql:
 e2e-mysql-jwt:
 		make e2e-prepare-mysql-jwt
 		make e2e-waiton
-		npm run test
+		CYPRESS_jwt_enabled=true npm run test
 
 .PHONY: e2e-plugin
 e2e-plugin:
@@ -89,14 +89,14 @@ e2e-plugin:
 e2e-plugin-jwt:
 		make e2e-prepare-plugin-jwt
 		make e2e-waiton
-		npm run test
+		CYPRESS_jwt_enabled=true npm run test
 
 .PHONY: e2e-waiton
 e2e-waiton:
-		npm run wait-on http-get://localhost:5000/health/ready
-		npm run wait-on http-get://localhost:5001/health/ready
-		npm run wait-on http-get://localhost:5002/
-		npm run wait-on http-get://localhost:5003/oauth2/callback
+		npm run wait-on -t 120000 http-get://localhost:5000/health/ready
+		npm run wait-on -t 120000 http-get://localhost:5001/health/ready
+		npm run wait-on -t 120000 http-get://localhost:5002/
+		npm run wait-on -t 120000 http-get://localhost:5003/oauth2/callback
 
 .PHONY: e2e-prepare-memory
 e2e-prepare-memory:

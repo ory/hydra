@@ -12,6 +12,15 @@ const isStatusOk = res =>
     new Error(`Received unexpected status code ${res.statusCode}`)
     )
 
+export const findEndUserAuthorization = subject =>
+  fetch(Cypress.env('admin_url') + '/oauth2/auth/sessions/consent?subject='+subject)
+    .then(isStatusOk)
+    .then((res) => res.json())
+
+export const revokeEndUserAuthorization = subject =>
+  fetch(Cypress.env('admin_url') + '/oauth2/auth/sessions/consent?subject='+subject, { method: 'DELETE' })
+    .then(isStatusOk)
+
 export const createClient = client =>
   fetch(Cypress.env('admin_url') + '/clients', {
     method: 'POST',

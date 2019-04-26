@@ -86,13 +86,32 @@ case "$1" in
             export CYPRESS_jwt_enabled=true
             ;;
         *)
-            echo $"Usage: $0 {memory|memory-jwt}"
+            echo $"Usage: $0 {memory|postgres|mysql|plugin|memory-jwt|postgres-jwt|mysql-jwt|plugin-jwt} [--watch]"
             exit 1
 esac
 
 npm run wait-on -- -t 6000000 http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
 
-(cd ../..; npm run test)
+WATCH=no
+
+for i in "$@"
+do
+case $i in
+    --watch)
+    WATCH=yes
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
+
+if [[ $WATCH = "yes" ]]; then
+    (cd ../..; npm run test:watch)
+else
+    (cd ../..; npm run test)
+fi
 
 kill %1 || true # This is oauth2-client
 kill %2 || true # This is the login-consent-logout

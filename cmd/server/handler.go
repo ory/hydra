@@ -168,10 +168,10 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicmw.Use(tracer)
 	}
 
-	adminmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), d.Configuration().IssuerURL().String()))
+	adminmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String())))
 	adminmw.Use(d.Registry().PrometheusManager())
 
-	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), d.Configuration().IssuerURL().String()))
+	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String())))
 	publicmw.Use(d.Registry().PrometheusManager())
 
 	metrics := metricsx.New(

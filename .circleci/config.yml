@@ -78,23 +78,33 @@ jobs:
 #    - run: make e2e-memory
 
   test-e2e-memory:
-    machine: true
+    docker:
+      - image: circleci/golang:1.12
+        environment:
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+          - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
+      - image: postgres:9.6
+        environment:
+          - POSTGRES_USER=test
+          - POSTGRES_PASSWORD=test
+          - POSTGRES_DB=hydra
+      - image: mysql:5.7
+        environment:
+          - MYSQL_ROOT_PASSWORD=test
+      - image: mysql:5.7
+        environment:
+          - MYSQL_ROOT_PASSWORD=test
+    working_directory: /go/src/github.com/ory/hydra
     steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-prepare-memory
-    - run: make e2e-waiton
-    - run: npm run test
+      - run:
+          name: Enable go1.12 modules
+          command: |
+            echo 'export GO111MODULE=on' >> $BASH_ENV
+            source $BASH_ENV
+      - checkout
+      - run: ./test/e2e/circle-ci.bash memory
+      - run: ./test/e2e/circle-ci.bash memory-jwt
 
-#  test-e2e-plugin:
-#    machine: true
-#    steps:
-#    - checkout
-#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-#    - run: make tools
-#    - run: make e2e-plugin
-#
 #  test-e2e-mysql:
 #    machine: true
 #    steps:

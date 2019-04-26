@@ -22,11 +22,7 @@ fi
 (cd oauth2-client; ADMIN_URL=http://127.0.0.1:5001 PUBLIC_URL=http://127.0.0.1:5000 PORT=5003 npm run start >> ../oauth2-client.e2e.log 2>&1 &)
 
 # Install consent app
-if [[ ! -d "./hydra-login-consent-node" ]]; then
-    git clone https://github.com/ory/hydra-login-consent-node.git ./hydra-login-consent-node/
-    (cd ./hydra-login-consent-node/; npm ci)
-fi
-(cd ./hydra-login-consent-node; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run start >> ../login-consent-logout.e2e.log 2>&1 &)
+(cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run consent >> ../login-consent-logout.e2e.log 2>&1 &)
 
 source ./circle-ci.env.bash
 
@@ -87,9 +83,6 @@ case "$1" in
 esac
 
 npm run wait-on -- -t 6000000 http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
-
-#TEST_DATABASE_MYSQL
-#TEST_DATABASE_POSTGRESQL
 
 (cd ../..; npm run test)
 

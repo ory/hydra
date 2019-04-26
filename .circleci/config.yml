@@ -58,7 +58,7 @@ jobs:
 
   test-e2e:
     docker:
-      - image: circleci/golang:1.12-node
+      - image: oryd/e2e-env:latest
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
@@ -77,9 +77,6 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
-      - run: sudo apt-get update
-      - run: sudo apt-get install -y libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
-
       # core node_modules cache
       - restore_cache:
           keys:

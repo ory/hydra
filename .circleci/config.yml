@@ -96,12 +96,27 @@ jobs:
           - MYSQL_ROOT_PASSWORD=test
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - checkout
+      - run: apt-get update && apt-get install -y libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
+      - restore_cache:
+          keys:
+            - v1-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - v1-deps-{{ .Branch }}
+            - v1-deps
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - save_cache:
+          key: v1-deps-{{ .Branch }}-{{ checksum "package.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
       - run:
           name: Enable go1.12 modules
           command: |
             echo 'export GO111MODULE=on' >> $BASH_ENV
             source $BASH_ENV
-      - checkout
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt
 

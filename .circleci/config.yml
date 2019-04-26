@@ -13,8 +13,15 @@ jobs:
       - checkout
       - run: curl -L https://git.io/vp6lP | sh -s -- -b ./bin
       - run: mv ./bin/* $GOPATH/bin
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run: go mod download
       - run: go mod vendor
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
       - run: GO111MODULE=off gometalinter --disable-all --enable=goimports --enable=vet --vendor ./...
 
   test:
@@ -36,7 +43,14 @@ jobs:
     steps:
       - checkout
       - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run: go mod download
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
       - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
 #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
@@ -65,20 +79,35 @@ jobs:
       - checkout
       - run: sudo apt-get update
       - run: sudo apt-get install -y libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 xvfb
+
+      # core node_modules cache
       - restore_cache:
           keys:
-            - v1-deps-{{ .Branch }}-{{ checksum "package.json" }}
-            - v1-deps-{{ .Branch }}
+            - v1-deps-{{ checksum "package-lock.json" }}
             - v1-deps
-      - run:
-          name: Install Dependencies
-          command: npm ci
+      - run: npm ci
       - save_cache:
-          key: v1-deps-{{ .Branch }}-{{ checksum "package.json" }}
+          key: v1-deps-{{ checksum "package-lock.json" }}
           # cache NPM modules and the folder with the Cypress binary
           paths:
             - ~/.npm
             - ~/.cache
+
+      # oauth2_client node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+            - v1-deps
+      - run: cd test/e2e/oauth2-client; npm ci
+      - save_cache:
+          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+            - /test/e2e/oauth2-client/node_modules
+
+      # go modules cache
       - restore_cache:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
@@ -87,14 +116,16 @@ jobs:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt
-      - run: ./test/e2e/circle-ci.bash postgres
-      - run: ./test/e2e/circle-ci.bash postgres-jwt
-      - run: ./test/e2e/circle-ci.bash mysql
-      - run: ./test/e2e/circle-ci.bash mysql-jwt
-      - run: ./test/e2e/circle-ci.bash plugin
-      - run: ./test/e2e/circle-ci.bash plugin-jwt
+
+#      - run: ./test/e2e/circle-ci.bash postgres
+#      - run: ./test/e2e/circle-ci.bash postgres-jwt
+#      - run: ./test/e2e/circle-ci.bash mysql
+#      - run: ./test/e2e/circle-ci.bash mysql-jwt
+#      - run: ./test/e2e/circle-ci.bash plugin
+#      - run: ./test/e2e/circle-ci.bash plugin-jwt
 
   release-npm:
     docker:

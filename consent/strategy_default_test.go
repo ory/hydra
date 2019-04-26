@@ -851,7 +851,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 			},
 		},
 		{
-			d:                     "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme",
+			d:                     "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme and acustom domain",
 			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://redirection-scheme/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			prompt:                "none",
 			jar:                   persistentCJ,
@@ -859,6 +859,37 @@ func TestStrategyLoginConsent(t *testing.T) {
 			expectFinalStatusCode: fosite.ErrConsentRequired.StatusCode(),
 			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrConsentRequired},
 			expectErr:             []bool{true, true},
+		},
+		{
+			d:                     "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme",
+			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://localhost/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			prompt:                "none",
+			jar:                   persistentCJ,
+			lph:                   passAuthentication(apiClient, false),
+			expectFinalStatusCode: fosite.ErrConsentRequired.StatusCode(),
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrConsentRequired},
+			expectErr:             []bool{true, true},
+		},
+		{
+			d:                     "This should pass because prompt=none, client is public, redirection scheme is HTTP and host is localhost",
+			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "http://localhost/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			prompt:                "none",
+			jar:                   persistentCJ,
+			lph:                   passAuthentication(apiClient, true),
+			cph:                   passAuthorization(apiClient, true),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       true,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
 		},
 		// This test is disabled because it breaks OIDC Conformity Tests
 		// {

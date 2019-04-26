@@ -37,151 +37,17 @@ docker:
 
 .PHONY: e2e
 e2e:
-		docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-		make e2e-memory
-		make e2e-memory-jwt
-		make e2e-postgres
-		make e2e-postgres-jwt
-		make e2e-mysql
-		make e2e-mysql-jwt
-
-.PHONY: e2e-memory
-e2e-memory:
-		make e2e-prepare-memory
-		make e2e-waiton
-		npm run test
-
-.PHONY: e2e-memory-jwt
-e2e-memory-jwt:
-		make e2e-prepare-memory-jwt
-		make e2e-waiton
-		CYPRESS_jwt_enabled=true npm run test
-
-.PHONY: e2e-postgres
-e2e-postgres:
-		make e2e-prepare-postgres
-		make e2e-waiton
-		npm run test
-
-.PHONY: e2e-postgres-jwt
-e2e-postgres-jwt:
-		make e2e-prepare-postgres-jwt
-		make e2e-waiton
-		CYPRESS_jwt_enabled=true npm run test
-
-.PHONY: e2e-mysql
-e2e-mysql:
-		make e2e-prepare-mysql
-		make e2e-waiton
-		npm run test
-
-.PHONY: e2e-mysql-jwt
-e2e-mysql-jwt:
-		make e2e-prepare-mysql-jwt
-		make e2e-waiton
-		CYPRESS_jwt_enabled=true npm run test
-
-.PHONY: e2e-plugin
-e2e-plugin:
-		make e2e-prepare-plugin
-		make e2e-waiton
-		npm run test
-
-.PHONY: e2e-plugin-jwt
-e2e-plugin-jwt:
-		make e2e-prepare-plugin-jwt
-		make e2e-waiton
-		CYPRESS_jwt_enabled=true npm run test
-
-.PHONY: e2e-waiton
-e2e-waiton:
-		npm run wait-on -- -t 6000000 http-get://localhost:5000/health/ready
-		npm run wait-on -- -t 6000000 http-get://localhost:5001/health/ready
-		npm run wait-on -- -t 6000000 http-get://localhost:5002/
-		npm run wait-on -- -t 6000000 http-get://localhost:5003/oauth2/callback
-
-.PHONY: e2e-prepare-memory
-e2e-prepare-memory:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			up --build -d
-
-.PHONY: e2e-prepare-memory-jwt
-e2e-prepare-memory-jwt:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.jwt.yml \
-			up --build -d
-
-.PHONY: e2e-prepare-postgres
-e2e-prepare-postgres:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.postgres.yml \
-			up --build -d
-
-.PHONY: e2e-prepare-postgres-jwt
-e2e-prepare-postgres-jwt:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.postgres.yml \
-			-f ./test/e2e/docker-compose.jwt.yml \
-			up --build -d
-
-.PHONY: e2e-prepare-mysql
-e2e-prepare-mysql:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.mysql.yml \
-			up --build -d
-			
-.PHONY: e2e-prepare-mysql-jwt
-e2e-prepare-mysql-jwt:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.mysql.yml \
-			-f ./test/e2e/docker-compose.jwt.yml \
-			up --build -d
-
-.PHONY: e2e-prepare-plugin
-e2e-prepare-plugin:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.plugin.yml \
-			up --build -d
-			
-.PHONY: e2e-prepare-plugin-jwt
-e2e-prepare-plugin-jwt:
-		make e2e-prepare-reset
-		docker-compose \
-			-f ./test/e2e/docker-compose.yml \
-			-f ./test/e2e/docker-compose.plugin.yml \
-			-f ./test/e2e/docker-compose.jwt.yml \
-			up --build -d
-
-.PHONY: e2e-prepare-reset
-e2e-prepare-reset:
-		docker-compose \
-			-f ./test/e2e/docker-compose.jwt.yml \
-			-f ./test/e2e/docker-compose.mysql.yml \
-			-f ./test/e2e/docker-compose.plugin.yml \
-			-f ./test/e2e/docker-compose.postgres.yml \
-			-f ./test/e2e/docker-compose.yml \
-			kill
-		docker-compose \
-			-f ./test/e2e/docker-compose.jwt.yml \
-			-f ./test/e2e/docker-compose.mysql.yml \
-			-f ./test/e2e/docker-compose.plugin.yml \
-			-f ./test/e2e/docker-compose.postgres.yml \
-			-f ./test/e2e/docker-compose.yml \
-			rm -f
+		make test-resetdb
+		export TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
+		export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable'
+		./test/e2e/circle-ci.bash memory
+		./test/e2e/circle-ci.bash memory-jwt
+		./test/e2e/circle-ci.bash postgres
+		./test/e2e/circle-ci.bash postgres-jwt
+		./test/e2e/circle-ci.bash mysql
+		./test/e2e/circle-ci.bash mysql-jwt
+		./test/e2e/circle-ci.bash plugin
+		./test/e2e/circle-ci.bash plugin-jwt
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

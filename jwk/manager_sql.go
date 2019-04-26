@@ -65,6 +65,10 @@ type sqlData struct {
 	Key       string    `db:"keydata"`
 }
 
+func (m *SQLManager) GetMigrations() *dbal.PackrMigrationSource {
+	return Migrations[dbal.Canonicalize(m.DB.DriverName())]
+}
+
 func (m *SQLManager) CreateSchemas() (int, error) {
 	database := m.DB.DriverName()
 	switch database {

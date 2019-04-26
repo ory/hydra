@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "node ./src/index.js",
-    "watch": "nodemon ./src/index.js"
+    "watch": "nodemon ./src/index.js",
+    "consent": "hydra-login-consent-logout"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -13,6 +14,7 @@
     "express": "^4.16.4",
     "express-session": "^1.16.1",
     "express-winston": "^3.1.0",
+    "hydra-login-consent-logout": "0.0.3",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.4.0",
     "node-fetch": "^2.3.0",

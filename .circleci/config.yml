@@ -6,32 +6,29 @@ jobs:
   format:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
-# This is disabled for now because goimports is really slow when go modules are used, see
-# https://github.com/golang/go/issues/27287
-#
-#      - run:
-#          name: Enable go1.12 modules
-#          command: |
-#            echo 'export GO111MODULE=on' >> $BASH_ENV
-#            source $BASH_ENV
       - checkout
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - run: curl -L https://git.io/vp6lP | sh -s -- -b ./bin
       - run: mv ./bin/* $GOPATH/bin
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run: go mod download
       - run: go mod vendor
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
       - run: GO111MODULE=off gometalinter --disable-all --enable=goimports --enable=vet --vendor ./...
 
   test:
     docker:
       - image: circleci/golang:1.12
         environment:
+        - GO111MODULE=on
         - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
       - image: postgres:9.6
@@ -44,70 +41,222 @@ jobs:
         - MYSQL_ROOT_PASSWORD=test
     working_directory: /go/src/github.com/ory/hydra
     steps:
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - checkout
-      - run: go mod download
       - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go mod download
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
       - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
 #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-#  test-e2e:
-#    docker:
-#      - image: circleci/golang:1.12
-#        environment:
-#          - DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
-#          - DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
-#      - image: postgres:9.6
-#        environment:
-#          - POSTGRES_USER=test
-#          - POSTGRES_PASSWORD=test
-#          - POSTGRES_DB=hydra
-#      - image: mysql:5.7
-#        environment:
-#          - MYSQL_ROOT_PASSWORD=test
-#    steps:
-#    - checkout
-#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-#    - run: make tools
-#    - run: make e2e-memory
-
   test-e2e-memory:
-    machine: true
+    docker:
+      - image: oryd/e2e-env:latest
+        environment:
+          - GO111MODULE=on
+    working_directory: /go/src/github.com/ory/hydra
     steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-memory
+      - checkout
+      # core node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "package-lock.json" }}
+            - v1-deps
+      - run: npm ci
+      - save_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
 
-  test-e2e-plugin:
-    machine: true
-    steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-plugin
+      # oauth2_client node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+            - v1-deps
+      - run: cd test/e2e/oauth2-client; npm ci
+      - save_cache:
+          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+            - /test/e2e/oauth2-client/node_modules
+
+      # go modules cache
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go install .
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+
+      - run: ./test/e2e/circle-ci.bash memory
+      - run: ./test/e2e/circle-ci.bash memory-jwt
 
   test-e2e-mysql:
-    machine: true
+    docker:
+      - image: oryd/e2e-env:latest
+        environment:
+          - GO111MODULE=on
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+      - image: mysql:5.7
+        environment:
+          - MYSQL_ROOT_PASSWORD=test
+    working_directory: /go/src/github.com/ory/hydra
     steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-mysql
+      - checkout
+      # core node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "package-lock.json" }}
+            - v1-deps
+      - run: npm ci
+      - save_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+
+      # oauth2_client node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+            - v1-deps
+      - run: cd test/e2e/oauth2-client; npm ci
+      - save_cache:
+          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+            - /test/e2e/oauth2-client/node_modules
+
+      # go modules cache
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go install .
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+
+      - run: ./test/e2e/circle-ci.bash mysql
+      - run: ./test/e2e/circle-ci.bash mysql-jwt
 
   test-e2e-postgres:
-    machine: true
+    docker:
+      - image: oryd/e2e-env:latest
+        environment:
+          - GO111MODULE=on
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+      - image: postgres:9.6
+        environment:
+          - POSTGRES_USER=test
+          - POSTGRES_PASSWORD=test
+          - POSTGRES_DB=hydra
+    working_directory: /go/src/github.com/ory/hydra
     steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-postgres
+      - checkout
+      # core node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "package-lock.json" }}
+            - v1-deps
+      - run: npm ci
+      - save_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+
+      # oauth2_client node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+            - v1-deps
+      - run: cd test/e2e/oauth2-client; npm ci
+      - save_cache:
+          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+            - /test/e2e/oauth2-client/node_modules
+
+      # go modules cache
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go install .
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+
+      - run: ./test/e2e/circle-ci.bash postgres
+      - run: ./test/e2e/circle-ci.bash postgres-jwt
+
+  test-e2e-plugin:
+    docker:
+      - image: oryd/e2e-env:latest
+        environment:
+          - GO111MODULE=on
+    working_directory: /go/src/github.com/ory/hydra
+    steps:
+      - checkout
+      # core node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "package-lock.json" }}
+            - v1-deps
+      - run: npm ci
+      - save_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+
+      # oauth2_client node_modules cache
+      - restore_cache:
+          keys:
+            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+            - v1-deps
+      - run: cd test/e2e/oauth2-client; npm ci
+      - save_cache:
+          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - ~/.cache
+            - /test/e2e/oauth2-client/node_modules
+
+      # go modules cache
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go install .
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+
+      - run: ./test/e2e/circle-ci.bash plugin
+      - run: ./test/e2e/circle-ci.bash plugin-jwt
 
   release-npm:
     docker:
@@ -153,13 +302,10 @@ jobs:
   benchmark:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - checkout
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
@@ -175,12 +321,12 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - run:
-          name: Enable go1.12 modules
           command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
             echo 'export DOCKER_FULL_TAG=$(echo $CIRCLE_TAG | tr '+' '_')' >> $BASH_ENV
             echo 'export DOCKER_SHORT_TAG=$(echo $CIRCLE_TAG | cut -d '+' -f1)' >> $BASH_ENV
             source $BASH_ENV
@@ -206,15 +352,15 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-plugin:
-          filters:
-            tags:
-              only: /.*/
       - test-e2e-postgres:
           filters:
             tags:
               only: /.*/
       - test-e2e-mysql:
+          filters:
+            tags:
+              only: /.*/
+      - test-e2e-plugin:
           filters:
             tags:
               only: /.*/
@@ -236,9 +382,9 @@ workflows:
             - test
             - format
             - test-e2e-memory
-            - test-e2e-plugin
             - test-e2e-postgres
             - test-e2e-mysql
+            - test-e2e-plugin
           filters:
             tags:
               only: /.*/

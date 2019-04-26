@@ -8,5 +8,6 @@
     "client_port": "5003",
     "jwt_enabled": false
   },
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "video": false
 }

@@ -6,22 +6,11 @@ jobs:
   format:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
-# This is disabled for now because goimports is really slow when go modules are used, see
-# https://github.com/golang/go/issues/27287
-#
-#      - run:
-#          name: Enable go1.12 modules
-#          command: |
-#            echo 'export GO111MODULE=on' >> $BASH_ENV
-#            source $BASH_ENV
       - checkout
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - run: curl -L https://git.io/vp6lP | sh -s -- -b ./bin
       - run: mv ./bin/* $GOPATH/bin
       - run: go mod download
@@ -32,6 +21,7 @@ jobs:
     docker:
       - image: circleci/golang:1.12
         environment:
+        - GO111MODULE=on
         - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
         - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
       - image: postgres:9.6
@@ -44,43 +34,18 @@ jobs:
         - MYSQL_ROOT_PASSWORD=test
     working_directory: /go/src/github.com/ory/hydra
     steps:
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - checkout
-      - run: go mod download
       - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
       - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
 #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
 #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-#  test-e2e:
-#    docker:
-#      - image: circleci/golang:1.12
-#        environment:
-#          - DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
-#          - DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
-#      - image: postgres:9.6
-#        environment:
-#          - POSTGRES_USER=test
-#          - POSTGRES_PASSWORD=test
-#          - POSTGRES_DB=hydra
-#      - image: mysql:5.7
-#        environment:
-#          - MYSQL_ROOT_PASSWORD=test
-#    steps:
-#    - checkout
-#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-#    - run: make tools
-#    - run: make e2e-memory
-
-  test-e2e-memory:
+  test-e2e:
     docker:
       - image: circleci/golang:1.12-node
         environment:
+          - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
           - TEST_DATABASE_MYSQL=root:test@(localhost:3306)/mysql?parseTime=true
       - image: postgres:9.6
@@ -113,11 +78,14 @@ jobs:
           paths:
             - ~/.npm
             - ~/.cache
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go install .
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt
       - run: ./test/e2e/circle-ci.bash postgres
@@ -126,22 +94,6 @@ jobs:
       - run: ./test/e2e/circle-ci.bash mysql-jwt
       - run: ./test/e2e/circle-ci.bash plugin
       - run: ./test/e2e/circle-ci.bash plugin-jwt
-
-#  test-e2e-mysql:
-#    machine: true
-#    steps:
-#    - checkout
-#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-#    - run: make tools
-#    - run: make e2e-mysql
-#
-#  test-e2e-postgres:
-#    machine: true
-#    steps:
-#    - checkout
-#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-#    - run: make tools
-#    - run: make e2e-postgres
 
   release-npm:
     docker:
@@ -187,13 +139,10 @@ jobs:
   benchmark:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
-      - run:
-          name: Enable go1.12 modules
-          command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
-            source $BASH_ENV
       - checkout
       - run: git config --global user.email "hi@ory.am"
       - run: git config --global user.name "ORY Continuous Integration"
@@ -209,12 +158,12 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - run:
-          name: Enable go1.12 modules
           command: |
-            echo 'export GO111MODULE=on' >> $BASH_ENV
             echo 'export DOCKER_FULL_TAG=$(echo $CIRCLE_TAG | tr '+' '_')' >> $BASH_ENV
             echo 'export DOCKER_SHORT_TAG=$(echo $CIRCLE_TAG | cut -d '+' -f1)' >> $BASH_ENV
             source $BASH_ENV
@@ -236,22 +185,10 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-memory:
+      - test-e2e:
           filters:
             tags:
               only: /.*/
-#      - test-e2e-plugin:
-#          filters:
-#            tags:
-#              only: /.*/
-#      - test-e2e-postgres:
-#          filters:
-#            tags:
-#              only: /.*/
-#      - test-e2e-mysql:
-#          filters:
-#            tags:
-#              only: /.*/
       - release-docs:
           requires:
             - test
@@ -269,10 +206,7 @@ workflows:
           requires:
             - test
             - format
-            - test-e2e-memory
-#            - test-e2e-plugin
-#            - test-e2e-postgres
-#            - test-e2e-mysql
+            - test-e2e
           filters:
             tags:
               only: /.*/

@@ -79,7 +79,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date,
+			version, build, date, true,
 		).CallRegistry()
 
 		isDSNAllowed(d)
@@ -105,7 +105,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date,
+			version, build, date, true,
 		).CallRegistry()
 
 		isDSNAllowed(d)
@@ -131,7 +131,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 			logrusx.New(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date,
+			version, build, date, true,
 		).CallRegistry()
 
 		admin, public, adminmw, publicmw := setup(d, cmd)

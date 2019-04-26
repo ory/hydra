@@ -9,6 +9,12 @@ before finalizing the upgrade process.
 
 
 - [Hassle-free upgrades](#hassle-free-upgrades)
+- [1.0.0-rc.10](#100-rc10)
+  - [SQL Migrations now require user-input or `--yes` flag](#sql-migrations-now-require-user-input-or---yes-flag)
+  - [Login and Consent Management](#login-and-consent-management)
+- [1.0.0-rc.9](#100-rc9)
+  - [Go SDK](#go-sdk)
+  - [Accepting Login and Consent Requests](#accepting-login-and-consent-requests)
 - [1.0.0-rc.7](#100-rc7)
   - [Configuration changes](#configuration-changes)
   - [System secret rotation](#system-secret-rotation)
@@ -89,7 +95,7 @@ before finalizing the upgrade process.
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
     - [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed)
-    - [Go SDK](#go-sdk)
+    - [Go SDK](#go-sdk-1)
     - [Health endpoints](#health-endpoints)
     - [Group endpoints](#group-endpoints)
     - [Replacing hierarchical scope strategy with wildcard scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy)
@@ -132,6 +138,11 @@ secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
 ## 1.0.0-rc.10
+
+### SQL Migrations now require user-input or `--yes` flag
+
+`hydra migrate sql` now shows an execution plan and asks for confirmation before executing the migrations. To run
+migrations without user interaction, add flag `--yes`.
 
 ### Login and Consent Management
 

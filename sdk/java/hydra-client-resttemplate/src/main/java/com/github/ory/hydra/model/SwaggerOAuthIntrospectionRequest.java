@@ -14,7 +14,6 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -22,9 +21,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerOAuthIntrospectionRequest
+ * SwaggerOAuthIntrospectionRequest swagger o auth introspection request
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@ApiModel(description = "SwaggerOAuthIntrospectionRequest swagger o auth introspection request")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class SwaggerOAuthIntrospectionRequest {
   @JsonProperty("scope")
   private String scope = null;
@@ -109,6 +109,6 @@ public class SwaggerOAuthIntrospectionRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

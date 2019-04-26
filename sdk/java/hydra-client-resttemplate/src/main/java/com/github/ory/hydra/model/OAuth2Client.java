@@ -14,7 +14,6 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -23,12 +22,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.threeten.bp.OffsetDateTime;
+import org.joda.time.DateTime;
 
 /**
  * OAuth2Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class OAuth2Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
@@ -61,7 +60,7 @@ public class OAuth2Client {
   private List<String> contacts = null;
 
   @JsonProperty("created_at")
-  private OffsetDateTime createdAt = null;
+  private DateTime createdAt = null;
 
   @JsonProperty("frontchannel_logout_session_required")
   private Boolean frontchannelLogoutSessionRequired = null;
@@ -118,7 +117,7 @@ public class OAuth2Client {
   private String tosUri = null;
 
   @JsonProperty("updated_at")
-  private OffsetDateTime updatedAt = null;
+  private DateTime updatedAt = null;
 
   @JsonProperty("userinfo_signed_response_alg")
   private String userinfoSignedResponseAlg = null;
@@ -185,7 +184,7 @@ public class OAuth2Client {
    * @return backchannelLogoutSessionRequired
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout Token to identify the RP session with the OP when the backchannel_logout_uri is used. If omitted, the default value is false.")
-  public Boolean isBackchannelLogoutSessionRequired() {
+  public Boolean getBackchannelLogoutSessionRequired() {
     return backchannelLogoutSessionRequired;
   }
 
@@ -327,7 +326,7 @@ public class OAuth2Client {
     this.contacts = contacts;
   }
 
-  public OAuth2Client createdAt(OffsetDateTime createdAt) {
+  public OAuth2Client createdAt(DateTime createdAt) {
     this.createdAt = createdAt;
     return this;
   }
@@ -337,11 +336,11 @@ public class OAuth2Client {
    * @return createdAt
   **/
   @ApiModelProperty(value = "CreatedAt returns the timestamp of the client's creation.")
-  public OffsetDateTime getCreatedAt() {
+  public DateTime getCreatedAt() {
     return createdAt;
   }
 
-  public void setCreatedAt(OffsetDateTime createdAt) {
+  public void setCreatedAt(DateTime createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -355,7 +354,7 @@ public class OAuth2Client {
    * @return frontchannelLogoutSessionRequired
   **/
   @ApiModelProperty(value = "Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.")
-  public Boolean isFrontchannelLogoutSessionRequired() {
+  public Boolean getFrontchannelLogoutSessionRequired() {
     return frontchannelLogoutSessionRequired;
   }
 
@@ -709,7 +708,7 @@ public class OAuth2Client {
     this.tosUri = tosUri;
   }
 
-  public OAuth2Client updatedAt(OffsetDateTime updatedAt) {
+  public OAuth2Client updatedAt(DateTime updatedAt) {
     this.updatedAt = updatedAt;
     return this;
   }
@@ -719,11 +718,11 @@ public class OAuth2Client {
    * @return updatedAt
   **/
   @ApiModelProperty(value = "UpdatedAt returns the timestamp of the last update.")
-  public OffsetDateTime getUpdatedAt() {
+  public DateTime getUpdatedAt() {
     return updatedAt;
   }
 
-  public void setUpdatedAt(OffsetDateTime updatedAt) {
+  public void setUpdatedAt(DateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
 
@@ -844,6 +843,6 @@ public class OAuth2Client {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

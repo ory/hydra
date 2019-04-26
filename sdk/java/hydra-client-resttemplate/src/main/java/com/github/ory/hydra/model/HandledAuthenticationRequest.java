@@ -14,7 +14,6 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -24,7 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * HandledAuthenticationRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class HandledAuthenticationRequest {
   @JsonProperty("acr")
   private String acr = null;
@@ -87,7 +86,7 @@ public class HandledAuthenticationRequest {
    * @return remember
   **/
   @ApiModelProperty(value = "Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she will not be asked to log in again.")
-  public Boolean isRemember() {
+  public Boolean getRemember() {
     return remember;
   }
 
@@ -178,6 +177,6 @@ public class HandledAuthenticationRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

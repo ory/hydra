@@ -14,7 +14,7 @@ import (
 )
 
 // SwaggerJwkSetQuery swagger jwk set query
-// swagger:model swaggerJwkSetQuery
+// swagger:model SwaggerJwkSetQuery
 type SwaggerJwkSetQuery struct {
 
 	// The set

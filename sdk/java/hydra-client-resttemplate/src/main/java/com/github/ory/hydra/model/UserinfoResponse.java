@@ -14,7 +14,6 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -25,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * The userinfo response
  */
 @ApiModel(description = "The userinfo response")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class UserinfoResponse {
   @JsonProperty("birthdate")
   private String birthdate = null;
@@ -130,7 +129,7 @@ public class UserinfoResponse {
    * @return emailVerified
   **/
   @ApiModelProperty(value = "True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.")
-  public Boolean isEmailVerified() {
+  public Boolean getEmailVerified() {
     return emailVerified;
   }
 
@@ -292,7 +291,7 @@ public class UserinfoResponse {
    * @return phoneNumberVerified
   **/
   @ApiModelProperty(value = "True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any extensions MUST be represented in RFC 3966 format.")
-  public Boolean isPhoneNumberVerified() {
+  public Boolean getPhoneNumberVerified() {
     return phoneNumberVerified;
   }
 
@@ -501,6 +500,6 @@ public class UserinfoResponse {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

@@ -47,4 +47,5 @@ func init() {
 	migrateCmd.AddCommand(migrateSqlCmd)
 
 	migrateSqlCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN.")
+	migrateSqlCmd.Flags().BoolP("yes", "y", false, "If set all confirmation requests are accepted without user interaction.")
 }

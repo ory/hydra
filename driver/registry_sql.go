@@ -1,7 +1,14 @@
 package driver
 
 import (
+	"fmt"
+	"os"
+	"regexp"
+	"strings"
 	"time"
+
+	"github.com/olekukonko/tablewriter"
+	migrate "github.com/rubenv/sql-migrate"
 
 	"github.com/jmoiron/sqlx"
 
@@ -24,12 +31,15 @@ type RegistrySQL struct {
 
 var _ Registry = new(RegistrySQL)
 
+var multiSpace = regexp.MustCompile("\\s+")
+
 func init() {
 	dbal.RegisterDriver(NewRegistrySQL())
 }
 
 type schemaCreator interface {
 	CreateSchemas() (int, error)
+	PlanMigration() ([]*migrate.PlannedMigration, error)
 }
 
 func NewRegistrySQL() *RegistrySQL {
@@ -76,6 +86,53 @@ func (m *RegistrySQL) DB() *sqlx.DB {
 	}
 
 	return m.db
+}
+
+func (m *RegistrySQL) SchemaMigrationPlan() (*tablewriter.Table, error) {
+	names := map[int]string{
+		0: "JSON Web Keys",
+		1: "OAuth 2.0 Clients",
+		2: "Login &Consent",
+		3: "OAuth 2.0",
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+	table.SetAutoMergeCells(true)
+	table.SetRowLine(true)
+	table.SetColMinWidth(4, 20)
+	table.SetHeader([]string{
+		"Driver",
+		"Module",
+		"ID",
+		"#",
+		"Query",
+	})
+
+	for _, s := range []schemaCreator{
+		m.KeyManager().(schemaCreator),
+		m.ClientManager().(schemaCreator),
+		m.ConsentManager().(schemaCreator),
+		m.OAuth2Storage().(schemaCreator),
+	} {
+		plans, err := s.PlanMigration()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, plan := range plans {
+			for k, up := range plan.Up {
+				up = strings.Replace("\n", "", strings.TrimSpace(up), -1)
+				up = strings.Join(strings.Fields(up), " ")
+				if len(up) > 0 {
+					table.Append([]string{m.db.DriverName(), names[k], plan.Id + ".sql", fmt.Sprintf("%d", k), up})
+				}
+			}
+		}
+	}
+
+	return table, nil
 }
 
 func (m *RegistrySQL) CreateSchemas() (int, error) {

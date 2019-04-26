@@ -187,7 +187,8 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 // Invalidates a subject's authentication session
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-// has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+// has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
+// Front- or Back-channel logout.
 //
 //
 //     Consumes:

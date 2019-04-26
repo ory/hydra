@@ -65,8 +65,10 @@ type sqlData struct {
 	Key       string    `db:"keydata"`
 }
 
-func (m *SQLManager) GetMigrations() *dbal.PackrMigrationSource {
-	return Migrations[dbal.Canonicalize(m.DB.DriverName())]
+func (m *SQLManager) PlanMigration() ([]*migrate.PlannedMigration, error) {
+	migrate.SetTable("hydra_jwk_migration")
+	plan, _, err := migrate.PlanMigration(m.DB.DB, m.DB.DriverName(), Migrations[dbal.Canonicalize(m.DB.DriverName())], migrate.Up, 0)
+	return plan, errors.WithStack(err)
 }
 
 func (m *SQLManager) CreateSchemas() (int, error) {

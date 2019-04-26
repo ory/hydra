@@ -30,6 +30,7 @@ case "$1" in
         memory)
             DSN=memory \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=false
             ;;
 
         memory-jwt)
@@ -37,12 +38,14 @@ case "$1" in
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=true
             ;;
 
         postgres)
             hydra migrate sql $TEST_DATABASE_POSTGRESQL
             DSN=$TEST_DATABASE_POSTGRESQL \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=false
             ;;
 
         postgres-jwt)
@@ -51,12 +54,14 @@ case "$1" in
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=true
             ;;
 
         mysql)
             hydra migrate sql $TEST_DATABASE_MYSQL
             DSN=$TEST_DATABASE_MYSQL \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=false
             ;;
 
         mysql-jwt)
@@ -64,11 +69,13 @@ case "$1" in
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=true
             ;;
 
         plugin)
             DSN=plugin://./memtest.so \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=false
             ;;
 
         plugin-jwt)
@@ -76,6 +83,7 @@ case "$1" in
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=true
             ;;
         *)
             echo $"Usage: $0 {memory|memory-jwt}"

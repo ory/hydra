@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -35,8 +35,7 @@ use \ArrayAccess;
  * SwaggerFlushInactiveAccessTokens Class Doc Comment
  *
  * @category    Class
- * @description SwaggerFlushInactiveAccessTokens swagger flush inactive access tokens
- * @package     HydraSDK
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,7 +54,7 @@ class SwaggerFlushInactiveAccessTokens implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'body' => '\HydraSDK\Model\FlushInactiveOAuth2TokensRequest'
+        'body' => '\Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest'
     ];
 
     /**
@@ -163,7 +162,7 @@ class SwaggerFlushInactiveAccessTokens implements ArrayAccess
 
     /**
      * Gets body
-     * @return \HydraSDK\Model\FlushInactiveOAuth2TokensRequest
+     * @return \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest
      */
     public function getBody()
     {
@@ -172,7 +171,7 @@ class SwaggerFlushInactiveAccessTokens implements ArrayAccess
 
     /**
      * Sets body
-     * @param \HydraSDK\Model\FlushInactiveOAuth2TokensRequest $body
+     * @param \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest $body
      * @return $this
      */
     public function setBody($body)
@@ -233,10 +232,10 @@ class SwaggerFlushInactiveAccessTokens implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

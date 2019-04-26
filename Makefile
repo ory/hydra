@@ -83,7 +83,7 @@ sdk:
 		rm -rf ./vendor/
 		GO111MODULE=on go mod tidy
 		GO111MODULE=on go mod vendor
-		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json
+		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json -x sdk
 		GO111MODULE=off swagger validate ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra

@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerOAuthIntrospectionRequest SwaggerOAuthIntrospectionRequest swagger o auth introspection request
-// swagger:model SwaggerOAuthIntrospectionRequest
+// SwaggerOAuthIntrospectionRequest swagger o auth introspection request
+// swagger:model swaggerOAuthIntrospectionRequest
 type SwaggerOAuthIntrospectionRequest struct {
 
 	// An optional, space separated list of required scopes. If the access token was not granted one of the
@@ -25,8 +25,8 @@ type SwaggerOAuthIntrospectionRequest struct {
 
 	// The string value of the token. For access tokens, this
 	// is the "access_token" value returned from the token endpoint
-	// defined in OAuth 2.0 [RFC6749], Section 5.1.
-	// This endpoint DOES NOT accept refresh tokens for validation.
+	// defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
+	// value returned.
 	// Required: true
 	Token *string `json:"token"`
 }

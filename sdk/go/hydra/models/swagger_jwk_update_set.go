@@ -14,7 +14,7 @@ import (
 )
 
 // SwaggerJwkUpdateSet swagger jwk update set
-// swagger:model SwaggerJwkUpdateSet
+// swagger:model swaggerJwkUpdateSet
 type SwaggerJwkUpdateSet struct {
 
 	// body

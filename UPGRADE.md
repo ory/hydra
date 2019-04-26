@@ -139,6 +139,15 @@ secure deployment with zero effort? We can run it for you! If you're interested,
 
 ## 1.0.0-rc.10
 
+### Schema Changes
+
+Please read all paragraphs of this section with the utmost care, before executing `hydra migrate sql`. Do
+not take this change lightly and create a backup of the database before you begin. To be sure, copy the database
+and do a dry-run locally.
+
+> Be aware that running these migrations might take some time when using large databases. Do a dry-run before hammering
+your production database.
+
 ### SQL Migrations now require user-input or `--yes` flag
 
 `hydra migrate sql` now shows an execution plan and asks for confirmation before executing the migrations. To run

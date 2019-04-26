@@ -42,14 +42,14 @@ case "$1" in
             ;;
 
         postgres)
-            hydra migrate sql $TEST_DATABASE_POSTGRESQL
+            hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL
             DSN=$TEST_DATABASE_POSTGRESQL \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
         postgres-jwt)
-            hydra migrate sql $TEST_DATABASE_POSTGRESQL
+            hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL
             DSN=$TEST_DATABASE_POSTGRESQL \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \
@@ -58,13 +58,14 @@ case "$1" in
             ;;
 
         mysql)
-            hydra migrate sql $TEST_DATABASE_MYSQL
+            hydra migrate sql --yes $TEST_DATABASE_MYSQL
             DSN=$TEST_DATABASE_MYSQL \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
         mysql-jwt)
+            hydra migrate sql --yes $TEST_DATABASE_MYSQL
             DSN=$TEST_DATABASE_MYSQL \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \

@@ -83,31 +83,33 @@ jobs:
     - checkout
     - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
     - run: make tools
-    - run: make e2e-memory
+    - run: make e2e-prepare-memory
+    - run: make e2e-waiton
+    - run: npm run test
 
-  test-e2e-plugin:
-    machine: true
-    steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-plugin
-
-  test-e2e-mysql:
-    machine: true
-    steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-mysql
-
-  test-e2e-postgres:
-    machine: true
-    steps:
-    - checkout
-    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
-    - run: make tools
-    - run: make e2e-postgres
+#  test-e2e-plugin:
+#    machine: true
+#    steps:
+#    - checkout
+#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+#    - run: make tools
+#    - run: make e2e-plugin
+#
+#  test-e2e-mysql:
+#    machine: true
+#    steps:
+#    - checkout
+#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+#    - run: make tools
+#    - run: make e2e-mysql
+#
+#  test-e2e-postgres:
+#    machine: true
+#    steps:
+#    - checkout
+#    - run: docker build -t oryd/hydra:e2e -f Dockerfile-e2e .
+#    - run: make tools
+#    - run: make e2e-postgres
 
   release-npm:
     docker:
@@ -206,18 +208,18 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-plugin:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-postgres:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-mysql:
-          filters:
-            tags:
-              only: /.*/
+#      - test-e2e-plugin:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-e2e-postgres:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-e2e-mysql:
+#          filters:
+#            tags:
+#              only: /.*/
       - release-docs:
           requires:
             - test
@@ -236,9 +238,9 @@ workflows:
             - test
             - format
             - test-e2e-memory
-            - test-e2e-plugin
-            - test-e2e-postgres
-            - test-e2e-mysql
+#            - test-e2e-plugin
+#            - test-e2e-postgres
+#            - test-e2e-mysql
           filters:
             tags:
               only: /.*/

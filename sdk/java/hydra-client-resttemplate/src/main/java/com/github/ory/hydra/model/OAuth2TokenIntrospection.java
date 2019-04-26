@@ -14,7 +14,6 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -29,7 +28,7 @@ import java.util.Map;
  * https://tools.ietf.org/html/rfc7662
  */
 @ApiModel(description = "https://tools.ietf.org/html/rfc7662")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class OAuth2TokenIntrospection {
   @JsonProperty("active")
   private Boolean active = null;
@@ -80,7 +79,7 @@ public class OAuth2TokenIntrospection {
    * @return active
   **/
   @ApiModelProperty(required = true, value = "Active is a boolean indicator of whether or not the presented token is currently active.  The specifics of a token's \"active\" state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a \"true\" value return for the \"active\" property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time).")
-  public Boolean isActive() {
+  public Boolean getActive() {
     return active;
   }
 
@@ -383,6 +382,6 @@ public class OAuth2TokenIntrospection {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

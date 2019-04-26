@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Client Client represents an OAuth 2.0 Client.
+// Client Client Client represents an OAuth 2.0 Client.
 // swagger:model Client
 type Client struct {
 
@@ -49,6 +49,7 @@ type Client struct {
 	Contacts []string `json:"contacts"`
 
 	// CreatedAt returns the timestamp of the client's creation.
+	// Format: date-time
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
@@ -153,6 +154,7 @@ type Client struct {
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 
 	// UpdatedAt returns the timestamp of the last update.
+	// Format: date-time
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 

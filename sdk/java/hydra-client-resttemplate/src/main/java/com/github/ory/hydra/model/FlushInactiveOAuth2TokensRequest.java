@@ -14,23 +14,22 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.threeten.bp.OffsetDateTime;
+import org.joda.time.DateTime;
 
 /**
  * FlushInactiveOAuth2TokensRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class FlushInactiveOAuth2TokensRequest {
   @JsonProperty("notAfter")
-  private OffsetDateTime notAfter = null;
+  private DateTime notAfter = null;
 
-  public FlushInactiveOAuth2TokensRequest notAfter(OffsetDateTime notAfter) {
+  public FlushInactiveOAuth2TokensRequest notAfter(DateTime notAfter) {
     this.notAfter = notAfter;
     return this;
   }
@@ -40,11 +39,11 @@ public class FlushInactiveOAuth2TokensRequest {
    * @return notAfter
   **/
   @ApiModelProperty(value = "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history of recently issued tokens for auditing.")
-  public OffsetDateTime getNotAfter() {
+  public DateTime getNotAfter() {
     return notAfter;
   }
 
-  public void setNotAfter(OffsetDateTime notAfter) {
+  public void setNotAfter(DateTime notAfter) {
     this.notAfter = notAfter;
   }
 
@@ -87,6 +86,6 @@ public class FlushInactiveOAuth2TokensRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

@@ -14,7 +14,7 @@ import (
 )
 
 // SwaggerJwkCreateSet swagger jwk create set
-// swagger:model swaggerJwkCreateSet
+// swagger:model SwaggerJwkCreateSet
 type SwaggerJwkCreateSet struct {
 
 	// body

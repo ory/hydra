@@ -1,4 +1,4 @@
-# Hydra\SDK\AdminApi
+# HydraSDK\AdminApi
 Client for Hydra
 
 All URIs are relative to *http://localhost*
@@ -34,7 +34,7 @@ Method | HTTP request | Description
 
 
 # **acceptConsentRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptConsentRequest($consent_challenge, $body)
+> \HydraSDK\Model\CompletedRequest acceptConsentRequest($consent_challenge, $body)
 
 Accept an consent request
 
@@ -45,16 +45,12 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $consent_challenge = "consent_challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
+$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
 
 try {
-    $result = $apiInstance->acceptConsentRequest($consent_challenge, $body);
+    $result = $api_instance->acceptConsentRequest($consent_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->acceptConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -67,11 +63,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **consent_challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\AcceptConsentRequest**](../Model/AcceptConsentRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\AcceptConsentRequest**](../Model/AcceptConsentRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -85,7 +81,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **acceptLoginRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptLoginRequest($login_challenge, $body)
+> \HydraSDK\Model\CompletedRequest acceptLoginRequest($login_challenge, $body)
 
 Accept an login request
 
@@ -96,16 +92,12 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $login_challenge = "login_challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\AcceptLoginRequest(); // \Hydra\SDK\Model\AcceptLoginRequest | 
+$body = new \HydraSDK\Model\AcceptLoginRequest(); // \HydraSDK\Model\AcceptLoginRequest | 
 
 try {
-    $result = $apiInstance->acceptLoginRequest($login_challenge, $body);
+    $result = $api_instance->acceptLoginRequest($login_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->acceptLoginRequest: ', $e->getMessage(), PHP_EOL;
@@ -118,11 +110,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **login_challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\AcceptLoginRequest**](../Model/AcceptLoginRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\AcceptLoginRequest**](../Model/AcceptLoginRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -136,7 +128,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **acceptLogoutRequest**
-> \Hydra\SDK\Model\CompletedRequest acceptLogoutRequest($logout_challenge)
+> \HydraSDK\Model\CompletedRequest acceptLogoutRequest($logout_challenge)
 
 Accept a logout request
 
@@ -147,15 +139,11 @@ When a user or an application requests ORY Hydra to log out a user, this endpoin
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $logout_challenge = "logout_challenge_example"; // string | 
 
 try {
-    $result = $apiInstance->acceptLogoutRequest($logout_challenge);
+    $result = $api_instance->acceptLogoutRequest($logout_challenge);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->acceptLogoutRequest: ', $e->getMessage(), PHP_EOL;
@@ -171,7 +159,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -185,7 +173,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **createJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
+> \HydraSDK\Model\JSONWebKeySet createJsonWebKeySet($set, $body)
 
 Generate a new JSON Web Key
 
@@ -196,16 +184,12 @@ This endpoint is capable of generating JSON Web Key Sets for you. There a differ
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest(); // \Hydra\SDK\Model\JsonWebKeySetGeneratorRequest | 
+$body = new \HydraSDK\Model\JsonWebKeySetGeneratorRequest(); // \HydraSDK\Model\JsonWebKeySetGeneratorRequest | 
 
 try {
-    $result = $apiInstance->createJsonWebKeySet($set, $body);
+    $result = $api_instance->createJsonWebKeySet($set, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->createJsonWebKeySet: ', $e->getMessage(), PHP_EOL;
@@ -218,11 +202,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JsonWebKeySetGeneratorRequest**](../Model/JsonWebKeySetGeneratorRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JsonWebKeySetGeneratorRequest**](../Model/JsonWebKeySetGeneratorRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -236,7 +220,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **createOAuth2Client**
-> \Hydra\SDK\Model\OAuth2Client createOAuth2Client($body)
+> \HydraSDK\Model\OAuth2Client createOAuth2Client($body)
 
 Create an OAuth 2.0 client
 
@@ -247,15 +231,11 @@ Create a new OAuth 2.0 client If you pass `client_secret` the secret will be use
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
-$body = new \Hydra\SDK\Model\OAuth2Client(); // \Hydra\SDK\Model\OAuth2Client | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$body = new \HydraSDK\Model\OAuth2Client(); // \HydraSDK\Model\OAuth2Client | 
 
 try {
-    $result = $apiInstance->createOAuth2Client($body);
+    $result = $api_instance->createOAuth2Client($body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->createOAuth2Client: ', $e->getMessage(), PHP_EOL;
@@ -267,11 +247,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
+ **body** | [**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
 
 ### Authorization
 
@@ -296,16 +276,12 @@ Use this endpoint to delete a single JSON Web Key.  A JSON Web Key (JWK) is a Ja
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
 
 try {
-    $apiInstance->deleteJsonWebKey($kid, $set);
+    $api_instance->deleteJsonWebKey($kid, $set);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->deleteJsonWebKey: ', $e->getMessage(), PHP_EOL;
 }
@@ -346,15 +322,11 @@ Use this endpoint to delete a complete JSON Web Key Set and all the keys in that
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
 
 try {
-    $apiInstance->deleteJsonWebKeySet($set);
+    $api_instance->deleteJsonWebKeySet($set);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->deleteJsonWebKeySet: ', $e->getMessage(), PHP_EOL;
 }
@@ -394,15 +366,11 @@ Delete an existing OAuth 2.0 Client by its ID.  OAuth 2.0 clients are used to pe
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $id = "id_example"; // string | The id of the OAuth 2.0 Client.
 
 try {
-    $apiInstance->deleteOAuth2Client($id);
+    $api_instance->deleteOAuth2Client($id);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->deleteOAuth2Client: ', $e->getMessage(), PHP_EOL;
 }
@@ -442,15 +410,11 @@ This endpoint flushes expired OAuth2 access tokens from the database. You can se
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
-$body = new \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest(); // \Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest | 
+$api_instance = new HydraSDK\Api\AdminApi();
+$body = new \HydraSDK\Model\FlushInactiveOAuth2TokensRequest(); // \HydraSDK\Model\FlushInactiveOAuth2TokensRequest | 
 
 try {
-    $apiInstance->flushInactiveOAuth2Tokens($body);
+    $api_instance->flushInactiveOAuth2Tokens($body);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->flushInactiveOAuth2Tokens: ', $e->getMessage(), PHP_EOL;
 }
@@ -461,7 +425,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**\Hydra\SDK\Model\FlushInactiveOAuth2TokensRequest**](../Model/FlushInactiveOAuth2TokensRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\FlushInactiveOAuth2TokensRequest**](../Model/FlushInactiveOAuth2TokensRequest.md)|  | [optional]
 
 ### Return type
 
@@ -479,7 +443,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getConsentRequest**
-> \Hydra\SDK\Model\ConsentRequest getConsentRequest($consent_challenge)
+> \HydraSDK\Model\ConsentRequest getConsentRequest($consent_challenge)
 
 Get consent request information
 
@@ -490,15 +454,11 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $consent_challenge = "consent_challenge_example"; // string | 
 
 try {
-    $result = $apiInstance->getConsentRequest($consent_challenge);
+    $result = $api_instance->getConsentRequest($consent_challenge);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -514,7 +474,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\ConsentRequest**](../Model/ConsentRequest.md)
+[**\HydraSDK\Model\ConsentRequest**](../Model/ConsentRequest.md)
 
 ### Authorization
 
@@ -528,7 +488,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKey**
-> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
+> \HydraSDK\Model\JSONWebKeySet getJsonWebKey($kid, $set)
 
 Fetch a JSON Web Key
 
@@ -539,16 +499,12 @@ This endpoint returns a singular JSON Web Key, identified by the set and the spe
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
 
 try {
-    $result = $apiInstance->getJsonWebKey($kid, $set);
+    $result = $api_instance->getJsonWebKey($kid, $set);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getJsonWebKey: ', $e->getMessage(), PHP_EOL;
@@ -565,7 +521,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -579,7 +535,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet getJsonWebKeySet($set)
+> \HydraSDK\Model\JSONWebKeySet getJsonWebKeySet($set)
 
 Retrieve a JSON Web Key Set
 
@@ -590,15 +546,11 @@ This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.  A JSON Web 
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
 
 try {
-    $result = $apiInstance->getJsonWebKeySet($set);
+    $result = $api_instance->getJsonWebKeySet($set);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getJsonWebKeySet: ', $e->getMessage(), PHP_EOL;
@@ -614,7 +566,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -628,7 +580,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getLoginRequest**
-> \Hydra\SDK\Model\LoginRequest getLoginRequest($login_challenge)
+> \HydraSDK\Model\LoginRequest getLoginRequest($login_challenge)
 
 Get an login request
 
@@ -639,15 +591,11 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $login_challenge = "login_challenge_example"; // string | 
 
 try {
-    $result = $apiInstance->getLoginRequest($login_challenge);
+    $result = $api_instance->getLoginRequest($login_challenge);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getLoginRequest: ', $e->getMessage(), PHP_EOL;
@@ -663,7 +611,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\LoginRequest**](../Model/LoginRequest.md)
+[**\HydraSDK\Model\LoginRequest**](../Model/LoginRequest.md)
 
 ### Authorization
 
@@ -677,7 +625,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getLogoutRequest**
-> \Hydra\SDK\Model\LogoutRequest getLogoutRequest($logout_challenge)
+> \HydraSDK\Model\LogoutRequest getLogoutRequest($logout_challenge)
 
 Get a logout request
 
@@ -688,15 +636,11 @@ Use this endpoint to fetch a logout request.
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $logout_challenge = "logout_challenge_example"; // string | 
 
 try {
-    $result = $apiInstance->getLogoutRequest($logout_challenge);
+    $result = $api_instance->getLogoutRequest($logout_challenge);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getLogoutRequest: ', $e->getMessage(), PHP_EOL;
@@ -712,7 +656,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\LogoutRequest**](../Model/LogoutRequest.md)
+[**\HydraSDK\Model\LogoutRequest**](../Model/LogoutRequest.md)
 
 ### Authorization
 
@@ -726,7 +670,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **getOAuth2Client**
-> \Hydra\SDK\Model\OAuth2Client getOAuth2Client($id)
+> \HydraSDK\Model\OAuth2Client getOAuth2Client($id)
 
 Get an OAuth 2.0 Client.
 
@@ -737,15 +681,11 @@ Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.  OAuth
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $id = "id_example"; // string | The id of the OAuth 2.0 Client.
 
 try {
-    $result = $apiInstance->getOAuth2Client($id);
+    $result = $api_instance->getOAuth2Client($id);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->getOAuth2Client: ', $e->getMessage(), PHP_EOL;
@@ -761,7 +701,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
 
 ### Authorization
 
@@ -775,7 +715,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **introspectOAuth2Token**
-> \Hydra\SDK\Model\OAuth2TokenIntrospection introspectOAuth2Token($token, $scope)
+> \HydraSDK\Model\OAuth2TokenIntrospection introspectOAuth2Token($token, $scope)
 
 Introspect OAuth2 tokens
 
@@ -787,24 +727,17 @@ The introspection endpoint allows to check if a token (both refresh and access) 
 require_once(__DIR__ . '/vendor/autoload.php');
 
 // Configure HTTP basic authorization: basic
-$config = Hydra\SDK\Configuration::getDefaultConfiguration()
-              ->setUsername('YOUR_USERNAME')
-              ->setPassword('YOUR_PASSWORD');
-
+HydraSDK\Configuration::getDefaultConfiguration()->setUsername('YOUR_USERNAME');
+HydraSDK\Configuration::getDefaultConfiguration()->setPassword('YOUR_PASSWORD');
 // Configure OAuth2 access token for authorization: oauth2
-$config = Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
+HydraSDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_TOKEN');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client(),
-    $config
-);
-$token = "token_example"; // string | The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
+$api_instance = new HydraSDK\Api\AdminApi();
+$token = "token_example"; // string | The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\" value returned.
 $scope = "scope_example"; // string | An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false.
 
 try {
-    $result = $apiInstance->introspectOAuth2Token($token, $scope);
+    $result = $api_instance->introspectOAuth2Token($token, $scope);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->introspectOAuth2Token: ', $e->getMessage(), PHP_EOL;
@@ -816,12 +749,12 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **token** | **string**| The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation. |
+ **token** | **string**| The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \&quot;refresh_token\&quot; value returned. |
  **scope** | **string**| An optional, space separated list of required scopes. If the access token was not granted one of the scopes, the result of active will be false. | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2TokenIntrospection**](../Model/OAuth2TokenIntrospection.md)
+[**\HydraSDK\Model\OAuth2TokenIntrospection**](../Model/OAuth2TokenIntrospection.md)
 
 ### Authorization
 
@@ -835,7 +768,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **listOAuth2Clients**
-> \Hydra\SDK\Model\OAuth2Client[] listOAuth2Clients($limit, $offset)
+> \HydraSDK\Model\OAuth2Client[] listOAuth2Clients($limit, $offset)
 
 List OAuth 2.0 Clients
 
@@ -846,16 +779,12 @@ This endpoint lists all clients in the database, and never returns client secret
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $limit = 789; // int | The maximum amount of policies returned.
 $offset = 789; // int | The offset from where to start looking.
 
 try {
-    $result = $apiInstance->listOAuth2Clients($limit, $offset);
+    $result = $api_instance->listOAuth2Clients($limit, $offset);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->listOAuth2Clients: ', $e->getMessage(), PHP_EOL;
@@ -872,7 +801,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client[]**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client[]**](../Model/OAuth2Client.md)
 
 ### Authorization
 
@@ -886,7 +815,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **listSubjectConsentSessions**
-> \Hydra\SDK\Model\PreviousConsentSession[] listSubjectConsentSessions($subject)
+> \HydraSDK\Model\PreviousConsentSession[] listSubjectConsentSessions($subject)
 
 Lists all consent sessions of a subject
 
@@ -897,15 +826,11 @@ This endpoint lists all subject's granted consent sessions, including client and
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $subject = "subject_example"; // string | 
 
 try {
-    $result = $apiInstance->listSubjectConsentSessions($subject);
+    $result = $api_instance->listSubjectConsentSessions($subject);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->listSubjectConsentSessions: ', $e->getMessage(), PHP_EOL;
@@ -921,7 +846,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**\Hydra\SDK\Model\PreviousConsentSession[]**](../Model/PreviousConsentSession.md)
+[**\HydraSDK\Model\PreviousConsentSession[]**](../Model/PreviousConsentSession.md)
 
 ### Authorization
 
@@ -935,7 +860,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **rejectConsentRequest**
-> \Hydra\SDK\Model\CompletedRequest rejectConsentRequest($consent_challenge, $body)
+> \HydraSDK\Model\CompletedRequest rejectConsentRequest($consent_challenge, $body)
 
 Reject an consent request
 
@@ -946,16 +871,12 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $consent_challenge = "consent_challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
+$body = new \HydraSDK\Model\RejectRequest(); // \HydraSDK\Model\RejectRequest | 
 
 try {
-    $result = $apiInstance->rejectConsentRequest($consent_challenge, $body);
+    $result = $api_instance->rejectConsentRequest($consent_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->rejectConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -968,11 +889,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **consent_challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -986,7 +907,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **rejectLoginRequest**
-> \Hydra\SDK\Model\CompletedRequest rejectLoginRequest($login_challenge, $body)
+> \HydraSDK\Model\CompletedRequest rejectLoginRequest($login_challenge, $body)
 
 Reject a login request
 
@@ -997,16 +918,12 @@ When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $login_challenge = "login_challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
+$body = new \HydraSDK\Model\RejectRequest(); // \HydraSDK\Model\RejectRequest | 
 
 try {
-    $result = $apiInstance->rejectLoginRequest($login_challenge, $body);
+    $result = $api_instance->rejectLoginRequest($login_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->rejectLoginRequest: ', $e->getMessage(), PHP_EOL;
@@ -1019,11 +936,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **login_challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
+[**\HydraSDK\Model\CompletedRequest**](../Model/CompletedRequest.md)
 
 ### Authorization
 
@@ -1048,16 +965,12 @@ When a user or an application requests ORY Hydra to log out a user, this endpoin
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $logout_challenge = "logout_challenge_example"; // string | 
-$body = new \Hydra\SDK\Model\RejectRequest(); // \Hydra\SDK\Model\RejectRequest | 
+$body = new \HydraSDK\Model\RejectRequest(); // \HydraSDK\Model\RejectRequest | 
 
 try {
-    $apiInstance->rejectLogoutRequest($logout_challenge, $body);
+    $api_instance->rejectLogoutRequest($logout_challenge, $body);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->rejectLogoutRequest: ', $e->getMessage(), PHP_EOL;
 }
@@ -1069,7 +982,7 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **logout_challenge** | **string**|  |
- **body** | [**\Hydra\SDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\RejectRequest**](../Model/RejectRequest.md)|  | [optional]
 
 ### Return type
 
@@ -1098,15 +1011,11 @@ This endpoint invalidates a subject's authentication session. After revoking the
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $subject = "subject_example"; // string | 
 
 try {
-    $apiInstance->revokeAuthenticationSession($subject);
+    $api_instance->revokeAuthenticationSession($subject);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->revokeAuthenticationSession: ', $e->getMessage(), PHP_EOL;
 }
@@ -1146,16 +1055,12 @@ This endpoint revokes a subject's granted consent sessions for a specific OAuth 
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $subject = "subject_example"; // string | The subject (Subject) who's consent sessions should be deleted.
 $client = "client_example"; // string | If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 
 try {
-    $apiInstance->revokeConsentSessions($subject, $client);
+    $api_instance->revokeConsentSessions($subject, $client);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->revokeConsentSessions: ', $e->getMessage(), PHP_EOL;
 }
@@ -1185,7 +1090,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKey**
-> \Hydra\SDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
+> \HydraSDK\Model\JSONWebKey updateJsonWebKey($kid, $set, $body)
 
 Update a JSON Web Key
 
@@ -1196,17 +1101,13 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $kid = "kid_example"; // string | The kid of the desired key
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JSONWebKey(); // \Hydra\SDK\Model\JSONWebKey | 
+$body = new \HydraSDK\Model\JSONWebKey(); // \HydraSDK\Model\JSONWebKey | 
 
 try {
-    $result = $apiInstance->updateJsonWebKey($kid, $set, $body);
+    $result = $api_instance->updateJsonWebKey($kid, $set, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->updateJsonWebKey: ', $e->getMessage(), PHP_EOL;
@@ -1220,11 +1121,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **kid** | **string**| The kid of the desired key |
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JSONWebKey**](../Model/JSONWebKey.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
+[**\HydraSDK\Model\JSONWebKey**](../Model/JSONWebKey.md)
 
 ### Authorization
 
@@ -1238,7 +1139,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateJsonWebKeySet**
-> \Hydra\SDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
+> \HydraSDK\Model\JSONWebKeySet updateJsonWebKeySet($set, $body)
 
 Update a JSON Web Key Set
 
@@ -1249,16 +1150,12 @@ Use this method if you do not want to let Hydra generate the JWKs for you, but i
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $set = "set_example"; // string | The set
-$body = new \Hydra\SDK\Model\JSONWebKeySet(); // \Hydra\SDK\Model\JSONWebKeySet | 
+$body = new \HydraSDK\Model\JSONWebKeySet(); // \HydraSDK\Model\JSONWebKeySet | 
 
 try {
-    $result = $apiInstance->updateJsonWebKeySet($set, $body);
+    $result = $api_instance->updateJsonWebKeySet($set, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->updateJsonWebKeySet: ', $e->getMessage(), PHP_EOL;
@@ -1271,11 +1168,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **set** | **string**| The set |
- **body** | [**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
+ **body** | [**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)|  | [optional]
 
 ### Return type
 
-[**\Hydra\SDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
+[**\HydraSDK\Model\JSONWebKeySet**](../Model/JSONWebKeySet.md)
 
 ### Authorization
 
@@ -1289,7 +1186,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **updateOAuth2Client**
-> \Hydra\SDK\Model\OAuth2Client updateOAuth2Client($id, $body)
+> \HydraSDK\Model\OAuth2Client updateOAuth2Client($id, $body)
 
 Update an OAuth 2.0 Client
 
@@ -1300,16 +1197,12 @@ Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$apiInstance = new Hydra\SDK\Api\AdminApi(
-    // If you want use custom http client, pass your client which implements `GuzzleHttp\ClientInterface`.
-    // This is optional, `GuzzleHttp\Client` will be used as default.
-    new GuzzleHttp\Client()
-);
+$api_instance = new HydraSDK\Api\AdminApi();
 $id = "id_example"; // string | 
-$body = new \Hydra\SDK\Model\OAuth2Client(); // \Hydra\SDK\Model\OAuth2Client | 
+$body = new \HydraSDK\Model\OAuth2Client(); // \HydraSDK\Model\OAuth2Client | 
 
 try {
-    $result = $apiInstance->updateOAuth2Client($id, $body);
+    $result = $api_instance->updateOAuth2Client($id, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->updateOAuth2Client: ', $e->getMessage(), PHP_EOL;
@@ -1322,11 +1215,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **string**|  |
- **body** | [**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
+ **body** | [**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)|  |
 
 ### Return type
 
-[**\Hydra\SDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
+[**\HydraSDK\Model\OAuth2Client**](../Model/OAuth2Client.md)
 
 ### Authorization
 

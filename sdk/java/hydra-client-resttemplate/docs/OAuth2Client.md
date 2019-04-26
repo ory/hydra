@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **clientSecretExpiresAt** | **Long** | SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it&#39;s value will always be set to 0. |  [optional]
 **clientUri** | **String** | ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion. |  [optional]
 **contacts** | **List&lt;String&gt;** | Contacts is a array of strings representing ways to contact people responsible for this client, typically email addresses. |  [optional]
-**createdAt** | [**OffsetDateTime**](OffsetDateTime.md) | CreatedAt returns the timestamp of the client&#39;s creation. |  [optional]
+**createdAt** | [**DateTime**](DateTime.md) | CreatedAt returns the timestamp of the client&#39;s creation. |  [optional]
 **frontchannelLogoutSessionRequired** | **Boolean** | Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false. |  [optional]
 **frontchannelLogoutUri** | **String** | RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be. |  [optional]
 **grantTypes** | **List&lt;String&gt;** | GrantTypes is an array of grant types the client is allowed to use. |  [optional]
@@ -33,7 +33,7 @@ Name | Type | Description | Notes
 **subjectType** | **String** | SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include &#x60;pairwise&#x60; and &#x60;public&#x60;. |  [optional]
 **tokenEndpointAuthMethod** | **String** | Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none. |  [optional]
 **tosUri** | **String** | TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client. |  [optional]
-**updatedAt** | [**OffsetDateTime**](OffsetDateTime.md) | UpdatedAt returns the timestamp of the last update. |  [optional]
+**updatedAt** | [**DateTime**](DateTime.md) | UpdatedAt returns the timestamp of the last update. |  [optional]
 **userinfoSignedResponseAlg** | **String** | JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type. |  [optional]
 
 

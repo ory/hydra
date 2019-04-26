@@ -14,7 +14,6 @@
 package com.github.ory.hydra.model;
 
 import java.util.Objects;
-import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -30,7 +29,7 @@ import java.util.Map;
 /**
  * ConsentRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-25T13:51:05.405+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
 public class ConsentRequest {
   @JsonProperty("acr")
   private String acr = null;
@@ -282,7 +281,7 @@ public class ConsentRequest {
    * @return skip
   **/
   @ApiModelProperty(value = "Skip, if true, implies that the client has requested the same scopes from the same user previously. If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the consent request using the usual API call.")
-  public Boolean isSkip() {
+  public Boolean getSkip() {
     return skip;
   }
 
@@ -369,6 +368,6 @@ public class ConsentRequest {
     }
     return o.toString().replace("\n", "\n    ");
   }
-
+  
 }
 

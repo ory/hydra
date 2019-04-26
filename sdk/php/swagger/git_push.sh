@@ -13,7 +13,7 @@ if [ "$git_user_id" = "" ]; then
 fi
 
 if [ "$git_repo_id" = "" ]; then
-    git_repo_id="hydra"
+    git_repo_id="swagger"
     echo "[INFO] No command line input provided. Set \$git_repo_id to $git_repo_id"
 fi
 
@@ -36,7 +36,7 @@ git_remote=`git remote`
 if [ "$git_remote" = "" ]; then # git remote not defined
 
     if [ "$GIT_TOKEN" = "" ]; then
-        echo "[INFO] \$GIT_TOKEN (environment variable) is not set. Using the git credential in your environment."
+        echo "[INFO] \$GIT_TOKEN (environment variable) is not set. Using the git crediential in your environment."
         git remote add origin https://github.com/${git_user_id}/${git_repo_id}.git
     else
         git remote add origin https://${git_user_id}:${GIT_TOKEN}@github.com/${git_user_id}/${git_repo_id}.git

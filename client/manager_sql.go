@@ -31,7 +31,7 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/dbal"
@@ -223,6 +223,12 @@ func (d *sqlData) ToClient() (*Client, error) {
 	}
 
 	return c, nil
+}
+
+func (m *SQLManager) PlanMigration() ([]*migrate.PlannedMigration, error) {
+	migrate.SetTable("hydra_client_migration")
+	plan, _, err := migrate.PlanMigration(m.DB.DB, m.DB.DriverName(), Migrations[dbal.Canonicalize(m.DB.DriverName())], migrate.Up, 0)
+	return plan, errors.WithStack(err)
 }
 
 func (m *SQLManager) CreateSchemas() (int, error) {

@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// SwaggerJSONWebKeyQuery swagger JSON web key query
-// swagger:model SwaggerJSONWebKeyQuery
+// SwaggerJSONWebKeyQuery swagger Json web key query
+// swagger:model swaggerJsonWebKeyQuery
 type SwaggerJSONWebKeyQuery struct {
 
 	// The kid of the desired key
@@ -28,7 +28,7 @@ type SwaggerJSONWebKeyQuery struct {
 	Set *string `json:"set"`
 }
 
-// Validate validates this swagger JSON web key query
+// Validate validates this swagger Json web key query
 func (m *SwaggerJSONWebKeyQuery) Validate(formats strfmt.Registry) error {
 	var res []error
 

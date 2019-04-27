@@ -17,10 +17,10 @@ import java.util.Objects;
 import io.swagger.annotations.ApiModel;
 
 /**
- * EmptyResponse Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
+ * Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
  */
-@ApiModel(description = "EmptyResponse Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
+@ApiModel(description = "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-27T01:47:23.524+02:00")
 public class EmptyResponse {
 
   @Override

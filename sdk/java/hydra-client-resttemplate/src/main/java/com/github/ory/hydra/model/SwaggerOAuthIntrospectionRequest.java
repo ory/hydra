@@ -21,10 +21,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * SwaggerOAuthIntrospectionRequest swagger o auth introspection request
+ * SwaggerOAuthIntrospectionRequest
  */
-@ApiModel(description = "SwaggerOAuthIntrospectionRequest swagger o auth introspection request")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-27T01:47:23.524+02:00")
 public class SwaggerOAuthIntrospectionRequest {
   @JsonProperty("scope")
   private String scope = null;
@@ -56,10 +55,10 @@ public class SwaggerOAuthIntrospectionRequest {
   }
 
    /**
-   * The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.
+   * The string value of the token. For access tokens, this is the \&quot;access_token\&quot; value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \&quot;refresh_token\&quot; value returned.
    * @return token
   **/
-  @ApiModelProperty(required = true, value = "The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0 [RFC6749], Section 5.1. This endpoint DOES NOT accept refresh tokens for validation.")
+  @ApiModelProperty(required = true, value = "The string value of the token. For access tokens, this is the \"access_token\" value returned from the token endpoint defined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\" value returned.")
   public String getToken() {
     return token;
   }

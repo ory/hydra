@@ -21,10 +21,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * Swaggeroauth2TokenParameters swaggeroauth2 token parameters
+ * Swaggeroauth2TokenParameters
  */
-@ApiModel(description = "Swaggeroauth2TokenParameters swaggeroauth2 token parameters")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-26T09:49:08.655+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-27T01:47:23.524+02:00")
 public class Swaggeroauth2TokenParameters {
   @JsonProperty("client_id")
   private String clientId = null;

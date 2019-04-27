@@ -56,9 +56,9 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\AdminApi();
+$api_instance = new Hydra\SDK\Api\AdminApi();
 $consent_challenge = "consent_challenge_example"; // string | 
-$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
+$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
 
 try {
     $result = $api_instance->acceptConsentRequest($consent_challenge, $body);
@@ -118,23 +118,14 @@ Class | Method | HTTP request | Description
 
  - [AcceptConsentRequest](docs/Model/AcceptConsentRequest.md)
  - [AcceptLoginRequest](docs/Model/AcceptLoginRequest.md)
- - [AuthenticationRequest](docs/Model/AuthenticationRequest.md)
- - [AuthenticationSession](docs/Model/AuthenticationSession.md)
- - [Client](docs/Model/Client.md)
  - [CompletedRequest](docs/Model/CompletedRequest.md)
  - [ConsentRequest](docs/Model/ConsentRequest.md)
  - [ConsentRequestSession](docs/Model/ConsentRequestSession.md)
- - [ConsentRequestSessionData](docs/Model/ConsentRequestSessionData.md)
- - [CreateRequest](docs/Model/CreateRequest.md)
  - [EmptyResponse](docs/Model/EmptyResponse.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [GenericError](docs/Model/GenericError.md)
- - [HandledAuthenticationRequest](docs/Model/HandledAuthenticationRequest.md)
- - [HandledConsentRequest](docs/Model/HandledConsentRequest.md)
- - [HandledLoginRequest](docs/Model/HandledLoginRequest.md)
  - [HealthNotReadyStatus](docs/Model/HealthNotReadyStatus.md)
  - [HealthStatus](docs/Model/HealthStatus.md)
- - [Introspection](docs/Model/Introspection.md)
  - [JSONWebKey](docs/Model/JSONWebKey.md)
  - [JSONWebKeySet](docs/Model/JSONWebKeySet.md)
  - [JsonWebKeySetGeneratorRequest](docs/Model/JsonWebKeySetGeneratorRequest.md)
@@ -147,25 +138,15 @@ Class | Method | HTTP request | Description
  - [OpenIDConnectContext](docs/Model/OpenIDConnectContext.md)
  - [PreviousConsentSession](docs/Model/PreviousConsentSession.md)
  - [RejectRequest](docs/Model/RejectRequest.md)
- - [RequestDeniedError](docs/Model/RequestDeniedError.md)
- - [RequestHandlerResponse](docs/Model/RequestHandlerResponse.md)
  - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerHealthStatus](docs/Model/SwaggerHealthStatus.md)
- - [SwaggerJSONWebKey](docs/Model/SwaggerJSONWebKey.md)
- - [SwaggerJSONWebKeySet](docs/Model/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/Model/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/Model/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/Model/SwaggerJwkUpdateSetKey.md)
- - [SwaggerNotReadyStatus](docs/Model/SwaggerNotReadyStatus.md)
  - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
- - [SwaggerOAuthTokenResponse](docs/Model/SwaggerOAuthTokenResponse.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
- - [SwaggerVersion](docs/Model/SwaggerVersion.md)
  - [Swaggeroauth2TokenParameters](docs/Model/Swaggeroauth2TokenParameters.md)
- - [Swaggeroauth2TokenResponse](docs/Model/Swaggeroauth2TokenResponse.md)
- - [SwaggeruserinfoResponsePayload](docs/Model/SwaggeruserinfoResponsePayload.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
  - [Version](docs/Model/Version.md)
  - [WellKnown](docs/Model/WellKnown.md)

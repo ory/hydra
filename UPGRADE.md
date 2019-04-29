@@ -158,10 +158,10 @@ migrations without user interaction, add flag `--yes`.
 Orthogonal to the changes when accepting and rejection consent and login requests, the following endpoints
 have been updated as well:
 
-* DELETE /oauth2/auth/sessions/login/:subject ->DELETE /oauth2/auth/sessions/login?subject={subject}
-* GET /oauth2/auth/sessions/consent/:subject -> GET /oauth2/auth/sessions/login?subject={subject}
-* DELETE /oauth2/auth/sessions/consent/:subject -> DELETE /oauth2/auth/sessions/login?subject={subject}
-* DELETE /oauth2/auth/sessions/consent/:subject/:client -> DELETE /oauth2/auth/sessions/login?subject={subject}&client={client}
+* `DELETE /oauth2/auth/sessions/login/:subject` -> `DELETE /oauth2/auth/sessions/login?subject={subject}`
+* `GET /oauth2/auth/sessions/consent/:subject` -> `GET /oauth2/auth/sessions/login?subject={subject}`
+* `DELETE /oauth2/auth/sessions/consent/:subject` -> `DELETE /oauth2/auth/sessions/login?subject={subject}`
+* `DELETE /oauth2/auth/sessions/consent/:subject/:client` -> `DELETE /oauth2/auth/sessions/login?subject={subject}&client={client}`
 
 While this does not include a security warning, this patch allows developers to use slashes in dots in their subject/user
 IDs.

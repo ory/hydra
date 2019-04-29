@@ -69,7 +69,7 @@ dockers:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-      - "oryd/hydra:{{ .Env.DOCKER_FULL_TAG }}"
+#      - "oryd/hydra:{{ .Env.DOCKER_FULL_TAG }}"
       - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/hydra:latest"
     extra_files:

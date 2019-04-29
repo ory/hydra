@@ -585,7 +585,7 @@ func migrationsSqlTests9_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/9_test.sql", size: 4205, mode: os.FileMode(420), modTime: time.Unix(1556225084, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/9_test.sql", size: 4205, mode: os.FileMode(420), modTime: time.Unix(1556269326, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

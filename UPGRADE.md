@@ -10,6 +10,8 @@ before finalizing the upgrade process.
 
 - [Hassle-free upgrades](#hassle-free-upgrades)
 - [1.0.0-rc.10](#100-rc10)
+  - [OpenID Connect Front-/Backchannel Logout 1.0](#openid-connect-front-backchannel-logout-10)
+  - [Schema Changes](#schema-changes)
   - [SQL Migrations now require user-input or `--yes` flag](#sql-migrations-now-require-user-input-or---yes-flag)
   - [Login and Consent Management](#login-and-consent-management)
 - [1.0.0-rc.9](#100-rc9)
@@ -21,7 +23,7 @@ before finalizing the upgrade process.
   - [Database Plugins](#database-plugins)
 - [1.0.0-rc.4](#100-rc4)
 - [1.0.0-rc.1](#100-rc1)
-  - [Schema Changes](#schema-changes)
+  - [Schema Changes](#schema-changes-1)
     - [Foreign Keys](#foreign-keys)
       - [Removing inconsistent oauth2 data](#removing-inconsistent-oauth2-data)
       - [Removing inconsistent login & consent data](#removing-inconsistent-login--consent-data)
@@ -41,7 +43,7 @@ before finalizing the upgrade process.
 - [1.0.0-beta.9](#100-beta9)
   - [CORS is disabled by default](#cors-is-disabled-by-default)
 - [1.0.0-beta.8](#100-beta8)
-  - [Schema Changes](#schema-changes-1)
+  - [Schema Changes](#schema-changes-2)
   - [Split of Public and Administrative Endpoints](#split-of-public-and-administrative-endpoints)
   - [Golang SDK `Configuration.EndpointURL` is now `Configuration.AdminURL`](#golang-sdk-configurationendpointurl-is-now-configurationadminurl)
   - [`hydra serve` is now `hydra serve all`](#hydra-serve-is-now-hydra-serve-all)
@@ -52,7 +54,7 @@ before finalizing the upgrade process.
   - [Regenerated OpenID Connect ID Token cryptographic keys](#regenerated-openid-connect-id-token-cryptographic-keys)
 - [1.0.0-beta.5](#100-beta5)
   - [OAuth 2.0 Client Response Type changes](#oauth-20-client-response-type-changes)
-  - [Schema Changes](#schema-changes-2)
+  - [Schema Changes](#schema-changes-3)
   - [HTTP Error Payload](#http-error-payload)
   - [OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`](#oauth-20-clients-must-specify-correct-token_endpoint_auth_method)
   - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
@@ -138,6 +140,11 @@ secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
 ## 1.0.0-rc.10
+
+### OpenID Connect Front-/Backchannel Logout 1.0
+
+This patch implements OpenID Connect Front-/Backchannel Logout 1.0 ([read docs](https://www.ory.sh/docs/hydra/oauth2#logout)).
+Therefore, endpoint `/oauth2/auth/sessions/login/revoke` has been deprecated.
 
 ### Schema Changes
 

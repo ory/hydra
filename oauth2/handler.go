@@ -47,8 +47,8 @@ import (
 )
 
 const (
-	DefaultConsentPath    = "/oauth2/fallbacks/login"
-	DefaultLoginPath      = "/oauth2/fallbacks/consent"
+	DefaultLoginPath      = "/oauth2/fallbacks/login"
+	DefaultConsentPath    = "/oauth2/fallbacks/consent"
 	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
 	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
 	DefaultErrorPath      = "/oauth2/fallbacks/error"
@@ -85,12 +85,12 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLoginURL))
 	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyConsentURL))
-	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyConsentURL))
+	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLogoutURL))
 	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
 		"You logged out successfully!",
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
 		http.StatusOK,
-		configuration.ViperKeyConsentURL,
+		configuration.ViperKeyLogoutRedirectURL,
 	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 

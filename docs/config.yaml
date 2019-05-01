@@ -325,20 +325,20 @@ strategies:
   #
   #  access_token: jwt
 
-oauth2:
-  # configures time to live
-  ttl:
-    # configures how long a user login and consent flow may take. Defaults to 1h.
-    login_consent_request: 1h
-    # configures how long access tokens are valid. Defaults to 1h.
-    access_token: 1h
-    # configures how long refresh tokens are valid. Defaults to 720h. Set to -1 for refresh tokens to never expire.
-    refresh_token: 720h
-    # configures how long id tokens are valid. Defaults to 1h.
-    id_token: 1h
-    # configures how long id tokens are valid. Defaults to 10m.
-    auth_code: 10m
+# configures time to live
+ttl:
+  # configures how long a user login and consent flow may take. Defaults to 1h.
+  login_consent_request: 1h
+  # configures how long access tokens are valid. Defaults to 1h.
+  access_token: 1h
+  # configures how long refresh tokens are valid. Defaults to 720h. Set to -1 for refresh tokens to never expire.
+  refresh_token: 720h
+  # configures how long id tokens are valid. Defaults to 1h.
+  id_token: 1h
+  # configures how long auth codes are valid. Defaults to 10m.
+  auth_code: 10m
 
+oauth2:
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients.
   #	Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error
   #	codes and similar errors. Defaults to false.

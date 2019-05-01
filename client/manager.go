@@ -23,6 +23,8 @@ package client
 import (
 	"context"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/ory/fosite"
 )
 
@@ -33,6 +35,7 @@ type Manager interface {
 }
 
 type Storage interface {
+	prometheus.Collector
 	fosite.Storage
 
 	CreateClient(ctx context.Context, c *Client) error

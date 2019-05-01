@@ -3,29 +3,84 @@ package consent
 import (
 	"strconv"
 
-	"github.com/ory/hydra/metrics/prometheus"
-
-	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
+var (
+	ConsentRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "hydra",
+		Subsystem: "consent",
+		Name:      "requests",
+		Help:      "incremented when a request is sent to consent.AcceptConsentRequest",
+	}, []string{"error"})
+	ConsentRequestScopes = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "hydra",
+		Subsystem: "consent",
+		Name:      "request_scopes",
+		Help:      "tracks the number of consent requests submitted per scope",
+	}, []string{"scope", "type"})
+	ConsentRequestAudiences = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "hydra",
+		Subsystem: "consent",
+		Name:      "request_audiences",
+		Help:      "tracks the number of consent requests submitted per audience",
+	}, []string{"audience", "type"})
+	ConsentRequestsRejected = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "hydra",
+		Subsystem: "consent",
+		Name:      "requests_rejected",
+		Help:      "incremented when consent.RejectConsentRequest is successful",
+	}, []string{"error"})
+
+	LoginRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "hydra",
+		Subsystem: "login",
+		Name:      "requests",
+		Help:      "incremented when a request is sent to consent.AcceptLoginRequest",
+	}, []string{"remember", "error"})
+	LoginRequestsRejected = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "hydra",
+		Subsystem: "login",
+		Name:      "requests_rejected",
+		Help:      "incremented when a request to consent.RejectLoginRequest is successful",
+	}, []string{"error"})
+)
+
+func collectCounters(c chan<- prometheus.Metric) {
+	ConsentRequests.Collect(c)
+	ConsentRequestScopes.Collect(c)
+	ConsentRequestAudiences.Collect(c)
+	ConsentRequestsRejected.Collect(c)
+	LoginRequests.Collect(c)
+	LoginRequestsRejected.Collect(c)
+}
+
+func describeCounters(c chan<- *prometheus.Desc) {
+	ConsentRequests.Describe(c)
+	ConsentRequestScopes.Describe(c)
+	ConsentRequestAudiences.Describe(c)
+	ConsentRequestsRejected.Describe(c)
+	LoginRequests.Describe(c)
+	LoginRequestsRejected.Describe(c)
+}
+
 func recordAcceptConsentRequest(
-	m *prometheus.MetricsManager,
 	cr *HandledConsentRequest,
 	err error,
 ) {
-	m.PrometheusMetrics.ConsentRequests.With(prom.Labels{
+	ConsentRequests.With(prometheus.Labels{
 		"error": strconv.FormatBool(err != nil),
 	}).Inc()
 
 	for _, v := range cr.GrantedScope {
-		m.PrometheusMetrics.ConsentRequestScopes.With(prom.Labels{
+		ConsentRequestScopes.With(prometheus.Labels{
 			"scope": v,
 			"type":  "granted",
 		}).Inc()
 	}
 
 	for _, v := range cr.GrantedAudience {
-		m.PrometheusMetrics.ConsentRequestAudiences.With(prom.Labels{
+		ConsentRequestAudiences.With(prometheus.Labels{
 			"audience": v,
 			"type":     "granted",
 		}).Inc()
@@ -33,13 +88,13 @@ func recordAcceptConsentRequest(
 
 	if cr.ConsentRequest != nil {
 		for _, v := range cr.ConsentRequest.RequestedScope {
-			m.PrometheusMetrics.ConsentRequestScopes.With(prom.Labels{
+			ConsentRequestScopes.With(prometheus.Labels{
 				"scope": v,
 				"type":  "requested",
 			}).Inc()
 		}
 		for _, v := range cr.ConsentRequest.RequestedAudience {
-			m.PrometheusMetrics.ConsentRequestAudiences.With(prom.Labels{
+			ConsentRequestAudiences.With(prometheus.Labels{
 				"audience": v,
 				"type":     "requested",
 			}).Inc()
@@ -47,21 +102,21 @@ func recordAcceptConsentRequest(
 	}
 }
 
-func recordAcceptLoginRequest(m *prometheus.MetricsManager, lr *HandledLoginRequest, err error) {
-	m.PrometheusMetrics.LoginRequests.With(prom.Labels{
+func recordAcceptLoginRequest(lr *HandledLoginRequest, err error) {
+	LoginRequests.With(prometheus.Labels{
 		"error":    strconv.FormatBool(err != nil),
 		"remember": strconv.FormatBool(lr.Remember),
 	}).Inc()
 }
 
-func recordRejectLoginRequest(m *prometheus.MetricsManager, err error) {
-	m.PrometheusMetrics.LoginRequestsRejected.With(prom.Labels{
+func recordRejectLoginRequest(err error) {
+	LoginRequestsRejected.With(prometheus.Labels{
 		"error": strconv.FormatBool(err != nil),
 	}).Inc()
 }
 
-func recordRejectConsentRequest(m *prometheus.MetricsManager, err error) {
-	m.PrometheusMetrics.ConsentRequestsRejected.With(prom.Labels{
+func recordRejectConsentRequest(err error) {
+	ConsentRequestsRejected.With(prometheus.Labels{
 		"error": strconv.FormatBool(err != nil),
 	}).Inc()
 }

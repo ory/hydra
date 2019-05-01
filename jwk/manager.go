@@ -23,10 +23,13 @@ package jwk
 import (
 	"context"
 
+	"github.com/prometheus/client_golang/prometheus"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
 type Manager interface {
+	prometheus.Collector
+
 	AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error
 
 	AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error

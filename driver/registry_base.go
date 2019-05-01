@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/metrics/prometheus"
+	"github.com/ory/hydra/metrics"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/serverx"
 
@@ -66,7 +66,8 @@ type RegistryBase struct {
 	oah          *oauth2.Handler
 	sia          map[string]consent.SubjectIdentifierAlgorithm
 	trc          *tracing.Tracer
-	pmm          *prometheus.MetricsManager
+	pmm          *metrics.Prometheus
+	mbm          *metrics.BridgeManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
 	buildVersion string
@@ -100,7 +101,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
 	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))
 
-	admin.Handler("GET", MetricsPrometheusPath, promhttp.HandlerFor(m.pmm.PrometheusMetrics.Registry, promhttp.HandlerOpts{}))
+	admin.Handler("GET", MetricsPrometheusPath, promhttp.HandlerFor(m.pmm.Registry, promhttp.HandlerOpts{}))
 
 	m.ConsentHandler().SetRoutes(admin, public)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
@@ -411,9 +412,9 @@ func (m *RegistryBase) Tracer() *tracing.Tracer {
 	return m.trc
 }
 
-func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
+func (m *RegistryBase) PrometheusManager() *metrics.Prometheus {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate, m.pr)
+		m.pmm = metrics.NewPrometheus(m.pr, m.cm, m.com, m.km)
 	}
 	return m.pmm
 }

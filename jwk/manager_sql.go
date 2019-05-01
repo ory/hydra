@@ -27,6 +27,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	jose "gopkg.in/square/go-jose.v2"
@@ -235,4 +236,10 @@ func (m *SQLManager) deleteKeySet(ctx context.Context, tx *sqlx.Tx, set string) 
 		return sqlcon.HandleError(err)
 	}
 	return nil
+}
+
+func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
+}
+
+func (m *SQLManager) Describe(c chan<- *prometheus.Desc) {
 }

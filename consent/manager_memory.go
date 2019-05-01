@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
@@ -407,4 +408,12 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 		}
 	}
 	return nil, errors.WithStack(x.ErrNotFound)
+}
+
+func (m *MemoryManager) Collect(c chan<- prometheus.Metric) {
+	collectCounters(c)
+}
+
+func (m *MemoryManager) Describe(c chan<- *prometheus.Desc) {
+	describeCounters(c)
 }

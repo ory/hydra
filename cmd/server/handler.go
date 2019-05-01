@@ -21,12 +21,14 @@
 package server
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -40,14 +42,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 
 	"github.com/ory/graceful"
-	"github.com/ory/hydra/client"
+	// "github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/x/healthx"
+	// "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/metrics"
+	// "github.com/ory/hydra/oauth2"
+	"github.com/ory/x/cmdx"
+	// "github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 )
 
@@ -178,10 +183,35 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), d.Configuration().IssuerURL().String()))
 	publicmw.Use(d.Registry().PrometheusManager())
 
-	metrics := metricsx.New(
-		cmd,
-		d.Registry().Logger(),
-		&metricsx.Options{
+	var (
+		bridges = []metrics.Bridge{}
+		l       = d.Registry().Logger()
+		ctx     = context.Background()
+	)
+
+	optOut, err := cmd.Flags().GetBool("sqa-opt-out")
+	if !optOut {
+		optOut, err = cmd.Flags().GetBool("disable-telemetry")
+		if optOut {
+			l.Warn(`Command line argument "--disable-telemetry" has been deprecated and will be removed in an upcoming release. Use "--sqa-opt-out" instead.`)
+		}
+	}
+	cmdx.Must(err, "Unable to get command line flag.")
+
+	if !optOut {
+		optOut = viper.GetBool("sqa.opt_out")
+	}
+
+	if !optOut {
+		optOut = viper.GetBool("DISABLE_TELEMETRY")
+		if optOut {
+			l.Warn(`Environment variable "DISABLE_TELEMETRY" has been deprecated and will be removed in an upcoming release. Use configuration key "sqa.opt_out: true" or environment variable "SQA_OPT_OUT=true" instead.`)
+		}
+	}
+
+	if !optOut {
+		l.Info("Software quality assurance features are enabled. Learn more at: https://www.ory.sh/docs/ecosystem/sqa")
+		s := &metrics.SegmentOptions{
 			Service: "ory-hydra",
 			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
 				d.Configuration().IssuerURL().String(),
@@ -190,36 +220,66 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 			IsDevelopment: d.Configuration().DSN() == "memory" ||
 				d.Configuration().IssuerURL().String() == "" ||
 				strings.Contains(d.Configuration().IssuerURL().String(), "localhost"),
-			WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
-			WhitelistedPaths: []string{
-				client.ClientsHandlerPath,
-				jwk.KeyHandlerPath,
-				jwk.WellKnownKeysPath,
-				oauth2.DefaultConsentPath,
-				oauth2.TokenPath,
-				oauth2.AuthPath,
-				oauth2.UserinfoPath,
-				oauth2.WellKnownPath,
-				oauth2.IntrospectPath,
-				oauth2.RevocationPath,
-				consent.ConsentPath,
-				consent.LoginPath,
-				healthx.AliveCheckPath,
-				healthx.ReadyCheckPath,
-				healthx.VersionPath,
-				driver.MetricsPrometheusPath,
-				"/oauth2/auth/sessions/login",
-				"/oauth2/auth/sessions/consent",
-				"/",
-			},
+			WriteKey:     "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
 			BuildVersion: d.Registry().BuildVersion(),
 			BuildTime:    d.Registry().BuildDate(),
 			BuildHash:    d.Registry().BuildHash(),
-		},
-	)
+		}
+		b, err := metrics.NewSegmentBridge(ctx, s, l, d.Registry().PrometheusManager().Registry)
+		if err != nil {
+			l.WithError(err).Debug("Software quality assurance features could not be started. Learn more at: https://www.ory.sh/docs/ecosystem/sqa")
+		}
+		bridges = append(bridges, b)
+	}
+	bm := metrics.NewBridgeManager(&metrics.BridgeManagerOptions{
+		Interval: time.Duration(5 * time.Second),
+		Log:      l,
+	}, bridges)
 
-	adminmw.Use(metrics)
-	publicmw.Use(metrics)
+	go bm.Start(ctx)
+
+	// metrics := metricsx.New(
+	// 	cmd,
+	// 	d.Registry().Logger(),
+	// 	&metricsx.Options{
+	// 		Service: "ory-hydra",
+	// 		ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
+	// 			d.Configuration().IssuerURL().String(),
+	// 			d.Configuration().DSN(),
+	// 		)),
+	// 		IsDevelopment: d.Configuration().DSN() == "memory" ||
+	// 			d.Configuration().IssuerURL().String() == "" ||
+	// 			strings.Contains(d.Configuration().IssuerURL().String(), "localhost"),
+	// 		WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
+	// 		WhitelistedPaths: []string{
+	// 			client.ClientsHandlerPath,
+	// 			jwk.KeyHandlerPath,
+	// 			jwk.WellKnownKeysPath,
+	// 			oauth2.DefaultConsentPath,
+	// 			oauth2.TokenPath,
+	// 			oauth2.AuthPath,
+	// 			oauth2.UserinfoPath,
+	// 			oauth2.WellKnownPath,
+	// 			oauth2.IntrospectPath,
+	// 			oauth2.RevocationPath,
+	// 			consent.ConsentPath,
+	// 			consent.LoginPath,
+	// 			healthx.AliveCheckPath,
+	// 			healthx.ReadyCheckPath,
+	// 			healthx.VersionPath,
+	// 			driver.MetricsPrometheusPath,
+	// 			"/oauth2/auth/sessions/login",
+	// 			"/oauth2/auth/sessions/consent",
+	// 			"/",
+	// 		},
+	// 		BuildVersion: d.Registry().BuildVersion(),
+	// 		BuildTime:    d.Registry().BuildDate(),
+	// 		BuildHash:    d.Registry().BuildHash(),
+	// 	},
+	// )
+
+	// adminmw.Use(metrics)
+	// publicmw.Use(metrics)
 
 	d.Registry().RegisterRoutes(admin, public)
 

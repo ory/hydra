@@ -27,6 +27,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
@@ -144,4 +145,14 @@ func (m *MemoryManager) alloc() {
 	if m.Keys == nil {
 		m.Keys = make(map[string]*jose.JSONWebKeySet)
 	}
+}
+
+func (m *MemoryManager) Collect(c chan<- prometheus.Metric) {
+	JWKs.WithLabelValues().Set(float64(len(m.Keys)))
+
+	JWKs.Collect(c)
+}
+
+func (m *MemoryManager) Describe(c chan<- *prometheus.Desc) {
+	JWKs.Describe(c)
 }

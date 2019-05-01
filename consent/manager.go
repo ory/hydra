@@ -20,7 +20,11 @@
 
 package consent
 
-import "context"
+import (
+	"context"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 type ForcedObfuscatedLoginSession struct {
 	ClientID          string `db:"client_id"`
@@ -29,6 +33,8 @@ type ForcedObfuscatedLoginSession struct {
 }
 
 type Manager interface {
+	prometheus.Collector
+
 	CreateConsentRequest(ctx context.Context, req *ConsentRequest) error
 	GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error)
 	HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error)

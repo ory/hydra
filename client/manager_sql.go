@@ -29,6 +29,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
@@ -330,4 +331,10 @@ func (m *SQLManager) CountClients(ctx context.Context) (int, error) {
 	}
 
 	return n, nil
+}
+
+func (m *SQLManager) Collect(chan<- prometheus.Metric) {
+}
+
+func (m *SQLManager) Describe(chan<- *prometheus.Desc) {
 }

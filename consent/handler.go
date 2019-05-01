@@ -28,7 +28,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/ory/fosite"
 	"github.com/ory/go-convenience/urlx"
@@ -305,7 +304,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	)
 
 	defer func(p *HandledLoginRequest, err error) {
-		recordAcceptLoginRequest(h.r.PrometheusManager(), p, err)
+		recordAcceptLoginRequest(p, err)
 	}(&p, err)
 
 	d := json.NewDecoder(r.Body)
@@ -397,7 +396,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	)
 
 	defer func(err error) {
-		recordRejectLoginRequest(h.r.PrometheusManager(), err)
+		recordRejectLoginRequest(err)
 	}(err)
 
 	d := json.NewDecoder(r.Body)
@@ -529,7 +528,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	)
 
 	defer func(p *HandledConsentRequest, err error) {
-		recordAcceptConsentRequest(h.r.PrometheusManager(), p, err)
+		recordAcceptConsentRequest(p, err)
 	}(&p, err)
 
 	d := json.NewDecoder(r.Body)
@@ -612,7 +611,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	)
 
 	defer func(err error) {
-		recordRejectConsentRequest(h.r.PrometheusManager(), err)
+		recordRejectConsentRequest(err)
 	}(err)
 
 	d := json.NewDecoder(r.Body)
@@ -644,7 +643,6 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	h.r.PrometheusManager().PrometheusMetrics.ConsentRequestsRejected.With(prometheus.Labels{}).Inc()
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
 		RedirectTo: urlx.SetQuery(ru, url.Values{"consent_verifier": {request.Verifier}}).String(),
 	})

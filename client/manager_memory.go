@@ -26,6 +26,7 @@ import (
 
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/pagination"
@@ -155,4 +156,13 @@ func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clie
 
 func (m *MemoryManager) CountClients(ctx context.Context) (n int, err error) {
 	return len(m.Clients), nil
+}
+
+func (m *MemoryManager) Collect(c chan<- prometheus.Metric) {
+	Clients.Set(float64(len(m.Clients)))
+	Clients.Collect(c)
+}
+
+func (m *MemoryManager) Describe(c chan<- *prometheus.Desc) {
+	Clients.Describe(c)
 }

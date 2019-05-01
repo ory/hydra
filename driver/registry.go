@@ -2,10 +2,10 @@ package driver
 
 import (
 	"github.com/go-errors/errors"
-	prom "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/hydra/metrics/prometheus"
+	"github.com/ory/hydra/metrics"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
 
@@ -26,7 +26,7 @@ type Registry interface {
 
 	WithConfig(c configuration.Provider) Registry
 	WithLogger(l logrus.FieldLogger) Registry
-	WithPrometheusRegistry(r *prom.Registry) Registry
+	WithPrometheusRegistry(r *prometheus.Registry) Registry
 
 	WithBuildInfo(version, hash, date string) Registry
 	BuildVersion() string
@@ -40,7 +40,7 @@ type Registry interface {
 	consent.Registry
 	jwk.Registry
 	oauth2.Registry
-	PrometheusManager() *prometheus.MetricsManager
+	PrometheusManager() *metrics.Prometheus
 	Tracer() *tracing.Tracer
 
 	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)

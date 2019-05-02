@@ -334,11 +334,11 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	if !ar.Skip {
-		p.AuthenticatedAt = time.Now().UTC()
-	} else {
-		p.Remember = false
+	if ar.Skip {
+		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
 		p.AuthenticatedAt = ar.AuthenticatedAt
+	} else {
+		p.AuthenticatedAt = time.Now().UTC()
 	}
 	p.RequestedAt = ar.RequestedAt
 

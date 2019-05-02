@@ -354,7 +354,7 @@ func (m *MemoryManager) ConfirmLoginSession(ctx context.Context, id string, subj
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
 	if c, ok := m.authSessions[id]; ok {
-		c.Remember = true
+		c.Remember = remember
 		c.Subject = subject
 		c.AuthenticatedAt = time.Now().UTC()
 		m.authSessions[id] = c

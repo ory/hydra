@@ -91,6 +91,56 @@ type clientCreator interface {
 	CreateClient(cxt context.Context, client *hc.Client) error
 }
 
+func acceptLogin(apiClient *hydra.OryHydra, subject string, expectSkip bool, expectSubject string) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+		return func(w http.ResponseWriter, r *http.Request) {
+			rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+			require.NoError(t, err)
+
+			rr := rrr.Payload
+			assert.Equal(t, expectSkip, rr.Skip)
+			assert.EqualValues(t, expectSubject, rr.Subject)
+
+			vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+				WithBody(&models.HandledLoginRequest{Subject: pointerx.String(subject)}))
+			require.NoError(t, err)
+
+			v := vr.Payload
+			require.NotEmpty(t, v.RedirectTo)
+			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+		}
+	}
+}
+
+func acceptConsent(apiClient *hydra.OryHydra, scope []string, expectSkip bool, expectSubject string) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+		return func(w http.ResponseWriter, r *http.Request) {
+			rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+			require.NoError(t, err)
+
+			rr := rrr.Payload
+			assert.Equal(t, expectSkip, rr.Skip)
+			assert.EqualValues(t, expectSubject, rr.Subject)
+
+			vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
+				WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
+				WithBody(&models.HandledConsentRequest{
+					GrantedScope: scope,
+					Session: &models.ConsentRequestSessionData{
+						AccessToken: map[string]interface{}{"foo": "bar"},
+						IDToken:     map[string]interface{}{"bar": "baz"},
+					},
+				}))
+			require.NoError(t, err)
+			v := vr.Payload
+
+			require.NotEmpty(t, v.RedirectTo)
+			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+		}
+	}
+}
+
 // TestAuthCodeWithDefaultStrategy runs proper integration tests against in-memory and database connectors, specifically
 // we test:
 //
@@ -685,49 +735,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
 							cj:      persistentCJ,
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
-								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
-									require.NoError(t, err)
-
-									rr := rrr.Payload
-									assert.True(t, rr.Skip)
-									assert.EqualValues(t, "user-a", rr.Subject)
-
-									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
-										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{Subject: pointerx.String("user-a")}))
-									require.NoError(t, err)
-
-									v := vr.Payload
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
-								}
-							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
-								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
-									require.NoError(t, err)
-									rr := rrr.Payload
-									assert.True(t, rr.Skip)
-									assert.EqualValues(t, "user-a", rr.Subject)
-
-									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "offline"},
-											Session: &models.ConsentRequestSessionData{
-												AccessToken: map[string]interface{}{"foo": "bar"},
-												IDToken:     map[string]interface{}{"bar": "baz"},
-											},
-										}))
-									require.NoError(t, err)
-									v := vr.Payload
-
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
-								}
-							},
+							lph:     acceptLogin(apiClient, "user-a", true, "user-a"),
+							cph:     acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
 							cb: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
@@ -783,6 +792,57 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							cj:                    newCookieJar(),
 							expectOAuthAuthError:  true,
 							expectOAuthTokenError: false,
+						},
+						{
+							d:                     "checks if consecutive authentications cause any issues (1/3)",
+							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cj:                    persistentCJ,
+							lph:                   acceptLogin(apiClient, "user-a", true, "user-a"),
+							cph:                   acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							expectOAuthAuthError:  false,
+							expectOAuthTokenError: false,
+							expectRefreshToken:    true,
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.NotEmpty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+						},
+						{
+							d:                     "checks if consecutive authentications cause any issues (2/3)",
+							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cj:                    persistentCJ,
+							lph:                   acceptLogin(apiClient, "user-a", true, "user-a"),
+							cph:                   acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							expectOAuthAuthError:  false,
+							expectOAuthTokenError: false,
+							expectRefreshToken:    true,
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.NotEmpty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
+						},
+						{
+							d:                     "checks if consecutive authentications cause any issues (3/3)",
+							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cj:                    persistentCJ,
+							lph:                   acceptLogin(apiClient, "user-a", true, "user-a"),
+							cph:                   acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							expectOAuthAuthError:  false,
+							expectOAuthTokenError: false,
+							expectRefreshToken:    true,
+							cb: func(t *testing.T) httprouter.Handle {
+								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+									code = r.URL.Query().Get("code")
+									require.NotEmpty(t, code)
+									w.WriteHeader(http.StatusOK)
+								}
+							},
 						},
 						{
 							d:                     "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=none fails when maxAge is reached",

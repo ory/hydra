@@ -87,7 +87,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Basic Zm9vLTM6YmFy"}},
-			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foobar.com"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed per client",
@@ -96,7 +96,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vLTQ6YmFy"}},
-			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foo.foobar.com"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foo.foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) is allowed globally",
@@ -106,7 +106,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"*"}, "Authorization": {"Basic Zm9vLTU6YmFy"}},
-			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"*"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"*"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed globally",
@@ -116,7 +116,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vLTY6YmFy"}},
-			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foo.foobar.com"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foo.foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) allowed per client",
@@ -126,7 +126,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Basic Zm9vLTc6YmFy"}},
-			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foobar.com"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 		{
 			d: "should fail when token introspection fails",
@@ -155,7 +155,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Bearer " + token}},
-			expectHeader: http.Header{"Vary": {"Origin"}, "Access-Control-Allow-Origin": {"http://foobar.com"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {

@@ -43,11 +43,14 @@ Cypress.Commands.add(
         username = 'foo@bar.com',
         password = 'foobar'
       } = {},
-      prompt = ''
+      prompt = '',
+      createClient: doCreateClient = true
     } = {},
     path = 'oauth2'
   ) => {
-    cy.wrap(createClient(client));
+    if (doCreateClient) {
+      cy.wrap(createClient(client));
+    }
 
     cy.visit(
       `${Cypress.env('client_url')}/${path}/code?client_id=${client_id ||

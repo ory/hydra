@@ -92,7 +92,13 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 	return c, h
 }
 
-func MockLogoutRequest(key string) (c *LogoutRequest) {
+func MockLogoutRequest(key string, withClient bool) (c *LogoutRequest) {
+	var cl *client.Client
+	if withClient {
+		cl = &client.Client{
+			ClientID: "fk-client-" + key,
+		}
+	}
 	return &LogoutRequest{
 		Subject:               "subject" + key,
 		Challenge:             "challenge" + key,
@@ -103,7 +109,7 @@ func MockLogoutRequest(key string) (c *LogoutRequest) {
 		PostLogoutRedirectURI: "http://redirect-me/",
 		WasUsed:               false,
 		Accepted:              false,
-		Client:                &client.Client{ClientID: "fk-client-" + key},
+		Client:                cl,
 	}
 }
 
@@ -622,19 +628,22 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			t.Run("case=LogoutRequest", func(t *testing.T) {
 				for k, tc := range []struct {
-					key    string
-					authAt bool
+					key        string
+					authAt     bool
+					withClient bool
 				}{
-					{"LogoutRequest-1", true},
-					{"LogoutRequest-2", true},
-					{"LogoutRequest-3", true},
-					{"LogoutRequest-4", true},
-					{"LogoutRequest-5", true},
-					{"LogoutRequest-6", false},
+					{"LogoutRequest-1", true, true},
+					{"LogoutRequest-2", true, true},
+					{"LogoutRequest-3", true, true},
+					{"LogoutRequest-4", true, true},
+					{"LogoutRequest-5", true, false},
+					{"LogoutRequest-6", false, false},
 				} {
 					t.Run("key="+tc.key, func(t *testing.T) {
-						c := MockLogoutRequest(tc.key)
-						clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+						c := MockLogoutRequest(tc.key, tc.withClient)
+						if tc.withClient {
+							clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+						}
 
 						_, err := m.GetLogoutRequest(context.TODO(), "challenge"+tc.key)
 						require.Error(t, err)
@@ -679,7 +688,11 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 }
 
 func compareLogoutRequest(t *testing.T, a, b *LogoutRequest) {
-	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
+	require.True(t, (a.Client != nil && b.Client != nil) || (a.Client == nil && b.Client == nil))
+	if a.Client != nil {
+		assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
+	}
+
 	assert.EqualValues(t, a.Challenge, b.Challenge)
 	assert.EqualValues(t, a.Subject, b.Subject)
 	assert.EqualValues(t, a.Verifier, b.Verifier)

@@ -105,7 +105,7 @@ serve:
         - https://example.com
         - https://*.example.com
       # allowed_methods is list of HTTP methods the user agent is allowed to use with cross-domain
-      # requests. Defaults to GET and POST.
+      # requests. Defaults to the methods listed.
       allowed_methods:
         - POST
         - GET
@@ -113,17 +113,18 @@ serve:
         - PATCH
         - DELETE
 
-      # A list of non simple headers the client is allowed to use with cross-domain requests.
+      # A list of non simple headers the client is allowed to use with cross-domain requests.Defaults
+      # to the values listed.
       allowed_headers:
         - Authorization
 
-      # Sets which headers (comma separated values) are safe to expose to the API of a CORS API specification
+      # Sets which headers (comma separated values) are safe to expose to the API of a CORS API specification. Defaults
+      # to the values listed.
       exposed_headers:
-        - Set-Cookie
         - Content-Type
 
       # Sets whether the request can include user credentials like cookies, HTTP authentication
-      # or client side SSL certificates.
+      # or client side SSL certificates. Defaults to true.
       allow_credentials: true
 
       # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request

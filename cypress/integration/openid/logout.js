@@ -70,8 +70,8 @@ describe('OpenID Connect Logout', () => {
       cy.authCodeFlow(
         client,
         {
-          login: { remember: true }, // login should have skip false because we removed the session.mak
-          consent: { scope: ['openid'], remember: true, skip: true },
+          login: { remember: false }, // login should have skip false because we removed the session.mak
+          consent: { scope: ['openid'], remember: false, skip: true },
           createClient: false
         },
         'openid'

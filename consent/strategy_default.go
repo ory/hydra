@@ -416,8 +416,10 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, session.Subject, session.Remember); err != nil {
-		return nil, err
+	if !session.LoginRequest.Skip {
+		if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, session.Subject, session.Remember); err != nil {
+			return nil, err
+		}
 	}
 
 	if !session.Remember {

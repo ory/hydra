@@ -778,6 +778,74 @@ func TestStrategyLoginConsent(t *testing.T) {
 			},
 		},
 		{
+			d:   "This should pass because login and consent have been granted, this time we remember the decision",
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					require.True(t, res.Payload.Skip)
+					passAuthentication(apiClient, true)(t)(w, r)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					require.True(t, rrr.Payload.Skip)
+					passAuthorization(apiClient, true)(t)(w, r)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       true,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
+			d:   "This should pass because login and consent have been granted, this time we remember the decision",
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					require.True(t, res.Payload.Skip)
+					passAuthentication(apiClient, true)(t)(w, r)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					require.True(t, rrr.Payload.Skip)
+					passAuthorization(apiClient, true)(t)(w, r)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       true,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
 			d:   "This should pass because login was remembered and session id should be set and session context should also work",
 			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ClientID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
@@ -818,22 +886,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					assert.NotEmpty(t, cr.LoginChallenge)
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, cr.Context)
 
-					vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-						WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-						WithBody(&models.HandledConsentRequest{
-							GrantedScope: []string{"scope-a"},
-							Remember:     false,
-							RememberFor:  0,
-							Session: &models.ConsentRequestSessionData{
-								AccessToken: map[string]interface{}{"foo": "bar"},
-								IDToken:     map[string]interface{}{"bar": "baz"},
-							},
-						}))
-					require.NoError(t, err)
-					v := vr.Payload
-
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					passAuthorization(apiClient, false)(t)(w, r)
 				}
 			},
 			expectFinalStatusCode: http.StatusOK,
@@ -1023,22 +1076,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					assert.Equal(t, "user", rr.Subject)
 					assert.Empty(t, rr.Client.Secret)
 
-					vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-						WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-						WithBody(&models.HandledConsentRequest{
-							GrantedScope: []string{"scope-a"},
-							Remember:     false,
-							RememberFor:  0,
-							Session: &models.ConsentRequestSessionData{
-								AccessToken: map[string]interface{}{"foo": "bar"},
-								IDToken:     map[string]interface{}{"bar": "baz"},
-							},
-						}))
-					require.NoError(t, err)
-					v := vr.Payload
-
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					passAuthorization(apiClient, false)(t)(w, r)
 				}
 			},
 			expectFinalStatusCode: http.StatusOK,
@@ -1155,22 +1193,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					rr := rrr.Payload
 					assert.True(t, rr.Skip)
 
-					vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-						WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-						WithBody(&models.HandledConsentRequest{
-							GrantedScope: []string{"scope-a"},
-							Remember:     false,
-							RememberFor:  0,
-							Session: &models.ConsentRequestSessionData{
-								AccessToken: map[string]interface{}{"foo": "bar"},
-								IDToken:     map[string]interface{}{"bar": "baz"},
-							},
-						}))
-					require.NoError(t, err)
-					v := vr.Payload
-
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					passAuthorization(apiClient, false)(t)(w, r)
 				}
 			},
 			expectFinalStatusCode: http.StatusOK,
@@ -1275,22 +1298,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					rr := rrr.Payload
 					assert.False(t, rr.Skip)
 
-					vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
-						WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-						WithBody(&models.HandledConsentRequest{
-							GrantedScope: []string{"scope-a"},
-							Remember:     false,
-							RememberFor:  0,
-							Session: &models.ConsentRequestSessionData{
-								AccessToken: map[string]interface{}{"foo": "bar"},
-								IDToken:     map[string]interface{}{"bar": "baz"},
-							},
-						}))
-					require.NoError(t, err)
-					v := vr.Payload
-
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					passAuthorization(apiClient, false)(t)(w, r)
 				}
 			},
 			expectFinalStatusCode: http.StatusOK,

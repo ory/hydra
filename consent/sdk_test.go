@@ -85,10 +85,10 @@ func TestSDK(t *testing.T) {
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
 	require.NoError(t, err)
 
-	lur1 := MockLogoutRequest("testsdk-1")
+	lur1 := MockLogoutRequest("testsdk-1", true)
 	require.NoError(t, m.CreateLogoutRequest(context.TODO(), lur1))
 
-	lur2 := MockLogoutRequest("testsdk-2")
+	lur2 := MockLogoutRequest("testsdk-2", false)
 	require.NoError(t, m.CreateLogoutRequest(context.TODO(), lur2))
 
 	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))

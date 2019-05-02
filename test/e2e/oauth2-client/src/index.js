@@ -358,14 +358,18 @@ app.get('/openid/session/end', async (req, res) => {
   const client = await nc(req);
   const state = uuid.v4();
 
-  req.session.logout_state = state;
-  res.redirect(
-    client.endSessionUrl({
-      state,
-      id_token_hint:
-        req.query.id_token_hint || req.session.openid_token.id_token
-    })
-  );
+  if (req.query.simple) {
+    res.redirect(new URL('/oauth2/sessions/logout', config.public).toString());
+  } else {
+    req.session.logout_state = state;
+    res.redirect(
+      client.endSessionUrl({
+        state,
+        id_token_hint:
+          req.query.id_token_hint || req.session.openid_token.id_token
+      })
+    );
+  }
 });
 
 app.get('/openid/session/end/fc', async (req, res) => {

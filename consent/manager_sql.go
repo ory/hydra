@@ -584,12 +584,16 @@ func (m *SQLManager) GetLogoutRequest(ctx context.Context, challenge string) (*L
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
-	if err != nil {
-		return nil, err
+	if d.Client.Valid {
+		c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client.String)
+		if err != nil {
+			return nil, err
+		}
+
+		return d.ToLogoutRequest(c), nil
 	}
 
-	return d.ToLogoutRequest(c), nil
+	return d.ToLogoutRequest(nil), nil
 }
 
 func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {

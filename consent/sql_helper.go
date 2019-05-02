@@ -126,20 +126,28 @@ var sqlParamsLogoutRequest = []string{
 }
 
 type sqlLogoutRequest struct {
-	Challenge             string `db:"challenge"`
-	Verifier              string `db:"verifier"`
-	Subject               string `db:"subject"`
-	SessionID             string `db:"sid"`
-	RequestURL            string `db:"request_url"`
-	PostLogoutRedirectURI string `db:"redir_url"`
-	WasUsed               bool   `db:"was_used"`
-	Accepted              bool   `db:"accepted"`
-	Rejected              bool   `db:"rejected"`
-	Client                string `db:"client_id"`
-	RPInitiated           bool   `db:"rp_initiated"`
+	Challenge             string         `db:"challenge"`
+	Verifier              string         `db:"verifier"`
+	Subject               string         `db:"subject"`
+	SessionID             string         `db:"sid"`
+	RequestURL            string         `db:"request_url"`
+	PostLogoutRedirectURI string         `db:"redir_url"`
+	WasUsed               bool           `db:"was_used"`
+	Accepted              bool           `db:"accepted"`
+	Rejected              bool           `db:"rejected"`
+	Client                sql.NullString `db:"client_id"`
+	RPInitiated           bool           `db:"rp_initiated"`
 }
 
 func newSQLLogoutRequest(c *LogoutRequest) *sqlLogoutRequest {
+	var clientID sql.NullString
+	if c.Client != nil {
+		clientID = sql.NullString{
+			Valid:  true,
+			String: c.Client.ClientID,
+		}
+	}
+
 	return &sqlLogoutRequest{
 		Challenge:             c.Challenge,
 		Verifier:              c.Verifier,
@@ -149,7 +157,7 @@ func newSQLLogoutRequest(c *LogoutRequest) *sqlLogoutRequest {
 		PostLogoutRedirectURI: c.PostLogoutRedirectURI,
 		WasUsed:               c.WasUsed,
 		Accepted:              c.Accepted,
-		Client:                c.Client.ClientID,
+		Client:                clientID,
 		RPInitiated:           c.RPInitiated,
 	}
 }

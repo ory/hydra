@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ory/x/stringslice"
+
 	"github.com/ory/hydra/x"
 
 	"github.com/julienschmidt/httprouter"
@@ -33,7 +35,6 @@ import (
 )
 
 const (
-	IDTokenKeyName    = "hydra.openid.id-token"
 	KeyHandlerPath    = "/keys"
 	WellKnownKeysPath = "/.well-known/jwks.json"
 )
@@ -85,7 +86,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
-	for _, set := range h.c.WellKnownKeys() {
+	for _, set := range stringslice.Unique(h.c.WellKnownKeys()) {
 		keys, err := h.r.KeyManager().GetKeySet(r.Context(), set)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)

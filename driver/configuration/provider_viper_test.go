@@ -6,6 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -50,4 +52,9 @@ func TestSubjectTypesSupported(t *testing.T) {
 			tc.c(t)
 		})
 	}
+}
+
+func TestWellKnownKeysUnique(t *testing.T) {
+	p := NewViperProvider(logrus.New(), false, nil)
+	assert.EqualValues(t, []string{x.OAuth2JWTKeyName, x.OpenIDConnectKeyName}, p.WellKnownKeys(x.OAuth2JWTKeyName, x.OpenIDConnectKeyName, x.OpenIDConnectKeyName))
 }

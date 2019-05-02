@@ -97,7 +97,7 @@ func (v *ViperProvider) WellKnownKeys(include ...string) []string {
 	}
 
 	include = append(include, x.OpenIDConnectKeyName)
-	return append(viperx.GetStringSlice(v.l, ViperKeyWellKnownKeys, []string{}), include...)
+	return stringslice.Unique(append(viperx.GetStringSlice(v.l, ViperKeyWellKnownKeys, []string{}), include...))
 }
 
 func (v *ViperProvider) ServesHTTPS() bool {

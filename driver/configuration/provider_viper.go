@@ -153,7 +153,16 @@ func (v *ViperProvider) CORSEnabled(iface string) bool {
 }
 
 func (v *ViperProvider) CORSOptions(iface string) cors.Options {
-	return corsx.ParseOptions(v.l, "serve."+iface)
+	return cors.Options{
+		AllowedOrigins:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_origins", []string{}, "CORS_ALLOWED_ORIGINS"),
+		AllowedMethods:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_methods", []string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "CORS_ALLOWED_METHODS"),
+		AllowedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_headers", []string{"Authorization"}, "CORS_ALLOWED_HEADERS"),
+		ExposedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.exposed_headers", []string{"Content-Type"}, "CORS_EXPOSED_HEADERS"),
+		AllowCredentials:   viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", true, "CORS_ALLOWED_CREDENTIALS"),
+		OptionsPassthrough: viperx.GetBool(v.l, "serve."+iface+".cors.options_passthrough", false),
+		MaxAge:             viperx.GetInt(v.l, "serve."+iface+".cors.max_age", 0, "CORS_MAX_AGE"),
+		Debug:              viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", false, "CORS_DEBUG"),
+	}
 }
 
 func (v *ViperProvider) DSN() string {
@@ -381,5 +390,5 @@ func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
 }
 
 func (v *ViperProvider) ShareOAuth2Debug() bool {
-	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", "OAUTH2_SHARE_ERROR_DEBUG")
+	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", false, "OAUTH2_SHARE_ERROR_DEBUG")
 }

@@ -40,10 +40,11 @@ type RequestHandlerResponse struct {
 }
 
 // swagger:ignore
-type SubjectSession struct {
+type LoginSession struct {
 	ID              string    `db:"id"`
 	AuthenticatedAt time.Time `db:"authenticated_at"`
 	Subject         string    `db:"subject"`
+	Remember        bool      `db:"remember"`
 }
 
 // The request payload used to accept a login or consent request.
@@ -104,7 +105,7 @@ type HandledConsentRequest struct {
 	WasUsed         bool                `json:"-"`
 }
 
-// The response used to return handled consent requests
+// The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 type PreviousConsentSession struct {
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
@@ -228,11 +229,46 @@ type OpenIDConnectContext struct {
 	LoginHint string `json:"login_hint,omitempty"`
 }
 
+// Contains information about an ongoing logout request.
+//
+// swagger:model logoutRequest
+type LogoutRequest struct {
+	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
+	// identify the session.
+	Challenge string `json:"-"`
+
+	// Subject is the user for whom the logout was request.
+	Subject string `json:"subject"`
+
+	// SessionID is the login session ID that was requested to log out.
+	SessionID string `json:"sid,omitempty"`
+
+	// RequestURL is the original Logout URL requested.
+	RequestURL string `json:"request_url"`
+
+	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
+	RPInitiated bool `json:"rp_initiated"`
+
+	Verifier              string         `json:"-"`
+	PostLogoutRedirectURI string         `json:"-"`
+	WasUsed               bool           `json:"-"`
+	Accepted              bool           `json:"-"`
+	Client                *client.Client `json:"-"`
+}
+
+// Returned when the log out request was used.
+//
+// swagger:ignore
+type LogoutResult struct {
+	RedirectTo             string
+	FrontChannelLogoutURLs []string
+}
+
 // Contains information on an ongoing login request.
 //
 // swagger:model loginRequest
 type LoginRequest struct {
-	// Challenge is the identifier ("authentication challenge") of the consent authentication request. It is used to
+	// Challenge is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
 	Challenge string `json:"challenge"`
 
@@ -265,8 +301,10 @@ type LoginRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url"`
 
-	// SessionID is the authentication session ID. It is set if the browser had a valid authentication session at
-	// ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
+	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
+	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
+	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	SessionID string `json:"session_id"`
 
 	ForceSubjectIdentifier string    `json:"-"` // this is here but has no meaning apart from sql_helper working properly.
@@ -316,8 +354,10 @@ type ConsentRequest struct {
 	// a login and consent request in the login & consent app.
 	LoginChallenge string `json:"login_challenge"`
 
-	// LoginSessionID is the authentication session ID. It is set if the browser had a valid authentication session at
-	// ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+	// LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
+	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
+	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
+	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	LoginSessionID string `json:"login_session_id"`
 
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it

@@ -28,6 +28,8 @@ import (
 	"github.com/ory/hydra/consent"
 )
 
+var _ consent.Strategy = new(consentMock)
+
 type consentMock struct {
 	deny        bool
 	authTime    time.Time
@@ -53,4 +55,8 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 		},
 		RequestedAt: c.requestTime,
 	}, nil
+}
+
+func (c *consentMock) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
+	panic("not implemented")
 }

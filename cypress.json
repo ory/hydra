@@ -1,0 +1,13 @@
+{
+  "env": {
+    "public_url": "http://127.0.0.1:5000",
+    "admin_url": "http://127.0.0.1:5001",
+    "consent_url": "http://127.0.0.1:5002",
+    "client_url": "http://127.0.0.1:5003",
+    "public_port": "5000",
+    "client_port": "5003",
+    "jwt_enabled": false
+  },
+  "chromeWebSecurity": false,
+  "video": false
+}

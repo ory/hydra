@@ -21,8 +21,10 @@
 package cli
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cobra"
@@ -46,7 +48,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	var d driver.Driver
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
-		d = driver.NewDefaultDriver(logrusx.New(), prometheus.NewRegistry(), false, nil, "", "", "")
+		d = driver.NewDefaultDriver(logrusx.New(), prometheus.NewRegistry(), false, nil, "", "", "", false)
 		if len(d.Configuration().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
@@ -61,7 +63,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			return
 		}
 		viper.Set(configuration.ViperKeyDSN, args[0])
-		d = driver.NewDefaultDriver(logrusx.New(), prometheus.NewRegistry(), false, nil, "", "", "")
+		d = driver.NewDefaultDriver(logrusx.New(), prometheus.NewRegistry(), false, nil, "", "", "", false)
 	}
 
 	reg, ok := d.Registry().(*driver.RegistrySQL)
@@ -73,7 +75,41 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	plan, err := reg.SchemaMigrationPlan()
+	cmdx.Must(err, "An error occurred planning migrations: %s", err)
+
+	fmt.Println("The following migration is planned:")
+	fmt.Println("")
+	plan.Render()
+
+	if !flagx.MustGetBool(cmd, "yes") {
+		fmt.Println("")
+		fmt.Println("To skip the next question use flag --yes (at your own risk).")
+		if !askForConfirmation("Do you wish to execute this migration plan?") {
+			fmt.Println("Migration aborted.")
+			return
+		}
+	}
+
 	n, err := reg.CreateSchemas()
 	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
 	fmt.Printf("Successfully applied %d SQL migrations!\n", n)
+}
+
+func askForConfirmation(s string) bool {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Printf("%s [y/n]: ", s)
+
+		response, err := reader.ReadString('\n')
+		cmdx.Must(err, "%s", err)
+
+		response = strings.ToLower(strings.TrimSpace(response))
+		if response == "y" || response == "yes" {
+			return true
+		} else if response == "n" || response == "no" {
+			return false
+		}
+	}
 }

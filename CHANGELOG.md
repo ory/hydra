@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v1.0.0-rc.11 (2019-05-02)](#v100-rc11-2019-05-02)
+  - [v1.0.0-rc.10 (2019-04-29)](#v100-rc10-2019-04-29)
   - [v1.0.0-rc.9+oryOS.10 (2019-04-18)](#v100-rc9oryos10-2019-04-18)
   - [v1.0.0-rc.8+oryOS.10 (2019-04-03)](#v100-rc8oryos10-2019-04-03)
   - [v1.0.0-rc.7+oryOS.10 (2019-04-02)](#v100-rc7oryos10-2019-04-02)
@@ -143,6 +145,83 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v1.0.0-rc.11](https://github.com/ory/hydra/tree/v1.0.0-rc.11) (2019-05-02)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.10...v1.0.0-rc.11)
+
+**Fixed bugs:**
+
+- consent: Regression causes login to skip remember on consecutive calls [\#1409](https://github.com/ory/hydra/issues/1409)
+- jwk: Remove duplicates from jwks list [\#1408](https://github.com/ory/hydra/issues/1408)
+- nil pointer panic on /oauth2/sessions/logout without id token hint [\#1403](https://github.com/ory/hydra/issues/1403)
+
+**Closed issues:**
+
+- jwk: Remove duplicates from jwks list [\#1413](https://github.com/ory/hydra/issues/1413)
+- Help message for `migrate sql` is unclear regarding source of database URL. [\#1411](https://github.com/ory/hydra/issues/1411)
+- Documentation is incorrect for some admin URLs [\#1410](https://github.com/ory/hydra/issues/1410)
+- Accept login request 404s [\#1406](https://github.com/ory/hydra/issues/1406)
+- Audience is not set on access tokens [\#1405](https://github.com/ory/hydra/issues/1405)
+- cors: Apply sane defaults for cors [\#1400](https://github.com/ory/hydra/issues/1400)
+- sql: insert/update statements are slow on MySQL 8.0.x [\#1397](https://github.com/ory/hydra/issues/1397)
+
+**Merged pull requests:**
+
+- consent: Resolve nil pointer panic in logout flow [\#1418](https://github.com/ory/hydra/pull/1418) ([aeneasr](https://github.com/aeneasr))
+- cors: Use sane default settings for CORS options [\#1417](https://github.com/ory/hydra/pull/1417) ([aeneasr](https://github.com/aeneasr))
+- config: Remove duplicates JWKS IDs from wellknown config [\#1416](https://github.com/ory/hydra/pull/1416) ([aeneasr](https://github.com/aeneasr))
+- consent: Do not confirmLoginSession when skip is true \(\#1414\) [\#1415](https://github.com/ory/hydra/pull/1415) ([aeneasr](https://github.com/aeneasr))
+- Do not confirmLoginSession when skip is true to prevent remember reset to false [\#1414](https://github.com/ory/hydra/pull/1414) ([saadtazi](https://github.com/saadtazi))
+- Fix migrate SQL command message regarding config file. [\#1412](https://github.com/ory/hydra/pull/1412) ([dkushner](https://github.com/dkushner))
+- ttl is a top-level config value [\#1407](https://github.com/ory/hydra/pull/1407) ([MDrollette](https://github.com/MDrollette))
+- fix fallback routes and templates [\#1402](https://github.com/ory/hydra/pull/1402) ([MDrollette](https://github.com/MDrollette))
+- docs: Add OIDC FC/BC changes to upgrade guide [\#1401](https://github.com/ory/hydra/pull/1401) ([aeneasr](https://github.com/aeneasr))
+
+## [v1.0.0-rc.10](https://github.com/ory/hydra/tree/v1.0.0-rc.10) (2019-04-29)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.9+oryOS.10...v1.0.0-rc.10)
+
+**Implemented enhancements:**
+
+- cmd: Add plans to migrations [\#1139](https://github.com/ory/hydra/issues/1139)
+- docker: Investigate adding entrypoint.sh [\#1108](https://github.com/ory/hydra/issues/1108)
+- client: Whitelist logout redirect URL per client [\#1004](https://github.com/ory/hydra/issues/1004)
+- cmd: Remove notice about BETA in OAUTH2\_ACCESS\_TOKEN\_STRATEGY [\#946](https://github.com/ory/hydra/issues/946)
+- oauth2: Consider implementing OIDC Session Management [\#834](https://github.com/ory/hydra/issues/834)
+- consent: Move to query parameters [\#1375](https://github.com/ory/hydra/pull/1375) ([aeneasr](https://github.com/aeneasr))
+
+**Closed issues:**
+
+- \[Question\] What is the correct way to run `hydra token client` CLI command ? [\#1396](https://github.com/ory/hydra/issues/1396)
+- /.well-known/jwks.json output wrong keys [\#1395](https://github.com/ory/hydra/issues/1395)
+- test: Add consent revokation to e2e testing [\#1389](https://github.com/ory/hydra/issues/1389)
+- go sdk is broken in rc9 [\#1388](https://github.com/ory/hydra/issues/1388)
+- CORS for public is disabled? [\#1387](https://github.com/ory/hydra/issues/1387)
+- Class naming inconsistent in swagger comment to cause swagger generated sdk could not be built on case sensitive os.  [\#1384](https://github.com/ory/hydra/issues/1384)
+- Outdated hydra PHP composer package [\#1382](https://github.com/ory/hydra/issues/1382)
+- Add support for ACME TLS Certificates [\#1378](https://github.com/ory/hydra/issues/1378)
+- SDK documentation dissapeared  [\#1377](https://github.com/ory/hydra/issues/1377)
+- Access Tokens JWT signed with ID Token key when AcessTokenStrategy is JWT [\#1371](https://github.com/ory/hydra/issues/1371)
+- /.well-known/jwks.json only returns OpenIDConnect keys when strategy is JWT [\#1369](https://github.com/ory/hydra/issues/1369)
+- Introduce e2e testing using cypress [\#1368](https://github.com/ory/hydra/issues/1368)
+- how to get userinfo [\#1367](https://github.com/ory/hydra/issues/1367)
+- Unable to test silent refresh in local development [\#1364](https://github.com/ory/hydra/issues/1364)
+- Memory leak with jaeger tracing enabled [\#1363](https://github.com/ory/hydra/issues/1363)
+- docs: Are refresh tokens introspectable or not? [\#1250](https://github.com/ory/hydra/issues/1250)
+
+**Merged pull requests:**
+
+- docker: Remove full tag from build pipeline [\#1399](https://github.com/ory/hydra/pull/1399) ([aeneasr](https://github.com/aeneasr))
+- docker: Update jaeger tracing docker compose file [\#1398](https://github.com/ory/hydra/pull/1398) ([aeneasr](https://github.com/aeneasr))
+- sdk: Ignore sdk directory when generating OA spec [\#1394](https://github.com/ory/hydra/pull/1394) ([aeneasr](https://github.com/aeneasr))
+- Resolve several minor issues [\#1393](https://github.com/ory/hydra/pull/1393) ([aeneasr](https://github.com/aeneasr))
+- Improve e2e test performance [\#1392](https://github.com/ory/hydra/pull/1392) ([aeneasr](https://github.com/aeneasr))
+- consent: Allow prompt=none for public clients [\#1391](https://github.com/ory/hydra/pull/1391) ([aeneasr](https://github.com/aeneasr))
+- sdk: Make clear that refresh tokens are introspectable [\#1390](https://github.com/ory/hydra/pull/1390) ([aeneasr](https://github.com/aeneasr))
+- README.md: Fix contributors link [\#1385](https://github.com/ory/hydra/pull/1385) ([mkontani](https://github.com/mkontani))
+- Implement OpenID Connect Front-/Backchannel logout [\#1376](https://github.com/ory/hydra/pull/1376) ([aeneasr](https://github.com/aeneasr))
+- oauth2: Resolve memory leak in gorilla/sessions [\#1374](https://github.com/ory/hydra/pull/1374) ([aeneasr](https://github.com/aeneasr))
+- driver: Use proper key name when JWT is enabled [\#1373](https://github.com/ory/hydra/pull/1373) ([aeneasr](https://github.com/aeneasr))
+- cmd: fix help text on migrate cmd [\#1372](https://github.com/ory/hydra/pull/1372) ([MDrollette](https://github.com/MDrollette))
 
 ## [v1.0.0-rc.9+oryOS.10](https://github.com/ory/hydra/tree/v1.0.0-rc.9+oryOS.10) (2019-04-18)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.8+oryOS.10...v1.0.0-rc.9+oryOS.10)

@@ -21,11 +21,13 @@
 package consent
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -33,15 +35,17 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/httpx"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/go-convenience/mapx"
-	"github.com/ory/go-convenience/stringslice"
-	"github.com/ory/go-convenience/stringsx"
-	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/mapx"
+	"github.com/ory/x/stringslice"
+	"github.com/ory/x/stringsx"
+	"github.com/ory/x/urlx"
 )
 
 const (
@@ -67,8 +71,54 @@ func NewStrategy(
 	}
 }
 
-var ErrAbortOAuth2Request = errors.New("The OAuth 2.0 Authorization request must be aborted")
-var ErrNoPreviousConsentFound = errors.New("No previous OAuth 2.0 Consent could be found for this access request")
+var ErrAbortOAuth2Request = errors.New("the OAuth 2.0 Authorization request must be aborted")
+var ErrNoPreviousConsentFound = errors.New("no previous OAuth 2.0 Consent could be found for this access request")
+var ErrNoAuthenticationSessionFound = errors.New("no previous login session was found")
+var ErrHintDoesNotMatchAuthentication = errors.New("subject from hint does not match subject from session")
+
+func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.Client, hintSubject string, sessionSubject string) error {
+	obfuscatedUserID, err := s.obfuscateSubjectIdentifier(c, sessionSubject, "")
+	if err != nil {
+		return err
+	}
+
+	var forcedObfuscatedUserID string
+	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Cause(err) == x.ErrNotFound {
+		// do nothing
+	} else if err != nil {
+		return err
+	} else {
+		forcedObfuscatedUserID = s.SubjectObfuscated
+	}
+
+	if hintSubject != sessionSubject && hintSubject != obfuscatedUserID && hintSubject != forcedObfuscatedUserID {
+		return ErrHintDoesNotMatchAuthentication
+	}
+
+	return nil
+}
+
+func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*LoginSession, error) {
+	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
+	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
+	if err != nil {
+		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
+	}
+
+	sessionID := mapx.GetStringDefault(cookie.Values, CookieAuthenticationSIDName, "")
+	if sessionID == "" {
+		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
+	}
+
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionID)
+	if errors.Cause(err) == x.ErrNotFound {
+		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
+	} else if err != nil {
+		return nil, err
+	}
+
+	return session, nil
+}
 
 func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester) error {
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
@@ -76,20 +126,8 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
-	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
-	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
-	if err != nil {
-		//id.L.WithError(err).Debug("No OAuth2 authentication session was found, performing consent authentication flow")
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
-	}
-
-	sessionID := mapx.GetStringDefault(cookie.Values, CookieAuthenticationSIDName, "")
-	if sessionID == "" {
-		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
-	}
-
-	session, err := s.r.ConsentManager().GetLoginSession(r.Context(), sessionID)
-	if errors.Cause(err) == x.ErrNotFound {
+	session, err := s.authenticationSession(w, r)
+	if errors.Cause(err) == ErrNoAuthenticationSessionFound {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
 		return err
@@ -116,37 +154,49 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 	}
 
-	token, err := s.r.OpenIDJWTStrategy().Decode(r.Context(), idTokenHint)
-	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
-	} else {
+	hintSub, err := s.getSubjectFromIDTokenHint(r.Context(), idTokenHint)
+	if err != nil {
 		return err
 	}
 
-	var hintSub, obfuscatedUserID, forcedObfuscatedUserID string
-	if hintClaims, ok := token.Claims.(jwtgo.MapClaims); !ok {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to *jwt.StandardClaims failed"))
-	} else if hintSub, _ := hintClaims["sub"].(string); hintSub == "" {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
-	} else if obfuscatedUserID, err = s.obfuscateSubjectIdentifier(ar, session.Subject, ""); err != nil {
-		return err
-	}
-
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(r.Context(), ar.GetClient().GetID(), hintSub); errors.Cause(err) == x.ErrNotFound {
-		// do nothing
-	} else if err != nil {
-		return err
-	} else {
-		forcedObfuscatedUserID = s.SubjectObfuscated
-	}
-
-	if hintSub != session.Subject && hintSub != obfuscatedUserID && hintSub != forcedObfuscatedUserID {
+	if err := s.matchesValueFromSession(r.Context(), ar.GetClient(), hintSub, session.Subject); errors.Cause(err) == ErrHintDoesNotMatchAuthentication {
 		return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
-	} else {
-		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 	}
+
+	return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
 }
 
-func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *SubjectSession) error {
+func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwtgo.MapClaims, error) {
+	token, err := s.r.OpenIDJWTStrategy().Decode(ctx, idTokenHint)
+	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); errors.Cause(err) == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
+		// Expired is ok
+	} else {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint(err.Error()))
+	}
+
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to jwt.MapClaims failed"))
+	}
+
+	return claims, nil
+}
+
+func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idTokenHint string) (string, error) {
+	claims, err := s.getIDTokenHintClaims(ctx, idTokenHint)
+	if err != nil {
+		return "", err
+	}
+
+	sub, _ := claims["sub"].(string)
+	if sub == "" {
+		return "", errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
+	}
+
+	return sub, nil
+}
+
+func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *LoginSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
 	}
@@ -173,17 +223,26 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	var idTokenHintClaims jwtgo.MapClaims
 	if idTokenHint := ar.GetRequestForm().Get("id_token_hint"); len(idTokenHint) > 0 {
-		token, err := s.r.OpenIDJWTStrategy().Decode(r.Context(), idTokenHint)
-		if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); err == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
-			if hintClaims, ok := token.Claims.(jwtgo.MapClaims); ok {
-				idTokenHintClaims = hintClaims
-			}
+		claims, err := s.getIDTokenHintClaims(r.Context(), idTokenHint)
+		if err != nil {
+			return err
 		}
+
+		idTokenHintClaims = claims
 	}
 
-	sessionID := ""
+	sessionID := uuid.New()
 	if session != nil {
 		sessionID = session.ID
+	} else {
+		if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &LoginSession{
+			ID:              sessionID,
+			Subject:         "",
+			AuthenticatedAt: time.Now().UTC(),
+			Remember:        false,
+		}); err != nil {
+			return err
+		}
 	}
 
 	// Set the session
@@ -251,8 +310,8 @@ func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessio
 	return sid, nil
 }
 
-func (s *DefaultStrategy) obfuscateSubjectIdentifier(req fosite.AuthorizeRequester, subject, forcedIdentifier string) (string, error) {
-	if c, ok := req.GetClient().(*client.Client); ok && c.SubjectType == "pairwise" {
+func (s *DefaultStrategy) obfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error) {
+	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
 		algorithm, ok := s.r.SubjectIdentifierAlgorithm()[c.SubjectType]
 		if !ok {
 			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf(`Subject Identifier Algorithm "%s" was requested by OAuth 2.0 Client "%s", but is not configured.`, c.SubjectType, c.ClientID)))
@@ -290,8 +349,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	if session.LoginRequest.Skip && session.Remember {
-		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but is also marked as skipped - only one of the values can be true."))
+	if session.LoginRequest.Skip && !session.Remember {
+		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request was previously remembered and can only be forgotten using the reject feature."))
 	}
 
 	if session.LoginRequest.Skip && session.Subject != session.LoginRequest.Subject {
@@ -303,16 +362,18 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
-	subjectIdentifier, err := s.obfuscateSubjectIdentifier(req, session.Subject, session.ForceSubjectIdentifier)
+	subjectIdentifier, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}
+
+	sessionID := session.LoginRequest.SessionID
 
 	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
 		RedirectURI:   req.GetRedirectURI(),
 		State:         req.GetState(),
-		//HandledResponseTypes, this can be safely ignored because it's not being used by validation
+		// HandledResponseTypes, this can be safely ignored because it's not being used by validation
 		Request: fosite.Request{
 			ID:                req.GetID(),
 			RequestedAt:       req.GetRequestedAt(),
@@ -355,6 +416,12 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		}
 	}
 
+	if !session.LoginRequest.Skip {
+		if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, session.Subject, session.Remember); err != nil {
+			return nil, err
+		}
+	}
+
 	if !session.Remember {
 		if !session.LoginRequest.Skip {
 			// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
@@ -368,17 +435,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	cookie, _ := s.r.CookieStore().Get(r, CookieAuthenticationName)
-	sid := uuid.New()
-
-	if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &SubjectSession{
-		ID:              sid,
-		Subject:         session.Subject,
-		AuthenticatedAt: session.AuthenticatedAt,
-	}); err != nil {
-		return nil, err
-	}
-
-	cookie.Values[CookieAuthenticationSIDName] = sid
+	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
@@ -420,7 +477,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 		//
 		// This is tracked as issue: https://github.com/ory/hydra/issues/866
 		// This is also tracked as upstream issue: https://github.com/openid-certification/oidctest/issues/97
-		if ar.GetRedirectURI().Scheme != "https" {
+		if !(ar.GetRedirectURI().Scheme == "https" || (fosite.IsLocalhost(ar.GetRedirectURI()) && ar.GetRedirectURI().Scheme == "http")) {
 			return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 		}
 	}
@@ -428,7 +485,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	// This breaks OIDC Conformity Tests and is probably a bit paranoid.
 	//
 	// if ar.GetResponseTypes().Has("token") {
-	//	 // We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
+	// 	 // We're probably requesting the implicit or hybrid flow in which case we MUST authenticate and authorize the request
 	// 	 return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	// }
 
@@ -525,7 +582,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, err
 	}
 
-	pw, err := s.obfuscateSubjectIdentifier(req, session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	pw, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -545,6 +602,346 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	session.ConsentRequest.SubjectIdentifier = pw
 	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 	return session, nil
+}
+
+func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject)
+	if err != nil {
+		return nil, err
+	}
+
+	var urls []string
+	for _, c := range clients {
+		u, err := url.Parse(c.FrontChannelLogoutURI)
+		if err != nil {
+			return nil, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unable to parse frontchannel_logout_uri: %s", c.FrontChannelLogoutURI)).WithDebug(err.Error()))
+		}
+
+		urls = append(urls, urlx.SetQuery(u, url.Values{
+			"iss": {s.c.IssuerURL().String()},
+			"sid": {sid},
+		}).String())
+	}
+
+	return urls, nil
+}
+
+func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, subject, sid string) error {
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	if err != nil {
+		return err
+	}
+
+	openIDKeyID, err := s.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
+	if err != nil {
+		return err
+	}
+
+	type task struct {
+		url      string
+		token    string
+		clientID string
+	}
+
+	var tasks []task
+	for _, c := range clients {
+		// Getting the forced obfuscated login session is tricky because the user id could be obfuscated with a new
+		// ID every time the algorithm is used. Thus, we would only get the most recent version. It therefore makes
+		// sense to just use the sid.
+		//
+		// s.r.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), subject, <missing>)
+		// sub := s.obfuscateSubjectIdentifier(c, subject, )
+
+		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwtgo.MapClaims{
+			"iss":    s.c.IssuerURL().String(),
+			"aud":    []string{c.ClientID},
+			"iat":    time.Now().UTC().Unix(),
+			"jti":    uuid.New(),
+			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},
+			"sid":    sid,
+		}, &jwt.Headers{
+			Extra: map[string]interface{}{"kid": openIDKeyID},
+		})
+		if err != nil {
+			return err
+		}
+
+		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.ClientID, token: t})
+	}
+
+	var wg sync.WaitGroup
+	hc := http.Client{
+		Timeout:   time.Second * 5,
+		Transport: httpx.NewDefaultResilientRoundTripper(time.Second, time.Second*5),
+	}
+	wg.Add(len(tasks))
+
+	var execute = func(t task) {
+		defer wg.Done()
+
+		res, err := hc.PostForm(t.url, url.Values{"logout_token": {t.token}})
+		if err != nil {
+			s.r.Logger().WithError(err).
+				WithField("client_id", t.clientID).
+				WithField("backchannel_logout_url", t.url).
+				Warnf("Unable to execute OpenID Connect Back-Channel Logout Request")
+			return
+		}
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			s.r.Logger().WithError(errors.Errorf("expected HTTP status code %d but got %d", http.StatusOK, res.StatusCode)).
+				WithField("client_id", t.clientID).
+				WithField("backchannel_logout_url", t.url).
+				Warnf("Unable to execute OpenID Connect Back-Channel Logout Request")
+			return
+		}
+
+		return
+	}
+
+	for _, t := range tasks {
+		go execute(t)
+	}
+
+	wg.Wait()
+
+	return nil
+}
+
+func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
+	// There are two types of log out flows:
+	//
+	// - RP initiated logout
+	// - OP initiated logout
+
+	// Per default, we're redirecting to the global redirect URL. This is assuming that we're not an RP-initiated
+	// logout flow.
+	redir := s.c.LogoutRedirectURL().String()
+
+	// The hint must be set if it's an RP-initiated logout flow.
+	hint := r.URL.Query().Get("id_token_hint")
+	state := r.URL.Query().Get("state")
+	requestedRedir := r.URL.Query().Get("post_logout_redirect_uri")
+
+	if len(hint) == 0 {
+		// hint is not set, so this is an OP initiated logout
+
+		if len(state) > 0 {
+			// state can only be set if it's an RP-initiated logout flow. If not, we should throw an error.
+			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing"))
+		}
+
+		if len(requestedRedir) > 0 {
+			// post_logout_redirect_uri can only be set if it's an RP-initiated logout flow. If not, we should throw an error.
+			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing"))
+		}
+
+		session, err := s.authenticationSession(w, r)
+		if errors.Cause(err) == ErrNoAuthenticationSessionFound {
+			// OP initiated log out but no session was found. Since we can not identify the user we can not call
+			// any RPs.
+			http.Redirect(w, r, redir, http.StatusFound)
+			return nil, errors.WithStack(ErrAbortOAuth2Request)
+		} else if err != nil {
+			return nil, err
+		}
+
+		challenge := uuid.New()
+		if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &LogoutRequest{
+			RequestURL:  r.URL.String(),
+			Challenge:   challenge,
+			Subject:     session.Subject,
+			SessionID:   session.ID,
+			Verifier:    uuid.New(),
+			RPInitiated: false,
+
+			// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()
+			PostLogoutRedirectURI: redir,
+		}); err != nil {
+			return nil, err
+		}
+
+		http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
+		return nil, errors.WithStack(ErrAbortOAuth2Request)
+	}
+
+	claims, err := s.getIDTokenHintClaims(r.Context(), hint)
+	if err != nil {
+		return nil, err
+	}
+
+	mksi := mapx.KeyStringToInterface(claims)
+	if !claims.VerifyIssuer(s.c.IssuerURL().String(), true) {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.
+			WithHint(
+				fmt.Sprintf(
+					`Logout failed because issuer claim value "%s" from query parameter id_token_hint does not match with issuer value from configuration "%s"`,
+					mapx.GetStringDefault(mksi, "iss", ""),
+					s.c.IssuerURL().String(),
+				),
+			),
+		)
+	}
+
+	now := time.Now().UTC().Unix()
+	if !claims.VerifyIssuedAt(now, true) {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.
+			WithHint(
+				fmt.Sprintf(
+					`Logout failed because iat claim value "%.0f" from query parameter id_token_hint is before now ("%d")`,
+					mapx.GetFloat64Default(mksi, "iat", float64(0)),
+					now,
+				),
+			),
+		)
+	}
+
+	hintSid := mapx.GetStringDefault(mksi, "sid", "")
+	if len(hintSid) == 0 {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter id_token_hint is missing sid claim"))
+	}
+
+	// It doesn't really make sense to use the subject value from the ID Token because it might be obfuscated.
+	if hintSub := mapx.GetStringDefault(mksi, "sub", ""); len(hintSub) == 0 {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter id_token_hint is missing sub claim"))
+	}
+
+	// Let's find the client by cycling through the audiences. Typically, we only have one audience
+	var cl *client.Client
+	for _, aud := range mapx.GetStringSliceDefault(
+		mksi,
+		"aud",
+		[]string{
+			mapx.GetStringDefault(mksi, "aud", ""),
+		},
+	) {
+		c, err := s.r.ClientManager().GetConcreteClient(r.Context(), aud)
+		if errors.Cause(err) == x.ErrNotFound {
+			continue
+		} else if err != nil {
+			return nil, err
+		}
+		cl = c
+		break
+	}
+
+	if cl == nil {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.
+			WithHint("Logout failed because none of the listed audiences is a registered OAuth 2.0 Client"))
+	}
+
+	if len(requestedRedir) > 0 {
+		var f *url.URL
+		for _, w := range cl.PostLogoutRedirectURIs {
+			if w == requestedRedir {
+				u, err := url.Parse(w)
+				if err != nil {
+					return nil, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unable to parse post_logout_redirect_uri: %s", w)).WithDebug(err.Error()))
+				}
+
+				f = u
+			}
+		}
+
+		if f == nil {
+			return nil, errors.WithStack(fosite.ErrInvalidRequest.
+				WithHint("Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client"),
+			)
+		}
+
+		redir = urlx.SetQuery(f, url.Values{
+			"state": {r.URL.Query().Get("state")},
+		}).String()
+	}
+
+	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
+	// Instead, we'll check this when we're actually revoking the cookie!
+	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), hintSid)
+	if errors.Cause(err) == x.ErrNotFound {
+		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
+		// leaning back and redirecting back.
+		http.Redirect(w, r, redir, http.StatusFound)
+		return nil, errors.WithStack(ErrAbortOAuth2Request)
+	} else if err != nil {
+		return nil, err
+	}
+
+	challenge := uuid.New()
+	if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &LogoutRequest{
+		RequestURL:  r.URL.String(),
+		Challenge:   challenge,
+		SessionID:   hintSid,
+		Subject:     session.Subject,
+		Verifier:    uuid.New(),
+		Client:      cl,
+		RPInitiated: true,
+
+		// PostLogoutRedirectURI is set to the value from config.Provider().LogoutRedirectURL()
+		PostLogoutRedirectURI: redir,
+	}); err != nil {
+		return nil, err
+	}
+
+	http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
+	return nil, errors.WithStack(ErrAbortOAuth2Request)
+}
+
+func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
+	verifier := r.URL.Query().Get("logout_verifier")
+
+	lr, err := s.r.ConsentManager().VerifyAndInvalidateLogoutRequest(r.Context(), verifier)
+	if err != nil {
+		return nil, err
+	}
+
+	if !lr.RPInitiated {
+		session, err := s.authenticationSession(w, r)
+		if errors.Cause(err) == ErrNoAuthenticationSessionFound {
+			// OP initiated log out but no session was found. So let's just redirect back...
+			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
+			return nil, errors.WithStack(ErrAbortOAuth2Request)
+		} else if err != nil {
+			return nil, err
+		}
+
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
+		}
+
+		if session.Subject != lr.Subject {
+			// Seems like the session changed mid-flight, so we won't revoke the login cookie...
+			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
+			return nil, errors.WithStack(ErrAbortOAuth2Request)
+		}
+	}
+
+	if err := s.revokeAuthenticationSession(w, r); err != nil {
+		return nil, err
+	}
+
+	if err := s.executeBackChannelLogout(r.Context(), lr.Subject, lr.SessionID); err != nil {
+		return nil, err
+	}
+
+	urls, err := s.generateFrontChannelLogoutURLs(r.Context(), lr.Subject, lr.SessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &LogoutResult{
+		RedirectTo:             lr.PostLogoutRedirectURI,
+		FrontChannelLogoutURLs: urls,
+	}, nil
+}
+
+func (s *DefaultStrategy) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error) {
+	verifier := r.URL.Query().Get("logout_verifier")
+	if verifier == "" {
+		return s.issueLogoutVerifier(w, r)
+	}
+
+	return s.completeLogout(w, r)
 }
 
 func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*HandledConsentRequest, error) {

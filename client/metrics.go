@@ -11,10 +11,4 @@ var (
 		Name:      "sum",
 		Help:      "The current number of clients",
 	})
-	Grants = prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: "hydra",
-		Subsystem: "grants",
-		Name:      "sum",
-		Help:      "The number of grants performed",
-	}, []string{})
 )

@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+
+  hydra-migrate:
+    image: oryd/hydra:e2e
+    environment:
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+    command:
+      migrate sql -e --yes
+    restart: on-failure
+
+  hydra:
+    depends_on:
+      - hydra-migrate
+    environment:
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  postgresd:
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=hydra
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=hydra

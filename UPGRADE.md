@@ -9,13 +9,21 @@ before finalizing the upgrade process.
 
 
 - [Hassle-free upgrades](#hassle-free-upgrades)
+- [1.0.0-rc.10](#100-rc10)
+  - [OpenID Connect Front-/Backchannel Logout 1.0](#openid-connect-front-backchannel-logout-10)
+  - [Schema Changes](#schema-changes)
+  - [SQL Migrations now require user-input or `--yes` flag](#sql-migrations-now-require-user-input-or---yes-flag)
+  - [Login and Consent Management](#login-and-consent-management)
+- [1.0.0-rc.9](#100-rc9)
+  - [Go SDK](#go-sdk)
+  - [Accepting Login and Consent Requests](#accepting-login-and-consent-requests)
 - [1.0.0-rc.7](#100-rc7)
   - [Configuration changes](#configuration-changes)
   - [System secret rotation](#system-secret-rotation)
   - [Database Plugins](#database-plugins)
 - [1.0.0-rc.4](#100-rc4)
 - [1.0.0-rc.1](#100-rc1)
-  - [Schema Changes](#schema-changes)
+  - [Schema Changes](#schema-changes-1)
     - [Foreign Keys](#foreign-keys)
       - [Removing inconsistent oauth2 data](#removing-inconsistent-oauth2-data)
       - [Removing inconsistent login & consent data](#removing-inconsistent-login--consent-data)
@@ -35,7 +43,7 @@ before finalizing the upgrade process.
 - [1.0.0-beta.9](#100-beta9)
   - [CORS is disabled by default](#cors-is-disabled-by-default)
 - [1.0.0-beta.8](#100-beta8)
-  - [Schema Changes](#schema-changes-1)
+  - [Schema Changes](#schema-changes-2)
   - [Split of Public and Administrative Endpoints](#split-of-public-and-administrative-endpoints)
   - [Golang SDK `Configuration.EndpointURL` is now `Configuration.AdminURL`](#golang-sdk-configurationendpointurl-is-now-configurationadminurl)
   - [`hydra serve` is now `hydra serve all`](#hydra-serve-is-now-hydra-serve-all)
@@ -46,7 +54,7 @@ before finalizing the upgrade process.
   - [Regenerated OpenID Connect ID Token cryptographic keys](#regenerated-openid-connect-id-token-cryptographic-keys)
 - [1.0.0-beta.5](#100-beta5)
   - [OAuth 2.0 Client Response Type changes](#oauth-20-client-response-type-changes)
-  - [Schema Changes](#schema-changes-2)
+  - [Schema Changes](#schema-changes-3)
   - [HTTP Error Payload](#http-error-payload)
   - [OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`](#oauth-20-clients-must-specify-correct-token_endpoint_auth_method)
   - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
@@ -89,7 +97,7 @@ before finalizing the upgrade process.
     - [New consent flow](#new-consent-flow)
     - [Audience](#audience)
     - [Response payload changes to `/warden/token/allowed`](#response-payload-changes-to-wardentokenallowed)
-    - [Go SDK](#go-sdk)
+    - [Go SDK](#go-sdk-1)
     - [Health endpoints](#health-endpoints)
     - [Group endpoints](#group-endpoints)
     - [Replacing hierarchical scope strategy with wildcard scope strategy](#replacing-hierarchical-scope-strategy-with-wildcard-scope-strategy)
@@ -133,15 +141,34 @@ secure deployment with zero effort? We can run it for you! If you're interested,
 
 ## 1.0.0-rc.10
 
+### OpenID Connect Front-/Backchannel Logout 1.0
+
+This patch implements OpenID Connect Front-/Backchannel Logout 1.0 ([read docs](https://www.ory.sh/docs/hydra/oauth2#logout)).
+Therefore, endpoint `/oauth2/auth/sessions/login/revoke` has been deprecated.
+
+### Schema Changes
+
+Please read all paragraphs of this section with the utmost care, before executing `hydra migrate sql`. Do
+not take this change lightly and create a backup of the database before you begin. To be sure, copy the database
+and do a dry-run locally.
+
+> Be aware that running these migrations might take some time when using large databases. Do a dry-run before hammering
+your production database.
+
+### SQL Migrations now require user-input or `--yes` flag
+
+`hydra migrate sql` now shows an execution plan and asks for confirmation before executing the migrations. To run
+migrations without user interaction, add flag `--yes`.
+
 ### Login and Consent Management
 
 Orthogonal to the changes when accepting and rejection consent and login requests, the following endpoints
 have been updated as well:
 
-* DELETE /oauth2/auth/sessions/login/:subject ->DELETE /oauth2/auth/sessions/login?subject={subject}
-* GET /oauth2/auth/sessions/consent/:subject -> GET /oauth2/auth/sessions/login?subject={subject}
-* DELETE /oauth2/auth/sessions/consent/:subject -> DELETE /oauth2/auth/sessions/login?subject={subject}
-* DELETE /oauth2/auth/sessions/consent/:subject/:client -> DELETE /oauth2/auth/sessions/login?subject={subject}&client={client}
+* `DELETE /oauth2/auth/sessions/login/:subject` -> `DELETE /oauth2/auth/sessions/login?subject={subject}`
+* `GET /oauth2/auth/sessions/consent/:subject` -> `GET /oauth2/auth/sessions/login?subject={subject}`
+* `DELETE /oauth2/auth/sessions/consent/:subject` -> `DELETE /oauth2/auth/sessions/login?subject={subject}`
+* `DELETE /oauth2/auth/sessions/consent/:subject/:client` -> `DELETE /oauth2/auth/sessions/login?subject={subject}&client={client}`
 
 While this does not include a security warning, this patch allows developers to use slashes in dots in their subject/user
 IDs.

@@ -105,7 +105,7 @@ serve:
         - https://example.com
         - https://*.example.com
       # allowed_methods is list of HTTP methods the user agent is allowed to use with cross-domain
-      # requests. Defaults to GET and POST.
+      # requests. Defaults to the methods listed.
       allowed_methods:
         - POST
         - GET
@@ -113,17 +113,18 @@ serve:
         - PATCH
         - DELETE
 
-      # A list of non simple headers the client is allowed to use with cross-domain requests.
+      # A list of non simple headers the client is allowed to use with cross-domain requests.Defaults
+      # to the values listed.
       allowed_headers:
         - Authorization
 
-      # Sets which headers (comma separated values) are safe to expose to the API of a CORS API specification
+      # Sets which headers (comma separated values) are safe to expose to the API of a CORS API specification. Defaults
+      # to the values listed.
       exposed_headers:
-        - Set-Cookie
         - Content-Type
 
       # Sets whether the request can include user credentials like cookies, HTTP authentication
-      # or client side SSL certificates.
+      # or client side SSL certificates. Defaults to true.
       allow_credentials: true
 
       # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request
@@ -308,10 +309,12 @@ urls:
   login: https://my-login.app/login
   # Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
   consent: https://my-consent.app/consent
+  # Sets the logout endpoint. Defaults to an internal fallback URL.
+  logout: https://my-logout.app/logout
   # Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back
   # to the client. Defaults to an internal fallback URL.
   error: https://my-error.app/error
-  # When a user agent requests to remove the authentication session, it will be redirected to this url afterwards.
+  # When a user agent requests to logout, it will be redirected to this url afterwards per default.
   post_logout_redirect: https://my-example.app/logout-successful
 
 strategies:
@@ -323,20 +326,20 @@ strategies:
   #
   #  access_token: jwt
 
-oauth2:
-  # configures time to live
-  ttl:
-    # configures how long a user login and consent flow may take. Defaults to 1h.
-    login_consent_request: 1h
-    # configures how long access tokens are valid. Defaults to 1h.
-    access_token: 1h
-    # configures how long refresh tokens are valid. Defaults to 720h. Set to -1 for refresh tokens to never expire.
-    refresh_token: 720h
-    # configures how long id tokens are valid. Defaults to 1h.
-    id_token: 1h
-    # configures how long id tokens are valid. Defaults to 10m.
-    auth_code: 10m
+# configures time to live
+ttl:
+  # configures how long a user login and consent flow may take. Defaults to 1h.
+  login_consent_request: 1h
+  # configures how long access tokens are valid. Defaults to 1h.
+  access_token: 1h
+  # configures how long refresh tokens are valid. Defaults to 720h. Set to -1 for refresh tokens to never expire.
+  refresh_token: 720h
+  # configures how long id tokens are valid. Defaults to 1h.
+  id_token: 1h
+  # configures how long auth codes are valid. Defaults to 10m.
+  auth_code: 10m
 
+oauth2:
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients.
   #	Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error
   #	codes and similar errors. Defaults to false.

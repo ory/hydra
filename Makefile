@@ -1,14 +1,15 @@
 SHELL=/bin/bash -o pipefail
 
+.PHONY: tools
+tools:
+		npm i
+		go get github.com/go-bindata/go-bindata/go-bindata
+		go install github.com/go-bindata/go-bindata/go-bindata
+
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:
-		docker kill hydra_test_database_mysql || true
-		docker kill hydra_test_database_postgres || true
-		docker rm -f hydra_test_database_mysql || true
-		docker rm -f hydra_test_database_postgres || true
-		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		make test-resetdb
 		make sqlbin
 		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
 			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
@@ -24,13 +25,29 @@ test-resetdb:
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.
+		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
-		GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:latest .
+		make sqlbin
+		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
+		docker build -t oryd/hydra:latest .
 		rm hydra
+
+.PHONY: e2e
+e2e:
+		make test-resetdb
+		export TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
+		export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable'
+		./test/e2e/circle-ci.bash memory
+		./test/e2e/circle-ci.bash memory-jwt
+		./test/e2e/circle-ci.bash postgres
+		./test/e2e/circle-ci.bash postgres-jwt
+		./test/e2e/circle-ci.bash mysql
+		./test/e2e/circle-ci.bash mysql-jwt
+		./test/e2e/circle-ci.bash plugin
+		./test/e2e/circle-ci.bash plugin-jwt
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
@@ -41,14 +58,12 @@ quicktest:
 .PHONY: format
 format:
 		goreturns -w -local github.com/ory $$(listx .)
+		npm run format
 
 # Generates mocks
 .PHONY: mocks
 mocks:
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-		mockgen -mock_names Provider=MockConfiguration -package internal -destination internal/configuration_provider_mock.go github.com/ory/hydra/driver/configuration Provider
-		mockgen -mock_names Registry=MockRegistry -package internal -destination internal/registry_mock.go github.com/ory/hydra/driver Registry
-
 
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin
@@ -65,9 +80,10 @@ gen: mocks sqlbin sdk
 # Generates the SDKs
 .PHONY: sdk
 sdk:
+		rm -rf ./vendor/
 		GO111MODULE=on go mod tidy
 		GO111MODULE=on go mod vendor
-		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json
+		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json -x sdk
 		GO111MODULE=off swagger validate ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra

@@ -71,10 +71,10 @@ public class AdminApiExample {
     public static void main(String[] args) {
         
         AdminApi apiInstance = new AdminApi();
-        String challenge = "challenge_example"; // String | 
+        String consentChallenge = "consentChallenge_example"; // String | 
         AcceptConsentRequest body = new AcceptConsentRequest(); // AcceptConsentRequest | 
         try {
-            CompletedRequest result = apiInstance.acceptConsentRequest(challenge, body);
+            CompletedRequest result = apiInstance.acceptConsentRequest(consentChallenge, body);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling AdminApi#acceptConsentRequest");
@@ -93,6 +93,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AdminApi* | [**acceptConsentRequest**](docs/AdminApi.md#acceptConsentRequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
 *AdminApi* | [**acceptLoginRequest**](docs/AdminApi.md#acceptLoginRequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
+*AdminApi* | [**acceptLogoutRequest**](docs/AdminApi.md#acceptLogoutRequest) | **PUT** /oauth2/auth/requests/logout/accept | Accept a logout request
 *AdminApi* | [**createJsonWebKeySet**](docs/AdminApi.md#createJsonWebKeySet) | **POST** /keys/{set} | Generate a new JSON Web Key
 *AdminApi* | [**createOAuth2Client**](docs/AdminApi.md#createOAuth2Client) | **POST** /clients | Create an OAuth 2.0 client
 *AdminApi* | [**deleteJsonWebKey**](docs/AdminApi.md#deleteJsonWebKey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -103,24 +104,26 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**getJsonWebKey**](docs/AdminApi.md#getJsonWebKey) | **GET** /keys/{set}/{kid} | Fetch a JSON Web Key
 *AdminApi* | [**getJsonWebKeySet**](docs/AdminApi.md#getJsonWebKeySet) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 *AdminApi* | [**getLoginRequest**](docs/AdminApi.md#getLoginRequest) | **GET** /oauth2/auth/requests/login | Get an login request
+*AdminApi* | [**getLogoutRequest**](docs/AdminApi.md#getLogoutRequest) | **GET** /oauth2/auth/requests/logout | Get a logout request
 *AdminApi* | [**getOAuth2Client**](docs/AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 *AdminApi* | [**introspectOAuth2Token**](docs/AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *AdminApi* | [**listOAuth2Clients**](docs/AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
 *AdminApi* | [**listSubjectConsentSessions**](docs/AdminApi.md#listSubjectConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
 *AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
-*AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login | Invalidates a subject&#39;s authentication session
+*AdminApi* | [**rejectLogoutRequest**](docs/AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
+*AdminApi* | [**revokeAuthenticationSession**](docs/AdminApi.md#revokeAuthenticationSession) | **DELETE** /oauth2/auth/sessions/login | Invalidates all login sessions of a certain user Invalidates a subject&#39;s authentication session
 *AdminApi* | [**revokeConsentSessions**](docs/AdminApi.md#revokeConsentSessions) | **DELETE** /oauth2/auth/sessions/consent | Revokes consent sessions of a subject for a specific OAuth 2.0 Client
 *AdminApi* | [**updateJsonWebKey**](docs/AdminApi.md#updateJsonWebKey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**updateJsonWebKeySet**](docs/AdminApi.md#updateJsonWebKeySet) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**updateOAuth2Client**](docs/AdminApi.md#updateOAuth2Client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *HealthApi* | [**isInstanceAlive**](docs/HealthApi.md#isInstanceAlive) | **GET** /health/alive | Check alive status
 *HealthApi* | [**isInstanceReady**](docs/HealthApi.md#isInstanceReady) | **GET** /health/ready | Check readiness status
+*PublicApi* | [**disconnectUser**](docs/PublicApi.md#disconnectUser) | **GET** /oauth2/disconnect | OpenID Connect Front-Backchannel enabled Logout
 *PublicApi* | [**discoverOpenIDConfiguration**](docs/PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
 *PublicApi* | [**oauth2Token**](docs/PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**oauthAuth**](docs/PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *PublicApi* | [**revokeOAuth2Token**](docs/PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-*PublicApi* | [**revokeSubjectLoginCookie**](docs/PublicApi.md#revokeSubjectLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs subject out by deleting the session cookie
 *PublicApi* | [**userinfo**](docs/PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**wellKnown**](docs/PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 *VersionApi* | [**getVersion**](docs/VersionApi.md#getVersion) | **GET** /version | Get service version
@@ -130,27 +133,19 @@ Class | Method | HTTP request | Description
 
  - [AcceptConsentRequest](docs/AcceptConsentRequest.md)
  - [AcceptLoginRequest](docs/AcceptLoginRequest.md)
- - [AuthenticationRequest](docs/AuthenticationRequest.md)
- - [AuthenticationSession](docs/AuthenticationSession.md)
- - [Client](docs/Client.md)
  - [CompletedRequest](docs/CompletedRequest.md)
  - [ConsentRequest](docs/ConsentRequest.md)
  - [ConsentRequestSession](docs/ConsentRequestSession.md)
- - [ConsentRequestSessionData](docs/ConsentRequestSessionData.md)
- - [CreateRequest](docs/CreateRequest.md)
  - [EmptyResponse](docs/EmptyResponse.md)
  - [FlushInactiveOAuth2TokensRequest](docs/FlushInactiveOAuth2TokensRequest.md)
  - [GenericError](docs/GenericError.md)
- - [HandledAuthenticationRequest](docs/HandledAuthenticationRequest.md)
- - [HandledConsentRequest](docs/HandledConsentRequest.md)
- - [HandledLoginRequest](docs/HandledLoginRequest.md)
  - [HealthNotReadyStatus](docs/HealthNotReadyStatus.md)
  - [HealthStatus](docs/HealthStatus.md)
- - [Introspection](docs/Introspection.md)
  - [JSONWebKey](docs/JSONWebKey.md)
  - [JSONWebKeySet](docs/JSONWebKeySet.md)
  - [JsonWebKeySetGeneratorRequest](docs/JsonWebKeySetGeneratorRequest.md)
  - [LoginRequest](docs/LoginRequest.md)
+ - [LogoutRequest](docs/LogoutRequest.md)
  - [OAuth2Client](docs/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/OAuth2TokenIntrospection.md)
  - [Oauth2TokenResponse](docs/Oauth2TokenResponse.md)
@@ -158,26 +153,15 @@ Class | Method | HTTP request | Description
  - [OpenIDConnectContext](docs/OpenIDConnectContext.md)
  - [PreviousConsentSession](docs/PreviousConsentSession.md)
  - [RejectRequest](docs/RejectRequest.md)
- - [RequestDeniedError](docs/RequestDeniedError.md)
- - [RequestHandlerResponse](docs/RequestHandlerResponse.md)
  - [SwaggerFlushInactiveAccessTokens](docs/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerHealthStatus](docs/SwaggerHealthStatus.md)
- - [SwaggerJSONWebKey](docs/SwaggerJSONWebKey.md)
- - [SwaggerJSONWebKeyQuery](docs/SwaggerJSONWebKeyQuery.md)
- - [SwaggerJSONWebKeySet](docs/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/SwaggerJwkUpdateSetKey.md)
- - [SwaggerNotReadyStatus](docs/SwaggerNotReadyStatus.md)
  - [SwaggerOAuthIntrospectionRequest](docs/SwaggerOAuthIntrospectionRequest.md)
- - [SwaggerOAuthTokenResponse](docs/SwaggerOAuthTokenResponse.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/SwaggerRevokeOAuth2TokenParameters.md)
- - [SwaggerVersion](docs/SwaggerVersion.md)
  - [Swaggeroauth2TokenParameters](docs/Swaggeroauth2TokenParameters.md)
- - [Swaggeroauth2TokenResponse](docs/Swaggeroauth2TokenResponse.md)
- - [SwaggeruserinfoResponsePayload](docs/SwaggeruserinfoResponsePayload.md)
  - [UserinfoResponse](docs/UserinfoResponse.md)
  - [Version](docs/Version.md)
  - [WellKnown](docs/WellKnown.md)

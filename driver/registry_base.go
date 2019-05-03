@@ -103,7 +103,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 
 	admin.Handler("GET", MetricsPrometheusPath, promhttp.HandlerFor(m.pmm.Registry, promhttp.HandlerOpts{}))
 
-	m.ConsentHandler().SetRoutes(admin, public)
+	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.ClientHandler().SetRoutes(admin)
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())

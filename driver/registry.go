@@ -1,7 +1,7 @@
 package driver
 
 import (
-	"github.com/go-errors/errors"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 
@@ -60,7 +60,7 @@ func MustNewRegistry(c configuration.Provider) Registry {
 func NewRegistry(c configuration.Provider) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
-		return nil, err
+		return nil, errors.WithStack(err)
 	}
 
 	registry, ok := driver.(Registry)

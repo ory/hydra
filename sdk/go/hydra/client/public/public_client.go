@@ -25,6 +25,39 @@ type Client struct {
 }
 
 /*
+DisconnectUser opens ID connect front backchannel enabled logout
+
+This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:
+
+https://openid.net/specs/openid-connect-frontchannel-1_0.html
+https://openid.net/specs/openid-connect-backchannel-1_0.html
+*/
+func (a *Client) DisconnectUser(params *DisconnectUserParams) error {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDisconnectUserParams()
+	}
+
+	_, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "disconnectUser",
+		Method:             "GET",
+		PathPattern:        "/oauth2/disconnect",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DisconnectUserReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+/*
 DiscoverOpenIDConfiguration opens ID connect discovery
 
 The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
@@ -158,38 +191,6 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 		return nil, err
 	}
 	return result.(*RevokeOAuth2TokenOK), nil
-
-}
-
-/*
-RevokeSubjectLoginCookie logs subject out by deleting the session cookie
-
-This endpoint deletes ths subject's login session cookie and redirects the browser to the url
-listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to
-be called from the subject's browser.
-*/
-func (a *Client) RevokeSubjectLoginCookie(params *RevokeSubjectLoginCookieParams) error {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewRevokeSubjectLoginCookieParams()
-	}
-
-	_, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "revokeSubjectLoginCookie",
-		Method:             "GET",
-		PathPattern:        "/oauth2/auth/sessions/login/revoke",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &RevokeSubjectLoginCookieReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return err
-	}
-	return nil
 
 }
 

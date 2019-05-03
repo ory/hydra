@@ -84,7 +84,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 			prometheus.NewRegistry(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date,
+			version, build, date, true,
 		).CallRegistry()
 
 		isDSNAllowed(d)
@@ -111,7 +111,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 			prometheus.NewRegistry(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date,
+			version, build, date, true,
 		).CallRegistry()
 
 		isDSNAllowed(d)
@@ -138,7 +138,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 			prometheus.NewRegistry(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date,
+			version, build, date, true,
 		).CallRegistry()
 
 		admin, public, adminmw, publicmw := setup(d, cmd)
@@ -175,10 +175,10 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicmw.Use(tracer)
 	}
 
-	adminmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), d.Configuration().IssuerURL().String()))
+	adminmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String())))
 	adminmw.Use(d.Registry().PrometheusManager())
 
-	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), d.Configuration().IssuerURL().String()))
+	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String())))
 	publicmw.Use(d.Registry().PrometheusManager())
 
 	var (

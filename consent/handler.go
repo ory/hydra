@@ -26,13 +26,15 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/x/stringsx"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/go-convenience/urlx"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
+	"github.com/ory/x/urlx"
 )
 
 type Handler struct {
@@ -43,6 +45,7 @@ type Handler struct {
 const (
 	LoginPath    = "/oauth2/auth/requests/login"
 	ConsentPath  = "/oauth2/auth/requests/consent"
+	LogoutPath   = "/oauth2/auth/requests/logout"
 	SessionsPath = "/oauth2/auth/sessions"
 )
 
@@ -56,7 +59,7 @@ func NewHandler(
 	}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.GET(LoginPath, h.GetLoginRequest)
 	admin.PUT(LoginPath+"/accept", h.AcceptLoginRequest)
 	admin.PUT(LoginPath+"/reject", h.RejectLoginRequest)
@@ -69,7 +72,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.GET(SessionsPath+"/consent", h.GetConsentSessions)
 	admin.DELETE(SessionsPath+"/consent", h.DeleteConsentSession)
 
-	public.GET(SessionsPath+"/login/revoke", h.LogoutSubject)
+	admin.GET(LogoutPath, h.GetLogoutRequest)
+	admin.PUT(LogoutPath+"/accept", h.AcceptLogoutRequest)
+	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
@@ -178,10 +183,12 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route DELETE /oauth2/auth/sessions/login admin revokeAuthenticationSession
 //
+// Invalidates all login sessions of a certain user
 // Invalidates a subject's authentication session
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-// has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+// has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
+// Front- or Back-channel logout.
 //
 //
 //     Consumes:
@@ -240,7 +247,11 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := r.URL.Query().Get("challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("login_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
+
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
 		return
@@ -251,8 +262,9 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
 	if request.WasHandled {
-		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Login request has been handled already"))
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Login request has been used already"))
 		return
 	}
 
@@ -292,7 +304,10 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //       401: genericError
 //       500: genericError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := r.URL.Query().Get("challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("login_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
 		return
@@ -328,11 +343,11 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	if !ar.Skip {
-		p.AuthenticatedAt = time.Now().UTC()
-	} else {
-		p.Remember = false
+	if ar.Skip {
+		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
 		p.AuthenticatedAt = ar.AuthenticatedAt
+	} else {
+		p.AuthenticatedAt = time.Now().UTC()
 	}
 	p.RequestedAt = ar.RequestedAt
 
@@ -384,7 +399,10 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       404: genericError
 //       500: genericError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := r.URL.Query().Get("challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("login_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
 		return
@@ -462,7 +480,10 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //       409: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := r.URL.Query().Get("challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("consent_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
 		return
@@ -474,8 +495,16 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Consent request has been handled already"))
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Consent request has been used already"))
 		return
+	}
+
+	if request.RequestedScope == nil {
+		request.RequestedScope = []string{}
+	}
+
+	if request.RequestedAudience == nil {
+		request.RequestedAudience = []string{}
 	}
 
 	request.Client = sanitizeClient(request.Client)
@@ -516,7 +545,10 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //       404: genericError
 //       500: genericError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := r.URL.Query().Get("challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("consent_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
 		return
@@ -599,7 +631,10 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //       404: genericError
 //       500: genericError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	challenge := r.URL.Query().Get("challenge")
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("consent_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
 	if challenge == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "challenge" is not defined but should have been.`)))
 		return
@@ -648,13 +683,14 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 	})
 }
 
-// swagger:route GET /oauth2/auth/sessions/login/revoke public revokeSubjectLoginCookie
+// swagger:route PUT /oauth2/auth/requests/logout/accept admin acceptLogoutRequest
 //
-// Logs subject out by deleting the session cookie
+// Accept a logout request
 //
-// This endpoint deletes ths subject's login session cookie and redirects the browser to the url
-// listed in `LOGOUT_REDIRECT_URL` environment variable. This endpoint does not work as an API but has to
-// be called from the subject's browser.
+// When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
+// No body is required.
+//
+// The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
 //     Produces:
 //     - application/json
@@ -662,22 +698,89 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 //     Schemes: http, https
 //
 //     Responses:
-//       302: emptyResponse
+//       200: completedRequest
 //       404: genericError
 //       500: genericError
-func (h *Handler) LogoutSubject(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	sid, err := revokeAuthenticationCookie(w, r, h.r.CookieStore())
+func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("logout_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
+
+	c, err := h.r.ConsentManager().AcceptLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	if sid != "" {
-		if err := h.r.ConsentManager().DeleteLoginSession(r.Context(), sid); err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
+	h.r.Writer().Write(w, r, &RequestHandlerResponse{
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.IssuerURL(), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+	})
+}
+
+// swagger:route PUT /oauth2/auth/requests/logout/reject admin rejectLogoutRequest
+//
+// Reject a logout request
+//
+// When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
+// No body is required.
+//
+// The response is empty as the logout provider has to chose what action to perform next.
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       404: genericError
+//       500: genericError
+func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("logout_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
+
+	if err := h.r.ConsentManager().RejectLogoutRequest(r.Context(), challenge); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
 	}
 
-	http.Redirect(w, r, h.c.LogoutRedirectURL().String(), 302)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route GET /oauth2/auth/requests/logout admin getLogoutRequest
+//
+// Get a logout request
+//
+// Use this endpoint to fetch a logout request.
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: logoutRequest
+//       404: genericError
+//       500: genericError
+func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	challenge := stringsx.Coalesce(
+		r.URL.Query().Get("logout_challenge"),
+		r.URL.Query().Get("challenge"),
+	)
+
+	c, err := h.r.ConsentManager().GetLogoutRequest(r.Context(), challenge)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	if c.WasUsed {
+		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Logout request has been used already"))
+		return
+	}
+
+	h.r.Writer().Write(w, r, c)
 }

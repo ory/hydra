@@ -23,11 +23,14 @@ package oauth2
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/ory/x/urlx"
 
@@ -44,11 +47,14 @@ import (
 )
 
 const (
-	DefaultConsentPath = "/oauth2/fallbacks/consent"
-	DefaultLogoutPath  = "/oauth2/fallbacks/logout"
-	DefaultErrorPath   = "/oauth2/fallbacks/error"
-	TokenPath          = "/oauth2/token"
-	AuthPath           = "/oauth2/auth"
+	DefaultLoginPath      = "/oauth2/fallbacks/login"
+	DefaultConsentPath    = "/oauth2/fallbacks/consent"
+	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
+	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
+	DefaultErrorPath      = "/oauth2/fallbacks/error"
+	TokenPath             = "/oauth2/token"
+	AuthPath              = "/oauth2/auth"
+	LogoutPath            = "/oauth2/sessions/logout"
 
 	UserinfoPath  = "/userinfo"
 	WellKnownPath = "/.well-known/openid-configuration"
@@ -72,11 +78,22 @@ func NewHandler(r InternalRegistry, c Configuration) *Handler {
 func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
 	public.Handler("OPTIONS", TokenPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", TokenPath, corsMiddleware(http.HandlerFunc(h.TokenHandler)))
+
 	public.GET(AuthPath, h.AuthHandler)
 	public.POST(AuthPath, h.AuthHandler)
-	public.GET(DefaultConsentPath, h.DefaultConsentHandler)
+	public.GET(LogoutPath, h.LogoutHandler)
+
+	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLoginURL))
+	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyConsentURL))
+	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLogoutURL))
+	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
+		"You logged out successfully!",
+		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
+		http.StatusOK,
+		configuration.ViperKeyLogoutRedirectURL,
+	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
-	public.GET(DefaultLogoutPath, h.DefaultLogoutHandler)
+
 	public.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
 	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
 	public.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
@@ -87,6 +104,99 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)
+}
+
+// swagger:route GET /oauth2/disconnect public disconnectUser
+//
+// OpenID Connect Front-Backchannel enabled Logout
+//
+// This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:
+//
+// - https://openid.net/specs/openid-connect-frontchannel-1_0.html
+// - https://openid.net/specs/openid-connect-backchannel-1_0.html
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       302: emptyResponse
+func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(w, r)
+
+	if errors.Cause(err) == consent.ErrAbortOAuth2Request {
+		return
+	} else if err != nil {
+		x.LogError(err, h.r.Logger())
+		h.forwardError(w, r, err)
+		return
+	}
+
+	if len(handled.FrontChannelLogoutURLs) == 0 {
+		http.Redirect(w, r, handled.RedirectTo, http.StatusFound)
+		return
+	}
+
+	// TODO How are we supposed to test this? Maybe with cypress? #1368
+	t, err := template.New("logout").Parse(`<html>
+<head>
+    <meta http-equiv="refresh" content="7; URL={{ .RedirectTo }}">
+</head>
+<style type="text/css">
+    iframe { position: absolute; left: 0; top: 0; height: 0; width: 0; border: none; }
+</style>
+<script>
+    var total = {{ len .FrontChannelLogoutURLs }};
+    var redir = {{ .RedirectTo }};
+
+	function redirect() {
+		window.location.replace(redir);
+
+		// In case replace failed try href
+		setTimeout(function () {
+			window.location.href = redir;
+		}, 250); // Show message after http-equiv="refresh"
+	}
+
+    function done() {
+        total--;
+        if (total < 1) {
+			setTimeout(redirect, 500);
+        }
+    }
+
+	setTimeout(redirect, 7000); // redirect after 5 seconds if e.g. an iframe doesn't load
+
+	// If the redirect takes unusually long, show a message
+	setTimeout(function () {
+		document.getElementById("redir").style.display = "block";
+	}, 2000);
+</script>
+<body>
+<noscript>
+    <p>
+        JavaScript is disabled - you should be redirected in 5 seconds but if not, click <a
+            href="{{ .RedirectTo }}">here</a> to continue.
+    </p>
+</noscript>
+
+<p id="redir" style="display: none">
+    Redirection takes unusually long. If you are not being redirected within the next seconds, click <a href="{{ .RedirectTo }}">here</a> to continue.
+</p>
+
+{{ range .FrontChannelLogoutURLs }}<iframe src="{{ . }}" onload="done(this)"></iframe>
+{{ end }}
+</body>
+</html>`)
+	if err != nil {
+		x.LogError(err, h.r.Logger())
+		h.forwardError(w, r, err)
+		return
+	}
+
+	if err := t.Execute(w, handled); err != nil {
+		x.LogError(err, h.r.Logger())
+		h.forwardError(w, r, err)
+		return
+	}
 }
 
 // swagger:route GET /.well-known/openid-configuration public discoverOpenIDConfiguration
@@ -108,25 +218,30 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 //       500: genericError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.Writer().Write(w, r, &WellKnown{
-		Issuer:                            strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
-		AuthURL:                           urlx.AppendPaths(h.c.IssuerURL(), AuthPath).String(),
-		TokenURL:                          urlx.AppendPaths(h.c.IssuerURL(), TokenPath).String(),
-		JWKsURI:                           urlx.AppendPaths(h.c.IssuerURL(), JWKPath).String(),
-		RevocationEndpoint:                urlx.AppendPaths(h.c.IssuerURL(), RevocationPath).String(),
-		RegistrationEndpoint:              h.c.OAuth2ClientRegistrationURL().String(),
-		SubjectTypes:                      h.c.SubjectTypesSupported(),
-		ResponseTypes:                     []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                   h.c.OIDCDiscoverySupportedScope(),
-		ScopesSupported:                   h.c.OIDCDiscoverySupportedClaims(),
-		UserinfoEndpoint:                  h.c.OIDCDiscoveryUserinfoEndpoint(),
-		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
-		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
-		GrantTypesSupported:               []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
-		ResponseModesSupported:            []string{"query", "fragment"},
-		UserinfoSigningAlgValuesSupported: []string{"none", "RS256"},
-		RequestParameterSupported:         true,
-		RequestURIParameterSupported:      true,
-		RequireRequestURIRegistration:     true,
+		Issuer:                             strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
+		AuthURL:                            urlx.AppendPaths(h.c.IssuerURL(), AuthPath).String(),
+		TokenURL:                           urlx.AppendPaths(h.c.IssuerURL(), TokenPath).String(),
+		JWKsURI:                            urlx.AppendPaths(h.c.IssuerURL(), JWKPath).String(),
+		RevocationEndpoint:                 urlx.AppendPaths(h.c.IssuerURL(), RevocationPath).String(),
+		RegistrationEndpoint:               h.c.OAuth2ClientRegistrationURL().String(),
+		SubjectTypes:                       h.c.SubjectTypesSupported(),
+		ResponseTypes:                      []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
+		ClaimsSupported:                    h.c.OIDCDiscoverySupportedScope(),
+		ScopesSupported:                    h.c.OIDCDiscoverySupportedClaims(),
+		UserinfoEndpoint:                   h.c.OIDCDiscoveryUserinfoEndpoint(),
+		TokenEndpointAuthMethodsSupported:  []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
+		IDTokenSigningAlgValuesSupported:   []string{"RS256"},
+		GrantTypesSupported:                []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
+		ResponseModesSupported:             []string{"query", "fragment"},
+		UserinfoSigningAlgValuesSupported:  []string{"none", "RS256"},
+		RequestParameterSupported:          true,
+		RequestURIParameterSupported:       true,
+		RequireRequestURIRegistration:      true,
+		BackChannelLogoutSupported:         true,
+		BackChannelLogoutSessionSupported:  true,
+		FrontChannelLogoutSupported:        true,
+		FrontChannelLogoutSessionSupported: true,
+		EndSessionEndpoint:                 urlx.AppendPaths(h.c.IssuerURL(), LogoutPath).String(),
 	})
 }
 
@@ -496,7 +611,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	authorizeRequest, err := h.r.OAuth2Provider().NewAuthorizeRequest(ctx, r)
 	if err != nil {
 		x.LogError(err, h.r.Logger())
-		h.writeAuthorizeError(w, authorizeRequest, err)
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
 
@@ -506,7 +621,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	} else if err != nil {
 		x.LogError(err, h.r.Logger())
-		h.writeAuthorizeError(w, authorizeRequest, err)
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
 
@@ -521,7 +636,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
 	if err != nil {
 		x.LogError(err, h.r.Logger())
-		h.writeAuthorizeError(w, authorizeRequest, err)
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
 
@@ -530,33 +645,38 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
 		if err != nil {
 			x.LogError(err, h.r.Logger())
-			h.writeAuthorizeError(w, authorizeRequest, err)
+			h.writeAuthorizeError(w, r, authorizeRequest, err)
 			return
 		}
 	}
 
 	authorizeRequest.SetID(session.Challenge)
 
+	claims := &jwt.IDTokenClaims{
+		Subject:                             session.ConsentRequest.SubjectIdentifier,
+		Issuer:                              strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
+		IssuedAt:                            time.Now().UTC(),
+		AuthTime:                            session.AuthenticatedAt,
+		RequestedAt:                         session.RequestedAt,
+		Extra:                               session.Session.IDToken,
+		AuthenticationContextClassReference: session.ConsentRequest.ACR,
+
+		// We do not need to pass the audience because it's included directly by ORY Fosite
+		// Audience:    []string{authorizeRequest.GetClient().GetID()},
+
+		// This is set by the fosite strategy
+		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
+	}
+	claims.Add("sid", session.ConsentRequest.LoginSessionID)
+
 	// done
 	response, err := h.r.OAuth2Provider().NewAuthorizeResponse(ctx, authorizeRequest, &Session{
 		DefaultSession: &openid.DefaultSession{
-			Claims: &jwt.IDTokenClaims{
-				Subject:                             session.ConsentRequest.SubjectIdentifier,
-				Issuer:                              strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
-				IssuedAt:                            time.Now().UTC(),
-				AuthTime:                            session.AuthenticatedAt,
-				RequestedAt:                         session.RequestedAt,
-				Extra:                               session.Session.IDToken,
-				AuthenticationContextClassReference: session.ConsentRequest.ACR,
-
-				// We do not need to pass the audience because it's included directly by ORY Fosite
-				// Audience:    []string{authorizeRequest.GetClient().GetID()},
-
-				// This is set by the fosite strategy
-				// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),
-			},
-			// required for lookup on jwk endpoint
-			Headers: &jwt.Headers{Extra: map[string]interface{}{"kid": openIDKeyID}},
+			Claims: claims,
+			Headers: &jwt.Headers{Extra: map[string]interface{}{
+				// required for lookup on jwk endpoint
+				"kid": openIDKeyID,
+			}},
 			Subject: session.ConsentRequest.Subject,
 		},
 		Extra:            session.Session.AccessToken,
@@ -566,33 +686,31 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	})
 	if err != nil {
 		x.LogError(err, h.r.Logger())
-		h.writeAuthorizeError(w, authorizeRequest, err)
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
 
 	h.r.OAuth2Provider().WriteAuthorizeResponse(w, authorizeRequest, response)
 }
 
-func (h *Handler) writeAuthorizeError(w http.ResponseWriter, ar fosite.AuthorizeRequester, err error) {
+func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, err error) {
 	if !ar.IsRedirectURIValid() {
-		var rfcerr = fosite.ErrorToRFC6749Error(err)
-
-		query := url.Values{
-			"error":             {rfcerr.Name},
-			"error_description": {rfcerr.Description},
-			"error_hint":        {rfcerr.Hint},
-		}
-
-		if h.c.ShareOAuth2Debug() {
-			query.Add("error_debug", rfcerr.Debug)
-		}
-
-		w.Header().Add("Location", urlx.CopyWithQuery(h.c.ErrorURL(), query).String())
-		w.WriteHeader(http.StatusFound)
+		h.forwardError(w, r, err)
 		return
 	}
 
 	h.r.OAuth2Provider().WriteAuthorizeError(w, ar, err)
+}
+
+func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error) {
+	rfErr := fosite.ErrorToRFC6749Error(err)
+	query := url.Values{"error": {rfErr.Name}, "error_description": {rfErr.Description}, "error_hint": {rfErr.Hint}}
+
+	if h.c.ShareOAuth2Debug() {
+		query.Add("error_debug", rfErr.Debug)
+	}
+
+	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
 }
 
 // This function will not be called, OPTIONS request will be handled by cors

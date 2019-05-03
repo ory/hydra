@@ -4,14 +4,54 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**disconnectUser**](PublicApi.md#disconnectUser) | **GET** /oauth2/disconnect | OpenID Connect Front-Backchannel enabled Logout
 [**discoverOpenIDConfiguration**](PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
 [**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-[**revokeSubjectLoginCookie**](PublicApi.md#revokeSubjectLoginCookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs subject out by deleting the session cookie
 [**userinfo**](PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 [**wellKnown**](PublicApi.md#wellKnown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 
+
+<a name="disconnectUser"></a>
+# **disconnectUser**
+> disconnectUser()
+
+OpenID Connect Front-Backchannel enabled Logout
+
+This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:  https://openid.net/specs/openid-connect-frontchannel-1_0.html https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+### Example
+```javascript
+var OryHydra = require('ory_hydra');
+
+var apiInstance = new OryHydra.PublicApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+apiInstance.disconnectUser(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
 
 <a name="discoverOpenIDConfiguration"></a>
 # **discoverOpenIDConfiguration**
@@ -211,46 +251,6 @@ null (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: application/x-www-form-urlencoded
- - **Accept**: application/json
-
-<a name="revokeSubjectLoginCookie"></a>
-# **revokeSubjectLoginCookie**
-> revokeSubjectLoginCookie()
-
-Logs subject out by deleting the session cookie
-
-This endpoint deletes ths subject&#39;s login session cookie and redirects the browser to the url listed in &#x60;LOGOUT_REDIRECT_URL&#x60; environment variable. This endpoint does not work as an API but has to be called from the subject&#39;s browser.
-
-### Example
-```javascript
-var OryHydra = require('ory_hydra');
-
-var apiInstance = new OryHydra.PublicApi();
-
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log('API called successfully.');
-  }
-};
-apiInstance.revokeSubjectLoginCookie(callback);
-```
-
-### Parameters
-This endpoint does not need any parameter.
-
-### Return type
-
-null (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="userinfo"></a>

@@ -35,7 +35,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 func TestValidate(t *testing.T) {
@@ -81,6 +81,24 @@ func TestValidate(t *testing.T) {
 		{
 			in:        &Client{ClientID: "foo", JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
+			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			expectErr: true,
+		},
+		{
+			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
+			expectErr: true,
+		},
+		{
+			in: &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, []string{"https://foo/"}, c.PostLogoutRedirectURIs)
+			},
 		},
 		{
 			in: &Client{ClientID: "foo"},

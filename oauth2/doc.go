@@ -123,6 +123,24 @@ type WellKnown struct {
 
 	// URL of the authorization server's OAuth 2.0 revocation endpoint.
 	RevocationEndpoint string `json:"revocation_endpoint"`
+
+	// Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
+	BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
+
+	// Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP
+	// session with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP
+	BackChannelLogoutSessionSupported bool `json:"backchannel_logout_session_supported"`
+
+	// Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.
+	FrontChannelLogoutSupported bool `json:"frontchannel_logout_supported"`
+
+	// Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify
+	// the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also
+	// included in ID Tokens issued by the OP.
+	FrontChannelLogoutSessionSupported bool `json:"frontchannel_logout_session_supported"`
+
+	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
+	EndSessionEndpoint string `json:"end_session_endpoint"`
 }
 
 // swagger:model flushInactiveOAuth2TokensRequest
@@ -260,8 +278,8 @@ type swaggerOAuthTokenResponse struct {
 type swaggerOAuthIntrospectionRequest struct {
 	// The string value of the token. For access tokens, this
 	// is the "access_token" value returned from the token endpoint
-	// defined in OAuth 2.0 [RFC6749], Section 5.1.
-	// This endpoint DOES NOT accept refresh tokens for validation.
+	// defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
+	// value returned.
 	//
 	// required: true
 	// in: formData

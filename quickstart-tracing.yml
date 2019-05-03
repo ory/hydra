@@ -27,10 +27,11 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:1.7.0
     ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "9411:9411"
+      - "16686:16686" # The UI port
+#      These are ports for collecting, sampling, agents, ...
+#      - "5775:5775/udp"
+#      - "6831:6831/udp"
+#      - "6832:6832/udp"
+#      - "5778:5778"
+#      - "14268:14268"
+#      - "9411:9411"

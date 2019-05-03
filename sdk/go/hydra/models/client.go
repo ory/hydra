@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Client Client Client represents an OAuth 2.0 Client.
+// Client Client represents an OAuth 2.0 Client.
 // swagger:model Client
 type Client struct {
 
@@ -27,6 +27,14 @@ type Client struct {
 	// the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list
 	// of URLs. URLs MUST NOT contain whitespaces.
 	Audience []string `json:"audience"`
+
+	// Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
+	// Token to identify the RP session with the OP when the backchannel_logout_uri is used.
+	// If omitted, the default value is false.
+	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty"`
+
+	// RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
+	BackChannelLogoutURI string `json:"backchannel_logout_uri,omitempty"`
 
 	// ClientID  is the id for this client.
 	ClientID string `json:"client_id,omitempty"`
@@ -42,8 +50,18 @@ type Client struct {
 
 	// CreatedAt returns the timestamp of the client's creation.
 	// Format: date-time
-	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
+
+	// Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be
+	// included to identify the RP session with the OP when the frontchannel_logout_uri is used.
+	// If omitted, the default value is false.
+	FrontChannelLogoutSessionRequired bool `json:"frontchannel_logout_session_required,omitempty"`
+
+	// RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query
+	// parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the
+	// request and to determine which of the potentially multiple sessions is to be logged out; if either is
+	// included, both MUST be.
+	FrontChannelLogoutURI string `json:"frontchannel_logout_uri,omitempty"`
 
 	// GrantTypes is an array of grant types the client is allowed to use.
 	// Pattern: client_credentials|authorization_code|implicit|refresh_token
@@ -73,6 +91,10 @@ type Client struct {
 	// that describes how the deployment organization collects, uses,
 	// retains, and discloses personal data.
 	PolicyURI string `json:"policy_uri,omitempty"`
+
+	// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the
+	// post_logout_redirect_uri parameter after a logout has been performed.
+	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris"`
 
 	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
 	RedirectUris []string `json:"redirect_uris"`
@@ -131,7 +153,6 @@ type Client struct {
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 
 	// UpdatedAt returns the timestamp of the last update.
-	// Format: date-time
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 

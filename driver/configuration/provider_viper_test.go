@@ -6,6 +6,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rs/cors"
+
+	"github.com/ory/hydra/x"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -50,4 +54,25 @@ func TestSubjectTypesSupported(t *testing.T) {
 			tc.c(t)
 		})
 	}
+}
+
+func TestWellKnownKeysUnique(t *testing.T) {
+	p := NewViperProvider(logrus.New(), false, nil)
+	assert.EqualValues(t, []string{x.OAuth2JWTKeyName, x.OpenIDConnectKeyName}, p.WellKnownKeys(x.OAuth2JWTKeyName, x.OpenIDConnectKeyName, x.OpenIDConnectKeyName))
+}
+
+func TestCORSOptions(t *testing.T) {
+	p := NewViperProvider(logrus.New(), false, nil)
+	viper.Set("serve.public.cors.enabled", true)
+
+	assert.EqualValues(t, cors.Options{
+		AllowedOrigins:     []string{},
+		AllowedMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowedHeaders:     []string{"Authorization"},
+		ExposedHeaders:     []string{"Content-Type"},
+		AllowCredentials:   true,
+		OptionsPassthrough: false,
+		MaxAge:             0,
+		Debug:              false,
+	}, p.CORSOptions("public"))
 }

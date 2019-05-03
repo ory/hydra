@@ -28,14 +28,16 @@ import (
 	"github.com/ory/fosite"
 )
 
+var _, _ Manager = new(SQLManager), new(MemoryManager)
+
 type Manager interface {
 	Storage
+	prometheus.Collector
 
 	Authenticate(ctx context.Context, id string, secret []byte) (*Client, error)
 }
 
 type Storage interface {
-	prometheus.Collector
 	fosite.Storage
 
 	CreateClient(ctx context.Context, c *Client) error

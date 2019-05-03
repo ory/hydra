@@ -54,6 +54,7 @@ const (
 	ViperKeyGetSystemSecret                = "secrets.system"
 	ViperKeyLogoutRedirectURL              = "urls.post_logout_redirect"
 	ViperKeyLoginURL                       = "urls.login"
+	ViperKeyLogoutURL                      = "urls.logout"
 	ViperKeyConsentURL                     = "urls.consent"
 	ViperKeyErrorURL                       = "urls.error"
 	ViperKeyPublicURL                      = "urls.self.public"
@@ -96,7 +97,7 @@ func (v *ViperProvider) WellKnownKeys(include ...string) []string {
 	}
 
 	include = append(include, x.OpenIDConnectKeyName)
-	return append(viperx.GetStringSlice(v.l, ViperKeyWellKnownKeys, []string{}), include...)
+	return stringslice.Unique(append(viperx.GetStringSlice(v.l, ViperKeyWellKnownKeys, []string{}), include...))
 }
 
 func (v *ViperProvider) ServesHTTPS() bool {
@@ -152,7 +153,16 @@ func (v *ViperProvider) CORSEnabled(iface string) bool {
 }
 
 func (v *ViperProvider) CORSOptions(iface string) cors.Options {
-	return corsx.ParseOptions(v.l, "serve."+iface)
+	return cors.Options{
+		AllowedOrigins:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_origins", []string{}, "CORS_ALLOWED_ORIGINS"),
+		AllowedMethods:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_methods", []string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "CORS_ALLOWED_METHODS"),
+		AllowedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_headers", []string{"Authorization"}, "CORS_ALLOWED_HEADERS"),
+		ExposedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.exposed_headers", []string{"Content-Type"}, "CORS_EXPOSED_HEADERS"),
+		AllowCredentials:   viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", true, "CORS_ALLOWED_CREDENTIALS"),
+		OptionsPassthrough: viperx.GetBool(v.l, "serve."+iface+".cors.options_passthrough", false),
+		MaxAge:             viperx.GetInt(v.l, "serve."+iface+".cors.max_age", 0, "CORS_MAX_AGE"),
+		Debug:              viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", false, "CORS_DEBUG"),
+	}
 }
 
 func (v *ViperProvider) DSN() string {
@@ -284,7 +294,7 @@ func (v *ViperProvider) GetSystemSecret() []byte {
 }
 
 func (v *ViperProvider) LogoutRedirectURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutRedirectURL, "", "OAUTH2_LOGOUT_REDIRECT_URL"))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutRedirectURL, v.publicFallbackURL("oauth2/fallbacks/logout/callback"), "OAUTH2_LOGOUT_REDIRECT_URL")))
 }
 
 func (v *ViperProvider) adminFallbackURL(path string) string {
@@ -296,6 +306,7 @@ func (v *ViperProvider) publicFallbackURL(path string) string {
 	if len(v.IssuerURL().String()) > 0 {
 		return urlx.AppendPaths(v.IssuerURL(), path).String()
 	}
+
 	return v.fallbackURL(path, v.publicHost(), v.publicPort())
 }
 
@@ -313,23 +324,27 @@ func (v *ViperProvider) fallbackURL(path string, host string, port int) string {
 }
 
 func (v *ViperProvider) LoginURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, v.publicFallbackURL("oauth2/fallbacks/consent"), "OAUTH2_LOGIN_URL"))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, v.publicFallbackURL("oauth2/fallbacks/login"), "OAUTH2_LOGIN_URL")))
+}
+
+func (v *ViperProvider) LogoutURL() *url.URL {
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutURL, v.publicFallbackURL("oauth2/fallbacks/logout"))))
 }
 
 func (v *ViperProvider) ConsentURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyConsentURL, v.publicFallbackURL("oauth2/fallbacks/consent"), "OAUTH2_CONSENT_URL"))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyConsentURL, v.publicFallbackURL("oauth2/fallbacks/consent"), "OAUTH2_CONSENT_URL")))
 }
 
 func (v *ViperProvider) ErrorURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyErrorURL, v.publicFallbackURL("oauth2/fallbacks/error"), "OAUTH2_ERROR_URL"))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyErrorURL, v.publicFallbackURL("oauth2/fallbacks/error"), "OAUTH2_ERROR_URL")))
 }
 
 func (v *ViperProvider) PublicURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, v.publicFallbackURL("/")))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyPublicURL, v.publicFallbackURL("/"))))
 }
 
 func (v *ViperProvider) IssuerURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyIssuerURL, v.fallbackURL("", v.publicHost(), v.publicPort()), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyIssuerURL, v.fallbackURL("/", v.publicHost(), v.publicPort()), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL")))
 }
 
 func (v *ViperProvider) OAuth2AuthURL() string {
@@ -337,7 +352,7 @@ func (v *ViperProvider) OAuth2AuthURL() string {
 }
 
 func (v *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
-	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyOAuth2ClientRegistrationURL, "", "OAUTH2_CLIENT_REGISTRATION_URL"))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyOAuth2ClientRegistrationURL, "", "OAUTH2_CLIENT_REGISTRATION_URL")))
 }
 
 func (v *ViperProvider) AllowTLSTerminationFrom() []string {
@@ -375,5 +390,5 @@ func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
 }
 
 func (v *ViperProvider) ShareOAuth2Debug() bool {
-	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", "OAUTH2_SHARE_ERROR_DEBUG")
+	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", false, "OAUTH2_SHARE_ERROR_DEBUG")
 }

@@ -13,6 +13,7 @@ import (
 type InternalRegistry interface {
 	x.RegistryWriter
 	x.RegistryCookieStore
+	x.RegistryLogger
 	Registry
 	client.Registry
 

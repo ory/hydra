@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/hydra/client"
+
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -35,10 +37,11 @@ import (
 
 type MemoryManager struct {
 	consentRequests        map[string]ConsentRequest
+	logoutRequests         map[string]LogoutRequest
 	handledConsentRequests map[string]HandledConsentRequest
 	authRequests           map[string]LoginRequest
 	handledAuthRequests    map[string]HandledLoginRequest
-	authSessions           map[string]SubjectSession
+	authSessions           map[string]LoginSession
 	pairwise               []ForcedObfuscatedLoginSession
 	m                      map[string]*sync.RWMutex
 	r                      InternalRegistry
@@ -47,13 +50,15 @@ type MemoryManager struct {
 func NewMemoryManager(r InternalRegistry) *MemoryManager {
 	return &MemoryManager{
 		consentRequests:        map[string]ConsentRequest{},
+		logoutRequests:         map[string]LogoutRequest{},
 		handledConsentRequests: map[string]HandledConsentRequest{},
 		authRequests:           map[string]LoginRequest{},
 		handledAuthRequests:    map[string]HandledLoginRequest{},
-		authSessions:           map[string]SubjectSession{},
+		authSessions:           map[string]LoginSession{},
 		pairwise:               []ForcedObfuscatedLoginSession{},
 		r:                      r,
 		m: map[string]*sync.RWMutex{
+			"logoutRequests":         new(sync.RWMutex),
 			"consentRequests":        new(sync.RWMutex),
 			"handledConsentRequests": new(sync.RWMutex),
 			"authRequests":           new(sync.RWMutex),
@@ -90,15 +95,16 @@ func (m *MemoryManager) RevokeSubjectConsentSession(ctx context.Context, user st
 }
 
 func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error {
-	m.m["handledConsentRequests"].Lock()
-	defer m.m["handledConsentRequests"].Unlock()
-
 	var found bool
+
+	m.m["handledConsentRequests"].RLock()
 	for k, c := range m.handledConsentRequests {
+		m.m["handledConsentRequests"].RUnlock()
 		cr, err := m.GetConsentRequest(ctx, c.Challenge)
 		if err != nil {
 			return err
 		}
+		m.m["handledConsentRequests"].RLock()
 
 		if cr.Subject == user &&
 			(client == "" ||
@@ -122,6 +128,7 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 			found = true
 		}
 	}
+	m.m["handledConsentRequests"].RUnlock()
 
 	if !found {
 		return errors.WithStack(x.ErrNotFound)
@@ -166,11 +173,14 @@ func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string)
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
+	m.m["handledConsentRequests"].RLock()
 	for _, h := range m.handledConsentRequests {
 		if h.Challenge == c.Challenge {
 			c.WasHandled = h.WasUsed
 		}
 	}
+	m.m["handledConsentRequests"].RUnlock()
+
 	c.Client.ClientID = c.Client.GetID()
 	return &c, nil
 }
@@ -183,10 +193,14 @@ func (m *MemoryManager) HandleConsentRequest(ctx context.Context, challenge stri
 }
 
 func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error) {
+	m.m["consentRequests"].RLock()
 	for _, c := range m.consentRequests {
 		if c.Verifier == verifier {
+			m.m["handledConsentRequests"].RLock()
 			for _, h := range m.handledConsentRequests {
 				if h.Challenge == c.Challenge {
+					m.m["consentRequests"].RUnlock()
+					m.m["handledConsentRequests"].RUnlock()
 					if h.WasUsed {
 						return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
 					}
@@ -201,20 +215,26 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 					return &h, nil
 				}
 			}
+			m.m["handledConsentRequests"].RUnlock()
 		}
 	}
+	m.m["consentRequests"].RUnlock()
 	return nil, errors.WithStack(x.ErrNotFound)
 }
 
 func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
+
+	m.m["handledConsentRequests"].RLock()
 	for _, c := range m.handledConsentRequests {
+		m.m["handledConsentRequests"].RUnlock()
 		cr, err := m.GetConsentRequest(ctx, c.Challenge)
 		if errors.Cause(err) == x.ErrNotFound {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		} else if err != nil {
 			return nil, err
 		}
+		m.m["handledConsentRequests"].RLock()
 
 		if subject != cr.Subject {
 			continue
@@ -244,6 +264,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
+	m.m["handledConsentRequests"].RUnlock()
 
 	if len(rs) == 0 {
 		return nil, errors.WithStack(ErrNoPreviousConsentFound)
@@ -254,11 +275,15 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 
 func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
 	var rs []HandledConsentRequest
+
+	m.m["handledConsentRequests"].RLock()
 	for _, c := range m.handledConsentRequests {
+		m.m["handledConsentRequests"].RUnlock()
 		cr, err := m.GetConsentRequest(ctx, c.Challenge)
 		if err != nil {
 			return nil, err
 		}
+		m.m["handledConsentRequests"].RLock()
 
 		if subject != cr.Subject {
 			continue
@@ -280,6 +305,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
+	m.m["handledConsentRequests"].RUnlock()
 
 	if len(rs) == 0 {
 		return nil, errors.WithStack(ErrNoPreviousConsentFound)
@@ -325,16 +351,32 @@ func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context,
 	return len(rs), nil
 }
 
-func (m *MemoryManager) GetLoginSession(ctx context.Context, id string) (*SubjectSession, error) {
+func (m *MemoryManager) ConfirmLoginSession(ctx context.Context, id string, subject string, remember bool) error {
+	m.m["authSessions"].Lock()
+	defer m.m["authSessions"].Unlock()
+	if c, ok := m.authSessions[id]; ok {
+		c.Remember = remember
+		c.Subject = subject
+		c.AuthenticatedAt = time.Now().UTC()
+		m.authSessions[id] = c
+		return nil
+	}
+	return errors.WithStack(x.ErrNotFound)
+}
+
+func (m *MemoryManager) GetRememberedLoginSession(ctx context.Context, id string) (*LoginSession, error) {
 	m.m["authSessions"].RLock()
 	defer m.m["authSessions"].RUnlock()
 	if c, ok := m.authSessions[id]; ok {
-		return &c, nil
+		if c.Remember {
+			return &c, nil
+		}
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 	return nil, errors.WithStack(x.ErrNotFound)
 }
 
-func (m *MemoryManager) CreateLoginSession(ctx context.Context, a *SubjectSession) error {
+func (m *MemoryManager) CreateLoginSession(ctx context.Context, a *LoginSession) error {
 	m.m["authSessions"].Lock()
 	defer m.m["authSessions"].Unlock()
 	if _, ok := m.authSessions[a.ID]; ok {
@@ -387,10 +429,15 @@ func (m *MemoryManager) HandleLoginRequest(ctx context.Context, challenge string
 }
 
 func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
+	m.m["authRequests"].RLock()
 	for _, c := range m.authRequests {
 		if c.Verifier == verifier {
+			m.m["handledAuthRequests"].RLock()
 			for _, h := range m.handledAuthRequests {
 				if h.Challenge == c.Challenge {
+					m.m["handledAuthRequests"].RUnlock()
+					m.m["authRequests"].RUnlock()
+
 					if h.WasUsed {
 						return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Authentication verifier has been used already"))
 					}
@@ -405,15 +452,149 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 					return &h, nil
 				}
 			}
+			m.m["handledAuthRequests"].RUnlock()
 		}
+	}
+
+	m.m["authRequests"].RUnlock()
+	return nil, errors.WithStack(x.ErrNotFound)
+}
+
+func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+	m.m["consentRequests"].RLock()
+	defer m.m["consentRequests"].RUnlock()
+
+	var rs []client.Client
+	for _, cr := range m.consentRequests {
+		if cr.Subject == subject && len(cr.Client.FrontChannelLogoutURI) > 0 {
+			rs = append(rs, *cr.Client)
+		}
+	}
+
+	return rs, nil
+}
+
+func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+	m.m["consentRequests"].RLock()
+	defer m.m["consentRequests"].RUnlock()
+
+	var rs []client.Client
+	for _, cr := range m.consentRequests {
+		if cr.Subject == subject && len(cr.Client.BackChannelLogoutURI) > 0 {
+			rs = append(rs, *cr.Client)
+		}
+	}
+
+	return rs, nil
+}
+
+func (m *MemoryManager) CreateLogoutRequest(ctx context.Context, r *LogoutRequest) error {
+	m.m["logoutRequests"].Lock()
+	m.logoutRequests[r.Challenge] = *r
+	m.m["logoutRequests"].Unlock()
+	return nil
+}
+
+func (m *MemoryManager) GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
+	m.m["logoutRequests"].RLock()
+	defer m.m["logoutRequests"].RUnlock()
+	if c, ok := m.logoutRequests[challenge]; ok {
+		return &c, nil
 	}
 	return nil, errors.WithStack(x.ErrNotFound)
 }
 
+func (m *MemoryManager) AcceptLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
+	m.m["logoutRequests"].Lock()
+	lr, ok := m.logoutRequests[challenge]
+	if !ok {
+		m.m["logoutRequests"].Unlock()
+		return nil, errors.WithStack(x.ErrNotFound)
+	}
+
+	lr.Accepted = true
+	m.logoutRequests[challenge] = lr
+
+	m.m["logoutRequests"].Unlock()
+	return m.GetLogoutRequest(ctx, challenge)
+}
+
+func (m *MemoryManager) RejectLogoutRequest(ctx context.Context, challenge string) error {
+	m.m["logoutRequests"].Lock()
+	defer m.m["logoutRequests"].Unlock()
+
+	if _, ok := m.logoutRequests[challenge]; !ok {
+		return errors.WithStack(x.ErrNotFound)
+	}
+
+	delete(m.logoutRequests, challenge)
+	return nil
+}
+
+func (m *MemoryManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {
+	m.m["logoutRequests"].RLock()
+	for _, c := range m.logoutRequests {
+		if c.Verifier == verifier {
+			m.m["logoutRequests"].RUnlock()
+
+			if c.WasUsed {
+				return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Logout verifier has been used already"))
+			}
+
+			if !c.Accepted {
+				return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Logout verifier has not been accepted yet"))
+			}
+
+			c.WasUsed = true
+			if err := m.CreateLogoutRequest(ctx, &c); err != nil {
+				return nil, err
+			}
+
+			return &c, nil
+		}
+	}
+
+	m.m["logoutRequests"].RUnlock()
+	return nil, errors.WithStack(x.ErrNotFound)
+}
+
+// Collect is called by the Prometheus registry when collecting
+// metrics. The implementation sends each collected metric via the
+// provided channel and returns once the last metric has been sent. The
+// descriptor of each sent metric is one of those returned by Describe
+// (unless the Collector is unchecked, see above). Returned metrics that
+// share the same descriptor must differ in their variable label
+// values.
+//
+// This method may be called concurrently and must therefore be
+// implemented in a concurrency safe way. Blocking occurs at the expense
+// of total performance of rendering all registered metrics. Ideally,
+// Collector implementations support concurrent readers.
 func (m *MemoryManager) Collect(c chan<- prometheus.Metric) {
 	collectCounters(c)
 }
 
+// Describe sends the super-set of all possible descriptors of metrics
+// collected by this Collector to the provided channel and returns once
+// the last descriptor has been sent. The sent descriptors fulfill the
+// consistency and uniqueness requirements described in the Desc
+// documentation.
+//
+// It is valid if one and the same Collector sends duplicate
+// descriptors. Those duplicates are simply ignored. However, two
+// different Collectors must not send duplicate descriptors.
+//
+// Sending no descriptor at all marks the Collector as “unchecked”,
+// i.e. no checks will be performed at registration time, and the
+// Collector may yield any Metric it sees fit in its Collect method.
+//
+// This method idempotently sends the same descriptors throughout the
+// lifetime of the Collector. It may be called concurrently and
+// therefore must be implemented in a concurrency safe way.
+//
+// If a Collector encounters an error while executing this method, it
+// must send an invalid descriptor (created with NewInvalidDesc) to
+// signal the error to the registry.
 func (m *MemoryManager) Describe(c chan<- *prometheus.Desc) {
 	describeCounters(c)
 }

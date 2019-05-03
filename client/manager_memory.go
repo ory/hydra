@@ -24,6 +24,8 @@ import (
 	"context"
 	"sync"
 
+	"github.com/ory/hydra/x"
+
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -56,7 +58,7 @@ func (m *MemoryManager) GetConcreteClient(ctx context.Context, id string) (*Clie
 		}
 	}
 
-	return nil, errors.WithStack(sqlcon.ErrNoRows)
+	return nil, errors.WithStack(x.ErrNotFound)
 }
 
 func (m *MemoryManager) GetClient(ctx context.Context, id string) (fosite.Client, error) {

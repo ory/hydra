@@ -70,8 +70,8 @@ type IntrospectOAuth2TokenParams struct {
 	/*Token
 	  The string value of the token. For access tokens, this
 	is the "access_token" value returned from the token endpoint
-	defined in OAuth 2.0 [RFC6749], Section 5.1.
-	This endpoint DOES NOT accept refresh tokens for validation.
+	defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
+	value returned.
 
 	*/
 	Token string

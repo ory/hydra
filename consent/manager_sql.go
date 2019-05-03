@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/client"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -48,6 +50,12 @@ func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 		DB: db,
 		r:  r,
 	}
+}
+
+func (m *SQLManager) PlanMigration() ([]*migrate.PlannedMigration, error) {
+	migrate.SetTable("hydra_oauth2_authentication_consent_migration")
+	plan, _, err := migrate.PlanMigration(m.DB.DB, m.DB.DriverName(), Migrations[dbal.Canonicalize(m.DB.DriverName())], migrate.Up, 0)
+	return plan, errors.WithStack(err)
 }
 
 func (m *SQLManager) CreateSchemas() (int, error) {
@@ -383,9 +391,9 @@ func (m *SQLManager) VerifyAndInvalidateLoginRequest(ctx context.Context, verifi
 	return d.toHandledLoginRequest(r)
 }
 
-func (m *SQLManager) GetLoginSession(ctx context.Context, id string) (*SubjectSession, error) {
-	var a SubjectSession
-	if err := m.DB.GetContext(ctx, &a, m.DB.Rebind("SELECT * FROM hydra_oauth2_authentication_session WHERE id=?"), id); err != nil {
+func (m *SQLManager) GetRememberedLoginSession(ctx context.Context, id string) (*LoginSession, error) {
+	var a LoginSession
+	if err := m.DB.GetContext(ctx, &a, m.DB.Rebind("SELECT * FROM hydra_oauth2_authentication_session WHERE id=? AND remember=TRUE"), id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}
@@ -395,7 +403,14 @@ func (m *SQLManager) GetLoginSession(ctx context.Context, id string) (*SubjectSe
 	return &a, nil
 }
 
-func (m *SQLManager) CreateLoginSession(ctx context.Context, a *SubjectSession) error {
+func (m *SQLManager) ConfirmLoginSession(ctx context.Context, id string, subject string, remember bool) error {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_authentication_session SET remember=?, subject=?, authenticated_at=? WHERE id=?"), remember, subject, time.Now().UTC(), id); err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) CreateLoginSession(ctx context.Context, a *LoginSession) error {
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_session (%s) VALUES (%s)",
 		strings.Join(sqlParamsAuthSession, ", "),
@@ -481,7 +496,7 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 		r, err := m.GetConsentRequest(ctx, v.Challenge)
 		if err != nil {
 			return nil, err
-		} else if errors.Cause(err) == sqlcon.ErrNoRows {
+		} else if errors.Cause(err) == x.ErrNotFound {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		}
 
@@ -517,6 +532,7 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 // of total performance of rendering all registered metrics. Ideally,
 // Collector implementations support concurrent readers.
 func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
+	collectCounters(c)
 }
 
 // Describe sends the super-set of all possible descriptors of metrics
@@ -541,4 +557,99 @@ func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
 // must send an invalid descriptor (created with NewInvalidDesc) to
 // signal the error to the registry.
 func (m *SQLManager) Describe(c chan<- *prometheus.Desc) {
+	describeCounters(c)
+}
+
+func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+	return m.listUserAuthenticatedClients(ctx, subject, "front")
+}
+
+func (m *SQLManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+	return m.listUserAuthenticatedClients(ctx, subject, "back")
+}
+
+func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject string, channel string) ([]client.Client, error) {
+	var ids []string
+	if err := m.DB.SelectContext(ctx, &ids, m.DB.Rebind(fmt.Sprintf(`SELECT c.id FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' and c.%schannel_logout_uri IS NOT NULL`, channel, channel)), subject); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	cs := make([]client.Client, len(ids))
+	for k, id := range ids {
+		c, err := m.r.ClientManager().GetConcreteClient(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		cs[k] = *c
+	}
+
+	return cs, nil
+}
+
+func (m *SQLManager) CreateLogoutRequest(ctx context.Context, r *LogoutRequest) error {
+	d := newSQLLogoutRequest(r)
+	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
+		"INSERT INTO hydra_oauth2_logout_request (%s) VALUES (%s)",
+		strings.Join(sqlParamsLogoutRequest, ", "),
+		":"+strings.Join(sqlParamsLogoutRequest, ", :"),
+	), d); err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	return nil
+}
+
+func (m *SQLManager) AcceptLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_logout_request SET accepted=true, rejected=false WHERE challenge=?"), challenge); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return m.GetLogoutRequest(ctx, challenge)
+}
+
+func (m *SQLManager) RejectLogoutRequest(ctx context.Context, challenge string) error {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_logout_request SET rejected=true, accepted=false WHERE challenge=?"), challenge); err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (m *SQLManager) GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
+	var d sqlLogoutRequest
+	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE challenge=? AND rejected=FALSE"), challenge); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	if d.Client.Valid {
+		c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client.String)
+		if err != nil {
+			return nil, err
+		}
+
+		return d.ToLogoutRequest(c), nil
+	}
+
+	return d.ToLogoutRequest(nil), nil
+}
+
+func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {
+	var d sqlLogoutRequest
+	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE"), verifier); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.WithStack(x.ErrNotFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind("UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE verifier=?"), verifier); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return m.GetLogoutRequest(ctx, d.Challenge)
 }

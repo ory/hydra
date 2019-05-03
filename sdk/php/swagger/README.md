@@ -56,12 +56,12 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\AdminApi();
-$challenge = "challenge_example"; // string | 
-$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
+$api_instance = new Hydra\SDK\Api\AdminApi();
+$consent_challenge = "consent_challenge_example"; // string | 
+$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
 
 try {
-    $result = $api_instance->acceptConsentRequest($challenge, $body);
+    $result = $api_instance->acceptConsentRequest($consent_challenge, $body);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling AdminApi->acceptConsentRequest: ', $e->getMessage(), PHP_EOL;
@@ -78,6 +78,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AdminApi* | [**acceptConsentRequest**](docs/Api/AdminApi.md#acceptconsentrequest) | **PUT** /oauth2/auth/requests/consent/accept | Accept an consent request
 *AdminApi* | [**acceptLoginRequest**](docs/Api/AdminApi.md#acceptloginrequest) | **PUT** /oauth2/auth/requests/login/accept | Accept an login request
+*AdminApi* | [**acceptLogoutRequest**](docs/Api/AdminApi.md#acceptlogoutrequest) | **PUT** /oauth2/auth/requests/logout/accept | Accept a logout request
 *AdminApi* | [**createJsonWebKeySet**](docs/Api/AdminApi.md#createjsonwebkeyset) | **POST** /keys/{set} | Generate a new JSON Web Key
 *AdminApi* | [**createOAuth2Client**](docs/Api/AdminApi.md#createoauth2client) | **POST** /clients | Create an OAuth 2.0 client
 *AdminApi* | [**deleteJsonWebKey**](docs/Api/AdminApi.md#deletejsonwebkey) | **DELETE** /keys/{set}/{kid} | Delete a JSON Web Key
@@ -88,24 +89,26 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**getJsonWebKey**](docs/Api/AdminApi.md#getjsonwebkey) | **GET** /keys/{set}/{kid} | Fetch a JSON Web Key
 *AdminApi* | [**getJsonWebKeySet**](docs/Api/AdminApi.md#getjsonwebkeyset) | **GET** /keys/{set} | Retrieve a JSON Web Key Set
 *AdminApi* | [**getLoginRequest**](docs/Api/AdminApi.md#getloginrequest) | **GET** /oauth2/auth/requests/login | Get an login request
+*AdminApi* | [**getLogoutRequest**](docs/Api/AdminApi.md#getlogoutrequest) | **GET** /oauth2/auth/requests/logout | Get a logout request
 *AdminApi* | [**getOAuth2Client**](docs/Api/AdminApi.md#getoauth2client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
 *AdminApi* | [**introspectOAuth2Token**](docs/Api/AdminApi.md#introspectoauth2token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
 *AdminApi* | [**listOAuth2Clients**](docs/Api/AdminApi.md#listoauth2clients) | **GET** /clients | List OAuth 2.0 Clients
 *AdminApi* | [**listSubjectConsentSessions**](docs/Api/AdminApi.md#listsubjectconsentsessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
 *AdminApi* | [**rejectConsentRequest**](docs/Api/AdminApi.md#rejectconsentrequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *AdminApi* | [**rejectLoginRequest**](docs/Api/AdminApi.md#rejectloginrequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
-*AdminApi* | [**revokeAuthenticationSession**](docs/Api/AdminApi.md#revokeauthenticationsession) | **DELETE** /oauth2/auth/sessions/login | Invalidates a subject&#39;s authentication session
+*AdminApi* | [**rejectLogoutRequest**](docs/Api/AdminApi.md#rejectlogoutrequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
+*AdminApi* | [**revokeAuthenticationSession**](docs/Api/AdminApi.md#revokeauthenticationsession) | **DELETE** /oauth2/auth/sessions/login | Invalidates all login sessions of a certain user Invalidates a subject&#39;s authentication session
 *AdminApi* | [**revokeConsentSessions**](docs/Api/AdminApi.md#revokeconsentsessions) | **DELETE** /oauth2/auth/sessions/consent | Revokes consent sessions of a subject for a specific OAuth 2.0 Client
 *AdminApi* | [**updateJsonWebKey**](docs/Api/AdminApi.md#updatejsonwebkey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**updateJsonWebKeySet**](docs/Api/AdminApi.md#updatejsonwebkeyset) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**updateOAuth2Client**](docs/Api/AdminApi.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
 *HealthApi* | [**isInstanceAlive**](docs/Api/HealthApi.md#isinstancealive) | **GET** /health/alive | Check alive status
 *HealthApi* | [**isInstanceReady**](docs/Api/HealthApi.md#isinstanceready) | **GET** /health/ready | Check readiness status
+*PublicApi* | [**disconnectUser**](docs/Api/PublicApi.md#disconnectuser) | **GET** /oauth2/disconnect | OpenID Connect Front-Backchannel enabled Logout
 *PublicApi* | [**discoverOpenIDConfiguration**](docs/Api/PublicApi.md#discoveropenidconfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
 *PublicApi* | [**oauth2Token**](docs/Api/PublicApi.md#oauth2token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**oauthAuth**](docs/Api/PublicApi.md#oauthauth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *PublicApi* | [**revokeOAuth2Token**](docs/Api/PublicApi.md#revokeoauth2token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
-*PublicApi* | [**revokeSubjectLoginCookie**](docs/Api/PublicApi.md#revokesubjectlogincookie) | **GET** /oauth2/auth/sessions/login/revoke | Logs subject out by deleting the session cookie
 *PublicApi* | [**userinfo**](docs/Api/PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**wellKnown**](docs/Api/PublicApi.md#wellknown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
 *VersionApi* | [**getVersion**](docs/Api/VersionApi.md#getversion) | **GET** /version | Get service version
@@ -115,27 +118,19 @@ Class | Method | HTTP request | Description
 
  - [AcceptConsentRequest](docs/Model/AcceptConsentRequest.md)
  - [AcceptLoginRequest](docs/Model/AcceptLoginRequest.md)
- - [AuthenticationRequest](docs/Model/AuthenticationRequest.md)
- - [AuthenticationSession](docs/Model/AuthenticationSession.md)
- - [Client](docs/Model/Client.md)
  - [CompletedRequest](docs/Model/CompletedRequest.md)
  - [ConsentRequest](docs/Model/ConsentRequest.md)
  - [ConsentRequestSession](docs/Model/ConsentRequestSession.md)
- - [ConsentRequestSessionData](docs/Model/ConsentRequestSessionData.md)
- - [CreateRequest](docs/Model/CreateRequest.md)
  - [EmptyResponse](docs/Model/EmptyResponse.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [GenericError](docs/Model/GenericError.md)
- - [HandledAuthenticationRequest](docs/Model/HandledAuthenticationRequest.md)
- - [HandledConsentRequest](docs/Model/HandledConsentRequest.md)
- - [HandledLoginRequest](docs/Model/HandledLoginRequest.md)
  - [HealthNotReadyStatus](docs/Model/HealthNotReadyStatus.md)
  - [HealthStatus](docs/Model/HealthStatus.md)
- - [Introspection](docs/Model/Introspection.md)
  - [JSONWebKey](docs/Model/JSONWebKey.md)
  - [JSONWebKeySet](docs/Model/JSONWebKeySet.md)
  - [JsonWebKeySetGeneratorRequest](docs/Model/JsonWebKeySetGeneratorRequest.md)
  - [LoginRequest](docs/Model/LoginRequest.md)
+ - [LogoutRequest](docs/Model/LogoutRequest.md)
  - [OAuth2Client](docs/Model/OAuth2Client.md)
  - [OAuth2TokenIntrospection](docs/Model/OAuth2TokenIntrospection.md)
  - [Oauth2TokenResponse](docs/Model/Oauth2TokenResponse.md)
@@ -143,26 +138,15 @@ Class | Method | HTTP request | Description
  - [OpenIDConnectContext](docs/Model/OpenIDConnectContext.md)
  - [PreviousConsentSession](docs/Model/PreviousConsentSession.md)
  - [RejectRequest](docs/Model/RejectRequest.md)
- - [RequestDeniedError](docs/Model/RequestDeniedError.md)
- - [RequestHandlerResponse](docs/Model/RequestHandlerResponse.md)
  - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerHealthStatus](docs/Model/SwaggerHealthStatus.md)
- - [SwaggerJSONWebKey](docs/Model/SwaggerJSONWebKey.md)
- - [SwaggerJSONWebKeyQuery](docs/Model/SwaggerJSONWebKeyQuery.md)
- - [SwaggerJSONWebKeySet](docs/Model/SwaggerJSONWebKeySet.md)
  - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
  - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)
  - [SwaggerJwkSetQuery](docs/Model/SwaggerJwkSetQuery.md)
  - [SwaggerJwkUpdateSet](docs/Model/SwaggerJwkUpdateSet.md)
  - [SwaggerJwkUpdateSetKey](docs/Model/SwaggerJwkUpdateSetKey.md)
- - [SwaggerNotReadyStatus](docs/Model/SwaggerNotReadyStatus.md)
  - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
- - [SwaggerOAuthTokenResponse](docs/Model/SwaggerOAuthTokenResponse.md)
  - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
- - [SwaggerVersion](docs/Model/SwaggerVersion.md)
  - [Swaggeroauth2TokenParameters](docs/Model/Swaggeroauth2TokenParameters.md)
- - [Swaggeroauth2TokenResponse](docs/Model/Swaggeroauth2TokenResponse.md)
- - [SwaggeruserinfoResponsePayload](docs/Model/SwaggeruserinfoResponsePayload.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
  - [Version](docs/Model/Version.md)
  - [WellKnown](docs/Model/WellKnown.md)

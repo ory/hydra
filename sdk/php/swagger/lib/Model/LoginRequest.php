@@ -5,7 +5,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swaagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -27,7 +27,7 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Model;
+namespace Hydra\SDK\Model;
 
 use \ArrayAccess;
 
@@ -35,7 +35,7 @@ use \ArrayAccess;
  * LoginRequest Class Doc Comment
  *
  * @category    Class
- * @package     HydraSDK
+ * @package     Hydra\SDK
  * @author      Swagger Codegen team
  * @link        https://github.com/swagger-api/swagger-codegen
  */
@@ -55,8 +55,8 @@ class LoginRequest implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'challenge' => 'string',
-        'client' => '\HydraSDK\Model\OAuth2Client',
-        'oidc_context' => '\HydraSDK\Model\OpenIDConnectContext',
+        'client' => '\Hydra\SDK\Model\OAuth2Client',
+        'oidc_context' => '\Hydra\SDK\Model\OpenIDConnectContext',
         'request_url' => 'string',
         'requested_access_token_audience' => 'string[]',
         'requested_scope' => 'string[]',
@@ -219,7 +219,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets challenge
-     * @param string $challenge Challenge is the identifier (\"authentication challenge\") of the consent authentication request. It is used to identify the session.
+     * @param string $challenge Challenge is the identifier (\"login challenge\") of the login request. It is used to identify the session.
      * @return $this
      */
     public function setChallenge($challenge)
@@ -231,7 +231,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Gets client
-     * @return \HydraSDK\Model\OAuth2Client
+     * @return \Hydra\SDK\Model\OAuth2Client
      */
     public function getClient()
     {
@@ -240,7 +240,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets client
-     * @param \HydraSDK\Model\OAuth2Client $client
+     * @param \Hydra\SDK\Model\OAuth2Client $client
      * @return $this
      */
     public function setClient($client)
@@ -252,7 +252,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Gets oidc_context
-     * @return \HydraSDK\Model\OpenIDConnectContext
+     * @return \Hydra\SDK\Model\OpenIDConnectContext
      */
     public function getOidcContext()
     {
@@ -261,7 +261,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets oidc_context
-     * @param \HydraSDK\Model\OpenIDConnectContext $oidc_context
+     * @param \Hydra\SDK\Model\OpenIDConnectContext $oidc_context
      * @return $this
      */
     public function setOidcContext($oidc_context)
@@ -345,7 +345,7 @@ class LoginRequest implements ArrayAccess
 
     /**
      * Sets session_id
-     * @param string $session_id SessionID is the authentication session ID. It is set if the browser had a valid authentication session at ORY Hydra during the login flow. It can be used to associate consecutive login requests by a certain user.
+     * @param string $session_id SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back- channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
      * @return $this
      */
     public function setSessionId($session_id)
@@ -448,10 +448,10 @@ class LoginRequest implements ArrayAccess
     public function __toString()
     {
         if (defined('JSON_PRETTY_PRINT')) { // use JSON pretty print
-            return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
+            return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this), JSON_PRETTY_PRINT);
         }
 
-        return json_encode(\HydraSDK\ObjectSerializer::sanitizeForSerialization($this));
+        return json_encode(\Hydra\SDK\ObjectSerializer::sanitizeForSerialization($this));
     }
 }
 

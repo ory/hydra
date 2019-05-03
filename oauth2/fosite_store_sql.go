@@ -36,10 +36,10 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/fosite"
-	"github.com/ory/go-convenience/stringsx"
 	"github.com/ory/hydra/client"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/stringsx"
 )
 
 type FositeSQLStore struct {
@@ -190,6 +190,12 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger lo
 	}
 
 	return r, nil
+}
+
+func (s *FositeSQLStore) PlanMigration() ([]*migrate.PlannedMigration, error) {
+	migrate.SetTable("hydra_oauth2_migration")
+	plan, _, err := migrate.PlanMigration(s.DB.DB, s.DB.DriverName(), Migrations[dbal.Canonicalize(s.DB.DriverName())], migrate.Up, 0)
+	return plan, errors.WithStack(err)
 }
 
 func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {

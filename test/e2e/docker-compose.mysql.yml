@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+
+  hydra-migrate:
+    image: oryd/hydra:e2e
+    environment:
+      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
+    command:
+      migrate sql -e --yes
+    restart: on-failure
+
+  hydra:
+    depends_on:
+      - hydra-migrate
+    environment:
+      - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
+
+  mysqld:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret

@@ -66,6 +66,12 @@ type sqlData struct {
 	Key       string    `db:"keydata"`
 }
 
+func (m *SQLManager) PlanMigration() ([]*migrate.PlannedMigration, error) {
+	migrate.SetTable("hydra_jwk_migration")
+	plan, _, err := migrate.PlanMigration(m.DB.DB, m.DB.DriverName(), Migrations[dbal.Canonicalize(m.DB.DriverName())], migrate.Up, 0)
+	return plan, errors.WithStack(err)
+}
+
 func (m *SQLManager) CreateSchemas() (int, error) {
 	database := m.DB.DriverName()
 	switch database {
@@ -238,8 +244,24 @@ func (m *SQLManager) deleteKeySet(ctx context.Context, tx *sqlx.Tx, set string) 
 	return nil
 }
 
+func (m *SQLManager) countKeys(ctx context.Context) (int, error) {
+	var n int
+	if err := m.DB.QueryRow("SELECT count(*) FROM hydra_jwk").Scan(&n); err != nil {
+		return 0, sqlcon.HandleError(err)
+	}
+
+	return n, nil
+}
+
 func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
+	n, err := m.countKeys(context.Background())
+	if err != nil {
+		JWKs.WithLabelValues().Set(float64(n))
+	}
+
+	JWKs.Collect(c)
 }
 
 func (m *SQLManager) Describe(c chan<- *prometheus.Desc) {
+	JWKs.Describe(c)
 }

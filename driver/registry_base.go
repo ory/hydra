@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/metrics"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/metricsx"
 	"github.com/ory/x/serverx"
 
 	"github.com/gorilla/sessions"
@@ -66,8 +66,8 @@ type RegistryBase struct {
 	oah          *oauth2.Handler
 	sia          map[string]consent.SubjectIdentifierAlgorithm
 	trc          *tracing.Tracer
-	pmm          *metrics.Prometheus
-	mbm          *metrics.BridgeManager
+	pmm          *metricsx.Prometheus
+	mbm          *metricsx.BridgeManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
 	buildVersion string
@@ -412,9 +412,9 @@ func (m *RegistryBase) Tracer() *tracing.Tracer {
 	return m.trc
 }
 
-func (m *RegistryBase) PrometheusManager() *metrics.Prometheus {
+func (m *RegistryBase) PrometheusManager() *metricsx.Prometheus {
 	if m.pmm == nil {
-		m.pmm = metrics.NewPrometheus(m.pr, m.cm, m.com, m.km)
+		m.pmm = metricsx.NewPrometheus(m.pr, m.cm, m.com, m.km)
 	}
 	return m.pmm
 }

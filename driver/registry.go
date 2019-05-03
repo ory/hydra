@@ -5,7 +5,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/hydra/metrics"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/healthx"
+	"github.com/ory/x/metricsx"
 )
 
 type Registry interface {
@@ -40,7 +40,7 @@ type Registry interface {
 	consent.Registry
 	jwk.Registry
 	oauth2.Registry
-	PrometheusManager() *metrics.Prometheus
+	PrometheusManager() *metricsx.Prometheus
 	Tracer() *tracing.Tracer
 
 	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)

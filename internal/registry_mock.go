@@ -19,10 +19,10 @@ import (
 	driver "github.com/ory/hydra/driver"
 	configuration "github.com/ory/hydra/driver/configuration"
 	jwk "github.com/ory/hydra/jwk"
-	metrics "github.com/ory/hydra/metrics"
 	oauth2 "github.com/ory/hydra/oauth2"
 	x "github.com/ory/hydra/x"
 	healthx "github.com/ory/x/healthx"
+	metricsx "github.com/ory/x/metricsx"
 	tracing "github.com/ory/x/tracing"
 )
 
@@ -428,10 +428,10 @@ func (mr *MockRegistryMockRecorder) Ping() *gomock.Call {
 }
 
 // PrometheusManager mocks base method
-func (m *MockRegistry) PrometheusManager() *metrics.Prometheus {
+func (m *MockRegistry) PrometheusManager() *metricsx.Prometheus {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PrometheusManager")
-	ret0, _ := ret[0].(*metrics.Prometheus)
+	ret0, _ := ret[0].(*metricsx.Prometheus)
 	return ret0
 }
 

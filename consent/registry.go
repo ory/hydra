@@ -6,8 +6,8 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/metrics"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/metricsx"
 )
 
 type InternalRegistry interface {
@@ -18,7 +18,7 @@ type InternalRegistry interface {
 
 	OAuth2Storage() x.FositeStorer
 	OpenIDJWTStrategy() jwk.JWTStrategy
-	PrometheusManager() *metrics.Prometheus
+	PrometheusManager() *metricsx.Prometheus
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 	ScopeStrategy() fosite.ScopeStrategy
 }

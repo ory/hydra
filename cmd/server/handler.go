@@ -46,13 +46,11 @@ import (
 	"github.com/urfave/negroni"
 
 	"github.com/ory/graceful"
-	// "github.com/ory/hydra/client"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	// "github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/metrics"
-	// "github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/cmdx"
-	// "github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 )
 
@@ -184,7 +182,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	publicmw.Use(d.Registry().PrometheusManager())
 
 	var (
-		bridges = []metrics.Bridge{}
+		bridges = []metricsx.Bridge{}
 		l       = d.Registry().Logger()
 		ctx     = context.Background()
 	)
@@ -211,7 +209,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 
 	if !optOut {
 		l.Info("Software quality assurance features are enabled. Learn more at: https://www.ory.sh/docs/ecosystem/sqa")
-		s := &metrics.SegmentOptions{
+		s := &metricsx.SegmentOptions{
 			Service: "ory-hydra",
 			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
 				d.Configuration().IssuerURL().String(),
@@ -220,18 +218,59 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 			IsDevelopment: d.Configuration().DSN() == "memory" ||
 				d.Configuration().IssuerURL().String() == "" ||
 				strings.Contains(d.Configuration().IssuerURL().String(), "localhost"),
+			WhitelistedPaths: []string{
+				jwk.KeyHandlerPath,
+				jwk.WellKnownKeysPath,
+
+				client.ClientsHandlerPath,
+
+				oauth2.DefaultConsentPath,
+				oauth2.DefaultLoginPath,
+				oauth2.DefaultPostLogoutPath,
+				oauth2.DefaultLogoutPath,
+				oauth2.DefaultErrorPath,
+				oauth2.TokenPath,
+				oauth2.AuthPath,
+				oauth2.LogoutPath,
+				oauth2.UserinfoPath,
+				oauth2.WellKnownPath,
+				oauth2.JWKPath,
+				oauth2.IntrospectPath,
+				oauth2.RevocationPath,
+				oauth2.FlushPath,
+
+				consent.ConsentPath,
+				consent.ConsentPath + "/accept",
+				consent.ConsentPath + "/reject",
+				consent.LoginPath,
+				consent.LoginPath + "/accept",
+				consent.LoginPath + "/reject",
+				consent.LogoutPath,
+				consent.LogoutPath + "/accept",
+				consent.LogoutPath + "/reject",
+				consent.SessionsPath + "/login",
+				consent.SessionsPath + "/consent",
+
+				healthx.AliveCheckPath,
+				healthx.ReadyCheckPath,
+				healthx.VersionPath,
+				driver.MetricsPrometheusPath,
+				"/",
+			},
 			WriteKey:     "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
 			BuildVersion: d.Registry().BuildVersion(),
 			BuildTime:    d.Registry().BuildDate(),
 			BuildHash:    d.Registry().BuildHash(),
 		}
-		b, err := metrics.NewSegmentBridge(ctx, s, l, d.Registry().PrometheusManager().Registry)
+		b, err := metricsx.NewFormattedSegmentBridge(ctx, s, l, d.Registry().PrometheusManager().Registry)
 		if err != nil {
 			l.WithError(err).Debug("Software quality assurance features could not be started. Learn more at: https://www.ory.sh/docs/ecosystem/sqa")
 		}
+
+		publicmw.Use(b)
 		bridges = append(bridges, b)
 	}
-	bm := metrics.NewBridgeManager(&metrics.BridgeManagerOptions{
+	bm := metricsx.NewBridgeManager(&metricsx.BridgeManagerOptions{
 		Interval: time.Duration(5 * time.Second),
 		Log:      l,
 	}, bridges)

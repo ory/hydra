@@ -100,11 +100,15 @@ JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 			// do nothing
 		} else if err != nil {
 			return err
+		} else {
+			metricAccessTokensRevoked.Inc()
 		}
 		if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 			// do nothing
 		} else if err != nil {
 			return err
+		} else {
+			metricRefreshTokensRevoked.Inc()
 		}
 	}
 
@@ -533,6 +537,21 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 // Collector implementations support concurrent readers.
 func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
 	collectCounters(c)
+
+	// get t
+	go func(m *SQLManager, c chan<- prometheus.Metric) {
+		var n int
+		m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_access").Scan(&n)
+		metricAccessTokens.Inc()
+		metricAccessTokens.Collect(c)
+	}(m, c)
+
+	go func(m *SQLManager, c chan<- prometheus.Metric) {
+		var n int
+		m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_refresh").Scan(&n)
+		metricRefreshTokens.Inc()
+		metricRefreshTokens.Collect(c)
+	}(m, c)
 }
 
 // Describe sends the super-set of all possible descriptors of metrics
@@ -558,6 +577,9 @@ func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
 // signal the error to the registry.
 func (m *SQLManager) Describe(c chan<- *prometheus.Desc) {
 	describeCounters(c)
+
+	metricAccessTokens.Describe(c)
+	metricRefreshTokens.Describe(c)
 }
 
 func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {

@@ -161,10 +161,10 @@ func (m *MemoryManager) CountClients(ctx context.Context) (n int, err error) {
 }
 
 func (m *MemoryManager) Collect(c chan<- prometheus.Metric) {
-	Clients.Set(float64(len(m.Clients)))
-	Clients.Collect(c)
+	metricClients.Set(float64(len(m.Clients)))
+	metricClients.Collect(c)
 }
 
 func (m *MemoryManager) Describe(c chan<- *prometheus.Desc) {
-	Clients.Describe(c)
+	metricClients.Describe(c)
 }

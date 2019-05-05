@@ -5,10 +5,10 @@ import (
 )
 
 var (
-	Clients = prometheus.NewGauge(prometheus.GaugeOpts{
+	metricClients = prometheus.NewGauge(prometheus.GaugeOpts{
 		Namespace: "hydra",
 		Subsystem: "clients",
-		Name:      "sum",
+		Name:      "total",
 		Help:      "The current number of clients",
 	})
 )

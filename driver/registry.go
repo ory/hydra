@@ -21,6 +21,7 @@ import (
 
 type Registry interface {
 	dbal.Driver
+	prometheus.Collector
 
 	Init() error
 

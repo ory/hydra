@@ -119,6 +119,8 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 				// do nothing
 			} else if err != nil {
 				return err
+			} else {
+				metricAccessTokensRevoked.Inc()
 			}
 			if err := m.r.OAuth2Storage().RevokeRefreshToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
@@ -126,6 +128,8 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 				return err
 			}
 			found = true
+		} else {
+			metricRefreshTokensRevoked.Inc()
 		}
 	}
 	m.m["handledConsentRequests"].RUnlock()
@@ -597,4 +601,7 @@ func (m *MemoryManager) Collect(c chan<- prometheus.Metric) {
 // signal the error to the registry.
 func (m *MemoryManager) Describe(c chan<- *prometheus.Desc) {
 	describeCounters(c)
+
+	metricAccessTokens.Describe(c)
+	metricRefreshTokens.Describe(c)
 }

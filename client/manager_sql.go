@@ -363,12 +363,12 @@ func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
 	// consolidate the number of queries, run them concurrently, run them in a transaction, or create a view.
 	n, err := m.CountClients(context.Background())
 	if err == nil {
-		Clients.Set(float64(n))
+		metricClients.Set(float64(n))
 	}
 
-	Clients.Collect(c)
+	metricClients.Collect(c)
 }
 
 func (m *SQLManager) Describe(c chan<- *prometheus.Desc) {
-	Clients.Describe(c)
+	metricClients.Describe(c)
 }

@@ -5,10 +5,10 @@ import (
 )
 
 var (
-	JWKs = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	metricJWKs = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: "hydra",
 		Subsystem: "jwks",
-		Name:      "sum",
+		Name:      "total",
 		Help:      "The number of JWKs issued",
 	}, []string{})
 )

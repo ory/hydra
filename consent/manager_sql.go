@@ -538,7 +538,6 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
 	collectCounters(c)
 
-	// get t
 	go func(m *SQLManager, c chan<- prometheus.Metric) {
 		var n int
 		m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_access").Scan(&n)

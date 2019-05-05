@@ -161,7 +161,7 @@ func (v *ViperProvider) CORSOptions(iface string) cors.Options {
 		AllowCredentials:   viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", true, "CORS_ALLOWED_CREDENTIALS"),
 		OptionsPassthrough: viperx.GetBool(v.l, "serve."+iface+".cors.options_passthrough", false),
 		MaxAge:             viperx.GetInt(v.l, "serve."+iface+".cors.max_age", 0, "CORS_MAX_AGE"),
-		Debug:              viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", false, "CORS_DEBUG"),
+		Debug:              viperx.GetBool(v.l, "serve."+iface+".cors.debug", false, "CORS_DEBUG"),
 	}
 }
 

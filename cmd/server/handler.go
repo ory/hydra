@@ -51,6 +51,7 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 )
 
@@ -268,57 +269,16 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		}
 
 		publicmw.Use(b)
+		adminmw.Use(b)
 		bridges = append(bridges, b)
 	}
+
 	bm := metricsx.NewBridgeManager(&metricsx.BridgeManagerOptions{
 		Interval: time.Duration(5 * time.Second),
 		Log:      l,
 	}, bridges)
 
 	go bm.Start(ctx)
-
-	// metrics := metricsx.New(
-	// 	cmd,
-	// 	d.Registry().Logger(),
-	// 	&metricsx.Options{
-	// 		Service: "ory-hydra",
-	// 		ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
-	// 			d.Configuration().IssuerURL().String(),
-	// 			d.Configuration().DSN(),
-	// 		)),
-	// 		IsDevelopment: d.Configuration().DSN() == "memory" ||
-	// 			d.Configuration().IssuerURL().String() == "" ||
-	// 			strings.Contains(d.Configuration().IssuerURL().String(), "localhost"),
-	// 		WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
-	// 		WhitelistedPaths: []string{
-	// 			client.ClientsHandlerPath,
-	// 			jwk.KeyHandlerPath,
-	// 			jwk.WellKnownKeysPath,
-	// 			oauth2.DefaultConsentPath,
-	// 			oauth2.TokenPath,
-	// 			oauth2.AuthPath,
-	// 			oauth2.UserinfoPath,
-	// 			oauth2.WellKnownPath,
-	// 			oauth2.IntrospectPath,
-	// 			oauth2.RevocationPath,
-	// 			consent.ConsentPath,
-	// 			consent.LoginPath,
-	// 			healthx.AliveCheckPath,
-	// 			healthx.ReadyCheckPath,
-	// 			healthx.VersionPath,
-	// 			driver.MetricsPrometheusPath,
-	// 			"/oauth2/auth/sessions/login",
-	// 			"/oauth2/auth/sessions/consent",
-	// 			"/",
-	// 		},
-	// 		BuildVersion: d.Registry().BuildVersion(),
-	// 		BuildTime:    d.Registry().BuildDate(),
-	// 		BuildHash:    d.Registry().BuildHash(),
-	// 	},
-	// )
-
-	// adminmw.Use(metrics)
-	// publicmw.Use(metrics)
 
 	d.Registry().RegisterRoutes(admin, public)
 

@@ -156,7 +156,7 @@ func (v *ViperProvider) CORSOptions(iface string) cors.Options {
 	return cors.Options{
 		AllowedOrigins:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_origins", []string{}, "CORS_ALLOWED_ORIGINS"),
 		AllowedMethods:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_methods", []string{"GET", "POST", "PUT", "PATCH", "DELETE"}, "CORS_ALLOWED_METHODS"),
-		AllowedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_headers", []string{"Authorization"}, "CORS_ALLOWED_HEADERS"),
+		AllowedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.allowed_headers", []string{"Authorization", "Content-Type"}, "CORS_ALLOWED_HEADERS"),
 		ExposedHeaders:     viperx.GetStringSlice(v.l, "serve."+iface+".cors.exposed_headers", []string{"Content-Type"}, "CORS_EXPOSED_HEADERS"),
 		AllowCredentials:   viperx.GetBool(v.l, "serve."+iface+".cors.allow_credentials", true, "CORS_ALLOWED_CREDENTIALS"),
 		OptionsPassthrough: viperx.GetBool(v.l, "serve."+iface+".cors.options_passthrough", false),

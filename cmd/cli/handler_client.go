@@ -119,6 +119,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		AllowedCORSOrigins:      flagx.MustGetStringSlice(cmd, "allowed-cors-origins"),
 		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
 		Audience:                flagx.MustGetStringSlice(cmd, "audience"),
+		PostLogoutRedirectUris:  flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))

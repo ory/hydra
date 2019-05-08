@@ -1441,7 +1441,7 @@
     },
     "/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.",
+        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect\nFront- or Back-channel logout.",
         "consumes": [
           "application/json"
         ],

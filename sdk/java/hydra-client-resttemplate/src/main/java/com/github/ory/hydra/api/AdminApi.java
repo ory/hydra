@@ -37,7 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-04-27T01:47:23.524+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-05-08T10:14:06.817+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -924,7 +924,7 @@ public class AdminApi {
     }
     /**
      * Invalidates all login sessions of a certain user Invalidates a subject&#39;s authentication session
-     * This endpoint invalidates a subject&#39;s authentication session. After revoking the authentication session, the subject has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+     * This endpoint invalidates a subject&#39;s authentication session. After revoking the authentication session, the subject has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect Front- or Back-channel logout.
      * <p><b>204</b> - Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201.
      * <p><b>400</b> - genericError
      * <p><b>404</b> - genericError

@@ -86,12 +86,11 @@ sdk:
 		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json -x sdk
 		GO111MODULE=off swagger validate ./docs/api.swagger.json
 
-		rm -rf ./sdk/go/hydra
+		rm -rf ./sdk/go/hydra/client
+		rm -rf ./sdk/go/hydra/models
 		rm -rf ./sdk/js/swagger
 		rm -rf ./sdk/php/swagger
 		rm -rf ./sdk/java
-
-		mkdir ./sdk/go/hydra
 
 		GO111MODULE=off swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
 		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger

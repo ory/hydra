@@ -61,6 +61,7 @@ func init() {
 	clientsCreateCmd.Flags().String("subject-type", "public", "A identifier algorithm. Valid values are \"public\" and \"pairwise\"")
 	clientsCreateCmd.Flags().String("secret", "", "Provide the client's secret")
 	clientsCreateCmd.Flags().StringP("name", "n", "", "The client's name")
+	clientsCreateCmd.Flags().StringSlice("post-logout-callbacks", []string{}, "List of allowed URLs to be redirected to after a logout")
 
 	// encrypt client secret options
 	clientsCreateCmd.Flags().String("pgp-key", "", "Base64 encoded PGP encryption key for encrypting client secret")

@@ -5,26 +5,18 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/internal"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
-
-var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
-}
 
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
@@ -35,10 +27,10 @@ func TestXXMigrations(t *testing.T) {
 	migratest.RunPackrMigrationTests(
 		t,
 		migratest.MigrationSchemas{client.Migrations, consent.Migrations, oauth2.Migrations},
-		migratest.MigrationSchemas{nil, nil, createMigrations},
+		migratest.MigrationSchemas{nil, nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", oauth2.Migrations, oauth2.AssetNames(), oauth2.Asset)},
 		x.CleanSQL,
 		x.CleanSQL,
-		func(t *testing.T, db *sqlx.DB, m, k, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, m, k, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
@@ -49,6 +41,9 @@ func TestXXMigrations(t *testing.T) {
 				}
 
 				s := reg.OAuth2Storage().(*oauth2.FositeSQLStore)
+				if dbName == "cockroach" {
+					k += 8
+				}
 				sig := fmt.Sprintf("%d-sig", k+1)
 
 				if k < 8 {
@@ -57,7 +52,6 @@ func TestXXMigrations(t *testing.T) {
 					require.Error(t, err)
 					return
 				}
-
 				_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
 				require.NoError(t, err)
 				_, err = s.GetRefreshTokenSession(context.Background(), sig, oauth2.NewSession(""))

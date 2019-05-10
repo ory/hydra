@@ -25,11 +25,11 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 
-	"github.com/ory/hydra/jwk"
-
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/hydra/jwk"
 )
 
 type veryInsecureRS256Generator struct{}

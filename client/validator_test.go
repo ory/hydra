@@ -27,15 +27,13 @@ import (
 	"testing"
 
 	"github.com/spf13/viper"
-
-	"github.com/ory/hydra/driver/configuration"
-
-	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/internal"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
+
+	. "github.com/ory/hydra/client"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
 )
 
 func TestValidate(t *testing.T) {

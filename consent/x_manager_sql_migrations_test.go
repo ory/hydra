@@ -5,24 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
-	"github.com/ory/hydra/internal"
-
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
-
-var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
-}
 
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
@@ -40,9 +32,9 @@ func TestXXMigrations(t *testing.T) {
 	migratest.RunPackrMigrationTests(
 		t,
 		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
-		migratest.MigrationSchemas{nil, createMigrations},
+		migratest.MigrationSchemas{nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", consent.Migrations, consent.AssetNames(), consent.Asset)},
 		x.CleanSQL, x.CleanSQL,
-		func(t *testing.T, db *sqlx.DB, sk, step, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, sk, step, steps int) {
 			if sk == 0 {
 				t.Skip("Nothing to do...")
 				return
@@ -53,6 +45,9 @@ func TestXXMigrations(t *testing.T) {
 				reg := internal.NewRegistrySQL(conf, db)
 
 				kk := step + 1
+				if dbName == "cockroach" {
+					kk += 11
+				}
 				if kk <= 2 {
 					t.Skip("Skipping the first two entries were deleted in migration 7.sql login_session_id is not defined")
 					return

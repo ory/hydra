@@ -23,6 +23,7 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 
@@ -31,10 +32,9 @@ import (
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/x/logrusx"
-
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
+	"github.com/ory/x/logrusx"
 )
 
 type MigrateHandler struct{}
@@ -74,7 +74,16 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	plan, err := reg.SchemaMigrationPlan()
+	u, err := url.Parse(d.Configuration().DSN())
+	if err != nil {
+		fmt.Println(cmd.UsageString())
+		fmt.Println("")
+		fmt.Println(err)
+		os.Exit(1)
+		return
+	}
+
+	plan, err := reg.SchemaMigrationPlan(u.Scheme)
 	cmdx.Must(err, "An error occurred planning migrations: %s", err)
 
 	fmt.Println("The following migration is planned:")
@@ -90,7 +99,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	n, err := reg.CreateSchemas()
+	n, err := reg.CreateSchemas(u.Scheme)
 	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
 	fmt.Printf("Successfully applied %d SQL migrations!\n", n)
 }

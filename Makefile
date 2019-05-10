@@ -11,21 +11,26 @@ tools:
 test:
 		make test-resetdb
 		make sqlbin
-		TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
-			TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
-			go-acc ./... -- -failfast -timeout=20m
+		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
+		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
+		TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
+		go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
+		docker rm -f hydra_test_database_cockroach
 
 # Resets the test databases
 .PHONY: test-resetdb
 test-resetdb:
 		docker kill hydra_test_database_mysql || true
 		docker kill hydra_test_database_postgres || true
+		docker kill hydra_test_database_cockroach || true
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
+		docker rm -f hydra_test_database_cockroach || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
@@ -38,14 +43,17 @@ docker:
 .PHONY: e2e
 e2e:
 		make test-resetdb
-		export TEST_DATABASE_MYSQL='root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
+		export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
 		export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable'
+		export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
 		./test/e2e/circle-ci.bash memory
 		./test/e2e/circle-ci.bash memory-jwt
 		./test/e2e/circle-ci.bash postgres
 		./test/e2e/circle-ci.bash postgres-jwt
 		./test/e2e/circle-ci.bash mysql
 		./test/e2e/circle-ci.bash mysql-jwt
+		./test/e2e/circle-ci.bash cockroach
+		./test/e2e/circle-ci.bash cockroach-jwt
 		./test/e2e/circle-ci.bash plugin
 		./test/e2e/circle-ci.bash plugin-jwt
 

@@ -36,35 +36,28 @@ import (
 	"testing"
 	"time"
 
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pborman/uuid"
-	"github.com/urfave/negroni"
-
-	"github.com/ory/hydra/driver"
-
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/urlx"
-
-	"github.com/ory/hydra/x"
-
-	"github.com/spf13/viper"
-
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-
-	jwtgo "github.com/dgrijalva/jwt-go"
+	"github.com/urfave/negroni"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
 	hydra "github.com/ory/hydra/sdk/go/hydra/client"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
 )
 
 func mustRSAKey() *rsa.PrivateKey {

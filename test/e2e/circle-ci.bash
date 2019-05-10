@@ -73,6 +73,22 @@ case "$1" in
             export CYPRESS_jwt_enabled=true
             ;;
 
+        cockroach)
+            hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB
+            DSN=$TEST_DATABASE_COCKROACHDB \
+                hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=false
+            ;;
+
+        cockroach-jwt)
+            hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB
+            DSN=$TEST_DATABASE_COCKROACHDB \
+                OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
+                OIDC_SUBJECT_IDENTIFIERS_ENABLED=public \
+                hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
+            export CYPRESS_jwt_enabled=true
+            ;;
+
         plugin)
             DSN=plugin://./memtest.so \
                 hydra serve all --dangerous-force-http --disable-telemetry >> ./hydra.e2e.log 2>&1 &
@@ -87,7 +103,7 @@ case "$1" in
             export CYPRESS_jwt_enabled=true
             ;;
         *)
-            echo $"Usage: $0 {memory|postgres|mysql|plugin|memory-jwt|postgres-jwt|mysql-jwt|plugin-jwt} [--watch]"
+            echo $"Usage: $0 {memory|postgres|mysql|cockroach|plugin|memory-jwt|postgres-jwt|mysql-jwt|cockroach-jwt|plugin-jwt} [--watch]"
             exit 1
 esac
 

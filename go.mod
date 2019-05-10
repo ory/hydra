@@ -78,6 +78,3 @@ require (
 
 // Fix for https://github.com/golang/lint/issues/436
 replace github.com/golang/lint => github.com/golang/lint v0.0.0-20190227174305-8f45f776aaf1
-
-// Fix for https://github.com/golang/go/issues/27056
-replace github.com/ory/hydra/sdk/go/hydra => ./sdk/go/hydra

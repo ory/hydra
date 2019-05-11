@@ -3,42 +3,43 @@ package consent
 import (
 	"strconv"
 
+	"github.com/ory/x/metricsx"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
-	metricConsentRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
+	metricConsentRequests = metricsx.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "hydra",
 		Subsystem: "consent",
 		Name:      "requests",
 		Help:      "incremented when a request is sent to consent.AcceptConsentRequest",
 	}, []string{"error"})
-	metricConsentRequestScopes = prometheus.NewCounterVec(prometheus.CounterOpts{
+	metricConsentRequestScopes = metricsx.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "hydra",
 		Subsystem: "consent",
 		Name:      "request_scopes",
 		Help:      "tracks the number of consent requests submitted per scope",
 	}, []string{"scope", "type"})
-	metricConsentRequestAudiences = prometheus.NewCounterVec(prometheus.CounterOpts{
+	metricConsentRequestAudiences = metricsx.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "hydra",
 		Subsystem: "consent",
 		Name:      "request_audiences",
 		Help:      "tracks the number of consent requests submitted per audience",
 	}, []string{"audience", "type"})
-	metricConsentRequestsRejected = prometheus.NewCounterVec(prometheus.CounterOpts{
+	metricConsentRequestsRejected = metricsx.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "hydra",
 		Subsystem: "consent",
 		Name:      "requests_rejected",
 		Help:      "incremented when consent.RejectConsentRequest is successful",
 	}, []string{"error"})
 
-	metricLoginRequests = prometheus.NewCounterVec(prometheus.CounterOpts{
+	metricLoginRequests = metricsx.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "hydra",
 		Subsystem: "login",
 		Name:      "requests",
 		Help:      "incremented when a request is sent to consent.AcceptLoginRequest",
 	}, []string{"remember", "error"})
-	metricLoginRequestsRejected = prometheus.NewCounterVec(prometheus.CounterOpts{
+	metricLoginRequestsRejected = metricsx.NewCounterVec(prometheus.CounterOpts{
 		Namespace: "hydra",
 		Subsystem: "login",
 		Name:      "requests_rejected",

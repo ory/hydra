@@ -5,23 +5,48 @@ about: Create a report to help us improve
 ---
 
 **Describe the bug**
+
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+**Reproducing the bug**
+
 Steps to reproduce the behavior:
-1. Run `some-command`
-2. Open ...
-3. See error
+
+<!--
+1. Run `docker run ....`
+2. Make API Request to with `curl ...`
+3. Request fails with response: `{"some": "error"}`
+-->
+
+*Server logs*
+
+<!--
+```
+log=error ....
+```
+-->
+
+*Server configuration*
+
+<!--
+PLEASE OMIT SENSITIVE VALUES
+
+```yaml
+server:
+    admin:
+        port: 1234
+```
+-->
 
 **Expected behavior**
+
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Environment**
 
-**Version:**
- - Environment: [e.g. Docker, Kubernetes, ...]
- - Version [e.g. v1.0.0]
+* Version: v1.2.3, git sha hash
+* Environment: Debian, Docker, ...
 
 **Additional context**
+
 Add any other context about the problem here.

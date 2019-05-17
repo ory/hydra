@@ -1,7 +1,6 @@
 package tracing
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -31,15 +30,26 @@ type JaegerConfig struct {
 func (t *Tracer) Setup() error {
 	switch strings.ToLower(t.Provider) {
 	case "jaeger":
-		jc := jeagerConf.Configuration{
-			Sampler: &jeagerConf.SamplerConfig{
-				SamplingServerURL: t.JaegerConfig.SamplerServerUrl,
-				Type:              t.JaegerConfig.SamplerType,
-				Param:             t.JaegerConfig.SamplerValue,
-			},
-			Reporter: &jeagerConf.ReporterConfig{
-				LocalAgentHostPort: t.JaegerConfig.LocalAgentHostPort,
-			},
+		jc, err := jeagerConf.FromEnv()
+
+		if err != nil {
+			return err
+		}
+
+		if t.JaegerConfig.SamplerServerUrl != "" {
+			jc.Sampler.SamplingServerURL = t.JaegerConfig.SamplerServerUrl
+		}
+
+		if t.JaegerConfig.SamplerType != "" {
+			jc.Sampler.Type = t.JaegerConfig.SamplerType
+		}
+
+		if t.JaegerConfig.SamplerValue != 0 {
+			jc.Sampler.Param = t.JaegerConfig.SamplerValue
+		}
+
+		if t.JaegerConfig.LocalAgentHostPort != "" {
+			jc.Reporter.LocalAgentHostPort = t.JaegerConfig.LocalAgentHostPort
 		}
 
 		closer, err := jc.InitGlobalTracer(
@@ -56,7 +66,7 @@ func (t *Tracer) Setup() error {
 	case "":
 		t.Logger.Infof("No tracer configured - skipping tracing setup")
 	default:
-		return errors.New(fmt.Sprintf("unknown tracer: %s", t.Provider))
+		return fmt.Errorf("unknown tracer: %s", t.Provider)
 	}
 	return nil
 }

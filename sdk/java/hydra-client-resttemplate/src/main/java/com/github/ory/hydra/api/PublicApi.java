@@ -27,7 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-05-08T10:14:06.817+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-05-17T10:32:12.084+02:00")
 @Component("com.github.ory.hydra.api.PublicApi")
 public class PublicApi {
     private ApiClient apiClient;
@@ -58,7 +58,7 @@ public class PublicApi {
     public void disconnectUser() throws RestClientException {
         Object postBody = null;
         
-        String path = UriComponentsBuilder.fromPath("/oauth2/disconnect").build().toUriString();
+        String path = UriComponentsBuilder.fromPath("/oauth2/sessions/logout").build().toUriString();
         
         final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
         final HttpHeaders headerParams = new HttpHeaders();

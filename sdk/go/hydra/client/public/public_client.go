@@ -41,7 +41,7 @@ func (a *Client) DisconnectUser(params *DisconnectUserParams) error {
 	_, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "disconnectUser",
 		Method:             "GET",
-		PathPattern:        "/oauth2/disconnect",
+		PathPattern:        "/oauth2/sessions/logout",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
 		Schemes:            []string{"http", "https"},

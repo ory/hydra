@@ -75,6 +75,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //
 //     Responses:
 //       201: oAuth2Client
+//       400: genericError
 //       409: genericError
 //       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

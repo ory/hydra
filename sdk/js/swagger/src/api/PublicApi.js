@@ -79,7 +79,7 @@
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/oauth2/disconnect', 'GET',
+        '/oauth2/sessions/logout', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

@@ -171,6 +171,12 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
+          "400": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
           "409": {
             "description": "genericError",
             "schema": {
@@ -1491,25 +1497,6 @@
         }
       }
     },
-    "/oauth2/disconnect": {
-      "get": {
-        "description": "This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "OpenID Connect Front-Backchannel enabled Logout",
-        "operationId": "disconnectUser",
-        "responses": {
-          "302": {
-            "$ref": "#/responses/emptyResponse"
-          }
-        }
-      }
-    },
     "/oauth2/flush": {
       "post": {
         "description": "This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
@@ -1665,6 +1652,25 @@
             "schema": {
               "$ref": "#/definitions/genericError"
             }
+          }
+        }
+      }
+    },
+    "/oauth2/sessions/logout": {
+      "get": {
+        "description": "This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "public"
+        ],
+        "summary": "OpenID Connect Front-Backchannel enabled Logout",
+        "operationId": "disconnectUser",
+        "responses": {
+          "302": {
+            "$ref": "#/responses/emptyResponse"
           }
         }
       }

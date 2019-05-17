@@ -37,7 +37,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-05-08T10:14:06.817+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-05-17T10:32:12.084+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -229,6 +229,7 @@ public class AdminApi {
      * Create an OAuth 2.0 client
      * Create a new OAuth 2.0 client If you pass &#x60;client_secret&#x60; the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.  OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
      * <p><b>201</b> - oAuth2Client
+     * <p><b>400</b> - genericError
      * <p><b>409</b> - genericError
      * <p><b>500</b> - genericError
      * @param body The body parameter

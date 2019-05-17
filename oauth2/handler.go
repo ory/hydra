@@ -104,7 +104,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	admin.POST(FlushPath, h.FlushHandler)
 }
 
-// swagger:route GET /oauth2/disconnect public disconnectUser
+// swagger:route GET /oauth2/sessions/logout public disconnectUser
 //
 // OpenID Connect Front-Backchannel enabled Logout
 //

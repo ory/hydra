@@ -32,6 +32,13 @@ func (o *CreateOAuth2ClientReader) ReadResponse(response runtime.ClientResponse,
 		}
 		return result, nil
 
+	case 400:
+		result := NewCreateOAuth2ClientBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
+
 	case 409:
 		result := NewCreateOAuth2ClientConflict()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -71,6 +78,35 @@ func (o *CreateOAuth2ClientCreated) Error() string {
 func (o *CreateOAuth2ClientCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Client)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewCreateOAuth2ClientBadRequest creates a CreateOAuth2ClientBadRequest with default headers values
+func NewCreateOAuth2ClientBadRequest() *CreateOAuth2ClientBadRequest {
+	return &CreateOAuth2ClientBadRequest{}
+}
+
+/*CreateOAuth2ClientBadRequest handles this case with default header values.
+
+genericError
+*/
+type CreateOAuth2ClientBadRequest struct {
+	Payload *models.GenericError
+}
+
+func (o *CreateOAuth2ClientBadRequest) Error() string {
+	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *CreateOAuth2ClientBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -4,9 +4,11 @@ project_name: hydra
 
 env:
   - GO111MODULE=on
+
 before:
   hooks:
     - go mod download
+
 builds:
   -
     flags:
@@ -30,18 +32,21 @@ builds:
       - linux
       - windows
       - darwin
+
 archive:
-  replacements:
-    darwin: macOS
-    linux: Linux
-    windows: Windows
-    386: 32-bit
-    amd64: 64-bit
-  format_overrides:
-    - goos: windows
-      format: zip
-  files:
-    -  LICENSE.txt
+  -
+    replacements:
+      darwin: macOS
+      linux: Linux
+      windows: Windows
+      386: 32-bit
+      amd64: 64-bit
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      -  LICENSE.txt
+
 snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
@@ -69,8 +74,11 @@ dockers:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-#      - "oryd/hydra:{{ .Env.DOCKER_FULL_TAG }}"
       - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/hydra:latest"
     extra_files:
       - .releaser/LICENSE.txt
+
+release:
+  prerelease: auto
+  name_template: "{{.Env.RELEASE_NAME}}"

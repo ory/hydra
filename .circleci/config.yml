@@ -379,12 +379,13 @@ jobs:
           - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
     steps:
+      - checkout
       - run:
           command: |
             echo 'export DOCKER_FULL_TAG=$(echo $CIRCLE_TAG | tr '+' '_')' >> $BASH_ENV
             echo 'export DOCKER_SHORT_TAG=$(echo $CIRCLE_TAG | cut -d '+' -f1)' >> $BASH_ENV
+            ./.circleci/release_name.bash
             source $BASH_ENV
-      - checkout
       - setup_remote_docker
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
       - run: cp ./.releaser/LICENSE.txt ./LICENSE.txt

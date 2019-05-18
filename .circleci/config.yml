@@ -45,6 +45,7 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           command: |
             ./.circleci/release_name.bash

@@ -48,6 +48,7 @@ jobs:
       - run:
           command: |
             ./.circleci/release_name.bash
+            echo 'export DOCKER_SHORT_TAG=$CIRCLE_SHA1' >> $BASH_ENV
             source $BASH_ENV
       - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
       - restore_cache:

@@ -8,6 +8,7 @@ env:
 before:
   hooks:
     - go mod download
+    - cp ./.releaser/LICENSE.txt ./LICENSE.txt
 
 builds:
   -

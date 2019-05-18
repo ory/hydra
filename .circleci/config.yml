@@ -393,7 +393,6 @@ jobs:
             source $BASH_ENV
       - setup_remote_docker
       - run: docker login --username "$DOCKER_USERNAME" --password "$DOCKER_PASSWORD"
-      - run: cp ./.releaser/LICENSE.txt ./LICENSE.txt
       - run: curl -sL https://git.io/goreleaser | bash
 
 workflows:

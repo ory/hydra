@@ -45,6 +45,10 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
+      - run:
+          command: |
+            ./.circleci/release_name.bash
+            source $BASH_ENV
       - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
       - restore_cache:
           keys:

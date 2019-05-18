@@ -14,7 +14,7 @@ builds:
     flags:
       - -a
     ldflags:
-      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Env.RELEASE_NAME}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
     binary: hydra
     env:
       - CGO_ENABLED=0
@@ -33,7 +33,7 @@ builds:
       - windows
       - darwin
 
-archive:
+archives:
   -
     replacements:
       darwin: macOS

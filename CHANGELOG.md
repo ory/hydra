@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
-  - [Unreleased](#unreleased)
+  - [v1.0.0-rc.14 (2019-05-18)](#v100-rc14-2019-05-18)
   - [v1.0.0-rc.12 (2019-05-10)](#v100-rc12-2019-05-10)
   - [v1.0.0-rc.11 (2019-05-02)](#v100-rc11-2019-05-02)
   - [v1.0.0-rc.10 (2019-04-29)](#v100-rc10-2019-04-29)
@@ -148,13 +148,28 @@
 
 # Change Log
 
-## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+## [v1.0.0-rc.14](https://github.com/ory/hydra/tree/v1.0.0-rc.14) (2019-05-18)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.12...v1.0.0-rc.14)
 
-[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.12...HEAD)
+**Fixed bugs:**
+
+- cmd: `hydra token client` no longer seems to be using basic auth [\#1439](https://github.com/ory/hydra/issues/1439)
 
 **Closed issues:**
 
+- Logout REST API and documentation mismatch [\#1435](https://github.com/ory/hydra/issues/1435)
+- client, consent: rethink pagination [\#1434](https://github.com/ory/hydra/issues/1434)
+- Unix socket ignores first part of the uri [\#1433](https://github.com/ory/hydra/issues/1433)
+- .well-known/openid-configuration endpoint swapped values [\#1420](https://github.com/ory/hydra/issues/1420)
 - Feature request: CockroachDB support [\#990](https://github.com/ory/hydra/issues/990)
+
+**Merged pull requests:**
+
+- ci: Resolve goreleaser issues [\#1445](https://github.com/ory/hydra/pull/1445) ([aeneasr](https://github.com/aeneasr))
+- ci: Update release pipeline [\#1444](https://github.com/ory/hydra/pull/1444) ([aeneasr](https://github.com/aeneasr))
+- mod: Update module definitions [\#1441](https://github.com/ory/hydra/pull/1441) ([aeneasr](https://github.com/aeneasr))
+- sdk: Fix missing and broken swagger annotations [\#1440](https://github.com/ory/hydra/pull/1440) ([aeneasr](https://github.com/aeneasr))
+- docs: Updates issue and pull request templates [\#1432](https://github.com/ory/hydra/pull/1432) ([aeneasr](https://github.com/aeneasr))
 
 ## [v1.0.0-rc.12](https://github.com/ory/hydra/tree/v1.0.0-rc.12) (2019-05-10)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.11...v1.0.0-rc.12)

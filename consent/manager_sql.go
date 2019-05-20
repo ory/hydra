@@ -100,15 +100,11 @@ JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 			// do nothing
 		} else if err != nil {
 			return err
-		} else {
-			metricAccessTokensRevoked.Inc()
 		}
 		if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 			// do nothing
 		} else if err != nil {
 			return err
-		} else {
-			metricRefreshTokensRevoked.Inc()
 		}
 	}
 
@@ -523,62 +519,9 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 	return aa, nil
 }
 
-// Collect is called by the Prometheus registry when collecting
-// metrics. The implementation sends each collected metric via the
-// provided channel and returns once the last metric has been sent. The
-// descriptor of each sent metric is one of those returned by Describe
-// (unless the Collector is unchecked, see above). Returned metrics that
-// share the same descriptor must differ in their variable label
-// values.
-//
-// This method may be called concurrently and must therefore be
-// implemented in a concurrency safe way. Blocking occurs at the expense
-// of total performance of rendering all registered metrics. Ideally,
-// Collector implementations support concurrent readers.
-func (m *SQLManager) Collect(c chan<- prometheus.Metric) {
-	collectCounters(c)
-
-	go func(m *SQLManager, c chan<- prometheus.Metric) {
-		var n int
-		m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_access").Scan(&n)
-		metricAccessTokens.Inc()
-		metricAccessTokens.Collect(c)
-	}(m, c)
-
-	go func(m *SQLManager, c chan<- prometheus.Metric) {
-		var n int
-		m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_refresh").Scan(&n)
-		metricRefreshTokens.Inc()
-		metricRefreshTokens.Collect(c)
-	}(m, c)
+func (m *SQLManager) Collect(chan<- prometheus.Metric) {
 }
-
-// Describe sends the super-set of all possible descriptors of metrics
-// collected by this Collector to the provided channel and returns once
-// the last descriptor has been sent. The sent descriptors fulfill the
-// consistency and uniqueness requirements described in the Desc
-// documentation.
-//
-// It is valid if one and the same Collector sends duplicate
-// descriptors. Those duplicates are simply ignored. However, two
-// different Collectors must not send duplicate descriptors.
-//
-// Sending no descriptor at all marks the Collector as “unchecked”,
-// i.e. no checks will be performed at registration time, and the
-// Collector may yield any Metric it sees fit in its Collect method.
-//
-// This method idempotently sends the same descriptors throughout the
-// lifetime of the Collector. It may be called concurrently and
-// therefore must be implemented in a concurrency safe way.
-//
-// If a Collector encounters an error while executing this method, it
-// must send an invalid descriptor (created with NewInvalidDesc) to
-// signal the error to the registry.
 func (m *SQLManager) Describe(c chan<- *prometheus.Desc) {
-	describeCounters(c)
-
-	metricAccessTokens.Describe(c)
-	metricRefreshTokens.Describe(c)
 }
 
 func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
@@ -673,4 +616,20 @@ func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verif
 	}
 
 	return m.GetLogoutRequest(ctx, d.Challenge)
+}
+
+func (m *SQLManager) CountAccessTokens() (int, error) {
+	var n int
+	if err := m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_access").Scan(&n); err != nil {
+		return 0, sqlcon.HandleError(err)
+	}
+	return n, nil
+}
+
+func (m *SQLManager) CountRefreshTokens() (int, error) {
+	var n int
+	if err := m.DB.QueryRow("SELECT count(*) FROM hydra_oauth2_refresh").Scan(&n); err != nil {
+		return 0, sqlcon.HandleError(err)
+	}
+	return n, nil
 }

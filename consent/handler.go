@@ -313,24 +313,18 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	var (
-		p   HandledLoginRequest
-		err error
-	)
-
-	defer func(p *HandledLoginRequest, err error) {
-		recordAcceptLoginRequest(p, err)
-	}(&p, err)
+	var p HandledLoginRequest
 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err = d.Decode(&p); err != nil {
+	if err := d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
 
 	if p.Subject == "" {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
+		return
 	}
 
 	p.Challenge = challenge
@@ -408,18 +402,11 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	var (
-		p   RequestDeniedError
-		err error
-	)
-
-	defer func(err error) {
-		recordRejectLoginRequest(err)
-	}(err)
+	var p RequestDeniedError
 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err = d.Decode(&p); err != nil {
+	if err := d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
@@ -554,18 +541,11 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	var (
-		p   HandledConsentRequest
-		err error
-	)
-
-	defer func(p *HandledConsentRequest, err error) {
-		recordAcceptConsentRequest(p, err)
-	}(&p, err)
+	var p HandledConsentRequest
 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err = d.Decode(&p); err != nil {
+	if err := d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}
@@ -640,18 +620,11 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	var (
-		p   RequestDeniedError
-		err error
-	)
-
-	defer func(err error) {
-		recordRejectConsentRequest(err)
-	}(err)
+	var p RequestDeniedError
 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err = d.Decode(&p); err != nil {
+	if err := d.Decode(&p); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.WithStack(err))
 		return
 	}

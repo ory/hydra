@@ -43,4 +43,6 @@ type Manager interface {
 	DeleteKey(ctx context.Context, set, kid string) error
 
 	DeleteKeySet(ctx context.Context, set string) error
+
+	CountJWKs(ctx context.Context) (int, error)
 }

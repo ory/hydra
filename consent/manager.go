@@ -72,4 +72,8 @@ type Manager interface {
 	AcceptLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error)
 	RejectLogoutRequest(ctx context.Context, challenge string) error
 	VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error)
+
+	// Metadata and metrics
+	CountAccessTokens() (int, error)
+	CountRefreshTokens() (int, error)
 }

@@ -21,14 +21,12 @@
 package server
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -42,7 +40,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/urfave/negroni"
 
 	"github.com/ory/graceful"
@@ -50,7 +47,6 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/x/cmdx"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 )
@@ -182,7 +178,66 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String())))
 	publicmw.Use(d.Registry().PrometheusManager())
 
-	metricsx.Setup(d)
+	metrics := metricsx.New(
+		cmd,
+		d.Registry().Logger(),
+		&metricsx.Options{
+			Service: "ory-hydra",
+			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
+				d.Configuration().IssuerURL().String(),
+				d.Configuration().DSN(),
+			)),
+			IsDevelopment: d.Configuration().DSN() == "memory" ||
+				d.Configuration().IssuerURL().String() == "" ||
+				strings.Contains(d.Configuration().IssuerURL().String(), "localhost"),
+			WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
+			WhitelistedPaths: []string{
+				jwk.KeyHandlerPath,
+				jwk.WellKnownKeysPath,
+
+				client.ClientsHandlerPath,
+
+				oauth2.DefaultConsentPath,
+				oauth2.DefaultLoginPath,
+				oauth2.DefaultPostLogoutPath,
+				oauth2.DefaultLogoutPath,
+				oauth2.DefaultErrorPath,
+				oauth2.TokenPath,
+				oauth2.AuthPath,
+				oauth2.LogoutPath,
+				oauth2.UserinfoPath,
+				oauth2.WellKnownPath,
+				oauth2.JWKPath,
+				oauth2.IntrospectPath,
+				oauth2.RevocationPath,
+				oauth2.FlushPath,
+
+				consent.ConsentPath,
+				consent.ConsentPath + "/accept",
+				consent.ConsentPath + "/reject",
+				consent.LoginPath,
+				consent.LoginPath + "/accept",
+				consent.LoginPath + "/reject",
+				consent.LogoutPath,
+				consent.LogoutPath + "/accept",
+				consent.LogoutPath + "/reject",
+				consent.SessionsPath + "/login",
+				consent.SessionsPath + "/consent",
+
+				healthx.AliveCheckPath,
+				healthx.ReadyCheckPath,
+				healthx.VersionPath,
+				driver.MetricsPrometheusPath,
+				"/",
+			},
+			BuildVersion: d.Registry().BuildVersion(),
+			BuildTime:    d.Registry().BuildDate(),
+			BuildHash:    d.Registry().BuildHash(),
+		},
+	)
+
+	adminmw.Use(metrics)
+	publicmw.Use(metrics)
 
 	d.Registry().RegisterRoutes(admin, public)
 

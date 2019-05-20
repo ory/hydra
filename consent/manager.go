@@ -23,8 +23,9 @@ package consent
 import (
 	"context"
 
-	"github.com/ory/hydra/client"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/ory/hydra/client"
 )
 
 var _, _ Manager = new(SQLManager), new(MemoryManager)

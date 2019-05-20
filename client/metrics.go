@@ -4,9 +4,10 @@ import (
 	"context"
 	"strings"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/ory/fosite"
 	"github.com/ory/x/metricsx"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 type Metrics struct {

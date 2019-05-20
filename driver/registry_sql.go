@@ -17,6 +17,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/metricsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/urlx"
 )

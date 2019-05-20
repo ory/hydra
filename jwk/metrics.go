@@ -3,9 +3,10 @@ package jwk
 import (
 	"context"
 
-	"github.com/ory/x/metricsx"
 	"github.com/prometheus/client_golang/prometheus"
 	jose "gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/x/metricsx"
 )
 
 type MetricManager struct {

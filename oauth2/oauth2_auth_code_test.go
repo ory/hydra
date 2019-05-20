@@ -35,25 +35,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/urlx"
-
-	"github.com/jmoiron/sqlx"
-
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
-
-	"github.com/spf13/viper"
-
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-
 	djwt "github.com/dgrijalva/jwt-go"
+	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/oauth2"
@@ -62,7 +48,16 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	hc "github.com/ory/hydra/client"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
 	hydra "github.com/ory/hydra/sdk/go/hydra/client"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/urlx"
 )
 
 func newCookieJar() http.CookieJar {
@@ -159,7 +154,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 
 	if !testing.Short() {
-		var p, m *sqlx.DB
+		var p, m, c *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
 				p = connectToPG(t)
@@ -167,16 +162,24 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			func() {
 				m = connectToMySQL(t)
 			},
+			func() {
+				c = connectToCRDB(t)
+			},
 		})
 		pr := internal.NewRegistrySQL(conf, p)
-		_, err := pr.CreateSchemas()
+		_, err := pr.CreateSchemas("postgres")
 		require.NoError(t, err)
 		regs["postgres"] = pr
 
 		mr := internal.NewRegistrySQL(conf, m)
-		_, err = mr.CreateSchemas()
+		_, err = mr.CreateSchemas("mysql")
 		require.NoError(t, err)
 		regs["mysql"] = mr
+
+		cr := internal.NewRegistrySQL(conf, c)
+		_, err = cr.CreateSchemas("cockroach")
+		require.NoError(t, err)
+		regs["cockroach"] = cr
 	}
 
 	for km, reg := range regs {

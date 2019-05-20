@@ -1,18 +1,19 @@
 module github.com/ory/hydra
 
 require (
-	cloud.google.com/go v0.37.2 // indirect
+	cloud.google.com/go v0.39.0 // indirect
 	github.com/Microsoft/go-winio v0.4.12 // indirect
+	github.com/apache/thrift v0.12.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-openapi/analysis v0.19.0 // indirect
-	github.com/go-openapi/errors v0.19.0
+	github.com/go-openapi/errors v0.18.0
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-openapi/loads v0.19.0 // indirect
 	github.com/go-openapi/runtime v0.19.0
 	github.com/go-openapi/spec v0.19.0 // indirect
 	github.com/go-openapi/strfmt v0.19.0
-	github.com/go-openapi/swag v0.19.0
-	github.com/go-openapi/validate v0.19.0
+	github.com/go-openapi/swag v0.18.0
+	github.com/go-openapi/validate v0.18.0
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-swagger/go-swagger v0.19.0
 	github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 // indirect
@@ -20,8 +21,10 @@ require (
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/gddo v0.0.0-20190312205958-5a2505f3dbf0 // indirect
-	github.com/golang/mock v1.2.0
-	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/golang/mock v1.3.1
+	github.com/google/btree v1.0.0 // indirect
+	github.com/google/go-cmp v0.3.0 // indirect
+	github.com/google/pprof v0.0.0-20190515194954-54271f7e092f // indirect
 	github.com/gorilla/handlers v1.4.0 // indirect
 	github.com/gorilla/sessions v1.1.4-0.20181208214519-12bd4761fc66
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
@@ -40,11 +43,12 @@ require (
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.0
+	github.com/openzipkin/zipkin-go v0.1.6 // indirect
 	github.com/ory/fosite v0.29.6
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
-	github.com/ory/x v0.0.56
+	github.com/ory/x v0.0.59
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1
@@ -65,17 +69,23 @@ require (
 	github.com/uber/jaeger-client-go v2.16.0+incompatible
 	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
-	go.opencensus.io v0.20.0 // indirect
-	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
-	golang.org/x/net v0.0.0-20190326090315-15845e8f865b // indirect
-	golang.org/x/oauth2 v0.0.0-20190319182350-c85d3e98c914
-	golang.org/x/sys v0.0.0-20190322080309-f49334f85ddc // indirect
+	golang.org/x/build v0.0.0-20190314133821-5284462c4bec // indirect
+	golang.org/x/crypto v0.0.0-20190513172903-22d7a77e9e5f
+	golang.org/x/exp v0.0.0-20190510132918-efd6b22b2522 // indirect
+	golang.org/x/image v0.0.0-20190516052701-61b8692d9a5c // indirect
+	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
+	golang.org/x/mobile v0.0.0-20190509164839-32b2708ab171 // indirect
+	golang.org/x/net v0.0.0-20190514140710-3ec191127204 // indirect
+	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a
+	golang.org/x/sys v0.0.0-20190516110030-61b9204099cb // indirect
+	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
-	golang.org/x/tools v0.0.0-20190402200628-202502a5a924
-	google.golang.org/appengine v1.5.0 // indirect
-	google.golang.org/genproto v0.0.0-20190321212433-e79c0c59cdb5 // indirect
-	google.golang.org/grpc v1.19.1 // indirect
+	golang.org/x/tools v0.0.0-20190517003510-bffc5affc6df
+	google.golang.org/appengine v1.6.0 // indirect
+	google.golang.org/genproto v0.0.0-20190516172635-bb713bdc0e52 // indirect
+	google.golang.org/grpc v1.20.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.0
+	honnef.co/go/tools v0.0.0-20190418001031-e561f6794a2a // indirect
 )
 
 // Fix for https://github.com/golang/lint/issues/436

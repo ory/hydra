@@ -25,15 +25,13 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
-	"github.com/ory/hydra/internal"
-
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -62,6 +60,13 @@ func connectToMySQL(t *testing.T) *SQLManager {
 	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
 }
 
+func connectToCRDB(t *testing.T) *SQLManager {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	require.NoError(t, err)
+	x.CleanSQL(t, db)
+	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
+}
+
 func TestManager(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
@@ -79,6 +84,11 @@ func TestManager(t *testing.T) {
 				managers["mysql"] = connectToMySQL(t)
 				m.Unlock()
 			},
+			func() {
+				m.Lock()
+				managers["cockroach"] = connectToCRDB(t)
+				m.Unlock()
+			},
 		})
 	}
 
@@ -88,7 +98,7 @@ func TestManager(t *testing.T) {
 
 		for name, m := range managers {
 			if m, ok := m.(*SQLManager); ok {
-				n, err := m.CreateSchemas()
+				n, err := m.CreateSchemas(name)
 				require.NoError(t, err)
 				t.Logf("Applied %d migrations to %s", n, name)
 			}
@@ -103,7 +113,7 @@ func TestManager(t *testing.T) {
 
 		for name, m := range managers {
 			if m, ok := m.(*SQLManager); ok {
-				n, err := m.CreateSchemas()
+				n, err := m.CreateSchemas(name)
 				require.NoError(t, err)
 				t.Logf("Applied %d migrations to %s", n, name)
 			}

@@ -26,20 +26,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/x"
-
-	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
-
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -64,16 +61,25 @@ func connectToMySQL(t *testing.T) *sqlx.DB {
 	return db
 }
 
+func connectToCockroach(t *testing.T) *sqlx.DB {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	require.NoError(t, err)
+	t.Logf("Cleaning cockroach db...")
+	x.CleanSQL(t, db)
+	t.Logf("Cleaned cockroach db")
+	return db
+}
+
 func TestMain(m *testing.M) {
 	flag.Parse()
 	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
 
-func createSQL(db *sqlx.DB) driver.Registry {
+func createSQL(dbName string, db *sqlx.DB) driver.Registry {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
-	if _, err := reg.CreateSchemas(); err != nil {
+	if _, err := reg.CreateSchemas(dbName); err != nil {
 		panic(err)
 	}
 
@@ -86,16 +92,21 @@ func TestManagers(t *testing.T) {
 	regs["memory"] = internal.NewRegistry(conf)
 
 	if !testing.Short() {
-		var p, m *sqlx.DB
+		var p, m, c *sqlx.DB
 		dockertest.Parallel([]func(){
 			func() {
 				p = connectToPostgres(t)
-			}, func() {
+			},
+			func() {
 				m = connectToMySQL(t)
 			},
+			func() {
+				c = connectToCockroach(t)
+			},
 		})
-		regs["postgres"] = createSQL(p)
-		regs["mysql"] = createSQL(m)
+		regs["postgres"] = createSQL("postgres", p)
+		regs["mysql"] = createSQL("mysql", m)
+		regs["cockroach"] = createSQL("cockroach", c)
 	}
 
 	for k, m := range regs {

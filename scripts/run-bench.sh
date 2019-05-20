@@ -20,7 +20,7 @@ In this document you will find benchmark results for different endpoints of ORY 
 using [rakyll/hey](https://github.com/rakyll/hey). Please note that these benchmarks run against the in-memory storage
 adapter of ORY Hydra. These benchmarks represent what performance you would get with a zero-overhead database implementation.
 
-We do not include benchmarks against databases (e.g. MySQL or PostgreSQL) as the performance greatly differs between
+We do not include benchmarks against databases (e.g. MySQL, PostgreSQL or CockroachDB) as the performance greatly differs between
 deployments (e.g. request latency, database configuration) and tweaking individual things may greatly improve performance.
 We believe, for that reason, that benchmark results for these database adapters are difficult to generalize and potentially
 deceiving. They are thus not included.

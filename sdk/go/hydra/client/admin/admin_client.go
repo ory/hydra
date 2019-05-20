@@ -756,7 +756,8 @@ func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*Reject
 RevokeAuthenticationSession invalidates all login sessions of a certain user invalidates a subject s authentication session
 
 This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
+Front- or Back-channel logout.
 */
 func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams) (*RevokeAuthenticationSessionNoContent, error) {
 	// TODO: Validate the params before sending

@@ -30,10 +30,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/driver/configuration"
-
-	"github.com/ory/x/urlx"
-
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -43,7 +39,9 @@ import (
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/urlx"
 )
 
 const (
@@ -106,7 +104,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	admin.POST(FlushPath, h.FlushHandler)
 }
 
-// swagger:route GET /oauth2/disconnect public disconnectUser
+// swagger:route GET /oauth2/sessions/logout public disconnectUser
 //
 // OpenID Connect Front-Backchannel enabled Logout
 //
@@ -226,8 +224,8 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		RegistrationEndpoint:               h.c.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                       h.c.SubjectTypesSupported(),
 		ResponseTypes:                      []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                    h.c.OIDCDiscoverySupportedScope(),
-		ScopesSupported:                    h.c.OIDCDiscoverySupportedClaims(),
+		ClaimsSupported:                    h.c.OIDCDiscoverySupportedClaims(),
+		ScopesSupported:                    h.c.OIDCDiscoverySupportedScope(),
 		UserinfoEndpoint:                   h.c.OIDCDiscoveryUserinfoEndpoint(),
 		TokenEndpointAuthMethodsSupported:  []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		IDTokenSigningAlgValuesSupported:   []string{"RS256"},

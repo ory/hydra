@@ -3,6 +3,8 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [v1.0.0-rc.14 (2019-05-18)](#v100-rc14-2019-05-18)
+  - [v1.0.0-rc.12 (2019-05-10)](#v100-rc12-2019-05-10)
   - [v1.0.0-rc.11 (2019-05-02)](#v100-rc11-2019-05-02)
   - [v1.0.0-rc.10 (2019-04-29)](#v100-rc10-2019-04-29)
   - [v1.0.0-rc.9+oryOS.10 (2019-04-18)](#v100-rc9oryos10-2019-04-18)
@@ -145,6 +147,52 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [v1.0.0-rc.14](https://github.com/ory/hydra/tree/v1.0.0-rc.14) (2019-05-18)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.12...v1.0.0-rc.14)
+
+**Fixed bugs:**
+
+- cmd: `hydra token client` no longer seems to be using basic auth [\#1439](https://github.com/ory/hydra/issues/1439)
+
+**Closed issues:**
+
+- Logout REST API and documentation mismatch [\#1435](https://github.com/ory/hydra/issues/1435)
+- client, consent: rethink pagination [\#1434](https://github.com/ory/hydra/issues/1434)
+- Unix socket ignores first part of the uri [\#1433](https://github.com/ory/hydra/issues/1433)
+- .well-known/openid-configuration endpoint swapped values [\#1420](https://github.com/ory/hydra/issues/1420)
+- Feature request: CockroachDB support [\#990](https://github.com/ory/hydra/issues/990)
+
+**Merged pull requests:**
+
+- ci: Resolve goreleaser issues [\#1445](https://github.com/ory/hydra/pull/1445) ([aeneasr](https://github.com/aeneasr))
+- ci: Update release pipeline [\#1444](https://github.com/ory/hydra/pull/1444) ([aeneasr](https://github.com/aeneasr))
+- mod: Update module definitions [\#1441](https://github.com/ory/hydra/pull/1441) ([aeneasr](https://github.com/aeneasr))
+- sdk: Fix missing and broken swagger annotations [\#1440](https://github.com/ory/hydra/pull/1440) ([aeneasr](https://github.com/aeneasr))
+- docs: Updates issue and pull request templates [\#1432](https://github.com/ory/hydra/pull/1432) ([aeneasr](https://github.com/aeneasr))
+
+## [v1.0.0-rc.12](https://github.com/ory/hydra/tree/v1.0.0-rc.12) (2019-05-10)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.11...v1.0.0-rc.12)
+
+**Implemented enhancements:**
+
+- cmd: add the post logout redirect uris flag to the clients create command [\#1426](https://github.com/ory/hydra/issues/1426)
+- all: add cockroachdb support [\#1348](https://github.com/ory/hydra/pull/1348) ([lopezator](https://github.com/lopezator))
+
+**Closed issues:**
+
+- Invalid namespace on composer.json [\#1429](https://github.com/ory/hydra/issues/1429)
+- CORS No 'Access-Control-Allow-Origin' header is present [\#1421](https://github.com/ory/hydra/issues/1421)
+- client\_secret\_basic fails when client\_secret is auto-generated [\#1419](https://github.com/ory/hydra/issues/1419)
+
+**Merged pull requests:**
+
+- Fixed composer namespace [\#1431](https://github.com/ory/hydra/pull/1431) ([MASNathan](https://github.com/MASNathan))
+- sdk: Remove go sdk submodule [\#1430](https://github.com/ory/hydra/pull/1430) ([aeneasr](https://github.com/aeneasr))
+- Swapped handlers to match correct values [\#1428](https://github.com/ory/hydra/pull/1428) ([MASNathan](https://github.com/MASNathan))
+- cmd: allow to set the client's post-logout URIs [\#1427](https://github.com/ory/hydra/pull/1427) ([aberasarte](https://github.com/aberasarte))
+- sdk/go: Add go.mod definition in sdk directory [\#1425](https://github.com/ory/hydra/pull/1425) ([aeneasr](https://github.com/aeneasr))
+- driver: Fix broken cors option test [\#1423](https://github.com/ory/hydra/pull/1423) ([aeneasr](https://github.com/aeneasr))
 
 ## [v1.0.0-rc.11](https://github.com/ory/hydra/tree/v1.0.0-rc.11) (2019-05-02)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.10...v1.0.0-rc.11)

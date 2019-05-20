@@ -26,15 +26,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
-	"github.com/ory/x/pointerx"
-
 	"github.com/spf13/cobra"
 
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	"github.com/ory/hydra/sdk/go/hydra/models"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
+	"github.com/ory/x/pointerx"
 )
 
 type ClientHandler struct{}
@@ -119,6 +118,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		AllowedCORSOrigins:      flagx.MustGetStringSlice(cmd, "allowed-cors-origins"),
 		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
 		Audience:                flagx.MustGetStringSlice(cmd, "audience"),
+		PostLogoutRedirectUris:  flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))

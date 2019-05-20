@@ -68,7 +68,7 @@ func TestCORSOptions(t *testing.T) {
 	assert.EqualValues(t, cors.Options{
 		AllowedOrigins:     []string{},
 		AllowedMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
-		AllowedHeaders:     []string{"Authorization"},
+		AllowedHeaders:     []string{"Authorization", "Content-Type"},
 		ExposedHeaders:     []string{"Content-Type"},
 		AllowCredentials:   true,
 		OptionsPassthrough: false,

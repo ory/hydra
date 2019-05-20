@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+
+  hydra-migrate:
+    image: oryd/hydra:e2e
+    environment:
+      - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
+    command:
+      migrate sql -e --yes
+    restart: on-failure
+
+  hydra:
+    depends_on:
+      - hydra-migrate
+    environment:
+      - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  cockroachd:
+    image: cockroachdb/cockroach:v2.1.6
+    ports:
+      - "26257:26257"
+    command: start --insecure

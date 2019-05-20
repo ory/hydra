@@ -48,7 +48,7 @@ type DisconnectUserFound struct {
 }
 
 func (o *DisconnectUserFound) Error() string {
-	return fmt.Sprintf("[GET /oauth2/disconnect][%d] disconnectUserFound ", 302)
+	return fmt.Sprintf("[GET /oauth2/sessions/logout][%d] disconnectUserFound ", 302)
 }
 
 func (o *DisconnectUserFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

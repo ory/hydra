@@ -1048,7 +1048,7 @@
 
     /**
      * Invalidates all login sessions of a certain user Invalidates a subject&#39;s authentication session
-     * This endpoint invalidates a subject&#39;s authentication session. After revoking the authentication session, the subject has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens.
+     * This endpoint invalidates a subject&#39;s authentication session. After revoking the authentication session, the subject has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect Front- or Back-channel logout.
      * @param {String} subject 
      * @param {module:api/AdminApi~revokeAuthenticationSessionCallback} callback The callback function, accepting three arguments: error, data, response
      */

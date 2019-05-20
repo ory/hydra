@@ -27,13 +27,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/ory/hydra/internal"
-
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/client"
+	"github.com/ory/hydra/internal"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -74,6 +73,20 @@ func connectToPG() {
 	m.Unlock()
 }
 
+func connectToCRDB() {
+	db, err := dockertest.ConnectToTestCockroachDB()
+	if err != nil {
+		log.Fatalf("Could not connect to database: %v", err)
+	}
+
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistrySQL(conf, db)
+
+	m.Lock()
+	clientManagers["cockroach"] = reg.ClientManager()
+	m.Unlock()
+}
+
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
@@ -84,6 +97,7 @@ func TestManagers(t *testing.T) {
 		dockertest.Parallel([]func(){
 			connectToPG,
 			connectToMySQL,
+			connectToCRDB,
 		})
 	}
 
@@ -92,7 +106,7 @@ func TestManagers(t *testing.T) {
 		s, ok := m.(*SQLManager)
 		if ok {
 			CleanTestDB(t, s.DB)
-			x, err := s.CreateSchemas()
+			x, err := s.CreateSchemas(k)
 			if err != nil {
 				t.Fatal("Could not create schemas", err.Error())
 			} else {

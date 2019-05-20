@@ -34,14 +34,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/x/urlx"
-
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
 	hydra "github.com/ory/hydra/sdk/go/hydra/client"
+	"github.com/ory/hydra/sdk/go/hydra/client/admin"
 	"github.com/ory/x/cmdx"
+	"github.com/ory/x/urlx"
 )
 
 var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))

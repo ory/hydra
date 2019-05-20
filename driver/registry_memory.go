@@ -9,6 +9,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/metricsx"
 )
 
 type RegistryMemory struct {
@@ -55,14 +56,18 @@ func (m *RegistryMemory) Ping() error {
 
 func (m *RegistryMemory) ClientManager() client.Manager {
 	if m.cm == nil {
-		m.cm = client.NewMemoryManager(m)
+		cm := client.WithMetrics(client.NewMemoryManager(m))
+		m.cm = cm
+		go metricsx.Watch(cm, metricsx.DefaultWatchDuration, m.Logger())
 	}
 	return m.cm
 }
 
 func (m *RegistryMemory) ConsentManager() consent.Manager {
 	if m.com == nil {
-		m.com = consent.NewMemoryManager(m)
+		com := consent.WithMetrics(consent.NewMemoryManager(m))
+		m.com = com
+		go metricsx.Watch(com, metricsx.DefaultWatchDuration, m.Logger())
 	}
 	return m.com
 }
@@ -76,7 +81,9 @@ func (m *RegistryMemory) OAuth2Storage() x.FositeStorer {
 
 func (m *RegistryMemory) KeyManager() jwk.Manager {
 	if m.km == nil {
-		m.km = jwk.NewMemoryManager()
+		km := jwk.WithMetrics(jwk.NewMemoryManager())
+		m.km = km
+		go metricsx.Watch(km, metricsx.DefaultWatchDuration, m.Logger())
 	}
 	return m.km
 }

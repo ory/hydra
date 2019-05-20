@@ -6,9 +6,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/healthx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/metricsx"
+	"github.com/ory/x/resilience"
 	"github.com/ory/x/serverx"
+	"github.com/ory/x/tracing"
+	"github.com/ory/x/urlx"
 
 	"github.com/gorilla/sessions"
 	"github.com/prometheus/client_golang/prometheus"
@@ -19,17 +23,15 @@ import (
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
+
 	"github.com/ory/herodot"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/healthx"
-	"github.com/ory/x/resilience"
-	"github.com/ory/x/tracing"
-	"github.com/ory/x/urlx"
 )
 
 const (
@@ -67,7 +69,6 @@ type RegistryBase struct {
 	sia          map[string]consent.SubjectIdentifierAlgorithm
 	trc          *tracing.Tracer
 	pmm          *metricsx.Prometheus
-	mbm          *metricsx.BridgeManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
 	buildVersion string
@@ -141,7 +142,9 @@ func (m *RegistryBase) WithLogger(l logrus.FieldLogger) Registry {
 }
 
 func (m *RegistryBase) WithPrometheusRegistry(r *prometheus.Registry) Registry {
-	m.pr = r
+	if m.pr == nil {
+		m.pr = r
+	}
 	return m.r
 }
 

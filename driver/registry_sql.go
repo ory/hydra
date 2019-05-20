@@ -14,6 +14,7 @@ import (
 
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/metricsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/urlx"
 
@@ -169,14 +170,18 @@ func (m *RegistrySQL) Ping() error {
 
 func (m *RegistrySQL) ClientManager() client.Manager {
 	if m.cm == nil {
-		m.cm = client.NewSQLManager(m.DB(), m)
+		cm := client.WithMetrics(client.NewSQLManager(m.DB(), m))
+		m.cm = cm
+		go metricsx.Watch(cm, metricsx.DefaultWatchDuration, m.Logger())
 	}
 	return m.cm
 }
 
 func (m *RegistrySQL) ConsentManager() consent.Manager {
 	if m.com == nil {
-		m.com = consent.NewSQLManager(m.DB(), m)
+		com := consent.WithMetrics(consent.NewSQLManager(m.DB(), m))
+		m.com = com
+		go metricsx.Watch(com, metricsx.DefaultWatchDuration, m.Logger())
 	}
 	return m.com
 }
@@ -190,7 +195,9 @@ func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
 	if m.km == nil {
-		m.km = jwk.NewSQLManager(m.DB(), m)
+		km := jwk.WithMetrics(jwk.NewSQLManager(m.DB(), m))
+		m.km = km
+		go metricsx.Watch(km, metricsx.DefaultWatchDuration, m.Logger())
 	}
 	return m.km
 }

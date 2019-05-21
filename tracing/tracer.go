@@ -1,11 +1,11 @@
 package tracing
 
 import (
-	"fmt"
 	"io"
 	"strings"
 
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	jeagerConf "github.com/uber/jaeger-client-go/config"
 )
@@ -66,7 +66,7 @@ func (t *Tracer) Setup() error {
 	case "":
 		t.Logger.Infof("No tracer configured - skipping tracing setup")
 	default:
-		return fmt.Errorf("unknown tracer: %s", t.Provider)
+		return errors.Errorf("unknown tracer: %s", t.Provider)
 	}
 	return nil
 }

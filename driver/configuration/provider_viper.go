@@ -352,7 +352,7 @@ func (v *ViperProvider) OAuth2AuthURL() string {
 }
 
 func (v *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
-	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyOAuth2ClientRegistrationURL, "", "OAUTH2_CLIENT_REGISTRATION_URL")))
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyOAuth2ClientRegistrationURL, "", "OAUTH2_CLIENT_REGISTRATION_URL"))
 }
 
 func (v *ViperProvider) AllowTLSTerminationFrom() []string {

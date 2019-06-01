@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	jeagerConf "github.com/uber/jaeger-client-go/config"
+	"github.com/uber/jaeger-client-go/zipkin"
 )
 
 type Tracer struct {
@@ -25,6 +26,7 @@ type JaegerConfig struct {
 	SamplerType        string
 	SamplerValue       float64
 	SamplerServerUrl   string
+	Propagation        string
 }
 
 func (t *Tracer) Setup() error {
@@ -52,8 +54,21 @@ func (t *Tracer) Setup() error {
 			jc.Reporter.LocalAgentHostPort = t.JaegerConfig.LocalAgentHostPort
 		}
 
+		var configs []jeagerConf.Option
+
+		// This works in other jaeger clients, but is not part of jaeger-client-go
+		if t.JaegerConfig.Propagation == "b3" {
+			zipkinPropagator := zipkin.NewZipkinB3HTTPHeaderPropagator()
+			configs = append(
+				configs,
+				jeagerConf.Injector(opentracing.HTTPHeaders, zipkinPropagator),
+				jeagerConf.Extractor(opentracing.HTTPHeaders, zipkinPropagator),
+			)
+		}
+
 		closer, err := jc.InitGlobalTracer(
 			t.ServiceName,
+			configs...,
 		)
 
 		if err != nil {
@@ -118,6 +133,10 @@ func HelpMessage() string {
 - TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS: The address of the jaeger-agent where spans should be sent to
 
 	Example: TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS=127.0.0.1:6831
+
+- TRACING_PROVIDER_JAEGER_PROPAGATION: The tracing header propagation format. Defaults to jaeger.
+
+	Example: TRACING_PROVIDER_JAEGER_PROPAGATION=b3
 
 - TRACING_SERVICE_NAME: Specifies the service name to use on the tracer.
 

@@ -1,8 +1,10 @@
 ---
-name: Disclose vulnerability
-about: Please do not open a public issue about the vulnerability but instead disclose it directly to hi@ory.sh
-
+name: Disclose (potential) security vulnerability
+about: Disclose security vulnerabilities to security@ory.sh
 ---
 
-**Please refrain from publishing (potential) security vulnerabilities publicly on the forums, the chat, or GitHub. Instead,
-send us an email to [hi@ory.sh](mailto:hi@ory.sh) and we will respond within 24 hours.**
+Please refrain from publishing (potential) security vulnerabilities publicly
+on the forums, the chat, or GitHub.
+
+We describe how to disclose (potential) security vulnerabilities in our
+[Security Policy](SECURITY.md)

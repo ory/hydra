@@ -37,7 +37,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	negronilogrus "github.com/meatballhat/negroni-logrus"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
@@ -78,7 +77,6 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 	return func(cmd *cobra.Command, args []string) {
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
-			prometheus.NewRegistry(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,
@@ -105,7 +103,6 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 	return func(cmd *cobra.Command, args []string) {
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
-			prometheus.NewRegistry(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,
@@ -132,7 +129,6 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 	return func(cmd *cobra.Command, args []string) {
 		d := driver.NewDefaultDriver(
 			logrusx.New(),
-			prometheus.NewRegistry(),
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,

@@ -6,7 +6,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/ory/fosite"
 	"github.com/ory/x/metricsx"
 )
 
@@ -18,18 +17,6 @@ type Metrics struct {
 	Clients              prometheus.Gauge
 	ClientsCreated       prometheus.Counter
 	ClientsAuthenticated metricsx.CounterVec
-}
-
-func (m *Metrics) GetConcreteClient(ctx context.Context, id string) (*Client, error) {
-	return m.Manager.GetConcreteClient(ctx, id)
-}
-
-func (m *Metrics) GetClient(ctx context.Context, id string) (fosite.Client, error) {
-	return m.Manager.GetClient(ctx, id)
-}
-
-func (m *Metrics) UpdateClient(ctx context.Context, c *Client) error {
-	return m.Manager.UpdateClient(ctx, c)
 }
 
 func (m *Metrics) Authenticate(ctx context.Context, id string, secret []byte) (*Client, error) {
@@ -50,18 +37,6 @@ func (m *Metrics) CreateClient(ctx context.Context, c *Client) error {
 	}
 
 	return err
-}
-
-func (m *Metrics) DeleteClient(ctx context.Context, id string) error {
-	return m.Manager.DeleteClient(ctx, id)
-}
-
-func (m *Metrics) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
-	return m.Manager.GetClients(ctx, limit, offset)
-}
-
-func (m *Metrics) CountClients(ctx context.Context) (n int, err error) {
-	return m.Manager.CountClients(ctx)
 }
 
 // Collect is called by the Prometheus registry when collecting

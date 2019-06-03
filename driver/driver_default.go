@@ -1,7 +1,6 @@
 package driver
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/driver/configuration"
@@ -12,7 +11,7 @@ type DefaultDriver struct {
 	r Registry
 }
 
-func NewDefaultDriver(l logrus.FieldLogger, pr *prometheus.Registry, forcedHTTP bool, insecureRedirects []string, version, build, date string, validate bool) Driver {
+func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, insecureRedirects []string, version, build, date string, validate bool) Driver {
 	c := configuration.NewViperProvider(l, forcedHTTP, insecureRedirects)
 
 	if validate {
@@ -27,7 +26,6 @@ func NewDefaultDriver(l logrus.FieldLogger, pr *prometheus.Registry, forcedHTTP 
 	r.
 		WithConfig(c).
 		WithLogger(l).
-		WithPrometheusRegistry(pr).
 		WithBuildInfo(version, build, date)
 
 	if err = r.Init(); err != nil {

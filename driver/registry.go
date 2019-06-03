@@ -27,7 +27,6 @@ type Registry interface {
 
 	WithConfig(c configuration.Provider) Registry
 	WithLogger(l logrus.FieldLogger) Registry
-	WithPrometheusRegistry(r *prometheus.Registry) Registry
 
 	WithBuildInfo(version, hash, date string) Registry
 	BuildVersion() string
@@ -41,7 +40,6 @@ type Registry interface {
 	consent.Registry
 	jwk.Registry
 	oauth2.Registry
-	PrometheusManager() *metricsx.Prometheus
 	Tracer() *tracing.Tracer
 
 	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
@@ -50,6 +48,9 @@ type Registry interface {
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
+
+	PrometheusRegistry() *prometheus.Registry
+	PrometheusManager() *metricsx.Prometheus
 }
 
 func MustNewRegistry(c configuration.Provider) Registry {

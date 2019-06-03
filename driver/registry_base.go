@@ -102,7 +102,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
 	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))
 
-	admin.Handler("GET", MetricsPrometheusPath, promhttp.HandlerFor(m.pmm.Registry, promhttp.HandlerOpts{}))
+	admin.Handler("GET", MetricsPrometheusPath, promhttp.HandlerFor(m.PrometheusRegistry(), promhttp.HandlerOpts{}))
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
@@ -138,13 +138,6 @@ func (m *RegistryBase) Writer() herodot.Writer {
 
 func (m *RegistryBase) WithLogger(l logrus.FieldLogger) Registry {
 	m.l = l
-	return m.r
-}
-
-func (m *RegistryBase) WithPrometheusRegistry(r *prometheus.Registry) Registry {
-	if m.pr == nil {
-		m.pr = r
-	}
 	return m.r
 }
 
@@ -194,6 +187,13 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 	}
 
 	return m.hh
+}
+
+func (m *RegistryBase) PrometheusRegistry() *prometheus.Registry {
+	if m.pr == nil {
+		m.pr = prometheus.NewRegistry()
+	}
+	return m.pr
 }
 
 func (m *RegistryBase) ConsentStrategy() consent.Strategy {
@@ -435,9 +435,17 @@ func (m *RegistryBase) PrometheusManager() *metricsx.Prometheus {
 // of total performance of rendering all registered metrics. Ideally,
 // Collector implementations support concurrent readers.
 func (m *RegistryBase) Collect(c chan<- prometheus.Metric) {
-	m.com.Collect(c)
-	m.cm.Collect(c)
-	m.km.Collect(c)
+	if m.com != nil {
+		m.com.Collect(c)
+	}
+
+	if m.cm != nil {
+		m.cm.Collect(c)
+	}
+
+	if m.km != nil {
+		m.km.Collect(c)
+	}
 }
 
 // Describe sends the super-set of all possible descriptors of metrics
@@ -462,7 +470,15 @@ func (m *RegistryBase) Collect(c chan<- prometheus.Metric) {
 // must send an invalid descriptor (created with NewInvalidDesc) to
 // signal the error to the registry.
 func (m *RegistryBase) Describe(c chan<- *prometheus.Desc) {
-	m.com.Describe(c)
-	m.cm.Describe(c)
-	m.km.Describe(c)
+	if m.com != nil {
+		m.com.Describe(c)
+	}
+
+	if m.cm != nil {
+		m.cm.Describe(c)
+	}
+
+	if m.km != nil {
+		m.km.Describe(c)
+	}
 }

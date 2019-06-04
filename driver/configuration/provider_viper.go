@@ -42,8 +42,10 @@ const (
 	ViperKeyBCryptCost                     = "oauth2.hashers.bcrypt.cost"
 	ViperKeyAdminListenOnHost              = "serve.admin.host"
 	ViperKeyAdminListenOnPort              = "serve.admin.port"
+	ViperKeyAdminDisableHealthAccessLog    = "serve.admin.access_log.disable_for_health"
 	ViperKeyPublicListenOnHost             = "serve.public.host"
 	ViperKeyPublicListenOnPort             = "serve.public.port"
+	ViperKeyPublicDisableHealthAccessLog   = "serve.public.access_log.disable_for_health"
 	ViperKeyConsentRequestMaxAge           = "ttl.login_consent_request"
 	ViperKeyAccessTokenLifespan            = "ttl.access_token"
 	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token"
@@ -183,8 +185,16 @@ func (v *ViperProvider) AdminListenOn() string {
 	return v.getAddress(host, port)
 }
 
+func (v *ViperProvider) AdminDisableHealthAccessLog() bool {
+	return viperx.GetBool(v.l, ViperKeyAdminDisableHealthAccessLog, false)
+}
+
 func (v *ViperProvider) PublicListenOn() string {
 	return v.getAddress(v.publicHost(), v.publicPort())
+}
+
+func (v *ViperProvider) PublicDisableHealthAccessLog() bool {
+	return viperx.GetBool(v.l, ViperKeyPublicDisableHealthAccessLog, false)
 }
 
 func (v *ViperProvider) publicHost() string {

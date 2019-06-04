@@ -2,19 +2,19 @@ package configuration
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 
 	"github.com/rs/cors"
-
-	"github.com/ory/hydra/x"
-
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
-
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/logrusx"
 )
 
 func setEnv(key, value string) func(t *testing.T) {
@@ -75,4 +75,34 @@ func TestCORSOptions(t *testing.T) {
 		MaxAge:             0,
 		Debug:              false,
 	}, p.CORSOptions("public"))
+}
+
+func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
+	l := logrusx.New()
+	l.SetOutput(ioutil.Discard)
+
+	p := NewViperProvider(l, false, nil)
+
+	value := p.AdminDisableHealthAccessLog()
+	assert.Equal(t, false, value)
+
+	os.Setenv("SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH", "true")
+
+	value = p.AdminDisableHealthAccessLog()
+	assert.Equal(t, true, value)
+}
+
+func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
+	l := logrusx.New()
+	l.SetOutput(ioutil.Discard)
+
+	p := NewViperProvider(l, false, nil)
+
+	value := p.PublicDisableHealthAccessLog()
+	assert.Equal(t, false, value)
+
+	os.Setenv("SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH", "true")
+
+	value = p.PublicDisableHealthAccessLog()
+	assert.Equal(t, true, value)
 }

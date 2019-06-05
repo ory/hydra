@@ -75,10 +75,10 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
 <head></head>
 <body>
 <ul>
-    <li>Access Token: <code>{{.AccessToken}}</code></li>
-    <li>Refresh Token: <code>{{.RefreshToken}}</code></li>
-    <li>Expires in: <code>{{.Expiry}}</code></li>
-    <li>ID Token: <code>{{.IDToken }}</code></li>
+    <li>Access Token: <code>{{ .AccessToken }}</code></li>
+    <li>Refresh Token: <code>{{ .RefreshToken }}</code></li>
+    <li>Expires in: <code>{{ .Expiry }}</code></li>
+    <li>ID Token: <code>{{ .IDToken }}</code></li>
 </ul>
 </body>
 </html>`))

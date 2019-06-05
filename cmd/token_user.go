@@ -26,6 +26,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"strconv"
@@ -45,6 +46,42 @@ import (
 	"github.com/ory/x/tlsx"
 	"github.com/ory/x/urlx"
 )
+
+var tokenUserWelcome = template.Must(template.New("").Parse(`<html>
+<head></head>
+<body>
+<h1>Welcome to the exemplary OAuth 2.0 Consumer!</h1>
+<p>This is an example app which emulates an OAuth 2.0 consumer application. Usually, this would be your web or mobile
+    application and would use an <a href="https://oauth.net/code/">OAuth 2.0</a> or <a href="https://oauth.net/code/">OpenID
+        Connect</a> library.</p>
+<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY
+    Hydra).
+    To initiate the flow, click the "Authorize Application" button.</p>
+<p><a href="{{ .URL }}">Authorize application</a></p>
+</body>`))
+
+var tokenUserError = template.Must(template.New("").Parse(`<html>
+<body>
+<h1>An error occurred</h1>
+<h2>{{ .Name }}</h2>
+<p>{{ .Description }}</p>
+<p>{{ .Hint }}</p>
+<p>{{ .Debug }}</p>
+</body>
+</html>`))
+
+var tokenUserResult = template.Must(template.New("").Parse(`<html>
+<html>
+<head></head>
+<body>
+<ul>
+    <li>Access Token: <code>{{ .AccessToken }}</code></li>
+    <li>Refresh Token: <code>{{ .RefreshToken }}</code></li>
+    <li>Expires in: <code>{{ .Expiry }}</code></li>
+    <li>ID Token: <code>{{ .IDToken }}</code></li>
+</ul>
+</body>
+</html>`))
 
 // tokenUserCmd represents the token command
 var tokenUserCmd = &cobra.Command{
@@ -148,28 +185,32 @@ and success.`,
 			time.Sleep(time.Second * 1)
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 			defer cancel()
-			server.Shutdown(ctx)
+			_ = server.Shutdown(ctx)
 		}
 
 		r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-			w.Write([]byte(fmt.Sprintf(`
-<html><head></head><body>
-<h1>Welcome to the exemplary OAuth 2.0 Consumer!</h1>
-<p>This is an example app which emulates an OAuth 2.0 consumer application. Usually, this would be your web or mobile
-application and would use an <a href="https://oauth.net/code/">OAuth 2.0</a> or <a href="https://oauth.net/code/">OpenID Connect</a> library.</p>
-<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY Hydra).
-To initiate the flow, click the "Authorize Application" button.</p>
-<p><a href="%s">Authorize application</a></p>
-</body>
-`, authCodeURL)))
+			_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
 		})
+
+		type ed struct {
+			Name        string
+			Description string
+			Hint        string
+			Debug       string
+		}
 
 		r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			if len(r.URL.Query().Get("error")) > 0 {
 				fmt.Printf("Got error: %s\n", r.URL.Query().Get("error_description"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p><p>%s</p><p>%s</p></body></html>", r.URL.Query().Get("error"), r.URL.Query().Get("error_description"), r.URL.Query().Get("error_hint"), r.URL.Query().Get("error_debug"))
+				_ = tokenUserError.Execute(w, &ed{
+					Name:        r.URL.Query().Get("error"),
+					Description: r.URL.Query().Get("error_description"),
+					Hint:        r.URL.Query().Get("error_hint"),
+					Debug:       r.URL.Query().Get("error_debug"),
+				})
+
 				go shutdown()
 				return
 			}
@@ -178,7 +219,10 @@ To initiate the flow, click the "Authorize Application" button.</p>
 				fmt.Printf("States do not match. Expected %s, got %s\n", string(state), r.URL.Query().Get("state"))
 
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><h2>%s</h2><p>%s</p></body></html>", "States do not match", "Expected state "+string(state)+" but got "+r.URL.Query().Get("state"))
+				_ = tokenUserError.Execute(w, &ed{
+					Name:        "States do not match",
+					Description: "Expected state " + string(state) + " but got " + r.URL.Query().Get("state"),
+				})
 				go shutdown()
 				return
 			}
@@ -189,29 +233,30 @@ To initiate the flow, click the "Authorize Application" button.</p>
 				fmt.Printf("Unable to exchange code for token: %s\n", err)
 
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, "<html><body><h1>An error occurred</h1><p>%s</p></body></html>", err)
+				_ = tokenUserError.Execute(w, &ed{
+					Name: err.Error(),
+				})
 				go shutdown()
 				return
 			}
 
-			fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
-			fmt.Printf("Refresh Token:\n\t%s\n\n", token.RefreshToken)
-			fmt.Printf("Expires in:\n\t%s\n\n", token.Expiry)
-
-			w.Write([]byte(fmt.Sprintf(`
-<html><head></head><body>
-<ul>
-	<li>Access Token: <code>%s</code></li>
-	<li>Refresh Token: <code>%s</code></li>
-	<li>Expires in: <code>%s</code></li>
-`, token.AccessToken, token.RefreshToken, token.Expiry)))
-
 			idt := token.Extra("id_token")
-			if idt != nil {
-				w.Write([]byte(fmt.Sprintf(`<li>ID Token: <code>%s</code></li>`, idt)))
-				fmt.Printf("ID Token:\n\t%s\n\n", idt)
-			}
-			w.Write([]byte("</ul></body></html>"))
+			fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
+			fmt.Printf("Refresh Token:\n\t%s\n", token.RefreshToken)
+			fmt.Printf("Expires in:\n\t%s\n", token.Expiry.Format(time.RFC1123))
+			fmt.Printf("ID Token:\n\t%v\n\n", idt)
+
+			_ = tokenUserResult.Execute(w, struct {
+				AccessToken  string
+				RefreshToken string
+				Expiry       string
+				IDToken      string
+			}{
+				AccessToken:  token.AccessToken,
+				RefreshToken: token.RefreshToken,
+				Expiry:       fmt.Sprintf("%s", token.Expiry.Format(time.RFC1123)),
+				IDToken:      fmt.Sprintf("%v", idt),
+			})
 
 			go shutdown()
 		})

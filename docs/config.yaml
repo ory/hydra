@@ -359,7 +359,7 @@ oauth2:
 
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated,
 # for more information on this topic navigate to:
-# -> https://www.ory.sh/docs/hydra/advanced#system-secret-rotation
+# -> https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys
 secrets:
   # The system secret must be at least 16 characters long. If none is provided, one will be generated. They key
   #	is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures.

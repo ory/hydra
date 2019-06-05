@@ -243,7 +243,7 @@ are loaded (see section after next).
 Rotating system secrets was fairly cumbersome in the past and required a restart of ORY Hydra. This changed. The
 system secret is now an array where the first element is used for encryption and all elements can be used for decryption.
 
-For more information on this topic, click [here](https://www.ory.sh/docs/hydra/advanced#system-secret-rotation).
+For more information on this topic, click [here](https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys).
 
 To make this change work, environment variable `ROTATED_SYSTEM_SECRET` has been removed and can no longer be used. Command
 `hydra migrate secret` has also been removed without replacement as it is no longer required for rotating secrets.

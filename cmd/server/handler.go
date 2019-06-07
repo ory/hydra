@@ -168,10 +168,28 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicmw.Use(tracer)
 	}
 
-	adminmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String())))
+	adminLogger := negronilogrus.NewMiddlewareFromLogger(
+		d.Registry().Logger().(*logrus.Logger),
+		fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()),
+	)
+	if d.Configuration().AdminDisableHealthAccessLog() {
+		adminLogger.ExcludeURL(healthx.AliveCheckPath)
+		adminLogger.ExcludeURL(healthx.ReadyCheckPath)
+	}
+
+	adminmw.Use(adminLogger)
 	adminmw.Use(d.Registry().PrometheusManager())
 
-	publicmw.Use(negronilogrus.NewMiddlewareFromLogger(d.Registry().Logger().(*logrus.Logger), fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String())))
+	publicLogger := negronilogrus.NewMiddlewareFromLogger(
+		d.Registry().Logger().(*logrus.Logger),
+		fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String()),
+	)
+	if d.Configuration().PublicDisableHealthAccessLog() {
+		publicLogger.ExcludeURL(healthx.AliveCheckPath)
+		publicLogger.ExcludeURL(healthx.ReadyCheckPath)
+	}
+
+	publicmw.Use(publicLogger)
 	publicmw.Use(d.Registry().PrometheusManager())
 
 	metrics := metricsx.New(

@@ -40,7 +40,9 @@ type Provider interface {
 	DataSourcePlugin() string
 	DefaultClientScope() []string
 	AdminListenOn() string
+	AdminDisableHealthAccessLog() bool
 	PublicListenOn() string
+	PublicDisableHealthAccessLog() bool
 	ConsentRequestMaxAge() time.Duration
 	AccessTokenLifespan() time.Duration
 	RefreshTokenLifespan() time.Duration

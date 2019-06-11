@@ -184,7 +184,7 @@ and send us an email to [hi@ory.am](mailto:hi@ory.sh) instead.
 
 ## Benchmarks
 
-Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results [here](https://www.ory.sh/docs/next/performance/performance-hydra).
+Our continuous integration runs a collection of benchmarks against ORY Hydra. You can find the results [here](https://www.ory.sh/docs/next/performance/hydra).
 
 ## Telemetry
 

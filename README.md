@@ -245,6 +245,7 @@ Community:
 * [Consent App SDK for Go](https://github.com/janekolszak/idp)
 * [ORY Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
 * [Kubernetes helm chart](https://github.com/kubernetes/charts/pull/1022)
+* [Werther - an Identity Provider over LDAP](https://github.com/i-core/werther)
 
 ## Blog posts & articles
 

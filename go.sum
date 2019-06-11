@@ -503,8 +503,8 @@ github.com/ory/graceful v0.1.1/go.mod h1:zqu70l95WrKHF4AZ6tXHvAqAvpY6M7g6ttaAVcM
 github.com/ory/herodot v0.5.1/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJiJow=
 github.com/ory/herodot v0.6.0 h1:Dcs4yH1Qw1GIgGCvvvdafhT8xjwElTE//8xLmHtPEYA=
 github.com/ory/herodot v0.6.0/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJiJow=
-github.com/ory/x v0.0.61 h1:3SuwpwMujmBfCrQb07lDcMiHTMoEuhjmLeLLFbhVjLU=
-github.com/ory/x v0.0.61/go.mod h1:da8VE+hIbNK87ppdGvzRFpOgozsT0yKYm82MC/0eGaY=
+github.com/ory/x v0.0.63 h1:MMAjR4rn0nLKPQP44IZjMVCtcqnNXBklCXnA8xff92c=
+github.com/ory/x v0.0.63/go.mod h1:da8VE+hIbNK87ppdGvzRFpOgozsT0yKYm82MC/0eGaY=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

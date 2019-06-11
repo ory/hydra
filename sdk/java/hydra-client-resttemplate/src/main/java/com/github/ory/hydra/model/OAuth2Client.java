@@ -27,7 +27,7 @@ import org.joda.time.DateTime;
 /**
  * OAuth2Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-05-17T10:32:12.084+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-06-11T14:10:17.875+02:00")
 public class OAuth2Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;

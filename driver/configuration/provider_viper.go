@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/ory/x/corsx"
+	"github.com/ory/x/stringsx"
 
 	"github.com/sirupsen/logrus"
 
@@ -251,6 +252,10 @@ func (v *ViperProvider) TracingJaegerConfig() *tracing.JaegerConfig {
 		SamplerType:        viperx.GetString(v.l, "tracing.providers.jaeger.sampling.type", "const", "TRACING_PROVIDER_JAEGER_SAMPLING_TYPE"),
 		SamplerValue:       viperx.GetFloat64(v.l, "tracing.providers.jaeger.sampling.value", float64(1), "TRACING_PROVIDER_JAEGER_SAMPLING_VALUE"),
 		SamplerServerURL:   viperx.GetString(v.l, "tracing.providers.jaeger.sampling.server_url", "", "TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL"),
+		Propagation: stringsx.Coalesce(
+			viper.GetString("JAEGER_PROPAGATION"), // Standard Jaeger client config
+			viperx.GetString(v.l, "tracing.providers.jaeger.propagation", "", "TRACING_PROVIDER_JAEGER_PROPAGATION"),
+		),
 	}
 }
 

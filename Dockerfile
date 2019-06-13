@@ -11,5 +11,7 @@ COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY hydra /usr/bin/hydra
 COPY .releaser/LICENSE.txt /LICENSE.txt
 
+USER 1000
+
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

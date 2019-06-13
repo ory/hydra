@@ -44,8 +44,6 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
-    files:
-      -  LICENSE.txt
 
 snapshot:
   name_template: "{{ .Tag }}-next"

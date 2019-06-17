@@ -3,6 +3,9 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Change Log](#change-log)
+  - [Unreleased](#unreleased)
+  - [v1.0.0-rc.16 (2019-06-13)](#v100-rc16-2019-06-13)
+  - [v1.0.0-rc.15 (2019-06-05)](#v100-rc15-2019-06-05)
   - [v1.0.0-rc.14 (2019-05-18)](#v100-rc14-2019-05-18)
   - [v1.0.0-rc.12 (2019-05-10)](#v100-rc12-2019-05-10)
   - [v1.0.0-rc.11 (2019-05-02)](#v100-rc11-2019-05-02)
@@ -147,6 +150,59 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Change Log
+
+## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
+
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.16...HEAD)
+
+**Closed issues:**
+
+- The Hydra can't recovery the readiness status in k8s [\#1471](https://github.com/ory/hydra/issues/1471)
+- oauth2: BCrypt hashs inputs \(passwords\) of maximum of 72 bytes, limiting OAuth 2.0 Client Secret length [\#1438](https://github.com/ory/hydra/issues/1438)
+
+## [v1.0.0-rc.16](https://github.com/ory/hydra/tree/v1.0.0-rc.16) (2019-06-13)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.15...v1.0.0-rc.16)
+
+**Closed issues:**
+
+- Benchmark link is broken in README.md [\#1465](https://github.com/ory/hydra/issues/1465)
+- hydra fails to connect mysql server [\#1463](https://github.com/ory/hydra/issues/1463)
+- What's the deal with LICENSE.txt in the 64-bit linux tarball? is this open source or not? [\#1462](https://github.com/ory/hydra/issues/1462)
+- The hydra can't handle the DB username with "@" character [\#1460](https://github.com/ory/hydra/issues/1460)
+- `pq: operator does not exist: character varying =?` [\#1457](https://github.com/ory/hydra/issues/1457)
+- Slow MySQL query  [\#1454](https://github.com/ory/hydra/issues/1454)
+- Support Jaeger Tracing with Istio and Kubernetes [\#1447](https://github.com/ory/hydra/issues/1447)
+- Incorrect namespace for PHP SDK [\#1443](https://github.com/ory/hydra/issues/1443)
+
+**Merged pull requests:**
+
+- Remove binary license [\#1470](https://github.com/ory/hydra/pull/1470) ([aeneasr](https://github.com/aeneasr))
+- docker: Run as non-root user [\#1469](https://github.com/ory/hydra/pull/1469) ([aeneasr](https://github.com/aeneasr))
+- sdk: Update SDKs and fix PHP namespace [\#1468](https://github.com/ory/hydra/pull/1468) ([aeneasr](https://github.com/aeneasr))
+- mod: Update ory/x to 0.0.63 [\#1467](https://github.com/ory/hydra/pull/1467) ([aeneasr](https://github.com/aeneasr))
+- mod: Update to ory/x 0.0.61 [\#1466](https://github.com/ory/hydra/pull/1466) ([aeneasr](https://github.com/aeneasr))
+- docs: Add a link to Identity Provider "Werther" to community projects [\#1464](https://github.com/ory/hydra/pull/1464) ([nikolaas](https://github.com/nikolaas))
+- cmd: Add option to disable access log for health endpoints [\#1458](https://github.com/ory/hydra/pull/1458) ([hypnoglow](https://github.com/hypnoglow))
+- tracing: Add support for B3 headers via the JAEGER\_PROPAGATION env var [\#1456](https://github.com/ory/hydra/pull/1456) ([ptescher](https://github.com/ptescher))
+
+## [v1.0.0-rc.15](https://github.com/ory/hydra/tree/v1.0.0-rc.15) (2019-06-05)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.14...v1.0.0-rc.15)
+
+**Closed issues:**
+
+- level=fatal msg="Unable to instantiate service registry." error="no driver is capable of handling the given DSN" [\#1455](https://github.com/ory/hydra/issues/1455)
+- Display `/` as RegistrationEndpoint in spite of undefined [\#1448](https://github.com/ory/hydra/issues/1448)
+
+**Merged pull requests:**
+
+- cli: Use go templates in token user [\#1461](https://github.com/ory/hydra/pull/1461) ([aeneasr](https://github.com/aeneasr))
+- docs: Fix link to system secret rotation [\#1459](https://github.com/ory/hydra/pull/1459) ([sawadashota](https://github.com/sawadashota))
+- Build\(deps\): Bump jackson-version from 2.8.9 to 2.9.9 in /sdk/java/hydra-client-resttemplate [\#1453](https://github.com/ory/hydra/pull/1453) ([dependabot[bot]](https://github.com/apps/dependabot))
+- docs: Updates issue and pull request templates [\#1452](https://github.com/ory/hydra/pull/1452) ([aeneasr](https://github.com/aeneasr))
+- docs: Updates issue and pull request templates [\#1451](https://github.com/ory/hydra/pull/1451) ([aeneasr](https://github.com/aeneasr))
+- docs: Updates issue and pull request templates [\#1450](https://github.com/ory/hydra/pull/1450) ([aeneasr](https://github.com/aeneasr))
+-  oauth2: Don't show registration\_endpoint if config is undefined [\#1449](https://github.com/ory/hydra/pull/1449) ([sawadashota](https://github.com/sawadashota))
+- feat: support default jaeger environment variables [\#1442](https://github.com/ory/hydra/pull/1442) ([shaxbee](https://github.com/shaxbee))
 
 ## [v1.0.0-rc.14](https://github.com/ory/hydra/tree/v1.0.0-rc.14) (2019-05-18)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.12...v1.0.0-rc.14)

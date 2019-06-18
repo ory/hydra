@@ -5,6 +5,8 @@ tools:
 		npm i
 		go get github.com/go-bindata/go-bindata/go-bindata
 		go install github.com/go-bindata/go-bindata/go-bindata
+		go get github.com/ory/go-acc
+		go install github.com/ory/go-acc
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test

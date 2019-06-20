@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -69,4 +70,67 @@ func TestHandlerWellKnown(t *testing.T) {
 	resp := known.Key("public:test-id")
 	require.NotNil(t, resp, "Could not find key public")
 	assert.Equal(t, resp, IDKS.Key("public:test-id"))
+}
+
+func TestHandlerKeySet(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistry(conf)
+
+	viper.Set(configuration.ViperKeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
+
+	router := x.NewRouterAdmin()
+
+	h := reg.KeyHandler()
+
+	h.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
+		return h
+	})
+	testServer := httptest.NewServer(router)
+
+	t.Run("CreateJSONWebKeySet", func(t *testing.T) {
+		createJWKSetPath := "/keys/test-key"
+		createJWKSetReqBody := strings.NewReader(`{"alg": "RS256", "kid": "test-01", "use": "sig"}`)
+		createRes, err := http.Post(testServer.URL+createJWKSetPath, "application/json", createJWKSetReqBody)
+		require.NoError(t, err, "problem in http request")
+		defer createRes.Body.Close()
+
+		var createdJWKSet jose.JSONWebKeySet
+		err = json.NewDecoder(createRes.Body).Decode(&createdJWKSet)
+		require.NoError(t, err, "problem in decoding response")
+
+		assert.EqualValues(t, createRes.StatusCode, http.StatusCreated)
+		assert.Len(t, createdJWKSet.Key("public:test-01"), 1)
+		assert.Len(t, createdJWKSet.Key("private:test-01"), 1)
+	})
+
+	t.Run("GetJSONWebKeySet", func(t *testing.T) {
+		getJWKSetPath := "/keys/test-key"
+		getRes, err := http.Get(testServer.URL + getJWKSetPath)
+		require.NoError(t, err, "problem in http request")
+		defer getRes.Body.Close()
+
+		var getJWKSet jose.JSONWebKeySet
+		err = json.NewDecoder(getRes.Body).Decode(&getJWKSet)
+		require.NoError(t, err, "problem in decoding response")
+
+		require.Len(t, getJWKSet.Keys, 2)
+	})
+
+	t.Run("DeleteJSONWebKeySet", func(t *testing.T) {
+		deleteJWKSetPath := "/keys/test-key"
+		deleteReq, err := http.NewRequest(http.MethodDelete, testServer.URL+deleteJWKSetPath, nil)
+		deleteRes, err := http.DefaultClient.Do(deleteReq)
+		deleteReq.Header.Add("Content-Type", "application/json")
+		require.NoError(t, err, "problem in http request")
+		defer deleteRes.Body.Close()
+
+		assert.Equal(t, http.StatusNoContent, deleteRes.StatusCode)
+
+		getJWKSetPath := "/keys/test-key"
+		getRes, err := http.Get(testServer.URL + getJWKSetPath)
+		require.NoError(t, err, "problem in http request")
+		defer getRes.Body.Close()
+
+		assert.Equal(t, http.StatusNotFound, getRes.StatusCode)
+	})
 }

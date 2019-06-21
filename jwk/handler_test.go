@@ -23,6 +23,7 @@ package jwk_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -131,5 +132,87 @@ func TestHandlerKeySet(t *testing.T) {
 		defer getRes.Body.Close()
 
 		assert.Equal(t, http.StatusNotFound, getRes.StatusCode)
+	})
+
+	t.Run("DeleteJSONWebKeySetKeepPairsOption", func(t *testing.T) {
+		cases := []struct {
+			keepPairs      string
+			expectedKeyIDs []string
+			expectedError  bool
+		}{
+			{
+				keepPairs:      "1",
+				expectedKeyIDs: []string{"public:test-key-03", "private:test-key-03"},
+				expectedError:  false,
+			},
+			{
+				keepPairs: "10",
+				expectedKeyIDs: []string{
+					"public:test-key-03",
+					"private:test-key-03",
+					"public:test-key-02",
+					"private:test-key-02",
+					"public:test-key-01",
+					"private:test-key-01",
+				},
+				expectedError: false,
+			},
+			{
+				keepPairs:     "bar",
+				expectedError: true,
+			},
+		}
+
+		for _, c := range cases {
+			t.Run(fmt.Sprintf("keepPairs=%s", c.keepPairs), func(t *testing.T) {
+				createJWKSetPath := "/keys/test-key"
+				createJWKSetReqBody01 := strings.NewReader(`{"alg": "RS256", "kid": "test-key-01", "use": "sig"}`)
+				_, err := http.Post(testServer.URL+createJWKSetPath, "application/json", createJWKSetReqBody01)
+				require.NoError(t, err, "problem in http request")
+
+				createJWKSetReqBody02 := strings.NewReader(`{"alg": "RS256", "kid": "test-key-02", "use": "sig"}`)
+				_, err = http.Post(testServer.URL+createJWKSetPath, "application/json", createJWKSetReqBody02)
+				require.NoError(t, err, "problem in http request")
+
+				createJWKSetReqBody03 := strings.NewReader(`{"alg": "RS256", "kid": "test-key-03", "use": "sig"}`)
+				_, err = http.Post(testServer.URL+createJWKSetPath, "application/json", createJWKSetReqBody03)
+				require.NoError(t, err, "problem in http request")
+
+				getJWKSetPath := "/keys/test-key"
+				getResBefore, err := http.Get(testServer.URL + getJWKSetPath)
+				require.NoError(t, err, "problem in http request")
+				defer getResBefore.Body.Close()
+
+				var getJWKSetBefore jose.JSONWebKeySet
+				err = json.NewDecoder(getResBefore.Body).Decode(&getJWKSetBefore)
+				require.NoError(t, err, "problem in decoding response")
+				require.Len(t, getJWKSetBefore.Keys, 6)
+
+				deleteJWKSetPath := fmt.Sprintf("/keys/test-key?keep-pairs=%s", c.keepPairs)
+				deleteReq, err := http.NewRequest(http.MethodDelete, testServer.URL+deleteJWKSetPath, nil)
+				deleteRes, err := http.DefaultClient.Do(deleteReq)
+				deleteReq.Header.Add("Content-Type", "application/json")
+				require.NoError(t, err, "problem in http request")
+				defer deleteRes.Body.Close()
+
+				getResAfter, err := http.Get(testServer.URL + getJWKSetPath)
+
+				if c.expectedError {
+					require.Error(t, err, "no problem in http request but expected error")
+					return
+				}
+
+				require.NoError(t, err, "problem in http request")
+				defer getResAfter.Body.Close()
+
+				var getJWKSetAfter jose.JSONWebKeySet
+				err = json.NewDecoder(getResAfter.Body).Decode(&getJWKSetAfter)
+				require.NoError(t, err, "problem in decoding response")
+
+				for _, keyID := range c.expectedKeyIDs {
+					assert.Len(t, getJWKSetAfter.Key(keyID), 1)
+				}
+			})
+		}
 	})
 }

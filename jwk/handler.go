@@ -23,7 +23,9 @@ package jwk
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/ory/x/stringslice"
 
@@ -327,8 +329,29 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //       500: genericError
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
+	keepPairsStr := r.URL.Query().Get("keep-pairs")
 
-	if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
+	if keepPairsStr != "" {
+		keepPairs, err := strconv.Atoi(keepPairsStr)
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+
+		keys, err := h.r.KeyManager().GetKeySet(r.Context(), setName)
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+
+		keepKeyIndex := int(math.Min(float64(len(keys.Keys)), float64(keepPairs*2)))
+		for _, key := range keys.Keys[keepKeyIndex:] {
+			if err := h.r.KeyManager().DeleteKey(r.Context(), setName, key.KeyID); err != nil {
+				h.r.Writer().WriteError(w, r, err)
+				return
+			}
+		}
+	} else if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

@@ -193,22 +193,23 @@ func TestHandlerKeySet(t *testing.T) {
 				deleteRes, err := http.DefaultClient.Do(deleteReq)
 				deleteReq.Header.Add("Content-Type", "application/json")
 				require.NoError(t, err, "problem in http request")
-				defer deleteRes.Body.Close()
-
-				getResAfter, err := http.Get(testServer.URL + getJWKSetPath)
 
 				if c.expectedError {
-					require.Error(t, err, "no problem in http request but expected error")
+					assert.NotEqual(t, http.StatusNoContent, deleteRes.StatusCode)
 					return
 				}
+				assert.Equal(t, http.StatusNoContent, deleteRes.StatusCode)
 
+				getResAfter, err := http.Get(testServer.URL + getJWKSetPath)
 				require.NoError(t, err, "problem in http request")
+
 				defer getResAfter.Body.Close()
 
 				var getJWKSetAfter jose.JSONWebKeySet
 				err = json.NewDecoder(getResAfter.Body).Decode(&getJWKSetAfter)
 				require.NoError(t, err, "problem in decoding response")
 
+				assert.Len(t, getJWKSetAfter.Keys, len(c.expectedKeyIDs))
 				for _, keyID := range c.expectedKeyIDs {
 					assert.Len(t, getJWKSetAfter.Key(keyID), 1)
 				}

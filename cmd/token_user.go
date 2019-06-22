@@ -48,7 +48,6 @@ import (
 )
 
 var tokenUserWelcome = template.Must(template.New("").Parse(`<html>
-<head></head>
 <body>
 <h1>Welcome to the exemplary OAuth 2.0 Consumer!</h1>
 <p>This is an example app which emulates an OAuth 2.0 consumer application. Usually, this would be your web or mobile
@@ -58,7 +57,8 @@ var tokenUserWelcome = template.Must(template.New("").Parse(`<html>
     Hydra).
     To initiate the flow, click the "Authorize Application" button.</p>
 <p><a href="{{ .URL }}">Authorize application</a></p>
-</body>`))
+</body>
+</html>`))
 
 var tokenUserError = template.Must(template.New("").Parse(`<html>
 <body>

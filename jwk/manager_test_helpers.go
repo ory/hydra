@@ -81,11 +81,16 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 		require.NoError(t, err)
 		assert.EqualValues(t, "new-key-id:"+suffix, First(keys.Keys).KeyID)
 
+		beforeDeleteKeysCount := len(keys.Keys)
 		err = m.DeleteKey(context.TODO(), "faz", "public:"+suffix)
 		require.NoError(t, err)
 
 		_, err = m.GetKey(context.TODO(), "faz", "public:"+suffix)
 		require.Error(t, err)
+
+		keys, err = m.GetKeySet(context.TODO(), "faz")
+		require.NoError(t, err)
+		assert.EqualValues(t, beforeDeleteKeysCount-1, len(keys.Keys))
 	}
 }
 

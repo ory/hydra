@@ -123,7 +123,7 @@ func (m *MemoryManager) DeleteKey(ctx context.Context, set, kid string) error {
 	var results []jose.JSONWebKey
 	for _, key := range keys.Keys {
 		if key.KeyID != kid {
-			results = append(results)
+			results = append(results, key)
 		}
 	}
 	m.Keys[set].Keys = results

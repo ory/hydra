@@ -6,7 +6,7 @@
 # are enabled, it will not work out of the box either.
 #
 #
-# ORY Hydra can be configured using a configuration file and passing the file location using `-c path/to/config.yaml`.
+# ORY Hydra can be configured using a configuration file and passing the file location using `--config path/to/config.yaml`.
 # Per default, ORY Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
 # variables as well.
 #

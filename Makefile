@@ -38,6 +38,7 @@ test-resetdb:
 .PHONY: docker
 docker:
 		make sqlbin
+		# TODO: internalize build !
 		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
 		docker build -t oryd/hydra:latest .
 		rm hydra

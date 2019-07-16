@@ -124,7 +124,7 @@ and success.`,
 			proto = "https"
 		}
 
-		serverLocation := fmt.Sprintf("%s://127.0.0.1:%d/", proto, port)
+		serverLocation := fmt.Sprintf("%s://192.168.99.101:%d/", proto, port)
 		if redirectUrl == "" {
 			redirectUrl = serverLocation + "callback"
 		}

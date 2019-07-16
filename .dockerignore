@@ -8,5 +8,5 @@ node_modules/
 scripts/
 sdk/js
 sdk/php
-vendor/
+#vendor/
 dist/

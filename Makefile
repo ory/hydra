@@ -37,11 +37,13 @@ test-resetdb:
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
-		make sqlbin
-		# TODO: internalize build !
-		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
 		docker build -t oryd/hydra:latest .
-		rm hydra
+
+#locally:
+#		make sqlbin
+#		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
+#		docker build -t oryd/hydra:latest .
+#		rm hydra
 
 .PHONY: e2e
 e2e:

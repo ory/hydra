@@ -1,0 +1,30 @@
+# To compile this image manually run:
+#
+# $ GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:v1.0.0-rc.7_oryOS.10 . && rm hydra
+FROM golang:1.11.12-alpine3.10
+#FROM golang:1.11
+
+
+WORKDIR /hydra/
+RUN chown 1000 /hydra/
+
+ADD metrics/ metrics/
+ADD cmd/ cmd/
+ADD tracing/ tracing/
+ADD cypress/ cypress/
+ADD test/ test/
+ADD driver/ driver/
+ADD health/ health/
+ADD oauth2/ oauth2/
+ADD internal/ internal/
+ADD jwk/ jwk/
+ADD consent/ consent/
+ADD sdk/ sdk/
+ADD client/ client/
+ADD x/ x/
+ADD vendor/ vendor/
+ADD main.go main.go
+ADD go.mod go.mod
+ADD go.sum go.sum
+
+USER 1000

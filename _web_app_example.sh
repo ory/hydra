@@ -1,5 +1,5 @@
-docker-compose -f quickstart.yml exec hydra \
-    hydra token user \
+docker-compose exec hydra \
+    /app/hydra token user \
     --client-id auth-code-client2 \
     --client-secret secret \
     --endpoint http://192.168.99.101:4444/ \

@@ -43,13 +43,13 @@ services:
       - hydra-migrate
       - postgresd
 
-  #  consent:
-  #    environment:
-  #      - HYDRA_ADMIN_URL=http://192.168.99.101:4445
-  #    image: oryd/hydra-login-consent-node:v1.0.0-rc.10
-  #    ports:
-  #      - "3000:3000"
-  #    restart: unless-stopped
+  consent:
+    environment:
+      - HYDRA_ADMIN_URL=http://192.168.99.101:4445
+    image: oryd/hydra-login-consent-node:v1.0.0-rc.10
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
 
   hydra-migrate:
     build: .

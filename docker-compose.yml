@@ -1,15 +1,35 @@
 version: '3'
 services:
 
+  hydra_build:
+    build: .
+    volumes:
+      #- ./publisher:/app
+      - $GOPATH/pkg/mod/:/go/pkg/mod/
+      - ./.cache:/.cache
+    image: oryd/hydra:latest
+    command:
+      sh -c "pwd; go build -v; ls -l"
+
+    environment:
+      #- HOME=/tmp
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+      - GOOS=linux
+      - GOARCH=amd64
+
   hydra:
-    #build: .
+    build: .
+    #volumes:
+    #  - ./publisher:/app
     image: oryd/hydra:latest
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
       - "5555:5555" # Port for hydra token user
     command:
-      serve all --dangerous-force-http
+      serve
+
     environment:
       - URLS_SELF_ISSUER=http://192.168.99.101:4444
       - URLS_CONSENT=http://192.168.99.101:3000/consent

@@ -37,7 +37,8 @@ test-resetdb:
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
-		docker build -t oryd/hydra:latest .
+		#docker build -t oryd/hydra:latest .
+		docker-compose up
 
 #locally:
 #		make sqlbin

@@ -6,6 +6,10 @@ import (
 )
 
 func formatSwaggerError(err error) string {
+	if err == nil {
+		return ""
+	}
+
 	var b bytes.Buffer
 	if err := json.NewEncoder(&b).Encode(err); err != nil {
 		panic(err)

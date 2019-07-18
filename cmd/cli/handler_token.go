@@ -59,7 +59,7 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 
 	token := args[0]
 	_, err := handler.Public.RevokeOAuth2Token(public.NewRevokeOAuth2TokenParams().WithToken(args[0]), httptransport.BasicAuth(clientID, clientSecret))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 
 	fmt.Printf("Revoked OAuth 2.0 Access Token: %s\n", token)
 }
@@ -69,6 +69,6 @@ func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
 	_, err := handler.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{
 		NotAfter: strfmt.DateTime(time.Now().Add(-flagx.MustGetDuration(cmd, "min-age"))),
 	}))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Println("Successfully flushed inactive access tokens")
 }

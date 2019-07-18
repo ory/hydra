@@ -49,8 +49,8 @@
   var exports = function(error) {
     var _this = this;
 
-    _this['error'] = error;
 
+    _this['error'] = error;
 
 
   };
@@ -66,42 +66,42 @@
     if (data) {
       obj = obj || new exports();
 
+      if (data.hasOwnProperty('debug')) {
+        obj['debug'] = ApiClient.convertToType(data['debug'], 'String');
+      }
       if (data.hasOwnProperty('error')) {
         obj['error'] = ApiClient.convertToType(data['error'], 'String');
       }
-      if (data.hasOwnProperty('error_code')) {
-        obj['error_code'] = ApiClient.convertToType(data['error_code'], 'Number');
+      if (data.hasOwnProperty('error_description')) {
+        obj['error_description'] = ApiClient.convertToType(data['error_description'], 'String');
       }
-      if (data.hasOwnProperty('error_debug')) {
-        obj['error_debug'] = ApiClient.convertToType(data['error_debug'], 'String');
-      }
-      if (data.hasOwnProperty('error_hint')) {
-        obj['error_hint'] = ApiClient.convertToType(data['error_hint'], 'String');
+      if (data.hasOwnProperty('status_code')) {
+        obj['status_code'] = ApiClient.convertToType(data['status_code'], 'Number');
       }
     }
     return obj;
   }
 
   /**
+   * Debug contains debug information. This is usually not available and has to be enabled.
+   * @member {String} debug
+   */
+  exports.prototype['debug'] = undefined;
+  /**
    * Name is the error name.
    * @member {String} error
    */
   exports.prototype['error'] = undefined;
   /**
+   * Description contains further information on the nature of the error.
+   * @member {String} error_description
+   */
+  exports.prototype['error_description'] = undefined;
+  /**
    * Code represents the error status code (404, 403, 401, ...).
-   * @member {Number} error_code
+   * @member {Number} status_code
    */
-  exports.prototype['error_code'] = undefined;
-  /**
-   * Debug contains debug information. This is usually not available and has to be enabled.
-   * @member {String} error_debug
-   */
-  exports.prototype['error_debug'] = undefined;
-  /**
-   * Hint contains further information on the nature of the error.
-   * @member {String} error_hint
-   */
-  exports.prototype['error_hint'] = undefined;
+  exports.prototype['status_code'] = undefined;
 
 
 

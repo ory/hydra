@@ -59,6 +59,6 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 		WithScope(pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))),
 		ht,
 	)
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Println(formatResponse(result.Payload))
 }

@@ -58,7 +58,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		cmdx.Must(err, "Could not parse JSON from file %s: %s", path, err)
 
 		response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&c))
-		cmdx.Must(err, "Unable to execute request: %s", err)
+		cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 		result := response.Payload
 
 		if c.Secret == "" {
@@ -122,7 +122,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	result := response.Payload
 
 	fmt.Printf("OAuth 2.0 Client ID: %s\n", result.ClientID)
@@ -153,7 +153,7 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 
 	for _, c := range args {
 		_, err := m.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID(c))
-		cmdx.Must(err, "Unable to execute request: %s", err)
+		cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	}
 
 	fmt.Println("OAuth2 client(s) deleted")
@@ -168,7 +168,7 @@ func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 	}
 
 	response, err := m.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(args[0]))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	cl := response.Payload
 	fmt.Println(cmdx.FormatResponse(cl))
 }
@@ -181,7 +181,7 @@ func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
 	offset := (limit * page) - limit
 
 	response, err := m.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(int64(limit))).WithOffset(pointerx.Int64(int64(offset))))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	cls := response.Payload
 
 	table := newTable()

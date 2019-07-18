@@ -20,13 +20,13 @@ import (
 type GenericError struct {
 
 	// Code represents the error status code (404, 403, 401, ...).
-	Code int64 `json:"error_code,omitempty"`
+	Code int64 `json:"status_code,omitempty"`
 
 	// Debug contains debug information. This is usually not available and has to be enabled.
-	Debug string `json:"error_debug,omitempty"`
+	Debug string `json:"debug,omitempty"`
 
-	// Hint contains further information on the nature of the error.
-	Hint string `json:"error_hint,omitempty"`
+	// Description contains further information on the nature of the error.
+	Description string `json:"error_description,omitempty"`
 
 	// Name is the error name.
 	// Required: true

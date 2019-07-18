@@ -24,19 +24,37 @@ import io.swagger.annotations.ApiModelProperty;
  * Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
  */
 @ApiModel(description = "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-06-11T14:10:17.875+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-07-18T19:30:59.329+02:00")
 public class GenericError {
+  @JsonProperty("debug")
+  private String debug = null;
+
   @JsonProperty("error")
   private String error = null;
 
-  @JsonProperty("error_code")
-  private Long errorCode = null;
+  @JsonProperty("error_description")
+  private String errorDescription = null;
 
-  @JsonProperty("error_debug")
-  private String errorDebug = null;
+  @JsonProperty("status_code")
+  private Long statusCode = null;
 
-  @JsonProperty("error_hint")
-  private String errorHint = null;
+  public GenericError debug(String debug) {
+    this.debug = debug;
+    return this;
+  }
+
+   /**
+   * Debug contains debug information. This is usually not available and has to be enabled.
+   * @return debug
+  **/
+  @ApiModelProperty(example = "The database adapter was unable to find the element", value = "Debug contains debug information. This is usually not available and has to be enabled.")
+  public String getDebug() {
+    return debug;
+  }
+
+  public void setDebug(String debug) {
+    this.debug = debug;
+  }
 
   public GenericError error(String error) {
     this.error = error;
@@ -56,58 +74,40 @@ public class GenericError {
     this.error = error;
   }
 
-  public GenericError errorCode(Long errorCode) {
-    this.errorCode = errorCode;
+  public GenericError errorDescription(String errorDescription) {
+    this.errorDescription = errorDescription;
+    return this;
+  }
+
+   /**
+   * Description contains further information on the nature of the error.
+   * @return errorDescription
+  **/
+  @ApiModelProperty(example = "Object with ID 12345 does not exist", value = "Description contains further information on the nature of the error.")
+  public String getErrorDescription() {
+    return errorDescription;
+  }
+
+  public void setErrorDescription(String errorDescription) {
+    this.errorDescription = errorDescription;
+  }
+
+  public GenericError statusCode(Long statusCode) {
+    this.statusCode = statusCode;
     return this;
   }
 
    /**
    * Code represents the error status code (404, 403, 401, ...).
-   * @return errorCode
+   * @return statusCode
   **/
   @ApiModelProperty(example = "404", value = "Code represents the error status code (404, 403, 401, ...).")
-  public Long getErrorCode() {
-    return errorCode;
+  public Long getStatusCode() {
+    return statusCode;
   }
 
-  public void setErrorCode(Long errorCode) {
-    this.errorCode = errorCode;
-  }
-
-  public GenericError errorDebug(String errorDebug) {
-    this.errorDebug = errorDebug;
-    return this;
-  }
-
-   /**
-   * Debug contains debug information. This is usually not available and has to be enabled.
-   * @return errorDebug
-  **/
-  @ApiModelProperty(example = "The database adapter was unable to find the element", value = "Debug contains debug information. This is usually not available and has to be enabled.")
-  public String getErrorDebug() {
-    return errorDebug;
-  }
-
-  public void setErrorDebug(String errorDebug) {
-    this.errorDebug = errorDebug;
-  }
-
-  public GenericError errorHint(String errorHint) {
-    this.errorHint = errorHint;
-    return this;
-  }
-
-   /**
-   * Hint contains further information on the nature of the error.
-   * @return errorHint
-  **/
-  @ApiModelProperty(example = "Object with ID 12345 does not exist", value = "Hint contains further information on the nature of the error.")
-  public String getErrorHint() {
-    return errorHint;
-  }
-
-  public void setErrorHint(String errorHint) {
-    this.errorHint = errorHint;
+  public void setStatusCode(Long statusCode) {
+    this.statusCode = statusCode;
   }
 
 
@@ -120,15 +120,15 @@ public class GenericError {
       return false;
     }
     GenericError genericError = (GenericError) o;
-    return Objects.equals(this.error, genericError.error) &&
-        Objects.equals(this.errorCode, genericError.errorCode) &&
-        Objects.equals(this.errorDebug, genericError.errorDebug) &&
-        Objects.equals(this.errorHint, genericError.errorHint);
+    return Objects.equals(this.debug, genericError.debug) &&
+        Objects.equals(this.error, genericError.error) &&
+        Objects.equals(this.errorDescription, genericError.errorDescription) &&
+        Objects.equals(this.statusCode, genericError.statusCode);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(error, errorCode, errorDebug, errorHint);
+    return Objects.hash(debug, error, errorDescription, statusCode);
   }
 
 
@@ -137,10 +137,10 @@ public class GenericError {
     StringBuilder sb = new StringBuilder();
     sb.append("class GenericError {\n");
     
+    sb.append("    debug: ").append(toIndentedString(debug)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
-    sb.append("    errorCode: ").append(toIndentedString(errorCode)).append("\n");
-    sb.append("    errorDebug: ").append(toIndentedString(errorDebug)).append("\n");
-    sb.append("    errorHint: ").append(toIndentedString(errorHint)).append("\n");
+    sb.append("    errorDescription: ").append(toIndentedString(errorDescription)).append("\n");
+    sb.append("    statusCode: ").append(toIndentedString(statusCode)).append("\n");
     sb.append("}");
     return sb.toString();
   }

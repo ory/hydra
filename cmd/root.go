@@ -26,8 +26,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/x/viperx"
+
+	"github.com/ory/hydra/cmd/cli"
 )
 
 var (

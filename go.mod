@@ -53,7 +53,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.5
-	github.com/spf13/viper v1.4.0
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.3.0
 	github.com/toqueteos/webbrowser v0.0.0-20150720201625-21fc9f95c834

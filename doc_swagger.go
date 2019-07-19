@@ -32,20 +32,20 @@ type genericError struct {
 	// example: The requested resource could not be found
 	Name string `json:"error"`
 
-	// Hint contains further information on the nature of the error.
+	// Description contains further information on the nature of the error.
 	//
 	// example: Object with ID 12345 does not exist
-	Hint string `json:"error_hint"`
+	Description string `json:"error_description"`
 
 	// Code represents the error status code (404, 403, 401, ...).
 	//
 	// example: 404
-	Code int `json:"error_code"`
+	Code int `json:"status_code"`
 
 	// Debug contains debug information. This is usually not available and has to be enabled.
 	//
 	// example: The database adapter was unable to find the element
-	Debug string `json:"error_debug"`
+	Debug string `json:"debug"`
 }
 
 // Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is

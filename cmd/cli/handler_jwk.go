@@ -62,7 +62,7 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 		KeyID:     pointerx.String(kid),
 		Use:       pointerx.String(flagx.MustGetString(cmd, "use")),
 	}))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Println(formatResponse(res.Payload))
 }
 
@@ -175,7 +175,7 @@ func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 	m := configureClient(cmd)
 
 	keys, err := m.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet(args[0]))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Printf("%s\n", formatResponse(keys))
 }
 
@@ -184,6 +184,6 @@ func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	m := configureClient(cmd)
 
 	_, err := m.Admin.DeleteJSONWebKeySet(admin.NewDeleteJSONWebKeySetParams().WithSet(args[0]))
-	cmdx.Must(err, "Unable to execute request: %s", err)
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Printf("JSON Web Key Set deleted: %s\n", args[0])
 }

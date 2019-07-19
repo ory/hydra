@@ -2194,30 +2194,30 @@
         "error"
       ],
       "properties": {
+        "debug": {
+          "description": "Debug contains debug information. This is usually not available and has to be enabled.",
+          "type": "string",
+          "x-go-name": "Debug",
+          "example": "The database adapter was unable to find the element"
+        },
         "error": {
           "description": "Name is the error name.",
           "type": "string",
           "x-go-name": "Name",
           "example": "The requested resource could not be found"
         },
-        "error_code": {
+        "error_description": {
+          "description": "Description contains further information on the nature of the error.",
+          "type": "string",
+          "x-go-name": "Description",
+          "example": "Object with ID 12345 does not exist"
+        },
+        "status_code": {
           "description": "Code represents the error status code (404, 403, 401, ...).",
           "type": "integer",
           "format": "int64",
           "x-go-name": "Code",
           "example": 404
-        },
-        "error_debug": {
-          "description": "Debug contains debug information. This is usually not available and has to be enabled.",
-          "type": "string",
-          "x-go-name": "Debug",
-          "example": "The database adapter was unable to find the element"
-        },
-        "error_hint": {
-          "description": "Hint contains further information on the nature of the error.",
-          "type": "string",
-          "x-go-name": "Hint",
-          "example": "Object with ID 12345 does not exist"
         }
       },
       "x-go-package": "github.com/ory/hydra"

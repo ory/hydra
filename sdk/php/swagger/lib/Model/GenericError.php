@@ -55,10 +55,10 @@ class GenericError implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
+        'debug' => 'string',
         'error' => 'string',
-        'error_code' => 'int',
-        'error_debug' => 'string',
-        'error_hint' => 'string'
+        'error_description' => 'string',
+        'status_code' => 'int'
     ];
 
     /**
@@ -66,10 +66,10 @@ class GenericError implements ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
+        'debug' => null,
         'error' => null,
-        'error_code' => 'int64',
-        'error_debug' => null,
-        'error_hint' => null
+        'error_description' => null,
+        'status_code' => 'int64'
     ];
 
     public static function swaggerTypes()
@@ -87,10 +87,10 @@ class GenericError implements ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
+        'debug' => 'debug',
         'error' => 'error',
-        'error_code' => 'error_code',
-        'error_debug' => 'error_debug',
-        'error_hint' => 'error_hint'
+        'error_description' => 'error_description',
+        'status_code' => 'status_code'
     ];
 
 
@@ -99,10 +99,10 @@ class GenericError implements ArrayAccess
      * @var string[]
      */
     protected static $setters = [
+        'debug' => 'setDebug',
         'error' => 'setError',
-        'error_code' => 'setErrorCode',
-        'error_debug' => 'setErrorDebug',
-        'error_hint' => 'setErrorHint'
+        'error_description' => 'setErrorDescription',
+        'status_code' => 'setStatusCode'
     ];
 
 
@@ -111,10 +111,10 @@ class GenericError implements ArrayAccess
      * @var string[]
      */
     protected static $getters = [
+        'debug' => 'getDebug',
         'error' => 'getError',
-        'error_code' => 'getErrorCode',
-        'error_debug' => 'getErrorDebug',
-        'error_hint' => 'getErrorHint'
+        'error_description' => 'getErrorDescription',
+        'status_code' => 'getStatusCode'
     ];
 
     public static function attributeMap()
@@ -148,10 +148,10 @@ class GenericError implements ArrayAccess
      */
     public function __construct(array $data = null)
     {
+        $this->container['debug'] = isset($data['debug']) ? $data['debug'] : null;
         $this->container['error'] = isset($data['error']) ? $data['error'] : null;
-        $this->container['error_code'] = isset($data['error_code']) ? $data['error_code'] : null;
-        $this->container['error_debug'] = isset($data['error_debug']) ? $data['error_debug'] : null;
-        $this->container['error_hint'] = isset($data['error_hint']) ? $data['error_hint'] : null;
+        $this->container['error_description'] = isset($data['error_description']) ? $data['error_description'] : null;
+        $this->container['status_code'] = isset($data['status_code']) ? $data['status_code'] : null;
     }
 
     /**
@@ -186,6 +186,27 @@ class GenericError implements ArrayAccess
 
 
     /**
+     * Gets debug
+     * @return string
+     */
+    public function getDebug()
+    {
+        return $this->container['debug'];
+    }
+
+    /**
+     * Sets debug
+     * @param string $debug Debug contains debug information. This is usually not available and has to be enabled.
+     * @return $this
+     */
+    public function setDebug($debug)
+    {
+        $this->container['debug'] = $debug;
+
+        return $this;
+    }
+
+    /**
      * Gets error
      * @return string
      */
@@ -207,64 +228,43 @@ class GenericError implements ArrayAccess
     }
 
     /**
-     * Gets error_code
+     * Gets error_description
+     * @return string
+     */
+    public function getErrorDescription()
+    {
+        return $this->container['error_description'];
+    }
+
+    /**
+     * Sets error_description
+     * @param string $error_description Description contains further information on the nature of the error.
+     * @return $this
+     */
+    public function setErrorDescription($error_description)
+    {
+        $this->container['error_description'] = $error_description;
+
+        return $this;
+    }
+
+    /**
+     * Gets status_code
      * @return int
      */
-    public function getErrorCode()
+    public function getStatusCode()
     {
-        return $this->container['error_code'];
+        return $this->container['status_code'];
     }
 
     /**
-     * Sets error_code
-     * @param int $error_code Code represents the error status code (404, 403, 401, ...).
+     * Sets status_code
+     * @param int $status_code Code represents the error status code (404, 403, 401, ...).
      * @return $this
      */
-    public function setErrorCode($error_code)
+    public function setStatusCode($status_code)
     {
-        $this->container['error_code'] = $error_code;
-
-        return $this;
-    }
-
-    /**
-     * Gets error_debug
-     * @return string
-     */
-    public function getErrorDebug()
-    {
-        return $this->container['error_debug'];
-    }
-
-    /**
-     * Sets error_debug
-     * @param string $error_debug Debug contains debug information. This is usually not available and has to be enabled.
-     * @return $this
-     */
-    public function setErrorDebug($error_debug)
-    {
-        $this->container['error_debug'] = $error_debug;
-
-        return $this;
-    }
-
-    /**
-     * Gets error_hint
-     * @return string
-     */
-    public function getErrorHint()
-    {
-        return $this->container['error_hint'];
-    }
-
-    /**
-     * Sets error_hint
-     * @param string $error_hint Hint contains further information on the nature of the error.
-     * @return $this
-     */
-    public function setErrorHint($error_hint)
-    {
-        $this->container['error_hint'] = $error_hint;
+        $this->container['status_code'] = $status_code;
 
         return $this;
     }

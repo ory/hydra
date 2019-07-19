@@ -65,6 +65,6 @@ func init() {
 
 	viperx.RegisterConfigFlag(RootCmd, "hydra")
 
-	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unkown certificate authorities")
+	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unknown certificate authorities")
 
 }

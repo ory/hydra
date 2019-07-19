@@ -26,7 +26,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"

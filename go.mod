@@ -27,6 +27,7 @@ require (
 	github.com/jessevdk/go-flags v1.4.0 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.2.0
+	github.com/kr/pty v1.1.3 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/luna-duclos/instrumentedsql v0.0.0-20190316074304-ecad98b20aec // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
@@ -40,6 +41,7 @@ require (
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
+	github.com/ory/viper v1.5.6
 	github.com/ory/x v0.0.66
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5

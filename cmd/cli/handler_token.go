@@ -45,8 +45,6 @@ func newTokenHandler() *TokenHandler {
 }
 
 func (h *TokenHandler) RevokeToken(cmd *cobra.Command, args []string) {
-	cmdx.ExactArgs(cmd, args, 1)
-
 	handler := configureClientWithoutAuth(cmd)
 
 	clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret")

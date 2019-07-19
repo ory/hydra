@@ -34,7 +34,7 @@ import (
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 

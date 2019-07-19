@@ -26,6 +26,7 @@ import (
 
 var clientsGetCmd = &cobra.Command{
 	Use:   "get <id>",
+	Args:  cobra.MinimumNArgs(1),
 	Short: "Get an OAuth 2.0 Client",
 	Long: `This command retrieves an OAuth 2.0 Clients by its ID.
 

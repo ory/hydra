@@ -43,7 +43,6 @@ func newClientHandler() *ClientHandler {
 }
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
-	cmdx.MinArgs(cmd, args, 1)
 	m := configureClient(cmd)
 
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
@@ -148,7 +147,6 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 }
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
-	cmdx.MinArgs(cmd, args, 1)
 	m := configureClient(cmd)
 
 	for _, c := range args {

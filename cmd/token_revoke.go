@@ -29,6 +29,7 @@ import (
 // validateCmd represents the validate command
 var tokenRevokeCmd = &cobra.Command{
 	Use:   "revoke <token>",
+	Args:  cobra.ExactArgs(1),
 	Short: "Revoke an access or refresh token",
 	Run:   cmdHandler.Token.RevokeToken,
 }

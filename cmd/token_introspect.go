@@ -29,6 +29,7 @@ import (
 // validateCmd represents the validate command
 var tokenIntrospectCmd = &cobra.Command{
 	Use:   "introspect <token>",
+	Args:  cobra.ExactArgs(1),
 	Short: "Introspect an access or refresh token",
 	Run:   cmdHandler.Introspection.Introspect,
 }

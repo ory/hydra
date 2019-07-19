@@ -46,7 +46,7 @@ To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--
 func init() {
 	clientsCmd.AddCommand(clientsCreateCmd)
 	clientsCreateCmd.Flags().String("id", "", "Give the client this id")
-	clientsCreateCmd.Flags().StringSliceP("callbacks", "c", []string{}, "REQUIRED list of allowed callback URLs")
+	clientsCreateCmd.Flags().StringSlice("callbacks", []string{}, "REQUIRED list of allowed callback URLs")
 	clientsCreateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	clientsCreateCmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")
 	clientsCreateCmd.Flags().StringSliceP("scope", "a", []string{""}, "The scope the client is allowed to request")

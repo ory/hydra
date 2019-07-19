@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
@@ -13,36 +14,7 @@ import (
 )
 
 func resetConfig() {
-	viper.Set(configuration.ViperKeyWellKnownKeys, nil)
-	viper.Set(configuration.ViperKeySubjectTypesSupported, nil)
-	viper.Set(configuration.ViperKeyDefaultClientScope, nil)
-	viper.Set(configuration.ViperKeyDSN, nil)
-	viper.Set(configuration.ViperKeyBCryptCost, nil)
-	viper.Set(configuration.ViperKeyAdminListenOnHost, nil)
-	viper.Set(configuration.ViperKeyAdminListenOnPort, nil)
-	viper.Set(configuration.ViperKeyPublicListenOnHost, nil)
-	viper.Set(configuration.ViperKeyPublicListenOnPort, nil)
-	viper.Set(configuration.ViperKeyConsentRequestMaxAge, nil)
-	viper.Set(configuration.ViperKeyAccessTokenLifespan, nil)
-	viper.Set(configuration.ViperKeyRefreshTokenLifespan, nil)
-	viper.Set(configuration.ViperKeyIDTokenLifespan, nil)
-	viper.Set(configuration.ViperKeyAuthCodeLifespan, nil)
-	viper.Set(configuration.ViperKeyScopeStrategy, nil)
-	viper.Set(configuration.ViperKeyGetCookieSecrets, nil)
-	viper.Set(configuration.ViperKeyGetSystemSecret, nil)
-	viper.Set(configuration.ViperKeyLogoutRedirectURL, nil)
-	viper.Set(configuration.ViperKeyLoginURL, nil)
-	viper.Set(configuration.ViperKeyConsentURL, nil)
-	viper.Set(configuration.ViperKeyErrorURL, nil)
-	viper.Set(configuration.ViperKeyPublicURL, nil)
-	viper.Set(configuration.ViperKeyIssuerURL, nil)
-	viper.Set(configuration.ViperKeyOAuth2ClientRegistrationURL, nil)
-	viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, nil)
-	viper.Set(configuration.ViperKeyAccessTokenStrategy, nil)
-	viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, nil)
-	viper.Set(configuration.ViperKeyOIDCDiscoverySupportedClaims, nil)
-	viper.Set(configuration.ViperKeyOIDCDiscoverySupportedScope, nil)
-	viper.Set(configuration.ViperKeyOIDCDiscoveryUserinfoEndpoint, nil)
+	viper.Reset()
 
 	viper.Set(configuration.ViperKeyBCryptCost, "4")
 	viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, "00000000")

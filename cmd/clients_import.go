@@ -27,6 +27,7 @@ import (
 var clientsImportCmd = &cobra.Command{
 	Use:   "import <path/to/file.json> [<path/to/other/file.json>...]",
 	Short: "Import OAuth 2.0 Clients from one or more JSON files",
+	Args:  cobra.MinimumNArgs(1),
 	Long: `This command reads in each listed JSON file and imports their contents as OAuth 2.0 Clients.
 
 The format for the JSON file is:

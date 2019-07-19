@@ -49,7 +49,6 @@ func newJWKHandler() *JWKHandler {
 }
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
-	cmdx.RangeArgs(cmd, args, []int{1, 2})
 	m := configureClient(cmd)
 
 	var kid string
@@ -96,8 +95,6 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose
 }
 
 func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
-	cmdx.MinArgs(cmd, args, 2)
-
 	id := args[0]
 	use := flagx.MustGetString(cmd, "use")
 	client := &http.Client{}
@@ -171,7 +168,6 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 }
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
-	cmdx.ExactArgs(cmd, args, 1)
 	m := configureClient(cmd)
 
 	keys, err := m.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet(args[0]))
@@ -180,7 +176,6 @@ func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 }
 
 func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
-	cmdx.ExactArgs(cmd, args, 1)
 	m := configureClient(cmd)
 
 	_, err := m.Admin.DeleteJSONWebKeySet(admin.NewDeleteJSONWebKeySetParams().WithSet(args[0]))

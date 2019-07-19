@@ -27,6 +27,7 @@ import (
 // deleteCmd represents the delete command
 var keysDeleteCmd = &cobra.Command{
 	Use:   "delete <set>",
+	Args:  cobra.ExactArgs(1),
 	Short: "Delete a new JSON Web Key Set",
 	Run:   cmdHandler.Keys.DeleteKeys,
 }

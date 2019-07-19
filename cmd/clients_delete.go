@@ -27,6 +27,7 @@ import (
 // clientsDeleteCmd represents the delete command
 var clientsDeleteCmd = &cobra.Command{
 	Use:   "delete <id> [<id>...]",
+	Args:  cobra.MinimumNArgs(1),
 	Short: "Delete an OAuth 2.0 Client",
 	Long: `This command deletes one or more OAuth 2.0 Clients by their respective IDs.
 

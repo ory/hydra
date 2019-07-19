@@ -28,7 +28,8 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"

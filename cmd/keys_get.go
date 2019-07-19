@@ -27,6 +27,7 @@ import (
 // getCmd represents the get command
 var keysGetCmd = &cobra.Command{
 	Use:   "get <set>",
+	Args:  cobra.ExactArgs(1),
 	Short: "Get a new JSON Web Key Set",
 	Run:   cmdHandler.Keys.GetKeys,
 }

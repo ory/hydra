@@ -44,7 +44,6 @@ func newIntrospectionHandler() *IntrospectionHandler {
 }
 
 func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
-	cmdx.ExactArgs(cmd, args, 1)
 	c := configureClient(cmd)
 
 	var ht runtime.ClientAuthInfoWriter

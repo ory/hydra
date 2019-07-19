@@ -21,6 +21,7 @@ import (
 // keysImportCmd represents the import command
 var keysImportCmd = &cobra.Command{
 	Use:   "import <set> <file-1> [<file-2> [<file-3 [<...>]]]",
+	Args:  cobra.MinimumNArgs(2),
 	Short: "Imports cryptographic keys of any format to the JSON Web Key Store",
 	Long: `This command allows you to import cryptographic keys to the JSON Web Key Store.
 

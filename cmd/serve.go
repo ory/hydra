@@ -45,7 +45,7 @@ port handles administrative requests like creating OAuth 2.0 Clients, managing J
 and Consent sessions.
 
 It is recommended to run "hydra serve all". If you need granular control over CORS settings or similar, you may
-want to run "hydra serve admin" and "admin serve public" separately.
+want to run "hydra serve admin" and "hydra serve public" separately.
 
 To learn more about each individual command, run:
 

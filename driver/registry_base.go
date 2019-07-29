@@ -268,7 +268,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			m.Logger().Fatalf(`Environment variable OAUTH2_ACCESS_TOKEN_STRATEGY is set to "%s" but only "opaque" and "jwt" are valid values.`, ats)
 		}
 
-		return compose.Compose(
+		m.fop = compose.Compose(
 			fc,
 			m.r.OAuth2Storage(),
 			&compose.CommonStrategy{

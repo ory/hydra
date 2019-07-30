@@ -11,14 +11,15 @@ import (
 	"github.com/olekukonko/tablewriter"
 	migrate "github.com/rubenv/sql-migrate"
 
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/sqlcon"
-	"github.com/ory/x/urlx"
 )
 
 type RegistrySQL struct {
@@ -108,7 +109,7 @@ func (m *RegistrySQL) SchemaMigrationPlan(dbName string) (*tablewriter.Table, er
 		"Query",
 	})
 
-	for _, s := range []schemaCreator{
+	for component, s := range []schemaCreator{
 		m.KeyManager().(schemaCreator),
 		m.ClientManager().(schemaCreator),
 		m.ConsentManager().(schemaCreator),
@@ -121,10 +122,10 @@ func (m *RegistrySQL) SchemaMigrationPlan(dbName string) (*tablewriter.Table, er
 
 		for _, plan := range plans {
 			for k, up := range plan.Up {
-				up = strings.Replace("\n", "", strings.TrimSpace(up), -1)
+				up = strings.Replace(strings.TrimSpace(up), "\n", "", -1)
 				up = strings.Join(strings.Fields(up), " ")
 				if len(up) > 0 {
-					table.Append([]string{m.db.DriverName(), names[k], plan.Id + ".sql", fmt.Sprintf("%d", k), up})
+					table.Append([]string{m.db.DriverName(), names[component], plan.Id + ".sql", fmt.Sprintf("%d", k), up})
 				}
 			}
 		}

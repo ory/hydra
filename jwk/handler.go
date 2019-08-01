@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/ory/x/stringslice"
 
@@ -327,8 +328,22 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //       500: genericError
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
+	var olderThan = r.URL.Query().Get("older-than")
 
-	if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
+	if olderThan != "" {
+		date, err := time.Parse("2006-01-02", olderThan)
+
+		if err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+
+		if err := h.r.KeyManager().DeleteOldKeys(r.Context(), setName, date); err != nil {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+
+	} else if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

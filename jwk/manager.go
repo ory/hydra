@@ -22,6 +22,7 @@ package jwk
 
 import (
 	"context"
+	"time"
 
 	jose "gopkg.in/square/go-jose.v2"
 )
@@ -38,6 +39,8 @@ type Manager interface {
 	GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error)
 
 	DeleteKey(ctx context.Context, set, kid string) error
+
+	DeleteOldKeys(ctx context.Context, set string, date time.Time) error
 
 	DeleteKeySet(ctx context.Context, set string) error
 }

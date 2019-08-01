@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"
@@ -33,14 +34,23 @@ import (
 	"github.com/ory/hydra/x"
 )
 
+type jsonWebKeySet struct {
+	keys []jsonWebKey
+}
+
+type jsonWebKey struct {
+	jose.JSONWebKey
+	createdAt time.Time
+}
+
 type MemoryManager struct {
-	Keys map[string]*jose.JSONWebKeySet
+	Keys map[string]*jsonWebKeySet
 	sync.RWMutex
 }
 
 func NewMemoryManager() *MemoryManager {
 	return &MemoryManager{
-		Keys: map[string]*jose.JSONWebKeySet{},
+		Keys: make(map[string]*jsonWebKeySet),
 	}
 }
 
@@ -50,10 +60,12 @@ func (m *MemoryManager) AddKey(ctx context.Context, set string, key *jose.JSONWe
 
 	m.alloc()
 	if m.Keys[set] == nil {
-		m.Keys[set] = &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
+		m.Keys[set] = &jsonWebKeySet{
+			keys: make([]jsonWebKey, 0),
+		}
 	}
 
-	for _, k := range m.Keys[set].Keys {
+	for _, k := range m.Keys[set].keys {
 		if k.KeyID == key.KeyID {
 			return errors.WithStack(&fosite.RFC6749Error{
 				Code:        http.StatusConflict,
@@ -63,7 +75,11 @@ func (m *MemoryManager) AddKey(ctx context.Context, set string, key *jose.JSONWe
 		}
 	}
 
-	m.Keys[set].Keys = append([]jose.JSONWebKey{*key}, m.Keys[set].Keys...)
+	newKey := jsonWebKey{
+		JSONWebKey: *key,
+		createdAt:  time.Now(),
+	}
+	m.Keys[set].keys = append([]jsonWebKey{newKey}, m.Keys[set].keys...)
 	return nil
 }
 
@@ -86,7 +102,12 @@ func (m *MemoryManager) GetKey(ctx context.Context, set, kid string) (*jose.JSON
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
-	result := keys.Key(kid)
+	var result []jose.JSONWebKey
+	for _, k := range keys.keys {
+		if k.KeyID == kid {
+			result = append(result, k.JSONWebKey)
+		}
+	}
 	if len(result) == 0 {
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
@@ -97,6 +118,22 @@ func (m *MemoryManager) GetKey(ctx context.Context, set, kid string) (*jose.JSON
 }
 
 func (m *MemoryManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
+	keys, err := m.getKeySet(ctx, set)
+	if err != nil {
+		return nil, err
+	}
+
+	keySet := &jose.JSONWebKeySet{
+		Keys: make([]jose.JSONWebKey, 0, len(keys.keys)),
+	}
+	for _, k := range keys.keys {
+		keySet.Keys = append(keySet.Keys, k.JSONWebKey)
+	}
+
+	return keySet, nil
+}
+
+func (m *MemoryManager) getKeySet(ctx context.Context, set string) (*jsonWebKeySet, error) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -106,7 +143,7 @@ func (m *MemoryManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWe
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
-	if len(keys.Keys) == 0 {
+	if len(keys.keys) == 0 {
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
@@ -114,20 +151,40 @@ func (m *MemoryManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWe
 }
 
 func (m *MemoryManager) DeleteKey(ctx context.Context, set, kid string) error {
-	keys, err := m.GetKeySet(ctx, set)
+	keys, err := m.getKeySet(ctx, set)
 	if err != nil {
 		return err
 	}
 
 	m.Lock()
-	var results []jose.JSONWebKey
-	for _, key := range keys.Keys {
+	var results []jsonWebKey
+	for _, key := range keys.keys {
 		if key.KeyID != kid {
 			results = append(results, key)
 		}
 	}
-	m.Keys[set].Keys = results
+	m.Keys[set].keys = results
 	defer m.Unlock()
+
+	return nil
+}
+
+func (m *MemoryManager) DeleteOldKeys(ctx context.Context, set string, date time.Time) error {
+	keys, err := m.getKeySet(ctx, set)
+	if err != nil {
+		return err
+	}
+
+	m.Lock()
+	defer m.Unlock()
+
+	var results []jsonWebKey
+	for _, key := range keys.keys {
+		if key.createdAt.After(date) {
+			results = append(results, key)
+		}
+	}
+	m.Keys[set].keys = results
 
 	return nil
 }
@@ -142,6 +199,6 @@ func (m *MemoryManager) DeleteKeySet(ctx context.Context, set string) error {
 
 func (m *MemoryManager) alloc() {
 	if m.Keys == nil {
-		m.Keys = make(map[string]*jose.JSONWebKeySet)
+		m.Keys = make(map[string]*jsonWebKeySet)
 	}
 }

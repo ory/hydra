@@ -13,23 +13,10 @@ PHP 5.4.0 and later
 ## Installation & Usage
 ### Composer
 
-To install the bindings via [Composer](http://getcomposer.org/), add the following to `composer.json`:
-
+To install the bindings via [Composer](http://getcomposer.org/), run the following command:
+```bash
+$ composer require ory/hydra-sdk
 ```
-{
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/ory/swagger.git"
-    }
-  ],
-  "require": {
-    "ory/swagger": "*@dev"
-  }
-}
-```
-
-Then run `composer install`
 
 ### Manual Installation
 

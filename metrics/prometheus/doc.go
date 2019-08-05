@@ -3,7 +3,15 @@
 //
 // swagger:route GET /metrics/prometheus public isInstanceAlive
 //
-// Get snapshot metrics from the Hydra service
+// Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to
+// your deployment like so:
+
+// ```
+// metadata:
+//  annotations:
+//    prometheus.io/port: "4445"
+//      prometheus.io/path: "/metrics/prometheus"
+// ```
 //
 //     Produces:
 //     - plain/text

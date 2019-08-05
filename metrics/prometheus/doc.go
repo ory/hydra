@@ -17,5 +17,5 @@
 //     - plain/text
 //
 //     Responses:
-//       200: promResponse
+//       200: emptyResponse
 func swaggerPublicPrometheus() {}

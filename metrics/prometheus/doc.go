@@ -1,4 +1,4 @@
-
+package prometheus
 // Outputs Prometheus metrics
 //
 // swagger:route GET /metrics/prometheus public isInstanceAlive

@@ -242,10 +242,13 @@ Official:
 * [User Login & Consent Example](https://github.com/ory/hydra-login-consent-node)
 
 Community:
-* [Consent App SDK for Go](https://github.com/janekolszak/idp)
-* [ORY Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
 * [Kubernetes helm chart](https://github.com/kubernetes/charts/pull/1022)
 * [Werther - an Identity Provider over LDAP](https://github.com/i-core/werther)
+
+:warning: Outdated Community Projects:
+The following projects are outdated and won't work anymore in most cases. Having said that they still might help you to better understand how to integrate HYDRA and solve specific cases.
+* [ORY Hydra middleware for Gin](https://github.com/janekolszak/gin-hydra)
+* [Consent App SDK for Go](https://github.com/janekolszak/idp)
 
 ## Blog posts & articles
 

@@ -38,6 +38,7 @@ able to securely manage JSON Web Keys.
 **Table of Contents**
 
 - [What is ORY Hydra?](#what-is-ory-hydra)
+  - [Who uses it?](#who-uses-it)
   - [OAuth2 and OpenID Connect: Open Standards!](#oauth2-and-openid-connect-open-standards)
   - [OpenID Connect Certified](#openid-connect-certified)
 - [Quickstart](#quickstart)
@@ -79,6 +80,12 @@ SDKs are being used. The primary goal of ORY Hydra is to make OAuth 2.0 and Open
 ORY Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
 or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
 to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/) or your proprietary Java authentication.
+
+### Who's using it?
+
+<!-- BEGIN ADOPTERS -->
+
+<!-- END ADOPTERS -->
 
 ### OAuth2 and OpenID Connect: Open Standards!
 

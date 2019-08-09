@@ -81,7 +81,7 @@ ORY Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 withou
 or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
 to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/) or your proprietary Java authentication.
 
-### Who uses it?
+### Who's using it?
 
 <!-- BEGIN ADOPTERS -->
 

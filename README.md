@@ -83,9 +83,101 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 
 ### Who's using it?
 
-<!-- BEGIN ADOPTERS -->
+<!--BEGIN ADOPTERS-->
+The ORY community stands on the shoulders of individuals, companies, and maintainers. We thank everyone involved - from
+submitting bug reports and feature requests, to contributing patches, to sponsoring our work. Our community is
+1000+ strong and growing rapidly. The ORY stack protects 1.200.000.000+ API requests every month with over
+15.000+ active service nodes. Our small but expert team would have never been able to achieve this without each and
+everyone of you.
 
-<!-- END ADOPTERS -->
+The following list represents companies that have accompanied us along the way and that have made outstanding contributions
+to our ecosystem. *If you think that your company deserves a spot here, reach out to <a href="mailto:hi@ory.sh">hi@ory.sh</a>now*!
+
+**Please consider giving back by becoming a sponsor of our open source work on <a href="https://www.patreon.com/_ory">Patreon</a> or 
+<a href="https://opencollective.com/ory">Open Collective</a>.**
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Logo</th>
+            <th>Website</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Sponsor</td>
+            <td>Raspberry PI Foundation</td>
+            <td align="center"><img height="32px" src="./docs/adopters/raspi.svg" alt="Raspberry PI Foundation"></td>
+            <td><a href="https://www.raspberrypi.org/">raspberrypi.org</a></td>
+        </tr>
+        <tr>
+            <td>Contributor</td>
+            <td>Kyma Project</a>
+            <td align="center"><img height="32px" src="./docs/adopters/kyma.svg" alt="Kyma Project"></td>
+            <td><a href="https://kyma-project.io">kyma-project.io</a></td>
+        </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>ThoughtWorks</td>
+            <td align="center"><img height="32px" src="./docs/adopters/tw.svg" alt="ThoughtWorks"></td>
+            <td><a href="https://www.thoughtworks.com/">thoughtworks.com</a></td>
+        </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>Tulip</td>
+            <td align="center"><img height="32px" src="./docs/adopters/tulip.svg" alt="Tulip Retail"></td>
+            <td><a href="https://tulip.com/">tulip.com</a></td>
+        </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>Cashdeck / All My Funds</td>
+            <td align="center"><img height="32px" src="./docs/adopters/allmyfunds.svg" alt="All My Funds"></td>
+            <td><a href="https://cashdeck.com.au/">cashdeck.com.au</a></td>
+        </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>3 Rein</td>
+            <td align="center"><img height="32px" src="./docs/adopters/3R-horiz.svg" alt="3REIN"></td>
+            <td><a href="https://3rein.com/">3rein.com</a> <em>(avaiable soon)</em></td>
+        </tr>
+        <tr>
+            <td>Contributor</td>
+            <td>Hootsuite</td>
+            <td align="center"><img height="32px" src="./docs/adopters/hootsuite.svg" alt="Hootsuite"></td>
+            <td><a href="https://hootsuite.com/">hootsuite.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Segment</td>
+            <td align="center"><img height="32px" src="./docs/adopters/segment.svg" alt="Segment"></td>
+            <td><a href="https://segment.com/">segment.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Arduino</td>
+            <td align="center"><img height="32px" src="./docs/adopters/arduino.svg" alt="Arduino"></td>
+            <td><a href="https://www.arduino.cc/">segment.com</a></td>
+        </tr>
+    </tdbody>
+</table>
+
+We also want to thank all individual contributors
+
+<img src="https://opencollective.com/ory/contributors.svg?width=890&button=false" /></a>
+
+as well as all of our backers
+
+<a href="https://opencollective.com/ory#backers" target="_blank"><img src="https://opencollective.com/ory/backers.svg?width=890"></a>
+
+and past & current supporters (in alphabetical order) on [Patreon](https://www.patreon.com/_ory): Alexander Alimovs,
+Billy, Chancy Kennedy, Drozzy, Edwin Trejos, Howard Edidin, Ken Adler Oz Haven, Stefan Hans, TheCrealm.
+
+<em>* Uses one of ORY's major projects in production.</em>
+
+<!--END ADOPTERS-->
+
 
 ### OAuth2 and OpenID Connect: Open Standards!
 

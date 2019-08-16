@@ -477,10 +477,13 @@ func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx co
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 
+	clientsMap := make(map[string]bool)
+
 	var rs []client.Client
 	for _, cr := range m.consentRequests {
-		if cr.Subject == subject && len(cr.Client.BackChannelLogoutURI) > 0 {
+		if cr.Subject == subject && len(cr.Client.BackChannelLogoutURI) > 0 && !clientsMap[cr.Client.GetID()] {
 			rs = append(rs, *cr.Client)
+			clientsMap[cr.Client.GetID()] = true
 		}
 	}
 

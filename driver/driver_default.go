@@ -3,8 +3,9 @@ package driver
 import (
 	"fmt"
 
-	"github.com/ory/viper"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 )

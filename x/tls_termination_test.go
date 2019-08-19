@@ -6,8 +6,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/ory/viper"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"

@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+
 	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"

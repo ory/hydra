@@ -13,7 +13,6 @@ import (
 
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
-	"github.com/ory/x/urlx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -158,7 +157,9 @@ func (m *RegistrySQL) CreateSchemas(dbName string) (int, error) {
 }
 
 func (m *RegistrySQL) CanHandle(dsn string) bool {
-	s := dbal.Canonicalize(urlx.ParseOrFatal(m.l, dsn).Scheme)
+	scheme := strings.Split(dsn, "://")[0]
+	fmt.Printf("scheme: %s %s \n\n", scheme, dsn)
+	s := dbal.Canonicalize(scheme)
 	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
 }
 

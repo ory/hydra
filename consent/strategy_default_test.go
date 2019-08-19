@@ -40,10 +40,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/urfave/negroni"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"

@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 
 	"github.com/ory/fosite"
 	. "github.com/ory/hydra/driver"

@@ -32,7 +32,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	goauth2 "golang.org/x/oauth2"

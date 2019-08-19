@@ -26,7 +26,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
 

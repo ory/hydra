@@ -157,7 +157,9 @@ func (m *RegistrySQL) CreateSchemas(dbName string) (int, error) {
 }
 
 func (m *RegistrySQL) CanHandle(dsn string) bool {
-	s := dbal.Canonicalize(strings.Split(dsn, "://")[0])
+	scheme := strings.Split(dsn, "://")[0]
+	fmt.Printf("scheme: %s %s \n\n", scheme, dsn)
+	s := dbal.Canonicalize(scheme)
 	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
 }
 

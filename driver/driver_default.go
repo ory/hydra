@@ -1,6 +1,9 @@
 package driver
 
 import (
+	"fmt"
+
+	"github.com/ory/viper"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/driver/configuration"
@@ -12,7 +15,9 @@ type DefaultDriver struct {
 }
 
 func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, insecureRedirects []string, version, build, date string, validate bool) Driver {
+	fmt.Printf("migrate dsn set viper 2: %s\n", viper.GetString("dsn"))
 	c := configuration.NewViperProvider(l, forcedHTTP, insecureRedirects)
+	fmt.Printf("migrate dsn set viper 3: %s\n", viper.GetString("dsn"))
 
 	if validate {
 		configuration.MustValidate(l, c)

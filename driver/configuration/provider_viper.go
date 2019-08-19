@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/rs/cors"
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/stringsx"

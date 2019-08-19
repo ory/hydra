@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/spf13/viper"
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"

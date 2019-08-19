@@ -61,7 +61,7 @@ func createTestClient(prefix string) *models.Client {
 		Scope:                     prefix + "foo bar baz",
 		TermsOfServiceURI:         prefix + "tos-uri",
 		ResponseTypes:             []string{prefix + "id_token", prefix + "code"},
-		RedirectUris:              []string{"https://" + prefix + "redirect-url", "https://" + prefix + "redirect-uri"},
+		RedirectURIs:              []string{"https://" + prefix + "redirect-url", "https://" + prefix + "redirect-uri"},
 		SecretExpiresAt:           0,
 		TokenEndpointAuthMethod:   "client_secret_basic",
 		UserinfoSignedResponseAlg: "none",

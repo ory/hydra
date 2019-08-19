@@ -155,7 +155,7 @@ to our ecosystem. *If you think that your company deserves a spot here, reach ou
             <td>Adopter *</td>
             <td>Arduino</td>
             <td align="center"><img height="32px" src="./docs/adopters/arduino.svg" alt="Arduino"></td>
-            <td><a href="https://www.arduino.cc/">segment.com</a></td>
+            <td><a href="https://www.arduino.cc/">arduino.cc</a></td>
         </tr>
     </tdbody>
 </table>
@@ -174,6 +174,7 @@ Billy, Chancy Kennedy, Drozzy, Edwin Trejos, Howard Edidin, Ken Adler Oz Haven, 
 <em>* Uses one of ORY's major projects in production.</em>
 
 <!--END ADOPTERS-->
+
 
 
 ### OAuth2 and OpenID Connect: Open Standards!

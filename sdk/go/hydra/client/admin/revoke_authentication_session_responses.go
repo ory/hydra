@@ -24,28 +24,24 @@ type RevokeAuthenticationSessionReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *RevokeAuthenticationSessionReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 204:
 		result := NewRevokeAuthenticationSessionNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewRevokeAuthenticationSessionBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewRevokeAuthenticationSessionNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewRevokeAuthenticationSessionInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -97,6 +93,10 @@ func (o *RevokeAuthenticationSessionBadRequest) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionBadRequest  %+v", 400, o.Payload)
 }
 
+func (o *RevokeAuthenticationSessionBadRequest) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *RevokeAuthenticationSessionBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -126,6 +126,10 @@ func (o *RevokeAuthenticationSessionNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionNotFound  %+v", 404, o.Payload)
 }
 
+func (o *RevokeAuthenticationSessionNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *RevokeAuthenticationSessionNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -153,6 +157,10 @@ type RevokeAuthenticationSessionInternalServerError struct {
 
 func (o *RevokeAuthenticationSessionInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *RevokeAuthenticationSessionInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *RevokeAuthenticationSessionInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

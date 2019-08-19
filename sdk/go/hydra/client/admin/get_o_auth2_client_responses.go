@@ -24,21 +24,18 @@ type GetOAuth2ClientReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetOAuth2ClientOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewGetOAuth2ClientNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewGetOAuth2ClientInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type GetOAuth2ClientOK struct {
 
 func (o *GetOAuth2ClientOK) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientOK  %+v", 200, o.Payload)
+}
+
+func (o *GetOAuth2ClientOK) GetPayload() *models.Client {
+	return o.Payload
 }
 
 func (o *GetOAuth2ClientOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *GetOAuth2ClientNotFound) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientNotFound  %+v", 404, o.Payload)
 }
 
+func (o *GetOAuth2ClientNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *GetOAuth2ClientNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type GetOAuth2ClientInternalServerError struct {
 
 func (o *GetOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *GetOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *GetOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

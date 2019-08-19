@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**disconnectUser**](PublicApi.md#disconnectUser) | **GET** /oauth2/sessions/logout | OpenID Connect Front-Backchannel enabled Logout
 [**discoverOpenIDConfiguration**](PublicApi.md#discoverOpenIDConfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
+[**isInstanceReady**](PublicApi.md#isInstanceReady) | **GET** /health/ready | Check readiness status
 [**oauth2Token**](PublicApi.md#oauth2Token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 [**oauthAuth**](PublicApi.md#oauthAuth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 [**revokeOAuth2Token**](PublicApi.md#revokeOAuth2Token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
@@ -84,6 +85,47 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**WellKnown**](WellKnown.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+<a name="isInstanceReady"></a>
+# **isInstanceReady**
+> HealthStatus isInstanceReady()
+
+Check readiness status
+
+This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g. the database) are responsive as well.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+
+### Example
+```java
+// Import classes:
+//import com.github.ory.hydra.ApiException;
+//import com.github.ory.hydra.api.PublicApi;
+
+
+PublicApi apiInstance = new PublicApi();
+try {
+    HealthStatus result = apiInstance.isInstanceReady();
+    System.out.println(result);
+} catch (ApiException e) {
+    System.err.println("Exception when calling PublicApi#isInstanceReady");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**HealthStatus**](HealthStatus.md)
 
 ### Authorization
 

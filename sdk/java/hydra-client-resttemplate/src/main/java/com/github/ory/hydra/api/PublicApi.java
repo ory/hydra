@@ -3,6 +3,8 @@ package com.github.ory.hydra.api;
 import com.github.ory.hydra.ApiClient;
 
 import com.github.ory.hydra.model.GenericError;
+import com.github.ory.hydra.model.HealthNotReadyStatus;
+import com.github.ory.hydra.model.HealthStatus;
 import com.github.ory.hydra.model.JSONWebKeySet;
 import com.github.ory.hydra.model.Oauth2TokenResponse;
 import com.github.ory.hydra.model.UserinfoResponse;
@@ -27,7 +29,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-07-18T19:30:59.329+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T18:06:10.908+02:00")
 @Component("com.github.ory.hydra.api.PublicApi")
 public class PublicApi {
     private ApiClient apiClient;
@@ -108,6 +110,37 @@ public class PublicApi {
         String[] authNames = new String[] {  };
 
         ParameterizedTypeReference<WellKnown> returnType = new ParameterizedTypeReference<WellKnown>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * Check readiness status
+     * This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g. the database) are responsive as well.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+     * <p><b>200</b> - healthStatus
+     * <p><b>503</b> - healthNotReadyStatus
+     * @return HealthStatus
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public HealthStatus isInstanceReady() throws RestClientException {
+        Object postBody = null;
+        
+        String path = UriComponentsBuilder.fromPath("/health/ready").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<HealthStatus> returnType = new ParameterizedTypeReference<HealthStatus>() {};
         return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**

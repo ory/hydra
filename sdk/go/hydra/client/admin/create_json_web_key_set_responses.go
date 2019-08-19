@@ -24,28 +24,24 @@ type CreateJSONWebKeySetReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *CreateJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 201:
 		result := NewCreateJSONWebKeySetCreated()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewCreateJSONWebKeySetUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 403:
 		result := NewCreateJSONWebKeySetForbidden()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewCreateJSONWebKeySetInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -73,6 +69,10 @@ type CreateJSONWebKeySetCreated struct {
 
 func (o *CreateJSONWebKeySetCreated) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetCreated  %+v", 201, o.Payload)
+}
+
+func (o *CreateJSONWebKeySetCreated) GetPayload() *models.SwaggerJSONWebKeySet {
+	return o.Payload
 }
 
 func (o *CreateJSONWebKeySetCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -104,6 +104,10 @@ func (o *CreateJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *CreateJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *CreateJSONWebKeySetUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -133,6 +137,10 @@ func (o *CreateJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
 
+func (o *CreateJSONWebKeySetForbidden) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *CreateJSONWebKeySetForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -160,6 +168,10 @@ type CreateJSONWebKeySetInternalServerError struct {
 
 func (o *CreateJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *CreateJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *CreateJSONWebKeySetInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

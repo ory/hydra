@@ -24,14 +24,12 @@ type ListOAuth2ClientsReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *ListOAuth2ClientsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewListOAuth2ClientsOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 500:
 		result := NewListOAuth2ClientsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -61,6 +59,10 @@ func (o *ListOAuth2ClientsOK) Error() string {
 	return fmt.Sprintf("[GET /clients][%d] listOAuth2ClientsOK  %+v", 200, o.Payload)
 }
 
+func (o *ListOAuth2ClientsOK) GetPayload() []*models.Client {
+	return o.Payload
+}
+
 func (o *ListOAuth2ClientsOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
@@ -86,6 +88,10 @@ type ListOAuth2ClientsInternalServerError struct {
 
 func (o *ListOAuth2ClientsInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /clients][%d] listOAuth2ClientsInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *ListOAuth2ClientsInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *ListOAuth2ClientsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

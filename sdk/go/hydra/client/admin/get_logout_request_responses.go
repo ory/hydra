@@ -24,21 +24,18 @@ type GetLogoutRequestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetLogoutRequestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetLogoutRequestOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewGetLogoutRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewGetLogoutRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type GetLogoutRequestOK struct {
 
 func (o *GetLogoutRequestOK) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestOK  %+v", 200, o.Payload)
+}
+
+func (o *GetLogoutRequestOK) GetPayload() *models.LogoutRequest {
+	return o.Payload
 }
 
 func (o *GetLogoutRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *GetLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestNotFound  %+v", 404, o.Payload)
 }
 
+func (o *GetLogoutRequestNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *GetLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type GetLogoutRequestInternalServerError struct {
 
 func (o *GetLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *GetLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *GetLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

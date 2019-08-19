@@ -24,14 +24,12 @@ type UpdateOAuth2ClientReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *UpdateOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewUpdateOAuth2ClientOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 500:
 		result := NewUpdateOAuth2ClientInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -61,6 +59,10 @@ func (o *UpdateOAuth2ClientOK) Error() string {
 	return fmt.Sprintf("[PUT /clients/{id}][%d] updateOAuth2ClientOK  %+v", 200, o.Payload)
 }
 
+func (o *UpdateOAuth2ClientOK) GetPayload() *models.Client {
+	return o.Payload
+}
+
 func (o *UpdateOAuth2ClientOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Client)
@@ -88,6 +90,10 @@ type UpdateOAuth2ClientInternalServerError struct {
 
 func (o *UpdateOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /clients/{id}][%d] updateOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *UpdateOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *UpdateOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

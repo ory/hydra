@@ -24,21 +24,18 @@ type OauthAuthReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *OauthAuthReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 302:
 		result := NewOauthAuthFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 401:
 		result := NewOauthAuthUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewOauthAuthInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -90,6 +87,10 @@ func (o *OauthAuthUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuthUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *OauthAuthUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *OauthAuthUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -117,6 +118,10 @@ type OauthAuthInternalServerError struct {
 
 func (o *OauthAuthInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuthInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *OauthAuthInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *OauthAuthInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

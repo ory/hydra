@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * ConsentRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-07-18T19:30:59.329+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T18:06:10.908+02:00")
 public class ConsentRequest {
   @JsonProperty("acr")
   private String acr = null;

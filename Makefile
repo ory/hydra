@@ -3,10 +3,7 @@ SHELL=/bin/bash -o pipefail
 .PHONY: tools
 tools:
 		npm i
-		go get github.com/go-bindata/go-bindata/go-bindata
-		go install github.com/go-bindata/go-bindata/go-bindata
-		go get github.com/ory/go-acc
-		go install github.com/ory/go-acc
+		go install github.com/ory/go-acc github.com/ory/x/tools/listx github.com/go-swagger/go-swagger/cmd/swagger github.com/go-bindata/go-bindata/go-bindata github.com/sqs/goreturns
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
@@ -67,7 +64,7 @@ quicktest:
 # Formats the code
 .PHONY: format
 format:
-		goreturns -w -local github.com/ory $$(listx .)
+		$$(go env GOPATH)/bin/goreturns -w -local github.com/ory $$($$(go env GOPATH)/bin/listx .)
 		npm run format
 
 # Generates mocks
@@ -90,11 +87,8 @@ gen: mocks sqlbin sdk
 # Generates the SDKs
 .PHONY: sdk
 sdk:
-		rm -rf ./vendor/
-		GO111MODULE=on go mod tidy
-		GO111MODULE=on go mod vendor
-		GO111MODULE=off swagger generate spec -m -o ./docs/api.swagger.json -x sdk
-		GO111MODULE=off swagger validate ./docs/api.swagger.json
+		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x sdk
+		$$(go env GOPATH)/bin/swagger validate ./docs/api.swagger.json
 
 		rm -rf ./sdk/go/hydra/client
 		rm -rf ./sdk/go/hydra/models
@@ -102,10 +96,10 @@ sdk:
 		rm -rf ./sdk/php/swagger
 		rm -rf ./sdk/java
 
-		GO111MODULE=off swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
+		$$(go env GOPATH)/bin/swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
 		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger
 		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l php -o sdk/php/ \
-			--invoker-package HydraSDK --git-repo-id swagger --git-user-id ory --additional-properties "packagePath=swagger,description=Client for Hydra"
+			--invoker-package Hydra\\SDK --git-repo-id swagger --git-user-id ory --additional-properties "packagePath=swagger,description=Client for Hydra"
 		java -DapiTests=false -DmodelTests=false -jar scripts/swagger-codegen-cli-2.2.3.jar generate \
 			--input-spec ./docs/api.swagger.json \
 			--lang java \
@@ -117,7 +111,7 @@ sdk:
 			--model-package com.github.ory.hydra.model \
 			--output ./sdk/java/hydra-client-resttemplate
 
-		cd sdk/go; goreturns -w -i -local github.com/ory $$(listx .)
+		make format
 
 		rm -f ./sdk/js/swagger/package.json
 		rm -rf ./sdk/js/swagger/test

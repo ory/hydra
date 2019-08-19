@@ -12,9 +12,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/client/health"
 	"github.com/ory/hydra/sdk/go/hydra/client/public"
-	"github.com/ory/hydra/sdk/go/hydra/client/version"
 )
 
 // Default ory hydra HTTP client.
@@ -62,11 +60,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *OryHydra {
 
 	cli.Admin = admin.New(transport, formats)
 
-	cli.Health = health.New(transport, formats)
-
 	cli.Public = public.New(transport, formats)
-
-	cli.Version = version.New(transport, formats)
 
 	return cli
 }
@@ -114,11 +108,7 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type OryHydra struct {
 	Admin *admin.Client
 
-	Health *health.Client
-
 	Public *public.Client
-
-	Version *version.Client
 
 	Transport runtime.ClientTransport
 }
@@ -129,10 +119,6 @@ func (c *OryHydra) SetTransport(transport runtime.ClientTransport) {
 
 	c.Admin.SetTransport(transport)
 
-	c.Health.SetTransport(transport)
-
 	c.Public.SetTransport(transport)
-
-	c.Version.SetTransport(transport)
 
 }

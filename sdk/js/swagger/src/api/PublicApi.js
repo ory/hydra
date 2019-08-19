@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/GenericError', 'model/JSONWebKeySet', 'model/Oauth2TokenResponse', 'model/UserinfoResponse', 'model/WellKnown'], factory);
+    define(['ApiClient', 'model/GenericError', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/JSONWebKeySet', 'model/Oauth2TokenResponse', 'model/UserinfoResponse', 'model/WellKnown'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/GenericError'), require('../model/JSONWebKeySet'), require('../model/Oauth2TokenResponse'), require('../model/UserinfoResponse'), require('../model/WellKnown'));
+    module.exports = factory(require('../ApiClient'), require('../model/GenericError'), require('../model/HealthNotReadyStatus'), require('../model/HealthStatus'), require('../model/JSONWebKeySet'), require('../model/Oauth2TokenResponse'), require('../model/UserinfoResponse'), require('../model/WellKnown'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.PublicApi = factory(root.OryHydra.ApiClient, root.OryHydra.GenericError, root.OryHydra.JSONWebKeySet, root.OryHydra.Oauth2TokenResponse, root.OryHydra.UserinfoResponse, root.OryHydra.WellKnown);
+    root.OryHydra.PublicApi = factory(root.OryHydra.ApiClient, root.OryHydra.GenericError, root.OryHydra.HealthNotReadyStatus, root.OryHydra.HealthStatus, root.OryHydra.JSONWebKeySet, root.OryHydra.Oauth2TokenResponse, root.OryHydra.UserinfoResponse, root.OryHydra.WellKnown);
   }
-}(this, function(ApiClient, GenericError, JSONWebKeySet, Oauth2TokenResponse, UserinfoResponse, WellKnown) {
+}(this, function(ApiClient, GenericError, HealthNotReadyStatus, HealthStatus, JSONWebKeySet, Oauth2TokenResponse, UserinfoResponse, WellKnown) {
   'use strict';
 
   /**
@@ -119,6 +119,45 @@
 
       return this.apiClient.callApi(
         '/.well-known/openid-configuration', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the isInstanceReady operation.
+     * @callback module:api/PublicApi~isInstanceReadyCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/HealthStatus} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Check readiness status
+     * This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g. the database) are responsive as well.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+     * @param {module:api/PublicApi~isInstanceReadyCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/HealthStatus}
+     */
+    this.isInstanceReady = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = HealthStatus;
+
+      return this.apiClient.callApi(
+        '/health/ready', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

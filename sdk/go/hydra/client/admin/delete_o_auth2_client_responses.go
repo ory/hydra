@@ -24,21 +24,18 @@ type DeleteOAuth2ClientReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *DeleteOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 204:
 		result := NewDeleteOAuth2ClientNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewDeleteOAuth2ClientNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewDeleteOAuth2ClientInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -90,6 +87,10 @@ func (o *DeleteOAuth2ClientNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientNotFound  %+v", 404, o.Payload)
 }
 
+func (o *DeleteOAuth2ClientNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *DeleteOAuth2ClientNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -117,6 +118,10 @@ type DeleteOAuth2ClientInternalServerError struct {
 
 func (o *DeleteOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *DeleteOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *DeleteOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

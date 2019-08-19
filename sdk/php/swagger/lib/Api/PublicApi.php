@@ -4,7 +4,7 @@
  * PHP version 5
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -26,18 +26,18 @@
  * Do not edit the class manually.
  */
 
-namespace HydraSDK\Api;
+namespace Hydra\SDK\Api;
 
-use \HydraSDK\ApiClient;
-use \HydraSDK\ApiException;
-use \HydraSDK\Configuration;
-use \HydraSDK\ObjectSerializer;
+use \Hydra\SDK\ApiClient;
+use \Hydra\SDK\ApiException;
+use \Hydra\SDK\Configuration;
+use \Hydra\SDK\ObjectSerializer;
 
 /**
  * PublicApi Class Doc Comment
  *
  * @category Class
- * @package  HydraSDK
+ * @package  Hydra\SDK
  * @author   Swagger Codegen team
  * @link     https://github.com/swagger-api/swagger-codegen
  */
@@ -46,16 +46,16 @@ class PublicApi
     /**
      * API Client
      *
-     * @var \HydraSDK\ApiClient instance of the ApiClient
+     * @var \Hydra\SDK\ApiClient instance of the ApiClient
      */
     protected $apiClient;
 
     /**
      * Constructor
      *
-     * @param \HydraSDK\ApiClient|null $apiClient The api client to use
+     * @param \Hydra\SDK\ApiClient|null $apiClient The api client to use
      */
-    public function __construct(\HydraSDK\ApiClient $apiClient = null)
+    public function __construct(\Hydra\SDK\ApiClient $apiClient = null)
     {
         if ($apiClient === null) {
             $apiClient = new ApiClient();
@@ -67,7 +67,7 @@ class PublicApi
     /**
      * Get API client
      *
-     * @return \HydraSDK\ApiClient get the API client
+     * @return \Hydra\SDK\ApiClient get the API client
      */
     public function getApiClient()
     {
@@ -77,11 +77,11 @@ class PublicApi
     /**
      * Set the API client
      *
-     * @param \HydraSDK\ApiClient $apiClient set the API client
+     * @param \Hydra\SDK\ApiClient $apiClient set the API client
      *
      * @return PublicApi
      */
-    public function setApiClient(\HydraSDK\ApiClient $apiClient)
+    public function setApiClient(\Hydra\SDK\ApiClient $apiClient)
     {
         $this->apiClient = $apiClient;
         return $this;
@@ -94,7 +94,7 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function disconnectUser()
@@ -110,7 +110,7 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function disconnectUserWithHttpInfo()
@@ -162,8 +162,8 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\WellKnown
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\WellKnown
      */
     public function discoverOpenIDConfiguration()
     {
@@ -178,8 +178,8 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\WellKnown, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\WellKnown, HTTP status code, HTTP response headers (array of strings)
      */
     public function discoverOpenIDConfigurationWithHttpInfo()
     {
@@ -210,23 +210,99 @@ class PublicApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\WellKnown',
+                '\Hydra\SDK\Model\WellKnown',
                 '/.well-known/openid-configuration'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\WellKnown', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\WellKnown', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\WellKnown', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\WellKnown', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation isInstanceReady
+     *
+     * Check readiness status
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\HealthStatus
+     */
+    public function isInstanceReady()
+    {
+        list($response) = $this->isInstanceReadyWithHttpInfo();
+        return $response;
+    }
+
+    /**
+     * Operation isInstanceReadyWithHttpInfo
+     *
+     * Check readiness status
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\HealthStatus, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function isInstanceReadyWithHttpInfo()
+    {
+        // parse inputs
+        $resourcePath = "/health/ready";
+        $httpBody = '';
+        $queryParams = [];
+        $headerParams = [];
+        $formParams = [];
+        $_header_accept = $this->apiClient->selectHeaderAccept(['application/json']);
+        if (!is_null($_header_accept)) {
+            $headerParams['Accept'] = $_header_accept;
+        }
+        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json', 'application/x-www-form-urlencoded']);
+
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
+        } elseif (count($formParams) > 0) {
+            $httpBody = $formParams; // for HTTP post (form)
+        }
+        // make the API Call
+        try {
+            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
+                $resourcePath,
+                'GET',
+                $queryParams,
+                $httpBody,
+                $headerParams,
+                '\Hydra\SDK\Model\HealthStatus',
+                '/health/ready'
+            );
+
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\HealthStatus', $httpHeader), $statusCode, $httpHeader];
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\HealthStatus', $e->getResponseHeaders());
+                    $e->setResponseObject($data);
+                    break;
+                case 503:
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\HealthNotReadyStatus', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -246,8 +322,8 @@ class PublicApi
      * @param string $code  (optional)
      * @param string $redirect_uri  (optional)
      * @param string $client_id  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\Oauth2TokenResponse
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\Oauth2TokenResponse
      */
     public function oauth2Token($grant_type, $code = null, $redirect_uri = null, $client_id = null)
     {
@@ -266,8 +342,8 @@ class PublicApi
      * @param string $code  (optional)
      * @param string $redirect_uri  (optional)
      * @param string $client_id  (optional)
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\Oauth2TokenResponse, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\Oauth2TokenResponse, HTTP status code, HTTP response headers (array of strings)
      */
     public function oauth2TokenWithHttpInfo($grant_type, $code = null, $redirect_uri = null, $client_id = null)
     {
@@ -326,23 +402,23 @@ class PublicApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\Oauth2TokenResponse',
+                '\Hydra\SDK\Model\Oauth2TokenResponse',
                 '/oauth2/token'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\Oauth2TokenResponse', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\Oauth2TokenResponse', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\Oauth2TokenResponse', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\Oauth2TokenResponse', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -358,7 +434,7 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function oauthAuth()
@@ -374,7 +450,7 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function oauthAuthWithHttpInfo()
@@ -414,11 +490,11 @@ class PublicApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -435,7 +511,7 @@ class PublicApi
      * Client for Hydra
      *
      * @param string $token  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return void
      */
     public function revokeOAuth2Token($token)
@@ -452,7 +528,7 @@ class PublicApi
      * Client for Hydra
      *
      * @param string $token  (required)
-     * @throws \HydraSDK\ApiException on non-2xx response
+     * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of null, HTTP status code, HTTP response headers (array of strings)
      */
     public function revokeOAuth2TokenWithHttpInfo($token)
@@ -508,11 +584,11 @@ class PublicApi
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -528,8 +604,8 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\UserinfoResponse
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\UserinfoResponse
      */
     public function userinfo()
     {
@@ -544,8 +620,8 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\UserinfoResponse, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\UserinfoResponse, HTTP status code, HTTP response headers (array of strings)
      */
     public function userinfoWithHttpInfo()
     {
@@ -580,23 +656,23 @@ class PublicApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\UserinfoResponse',
+                '\Hydra\SDK\Model\UserinfoResponse',
                 '/userinfo'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\UserinfoResponse', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\UserinfoResponse', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\UserinfoResponse', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\UserinfoResponse', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 401:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }
@@ -612,8 +688,8 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return \HydraSDK\Model\JSONWebKeySet
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return \Hydra\SDK\Model\JSONWebKeySet
      */
     public function wellKnown()
     {
@@ -628,8 +704,8 @@ class PublicApi
      *
      * Client for Hydra
      *
-     * @throws \HydraSDK\ApiException on non-2xx response
-     * @return array of \HydraSDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of \Hydra\SDK\Model\JSONWebKeySet, HTTP status code, HTTP response headers (array of strings)
      */
     public function wellKnownWithHttpInfo()
     {
@@ -660,19 +736,19 @@ class PublicApi
                 $queryParams,
                 $httpBody,
                 $headerParams,
-                '\HydraSDK\Model\JSONWebKeySet',
+                '\Hydra\SDK\Model\JSONWebKeySet',
                 '/.well-known/jwks.json'
             );
 
-            return [$this->apiClient->getSerializer()->deserialize($response, '\HydraSDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
+            return [$this->apiClient->getSerializer()->deserialize($response, '\Hydra\SDK\Model\JSONWebKeySet', $httpHeader), $statusCode, $httpHeader];
         } catch (ApiException $e) {
             switch ($e->getCode()) {
                 case 200:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\JSONWebKeySet', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\JSONWebKeySet', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
                 case 500:
-                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\HydraSDK\Model\GenericError', $e->getResponseHeaders());
+                    $data = $this->apiClient->getSerializer()->deserialize($e->getResponseBody(), '\Hydra\SDK\Model\GenericError', $e->getResponseHeaders());
                     $e->setResponseObject($data);
                     break;
             }

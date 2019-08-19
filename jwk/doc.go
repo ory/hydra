@@ -128,7 +128,6 @@ type swaggerJSONWebKey struct {
 	// a public key is used for encrypting data or verifying the signature
 	// on data. Values are commonly "sig" (signature) or "enc" (encryption).
 	//
-	// required: true
 	// example: sig
 	Use string `json:"use,omitempty"`
 
@@ -138,7 +137,6 @@ type swaggerJSONWebKey struct {
 	// established by [JWA] or be a value that contains a Collision-
 	// Resistant Name.  The "kty" value is a case-sensitive string.
 	//
-	// required: true
 	// example: RSA
 	Kty string `json:"kty,omitempty"`
 
@@ -152,7 +150,6 @@ type swaggerJSONWebKey struct {
 	// equivalent alternatives by the application using them.)  The "kid"
 	// value is a case-sensitive string.
 	//
-	// required: true
 	// example: 1603dfe0af8f4596
 	Kid string `json:"kid,omitempty"`
 
@@ -162,7 +159,6 @@ type swaggerJSONWebKey struct {
 	// established by [JWA] or be a value that contains a Collision-
 	// Resistant Name.
 	//
-	// required: true
 	// example: RS256
 	Alg string `json:"alg,omitempty"`
 

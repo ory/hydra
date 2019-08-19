@@ -16,18 +16,18 @@
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/LogoutRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/PreviousConsentSession', 'model/RejectRequest'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/HealthStatus', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/LogoutRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/PreviousConsentSession', 'model/RejectRequest', 'model/Version'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequest'), require('../model/AcceptLoginRequest'), require('../model/CompletedRequest'), require('../model/ConsentRequest'), require('../model/FlushInactiveOAuth2TokensRequest'), require('../model/GenericError'), require('../model/JSONWebKey'), require('../model/JSONWebKeySet'), require('../model/JsonWebKeySetGeneratorRequest'), require('../model/LoginRequest'), require('../model/LogoutRequest'), require('../model/OAuth2Client'), require('../model/OAuth2TokenIntrospection'), require('../model/PreviousConsentSession'), require('../model/RejectRequest'));
+    module.exports = factory(require('../ApiClient'), require('../model/AcceptConsentRequest'), require('../model/AcceptLoginRequest'), require('../model/CompletedRequest'), require('../model/ConsentRequest'), require('../model/FlushInactiveOAuth2TokensRequest'), require('../model/GenericError'), require('../model/HealthStatus'), require('../model/JSONWebKey'), require('../model/JSONWebKeySet'), require('../model/JsonWebKeySetGeneratorRequest'), require('../model/LoginRequest'), require('../model/LogoutRequest'), require('../model/OAuth2Client'), require('../model/OAuth2TokenIntrospection'), require('../model/PreviousConsentSession'), require('../model/RejectRequest'), require('../model/Version'));
   } else {
     // Browser globals (root is window)
     if (!root.OryHydra) {
       root.OryHydra = {};
     }
-    root.OryHydra.AdminApi = factory(root.OryHydra.ApiClient, root.OryHydra.AcceptConsentRequest, root.OryHydra.AcceptLoginRequest, root.OryHydra.CompletedRequest, root.OryHydra.ConsentRequest, root.OryHydra.FlushInactiveOAuth2TokensRequest, root.OryHydra.GenericError, root.OryHydra.JSONWebKey, root.OryHydra.JSONWebKeySet, root.OryHydra.JsonWebKeySetGeneratorRequest, root.OryHydra.LoginRequest, root.OryHydra.LogoutRequest, root.OryHydra.OAuth2Client, root.OryHydra.OAuth2TokenIntrospection, root.OryHydra.PreviousConsentSession, root.OryHydra.RejectRequest);
+    root.OryHydra.AdminApi = factory(root.OryHydra.ApiClient, root.OryHydra.AcceptConsentRequest, root.OryHydra.AcceptLoginRequest, root.OryHydra.CompletedRequest, root.OryHydra.ConsentRequest, root.OryHydra.FlushInactiveOAuth2TokensRequest, root.OryHydra.GenericError, root.OryHydra.HealthStatus, root.OryHydra.JSONWebKey, root.OryHydra.JSONWebKeySet, root.OryHydra.JsonWebKeySetGeneratorRequest, root.OryHydra.LoginRequest, root.OryHydra.LogoutRequest, root.OryHydra.OAuth2Client, root.OryHydra.OAuth2TokenIntrospection, root.OryHydra.PreviousConsentSession, root.OryHydra.RejectRequest, root.OryHydra.Version);
   }
-}(this, function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, FlushInactiveOAuth2TokensRequest, GenericError, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, LogoutRequest, OAuth2Client, OAuth2TokenIntrospection, PreviousConsentSession, RejectRequest) {
+}(this, function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, FlushInactiveOAuth2TokensRequest, GenericError, HealthStatus, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, LogoutRequest, OAuth2Client, OAuth2TokenIntrospection, PreviousConsentSession, RejectRequest, Version) {
   'use strict';
 
   /**
@@ -752,6 +752,45 @@
     }
 
     /**
+     * Callback function to receive the result of the getVersion operation.
+     * @callback module:api/AdminApi~getVersionCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/Version} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get service version
+     * This endpoint returns the service version typically notated using semantic versioning.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+     * @param {module:api/AdminApi~getVersionCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/Version}
+     */
+    this.getVersion = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = Version;
+
+      return this.apiClient.callApi(
+        '/version', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the introspectOAuth2Token operation.
      * @callback module:api/AdminApi~introspectOAuth2TokenCallback
      * @param {String} error Error message, if any.
@@ -796,6 +835,45 @@
 
       return this.apiClient.callApi(
         '/oauth2/introspect', 'POST',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the isInstanceAlive operation.
+     * @callback module:api/AdminApi~isInstanceAliveCallback
+     * @param {String} error Error message, if any.
+     * @param {module:model/HealthStatus} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Check alive status
+     * This endpoint returns a 200 status code when the HTTP server is up running. This status does currently not include checks whether the database connection is working.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+     * @param {module:api/AdminApi~isInstanceAliveCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link module:model/HealthStatus}
+     */
+    this.isInstanceAlive = function(callback) {
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = ['application/json', 'application/x-www-form-urlencoded'];
+      var accepts = ['application/json'];
+      var returnType = HealthStatus;
+
+      return this.apiClient.callApi(
+        '/health/alive', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

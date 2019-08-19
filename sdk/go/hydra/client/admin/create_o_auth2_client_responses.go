@@ -24,28 +24,24 @@ type CreateOAuth2ClientReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *CreateOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 201:
 		result := NewCreateOAuth2ClientCreated()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewCreateOAuth2ClientBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 409:
 		result := NewCreateOAuth2ClientConflict()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewCreateOAuth2ClientInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -73,6 +69,10 @@ type CreateOAuth2ClientCreated struct {
 
 func (o *CreateOAuth2ClientCreated) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientCreated  %+v", 201, o.Payload)
+}
+
+func (o *CreateOAuth2ClientCreated) GetPayload() *models.Client {
+	return o.Payload
 }
 
 func (o *CreateOAuth2ClientCreated) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -104,6 +104,10 @@ func (o *CreateOAuth2ClientBadRequest) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientBadRequest  %+v", 400, o.Payload)
 }
 
+func (o *CreateOAuth2ClientBadRequest) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *CreateOAuth2ClientBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -133,6 +137,10 @@ func (o *CreateOAuth2ClientConflict) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientConflict  %+v", 409, o.Payload)
 }
 
+func (o *CreateOAuth2ClientConflict) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *CreateOAuth2ClientConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -160,6 +168,10 @@ type CreateOAuth2ClientInternalServerError struct {
 
 func (o *CreateOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *CreateOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *CreateOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

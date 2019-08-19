@@ -24,21 +24,18 @@ type IntrospectOAuth2TokenReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *IntrospectOAuth2TokenReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewIntrospectOAuth2TokenOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewIntrospectOAuth2TokenUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewIntrospectOAuth2TokenInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type IntrospectOAuth2TokenOK struct {
 
 func (o *IntrospectOAuth2TokenOK) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenOK  %+v", 200, o.Payload)
+}
+
+func (o *IntrospectOAuth2TokenOK) GetPayload() *models.Introspection {
+	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *IntrospectOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *IntrospectOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type IntrospectOAuth2TokenInternalServerError struct {
 
 func (o *IntrospectOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

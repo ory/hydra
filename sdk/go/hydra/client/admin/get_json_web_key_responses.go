@@ -24,21 +24,18 @@ type GetJSONWebKeyReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetJSONWebKeyReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetJSONWebKeyOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewGetJSONWebKeyNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewGetJSONWebKeyInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type GetJSONWebKeyOK struct {
 
 func (o *GetJSONWebKeyOK) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyOK  %+v", 200, o.Payload)
+}
+
+func (o *GetJSONWebKeyOK) GetPayload() *models.SwaggerJSONWebKeySet {
+	return o.Payload
 }
 
 func (o *GetJSONWebKeyOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *GetJSONWebKeyNotFound) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyNotFound  %+v", 404, o.Payload)
 }
 
+func (o *GetJSONWebKeyNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *GetJSONWebKeyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type GetJSONWebKeyInternalServerError struct {
 
 func (o *GetJSONWebKeyInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *GetJSONWebKeyInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *GetJSONWebKeyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

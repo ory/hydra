@@ -24,28 +24,24 @@ type AcceptLoginRequestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *AcceptLoginRequestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewAcceptLoginRequestOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewAcceptLoginRequestUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewAcceptLoginRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewAcceptLoginRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -73,6 +69,10 @@ type AcceptLoginRequestOK struct {
 
 func (o *AcceptLoginRequestOK) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestOK  %+v", 200, o.Payload)
+}
+
+func (o *AcceptLoginRequestOK) GetPayload() *models.RequestHandlerResponse {
+	return o.Payload
 }
 
 func (o *AcceptLoginRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -104,6 +104,10 @@ func (o *AcceptLoginRequestUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *AcceptLoginRequestUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *AcceptLoginRequestUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -133,6 +137,10 @@ func (o *AcceptLoginRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestNotFound  %+v", 404, o.Payload)
 }
 
+func (o *AcceptLoginRequestNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *AcceptLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -160,6 +168,10 @@ type AcceptLoginRequestInternalServerError struct {
 
 func (o *AcceptLoginRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/accept][%d] acceptLoginRequestInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *AcceptLoginRequestInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *AcceptLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

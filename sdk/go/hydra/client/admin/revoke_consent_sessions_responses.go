@@ -24,28 +24,24 @@ type RevokeConsentSessionsReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *RevokeConsentSessionsReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 204:
 		result := NewRevokeConsentSessionsNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewRevokeConsentSessionsBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewRevokeConsentSessionsNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewRevokeConsentSessionsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -97,6 +93,10 @@ func (o *RevokeConsentSessionsBadRequest) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsBadRequest  %+v", 400, o.Payload)
 }
 
+func (o *RevokeConsentSessionsBadRequest) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *RevokeConsentSessionsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -126,6 +126,10 @@ func (o *RevokeConsentSessionsNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsNotFound  %+v", 404, o.Payload)
 }
 
+func (o *RevokeConsentSessionsNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *RevokeConsentSessionsNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -153,6 +157,10 @@ type RevokeConsentSessionsInternalServerError struct {
 
 func (o *RevokeConsentSessionsInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *RevokeConsentSessionsInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *RevokeConsentSessionsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

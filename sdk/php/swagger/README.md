@@ -56,9 +56,9 @@ Please follow the [installation procedure](#installation--usage) and then run th
 <?php
 require_once(__DIR__ . '/vendor/autoload.php');
 
-$api_instance = new HydraSDK\Api\AdminApi();
+$api_instance = new Hydra\SDK\Api\AdminApi();
 $consent_challenge = "consent_challenge_example"; // string | 
-$body = new \HydraSDK\Model\AcceptConsentRequest(); // \HydraSDK\Model\AcceptConsentRequest | 
+$body = new \Hydra\SDK\Model\AcceptConsentRequest(); // \Hydra\SDK\Model\AcceptConsentRequest | 
 
 try {
     $result = $api_instance->acceptConsentRequest($consent_challenge, $body);
@@ -91,7 +91,9 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**getLoginRequest**](docs/Api/AdminApi.md#getloginrequest) | **GET** /oauth2/auth/requests/login | Get an login request
 *AdminApi* | [**getLogoutRequest**](docs/Api/AdminApi.md#getlogoutrequest) | **GET** /oauth2/auth/requests/logout | Get a logout request
 *AdminApi* | [**getOAuth2Client**](docs/Api/AdminApi.md#getoauth2client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
+*AdminApi* | [**getVersion**](docs/Api/AdminApi.md#getversion) | **GET** /version | Get service version
 *AdminApi* | [**introspectOAuth2Token**](docs/Api/AdminApi.md#introspectoauth2token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
+*AdminApi* | [**isInstanceAlive**](docs/Api/AdminApi.md#isinstancealive) | **GET** /health/alive | Check alive status
 *AdminApi* | [**listOAuth2Clients**](docs/Api/AdminApi.md#listoauth2clients) | **GET** /clients | List OAuth 2.0 Clients
 *AdminApi* | [**listSubjectConsentSessions**](docs/Api/AdminApi.md#listsubjectconsentsessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
 *AdminApi* | [**rejectConsentRequest**](docs/Api/AdminApi.md#rejectconsentrequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
@@ -102,16 +104,14 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**updateJsonWebKey**](docs/Api/AdminApi.md#updatejsonwebkey) | **PUT** /keys/{set}/{kid} | Update a JSON Web Key
 *AdminApi* | [**updateJsonWebKeySet**](docs/Api/AdminApi.md#updatejsonwebkeyset) | **PUT** /keys/{set} | Update a JSON Web Key Set
 *AdminApi* | [**updateOAuth2Client**](docs/Api/AdminApi.md#updateoauth2client) | **PUT** /clients/{id} | Update an OAuth 2.0 Client
-*HealthApi* | [**isInstanceAlive**](docs/Api/HealthApi.md#isinstancealive) | **GET** /health/alive | Check alive status
-*HealthApi* | [**isInstanceReady**](docs/Api/HealthApi.md#isinstanceready) | **GET** /health/ready | Check readiness status
 *PublicApi* | [**disconnectUser**](docs/Api/PublicApi.md#disconnectuser) | **GET** /oauth2/sessions/logout | OpenID Connect Front-Backchannel enabled Logout
 *PublicApi* | [**discoverOpenIDConfiguration**](docs/Api/PublicApi.md#discoveropenidconfiguration) | **GET** /.well-known/openid-configuration | OpenID Connect Discovery
+*PublicApi* | [**isInstanceReady**](docs/Api/PublicApi.md#isinstanceready) | **GET** /health/ready | Check readiness status
 *PublicApi* | [**oauth2Token**](docs/Api/PublicApi.md#oauth2token) | **POST** /oauth2/token | The OAuth 2.0 token endpoint
 *PublicApi* | [**oauthAuth**](docs/Api/PublicApi.md#oauthauth) | **GET** /oauth2/auth | The OAuth 2.0 authorize endpoint
 *PublicApi* | [**revokeOAuth2Token**](docs/Api/PublicApi.md#revokeoauth2token) | **POST** /oauth2/revoke | Revoke OAuth2 tokens
 *PublicApi* | [**userinfo**](docs/Api/PublicApi.md#userinfo) | **GET** /userinfo | OpenID Connect Userinfo
 *PublicApi* | [**wellKnown**](docs/Api/PublicApi.md#wellknown) | **GET** /.well-known/jwks.json | JSON Web Keys Discovery
-*VersionApi* | [**getVersion**](docs/Api/VersionApi.md#getversion) | **GET** /version | Get service version
 
 
 ## Documentation For Models
@@ -121,7 +121,6 @@ Class | Method | HTTP request | Description
  - [CompletedRequest](docs/Model/CompletedRequest.md)
  - [ConsentRequest](docs/Model/ConsentRequest.md)
  - [ConsentRequestSession](docs/Model/ConsentRequestSession.md)
- - [EmptyResponse](docs/Model/EmptyResponse.md)
  - [FlushInactiveOAuth2TokensRequest](docs/Model/FlushInactiveOAuth2TokensRequest.md)
  - [GenericError](docs/Model/GenericError.md)
  - [HealthNotReadyStatus](docs/Model/HealthNotReadyStatus.md)
@@ -138,15 +137,6 @@ Class | Method | HTTP request | Description
  - [OpenIDConnectContext](docs/Model/OpenIDConnectContext.md)
  - [PreviousConsentSession](docs/Model/PreviousConsentSession.md)
  - [RejectRequest](docs/Model/RejectRequest.md)
- - [SwaggerFlushInactiveAccessTokens](docs/Model/SwaggerFlushInactiveAccessTokens.md)
- - [SwaggerJsonWebKeyQuery](docs/Model/SwaggerJsonWebKeyQuery.md)
- - [SwaggerJwkCreateSet](docs/Model/SwaggerJwkCreateSet.md)
- - [SwaggerJwkSetQuery](docs/Model/SwaggerJwkSetQuery.md)
- - [SwaggerJwkUpdateSet](docs/Model/SwaggerJwkUpdateSet.md)
- - [SwaggerJwkUpdateSetKey](docs/Model/SwaggerJwkUpdateSetKey.md)
- - [SwaggerOAuthIntrospectionRequest](docs/Model/SwaggerOAuthIntrospectionRequest.md)
- - [SwaggerRevokeOAuth2TokenParameters](docs/Model/SwaggerRevokeOAuth2TokenParameters.md)
- - [Swaggeroauth2TokenParameters](docs/Model/Swaggeroauth2TokenParameters.md)
  - [UserinfoResponse](docs/Model/UserinfoResponse.md)
  - [Version](docs/Model/Version.md)
  - [WellKnown](docs/Model/WellKnown.md)

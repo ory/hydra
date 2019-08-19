@@ -24,21 +24,18 @@ type RevokeOAuth2TokenReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *RevokeOAuth2TokenReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewRevokeOAuth2TokenOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewRevokeOAuth2TokenUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewRevokeOAuth2TokenInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -90,6 +87,10 @@ func (o *RevokeOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/revoke][%d] revokeOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *RevokeOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *RevokeOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -117,6 +118,10 @@ type RevokeOAuth2TokenInternalServerError struct {
 
 func (o *RevokeOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/revoke][%d] revokeOAuth2TokenInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *RevokeOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *RevokeOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

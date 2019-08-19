@@ -6,6 +6,8 @@ package admin
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"fmt"
+
 	"github.com/go-openapi/runtime"
 
 	strfmt "github.com/go-openapi/strfmt"
@@ -65,8 +67,14 @@ func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*Acce
 	if err != nil {
 		return nil, err
 	}
-	return result.(*AcceptConsentRequestOK), nil
-
+	success, ok := result.(*AcceptConsentRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for acceptConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -107,8 +115,14 @@ func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLo
 	if err != nil {
 		return nil, err
 	}
-	return result.(*AcceptLoginRequestOK), nil
-
+	success, ok := result.(*AcceptLoginRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for acceptLoginRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -140,8 +154,14 @@ func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*Accept
 	if err != nil {
 		return nil, err
 	}
-	return result.(*AcceptLogoutRequestOK), nil
-
+	success, ok := result.(*AcceptLogoutRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for acceptLogoutRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -172,8 +192,14 @@ func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams) (*Create
 	if err != nil {
 		return nil, err
 	}
-	return result.(*CreateJSONWebKeySetCreated), nil
-
+	success, ok := result.(*CreateJSONWebKeySetCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for createJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -204,8 +230,14 @@ func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOA
 	if err != nil {
 		return nil, err
 	}
-	return result.(*CreateOAuth2ClientCreated), nil
-
+	success, ok := result.(*CreateOAuth2ClientCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for createOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -236,8 +268,14 @@ func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWe
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DeleteJSONWebKeyNoContent), nil
-
+	success, ok := result.(*DeleteJSONWebKeyNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteJsonWebKey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -268,8 +306,14 @@ func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams) (*Delete
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DeleteJSONWebKeySetNoContent), nil
-
+	success, ok := result.(*DeleteJSONWebKeySetNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -300,8 +344,14 @@ func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOA
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DeleteOAuth2ClientNoContent), nil
-
+	success, ok := result.(*DeleteOAuth2ClientNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -332,8 +382,14 @@ func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensPara
 	if err != nil {
 		return nil, err
 	}
-	return result.(*FlushInactiveOAuth2TokensNoContent), nil
-
+	success, ok := result.(*FlushInactiveOAuth2TokensNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for flushInactiveOAuth2Tokens: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -371,8 +427,14 @@ func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsent
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetConsentRequestOK), nil
-
+	success, ok := result.(*GetConsentRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -401,8 +463,14 @@ func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams) (*GetJSONWebKeyOK, e
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetJSONWebKeyOK), nil
-
+	success, ok := result.(*GetJSONWebKeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getJsonWebKey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -433,8 +501,14 @@ func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKe
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetJSONWebKeySetOK), nil
-
+	success, ok := result.(*GetJSONWebKeySetOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -469,8 +543,14 @@ func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginReques
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetLoginRequestOK), nil
-
+	success, ok := result.(*GetLoginRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getLoginRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -499,8 +579,14 @@ func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutReq
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetLogoutRequestOK), nil
-
+	success, ok := result.(*GetLogoutRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getLogoutRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -531,8 +617,56 @@ func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2Clien
 	if err != nil {
 		return nil, err
 	}
-	return result.(*GetOAuth2ClientOK), nil
+	success, ok := result.(*GetOAuth2ClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
 
+/*
+GetVersion gets service version
+
+This endpoint returns the service version typically notated using semantic versioning.
+
+If the service supports TLS Edge Termination, this endpoint does not require the
+`X-Forwarded-Proto` header to be set.
+
+Be aware that if you are running multiple nodes of this service, the health status will never
+refer to the cluster state, only to a single instance.
+*/
+func (a *Client) GetVersion(params *GetVersionParams) (*GetVersionOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetVersionParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getVersion",
+		Method:             "GET",
+		PathPattern:        "/version",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetVersionReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetVersionOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getVersion: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -564,8 +698,57 @@ func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, auth
 	if err != nil {
 		return nil, err
 	}
-	return result.(*IntrospectOAuth2TokenOK), nil
+	success, ok := result.(*IntrospectOAuth2TokenOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for introspectOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
 
+/*
+IsInstanceAlive checks alive status
+
+This endpoint returns a 200 status code when the HTTP server is up running.
+This status does currently not include checks whether the database connection is working.
+
+If the service supports TLS Edge Termination, this endpoint does not require the
+`X-Forwarded-Proto` header to be set.
+
+Be aware that if you are running multiple nodes of this service, the health status will never
+refer to the cluster state, only to a single instance.
+*/
+func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams) (*IsInstanceAliveOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewIsInstanceAliveParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "isInstanceAlive",
+		Method:             "GET",
+		PathPattern:        "/health/alive",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &IsInstanceAliveReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*IsInstanceAliveOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for isInstanceAlive: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -598,8 +781,14 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2
 	if err != nil {
 		return nil, err
 	}
-	return result.(*ListOAuth2ClientsOK), nil
-
+	success, ok := result.(*ListOAuth2ClientsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listOAuth2Clients: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -630,8 +819,14 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 	if err != nil {
 		return nil, err
 	}
-	return result.(*ListSubjectConsentSessionsOK), nil
-
+	success, ok := result.(*ListSubjectConsentSessionsOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listSubjectConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -674,8 +869,14 @@ func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams) (*Reje
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RejectConsentRequestOK), nil
-
+	success, ok := result.(*RejectConsentRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for rejectConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -715,8 +916,14 @@ func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLo
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RejectLoginRequestOK), nil
-
+	success, ok := result.(*RejectLoginRequestOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for rejectLoginRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -748,8 +955,14 @@ func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*Reject
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RejectLogoutRequestNoContent), nil
-
+	success, ok := result.(*RejectLogoutRequestNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for rejectLogoutRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -780,8 +993,14 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RevokeAuthenticationSessionNoContent), nil
-
+	success, ok := result.(*RevokeAuthenticationSessionNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for revokeAuthenticationSession: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -811,8 +1030,14 @@ func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*Re
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RevokeConsentSessionsNoContent), nil
-
+	success, ok := result.(*RevokeConsentSessionsNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for revokeConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -843,8 +1068,14 @@ func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWe
 	if err != nil {
 		return nil, err
 	}
-	return result.(*UpdateJSONWebKeyOK), nil
-
+	success, ok := result.(*UpdateJSONWebKeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for updateJsonWebKey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -875,8 +1106,14 @@ func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams) (*Update
 	if err != nil {
 		return nil, err
 	}
-	return result.(*UpdateJSONWebKeySetOK), nil
-
+	success, ok := result.(*UpdateJSONWebKeySetOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for updateJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -907,8 +1144,14 @@ func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams) (*UpdateOA
 	if err != nil {
 		return nil, err
 	}
-	return result.(*UpdateOAuth2ClientOK), nil
-
+	success, ok := result.(*UpdateOAuth2ClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for updateOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 // SetTransport changes the transport on the client

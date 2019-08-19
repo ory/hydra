@@ -24,21 +24,18 @@ type AcceptLogoutRequestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *AcceptLogoutRequestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewAcceptLogoutRequestOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewAcceptLogoutRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewAcceptLogoutRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type AcceptLogoutRequestOK struct {
 
 func (o *AcceptLogoutRequestOK) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestOK  %+v", 200, o.Payload)
+}
+
+func (o *AcceptLogoutRequestOK) GetPayload() *models.RequestHandlerResponse {
+	return o.Payload
 }
 
 func (o *AcceptLogoutRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *AcceptLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestNotFound  %+v", 404, o.Payload)
 }
 
+func (o *AcceptLogoutRequestNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *AcceptLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type AcceptLogoutRequestInternalServerError struct {
 
 func (o *AcceptLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *AcceptLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

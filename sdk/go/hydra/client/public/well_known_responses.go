@@ -24,14 +24,12 @@ type WellKnownReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *WellKnownReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewWellKnownOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 500:
 		result := NewWellKnownInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -61,6 +59,10 @@ func (o *WellKnownOK) Error() string {
 	return fmt.Sprintf("[GET /.well-known/jwks.json][%d] wellKnownOK  %+v", 200, o.Payload)
 }
 
+func (o *WellKnownOK) GetPayload() *models.SwaggerJSONWebKeySet {
+	return o.Payload
+}
+
 func (o *WellKnownOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.SwaggerJSONWebKeySet)
@@ -88,6 +90,10 @@ type WellKnownInternalServerError struct {
 
 func (o *WellKnownInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/jwks.json][%d] wellKnownInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *WellKnownInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *WellKnownInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

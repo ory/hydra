@@ -24,28 +24,24 @@ type DeleteJSONWebKeyReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *DeleteJSONWebKeyReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 204:
 		result := NewDeleteJSONWebKeyNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewDeleteJSONWebKeyUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 403:
 		result := NewDeleteJSONWebKeyForbidden()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewDeleteJSONWebKeyInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -97,6 +93,10 @@ func (o *DeleteJSONWebKeyUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}/{kid}][%d] deleteJsonWebKeyUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *DeleteJSONWebKeyUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *DeleteJSONWebKeyUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -126,6 +126,10 @@ func (o *DeleteJSONWebKeyForbidden) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}/{kid}][%d] deleteJsonWebKeyForbidden  %+v", 403, o.Payload)
 }
 
+func (o *DeleteJSONWebKeyForbidden) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *DeleteJSONWebKeyForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -153,6 +157,10 @@ type DeleteJSONWebKeyInternalServerError struct {
 
 func (o *DeleteJSONWebKeyInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}/{kid}][%d] deleteJsonWebKeyInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *DeleteJSONWebKeyInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *DeleteJSONWebKeyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

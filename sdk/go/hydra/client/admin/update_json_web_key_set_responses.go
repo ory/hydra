@@ -24,28 +24,24 @@ type UpdateJSONWebKeySetReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *UpdateJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewUpdateJSONWebKeySetOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewUpdateJSONWebKeySetUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 403:
 		result := NewUpdateJSONWebKeySetForbidden()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewUpdateJSONWebKeySetInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -73,6 +69,10 @@ type UpdateJSONWebKeySetOK struct {
 
 func (o *UpdateJSONWebKeySetOK) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetOK  %+v", 200, o.Payload)
+}
+
+func (o *UpdateJSONWebKeySetOK) GetPayload() *models.SwaggerJSONWebKeySet {
+	return o.Payload
 }
 
 func (o *UpdateJSONWebKeySetOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -104,6 +104,10 @@ func (o *UpdateJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *UpdateJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *UpdateJSONWebKeySetUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -133,6 +137,10 @@ func (o *UpdateJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
 
+func (o *UpdateJSONWebKeySetForbidden) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *UpdateJSONWebKeySetForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -160,6 +168,10 @@ type UpdateJSONWebKeySetInternalServerError struct {
 
 func (o *UpdateJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *UpdateJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *UpdateJSONWebKeySetInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

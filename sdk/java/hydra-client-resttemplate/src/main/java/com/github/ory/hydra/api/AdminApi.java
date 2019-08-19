@@ -8,6 +8,7 @@ import com.github.ory.hydra.model.CompletedRequest;
 import com.github.ory.hydra.model.ConsentRequest;
 import com.github.ory.hydra.model.FlushInactiveOAuth2TokensRequest;
 import com.github.ory.hydra.model.GenericError;
+import com.github.ory.hydra.model.HealthStatus;
 import com.github.ory.hydra.model.JSONWebKey;
 import com.github.ory.hydra.model.JSONWebKeySet;
 import com.github.ory.hydra.model.JsonWebKeySetGeneratorRequest;
@@ -17,6 +18,7 @@ import com.github.ory.hydra.model.OAuth2Client;
 import com.github.ory.hydra.model.OAuth2TokenIntrospection;
 import com.github.ory.hydra.model.PreviousConsentSession;
 import com.github.ory.hydra.model.RejectRequest;
+import com.github.ory.hydra.model.Version;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +39,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-07-18T19:30:59.329+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T20:15:39.753+02:00")
 @Component("com.github.ory.hydra.api.AdminApi")
 public class AdminApi {
     private ApiClient apiClient;
@@ -680,6 +682,36 @@ public class AdminApi {
         return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
+     * Get service version
+     * This endpoint returns the service version typically notated using semantic versioning.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+     * <p><b>200</b> - version
+     * @return Version
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public Version getVersion() throws RestClientException {
+        Object postBody = null;
+        
+        String path = UriComponentsBuilder.fromPath("/version").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<Version> returnType = new ParameterizedTypeReference<Version>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
      * Introspect OAuth2 tokens
      * The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token is neither expired nor revoked. If a token is active, additional information on the token will be included. You can set additional data for a token by setting &#x60;accessTokenExtra&#x60; during the consent flow.
      * <p><b>200</b> - oAuth2TokenIntrospection
@@ -722,6 +754,37 @@ public class AdminApi {
 
         ParameterizedTypeReference<OAuth2TokenIntrospection> returnType = new ParameterizedTypeReference<OAuth2TokenIntrospection>() {};
         return apiClient.invokeAPI(path, HttpMethod.POST, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
+    }
+    /**
+     * Check alive status
+     * This endpoint returns a 200 status code when the HTTP server is up running. This status does currently not include checks whether the database connection is working.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+     * <p><b>200</b> - healthStatus
+     * <p><b>500</b> - genericError
+     * @return HealthStatus
+     * @throws RestClientException if an error occurs while attempting to invoke the API
+     */
+    public HealthStatus isInstanceAlive() throws RestClientException {
+        Object postBody = null;
+        
+        String path = UriComponentsBuilder.fromPath("/health/alive").build().toUriString();
+        
+        final MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        final HttpHeaders headerParams = new HttpHeaders();
+        final MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+
+        final String[] accepts = { 
+            "application/json"
+        };
+        final List<MediaType> accept = apiClient.selectHeaderAccept(accepts);
+        final String[] contentTypes = { 
+            "application/json", "application/x-www-form-urlencoded"
+        };
+        final MediaType contentType = apiClient.selectHeaderContentType(contentTypes);
+
+        String[] authNames = new String[] {  };
+
+        ParameterizedTypeReference<HealthStatus> returnType = new ParameterizedTypeReference<HealthStatus>() {};
+        return apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
     }
     /**
      * List OAuth 2.0 Clients

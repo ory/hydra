@@ -24,21 +24,18 @@ type FlushInactiveOAuth2TokensReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *FlushInactiveOAuth2TokensReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 204:
 		result := NewFlushInactiveOAuth2TokensNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewFlushInactiveOAuth2TokensUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewFlushInactiveOAuth2TokensInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -90,6 +87,10 @@ func (o *FlushInactiveOAuth2TokensUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/flush][%d] flushInactiveOAuth2TokensUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *FlushInactiveOAuth2TokensUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *FlushInactiveOAuth2TokensUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -117,6 +118,10 @@ type FlushInactiveOAuth2TokensInternalServerError struct {
 
 func (o *FlushInactiveOAuth2TokensInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/flush][%d] flushInactiveOAuth2TokensInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *FlushInactiveOAuth2TokensInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *FlushInactiveOAuth2TokensInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

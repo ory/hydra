@@ -94,10 +94,10 @@ type Client struct {
 
 	// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the
 	// post_logout_redirect_uri parameter after a logout has been performed.
-	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris"`
+	PostLogoutRedirectURIs []string `json:"post_logout_redirect_uris"`
 
 	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
-	RedirectUris []string `json:"redirect_uris"`
+	RedirectURIs []string `json:"redirect_uris"`
 
 	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
 	// from this Client MUST be rejected, if not signed with this algorithm.
@@ -107,7 +107,7 @@ type Client struct {
 	// contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
 	// OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
 	// discovery parameter.
-	RequestUris []string `json:"request_uris"`
+	RequestURIs []string `json:"request_uris"`
 
 	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can
 	// use at the authorization endpoint.

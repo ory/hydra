@@ -24,35 +24,30 @@ type GetLoginRequestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *GetLoginRequestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewGetLoginRequestOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 400:
 		result := NewGetLoginRequestBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 404:
 		result := NewGetLoginRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 409:
 		result := NewGetLoginRequestConflict()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewGetLoginRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -80,6 +75,10 @@ type GetLoginRequestOK struct {
 
 func (o *GetLoginRequestOK) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestOK  %+v", 200, o.Payload)
+}
+
+func (o *GetLoginRequestOK) GetPayload() *models.LoginRequest {
+	return o.Payload
 }
 
 func (o *GetLoginRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -111,6 +110,10 @@ func (o *GetLoginRequestBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestBadRequest  %+v", 400, o.Payload)
 }
 
+func (o *GetLoginRequestBadRequest) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *GetLoginRequestBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -138,6 +141,10 @@ type GetLoginRequestNotFound struct {
 
 func (o *GetLoginRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestNotFound  %+v", 404, o.Payload)
+}
+
+func (o *GetLoginRequestNotFound) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *GetLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -169,6 +176,10 @@ func (o *GetLoginRequestConflict) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestConflict  %+v", 409, o.Payload)
 }
 
+func (o *GetLoginRequestConflict) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *GetLoginRequestConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -196,6 +207,10 @@ type GetLoginRequestInternalServerError struct {
 
 func (o *GetLoginRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *GetLoginRequestInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *GetLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

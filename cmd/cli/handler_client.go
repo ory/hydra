@@ -107,7 +107,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		ResponseTypes:           flagx.MustGetStringSlice(cmd, "response-types"),
 		Scope:                   strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
 		GrantTypes:              flagx.MustGetStringSlice(cmd, "grant-types"),
-		RedirectUris:            flagx.MustGetStringSlice(cmd, "callbacks"),
+		RedirectURIs:            flagx.MustGetStringSlice(cmd, "callbacks"),
 		Name:                    flagx.MustGetString(cmd, "name"),
 		TokenEndpointAuthMethod: flagx.MustGetString(cmd, "token-endpoint-auth-method"),
 		JSONWebKeysURI:          flagx.MustGetString(cmd, "jwks-uri"),
@@ -118,7 +118,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		AllowedCORSOrigins:      flagx.MustGetStringSlice(cmd, "allowed-cors-origins"),
 		SubjectType:             flagx.MustGetString(cmd, "subject-type"),
 		Audience:                flagx.MustGetStringSlice(cmd, "audience"),
-		PostLogoutRedirectUris:  flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
+		PostLogoutRedirectURIs:  flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))
@@ -202,7 +202,7 @@ func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
 			cl.Name,
 			strings.Join(cl.ResponseTypes, ","),
 			cl.Scope,
-			strings.Join(cl.RedirectUris, "\n"),
+			strings.Join(cl.RedirectURIs, "\n"),
 			strings.Join(cl.GrantTypes, ","),
 			cl.TokenEndpointAuthMethod,
 		}

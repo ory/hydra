@@ -19,7 +19,9 @@ Method | HTTP request | Description
 [**getLoginRequest**](AdminApi.md#getLoginRequest) | **GET** /oauth2/auth/requests/login | Get an login request
 [**getLogoutRequest**](AdminApi.md#getLogoutRequest) | **GET** /oauth2/auth/requests/logout | Get a logout request
 [**getOAuth2Client**](AdminApi.md#getOAuth2Client) | **GET** /clients/{id} | Get an OAuth 2.0 Client.
+[**getVersion**](AdminApi.md#getVersion) | **GET** /version | Get service version
 [**introspectOAuth2Token**](AdminApi.md#introspectOAuth2Token) | **POST** /oauth2/introspect | Introspect OAuth2 tokens
+[**isInstanceAlive**](AdminApi.md#isInstanceAlive) | **GET** /health/alive | Check alive status
 [**listOAuth2Clients**](AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
 [**listSubjectConsentSessions**](AdminApi.md#listSubjectConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
 [**rejectConsentRequest**](AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
@@ -741,6 +743,46 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
+<a name="getVersion"></a>
+# **getVersion**
+> Version getVersion()
+
+Get service version
+
+This endpoint returns the service version typically notated using semantic versioning.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+
+### Example
+```javascript
+var OryHydra = require('ory_hydra');
+
+var apiInstance = new OryHydra.AdminApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getVersion(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Version**](Version.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
+ - **Accept**: application/json
+
 <a name="introspectOAuth2Token"></a>
 # **introspectOAuth2Token**
 > OAuth2TokenIntrospection introspectOAuth2Token(token, opts)
@@ -799,6 +841,46 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/x-www-form-urlencoded
+ - **Accept**: application/json
+
+<a name="isInstanceAlive"></a>
+# **isInstanceAlive**
+> HealthStatus isInstanceAlive()
+
+Check alive status
+
+This endpoint returns a 200 status code when the HTTP server is up running. This status does currently not include checks whether the database connection is working.  If the service supports TLS Edge Termination, this endpoint does not require the &#x60;X-Forwarded-Proto&#x60; header to be set.  Be aware that if you are running multiple nodes of this service, the health status will never refer to the cluster state, only to a single instance.
+
+### Example
+```javascript
+var OryHydra = require('ory_hydra');
+
+var apiInstance = new OryHydra.AdminApi();
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.isInstanceAlive(callback);
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**HealthStatus**](HealthStatus.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json, application/x-www-form-urlencoded
  - **Accept**: application/json
 
 <a name="listOAuth2Clients"></a>

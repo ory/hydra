@@ -24,21 +24,18 @@ type Oauth2TokenReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *Oauth2TokenReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewOauth2TokenOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewOauth2TokenUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewOauth2TokenInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type Oauth2TokenOK struct {
 
 func (o *Oauth2TokenOK) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenOK  %+v", 200, o.Payload)
+}
+
+func (o *Oauth2TokenOK) GetPayload() *models.Swaggeroauth2TokenResponse {
+	return o.Payload
 }
 
 func (o *Oauth2TokenOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *Oauth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *Oauth2TokenUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *Oauth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type Oauth2TokenInternalServerError struct {
 
 func (o *Oauth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *Oauth2TokenInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *Oauth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

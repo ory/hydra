@@ -24,21 +24,18 @@ type UserinfoReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *UserinfoReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewUserinfoOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewUserinfoUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewUserinfoInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type UserinfoOK struct {
 
 func (o *UserinfoOK) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoOK  %+v", 200, o.Payload)
+}
+
+func (o *UserinfoOK) GetPayload() *models.SwaggeruserinfoResponsePayload {
+	return o.Payload
 }
 
 func (o *UserinfoOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *UserinfoUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *UserinfoUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *UserinfoUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type UserinfoInternalServerError struct {
 
 func (o *UserinfoInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *UserinfoInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *UserinfoInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

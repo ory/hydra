@@ -21,7 +21,6 @@ type DisconnectUserReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *DisconnectUserReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 302:
 		result := NewDisconnectUserFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {

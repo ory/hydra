@@ -345,7 +345,7 @@
           "application/json"
         ],
         "tags": [
-          "health"
+          "admin"
         ],
         "summary": "Check alive status",
         "operationId": "isInstanceAlive",
@@ -372,7 +372,7 @@
           "application/json"
         ],
         "tags": [
-          "health"
+          "public"
         ],
         "summary": "Check readiness status",
         "operationId": "isInstanceReady",
@@ -1799,7 +1799,7 @@
           "application/json"
         ],
         "tags": [
-          "version"
+          "admin"
         ],
         "summary": "Get service version",
         "operationId": "getVersion",
@@ -1922,6 +1922,7 @@
     },
     "JSONWebKeySet": {
       "type": "object",
+      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -1933,7 +1934,7 @@
         }
       },
       "x-go-name": "swaggerJSONWebKeySet",
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "gopkg.in/square/go-jose.v2"
     },
     "PreviousConsentSession": {
       "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
@@ -2168,11 +2169,6 @@
       "x-go-name": "ConsentRequestSessionData",
       "x-go-package": "github.com/ory/hydra/consent"
     },
-    "emptyResponse": {
-      "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201.",
-      "type": "object",
-      "x-go-package": "github.com/ory/hydra"
-    },
     "flushInactiveOAuth2TokensRequest": {
       "type": "object",
       "properties": {
@@ -2235,7 +2231,7 @@
         }
       },
       "x-go-name": "swaggerNotReadyStatus",
-      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/x/healthx"
+      "x-go-package": "github.com/ory/x/healthx"
     },
     "healthStatus": {
       "type": "object",
@@ -2247,7 +2243,7 @@
         }
       },
       "x-go-name": "swaggerHealthStatus",
-      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/x/healthx"
+      "x-go-package": "github.com/ory/x/healthx"
     },
     "jsonWebKeySetGeneratorRequest": {
       "type": "object",
@@ -2772,168 +2768,6 @@
       "x-go-name": "RequestDeniedError",
       "x-go-package": "github.com/ory/hydra/consent"
     },
-    "swaggerFlushInactiveAccessTokens": {
-      "type": "object",
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/flushInactiveOAuth2TokensRequest"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggerJsonWebKeyQuery": {
-      "type": "object",
-      "required": [
-        "kid",
-        "set"
-      ],
-      "properties": {
-        "kid": {
-          "description": "The kid of the desired key\nin: path",
-          "type": "string",
-          "x-go-name": "KID"
-        },
-        "set": {
-          "description": "The set\nin: path",
-          "type": "string",
-          "x-go-name": "Set"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/jwk"
-    },
-    "swaggerJwkCreateSet": {
-      "type": "object",
-      "required": [
-        "set"
-      ],
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/jsonWebKeySetGeneratorRequest"
-        },
-        "set": {
-          "description": "The set\nin: path",
-          "type": "string",
-          "x-go-name": "Set"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/jwk"
-    },
-    "swaggerJwkSetQuery": {
-      "type": "object",
-      "required": [
-        "set"
-      ],
-      "properties": {
-        "set": {
-          "description": "The set\nin: path",
-          "type": "string",
-          "x-go-name": "Set"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/jwk"
-    },
-    "swaggerJwkUpdateSet": {
-      "type": "object",
-      "required": [
-        "set"
-      ],
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/JSONWebKeySet"
-        },
-        "set": {
-          "description": "The set\nin: path",
-          "type": "string",
-          "x-go-name": "Set"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/jwk"
-    },
-    "swaggerJwkUpdateSetKey": {
-      "type": "object",
-      "required": [
-        "kid",
-        "set"
-      ],
-      "properties": {
-        "Body": {
-          "$ref": "#/definitions/JSONWebKey"
-        },
-        "kid": {
-          "description": "The kid of the desired key\nin: path",
-          "type": "string",
-          "x-go-name": "KID"
-        },
-        "set": {
-          "description": "The set\nin: path",
-          "type": "string",
-          "x-go-name": "Set"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/jwk"
-    },
-    "swaggerOAuthIntrospectionRequest": {
-      "type": "object",
-      "required": [
-        "token"
-      ],
-      "properties": {
-        "scope": {
-          "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.\n\nin: formData",
-          "type": "string",
-          "x-go-name": "Scope"
-        },
-        "token": {
-          "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\"\nvalue returned.",
-          "type": "string",
-          "x-go-name": "Token"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggerRevokeOAuth2TokenParameters": {
-      "type": "object",
-      "required": [
-        "token"
-      ],
-      "properties": {
-        "token": {
-          "description": "in: formData",
-          "type": "string",
-          "x-go-name": "Token"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
-    "swaggeroauth2TokenParameters": {
-      "type": "object",
-      "required": [
-        "grant_type"
-      ],
-      "properties": {
-        "client_id": {
-          "description": "in: formData",
-          "type": "string",
-          "x-go-name": "ClientID"
-        },
-        "code": {
-          "description": "in: formData",
-          "type": "string",
-          "x-go-name": "Code"
-        },
-        "grant_type": {
-          "description": "in: formData",
-          "type": "string",
-          "x-go-name": "GrantType"
-        },
-        "redirect_uri": {
-          "description": "in: formData",
-          "type": "string",
-          "x-go-name": "RedirectURI"
-        }
-      },
-      "x-go-package": "github.com/ory/hydra/oauth2"
-    },
     "userinfoResponse": {
       "description": "The userinfo response",
       "type": "object",
@@ -3048,7 +2882,7 @@
         }
       },
       "x-go-name": "swaggerVersion",
-      "x-go-package": "github.com/ory/hydra/vendor/github.com/ory/x/healthx"
+      "x-go-package": "github.com/ory/x/healthx"
     },
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",

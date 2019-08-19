@@ -24,21 +24,18 @@ type DiscoverOpenIDConfigurationReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *DiscoverOpenIDConfigurationReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewDiscoverOpenIDConfigurationOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 401:
 		result := NewDiscoverOpenIDConfigurationUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewDiscoverOpenIDConfigurationInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type DiscoverOpenIDConfigurationOK struct {
 
 func (o *DiscoverOpenIDConfigurationOK) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationOK  %+v", 200, o.Payload)
+}
+
+func (o *DiscoverOpenIDConfigurationOK) GetPayload() *models.WellKnown {
+	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *DiscoverOpenIDConfigurationUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationUnauthorized  %+v", 401, o.Payload)
 }
 
+func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *DiscoverOpenIDConfigurationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type DiscoverOpenIDConfigurationInternalServerError struct {
 
 func (o *DiscoverOpenIDConfigurationInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

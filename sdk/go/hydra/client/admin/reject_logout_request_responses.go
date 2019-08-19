@@ -24,21 +24,18 @@ type RejectLogoutRequestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *RejectLogoutRequestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 204:
 		result := NewRejectLogoutRequestNoContent()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewRejectLogoutRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewRejectLogoutRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -90,6 +87,10 @@ func (o *RejectLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/reject][%d] rejectLogoutRequestNotFound  %+v", 404, o.Payload)
 }
 
+func (o *RejectLogoutRequestNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *RejectLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -117,6 +118,10 @@ type RejectLogoutRequestInternalServerError struct {
 
 func (o *RejectLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/reject][%d] rejectLogoutRequestInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *RejectLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *RejectLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

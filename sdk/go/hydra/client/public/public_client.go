@@ -6,6 +6,8 @@ package public
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"fmt"
+
 	"github.com/go-openapi/runtime"
 
 	strfmt "github.com/go-openapi/strfmt"
@@ -54,7 +56,6 @@ func (a *Client) DisconnectUser(params *DisconnectUserParams) error {
 		return err
 	}
 	return nil
-
 }
 
 /*
@@ -85,8 +86,57 @@ func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfiguration
 	if err != nil {
 		return nil, err
 	}
-	return result.(*DiscoverOpenIDConfigurationOK), nil
+	success, ok := result.(*DiscoverOpenIDConfigurationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for discoverOpenIDConfiguration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
 
+/*
+IsInstanceReady checks readiness status
+
+This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g.
+the database) are responsive as well.
+
+If the service supports TLS Edge Termination, this endpoint does not require the
+`X-Forwarded-Proto` header to be set.
+
+Be aware that if you are running multiple nodes of this service, the health status will never
+refer to the cluster state, only to a single instance.
+*/
+func (a *Client) IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceReadyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewIsInstanceReadyParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "isInstanceReady",
+		Method:             "GET",
+		PathPattern:        "/health/ready",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &IsInstanceReadyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*IsInstanceReadyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for isInstanceReady: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -123,8 +173,14 @@ func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientA
 	if err != nil {
 		return nil, err
 	}
-	return result.(*Oauth2TokenOK), nil
-
+	success, ok := result.(*Oauth2TokenOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for oauth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -157,7 +213,6 @@ func (a *Client) OauthAuth(params *OauthAuthParams) error {
 		return err
 	}
 	return nil
-
 }
 
 /*
@@ -190,8 +245,14 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 	if err != nil {
 		return nil, err
 	}
-	return result.(*RevokeOAuth2TokenOK), nil
-
+	success, ok := result.(*RevokeOAuth2TokenOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for revokeOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -222,8 +283,14 @@ func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInf
 	if err != nil {
 		return nil, err
 	}
-	return result.(*UserinfoOK), nil
-
+	success, ok := result.(*UserinfoOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for userinfo: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 /*
@@ -254,8 +321,14 @@ func (a *Client) WellKnown(params *WellKnownParams) (*WellKnownOK, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.(*WellKnownOK), nil
-
+	success, ok := result.(*WellKnownOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for wellKnown: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
 }
 
 // SetTransport changes the transport on the client

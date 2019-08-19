@@ -16,12 +16,12 @@
 (function(factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/ConsentRequestSession', 'model/EmptyResponse', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/LogoutRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/Oauth2TokenResponse', 'model/OauthTokenResponse', 'model/OpenIDConnectContext', 'model/PreviousConsentSession', 'model/RejectRequest', 'model/SwaggerFlushInactiveAccessTokens', 'model/SwaggerJsonWebKeyQuery', 'model/SwaggerJwkCreateSet', 'model/SwaggerJwkSetQuery', 'model/SwaggerJwkUpdateSet', 'model/SwaggerJwkUpdateSetKey', 'model/SwaggerOAuthIntrospectionRequest', 'model/SwaggerRevokeOAuth2TokenParameters', 'model/Swaggeroauth2TokenParameters', 'model/UserinfoResponse', 'model/Version', 'model/WellKnown', 'api/AdminApi', 'api/HealthApi', 'api/PublicApi', 'api/VersionApi'], factory);
+    define(['ApiClient', 'model/AcceptConsentRequest', 'model/AcceptLoginRequest', 'model/CompletedRequest', 'model/ConsentRequest', 'model/ConsentRequestSession', 'model/FlushInactiveOAuth2TokensRequest', 'model/GenericError', 'model/HealthNotReadyStatus', 'model/HealthStatus', 'model/JSONWebKey', 'model/JSONWebKeySet', 'model/JsonWebKeySetGeneratorRequest', 'model/LoginRequest', 'model/LogoutRequest', 'model/OAuth2Client', 'model/OAuth2TokenIntrospection', 'model/Oauth2TokenResponse', 'model/OauthTokenResponse', 'model/OpenIDConnectContext', 'model/PreviousConsentSession', 'model/RejectRequest', 'model/UserinfoResponse', 'model/Version', 'model/WellKnown', 'api/AdminApi', 'api/PublicApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequest'), require('./model/AcceptLoginRequest'), require('./model/CompletedRequest'), require('./model/ConsentRequest'), require('./model/ConsentRequestSession'), require('./model/EmptyResponse'), require('./model/FlushInactiveOAuth2TokensRequest'), require('./model/GenericError'), require('./model/HealthNotReadyStatus'), require('./model/HealthStatus'), require('./model/JSONWebKey'), require('./model/JSONWebKeySet'), require('./model/JsonWebKeySetGeneratorRequest'), require('./model/LoginRequest'), require('./model/LogoutRequest'), require('./model/OAuth2Client'), require('./model/OAuth2TokenIntrospection'), require('./model/Oauth2TokenResponse'), require('./model/OauthTokenResponse'), require('./model/OpenIDConnectContext'), require('./model/PreviousConsentSession'), require('./model/RejectRequest'), require('./model/SwaggerFlushInactiveAccessTokens'), require('./model/SwaggerJsonWebKeyQuery'), require('./model/SwaggerJwkCreateSet'), require('./model/SwaggerJwkSetQuery'), require('./model/SwaggerJwkUpdateSet'), require('./model/SwaggerJwkUpdateSetKey'), require('./model/SwaggerOAuthIntrospectionRequest'), require('./model/SwaggerRevokeOAuth2TokenParameters'), require('./model/Swaggeroauth2TokenParameters'), require('./model/UserinfoResponse'), require('./model/Version'), require('./model/WellKnown'), require('./api/AdminApi'), require('./api/HealthApi'), require('./api/PublicApi'), require('./api/VersionApi'));
+    module.exports = factory(require('./ApiClient'), require('./model/AcceptConsentRequest'), require('./model/AcceptLoginRequest'), require('./model/CompletedRequest'), require('./model/ConsentRequest'), require('./model/ConsentRequestSession'), require('./model/FlushInactiveOAuth2TokensRequest'), require('./model/GenericError'), require('./model/HealthNotReadyStatus'), require('./model/HealthStatus'), require('./model/JSONWebKey'), require('./model/JSONWebKeySet'), require('./model/JsonWebKeySetGeneratorRequest'), require('./model/LoginRequest'), require('./model/LogoutRequest'), require('./model/OAuth2Client'), require('./model/OAuth2TokenIntrospection'), require('./model/Oauth2TokenResponse'), require('./model/OauthTokenResponse'), require('./model/OpenIDConnectContext'), require('./model/PreviousConsentSession'), require('./model/RejectRequest'), require('./model/UserinfoResponse'), require('./model/Version'), require('./model/WellKnown'), require('./api/AdminApi'), require('./api/PublicApi'));
   }
-}(function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, ConsentRequestSession, EmptyResponse, FlushInactiveOAuth2TokensRequest, GenericError, HealthNotReadyStatus, HealthStatus, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, LogoutRequest, OAuth2Client, OAuth2TokenIntrospection, Oauth2TokenResponse, OauthTokenResponse, OpenIDConnectContext, PreviousConsentSession, RejectRequest, SwaggerFlushInactiveAccessTokens, SwaggerJsonWebKeyQuery, SwaggerJwkCreateSet, SwaggerJwkSetQuery, SwaggerJwkUpdateSet, SwaggerJwkUpdateSetKey, SwaggerOAuthIntrospectionRequest, SwaggerRevokeOAuth2TokenParameters, Swaggeroauth2TokenParameters, UserinfoResponse, Version, WellKnown, AdminApi, HealthApi, PublicApi, VersionApi) {
+}(function(ApiClient, AcceptConsentRequest, AcceptLoginRequest, CompletedRequest, ConsentRequest, ConsentRequestSession, FlushInactiveOAuth2TokensRequest, GenericError, HealthNotReadyStatus, HealthStatus, JSONWebKey, JSONWebKeySet, JsonWebKeySetGeneratorRequest, LoginRequest, LogoutRequest, OAuth2Client, OAuth2TokenIntrospection, Oauth2TokenResponse, OauthTokenResponse, OpenIDConnectContext, PreviousConsentSession, RejectRequest, UserinfoResponse, Version, WellKnown, AdminApi, PublicApi) {
   'use strict';
 
   /**
@@ -86,11 +86,6 @@
      * @property {module:model/ConsentRequestSession}
      */
     ConsentRequestSession: ConsentRequestSession,
-    /**
-     * The EmptyResponse model constructor.
-     * @property {module:model/EmptyResponse}
-     */
-    EmptyResponse: EmptyResponse,
     /**
      * The FlushInactiveOAuth2TokensRequest model constructor.
      * @property {module:model/FlushInactiveOAuth2TokensRequest}
@@ -172,51 +167,6 @@
      */
     RejectRequest: RejectRequest,
     /**
-     * The SwaggerFlushInactiveAccessTokens model constructor.
-     * @property {module:model/SwaggerFlushInactiveAccessTokens}
-     */
-    SwaggerFlushInactiveAccessTokens: SwaggerFlushInactiveAccessTokens,
-    /**
-     * The SwaggerJsonWebKeyQuery model constructor.
-     * @property {module:model/SwaggerJsonWebKeyQuery}
-     */
-    SwaggerJsonWebKeyQuery: SwaggerJsonWebKeyQuery,
-    /**
-     * The SwaggerJwkCreateSet model constructor.
-     * @property {module:model/SwaggerJwkCreateSet}
-     */
-    SwaggerJwkCreateSet: SwaggerJwkCreateSet,
-    /**
-     * The SwaggerJwkSetQuery model constructor.
-     * @property {module:model/SwaggerJwkSetQuery}
-     */
-    SwaggerJwkSetQuery: SwaggerJwkSetQuery,
-    /**
-     * The SwaggerJwkUpdateSet model constructor.
-     * @property {module:model/SwaggerJwkUpdateSet}
-     */
-    SwaggerJwkUpdateSet: SwaggerJwkUpdateSet,
-    /**
-     * The SwaggerJwkUpdateSetKey model constructor.
-     * @property {module:model/SwaggerJwkUpdateSetKey}
-     */
-    SwaggerJwkUpdateSetKey: SwaggerJwkUpdateSetKey,
-    /**
-     * The SwaggerOAuthIntrospectionRequest model constructor.
-     * @property {module:model/SwaggerOAuthIntrospectionRequest}
-     */
-    SwaggerOAuthIntrospectionRequest: SwaggerOAuthIntrospectionRequest,
-    /**
-     * The SwaggerRevokeOAuth2TokenParameters model constructor.
-     * @property {module:model/SwaggerRevokeOAuth2TokenParameters}
-     */
-    SwaggerRevokeOAuth2TokenParameters: SwaggerRevokeOAuth2TokenParameters,
-    /**
-     * The Swaggeroauth2TokenParameters model constructor.
-     * @property {module:model/Swaggeroauth2TokenParameters}
-     */
-    Swaggeroauth2TokenParameters: Swaggeroauth2TokenParameters,
-    /**
      * The UserinfoResponse model constructor.
      * @property {module:model/UserinfoResponse}
      */
@@ -237,20 +187,10 @@
      */
     AdminApi: AdminApi,
     /**
-     * The HealthApi service constructor.
-     * @property {module:api/HealthApi}
-     */
-    HealthApi: HealthApi,
-    /**
      * The PublicApi service constructor.
      * @property {module:api/PublicApi}
      */
-    PublicApi: PublicApi,
-    /**
-     * The VersionApi service constructor.
-     * @property {module:api/VersionApi}
-     */
-    VersionApi: VersionApi
+    PublicApi: PublicApi
   };
 
   return exports;

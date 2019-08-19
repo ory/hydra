@@ -24,21 +24,18 @@ type AcceptConsentRequestReader struct {
 // ReadResponse reads a server response into the received o.
 func (o *AcceptConsentRequestReader) ReadResponse(response runtime.ClientResponse, consumer runtime.Consumer) (interface{}, error) {
 	switch response.Code() {
-
 	case 200:
 		result := NewAcceptConsentRequestOK()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return result, nil
-
 	case 404:
 		result := NewAcceptConsentRequestNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
 		return nil, result
-
 	case 500:
 		result := NewAcceptConsentRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -66,6 +63,10 @@ type AcceptConsentRequestOK struct {
 
 func (o *AcceptConsentRequestOK) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/accept][%d] acceptConsentRequestOK  %+v", 200, o.Payload)
+}
+
+func (o *AcceptConsentRequestOK) GetPayload() *models.RequestHandlerResponse {
+	return o.Payload
 }
 
 func (o *AcceptConsentRequestOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -97,6 +98,10 @@ func (o *AcceptConsentRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/accept][%d] acceptConsentRequestNotFound  %+v", 404, o.Payload)
 }
 
+func (o *AcceptConsentRequestNotFound) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
 func (o *AcceptConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
@@ -124,6 +129,10 @@ type AcceptConsentRequestInternalServerError struct {
 
 func (o *AcceptConsentRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/accept][%d] acceptConsentRequestInternalServerError  %+v", 500, o.Payload)
+}
+
+func (o *AcceptConsentRequestInternalServerError) GetPayload() *models.GenericError {
+	return o.Payload
 }
 
 func (o *AcceptConsentRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {

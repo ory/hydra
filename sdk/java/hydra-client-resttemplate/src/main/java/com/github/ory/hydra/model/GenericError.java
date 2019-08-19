@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
  */
 @ApiModel(description = "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T20:15:39.753+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T21:19:13.533+02:00")
 public class GenericError {
   @JsonProperty("debug")
   private String debug = null;

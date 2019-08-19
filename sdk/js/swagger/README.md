@@ -140,6 +140,7 @@ Class | Method | HTTP request | Description
 *OryHydra.AdminApi* | [**isInstanceAlive**](docs/AdminApi.md#isInstanceAlive) | **GET** /health/alive | Check alive status
 *OryHydra.AdminApi* | [**listOAuth2Clients**](docs/AdminApi.md#listOAuth2Clients) | **GET** /clients | List OAuth 2.0 Clients
 *OryHydra.AdminApi* | [**listSubjectConsentSessions**](docs/AdminApi.md#listSubjectConsentSessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
+*OryHydra.AdminApi* | [**prometheus**](docs/AdminApi.md#prometheus) | **GET** /metrics/prometheus | Get snapshot metrics from the Hydra service. If you&#39;re using k8s, you can then add annotations to your deployment like so:
 *OryHydra.AdminApi* | [**rejectConsentRequest**](docs/AdminApi.md#rejectConsentRequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *OryHydra.AdminApi* | [**rejectLoginRequest**](docs/AdminApi.md#rejectLoginRequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
 *OryHydra.AdminApi* | [**rejectLogoutRequest**](docs/AdminApi.md#rejectLogoutRequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
@@ -199,6 +200,7 @@ Class | Method | HTTP request | Description
 - **Flow**: accessCode
 - **Authorization URL**: /oauth2/auth
 - **Scopes**: 
-  - offline: A scope required when requesting refresh tokens
+  - offline: A scope required when requesting refresh tokens (alias for &#x60;offline&#x60;)
+  - offline_access: A scope required when requesting refresh tokens
   - openid: Request an OpenID Connect ID Token
 

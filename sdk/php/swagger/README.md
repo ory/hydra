@@ -96,6 +96,7 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**isInstanceAlive**](docs/Api/AdminApi.md#isinstancealive) | **GET** /health/alive | Check alive status
 *AdminApi* | [**listOAuth2Clients**](docs/Api/AdminApi.md#listoauth2clients) | **GET** /clients | List OAuth 2.0 Clients
 *AdminApi* | [**listSubjectConsentSessions**](docs/Api/AdminApi.md#listsubjectconsentsessions) | **GET** /oauth2/auth/sessions/consent | Lists all consent sessions of a subject
+*AdminApi* | [**prometheus**](docs/Api/AdminApi.md#prometheus) | **GET** /metrics/prometheus | Get snapshot metrics from the Hydra service. If you&#39;re using k8s, you can then add annotations to your deployment like so:
 *AdminApi* | [**rejectConsentRequest**](docs/Api/AdminApi.md#rejectconsentrequest) | **PUT** /oauth2/auth/requests/consent/reject | Reject an consent request
 *AdminApi* | [**rejectLoginRequest**](docs/Api/AdminApi.md#rejectloginrequest) | **PUT** /oauth2/auth/requests/login/reject | Reject a login request
 *AdminApi* | [**rejectLogoutRequest**](docs/Api/AdminApi.md#rejectlogoutrequest) | **PUT** /oauth2/auth/requests/logout/reject | Reject a logout request
@@ -155,7 +156,8 @@ Class | Method | HTTP request | Description
 - **Flow**: accessCode
 - **Authorization URL**: /oauth2/auth
 - **Scopes**: 
- - **offline**: A scope required when requesting refresh tokens
+ - **offline**: A scope required when requesting refresh tokens (alias for `offline`)
+ - **offline_access**: A scope required when requesting refresh tokens
  - **openid**: Request an OpenID Connect ID Token
 
 

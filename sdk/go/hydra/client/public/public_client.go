@@ -63,7 +63,10 @@ DiscoverOpenIDConfiguration opens ID connect discovery
 
 The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
 your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
-flow at https://openid.net/specs/openid-connect-discovery-1_0.html
+flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
+
+Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
+For a full list of clients go here: https://openid.net/developers/certified/
 */
 func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams) (*DiscoverOpenIDConfigurationOK, error) {
 	// TODO: Validate the params before sending
@@ -258,8 +261,10 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 /*
 Userinfo opens ID connect userinfo
 
-This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token.
-The endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .
+This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
+the provided OAuth 2.0 Access Token.
+
+For more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
 */
 func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error) {
 	// TODO: Validate the params before sending

@@ -42,7 +42,7 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.0
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.68
+	github.com/ory/x v0.0.69
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1

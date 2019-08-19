@@ -1967,6 +1967,74 @@ class AdminApi
     }
 
     /**
+     * Operation prometheus
+     *
+     * Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to your deployment like so:
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return void
+     */
+    public function prometheus()
+    {
+        list($response) = $this->prometheusWithHttpInfo();
+        return $response;
+    }
+
+    /**
+     * Operation prometheusWithHttpInfo
+     *
+     * Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to your deployment like so:
+     *
+     * Client for Hydra
+     *
+     * @throws \Hydra\SDK\ApiException on non-2xx response
+     * @return array of null, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function prometheusWithHttpInfo()
+    {
+        // parse inputs
+        $resourcePath = "/metrics/prometheus";
+        $httpBody = '';
+        $queryParams = [];
+        $headerParams = [];
+        $formParams = [];
+        $_header_accept = $this->apiClient->selectHeaderAccept(['plain/text']);
+        if (!is_null($_header_accept)) {
+            $headerParams['Accept'] = $_header_accept;
+        }
+        $headerParams['Content-Type'] = $this->apiClient->selectHeaderContentType(['application/json', 'application/x-www-form-urlencoded']);
+
+
+        // for model (json/xml)
+        if (isset($_tempBody)) {
+            $httpBody = $_tempBody; // $_tempBody is the method argument, if present
+        } elseif (count($formParams) > 0) {
+            $httpBody = $formParams; // for HTTP post (form)
+        }
+        // make the API Call
+        try {
+            list($response, $statusCode, $httpHeader) = $this->apiClient->callApi(
+                $resourcePath,
+                'GET',
+                $queryParams,
+                $httpBody,
+                $headerParams,
+                null,
+                '/metrics/prometheus'
+            );
+
+            return [null, $statusCode, $httpHeader];
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
      * Operation rejectConsentRequest
      *
      * Reject an consent request

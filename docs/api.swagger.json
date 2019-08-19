@@ -54,7 +54,7 @@
     },
     "/.well-known/openid-configuration": {
       "get": {
-        "description": "The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll\nyour own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this\nflow at https://openid.net/specs/openid-connect-discovery-1_0.html",
+        "description": "The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll\nyour own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this\nflow at https://openid.net/specs/openid-connect-discovery-1_0.html .\n\nPopular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.\nFor a full list of clients go here: https://openid.net/developers/certified/",
         "produces": [
           "application/json"
         ],
@@ -807,6 +807,24 @@
         }
       }
     },
+    "/metrics/prometheus": {
+      "get": {
+        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
+        "produces": [
+          "plain/text"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
+        "operationId": "prometheus",
+        "responses": {
+          "200": {
+            "$ref": "#/responses/emptyResponse"
+          }
+        }
+      }
+    },
     "/oauth2/auth": {
       "get": {
         "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
@@ -1550,7 +1568,7 @@
             "oauth2": []
           }
         ],
-        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.",
+        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\nFor more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1757,7 +1775,7 @@
             "oauth2": []
           }
         ],
-        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of the provided OAuth 2.0 access token.\nThe endpoint implements http://openid.net/specs/openid-connect-core-1_0.html#UserInfo .",
+        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of\nthe provided OAuth 2.0 Access Token.\n\nFor more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).",
         "produces": [
           "application/json"
         ],
@@ -1922,7 +1940,6 @@
     },
     "JSONWebKeySet": {
       "type": "object",
-      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -1934,7 +1951,7 @@
         }
       },
       "x-go-name": "swaggerJSONWebKeySet",
-      "x-go-package": "gopkg.in/square/go-jose.v2"
+      "x-go-package": "github.com/ory/hydra/jwk"
     },
     "PreviousConsentSession": {
       "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
@@ -3094,7 +3111,8 @@
       "authorizationUrl": "/oauth2/auth",
       "tokenUrl": "/oauth2/token",
       "scopes": {
-        "offline": "A scope required when requesting refresh tokens",
+        "offline": "A scope required when requesting refresh tokens (alias for `offline`)",
+        "offline_access": "A scope required when requesting refresh tokens",
         "openid": "Request an OpenID Connect ID Token"
       }
     }

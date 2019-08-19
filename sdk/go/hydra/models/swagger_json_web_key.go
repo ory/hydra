@@ -8,7 +8,9 @@ package models
 import (
 	strfmt "github.com/go-openapi/strfmt"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // SwaggerJSONWebKey swagger JSON web key
@@ -20,7 +22,8 @@ type SwaggerJSONWebKey struct {
 	// IANA "JSON Web Signature and Encryption Algorithms" registry
 	// established by [JWA] or be a value that contains a Collision-
 	// Resistant Name.
-	Alg string `json:"alg,omitempty"`
+	// Required: true
+	Alg *string `json:"alg"`
 
 	// crv
 	Crv string `json:"crv,omitempty"`
@@ -49,14 +52,16 @@ type SwaggerJSONWebKey struct {
 	// they have different "kty" (key type) values but are considered to be
 	// equivalent alternatives by the application using them.)  The "kid"
 	// value is a case-sensitive string.
-	Kid string `json:"kid,omitempty"`
+	// Required: true
+	Kid *string `json:"kid"`
 
 	// The "kty" (key type) parameter identifies the cryptographic algorithm
 	// family used with the key, such as "RSA" or "EC". "kty" values should
 	// either be registered in the IANA "JSON Web Key Types" registry
 	// established by [JWA] or be a value that contains a Collision-
 	// Resistant Name.  The "kty" value is a case-sensitive string.
-	Kty string `json:"kty,omitempty"`
+	// Required: true
+	Kty *string `json:"kty"`
 
 	// n
 	N string `json:"n,omitempty"`
@@ -74,7 +79,8 @@ type SwaggerJSONWebKey struct {
 	// the public key. The "use" parameter is employed to indicate whether
 	// a public key is used for encrypting data or verifying the signature
 	// on data. Values are commonly "sig" (signature) or "enc" (encryption).
-	Use string `json:"use,omitempty"`
+	// Required: true
+	Use *string `json:"use"`
 
 	// x
 	X string `json:"x,omitempty"`
@@ -94,6 +100,63 @@ type SwaggerJSONWebKey struct {
 
 // Validate validates this swagger JSON web key
 func (m *SwaggerJSONWebKey) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAlg(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateKid(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateKty(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateUse(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *SwaggerJSONWebKey) validateAlg(formats strfmt.Registry) error {
+
+	if err := validate.Required("alg", "body", m.Alg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *SwaggerJSONWebKey) validateKid(formats strfmt.Registry) error {
+
+	if err := validate.Required("kid", "body", m.Kid); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *SwaggerJSONWebKey) validateKty(formats strfmt.Registry) error {
+
+	if err := validate.Required("kty", "body", m.Kty); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *SwaggerJSONWebKey) validateUse(formats strfmt.Registry) error {
+
+	if err := validate.Required("use", "body", m.Use); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -1817,6 +1817,12 @@
   "definitions": {
     "JSONWebKey": {
       "type": "object",
+      "required": [
+        "use",
+        "kty",
+        "kid",
+        "alg"
+      ],
       "properties": {
         "alg": {
           "description": "The \"alg\" (algorithm) parameter identifies the algorithm intended for\nuse with the key.  The values used should either be registered in the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.",
@@ -1916,6 +1922,7 @@
     },
     "JSONWebKeySet": {
       "type": "object",
+      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -1927,7 +1934,7 @@
         }
       },
       "x-go-name": "swaggerJSONWebKeySet",
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "gopkg.in/square/go-jose.v2"
     },
     "PreviousConsentSession": {
       "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",

@@ -28,7 +28,7 @@ import java.util.List;
  * The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
  */
 @ApiModel(description = "The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T18:06:10.908+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T20:15:39.753+02:00")
 public class PreviousConsentSession {
   @JsonProperty("consent_request")
   private ConsentRequest consentRequest = null;

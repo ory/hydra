@@ -2657,17 +2657,18 @@
           "type": "string",
           "x-go-name": "AccessToken"
         },
-        "client_id": {
+        "expires_in": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-name": "ExpiresIn"
+        },
+        "refresh_token": {
           "type": "string",
           "x-go-name": "RefreshToken"
         },
-        "code": {
+        "token_type": {
           "type": "string",
           "x-go-name": "TokenType"
-        },
-        "redirect_uri": {
-          "type": "string",
-          "x-go-name": "ExpiresIn"
         }
       },
       "x-go-name": "swaggeroauth2TokenResponse",

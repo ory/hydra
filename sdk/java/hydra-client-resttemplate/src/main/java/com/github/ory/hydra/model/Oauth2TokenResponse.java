@@ -24,19 +24,19 @@ import io.swagger.annotations.ApiModelProperty;
  * The Access Token Response
  */
 @ApiModel(description = "The Access Token Response")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T21:19:13.533+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T22:00:49.579+02:00")
 public class Oauth2TokenResponse {
   @JsonProperty("access_token")
   private String accessToken = null;
 
-  @JsonProperty("client_id")
-  private String clientId = null;
+  @JsonProperty("expires_in")
+  private Long expiresIn = null;
 
-  @JsonProperty("code")
-  private String code = null;
+  @JsonProperty("refresh_token")
+  private String refreshToken = null;
 
-  @JsonProperty("redirect_uri")
-  private String redirectUri = null;
+  @JsonProperty("token_type")
+  private String tokenType = null;
 
   public Oauth2TokenResponse accessToken(String accessToken) {
     this.accessToken = accessToken;
@@ -56,58 +56,58 @@ public class Oauth2TokenResponse {
     this.accessToken = accessToken;
   }
 
-  public Oauth2TokenResponse clientId(String clientId) {
-    this.clientId = clientId;
+  public Oauth2TokenResponse expiresIn(Long expiresIn) {
+    this.expiresIn = expiresIn;
     return this;
   }
 
    /**
-   * Get clientId
-   * @return clientId
+   * Get expiresIn
+   * @return expiresIn
   **/
   @ApiModelProperty(value = "")
-  public String getClientId() {
-    return clientId;
+  public Long getExpiresIn() {
+    return expiresIn;
   }
 
-  public void setClientId(String clientId) {
-    this.clientId = clientId;
+  public void setExpiresIn(Long expiresIn) {
+    this.expiresIn = expiresIn;
   }
 
-  public Oauth2TokenResponse code(String code) {
-    this.code = code;
+  public Oauth2TokenResponse refreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
     return this;
   }
 
    /**
-   * Get code
-   * @return code
+   * Get refreshToken
+   * @return refreshToken
   **/
   @ApiModelProperty(value = "")
-  public String getCode() {
-    return code;
+  public String getRefreshToken() {
+    return refreshToken;
   }
 
-  public void setCode(String code) {
-    this.code = code;
+  public void setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
   }
 
-  public Oauth2TokenResponse redirectUri(String redirectUri) {
-    this.redirectUri = redirectUri;
+  public Oauth2TokenResponse tokenType(String tokenType) {
+    this.tokenType = tokenType;
     return this;
   }
 
    /**
-   * Get redirectUri
-   * @return redirectUri
+   * Get tokenType
+   * @return tokenType
   **/
   @ApiModelProperty(value = "")
-  public String getRedirectUri() {
-    return redirectUri;
+  public String getTokenType() {
+    return tokenType;
   }
 
-  public void setRedirectUri(String redirectUri) {
-    this.redirectUri = redirectUri;
+  public void setTokenType(String tokenType) {
+    this.tokenType = tokenType;
   }
 
 
@@ -121,14 +121,14 @@ public class Oauth2TokenResponse {
     }
     Oauth2TokenResponse oauth2TokenResponse = (Oauth2TokenResponse) o;
     return Objects.equals(this.accessToken, oauth2TokenResponse.accessToken) &&
-        Objects.equals(this.clientId, oauth2TokenResponse.clientId) &&
-        Objects.equals(this.code, oauth2TokenResponse.code) &&
-        Objects.equals(this.redirectUri, oauth2TokenResponse.redirectUri);
+        Objects.equals(this.expiresIn, oauth2TokenResponse.expiresIn) &&
+        Objects.equals(this.refreshToken, oauth2TokenResponse.refreshToken) &&
+        Objects.equals(this.tokenType, oauth2TokenResponse.tokenType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(accessToken, clientId, code, redirectUri);
+    return Objects.hash(accessToken, expiresIn, refreshToken, tokenType);
   }
 
 
@@ -138,9 +138,9 @@ public class Oauth2TokenResponse {
     sb.append("class Oauth2TokenResponse {\n");
     
     sb.append("    accessToken: ").append(toIndentedString(accessToken)).append("\n");
-    sb.append("    clientId: ").append(toIndentedString(clientId)).append("\n");
-    sb.append("    code: ").append(toIndentedString(code)).append("\n");
-    sb.append("    redirectUri: ").append(toIndentedString(redirectUri)).append("\n");
+    sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
+    sb.append("    refreshToken: ").append(toIndentedString(refreshToken)).append("\n");
+    sb.append("    tokenType: ").append(toIndentedString(tokenType)).append("\n");
     sb.append("}");
     return sb.toString();
   }

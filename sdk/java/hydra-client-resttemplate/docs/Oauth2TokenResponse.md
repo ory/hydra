@@ -5,9 +5,9 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **accessToken** | **String** |  |  [optional]
-**clientId** | **String** |  |  [optional]
-**code** | **String** |  |  [optional]
-**redirectUri** | **String** |  |  [optional]
+**expiresIn** | **Long** |  |  [optional]
+**refreshToken** | **String** |  |  [optional]
+**tokenType** | **String** |  |  [optional]
 
 
 

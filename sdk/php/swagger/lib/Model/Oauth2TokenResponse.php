@@ -56,9 +56,9 @@ class Oauth2TokenResponse implements ArrayAccess
       */
     protected static $swaggerTypes = [
         'access_token' => 'string',
-        'client_id' => 'string',
-        'code' => 'string',
-        'redirect_uri' => 'string'
+        'expires_in' => 'int',
+        'refresh_token' => 'string',
+        'token_type' => 'string'
     ];
 
     /**
@@ -67,9 +67,9 @@ class Oauth2TokenResponse implements ArrayAccess
       */
     protected static $swaggerFormats = [
         'access_token' => null,
-        'client_id' => null,
-        'code' => null,
-        'redirect_uri' => null
+        'expires_in' => 'int64',
+        'refresh_token' => null,
+        'token_type' => null
     ];
 
     public static function swaggerTypes()
@@ -88,9 +88,9 @@ class Oauth2TokenResponse implements ArrayAccess
      */
     protected static $attributeMap = [
         'access_token' => 'access_token',
-        'client_id' => 'client_id',
-        'code' => 'code',
-        'redirect_uri' => 'redirect_uri'
+        'expires_in' => 'expires_in',
+        'refresh_token' => 'refresh_token',
+        'token_type' => 'token_type'
     ];
 
 
@@ -100,9 +100,9 @@ class Oauth2TokenResponse implements ArrayAccess
      */
     protected static $setters = [
         'access_token' => 'setAccessToken',
-        'client_id' => 'setClientId',
-        'code' => 'setCode',
-        'redirect_uri' => 'setRedirectUri'
+        'expires_in' => 'setExpiresIn',
+        'refresh_token' => 'setRefreshToken',
+        'token_type' => 'setTokenType'
     ];
 
 
@@ -112,9 +112,9 @@ class Oauth2TokenResponse implements ArrayAccess
      */
     protected static $getters = [
         'access_token' => 'getAccessToken',
-        'client_id' => 'getClientId',
-        'code' => 'getCode',
-        'redirect_uri' => 'getRedirectUri'
+        'expires_in' => 'getExpiresIn',
+        'refresh_token' => 'getRefreshToken',
+        'token_type' => 'getTokenType'
     ];
 
     public static function attributeMap()
@@ -149,9 +149,9 @@ class Oauth2TokenResponse implements ArrayAccess
     public function __construct(array $data = null)
     {
         $this->container['access_token'] = isset($data['access_token']) ? $data['access_token'] : null;
-        $this->container['client_id'] = isset($data['client_id']) ? $data['client_id'] : null;
-        $this->container['code'] = isset($data['code']) ? $data['code'] : null;
-        $this->container['redirect_uri'] = isset($data['redirect_uri']) ? $data['redirect_uri'] : null;
+        $this->container['expires_in'] = isset($data['expires_in']) ? $data['expires_in'] : null;
+        $this->container['refresh_token'] = isset($data['refresh_token']) ? $data['refresh_token'] : null;
+        $this->container['token_type'] = isset($data['token_type']) ? $data['token_type'] : null;
     }
 
     /**
@@ -201,64 +201,64 @@ class Oauth2TokenResponse implements ArrayAccess
     }
 
     /**
-     * Gets client_id
-     * @return string
+     * Gets expires_in
+     * @return int
      */
-    public function getClientId()
+    public function getExpiresIn()
     {
-        return $this->container['client_id'];
+        return $this->container['expires_in'];
     }
 
     /**
-     * Sets client_id
-     * @param string $client_id
+     * Sets expires_in
+     * @param int $expires_in
      * @return $this
      */
-    public function setClientId($client_id)
+    public function setExpiresIn($expires_in)
     {
-        $this->container['client_id'] = $client_id;
+        $this->container['expires_in'] = $expires_in;
 
         return $this;
     }
 
     /**
-     * Gets code
+     * Gets refresh_token
      * @return string
      */
-    public function getCode()
+    public function getRefreshToken()
     {
-        return $this->container['code'];
+        return $this->container['refresh_token'];
     }
 
     /**
-     * Sets code
-     * @param string $code
+     * Sets refresh_token
+     * @param string $refresh_token
      * @return $this
      */
-    public function setCode($code)
+    public function setRefreshToken($refresh_token)
     {
-        $this->container['code'] = $code;
+        $this->container['refresh_token'] = $refresh_token;
 
         return $this;
     }
 
     /**
-     * Gets redirect_uri
+     * Gets token_type
      * @return string
      */
-    public function getRedirectUri()
+    public function getTokenType()
     {
-        return $this->container['redirect_uri'];
+        return $this->container['token_type'];
     }
 
     /**
-     * Sets redirect_uri
-     * @param string $redirect_uri
+     * Sets token_type
+     * @param string $token_type
      * @return $this
      */
-    public function setRedirectUri($redirect_uri)
+    public function setTokenType($token_type)
     {
-        $this->container['redirect_uri'] = $redirect_uri;
+        $this->container['token_type'] = $token_type;
 
         return $this;
     }

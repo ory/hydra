@@ -19,13 +19,13 @@ type Swaggeroauth2TokenResponse struct {
 	AccessToken string `json:"access_token,omitempty"`
 
 	// expires in
-	ExpiresIn string `json:"redirect_uri,omitempty"`
+	ExpiresIn int64 `json:"expires_in,omitempty"`
 
 	// refresh token
-	RefreshToken string `json:"client_id,omitempty"`
+	RefreshToken string `json:"refresh_token,omitempty"`
 
 	// token type
-	TokenType string `json:"code,omitempty"`
+	TokenType string `json:"token_type,omitempty"`
 }
 
 // Validate validates this swaggeroauth2 token response

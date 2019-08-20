@@ -68,14 +68,14 @@
       if (data.hasOwnProperty('access_token')) {
         obj['access_token'] = ApiClient.convertToType(data['access_token'], 'String');
       }
-      if (data.hasOwnProperty('client_id')) {
-        obj['client_id'] = ApiClient.convertToType(data['client_id'], 'String');
+      if (data.hasOwnProperty('expires_in')) {
+        obj['expires_in'] = ApiClient.convertToType(data['expires_in'], 'Number');
       }
-      if (data.hasOwnProperty('code')) {
-        obj['code'] = ApiClient.convertToType(data['code'], 'String');
+      if (data.hasOwnProperty('refresh_token')) {
+        obj['refresh_token'] = ApiClient.convertToType(data['refresh_token'], 'String');
       }
-      if (data.hasOwnProperty('redirect_uri')) {
-        obj['redirect_uri'] = ApiClient.convertToType(data['redirect_uri'], 'String');
+      if (data.hasOwnProperty('token_type')) {
+        obj['token_type'] = ApiClient.convertToType(data['token_type'], 'String');
       }
     }
     return obj;
@@ -86,17 +86,17 @@
    */
   exports.prototype['access_token'] = undefined;
   /**
-   * @member {String} client_id
+   * @member {Number} expires_in
    */
-  exports.prototype['client_id'] = undefined;
+  exports.prototype['expires_in'] = undefined;
   /**
-   * @member {String} code
+   * @member {String} refresh_token
    */
-  exports.prototype['code'] = undefined;
+  exports.prototype['refresh_token'] = undefined;
   /**
-   * @member {String} redirect_uri
+   * @member {String} token_type
    */
-  exports.prototype['redirect_uri'] = undefined;
+  exports.prototype['token_type'] = undefined;
 
 
 

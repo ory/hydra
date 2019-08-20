@@ -99,7 +99,7 @@ type WellKnown struct {
 	// client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0
 	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 
-	//	JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
+	// 	JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
 	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
@@ -177,9 +177,9 @@ type swaggeroauth2TokenParameters struct {
 // swagger:model oauth2TokenResponse
 type swaggeroauth2TokenResponse struct {
 	AccessToken  string `json:"access_token"`
-	TokenType    string `json:"code"`
-	ExpiresIn    string `json:"redirect_uri"`
-	RefreshToken string `json:"client_id"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int    `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 // swagger:parameters flushInactiveOAuth2Tokens

@@ -21,8 +21,14 @@ type Swaggeroauth2TokenResponse struct {
 	// expires in
 	ExpiresIn int64 `json:"expires_in,omitempty"`
 
+	// Id token
+	IDToken string `json:"id_token,omitempty"`
+
 	// refresh token
 	RefreshToken string `json:"refresh_token,omitempty"`
+
+	// scope
+	Scope string `json:"scope,omitempty"`
 
 	// token type
 	TokenType string `json:"token_type,omitempty"`

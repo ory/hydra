@@ -167,6 +167,9 @@ type swaggeroauth2TokenParameters struct {
 	Code string `json:"code"`
 
 	// in: formData
+	RefreshToken string `json:"refresh_token"`
+
+	// in: formData
 	RedirectURI string `json:"redirect_uri"`
 
 	// in: formData
@@ -180,6 +183,8 @@ type swaggeroauth2TokenResponse struct {
 	TokenType    string `json:"token_type"`
 	ExpiresIn    int    `json:"expires_in"`
 	RefreshToken string `json:"refresh_token"`
+	IdToken      string `json:"id_token"`
+	Scope        string `json:"scope,omitempty"`
 }
 
 // swagger:parameters flushInactiveOAuth2Tokens

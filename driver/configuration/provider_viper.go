@@ -360,7 +360,7 @@ func (v *ViperProvider) PublicURL() *url.URL {
 }
 
 func (v *ViperProvider) IssuerURL() *url.URL {
-	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyIssuerURL, v.fallbackURL("/", v.publicHost(), v.publicPort()), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL")))
+	return urlRoot(urlx.ParseOrFatal(v.l, strings.TrimRight(viperx.GetString(v.l, ViperKeyIssuerURL, v.fallbackURL("/", v.publicHost(), v.publicPort()), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"), "/")+"/"))
 }
 
 func (v *ViperProvider) OAuth2AuthURL() string {

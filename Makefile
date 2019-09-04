@@ -131,3 +131,8 @@ install-stable:
 .PHONY: install
 install:
 		GO111MODULE=on go install .
+
+.PHONY: init
+init:
+		GO111MODULE=on go get .
+		GO111MODULE=on go install github.com/ory/go-acc

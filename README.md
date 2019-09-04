@@ -319,7 +319,7 @@ export GO111MODULE=on
 ## With database
 make test
 ## Without database
-make test-short
+make quicktest
 ```
 
 Then run it with in-memory database:

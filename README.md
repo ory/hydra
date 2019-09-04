@@ -88,7 +88,7 @@ submitting bug reports and feature requests, to contributing patches, to sponsor
 everyone of you.
 
 The following list represents companies that have accompanied us along the way and that have made outstanding contributions
-to our ecosystem. *If you think that your company deserves a spot here, reach out to <a href="mailto:hi@ory.sh">hi@ory.sh</a>now*!
+to our ecosystem. *If you think that your company deserves a spot here, reach out to <a href="mailto:hi@ory.sh">hi@ory.sh</a> now*!
 
 **Please consider giving back by becoming a sponsor of our open source work on <a href="https://www.patreon.com/_ory">Patreon</a> or 
 <a href="https://opencollective.com/ory">Open Collective</a>.**

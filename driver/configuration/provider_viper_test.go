@@ -107,3 +107,15 @@ func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
 	value = p.PublicDisableHealthAccessLog()
 	assert.Equal(t, true, value)
 }
+
+func TestViperProvider_IssuerURL(t *testing.T) {
+	l := logrusx.New()
+	l.SetOutput(ioutil.Discard)
+	viper.Set(ViperKeyIssuerURL, "http://hydra.localhost")
+	p := NewViperProvider(l, false, nil)
+	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
+
+	viper.Set(ViperKeyIssuerURL, "http://hydra.localhost/")
+	p2 := NewViperProvider(l, false, nil)
+	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
+}

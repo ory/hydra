@@ -1,0 +1,25 @@
+###########################################################################
+#######             FOR DEMONSTRATION PURPOSES ONLY                 #######
+###########################################################################
+#                                                                         #
+# If you have not yet read the tutorial, do so now:                       #
+#  https://www.ory.sh/docs/hydra/5min-tutorial                            #
+#                                                                         #
+# This set up is only for demonstration purposes. The login               #
+# endpoint can only be used if you follow the steps in the tutorial.      #
+#                                                                         #
+###########################################################################
+
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.12.0
+    ports:
+      - "9090:9090"
+    depends_on:
+      - hydra
+    command:
+      --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./quickstart-prometheus-config.yml:/etc/prometheus/prometheus.yml

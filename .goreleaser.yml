@@ -68,12 +68,20 @@ scoop:
     email: hi@ory.sh
 
 dockers:
-  - image_templates:
+  - dockerfile: Dockerfile
+    image_templates:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
       - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/hydra:latest"
+  - dockerfile: Dockerfile-alpine
+    image_templates:
+      - "oryd/hydra:v{{ .Major }}-alpine"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-alpine"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
+      - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}-alpine"
+      - "oryd/hydra:latest-alpine"
 
 release:
   prerelease: auto

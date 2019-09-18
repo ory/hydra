@@ -231,7 +231,7 @@ func (s *FositeSQLStore) GetClients(ctx context.Context, limit, offset int) (map
 	}
 
 	clients := map[string]client.Client{}
-	for _, c := range interim  {
+	for _, c := range interim {
 		clients[c.GetID()] = c
 	}
 

@@ -99,7 +99,7 @@ func (s *FositeMemoryStore) GetClients(ctx context.Context, limit, offset int) (
 	}
 
 	clients := map[string]client.Client{}
-	for _, c := range interim  {
+	for _, c := range interim {
 		clients[c.GetID()] = c
 	}
 

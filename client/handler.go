@@ -193,12 +193,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	clients := make([]Client, len(c))
-	k := 0
-	for _, cc := range c {
-		clients[k] = cc
-		clients[k].Secret = ""
-		k++
+	for k := range c {
+		c[k].Secret = ""
 	}
 
 	n, err := h.r.ClientManager().CountClients(r.Context())
@@ -209,7 +205,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	pagination.Header(w, r.URL, n, limit, offset)
 
-	h.r.Writer().Write(w, r, clients)
+	h.r.Writer().Write(w, r, c)
 }
 
 // swagger:route GET /clients/{id} admin getOAuth2Client

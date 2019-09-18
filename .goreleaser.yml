@@ -49,14 +49,14 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 changelog:
   sort: asc
-brew:
-  github:
-    owner: ory
-    name: homebrew-hydra
-  homepage:  https://www.ory.sh
-  commit_author:
-    name: ory
-    email: hi@ory.sh
+brews:
+  - github:
+      owner: ory
+      name: homebrew-hydra
+    homepage:  https://www.ory.sh
+    commit_author:
+      name: ory
+      email: hi@ory.sh
 
 scoop:
   bucket:
@@ -69,6 +69,8 @@ scoop:
 
 dockers:
   - dockerfile: Dockerfile
+    binaries:
+      - hydra
     image_templates:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
@@ -76,6 +78,8 @@ dockers:
       - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/hydra:latest"
   - dockerfile: Dockerfile-alpine
+    binaries:
+      - hydra
     image_templates:
       - "oryd/hydra:v{{ .Major }}-alpine"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-alpine"

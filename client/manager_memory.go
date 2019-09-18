@@ -142,14 +142,13 @@ func (m *MemoryManager) DeleteClient(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
+func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clients []Client, err error) {
 	m.RLock()
 	defer m.RUnlock()
-	clients = make(map[string]Client)
 
 	start, end := pagination.Index(limit, offset, len(m.Clients))
 	for _, c := range m.Clients[start:end] {
-		clients[c.GetID()] = c
+		clients = append(clients, c)
 	}
 
 	return clients, nil

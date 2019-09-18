@@ -329,21 +329,21 @@ func (m *SQLManager) DeleteClient(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients map[string]Client, err error) {
+func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients []Client, err error) {
 	d := make([]sqlData, 0)
-	clients = make(map[string]Client)
 
 	if err := m.DB.SelectContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	for _, k := range d {
+	clients = make([]Client, len(d))
+	for i, k := range d {
 		c, err := k.ToClient()
 		if err != nil {
 			return nil, errors.WithStack(err)
 		}
 
-		clients[k.ID] = *c
+		clients[i] = *c
 	}
 
 	return clients, nil

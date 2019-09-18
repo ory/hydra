@@ -93,7 +93,17 @@ func (s *FositeMemoryStore) DeleteClient(ctx context.Context, id string) error {
 }
 
 func (s *FositeMemoryStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, error) {
-	return s.r.ClientManager().GetClients(ctx, limit, offset)
+	interim, err := s.r.ClientManager().GetClients(ctx, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	clients := map[string]client.Client{}
+	for _, c := range interim  {
+		clients[c.GetID()] = c
+	}
+
+	return clients, nil
 }
 
 func (s *FositeMemoryStore) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {

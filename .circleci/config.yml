@@ -5,7 +5,7 @@ version: 2
 jobs:
   format:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
         environment:
           - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
@@ -26,7 +26,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
@@ -362,7 +362,7 @@ jobs:
 
   benchmark:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
         environment:
           - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra
@@ -381,7 +381,7 @@ jobs:
 
   release:
     docker:
-      - image: circleci/golang:1.12
+      - image: circleci/golang:1.13
         environment:
           - GO111MODULE=on
     working_directory: /go/src/github.com/ory/hydra

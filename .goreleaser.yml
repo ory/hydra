@@ -56,7 +56,8 @@ brews:
   - github:
       owner: ory
       name: homebrew-hydra
-    id: hydra-archive
+    ids:
+    - hydra-archive
     homepage:  https://www.ory.sh
     commit_author:
       name: ory

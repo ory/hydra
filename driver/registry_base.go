@@ -230,7 +230,7 @@ func (m *RegistryBase) oAuth2Config() *compose.Config {
 		HashCost:                       m.c.BCryptCost(),
 		ScopeStrategy:                  m.ScopeStrategy(),
 		SendDebugMessagesToClients:     m.c.ShareOAuth2Debug(),
-		EnforcePKCE:                    true,
+		EnforcePKCE:                    m.c.PKCEEnforced(),
 		EnablePKCEPlainChallengeMethod: false,
 		TokenURL:                       urlx.AppendPaths(m.c.PublicURL(), oauth2.TokenPath).String(),
 		RedirectSecureChecker:          x.IsRedirectURISecure(m.c),

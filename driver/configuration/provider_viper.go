@@ -66,6 +66,7 @@ const (
 	ViperKeyAllowTLSTerminationFrom        = "serve.tls.allow_termination_from"
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
+	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
 )
 
 func init() {
@@ -407,4 +408,8 @@ func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
 
 func (v *ViperProvider) ShareOAuth2Debug() bool {
 	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", false, "OAUTH2_SHARE_ERROR_DEBUG")
+}
+
+func (v *ViperProvider) PKCEEnforced() bool {
+	return viperx.GetBool(v.l, ViperKeyPKCEEnforced, false, "OAUTH2_PKCE_ENFORCED")
 }

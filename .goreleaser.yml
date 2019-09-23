@@ -11,6 +11,7 @@ before:
 
 builds:
   -
+    id: hydra
     flags:
       - -a
     ldflags:
@@ -34,7 +35,9 @@ builds:
       - darwin
 
 archives:
-  -
+  - builds:
+      - hydra
+    id: hydra-archive
     replacements:
       darwin: macOS
       linux: Linux
@@ -53,6 +56,7 @@ brews:
   - github:
       owner: ory
       name: homebrew-hydra
+    id: hydra-archive
     homepage:  https://www.ory.sh
     commit_author:
       name: ory

@@ -101,6 +101,10 @@ type swaggerJwkSetQuery struct {
 	// in: path
 	// required: true
 	Set string `json:"set"`
+
+	// A unix timestamp to delete all old keys created before the time
+	// in: query
+	Before int64 `json:"before"`
 }
 
 // swagger:model JSONWebKeySet

@@ -27,6 +27,8 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/ory/hydra/x"
 
@@ -154,4 +156,14 @@ func Ider(typ, id string) string {
 		id = uuid.New()
 	}
 	return fmt.Sprintf("%s:%s", typ, id)
+}
+
+func parseUnixTimestampParam(param string) (t time.Time, err error) {
+	unixTimestamp, err := strconv.Atoi(param)
+	if err != nil {
+		return
+	}
+
+	return time.Unix(int64(unixTimestamp), 0), nil
+
 }

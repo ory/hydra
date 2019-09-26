@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/ory/x/stringslice"
 
@@ -32,7 +31,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
 
 const (
@@ -328,17 +327,16 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //       500: genericError
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
-	var olderThan = r.URL.Query().Get("older-than")
+	var paramBefore = r.URL.Query().Get("before")
 
-	if olderThan != "" {
-		date, err := time.Parse("2006-01-02", olderThan)
-
+	if paramBefore != "" {
+		before, err := parseUnixTimestampParam(paramBefore)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 
-		if err := h.r.KeyManager().DeleteOldKeys(r.Context(), setName, date); err != nil {
+		if err := h.r.KeyManager().DeleteOldKeys(r.Context(), setName, before); err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}

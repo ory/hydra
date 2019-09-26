@@ -211,8 +211,8 @@ func (m *SQLManager) DeleteKey(ctx context.Context, set, kid string) error {
 	return nil
 }
 
-func (m *SQLManager) DeleteOldKeys(ctx context.Context, set string, date time.Time) error {
-	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND created_at < ?`), set, date.Format("2006-01-02")); err != nil {
+func (m *SQLManager) DeleteOldKeys(ctx context.Context, set string, before time.Time) error {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND created_at < ?`), set, before.Format(time.RFC3339)); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil

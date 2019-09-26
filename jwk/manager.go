@@ -40,7 +40,7 @@ type Manager interface {
 
 	DeleteKey(ctx context.Context, set, kid string) error
 
-	DeleteOldKeys(ctx context.Context, set string, date time.Time) error
+	DeleteOldKeys(ctx context.Context, set string, before time.Time) error
 
 	DeleteKeySet(ctx context.Context, set string) error
 }

@@ -169,7 +169,7 @@ func (m *MemoryManager) DeleteKey(ctx context.Context, set, kid string) error {
 	return nil
 }
 
-func (m *MemoryManager) DeleteOldKeys(ctx context.Context, set string, date time.Time) error {
+func (m *MemoryManager) DeleteOldKeys(ctx context.Context, set string, before time.Time) error {
 	keys, err := m.getKeySet(ctx, set)
 	if err != nil {
 		return err
@@ -180,7 +180,7 @@ func (m *MemoryManager) DeleteOldKeys(ctx context.Context, set string, date time
 
 	var results []jsonWebKey
 	for _, key := range keys.keys {
-		if key.createdAt.After(date) {
+		if key.createdAt.After(before) {
 			results = append(results, key)
 		}
 	}

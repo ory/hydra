@@ -12,17 +12,6 @@
 
 ---
 
-ORY Hydra is a hardened, certified OAuth2 and OpenID Connect server optimized for low-latency, high throughput,
-and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
-but connects to your existing identity provider through a [consent app](https://www.ory.sh/docs/next/hydra/oauth2#authenticating-users-and-requesting-consent).
-Implementing the consent app in a different language is easy, and exemplary consent apps
-([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
-[SDKs](https://www.ory.sh/docs/next/hydra/sdk/) are provided.
-
-Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
-able to securely manage JSON Web Keys.
-[Click here](https://www.ory.sh/docs/next/hydra/security-architecture) to read more about security.
-
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
     <a href="https://coveralls.io/github/ory/hydra?branch=master"> <img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
@@ -30,6 +19,24 @@ able to securely manage JSON Web Keys.
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
     <a href="#backers" alt="sponsors on Open Collective"><img src="https://opencollective.com/ory/backers/badge.svg" /></a> <a href="#sponsors" alt="Sponsors on Open Collective"><img src="https://opencollective.com/ory/sponsors/badge.svg" /></a>
 </p>
+
+ORY Hydra is a hardened, **OpenID Certified OAuth 2.0 Server and OpenID Connect Provider** optimized for low-latency, high throughput,
+and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
+but connects to your existing identity provider through a [login and consent app](https://www.ory.sh/docs/next/hydra/oauth2#authenticating-users-and-requesting-consent).
+Implementing the login and consent app in a different language is easy, and exemplary consent apps
+([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
+[SDKs](https://www.ory.sh/docs/next/hydra/sdk/) are provided.
+
+If you're looking to jump straight into it, go ahead:
+
+- **[Run your own OAuth 2.0 Server - step by step guide](https://www.ory.sh/run-oauth2-server-open-source-api-security/)**: A in-depth look at setting up ORY Hydra and performing a variety of OAuth 2.0 Flows.
+- [ORY Hydra 5 Minute Tutorial](https://www.ory.sh/docs/hydra/5min-tutorial): Set up and use ORY Hydra using Docker Compose in under 5 Minutes. Good for quickly hacking a Proof of Concept.
+- (Install and Set Up ORY Hydra)[https://www.ory.sh/docs/hydra/configure-deploy]: An advanced look at installation options and interaction with ORY Hydra.
+- (Integrating your Login and Consent UI with ORY Hydra)[https://www.ory.sh/docs/hydra/oauth2]: The go-to place if you wish to adopt ORY Hydra in your new or existing stack.
+
+Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
+able to securely manage JSON Web Keys.
+[Click here](https://www.ory.sh/docs/next/hydra/security-architecture) to read more about security.
 
 ---
 

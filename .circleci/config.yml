@@ -332,7 +332,7 @@ jobs:
 
   release-changelog:
     docker:
-      - image: circleci/ruby:2.4-node
+      - image: circleci/ruby:2.6-node
     steps:
       - checkout
       - run: gem install github_changelog_generator

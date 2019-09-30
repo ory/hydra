@@ -291,7 +291,7 @@ class AcceptLoginRequest implements ArrayAccess
 
     /**
      * Sets remember_for
-     * @param int $remember_for RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
+     * @param int $remember_for RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the authorization will be remembered for the duration of the browser session (using a session cookie).
      * @return $this
      */
     public function setRememberFor($remember_for)

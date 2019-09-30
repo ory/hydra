@@ -110,7 +110,7 @@
    */
   exports.prototype['remember'] = undefined;
   /**
-   * RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.
+   * RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the authorization will be remembered for the duration of the browser session (using a session cookie).
    * @member {Number} remember_for
    */
   exports.prototype['remember_for'] = undefined;

@@ -2805,6 +2805,14 @@
           "type": "boolean",
           "x-go-name": "EmailVerified"
         },
+        "extra_vars": {
+          "description": "Addition claims (https://openid.net/specs/openid-connect-core-1_0.html#AdditionalClaims).",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "ExtraVars"
+        },
         "family_name": {
           "description": "Surname(s) or last name(s) of the End-User. Note that in some cultures, people can have multiple family names or no family name; all can be present, with the names being separated by space characters.",
           "type": "string",

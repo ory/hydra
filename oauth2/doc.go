@@ -250,6 +250,9 @@ type swaggeruserinfoResponsePayload struct {
 	// True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any extensions MUST be represented in RFC 3966 format.
 	PhoneNumberVerified bool `json:"phone_number_verified,omitempty"`
 
+	// Addition claims (https://openid.net/specs/openid-connect-core-1_0.html#AdditionalClaims).
+	ExtraVars map[string]interface{} `json:"extra_vars,omitempty"`
+
 	// Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.
 	UpdatedAt int `json:"updated_at,omitempty"`
 }

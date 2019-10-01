@@ -24,6 +24,9 @@ type SwaggeruserinfoResponsePayload struct {
 	// True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.
 	EmailVerified bool `json:"email_verified,omitempty"`
 
+	// Addition claims (https://openid.net/specs/openid-connect-core-1_0.html#AdditionalClaims).
+	ExtraVars map[string]interface{} `json:"extra_vars,omitempty"`
+
 	// Surname(s) or last name(s) of the End-User. Note that in some cultures, people can have multiple family names or no family name; all can be present, with the names being separated by space characters.
 	FamilyName string `json:"family_name,omitempty"`
 

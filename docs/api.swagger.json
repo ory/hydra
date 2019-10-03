@@ -2062,7 +2062,7 @@
           "x-go-name": "Remember"
         },
         "remember_for": {
-          "description": "RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
+          "description": "RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered for the duration of the browser session (using a session cookie).",
           "type": "integer",
           "format": "int64",
           "x-go-name": "RememberFor"

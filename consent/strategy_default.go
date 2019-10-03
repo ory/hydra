@@ -422,18 +422,22 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	if !session.Remember {
-		if !session.LoginRequest.Skip {
-			// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
-			// wants us to store a cookie. So let's bust the authentication session (if one exists).
-			if err := s.revokeAuthenticationSession(w, r); err != nil {
-				return nil, err
-			}
+	if !session.Remember && !session.LoginRequest.Skip {
+		// If the session should not be remembered (and we're actually not skipping), than the user clearly don't
+		// wants us to store a cookie. So let's bust the authentication session (if one exists).
+		if err := s.revokeAuthenticationSession(w, r); err != nil {
+			return nil, err
 		}
+	}
 
+	if !session.Remember || session.LoginRequest.Skip {
+		// If the user doesn't want to remember the session, we do not store a cookie.
+		// If login was skipped, it means an authentication cookie was present and
+		// we don't want to touch it (in order to preserve its original expiry date)
 		return session, nil
 	}
 
+	// Not a skipped login and the user asked to remember its session, store a cookie
 	cookie, _ := s.r.CookieStore().Get(r, CookieAuthenticationName)
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	if session.RememberFor >= 0 {

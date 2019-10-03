@@ -51,7 +51,7 @@ type HandledLoginRequest struct {
 	Remember bool `json:"remember,omitempty"`
 
 	// RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
-	// authorization will be remembered indefinitely.
+	// authorization will be remembered for the duration of the browser session (using a session cookie).
 	RememberFor int64 `json:"remember_for,omitempty"`
 
 	// Subject is the user ID of the end-user that authenticated.

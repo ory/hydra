@@ -23,10 +23,12 @@ package jwk_test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,6 +74,24 @@ func TestHandlerWellKnown(t *testing.T) {
 	assert.Equal(t, resp, IDKS.Key("public:test-id"))
 }
 
+func createJSONWebKeySet(t *testing.T, server *httptest.Server, kid string) {
+	t.Helper()
+
+	createJWKSetPath := "/keys/test-key"
+	createJWKSetReqBody := strings.NewReader(fmt.Sprintf(`{"alg": "RS256", "kid": "%s", "use": "sig"}`, kid))
+	createRes, err := http.Post(server.URL+createJWKSetPath, "application/json", createJWKSetReqBody)
+	require.NoError(t, err, "problem in http request")
+	defer createRes.Body.Close()
+
+	var createdJWKSet jose.JSONWebKeySet
+	err = json.NewDecoder(createRes.Body).Decode(&createdJWKSet)
+	require.NoError(t, err, "problem in decoding response")
+
+	assert.EqualValues(t, createRes.StatusCode, http.StatusCreated)
+	assert.Len(t, createdJWKSet.Key("public:"+kid), 1)
+	assert.Len(t, createdJWKSet.Key("private:"+kid), 1)
+}
+
 func TestHandlerKeySet(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
@@ -88,19 +108,7 @@ func TestHandlerKeySet(t *testing.T) {
 	testServer := httptest.NewServer(router)
 
 	t.Run("CreateJSONWebKeySet", func(t *testing.T) {
-		createJWKSetPath := "/keys/test-key"
-		createJWKSetReqBody := strings.NewReader(`{"alg": "RS256", "kid": "test-01", "use": "sig"}`)
-		createRes, err := http.Post(testServer.URL+createJWKSetPath, "application/json", createJWKSetReqBody)
-		require.NoError(t, err, "problem in http request")
-		defer createRes.Body.Close()
-
-		var createdJWKSet jose.JSONWebKeySet
-		err = json.NewDecoder(createRes.Body).Decode(&createdJWKSet)
-		require.NoError(t, err, "problem in decoding response")
-
-		assert.EqualValues(t, createRes.StatusCode, http.StatusCreated)
-		assert.Len(t, createdJWKSet.Key("public:test-01"), 1)
-		assert.Len(t, createdJWKSet.Key("private:test-01"), 1)
+		createJSONWebKeySet(t, testServer, "test-01")
 	})
 
 	t.Run("GetJSONWebKeySet", func(t *testing.T) {
@@ -118,7 +126,17 @@ func TestHandlerKeySet(t *testing.T) {
 
 	t.Run("DeleteJSONWebKeySet", func(t *testing.T) {
 		deleteJWKSetPath := "/keys/test-key"
-		deleteReq, err := http.NewRequest(http.MethodDelete, testServer.URL+deleteJWKSetPath, nil)
+
+		// Delete old JSON Web Keys in the set
+		time.Sleep(1 * time.Second)
+		beforeCreateNewKey := time.Now().UTC()
+
+		// To add one more key with different timestamp
+		time.Sleep(1 * time.Second)
+		createJSONWebKeySet(t, testServer, "test-02")
+
+		oldKeyDeletionParam := fmt.Sprintf("?before=%d", beforeCreateNewKey.Unix())
+		deleteReq, err := http.NewRequest(http.MethodDelete, testServer.URL+deleteJWKSetPath+oldKeyDeletionParam, nil)
 		deleteRes, err := http.DefaultClient.Do(deleteReq)
 		deleteReq.Header.Add("Content-Type", "application/json")
 		require.NoError(t, err, "problem in http request")
@@ -128,6 +146,25 @@ func TestHandlerKeySet(t *testing.T) {
 
 		getJWKSetPath := "/keys/test-key"
 		getRes, err := http.Get(testServer.URL + getJWKSetPath)
+		require.NoError(t, err, "problem in http request")
+		defer getRes.Body.Close()
+
+		var getJWKSet jose.JSONWebKeySet
+		err = json.NewDecoder(getRes.Body).Decode(&getJWKSet)
+		require.NoError(t, err, "problem in decoding response")
+
+		require.Len(t, getJWKSet.Keys, 2)
+
+		// Delete JSON Web Key set
+		deleteReq, err = http.NewRequest(http.MethodDelete, testServer.URL+deleteJWKSetPath, nil)
+		deleteRes, err = http.DefaultClient.Do(deleteReq)
+		deleteReq.Header.Add("Content-Type", "application/json")
+		require.NoError(t, err, "problem in http request")
+		defer deleteRes.Body.Close()
+
+		assert.Equal(t, http.StatusNoContent, deleteRes.StatusCode)
+
+		getRes, err = http.Get(testServer.URL + getJWKSetPath)
 		require.NoError(t, err, "problem in http request")
 		defer getRes.Body.Close()
 

@@ -107,17 +107,13 @@ func TestManager(t *testing.T) {
 	})
 
 	t.Run("TestManagerKeySet", func(t *testing.T) {
-		ks, err := testGenerator.Generate("TestManagerKeySet", "sig")
-		require.NoError(t, err)
-		ks.Key("private")
-
 		for name, m := range managers {
 			if m, ok := m.(*SQLManager); ok {
 				n, err := m.CreateSchemas(name)
 				require.NoError(t, err)
 				t.Logf("Applied %d migrations to %s", n, name)
 			}
-			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
+			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, testGenerator))
 		}
 	})
 }

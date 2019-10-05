@@ -29,7 +29,7 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
@@ -211,8 +211,11 @@ func (m *SQLManager) DeleteKey(ctx context.Context, set, kid string) error {
 	return nil
 }
 
+// SQLDatetimeFormat .
+const SQLDatetimeFormat = "2006-01-02 15:04:05"
+
 func (m *SQLManager) DeleteOldKeys(ctx context.Context, set string, before time.Time) error {
-	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND created_at < ?`), set, before.Format(time.RFC3339)); err != nil {
+	if _, err := m.DB.ExecContext(ctx, m.DB.Rebind(`DELETE FROM hydra_jwk WHERE sid=? AND created_at < ?`), set, before.Format(SQLDatetimeFormat)); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil

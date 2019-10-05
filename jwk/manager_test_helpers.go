@@ -30,7 +30,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 )
 
 func RandomBytes(n int) ([]byte, error) {
@@ -94,18 +94,43 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 	}
 }
 
-func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+type keyGenerator interface {
+	Generate(id, use string) (*jose.JSONWebKeySet, error)
+}
+
+func TestHelperManagerKeySet(m Manager, generator keyGenerator) func(t *testing.T) {
 	return func(t *testing.T) {
 		_, err := m.GetKeySet(context.TODO(), "foo")
 		require.Error(t, err)
 
-		err = m.AddKeySet(context.TODO(), "bar", keys)
+		oldKs, err := generator.Generate("OldTestManagerKeySet", "sig")
+		require.NoError(t, err)
+		err = m.AddKeySet(context.TODO(), "bar", oldKs)
+		require.NoError(t, err)
+
+		// To make difference timestamp of second
+		time.Sleep(1 * time.Second)
+		afterCreatedOldKeys := time.Now().UTC()
+
+		// To delay creation timestamp of new keys for DeleteOldKeys()
+		time.Sleep(1 * time.Second)
+
+		newKs, err := generator.Generate("NewTestManagerKeySet", "sig")
+		require.NoError(t, err)
+		err = m.AddKeySet(context.TODO(), "bar", newKs)
 		require.NoError(t, err)
 
 		got, err := m.GetKeySet(context.TODO(), "bar")
 		require.NoError(t, err)
-		assert.Equal(t, keys.Key("public:"+suffix), got.Key("public:"+suffix))
-		assert.Equal(t, keys.Key("private:"+suffix), got.Key("private:"+suffix))
+		assert.Equal(t, oldKs.Key("public:OldTestManagerKeySet"), got.Key("public:OldTestManagerKeySet"))
+		assert.Equal(t, oldKs.Key("private:OldTestManagerKeySet"), got.Key("private:OldTestManagerKeySet"))
+
+		err = m.DeleteOldKeys(context.TODO(), "bar", afterCreatedOldKeys)
+		require.NoError(t, err)
+		got2, err := m.GetKeySet(context.TODO(), "bar")
+		require.NoError(t, err)
+		assert.Equal(t, 0, len(got2.Key("public:OldTestManagerKeySet")))
+		assert.Equal(t, 1, len(got2.Key("public:NewTestManagerKeySet")))
 
 		err = m.DeleteKeySet(context.TODO(), "bar")
 		require.NoError(t, err)

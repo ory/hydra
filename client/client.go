@@ -186,6 +186,9 @@ type Client struct {
 	// Token to identify the RP session with the OP when the backchannel_logout_uri is used.
 	// If omitted, the default value is false.
 	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty"`
+
+	// Metadata is arbitrary data.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 func (c *Client) GetID() string {

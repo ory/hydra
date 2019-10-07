@@ -90,6 +90,7 @@ type sqlData struct {
 	PostLogoutRedirectURIs            string    `db:"post_logout_redirect_uris"`
 	BackChannelLogoutURI              string    `db:"backchannel_logout_uri"`
 	BackChannelLogoutSessionRequired  bool      `db:"backchannel_logout_session_required"`
+	Metadata                          string    `db:"metadata"`
 }
 
 var sqlParams = []string{
@@ -124,6 +125,7 @@ var sqlParams = []string{
 	"post_logout_redirect_uris",
 	"backchannel_logout_uri",
 	"backchannel_logout_session_required",
+	"metadata",
 }
 
 func sqlDataFromClient(d *Client) (*sqlData, error) {
@@ -145,6 +147,11 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 
 	if d.UpdatedAt.IsZero() {
 		updatedAt = time.Now()
+	}
+
+	metadata, err := json.Marshal(d.Metadata)
+	if err != nil {
+		return nil, errors.WithStack(err)
 	}
 
 	return &sqlData{
@@ -179,10 +186,21 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		PostLogoutRedirectURIs:            strings.Join(d.PostLogoutRedirectURIs, "|"),
 		BackChannelLogoutURI:              d.BackChannelLogoutURI,
 		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired,
+		Metadata:                          string(metadata),
 	}, nil
 }
 
 func (d *sqlData) ToClient() (*Client, error) {
+	var metadata map[string]interface{}
+
+	if d.Metadata == "" {
+		d.Metadata = "{}"
+	}
+
+	if err := json.Unmarshal([]byte(d.Metadata), &metadata); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
 	c := &Client{
 		ClientID:                          d.ID,
 		Name:                              d.Name,
@@ -213,7 +231,8 @@ func (d *sqlData) ToClient() (*Client, error) {
 		FrontChannelLogoutSessionRequired: d.FrontChannelLogoutSessionRequired,
 		PostLogoutRedirectURIs:            stringsx.Splitx(d.PostLogoutRedirectURIs, "|"),
 		BackChannelLogoutURI:              d.BackChannelLogoutURI,
-		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired,
+		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired, //
+		Metadata:                          metadata,
 	}
 
 	if d.JSONWebKeys != "" {

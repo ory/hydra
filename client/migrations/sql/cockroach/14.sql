@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS hydra_client (
 	post_logout_redirect_uris TEXT NOT NULL DEFAULT '',
 	backchannel_logout_uri TEXT NOT NULL DEFAULT '',
 	backchannel_logout_session_required BOOL NOT NULL DEFAULT FALSE,
+	metadata TEXT NOT NULL DEFAULT '{}',
 	UNIQUE (id)
 );
 

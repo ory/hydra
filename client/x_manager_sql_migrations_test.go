@@ -34,10 +34,10 @@ import (
 )
 
 func CleanTestDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	t.Logf("Unable to execute clean up query: %s", err)
+	// _, err := db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
+	// t.Logf("Unable to execute clean up query: %s", err)
+	// _, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
+	// t.Logf("Unable to execute clean up query: %s", err)
 }
 
 func TestXXMigrations(t *testing.T) {
@@ -55,7 +55,7 @@ func TestXXMigrations(t *testing.T) {
 		CleanTestDB, CleanTestDB,
 		func(t *testing.T, dbName string, db *sqlx.DB, _, step, steps int) {
 			if dbName == "cockroach" {
-				step += 12
+				step += 13
 			}
 			id := fmt.Sprintf("%d-data", step+1)
 			t.Run("poll="+id, func(t *testing.T) {

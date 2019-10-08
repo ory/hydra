@@ -54,6 +54,7 @@ const (
 	ViperKeyIDTokenLifespan                = "ttl.id_token"
 	ViperKeyAuthCodeLifespan               = "ttl.auth_code"
 	ViperKeyScopeStrategy                  = "strategies.scope"
+	ViperKeyCookieForceSecure              = "cookie.force_secure"
 	ViperKeyGetCookieSecrets               = "secrets.cookie"
 	ViperKeyGetSystemSecret                = "secrets.system"
 	ViperKeyLogoutRedirectURL              = "urls.post_logout_redirect"
@@ -265,6 +266,10 @@ func (v *ViperProvider) GetCookieSecrets() [][]byte {
 	return [][]byte{
 		[]byte(viperx.GetString(v.l, ViperKeyGetCookieSecrets, string(v.GetSystemSecret()), "COOKIE_SECRET")),
 	}
+}
+
+func (v *ViperProvider) IsCookieSecure() bool {
+	return v.ServesHTTPS() || viperx.GetBool(v.l, ViperKeyCookieForceSecure, false, "COOKIE_FORCE_SECURE")
 }
 
 func (v *ViperProvider) GetRotatedSystemSecrets() [][]byte {

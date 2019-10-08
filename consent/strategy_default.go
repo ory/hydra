@@ -273,7 +273,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		return errors.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.IsCookieSecure()); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -445,7 +445,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 	cookie.Options.HttpOnly = true
 
-	if s.c.ServesHTTPS() {
+	if s.c.IsCookieSecure() {
 		cookie.Options.Secure = true
 	}
 
@@ -548,7 +548,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		return errors.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.IsCookieSecure()); err != nil {
 		return errors.WithStack(err)
 	}
 

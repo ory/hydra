@@ -53,6 +53,7 @@ type Provider interface {
 	TracingProvider() string
 	TracingJaegerConfig() *tracing.JaegerConfig
 	GetCookieSecrets() [][]byte
+	IsCookieSecure() bool
 	GetRotatedSystemSecrets() [][]byte
 	GetSystemSecret() []byte
 	LogoutRedirectURL() *url.URL

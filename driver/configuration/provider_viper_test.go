@@ -119,3 +119,20 @@ func TestViperProvider_IssuerURL(t *testing.T) {
 	p2 := NewViperProvider(l, false, nil)
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 }
+
+func TestViperProvider_IsCookieSecure(t *testing.T) {
+	l := logrusx.New()
+	l.SetOutput(ioutil.Discard)
+
+	p := NewViperProvider(l, false, nil)
+	value := p.IsCookieSecure()
+	assert.Equal(t, true, value)
+
+	p = NewViperProvider(l, true, nil)
+	value = p.IsCookieSecure()
+	assert.Equal(t, false, value)
+
+	os.Setenv("COOKIE_FORCE_SECURE", "true")
+	value = p.IsCookieSecure()
+	assert.Equal(t, true, value)
+}

@@ -58,7 +58,7 @@ type SQLManager struct {
 }
 
 type sqlData struct {
-	PK                                int       `db:"pk"`
+	PK                                int64     `db:"pk"`
 	ID                                string    `db:"id"`
 	Name                              string    `db:"client_name"`
 	Secret                            string    `db:"client_secret"`

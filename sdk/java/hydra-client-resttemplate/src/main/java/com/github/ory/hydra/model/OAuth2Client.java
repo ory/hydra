@@ -21,13 +21,15 @@ import com.github.ory.hydra.model.JSONWebKeySet;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.joda.time.DateTime;
 
 /**
  * OAuth2Client
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T22:00:49.579+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-10-08T15:22:06.432-04:00")
 public class OAuth2Client {
   @JsonProperty("allowed_cors_origins")
   private List<String> allowedCorsOrigins = null;
@@ -79,6 +81,9 @@ public class OAuth2Client {
 
   @JsonProperty("logo_uri")
   private String logoUri = null;
+
+  @JsonProperty("metadata")
+  private Map<String, Object> metadata = null;
 
   @JsonProperty("owner")
   private String owner = null;
@@ -460,6 +465,32 @@ public class OAuth2Client {
     this.logoUri = logoUri;
   }
 
+  public OAuth2Client metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public OAuth2Client putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<String, Object>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+   /**
+   * Metadata is arbitrary data.
+   * @return metadata
+  **/
+  @ApiModelProperty(value = "Metadata is arbitrary data.")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+  }
+
   public OAuth2Client owner(String owner) {
     this.owner = owner;
     return this;
@@ -771,6 +802,7 @@ public class OAuth2Client {
         Objects.equals(this.jwks, oAuth2Client.jwks) &&
         Objects.equals(this.jwksUri, oAuth2Client.jwksUri) &&
         Objects.equals(this.logoUri, oAuth2Client.logoUri) &&
+        Objects.equals(this.metadata, oAuth2Client.metadata) &&
         Objects.equals(this.owner, oAuth2Client.owner) &&
         Objects.equals(this.policyUri, oAuth2Client.policyUri) &&
         Objects.equals(this.postLogoutRedirectUris, oAuth2Client.postLogoutRedirectUris) &&
@@ -789,7 +821,7 @@ public class OAuth2Client {
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowedCorsOrigins, audience, backchannelLogoutSessionRequired, backchannelLogoutUri, clientId, clientName, clientSecret, clientSecretExpiresAt, clientUri, contacts, createdAt, frontchannelLogoutSessionRequired, frontchannelLogoutUri, grantTypes, jwks, jwksUri, logoUri, owner, policyUri, postLogoutRedirectUris, redirectUris, requestObjectSigningAlg, requestUris, responseTypes, scope, sectorIdentifierUri, subjectType, tokenEndpointAuthMethod, tosUri, updatedAt, userinfoSignedResponseAlg);
+    return Objects.hash(allowedCorsOrigins, audience, backchannelLogoutSessionRequired, backchannelLogoutUri, clientId, clientName, clientSecret, clientSecretExpiresAt, clientUri, contacts, createdAt, frontchannelLogoutSessionRequired, frontchannelLogoutUri, grantTypes, jwks, jwksUri, logoUri, metadata, owner, policyUri, postLogoutRedirectUris, redirectUris, requestObjectSigningAlg, requestUris, responseTypes, scope, sectorIdentifierUri, subjectType, tokenEndpointAuthMethod, tosUri, updatedAt, userinfoSignedResponseAlg);
   }
 
 
@@ -815,6 +847,7 @@ public class OAuth2Client {
     sb.append("    jwks: ").append(toIndentedString(jwks)).append("\n");
     sb.append("    jwksUri: ").append(toIndentedString(jwksUri)).append("\n");
     sb.append("    logoUri: ").append(toIndentedString(logoUri)).append("\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    owner: ").append(toIndentedString(owner)).append("\n");
     sb.append("    policyUri: ").append(toIndentedString(policyUri)).append("\n");
     sb.append("    postLogoutRedirectUris: ").append(toIndentedString(postLogoutRedirectUris)).append("\n");

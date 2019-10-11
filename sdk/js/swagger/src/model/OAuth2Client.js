@@ -78,6 +78,7 @@
 
 
 
+
   };
 
   /**
@@ -141,6 +142,9 @@
       }
       if (data.hasOwnProperty('logo_uri')) {
         obj['logo_uri'] = ApiClient.convertToType(data['logo_uri'], 'String');
+      }
+      if (data.hasOwnProperty('metadata')) {
+        obj['metadata'] = ApiClient.convertToType(data['metadata'], {'String': Object});
       }
       if (data.hasOwnProperty('owner')) {
         obj['owner'] = ApiClient.convertToType(data['owner'], 'String');
@@ -272,6 +276,11 @@
    * @member {String} logo_uri
    */
   exports.prototype['logo_uri'] = undefined;
+  /**
+   * Metadata is arbitrary data.
+   * @member {Object.<String, Object>} metadata
+   */
+  exports.prototype['metadata'] = undefined;
   /**
    * Owner is a string identifying the owner of the OAuth 2.0 Client.
    * @member {String} owner

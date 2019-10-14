@@ -90,7 +90,7 @@ type sqlData struct {
 	PostLogoutRedirectURIs            string    `db:"post_logout_redirect_uris"`
 	BackChannelLogoutURI              string    `db:"backchannel_logout_uri"`
 	BackChannelLogoutSessionRequired  bool      `db:"backchannel_logout_session_required"`
-	Metadata                          string    `db:"metadata"`
+	Metadata                          []byte    `db:"metadata"`
 }
 
 var sqlParams = []string{
@@ -186,21 +186,11 @@ func sqlDataFromClient(d *Client) (*sqlData, error) {
 		PostLogoutRedirectURIs:            strings.Join(d.PostLogoutRedirectURIs, "|"),
 		BackChannelLogoutURI:              d.BackChannelLogoutURI,
 		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired,
-		Metadata:                          string(metadata),
+		Metadata:                          []byte(metadata),
 	}, nil
 }
 
 func (d *sqlData) ToClient() (*Client, error) {
-	var metadata map[string]interface{}
-
-	if d.Metadata == "" {
-		d.Metadata = "{}"
-	}
-
-	if err := json.Unmarshal([]byte(d.Metadata), &metadata); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
 	c := &Client{
 		ClientID:                          d.ID,
 		Name:                              d.Name,
@@ -232,7 +222,7 @@ func (d *sqlData) ToClient() (*Client, error) {
 		PostLogoutRedirectURIs:            stringsx.Splitx(d.PostLogoutRedirectURIs, "|"),
 		BackChannelLogoutURI:              d.BackChannelLogoutURI,
 		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired, //
-		Metadata:                          metadata,
+		Metadata:                          d.Metadata,
 	}
 
 	if d.JSONWebKeys != "" {

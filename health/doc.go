@@ -103,9 +103,6 @@ func swaggerPublicIsInstanceReady() {}
 // If the service supports TLS Edge Termination, this endpoint does not require the
 // `X-Forwarded-Proto` header to be set.
 //
-// Be aware that if you are running multiple nodes of this service, the health status will never
-// refer to the cluster state, only to a single instance.
-//
 //     Produces:
 //     - application/json
 //

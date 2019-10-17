@@ -21,7 +21,7 @@
 </p>
 
 ORY Hydra is a hardened, **OpenID Certified OAuth 2.0 Server and OpenID Connect Provider** optimized for low-latency, high throughput,
-and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user log in, password reset flow),
+and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user login, password reset flow),
 but connects to your existing identity provider through a [login and consent app](https://www.ory.sh/docs/next/hydra/oauth2#authenticating-users-and-requesting-consent).
 Implementing the login and consent app in a different language is easy, and exemplary consent apps
 ([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
@@ -89,10 +89,10 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 
 <!--BEGIN ADOPTERS-->
 The ORY community stands on the shoulders of individuals, companies, and maintainers. We thank everyone involved - from
-submitting bug reports and feature requests, to contributing patches, to sponsoring our work. Our community is
+submitting bug reports and feature requests to contributing patches to sponsoring our work. Our community is
 1000+ strong and growing rapidly. The ORY stack protects 1.200.000.000+ API requests every month with over
 15.000+ active service nodes. Our small but expert team would have never been able to achieve this without each and
-everyone of you.
+every one of you.
 
 The following list represents companies that have accompanied us along the way and that have made outstanding contributions
 to our ecosystem. *If you think that your company deserves a spot here, reach out to <a href="mailto:hi@ory.sh">hi@ory.sh</a> now*!
@@ -234,7 +234,7 @@ This section is a quickstart guide to working with ORY Hydra. In-depth docs are 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
 The **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)** teaches you to set up ORY Hydra,
-a Postgres instance and an exemplary identity provider written in React using docker compose.
+a Postgres instance and an exemplary identity provider written in React using docker-compose.
 It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)**.
 
 <img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
@@ -292,7 +292,7 @@ Our continuous integration runs a collection of benchmarks against ORY Hydra. Yo
 
 ## Telemetry
 
-Our services collect summarized, anonymized data which can optionally be turned off. Click
+Our services collect summarized, anonymized data that can optionally be turned off. Click
 [here](https://www.ory.sh/docs/next/ecosystem/sqa) to learn more.
 
 ## Documentation
@@ -337,7 +337,7 @@ DSN=memory go run main.go serve all
 
 **Notes**
 
-* We changed organization name from `ory-am` to `ory`. In order to keep backwards compatibility, we did not rename Go packages.
+* We changed organization name from `ory-am` to `ory`. In order to keep backward compatibility, we did not rename Go packages.
 * You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/sirupsen/logrus" and "github.com/sirupsen/logrus"`.
 
 ## Libraries and third-party projects

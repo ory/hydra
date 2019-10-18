@@ -335,7 +335,7 @@ jobs:
       - image: circleci/ruby:2.5-node
     steps:
       - checkout
-      - run: gem install github_changelog_generator -v v1.15.0.pre.rc
+      - run: gem install github_changelog_generator -v v1.15.0
       - run: sudo npm i -g doctoc
       - run: github_changelog_generator -u ory -p hydra -o CHANGELOG.md --token $GITHUB_TOKEN
       - run: doctoc CHANGELOG.md
@@ -466,10 +466,10 @@ workflows:
               ignore: /.*/
       - release-changelog:
           requires:
-            - release
-            - release-npm
+            - test
+            - format
           filters:
             tags:
               only: /.*/
             branches:
-              ignore: /.*/
+              only: master

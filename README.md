@@ -31,8 +31,8 @@ If you're looking to jump straight into it, go ahead:
 
 - **[Run your own OAuth 2.0 Server - step by step guide](https://www.ory.sh/run-oauth2-server-open-source-api-security/)**: A in-depth look at setting up ORY Hydra and performing a variety of OAuth 2.0 Flows.
 - [ORY Hydra 5 Minute Tutorial](https://www.ory.sh/docs/hydra/5min-tutorial): Set up and use ORY Hydra using Docker Compose in under 5 Minutes. Good for quickly hacking a Proof of Concept.
-- (Install and Set Up ORY Hydra)[https://www.ory.sh/docs/hydra/configure-deploy]: An advanced look at installation options and interaction with ORY Hydra.
-- (Integrating your Login and Consent UI with ORY Hydra)[https://www.ory.sh/docs/hydra/oauth2]: The go-to place if you wish to adopt ORY Hydra in your new or existing stack.
+- [Install and Set Up ORY Hydra](https://www.ory.sh/docs/hydra/configure-deploy): An advanced look at installation options and interaction with ORY Hydra.
+- [Integrating your Login and Consent UI with ORY Hydra](https://www.ory.sh/docs/hydra/oauth2): The go-to place if you wish to adopt ORY Hydra in your new or existing stack.
 
 Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
 able to securely manage JSON Web Keys.

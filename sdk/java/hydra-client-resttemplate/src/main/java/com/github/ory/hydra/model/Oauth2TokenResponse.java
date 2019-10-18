@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * The Access Token Response
  */
 @ApiModel(description = "The Access Token Response")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T22:00:49.579+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-10-08T15:22:06.432-04:00")
 public class Oauth2TokenResponse {
   @JsonProperty("access_token")
   private String accessToken = null;
@@ -32,8 +32,14 @@ public class Oauth2TokenResponse {
   @JsonProperty("expires_in")
   private Long expiresIn = null;
 
+  @JsonProperty("id_token")
+  private String idToken = null;
+
   @JsonProperty("refresh_token")
   private String refreshToken = null;
+
+  @JsonProperty("scope")
+  private String scope = null;
 
   @JsonProperty("token_type")
   private String tokenType = null;
@@ -74,6 +80,24 @@ public class Oauth2TokenResponse {
     this.expiresIn = expiresIn;
   }
 
+  public Oauth2TokenResponse idToken(String idToken) {
+    this.idToken = idToken;
+    return this;
+  }
+
+   /**
+   * Get idToken
+   * @return idToken
+  **/
+  @ApiModelProperty(value = "")
+  public String getIdToken() {
+    return idToken;
+  }
+
+  public void setIdToken(String idToken) {
+    this.idToken = idToken;
+  }
+
   public Oauth2TokenResponse refreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
     return this;
@@ -90,6 +114,24 @@ public class Oauth2TokenResponse {
 
   public void setRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
+  }
+
+  public Oauth2TokenResponse scope(String scope) {
+    this.scope = scope;
+    return this;
+  }
+
+   /**
+   * Get scope
+   * @return scope
+  **/
+  @ApiModelProperty(value = "")
+  public String getScope() {
+    return scope;
+  }
+
+  public void setScope(String scope) {
+    this.scope = scope;
   }
 
   public Oauth2TokenResponse tokenType(String tokenType) {
@@ -122,13 +164,15 @@ public class Oauth2TokenResponse {
     Oauth2TokenResponse oauth2TokenResponse = (Oauth2TokenResponse) o;
     return Objects.equals(this.accessToken, oauth2TokenResponse.accessToken) &&
         Objects.equals(this.expiresIn, oauth2TokenResponse.expiresIn) &&
+        Objects.equals(this.idToken, oauth2TokenResponse.idToken) &&
         Objects.equals(this.refreshToken, oauth2TokenResponse.refreshToken) &&
+        Objects.equals(this.scope, oauth2TokenResponse.scope) &&
         Objects.equals(this.tokenType, oauth2TokenResponse.tokenType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(accessToken, expiresIn, refreshToken, tokenType);
+    return Objects.hash(accessToken, expiresIn, idToken, refreshToken, scope, tokenType);
   }
 
 
@@ -139,7 +183,9 @@ public class Oauth2TokenResponse {
     
     sb.append("    accessToken: ").append(toIndentedString(accessToken)).append("\n");
     sb.append("    expiresIn: ").append(toIndentedString(expiresIn)).append("\n");
+    sb.append("    idToken: ").append(toIndentedString(idToken)).append("\n");
     sb.append("    refreshToken: ").append(toIndentedString(refreshToken)).append("\n");
+    sb.append("    scope: ").append(toIndentedString(scope)).append("\n");
     sb.append("    tokenType: ").append(toIndentedString(tokenType)).append("\n");
     sb.append("}");
     return sb.toString();

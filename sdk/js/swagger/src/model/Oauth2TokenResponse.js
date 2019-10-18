@@ -52,6 +52,8 @@
 
 
 
+
+
   };
 
   /**
@@ -71,8 +73,14 @@
       if (data.hasOwnProperty('expires_in')) {
         obj['expires_in'] = ApiClient.convertToType(data['expires_in'], 'Number');
       }
+      if (data.hasOwnProperty('id_token')) {
+        obj['id_token'] = ApiClient.convertToType(data['id_token'], 'String');
+      }
       if (data.hasOwnProperty('refresh_token')) {
         obj['refresh_token'] = ApiClient.convertToType(data['refresh_token'], 'String');
+      }
+      if (data.hasOwnProperty('scope')) {
+        obj['scope'] = ApiClient.convertToType(data['scope'], 'String');
       }
       if (data.hasOwnProperty('token_type')) {
         obj['token_type'] = ApiClient.convertToType(data['token_type'], 'String');
@@ -90,9 +98,17 @@
    */
   exports.prototype['expires_in'] = undefined;
   /**
+   * @member {String} id_token
+   */
+  exports.prototype['id_token'] = undefined;
+  /**
    * @member {String} refresh_token
    */
   exports.prototype['refresh_token'] = undefined;
+  /**
+   * @member {String} scope
+   */
+  exports.prototype['scope'] = undefined;
   /**
    * @member {String} token_type
    */

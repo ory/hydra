@@ -71,6 +71,7 @@ class OAuth2Client implements ArrayAccess
         'jwks' => '\Hydra\SDK\Model\JSONWebKeySet',
         'jwks_uri' => 'string',
         'logo_uri' => 'string',
+        'metadata' => 'map[string,object]',
         'owner' => 'string',
         'policy_uri' => 'string',
         'post_logout_redirect_uris' => 'string[]',
@@ -109,6 +110,7 @@ class OAuth2Client implements ArrayAccess
         'jwks' => null,
         'jwks_uri' => null,
         'logo_uri' => null,
+        'metadata' => null,
         'owner' => null,
         'policy_uri' => null,
         'post_logout_redirect_uris' => null,
@@ -157,6 +159,7 @@ class OAuth2Client implements ArrayAccess
         'jwks' => 'jwks',
         'jwks_uri' => 'jwks_uri',
         'logo_uri' => 'logo_uri',
+        'metadata' => 'metadata',
         'owner' => 'owner',
         'policy_uri' => 'policy_uri',
         'post_logout_redirect_uris' => 'post_logout_redirect_uris',
@@ -196,6 +199,7 @@ class OAuth2Client implements ArrayAccess
         'jwks' => 'setJwks',
         'jwks_uri' => 'setJwksUri',
         'logo_uri' => 'setLogoUri',
+        'metadata' => 'setMetadata',
         'owner' => 'setOwner',
         'policy_uri' => 'setPolicyUri',
         'post_logout_redirect_uris' => 'setPostLogoutRedirectUris',
@@ -235,6 +239,7 @@ class OAuth2Client implements ArrayAccess
         'jwks' => 'getJwks',
         'jwks_uri' => 'getJwksUri',
         'logo_uri' => 'getLogoUri',
+        'metadata' => 'getMetadata',
         'owner' => 'getOwner',
         'policy_uri' => 'getPolicyUri',
         'post_logout_redirect_uris' => 'getPostLogoutRedirectUris',
@@ -299,6 +304,7 @@ class OAuth2Client implements ArrayAccess
         $this->container['jwks'] = isset($data['jwks']) ? $data['jwks'] : null;
         $this->container['jwks_uri'] = isset($data['jwks_uri']) ? $data['jwks_uri'] : null;
         $this->container['logo_uri'] = isset($data['logo_uri']) ? $data['logo_uri'] : null;
+        $this->container['metadata'] = isset($data['metadata']) ? $data['metadata'] : null;
         $this->container['owner'] = isset($data['owner']) ? $data['owner'] : null;
         $this->container['policy_uri'] = isset($data['policy_uri']) ? $data['policy_uri'] : null;
         $this->container['post_logout_redirect_uris'] = isset($data['post_logout_redirect_uris']) ? $data['post_logout_redirect_uris'] : null;
@@ -700,6 +706,27 @@ class OAuth2Client implements ArrayAccess
     public function setLogoUri($logo_uri)
     {
         $this->container['logo_uri'] = $logo_uri;
+
+        return $this;
+    }
+
+    /**
+     * Gets metadata
+     * @return map[string,object]
+     */
+    public function getMetadata()
+    {
+        return $this->container['metadata'];
+    }
+
+    /**
+     * Sets metadata
+     * @param map[string,object] $metadata Metadata is arbitrary data.
+     * @return $this
+     */
+    public function setMetadata($metadata)
+    {
+        $this->container['metadata'] = $metadata;
 
         return $this;
     }

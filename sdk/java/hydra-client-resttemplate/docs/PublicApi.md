@@ -138,7 +138,7 @@ No authorization required
 
 <a name="oauth2Token"></a>
 # **oauth2Token**
-> Oauth2TokenResponse oauth2Token(grantType, code, redirectUri, clientId)
+> Oauth2TokenResponse oauth2Token(grantType, code, refreshToken, redirectUri, clientId)
 
 The OAuth 2.0 token endpoint
 
@@ -167,10 +167,11 @@ oauth2.setAccessToken("YOUR ACCESS TOKEN");
 PublicApi apiInstance = new PublicApi();
 String grantType = "grantType_example"; // String | 
 String code = "code_example"; // String | 
+String refreshToken = "refreshToken_example"; // String | 
 String redirectUri = "redirectUri_example"; // String | 
 String clientId = "clientId_example"; // String | 
 try {
-    Oauth2TokenResponse result = apiInstance.oauth2Token(grantType, code, redirectUri, clientId);
+    Oauth2TokenResponse result = apiInstance.oauth2Token(grantType, code, refreshToken, redirectUri, clientId);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling PublicApi#oauth2Token");
@@ -184,6 +185,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **grantType** | **String**|  |
  **code** | **String**|  | [optional]
+ **refreshToken** | **String**|  | [optional]
  **redirectUri** | **String**|  | [optional]
  **clientId** | **String**|  | [optional]
 

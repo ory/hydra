@@ -177,6 +177,7 @@
      * @param {String} grantType 
      * @param {Object} opts Optional parameters
      * @param {String} opts.code 
+     * @param {String} opts.refreshToken 
      * @param {String} opts.redirectUri 
      * @param {String} opts.clientId 
      * @param {module:api/PublicApi~oauth2TokenCallback} callback The callback function, accepting three arguments: error, data, response
@@ -201,6 +202,7 @@
       var formParams = {
         'grant_type': grantType,
         'code': opts['code'],
+        'refresh_token': opts['refreshToken'],
         'redirect_uri': opts['redirectUri'],
         'client_id': opts['clientId']
       };

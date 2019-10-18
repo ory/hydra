@@ -162,6 +162,7 @@ var grantType = "grantType_example"; // String |
 
 var opts = { 
   'code': "code_example", // String | 
+  'refreshToken': "refreshToken_example", // String | 
   'redirectUri': "redirectUri_example", // String | 
   'clientId': "clientId_example" // String | 
 };
@@ -182,6 +183,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **grantType** | **String**|  | 
  **code** | **String**|  | [optional] 
+ **refreshToken** | **String**|  | [optional] 
  **redirectUri** | **String**|  | [optional] 
  **clientId** | **String**|  | [optional] 
 

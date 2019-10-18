@@ -320,14 +320,15 @@ class PublicApi
      *
      * @param string $grant_type  (required)
      * @param string $code  (optional)
+     * @param string $refresh_token  (optional)
      * @param string $redirect_uri  (optional)
      * @param string $client_id  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return \Hydra\SDK\Model\Oauth2TokenResponse
      */
-    public function oauth2Token($grant_type, $code = null, $redirect_uri = null, $client_id = null)
+    public function oauth2Token($grant_type, $code = null, $refresh_token = null, $redirect_uri = null, $client_id = null)
     {
-        list($response) = $this->oauth2TokenWithHttpInfo($grant_type, $code, $redirect_uri, $client_id);
+        list($response) = $this->oauth2TokenWithHttpInfo($grant_type, $code, $refresh_token, $redirect_uri, $client_id);
         return $response;
     }
 
@@ -340,12 +341,13 @@ class PublicApi
      *
      * @param string $grant_type  (required)
      * @param string $code  (optional)
+     * @param string $refresh_token  (optional)
      * @param string $redirect_uri  (optional)
      * @param string $client_id  (optional)
      * @throws \Hydra\SDK\ApiException on non-2xx response
      * @return array of \Hydra\SDK\Model\Oauth2TokenResponse, HTTP status code, HTTP response headers (array of strings)
      */
-    public function oauth2TokenWithHttpInfo($grant_type, $code = null, $redirect_uri = null, $client_id = null)
+    public function oauth2TokenWithHttpInfo($grant_type, $code = null, $refresh_token = null, $redirect_uri = null, $client_id = null)
     {
         // verify the required parameter 'grant_type' is set
         if ($grant_type === null) {
@@ -370,6 +372,10 @@ class PublicApi
         // form params
         if ($code !== null) {
             $formParams['code'] = $this->apiClient->getSerializer()->toFormValue($code);
+        }
+        // form params
+        if ($refresh_token !== null) {
+            $formParams['refresh_token'] = $this->apiClient->getSerializer()->toFormValue($refresh_token);
         }
         // form params
         if ($redirect_uri !== null) {

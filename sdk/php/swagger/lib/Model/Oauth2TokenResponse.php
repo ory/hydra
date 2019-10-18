@@ -57,7 +57,9 @@ class Oauth2TokenResponse implements ArrayAccess
     protected static $swaggerTypes = [
         'access_token' => 'string',
         'expires_in' => 'int',
+        'id_token' => 'string',
         'refresh_token' => 'string',
+        'scope' => 'string',
         'token_type' => 'string'
     ];
 
@@ -68,7 +70,9 @@ class Oauth2TokenResponse implements ArrayAccess
     protected static $swaggerFormats = [
         'access_token' => null,
         'expires_in' => 'int64',
+        'id_token' => null,
         'refresh_token' => null,
+        'scope' => null,
         'token_type' => null
     ];
 
@@ -89,7 +93,9 @@ class Oauth2TokenResponse implements ArrayAccess
     protected static $attributeMap = [
         'access_token' => 'access_token',
         'expires_in' => 'expires_in',
+        'id_token' => 'id_token',
         'refresh_token' => 'refresh_token',
+        'scope' => 'scope',
         'token_type' => 'token_type'
     ];
 
@@ -101,7 +107,9 @@ class Oauth2TokenResponse implements ArrayAccess
     protected static $setters = [
         'access_token' => 'setAccessToken',
         'expires_in' => 'setExpiresIn',
+        'id_token' => 'setIdToken',
         'refresh_token' => 'setRefreshToken',
+        'scope' => 'setScope',
         'token_type' => 'setTokenType'
     ];
 
@@ -113,7 +121,9 @@ class Oauth2TokenResponse implements ArrayAccess
     protected static $getters = [
         'access_token' => 'getAccessToken',
         'expires_in' => 'getExpiresIn',
+        'id_token' => 'getIdToken',
         'refresh_token' => 'getRefreshToken',
+        'scope' => 'getScope',
         'token_type' => 'getTokenType'
     ];
 
@@ -150,7 +160,9 @@ class Oauth2TokenResponse implements ArrayAccess
     {
         $this->container['access_token'] = isset($data['access_token']) ? $data['access_token'] : null;
         $this->container['expires_in'] = isset($data['expires_in']) ? $data['expires_in'] : null;
+        $this->container['id_token'] = isset($data['id_token']) ? $data['id_token'] : null;
         $this->container['refresh_token'] = isset($data['refresh_token']) ? $data['refresh_token'] : null;
+        $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
         $this->container['token_type'] = isset($data['token_type']) ? $data['token_type'] : null;
     }
 
@@ -222,6 +234,27 @@ class Oauth2TokenResponse implements ArrayAccess
     }
 
     /**
+     * Gets id_token
+     * @return string
+     */
+    public function getIdToken()
+    {
+        return $this->container['id_token'];
+    }
+
+    /**
+     * Sets id_token
+     * @param string $id_token
+     * @return $this
+     */
+    public function setIdToken($id_token)
+    {
+        $this->container['id_token'] = $id_token;
+
+        return $this;
+    }
+
+    /**
      * Gets refresh_token
      * @return string
      */
@@ -238,6 +271,27 @@ class Oauth2TokenResponse implements ArrayAccess
     public function setRefreshToken($refresh_token)
     {
         $this->container['refresh_token'] = $refresh_token;
+
+        return $this;
+    }
+
+    /**
+     * Gets scope
+     * @return string
+     */
+    public function getScope()
+    {
+        return $this->container['scope'];
+    }
+
+    /**
+     * Sets scope
+     * @param string $scope
+     * @return $this
+     */
+    public function setScope($scope)
+    {
+        $this->container['scope'] = $scope;
 
         return $this;
     }

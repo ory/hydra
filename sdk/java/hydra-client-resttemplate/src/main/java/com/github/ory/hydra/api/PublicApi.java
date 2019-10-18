@@ -29,7 +29,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-08-19T22:00:49.579+02:00")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.JavaClientCodegen", date = "2019-10-08T15:22:06.432-04:00")
 @Component("com.github.ory.hydra.api.PublicApi")
 public class PublicApi {
     private ApiClient apiClient;
@@ -151,12 +151,13 @@ public class PublicApi {
      * <p><b>500</b> - genericError
      * @param grantType The grantType parameter
      * @param code The code parameter
+     * @param refreshToken The refreshToken parameter
      * @param redirectUri The redirectUri parameter
      * @param clientId The clientId parameter
      * @return Oauth2TokenResponse
      * @throws RestClientException if an error occurs while attempting to invoke the API
      */
-    public Oauth2TokenResponse oauth2Token(String grantType, String code, String redirectUri, String clientId) throws RestClientException {
+    public Oauth2TokenResponse oauth2Token(String grantType, String code, String refreshToken, String redirectUri, String clientId) throws RestClientException {
         Object postBody = null;
         
         // verify the required parameter 'grantType' is set
@@ -174,6 +175,8 @@ public class PublicApi {
             formParams.add("grant_type", grantType);
         if (code != null)
             formParams.add("code", code);
+        if (refreshToken != null)
+            formParams.add("refresh_token", refreshToken);
         if (redirectUri != null)
             formParams.add("redirect_uri", redirectUri);
         if (clientId != null)

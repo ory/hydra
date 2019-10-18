@@ -66,6 +66,7 @@ func createTestClient(prefix string) *models.Client {
 		TokenEndpointAuthMethod:   "client_secret_basic",
 		UserinfoSignedResponseAlg: "none",
 		SubjectType:               "public",
+		Metadata:                  map[string]interface{}{"foo": "bar"},
 		//SectorIdentifierUri:   "https://sector.com/foo",
 	}
 }
@@ -108,6 +109,7 @@ func TestClientSDK(t *testing.T) {
 		assert.NotEmpty(t, result.Payload.CreatedAt)
 		result.Payload.CreatedAt = strfmt.DateTime{}
 		assert.EqualValues(t, compareClient, result.Payload)
+		assert.EqualValues(t, "bar", result.Payload.Metadata["foo"])
 
 		// secret is not returned on GetOAuth2Client
 		compareClient.Secret = ""

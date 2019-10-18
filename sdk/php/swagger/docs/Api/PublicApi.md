@@ -138,7 +138,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../README.md#documentation-for-models) [[Back to README]](../../README.md)
 
 # **oauth2Token**
-> \Hydra\SDK\Model\Oauth2TokenResponse oauth2Token($grant_type, $code, $redirect_uri, $client_id)
+> \Hydra\SDK\Model\Oauth2TokenResponse oauth2Token($grant_type, $code, $refresh_token, $redirect_uri, $client_id)
 
 The OAuth 2.0 token endpoint
 
@@ -158,11 +158,12 @@ Hydra\SDK\Configuration::getDefaultConfiguration()->setAccessToken('YOUR_ACCESS_
 $api_instance = new Hydra\SDK\Api\PublicApi();
 $grant_type = "grant_type_example"; // string | 
 $code = "code_example"; // string | 
+$refresh_token = "refresh_token_example"; // string | 
 $redirect_uri = "redirect_uri_example"; // string | 
 $client_id = "client_id_example"; // string | 
 
 try {
-    $result = $api_instance->oauth2Token($grant_type, $code, $redirect_uri, $client_id);
+    $result = $api_instance->oauth2Token($grant_type, $code, $refresh_token, $redirect_uri, $client_id);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling PublicApi->oauth2Token: ', $e->getMessage(), PHP_EOL;
@@ -176,6 +177,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **grant_type** | **string**|  |
  **code** | **string**|  | [optional]
+ **refresh_token** | **string**|  | [optional]
  **redirect_uri** | **string**|  | [optional]
  **client_id** | **string**|  | [optional]
 

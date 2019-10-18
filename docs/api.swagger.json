@@ -1735,6 +1735,12 @@
           },
           {
             "type": "string",
+            "x-go-name": "RefreshToken",
+            "name": "refresh_token",
+            "in": "formData"
+          },
+          {
+            "type": "string",
             "x-go-name": "RedirectURI",
             "name": "redirect_uri",
             "in": "formData"
@@ -1940,6 +1946,7 @@
     },
     "JSONWebKeySet": {
       "type": "object",
+      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -1951,7 +1958,7 @@
         }
       },
       "x-go-name": "swaggerJSONWebKeySet",
-      "x-go-package": "github.com/ory/hydra/jwk"
+      "x-go-package": "gopkg.in/square/go-jose.v2"
     },
     "PreviousConsentSession": {
       "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
@@ -2474,6 +2481,14 @@
           "type": "string",
           "x-go-name": "LogoURI"
         },
+        "metadata": {
+          "description": "Metadata is arbitrary data.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          },
+          "x-go-name": "Metadata"
+        },
         "owner": {
           "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
           "type": "string",
@@ -2662,9 +2677,17 @@
           "format": "int64",
           "x-go-name": "ExpiresIn"
         },
+        "id_token": {
+          "type": "string",
+          "x-go-name": "IdToken"
+        },
         "refresh_token": {
           "type": "string",
           "x-go-name": "RefreshToken"
+        },
+        "scope": {
+          "type": "string",
+          "x-go-name": "Scope"
         },
         "token_type": {
           "type": "string",

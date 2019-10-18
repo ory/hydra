@@ -80,6 +80,9 @@ type Client struct {
 	// LogoURI is an URL string that references a logo for the client.
 	LogoURI string `json:"logo_uri,omitempty"`
 
+	// Metadata is arbitrary data.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+
 	// Name is the human-readable string name of the client to be presented to the
 	// end-user during authorization.
 	Name string `json:"client_name,omitempty"`

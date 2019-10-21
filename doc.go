@@ -41,7 +41,7 @@
 //         tokenUrl: /oauth2/token
 //         flow: accessCode
 //         scopes:
-//           offline: "A scope required when requesting refresh tokens (alias for `offline`)"
+//           offline: "A scope required when requesting refresh tokens (alias for `offline_access`)"
 //           offline_access: "A scope required when requesting refresh tokens"
 //           openid: "Request an OpenID Connect ID Token"
 //     basic:

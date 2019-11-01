@@ -157,6 +157,17 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Bearer " + token}},
 			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
+		{
+			d: "should accept any allowed specified origin protocol",
+			prep: func() {
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
+				viper.Set("serve.public.cors.enabled", true)
+				viper.Set("serve.public.cors.allowed_origins", []string{"http://*", "https://*"})
+			},
+			code:         http.StatusNotImplemented,
+			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vLTQ6YmFy"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foo.foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			if tc.prep != nil {

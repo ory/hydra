@@ -22,6 +22,7 @@ package driver
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -44,6 +45,11 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 	corsOptions := conf.CORSOptions(iface)
 	var patterns []glob.Glob
 	for _, o := range corsOptions.AllowedOrigins {
+		// if the protocol (http or https) is specified, but the url is wildcard, use special ** glob, which ignore the '.' separator.
+		// This way g := glob.Compile("http://**") g.Match("http://google.com") returns true.
+		if splittedO := strings.Split(o, "://"); len(splittedO) != 1 && splittedO[1] == "*" {
+			o = fmt.Sprintf("%s://**", splittedO[0])
+		}
 		g, err := glob.Compile(strings.ToLower(o), '.')
 		if err != nil {
 			reg.Logger().WithError(err).Fatalf("Unable to parse cors origin: %s", o)

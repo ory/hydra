@@ -522,7 +522,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 // > Do not implement a client for this endpoint yourself. Use a library. There are many libraries
 // > available for any programming language. You can find a list of libraries here: https://oauth.net/code/
 // >
-// > Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
+// > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
 //
 //
 //     Consumes:

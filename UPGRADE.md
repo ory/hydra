@@ -139,6 +139,15 @@ Do you want the latest features and patches without work and hassle? Are you loo
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
+## 1.0.9
+
+### Schema Changes
+
+A minor Schema change was introduced to the OAuth 2.0 Clients table. It is now possible to store arbitrary metadata
+for a client.
+
+> Make a backup of your database before applying this change.
+
 ## 1.0.0-rc.10
 
 ### OpenID Connect Front-/Backchannel Logout 1.0

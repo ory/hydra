@@ -61,36 +61,47 @@ import (
 )
 
 var lifespan = time.Hour
-var flushRequests = []*fosite.Request{
-	{
-		ID:             "flush-1",
-		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{ClientID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	},
-	{
-		ID:             "flush-2",
-		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{ClientID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	},
-	{
-		ID:             "flush-3",
-		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{ClientID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	},
-}
 
+func buildFlushRequests(tokenLifespan time.Duration) []*fosite.Request {
+	return []*fosite.Request{
+		{
+			ID:             "flush-1",
+			RequestedAt:    time.Now().Round(time.Second),
+			Client:         &client.Client{ClientID: "foobar"},
+			RequestedScope: fosite.Arguments{"fa", "ba"},
+			GrantedScope:   fosite.Arguments{"fa", "ba"},
+			Form:           url.Values{"foo": []string{"bar", "baz"}},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		},
+		{
+			ID:             "flush-2",
+			RequestedAt:    time.Now().Round(time.Second).Add(-(tokenLifespan + time.Minute)),
+			Client:         &client.Client{ClientID: "foobar"},
+			RequestedScope: fosite.Arguments{"fa", "ba"},
+			GrantedScope:   fosite.Arguments{"fa", "ba"},
+			Form:           url.Values{"foo": []string{"bar", "baz"}},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		},
+		{
+			ID:             "flush-3",
+			RequestedAt:    time.Now().Round(time.Second).Add(-(tokenLifespan + time.Hour + time.Minute)),
+			Client:         &client.Client{ClientID: "foobar"},
+			RequestedScope: fosite.Arguments{"fa", "ba"},
+			GrantedScope:   fosite.Arguments{"fa", "ba"},
+			Form:           url.Values{"foo": []string{"bar", "baz"}},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		},
+		{
+			ID:             "flush-4",
+			RequestedAt:    time.Now().Round(time.Second).Add(-(tokenLifespan + time.Hour*24 + time.Minute)),
+			Client:         &client.Client{ClientID: "foobar"},
+			RequestedScope: fosite.Arguments{"fa", "ba"},
+			GrantedScope:   fosite.Arguments{"fa", "ba"},
+			Form:           url.Values{"foo": []string{"bar", "baz"}},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+		},
+	}
+}
 func TestHandlerFlushHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
@@ -101,7 +112,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	store := reg.OAuth2Storage()
 
 	h := oauth2.NewHandler(reg, conf)
-	for _, r := range flushRequests {
+	for _, r := range buildFlushRequests(conf.AccessTokenLifespan()) {
 		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
 		_ = cl.CreateClient(nil, r.Client.(*client.Client))
 	}
@@ -117,7 +128,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	ds := new(oauth2.Session)
 	ctx := context.Background()
 
-	_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-time.Hour * 24))}))
+	_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(time.Hour*24 + conf.AccessTokenLifespan())))}))
 	require.NoError(t, err)
 
 	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
@@ -126,8 +137,10 @@ func TestHandlerFlushHandler(t *testing.T) {
 	require.NoError(t, err)
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
 	require.NoError(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-4", ds)
+	require.Error(t, err)
 
-	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(lifespan + time.Hour/2)))}))
+	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(time.Hour + conf.AccessTokenLifespan())))}))
 	require.NoError(t, err)
 
 	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
@@ -136,8 +149,10 @@ func TestHandlerFlushHandler(t *testing.T) {
 	require.NoError(t, err)
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
 	require.Error(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-4", ds)
+	require.Error(t, err)
 
-	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now())}))
+	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(conf.AccessTokenLifespan())))}))
 	require.NoError(t, err)
 
 	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
@@ -145,6 +160,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
 	require.Error(t, err)
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
+	require.Error(t, err)
+	_, err = store.GetAccessTokenSession(ctx, "flush-4", ds)
 	require.Error(t, err)
 }
 

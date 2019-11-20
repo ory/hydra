@@ -145,6 +145,11 @@ func (s *FositeMemoryStore) DeleteOpenIDConnectSession(_ context.Context, author
 	return nil
 }
 
+func (s *FositeMemoryStore) deleteOpenIDConnectSession(_ context.Context, authorizeCode string) error {
+	delete(s.IDSessions, authorizeCode)
+	return nil
+}
+
 func (s *FositeMemoryStore) CreateAuthorizeCodeSession(_ context.Context, code string, req fosite.Requester) error {
 	s.Lock()
 	defer s.Unlock()
@@ -340,6 +345,26 @@ func (s *FositeMemoryStore) FlushInactiveRefreshTokens(ctx context.Context, notA
 
 		if isExpired && isNotAfter {
 			if err := s.deleteRefreshTokenSession(ctx, sig); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *FositeMemoryStore) FlushInactiveIDTokens(ctx context.Context, notAfter time.Time) error {
+	s.Lock()
+	defer s.Unlock()
+
+	now := time.Now()
+	for authorizeCode, token := range s.IDSessions {
+		expiresAt := token.GetRequestedAt().Add(s.c.IDTokenLifespan())
+		isExpired := expiresAt.Before(now)
+		isNotAfter := token.GetRequestedAt().Before(notAfter)
+
+		if isExpired && isNotAfter {
+			if err := s.deleteOpenIDConnectSession(ctx, authorizeCode); err != nil {
 				return err
 			}
 		}

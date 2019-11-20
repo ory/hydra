@@ -43,4 +43,6 @@ type FositeStorer interface {
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
 
 	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error
+
+	FlushInactiveIDTokens(ctx context.Context, notAfter time.Time) error
 }

@@ -328,6 +328,26 @@ func (s *FositeMemoryStore) FlushInactiveAccessTokens(ctx context.Context, notAf
 	return nil
 }
 
+func (s *FositeMemoryStore) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error {
+	s.Lock()
+	defer s.Unlock()
+
+	now := time.Now()
+	for sig, token := range s.RefreshTokens {
+		expiresAt := token.GetRequestedAt().Add(s.c.RefreshTokenLifespan())
+		isExpired := expiresAt.Before(now)
+		isNotAfter := token.GetRequestedAt().Before(notAfter)
+
+		if isExpired && isNotAfter {
+			if err := s.deleteRefreshTokenSession(ctx, sig); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s *FositeMemoryStore) CreatePKCERequestSession(_ context.Context, code string, req fosite.Requester) error {
 	s.Lock()
 	s.PKCES[code] = req

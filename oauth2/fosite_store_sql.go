@@ -420,6 +420,16 @@ func (s *FositeSQLStore) FlushInactiveAccessTokens(ctx context.Context, notAfter
 	return nil
 }
 
+func (s *FositeSQLStore) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error {
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE requested_at < ? AND requested_at < ?", sqlTableRefresh)), time.Now().Add(-s.c.RefreshTokenLifespan()), notAfter); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	} else if err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	return nil
+}
+
 func (s *FositeSQLStore) BeginTX(ctx context.Context) (context.Context, error) {
 	if tx, err := s.DB.BeginTxx(ctx, nil); err != nil {
 		return ctx, err

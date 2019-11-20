@@ -111,58 +111,63 @@ func TestHandlerFlushHandler(t *testing.T) {
 	cl := reg.ClientManager()
 	store := reg.OAuth2Storage()
 
-	h := oauth2.NewHandler(reg, conf)
-	for _, r := range buildFlushRequests(conf.AccessTokenLifespan()) {
-		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
-		_ = cl.CreateClient(nil, r.Client.(*client.Client))
+	for _, tokenType := range []string{"access"} {
+		h := oauth2.NewHandler(reg, conf)
+
+		switch tokenType {
+		case "access":
+			lifespan = conf.AccessTokenLifespan()
+			for _, r := range buildFlushRequests(conf.AccessTokenLifespan()) {
+				require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
+				_ = cl.CreateClient(nil, r.Client.(*client.Client))
+			}
+		default:
+			assert.Truef(t, false, "error token type %s", tokenType)
+		}
+
+		r := x.NewRouterAdmin()
+		h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+			return h
+		})
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
+
+		tokenIds := []string{"flush-1", "flush-2", "flush-3", "flush-4"}
+
+		_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(time.Hour*24 + lifespan)))}))
+		require.NoError(t, err)
+		checkTokensShouldExist(tokenType, tokenIds, []bool{true, true, true, false}, t, store)
+
+		_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(time.Hour + lifespan)))}))
+		require.NoError(t, err)
+		checkTokensShouldExist(tokenType, tokenIds, []bool{true, true, false, false}, t, store)
+
+		_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-lifespan))}))
+		require.NoError(t, err)
+		checkTokensShouldExist(tokenType, tokenIds, []bool{true, false, false, false}, t, store)
 	}
+}
 
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-		return h
-	})
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
+func checkTokensShouldExist(tokenType string, tokenIds []string, shouldExist []bool, t *testing.T, store x.FositeStorer) {
 	ds := new(oauth2.Session)
 	ctx := context.Background()
 
-	_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(time.Hour*24 + conf.AccessTokenLifespan())))}))
-	require.NoError(t, err)
+	for i := 0; i < len(tokenIds); i++ {
+		error := errors.New("")
+		switch tokenType {
+		case "access":
+			_, error = store.GetAccessTokenSession(ctx, tokenIds[i], ds)
+		default:
+			error = nil
+		}
 
-	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-4", ds)
-	require.Error(t, err)
-
-	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(time.Hour + conf.AccessTokenLifespan())))}))
-	require.NoError(t, err)
-
-	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
-	require.Error(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-4", ds)
-	require.Error(t, err)
-
-	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(conf.AccessTokenLifespan())))}))
-	require.NoError(t, err)
-
-	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
-	require.Error(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
-	require.Error(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-4", ds)
-	require.Error(t, err)
+		if shouldExist[i] {
+			require.NoError(t, error)
+		} else {
+			require.Error(t, error)
+		}
+	}
 }
 
 func TestUserinfo(t *testing.T) {

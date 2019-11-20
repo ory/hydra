@@ -111,7 +111,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	cl := reg.ClientManager()
 	store := reg.OAuth2Storage()
 
-	for _, tokenType := range []string{"access", "refresh", "idToken"} {
+	for _, tokenType := range []string{"access", "refresh", "idToken", "code"} {
 		h := oauth2.NewHandler(reg, conf)
 
 		switch tokenType {
@@ -131,6 +131,12 @@ func TestHandlerFlushHandler(t *testing.T) {
 			lifespan = conf.IDTokenLifespan()
 			for _, r := range buildFlushRequests(lifespan) {
 				require.NoError(t, store.CreateOpenIDConnectSession(nil, r.ID, r))
+				_ = cl.CreateClient(nil, r.Client.(*client.Client))
+			}
+		case "code":
+			lifespan = conf.AuthCodeLifespan()
+			for _, r := range buildFlushRequests(lifespan) {
+				require.NoError(t, store.CreateAuthorizeCodeSession(nil, r.ID, r))
 				_ = cl.CreateClient(nil, r.Client.(*client.Client))
 			}
 		default:
@@ -174,6 +180,8 @@ func checkTokensShouldExist(tokenType string, tokenIds []string, shouldExist []b
 			_, error = store.GetRefreshTokenSession(ctx, tokenIds[i], ds)
 		case "idToken":
 			_, error = store.GetOpenIDConnectSession(ctx, tokenIds[i], &fosite.Request{})
+		case "code":
+			_, error = store.GetAuthorizeCodeSession(ctx, tokenIds[i], ds)
 		default:
 			error = nil
 		}

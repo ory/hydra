@@ -15,7 +15,6 @@ require (
 	github.com/gobuffalo/packd v0.0.0-20190315124812-a385830c7fc0 // indirect
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobwas/glob v0.2.3
-	github.com/golang/gddo v0.0.0-20190312205958-5a2505f3dbf0 // indirect
 	github.com/golang/mock v1.3.1
 	github.com/gorilla/sessions v1.1.4-0.20181208214519-12bd4761fc66
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
@@ -34,9 +33,9 @@ require (
 	github.com/ory/fosite v0.30.0
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
-	github.com/ory/herodot v0.6.0
+	github.com/ory/herodot v0.6.2
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.73
+	github.com/ory/x v0.0.82
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1

@@ -5,6 +5,9 @@ CREATE INDEX hydra_oauth2_authentication_request_login_session_id_idx ON hydra_o
 CREATE INDEX hydra_oauth2_consent_request_login_session_id_idx ON hydra_oauth2_consent_request (login_session_id);
 CREATE INDEX hydra_oauth2_consent_request_login_challenge_idx ON hydra_oauth2_consent_request (login_challenge);
 
+-- Fix performance issue of Admin API - Revoke Consent Sessions
+CREATE INDEX hydra_oauth2_logout_request_client_id_idx ON hydra_oauth2_logout_request (client_id);
+
 -- +migrate Down
 -- Fix performance issue of Admin API - Revoke Login Sessions
 DROP INDEX hydra_oauth2_authentication_session_sub_idx ON hydra_oauth2_authentication_session;
@@ -20,3 +23,8 @@ ALTER TABLE hydra_oauth2_consent_request ADD CONSTRAINT hydra_oauth2_consent_req
 ALTER TABLE hydra_oauth2_consent_request DROP FOREIGN KEY hydra_oauth2_consent_request_login_challenge_fk;
 DROP INDEX hydra_oauth2_consent_request_login_challenge_idx ON hydra_oauth2_consent_request;
 ALTER TABLE hydra_oauth2_consent_request ADD CONSTRAINT hydra_oauth2_consent_request_login_challenge_fk FOREIGN KEY (login_challenge) REFERENCES hydra_oauth2_authentication_request(challenge) ON DELETE SET NULL;
+
+-- Fix performance issue of Admin API - Revoke Consent Sessions
+ALTER TABLE hydra_oauth2_logout_request DROP FOREIGN KEY hydra_oauth2_logout_request_client_id_fk;
+DROP INDEX hydra_oauth2_logout_request_client_id_idx ON hydra_oauth2_logout_request;
+ALTER TABLE hydra_oauth2_logout_request ADD CONSTRAINT hydra_oauth2_logout_request_client_id_fk FOREIGN KEY (client_id) REFERENCES hydra_client(id) ON DELETE CASCADE;

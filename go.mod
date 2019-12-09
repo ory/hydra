@@ -1,7 +1,6 @@
 module github.com/ory/hydra
 
 require (
-	cloud.google.com/go/bigquery v1.0.1 // indirect
 	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
@@ -22,10 +21,11 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/lib/pq v1.0.0
-	github.com/luna-duclos/instrumentedsql v0.0.0-20190316074304-ecad98b20aec // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/meatballhat/negroni-logrus v0.0.0-20170801195057-31067281800f
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
@@ -35,7 +35,7 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.2
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.82
+	github.com/ory/x v0.0.85
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1

@@ -25,7 +25,9 @@ import (
 	"os"
 )
 
+var osExit = os.Exit
+
 func fatal(message string, args ...interface{}) {
 	fmt.Printf(message+"\n", args...)
-	os.Exit(1)
+	osExit(1)
 }

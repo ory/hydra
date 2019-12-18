@@ -122,7 +122,7 @@ DEBUG CONTROLS
 	It is not possible to do both at the same time.
 	Example: PROFILING=cpu
 `,
-	Run: server.RunHost(c),
+	Run: server.RunHost(c, Version),
 }
 
 func init() {

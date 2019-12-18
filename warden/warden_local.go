@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/coupa/foundation-go/metrics"
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/firewall"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/pkg"
 	"github.com/ory/hydra/warden/group"
 	"github.com/ory/ladon"
 	"github.com/pkg/errors"
@@ -29,6 +31,8 @@ func (w *LocalWarden) TokenFromRequest(r *http.Request) string {
 }
 
 func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) error {
+	statsdResource := pkg.SanitizeForStatsd(a.Resource, "_")
+
 	if err := w.isAllowed(ctx, &ladon.Request{
 		Resource: a.Resource,
 		Action:   a.Action,
@@ -40,6 +44,12 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 			"request": a,
 			"reason":  "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
+
+		metrics.Increment("Warden.IsAllowed.Failure", map[string]string{
+			"client_id": a.Subject,
+			"resource":  statsdResource,
+			"reason":    "The policy decision point denied the request",
+		})
 		return err
 	}
 
@@ -48,17 +58,32 @@ func (w *LocalWarden) IsAllowed(ctx context.Context, a *firewall.AccessRequest) 
 		"request": a,
 		"reason":  "The policy decision point allowed the request",
 	}).Infof("Access allowed")
+
+	metrics.Increment("Warden.IsAllowed.Success", map[string]string{
+		"client_id": a.Subject,
+		"resource":  statsdResource,
+	})
 	return nil
 }
 
 func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewall.TokenAccessRequest, scopes ...string) (*firewall.Context, error) {
-	var auth, err = w.OAuth2.IntrospectToken(ctx, token, fosite.AccessToken, oauth2.NewSession(""), scopes...)
 	c := w.newBasicContext()
+	statsdResource := pkg.SanitizeForStatsd(a.Resource, "_")
+	statsdAction := pkg.SanitizeForStatsd(a.Action, "_")
+
+	var auth, err = w.OAuth2.IntrospectToken(ctx, token, fosite.AccessToken, oauth2.NewSession(""), scopes...)
 	if err != nil {
 		w.L.WithFields(logrus.Fields{
 			"request": a,
 			"reason":  "Token is expired, malformed or missing",
 		}).WithError(err).Infof("Access denied")
+
+		metrics.Increment("Warden.TokenAllowed.Failure", map[string]string{
+			"client_id": "",
+			"resource":  statsdResource,
+			"reason":    "Token is expired, malformed or missing",
+			"action":    statsdAction,
+		})
 		return c, err
 	}
 
@@ -76,6 +101,13 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 			"request":  a,
 			"reason":   "The policy decision point denied the request",
 		}).WithError(err).Infof("Access denied")
+
+		metrics.Increment("Warden.TokenAllowed.Failure", map[string]string{
+			"client_id": session.GetSubject(),
+			"resource":  statsdResource,
+			"reason":    "The policy decision point denied the request",
+			"action":    statsdAction,
+		})
 		c.Subject = session.GetSubject()
 		return c, err
 	}
@@ -88,6 +120,11 @@ func (w *LocalWarden) TokenAllowed(ctx context.Context, token string, a *firewal
 		"result":   c,
 	}).Infof("Access granted")
 
+	metrics.Increment("Warden.TokenAllowed.Success", map[string]string{
+		"client_id": c.Subject,
+		"resource":  statsdResource,
+		"action":    statsdAction,
+	})
 	return c, nil
 }
 

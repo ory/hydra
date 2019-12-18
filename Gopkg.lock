@@ -53,6 +53,14 @@
   revision = "7f53d412b9eb1cbf744c2063185d703a0ee34700"
 
 [[projects]]
+  digest = "1:d941401c29307046cf12935fdcf24e0cb04c95112baccceab7ce2c6f6cbce2e2"
+  name = "github.com/coupa/foundation-go"
+  packages = ["metrics"]
+  pruneopts = "UT"
+  revision = "3f11d091be70de3421453511d15dc171fcd83ce0"
+  version = "v1.2.2"
+
+[[projects]]
   digest = "1:667f41be124637d8af08d9163be07cc718ae291bc590b6a91047c94b25ef0753"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -325,8 +333,7 @@
   version = "v3.3.2"
 
 [[projects]]
-  branch = "v_0.10.1"
-  digest = "1:6d85381c015222d3cc663d045c9fdd5d41cd396aefc37f72dce30ff5f5928d9d"
+  digest = "1:2b6ab70d7f114eb4826d263c60bda753122c9b5775986f3fbd89d038bfed0cde"
   name = "github.com/ory/fosite"
   packages = [
     ".",
@@ -338,8 +345,9 @@
     "token/jwt",
   ]
   pruneopts = "UT"
-  revision = "ec793ab55310f69453ef6242abb52edfd2dfa19e"
+  revision = "75c261d8b590021bdc7e989db6cfc8dd911b706c"
   source = "https://github.com/coupa/fosite"
+  version = "v0.10.2.0"
 
 [[projects]]
   digest = "1:b13d02ca6486fa869211a39cb63fbb76778b71484f56ba2d19a0158cb14b7e5b"
@@ -443,12 +451,12 @@
   revision = "204274ad699c0983a70203a566887f17a717fef4"
 
 [[projects]]
-  digest = "1:dc2d85c13ac22c22a1f3170a41a8e1b897fa05134aaf533f16df44f66a25b4a1"
+  digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "UT"
-  revision = "a67f783a3814b8729bd2dac5780b5f78f8dbd64d"
-  version = "v1.1.0"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
 
 [[projects]]
   digest = "1:929ff9cb53ef18941beb32733b352c92fff0e0be24b29470a487572a528457e0"
@@ -543,14 +551,13 @@
   revision = "a0b114877d4caeffbd7f87e3757c17fce570fea7"
 
 [[projects]]
-  digest = "1:f006d0b1a564169d9c5b731486286a26ba8a4ed0b5aa8830599a668e3cb67953"
+  digest = "1:cdba2c61bea1a82b91c0b9dc03112e1373e3d825a6976b636b3d10769d6f6fb0"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish",
     "ed25519",
     "ed25519/internal/edwards25519",
-    "ssh/terminal",
   ]
   pruneopts = "UT"
   revision = "9419663f5a44be8b34ca85f08abc5fe1be11f8a3"
@@ -663,6 +670,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/coupa/foundation-go/metrics",
     "github.com/dgrijalva/jwt-go",
     "github.com/go-sql-driver/mysql",
     "github.com/gorilla/context",
@@ -705,7 +713,6 @@
     "golang.org/x/oauth2",
     "golang.org/x/oauth2/clientcredentials",
     "gopkg.in/airbrake/gobrake.v2",
-    "gopkg.in/alexcesaro/statsd.v2",
     "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"

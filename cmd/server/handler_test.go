@@ -35,14 +35,6 @@ func TestMiddleware(t *testing.T) {
 	logrus.SetOutput(os.Stderr)
 }
 
-func TestStatsdRegex(t *testing.T) {
-	regx = newStatsdTagsSanitizerRegex()
-	resource := "rn:hydra.warden-token_allowed"
-	sanitized_resource := regx.ReplaceAllString(resource, "_")
-	assert.NotEqual(t, resource, sanitized_resource, "regex does not behave as expected")
-	assert.Equal(t, "rn_hydra.warden-token_allowed", sanitized_resource, "regex does not behave as expected")
-}
-
 func testUseAirbrakeMiddleware(t *testing.T) {
 	os.Setenv("AIRBRAKE_PROJECT_ID", "1")
 	os.Setenv("AIRBRAKE_PROJECT_KEY", "1")

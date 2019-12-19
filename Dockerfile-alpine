@@ -3,11 +3,13 @@
 # $ GO111MODULE=on GOOS=linux GOARCH=amd64 go build && docker build -t oryd/hydra:v1.0.0-rc.7_oryOS.10 . && rm hydra
 FROM alpine:3.10
 
+RUN addgroup -S ory; \
+    adduser -S ory -G ory -D -H -s /bin/nologin
 RUN apk add -U --no-cache ca-certificates
 
 COPY hydra /usr/bin/hydra
 
-USER 1000
+USER ory
 
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

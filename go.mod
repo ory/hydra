@@ -7,6 +7,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5
 	github.com/asaskevich/govalidator v0.0.0-20170425121227-4918b99a7cb9
+	github.com/aws/aws-sdk-go v1.26.5 // indirect
 	github.com/cenkalti/backoff v2.0.0+incompatible
 	github.com/containerd/continuity v0.0.0-20180921161001-7f53d412b9eb
 	github.com/coupa/foundation-go v1.2.2

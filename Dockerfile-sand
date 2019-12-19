@@ -1,12 +1,7 @@
-FROM telegraf:alpine
+FROM alpine:3.10
 RUN apk add --update ca-certificates
 ADD tmp/dist/sand /bin/sand
-ADD telegraf.conf /etc/telegraf/telegraf.conf
-ADD ca.pem /etc/telegraf/ca.pem
 ADD entrypoint.sh /
 
-# Run SAND and Telegraf
 ENTRYPOINT ["/entrypoint.sh"]
-
-# Open the a port of SAND
 EXPOSE 4444

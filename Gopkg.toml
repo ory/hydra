@@ -24,6 +24,9 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[constraint]]
+  name = "github.com/coupa/foundation-go"
+  version = "1.2.2"
 
 [[constraint]]
   name = "github.com/dgrijalva/jwt-go"
@@ -74,7 +77,7 @@
   version = "3.3.2"
 
 [[constraint]]
-  branch = "v_0.10.1"
+  version = "v0.10.2.0"
   name = "github.com/ory/fosite"
   source = "https://github.com/coupa/fosite"
 

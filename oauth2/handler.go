@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coupa/foundation-go/metrics"
 	"github.com/gorilla/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ory/fosite"
@@ -16,7 +17,6 @@ import (
 	"github.com/ory/hydra/pkg"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/alexcesaro/statsd.v2"
 )
 
 const (
@@ -51,7 +51,6 @@ type Handler struct {
 	L logrus.FieldLogger
 
 	Issuer string
-	Statsd *statsd.Client
 }
 
 // swagger:model WellKnown
@@ -262,24 +261,29 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	var ctx = fosite.NewContext()
 
 	// NOTE: if we can't get the accessRequest object below, then we don't know what the client_id is
-	sandClientId := ""
-	statsdBucketString := "Token.Provision.Failure"
+	var sandClientID, scopes string
+	if originalID, _, ok := r.BasicAuth(); ok {
+		sandClientID, _ = url.QueryUnescape(originalID)
+	}
 
 	accessRequest, err := h.OAuth2.NewAccessRequest(ctx, r, session)
+
+	requestedScopes := accessRequest.GetRequestedScopes()
+	if len(requestedScopes) > 0 {
+		scopes = strings.Join(requestedScopes, " ")
+	}
+	statsdTags := map[string]string{"client_id": sandClientID, "scopes": scopes}
+
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.OAuth2.WriteAccessError(w, accessRequest, err)
-		if h.Statsd != nil {
-			statsdClient := h.Statsd.Clone(statsd.Tags("client_id", sandClientId))
-			statsdClient.Increment(statsdBucketString)
-		}
+		metrics.Increment("Token.Auth.Failure", statsdTags)
 		return
 	}
 
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
 		session.Subject = accessRequest.GetClient().GetID()
-		sandClientId = session.Subject
-		for _, scope := range accessRequest.GetRequestedScopes() {
+		for _, scope := range requestedScopes {
 			if fosite.HierarchicScopeStrategy(accessRequest.GetClient().GetScopes(), scope) {
 				accessRequest.GrantScope(scope)
 			}
@@ -290,20 +294,13 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request, _ httprou
 	if err != nil {
 		pkg.LogError(err, h.L)
 		h.OAuth2.WriteAccessError(w, accessRequest, err)
-		if h.Statsd != nil {
-			statsdClient := h.Statsd.Clone(statsd.Tags("client_id", sandClientId))
-			statsdClient.Increment(statsdBucketString)
-		}
+		metrics.Increment("Token.Provision.Failure", statsdTags)
 		return
 	}
 
 	h.OAuth2.WriteAccessResponse(w, accessRequest, accessResponse)
 
-	statsdBucketString = "Token.Provision.Success"
-	if h.Statsd != nil {
-		statsdClient := h.Statsd.Clone(statsd.Tags("client_id", sandClientId))
-		statsdClient.Increment(statsdBucketString)
-	}
+	metrics.Increment("Token.Provision.Success", statsdTags)
 }
 
 // swagger:route GET /oauth2/auth oauth2 oauthAuth

@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"net/url"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig(t *testing.T) {
@@ -81,4 +82,18 @@ func TestLifespan(t *testing.T) {
 
 	assert.Equal(t, (&Config{}).GetIDTokenLifespan(), time.Hour)
 	assert.Equal(t, (&Config{IDTokenLifespan: "10s"}).GetIDTokenLifespan(), time.Second*10)
+}
+
+func TestExtractPortFromDSN(t *testing.T) {
+	m, p := extractPortFromDSN("")
+	assert.Equal(t, m, "")
+	assert.Equal(t, p, "")
+
+	m, p = extractPortFromDSN("mysql://u:p@tcp(hostname:port)/db?parseTime=true")
+	assert.Equal(t, m, "mysql://u:p@tcp(hostname)/db?parseTime=true")
+	assert.Equal(t, p, "port")
+
+	m, p = extractPortFromDSN("mysql://u:p@tcp(hostname)/db?parseTime=true")
+	assert.Equal(t, m, "mysql://u:p@tcp(hostname)/db?parseTime=true")
+	assert.Equal(t, p, "")
 }

@@ -199,9 +199,18 @@ func (c *Config) Context() *Context {
 		}
 		connection = pc
 	} else if c.DatabaseURL != "memory" {
-		u, err := url.Parse(c.DatabaseURL)
+		dbURL, port := extractPortFromDSN(c.DatabaseURL)
+
+		u, err := url.Parse(dbURL)
 		if err != nil {
 			c.GetLogger().Fatalf("Could not parse DATABASE_URL: %s", err)
+		}
+		if port != "" {
+			if index := strings.Index(u.Host, ")"); index > -1 {
+				u.Host = u.Host[:index] + ":" + port + u.Host[index:]
+			} else {
+				u.Host = u.Host + ":" + port
+			}
 		}
 
 		switch u.Scheme {
@@ -265,6 +274,31 @@ func (c *Config) Context() *Context {
 	}
 
 	return c.context
+}
+
+//Go 1.12 has changes where url.Parse cannot parse DSN's port portion. So extract
+//the port out of the DSN
+//    mysql://u:p@tcp(hostname:port)/db?parseTime=true
+// => mysql://u:p@tcp(hostname)/db?parseTime=true
+func extractPortFromDSN(dsn string) (modified string, port string) {
+	segments := strings.Split(dsn, "@")
+	if len(segments) < 2 {
+		return dsn, ""
+	}
+	host := segments[1]
+	colonIndex := strings.Index(host, ":")
+	if colonIndex > -1 {
+		braceIndex := strings.Index(host, ")")
+		if braceIndex > -1 {
+			modified = segments[0] + "@" + host[0:colonIndex] + host[braceIndex:]
+			port = host[colonIndex+1 : braceIndex]
+		} else {
+			modified = dsn
+		}
+	} else {
+		modified = dsn
+	}
+	return
 }
 
 func (c *Config) Resolve(join ...string) *url.URL {

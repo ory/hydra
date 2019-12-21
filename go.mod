@@ -29,8 +29,10 @@ require (
 	github.com/jmoiron/sqlx v0.0.0-20180614180643-0dae4fefe7c0
 	github.com/julienschmidt/httprouter v1.1.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1
+	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v0.0.0-20171010183604-30d59eaf0152
 	github.com/magiconair/properties v1.7.4-0.20170902060319-8d7837e64d3c
+	github.com/mattn/go-sqlite3 v2.0.2+incompatible // indirect
 	github.com/meatballhat/negroni-logrus v0.0.0-20170801195057-31067281800f
 	github.com/mitchellh/mapstructure v0.0.0-20170523030023-d0303fe80992
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -73,6 +75,7 @@ require (
 	google.golang.org/appengine v1.0.1-0.20171010223110-07f075729064
 	gopkg.in/airbrake/gobrake.v2 v2.0.8
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/gorp.v1 v1.7.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.0.0-20170812160011-eb3733d160e7

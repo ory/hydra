@@ -4,6 +4,7 @@
 
 - [Change Log](#change-log)
   - [Unreleased](#unreleased)
+  - [v1.1.1 (2019-12-19)](#v111-2019-12-19)
   - [v1.1.0 (2019-12-16)](#v110-2019-12-16)
   - [v1.0.9 (2019-11-02)](#v109-2019-11-02)
   - [v1.0.8 (2019-10-04)](#v108-2019-10-04)
@@ -164,7 +165,19 @@
 
 ## [Unreleased](https://github.com/ory/hydra/tree/HEAD)
 
-[Full Changelog](https://github.com/ory/hydra/compare/v1.1.0...HEAD)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.1.1...HEAD)
+
+**Implemented enhancements:**
+
+- Kubernetes Mode [\#1319](https://github.com/ory/hydra/issues/1319)
+
+**Closed issues:**
+
+- hydra not finding passwords [\#1670](https://github.com/ory/hydra/issues/1670)
+- Feature Request: Configurable sql table prefix [\#1668](https://github.com/ory/hydra/issues/1668)
+
+## [v1.1.1](https://github.com/ory/hydra/tree/v1.1.1) (2019-12-19)
+[Full Changelog](https://github.com/ory/hydra/compare/v1.1.0...v1.1.1)
 
 **Closed issues:**
 
@@ -192,6 +205,7 @@
 - MySQL database password logged on startup [\#1640](https://github.com/ory/hydra/issues/1640)
 - CORS allowed\_origins not working as expected [\#1615](https://github.com/ory/hydra/issues/1615)
 - Migrations not working in 1.0.1 with go1.13 [\#1563](https://github.com/ory/hydra/issues/1563)
+- Can't connect Azure Postgres as username contains '@' character [\#1494](https://github.com/ory/hydra/issues/1494)
 
 **Closed issues:**
 
@@ -341,12 +355,12 @@
 
 **Merged pull requests:**
 
-- clients: Ensure order of paginated results [\#1568](https://github.com/ory/hydra/pull/1568) ([aeneasr](https://github.com/aeneasr))
 - oauth2: Enable PKCE for private clients [\#1567](https://github.com/ory/hydra/pull/1567) ([aeneasr](https://github.com/aeneasr))
 - docker: Add alpine image [\#1566](https://github.com/ory/hydra/pull/1566) ([aeneasr](https://github.com/aeneasr))
 - Add quickstart for prometheus. [\#1562](https://github.com/ory/hydra/pull/1562) ([genchilu](https://github.com/genchilu))
 - chore: remove confusing dsn setting value [\#1556](https://github.com/ory/hydra/pull/1556) ([cpwc](https://github.com/cpwc))
 - develop: Makes init task in makefile and corrects readme [\#1555](https://github.com/ory/hydra/pull/1555) ([solodynamo](https://github.com/solodynamo))
+- Consent: deduplicate user authenticated clients during logout. [\#1531](https://github.com/ory/hydra/pull/1531) ([genchilu](https://github.com/genchilu))
 
 ## [v1.0.1](https://github.com/ory/hydra/tree/v1.0.1) (2019-09-04)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0...v1.0.1)
@@ -386,6 +400,7 @@
 
 **Merged pull requests:**
 
+- clients: Ensure order of paginated results [\#1568](https://github.com/ory/hydra/pull/1568) ([aeneasr](https://github.com/aeneasr))
 - driver: Fix RP-Initiated Logout trailing slash bug [\#1552](https://github.com/ory/hydra/pull/1552) ([solodynamo](https://github.com/solodynamo))
 - SDK: enrich oauth2\_token\_response and params [\#1551](https://github.com/ory/hydra/pull/1551) ([tyaps](https://github.com/tyaps))
 - Update README.md [\#1549](https://github.com/ory/hydra/pull/1549) ([woojtek](https://github.com/woojtek))
@@ -395,7 +410,6 @@
 - \#1539 FIXED [\#1540](https://github.com/ory/hydra/pull/1540) ([GSokol](https://github.com/GSokol))
 - docs: Updates issue and pull request templates [\#1536](https://github.com/ory/hydra/pull/1536) ([aeneasr](https://github.com/aeneasr))
 - vendor: Fix SQL-regression caused by go 1.12.7 [\#1534](https://github.com/ory/hydra/pull/1534) ([aeneasr](https://github.com/aeneasr))
-- Consent: deduplicate user authenticated clients during logout. [\#1531](https://github.com/ory/hydra/pull/1531) ([genchilu](https://github.com/genchilu))
 - docs: Clean up readme [\#1526](https://github.com/ory/hydra/pull/1526) ([aeneasr](https://github.com/aeneasr))
 - docs: Updates issue and pull request templates [\#1525](https://github.com/ory/hydra/pull/1525) ([aeneasr](https://github.com/aeneasr))
 - docs: Updates issue and pull request templates [\#1523](https://github.com/ory/hydra/pull/1523) ([aeneasr](https://github.com/aeneasr))
@@ -408,11 +422,9 @@
 - docs: Updates issue and pull request templates [\#1500](https://github.com/ory/hydra/pull/1500) ([aeneasr](https://github.com/aeneasr))
 - Improve OAuth2 API Docs [\#1499](https://github.com/ory/hydra/pull/1499) ([aeneasr](https://github.com/aeneasr))
 - Fix wrong command name [\#1496](https://github.com/ory/hydra/pull/1496) ([shankardevy](https://github.com/shankardevy))
-- cmd: Print meaningful error messages on network issues [\#1493](https://github.com/ory/hydra/pull/1493) ([aeneasr](https://github.com/aeneasr))
 - Build\(deps\): Bump lodash from 4.17.11 to 4.17.14 in /test/e2e/oauth2-client [\#1491](https://github.com/ory/hydra/pull/1491) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Fixed typoe. Not -c but --config [\#1489](https://github.com/ory/hydra/pull/1489) ([herrjemand](https://github.com/herrjemand))
 - cmd: Use commit hash instead of version for link to config [\#1488](https://github.com/ory/hydra/pull/1488) ([aeneasr](https://github.com/aeneasr))
-- tracing: Add support for B3 headers via the JAEGER\_PROPAGATION env var [\#1456](https://github.com/ory/hydra/pull/1456) ([ptescher](https://github.com/ptescher))
 
 ## [v1.0.0](https://github.com/ory/hydra/tree/v1.0.0) (2019-06-24)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.16...v1.0.0)
@@ -479,6 +491,7 @@
 
 **Merged pull requests:**
 
+- jwk: Fix memory mamager of JWK deletion [\#1474](https://github.com/ory/hydra/pull/1474) ([sawadashota](https://github.com/sawadashota))
 - cmd: Add missing html closing tag to token user [\#1479](https://github.com/ory/hydra/pull/1479) ([aeneasr](https://github.com/aeneasr))
 - sdk: Fix missing and broken swagger annotations [\#1440](https://github.com/ory/hydra/pull/1440) ([aeneasr](https://github.com/aeneasr))
 - fix fallback routes and templates [\#1402](https://github.com/ory/hydra/pull/1402) ([MDrollette](https://github.com/MDrollette))
@@ -507,6 +520,7 @@
 
 **Merged pull requests:**
 
+- cmd: Print meaningful error messages on network issues [\#1493](https://github.com/ory/hydra/pull/1493) ([aeneasr](https://github.com/aeneasr))
 - Remove binary license [\#1470](https://github.com/ory/hydra/pull/1470) ([aeneasr](https://github.com/aeneasr))
 - docker: Run as non-root user [\#1469](https://github.com/ory/hydra/pull/1469) ([aeneasr](https://github.com/aeneasr))
 - sdk: Update SDKs and fix PHP namespace [\#1468](https://github.com/ory/hydra/pull/1468) ([aeneasr](https://github.com/aeneasr))
@@ -514,6 +528,7 @@
 - mod: Update to ory/x 0.0.61 [\#1466](https://github.com/ory/hydra/pull/1466) ([aeneasr](https://github.com/aeneasr))
 - docs: Add a link to Identity Provider "Werther" to community projects [\#1464](https://github.com/ory/hydra/pull/1464) ([nikolaas](https://github.com/nikolaas))
 - cmd: Add option to disable access log for health endpoints [\#1458](https://github.com/ory/hydra/pull/1458) ([hypnoglow](https://github.com/hypnoglow))
+- tracing: Add support for B3 headers via the JAEGER\_PROPAGATION env var [\#1456](https://github.com/ory/hydra/pull/1456) ([ptescher](https://github.com/ptescher))
 
 ## [v1.0.0-rc.15](https://github.com/ory/hydra/tree/v1.0.0-rc.15) (2019-06-05)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.14...v1.0.0-rc.15)
@@ -525,7 +540,6 @@
 
 **Merged pull requests:**
 
-- jwk: Fix memory mamager of JWK deletion [\#1474](https://github.com/ory/hydra/pull/1474) ([sawadashota](https://github.com/sawadashota))
 - cli: Use go templates in token user [\#1461](https://github.com/ory/hydra/pull/1461) ([aeneasr](https://github.com/aeneasr))
 - docs: Fix link to system secret rotation [\#1459](https://github.com/ory/hydra/pull/1459) ([sawadashota](https://github.com/sawadashota))
 - Build\(deps\): Bump jackson-version from 2.8.9 to 2.9.9 in /sdk/java/hydra-client-resttemplate [\#1453](https://github.com/ory/hydra/pull/1453) ([dependabot[bot]](https://github.com/apps/dependabot))
@@ -552,6 +566,7 @@
 - ci: Update release pipeline [\#1444](https://github.com/ory/hydra/pull/1444) ([aeneasr](https://github.com/aeneasr))
 - mod: Update module definitions [\#1441](https://github.com/ory/hydra/pull/1441) ([aeneasr](https://github.com/aeneasr))
 - docs: Updates issue and pull request templates [\#1432](https://github.com/ory/hydra/pull/1432) ([aeneasr](https://github.com/aeneasr))
+- Do not confirmLoginSession when skip is true to prevent remember reset to false [\#1414](https://github.com/ory/hydra/pull/1414) ([saadtazi](https://github.com/saadtazi))
 
 ## [v1.0.0-rc.12](https://github.com/ory/hydra/tree/v1.0.0-rc.12) (2019-05-10)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.11...v1.0.0-rc.12)
@@ -574,6 +589,7 @@
 - cmd: allow to set the client's post-logout URIs [\#1427](https://github.com/ory/hydra/pull/1427) ([aberasarte](https://github.com/aberasarte))
 - sdk/go: Add go.mod definition in sdk directory [\#1425](https://github.com/ory/hydra/pull/1425) ([aeneasr](https://github.com/aeneasr))
 - driver: Fix broken cors option test [\#1423](https://github.com/ory/hydra/pull/1423) ([aeneasr](https://github.com/aeneasr))
+- config: Remove duplicates JWKS IDs from wellknown config [\#1416](https://github.com/ory/hydra/pull/1416) ([aeneasr](https://github.com/aeneasr))
 
 ## [v1.0.0-rc.11](https://github.com/ory/hydra/tree/v1.0.0-rc.11) (2019-05-02)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.10...v1.0.0-rc.11)
@@ -592,9 +608,7 @@
 
 - consent: Resolve nil pointer panic in logout flow [\#1418](https://github.com/ory/hydra/pull/1418) ([aeneasr](https://github.com/aeneasr))
 - cors: Use sane default settings for CORS options [\#1417](https://github.com/ory/hydra/pull/1417) ([aeneasr](https://github.com/aeneasr))
-- config: Remove duplicates JWKS IDs from wellknown config [\#1416](https://github.com/ory/hydra/pull/1416) ([aeneasr](https://github.com/aeneasr))
 - consent: Do not confirmLoginSession when skip is true \(\#1414\) [\#1415](https://github.com/ory/hydra/pull/1415) ([aeneasr](https://github.com/aeneasr))
-- Do not confirmLoginSession when skip is true to prevent remember reset to false [\#1414](https://github.com/ory/hydra/pull/1414) ([saadtazi](https://github.com/saadtazi))
 - Fix migrate SQL command message regarding config file. [\#1412](https://github.com/ory/hydra/pull/1412) ([dkushner](https://github.com/dkushner))
 - ttl is a top-level config value [\#1407](https://github.com/ory/hydra/pull/1407) ([MDrollette](https://github.com/MDrollette))
 - docs: Add OIDC FC/BC changes to upgrade guide [\#1401](https://github.com/ory/hydra/pull/1401) ([aeneasr](https://github.com/aeneasr))
@@ -606,8 +620,13 @@
 
 - cmd: Add plans to migrations [\#1139](https://github.com/ory/hydra/issues/1139)
 - docker: Investigate adding entrypoint.sh [\#1108](https://github.com/ory/hydra/issues/1108)
+- Duplicate entry error for second consent request [\#1007](https://github.com/ory/hydra/issues/1007)
 - client: Whitelist logout redirect URL per client [\#1004](https://github.com/ory/hydra/issues/1004)
 - cmd: Remove notice about BETA in OAUTH2\_ACCESS\_TOKEN\_STRATEGY [\#946](https://github.com/ory/hydra/issues/946)
+
+**Fixed bugs:**
+
+- Copy-paste error in manager\_0\_sql\_migrations\_test.go [\#1135](https://github.com/ory/hydra/issues/1135)
 
 **Closed issues:**
 
@@ -634,6 +653,7 @@
 - sdk: Ignore sdk directory when generating OA spec [\#1394](https://github.com/ory/hydra/pull/1394) ([aeneasr](https://github.com/aeneasr))
 - Resolve several minor issues [\#1393](https://github.com/ory/hydra/pull/1393) ([aeneasr](https://github.com/aeneasr))
 - Improve e2e test performance [\#1392](https://github.com/ory/hydra/pull/1392) ([aeneasr](https://github.com/aeneasr))
+- consent: Allow prompt=none for public clients [\#1391](https://github.com/ory/hydra/pull/1391) ([aeneasr](https://github.com/aeneasr))
 - sdk: Make clear that refresh tokens are introspectable [\#1390](https://github.com/ory/hydra/pull/1390) ([aeneasr](https://github.com/aeneasr))
 - README.md: Fix contributors link [\#1385](https://github.com/ory/hydra/pull/1385) ([mkontani](https://github.com/mkontani))
 - Implement OpenID Connect Front-/Backchannel logout [\#1376](https://github.com/ory/hydra/pull/1376) ([aeneasr](https://github.com/aeneasr))
@@ -660,7 +680,6 @@
 
 **Merged pull requests:**
 
-- consent: Allow prompt=none for public clients [\#1391](https://github.com/ory/hydra/pull/1391) ([aeneasr](https://github.com/aeneasr))
 - Fix pagination headers [\#1362](https://github.com/ory/hydra/pull/1362) ([kminehart](https://github.com/kminehart))
 - Pagination headers [\#1358](https://github.com/ory/hydra/pull/1358) ([kminehart](https://github.com/kminehart))
 - oauth2: Expose revocation endpoint at OIDC Discover [\#1356](https://github.com/ory/hydra/pull/1356) ([aeneasr](https://github.com/aeneasr))
@@ -727,7 +746,6 @@
 - Support fosite delegated transactions in SQL storage [\#1247](https://github.com/ory/hydra/issues/1247)
 - Refresh token not works properly [\#1246](https://github.com/ory/hydra/issues/1246)
 - Error : The "redirect\_uri" parameter does not match any of the OAuth 2.0 Client's pre-registered redirect urls [\#1245](https://github.com/ory/hydra/issues/1245)
-- Security: bump Golang version to 1.11.3 \(CVE-2018-16875\) [\#1238](https://github.com/ory/hydra/issues/1238)
 - Feature request: Service account [\#1221](https://github.com/ory/hydra/issues/1221)
 - DX: Easily support different workflows by sharing compose configurations [\#1196](https://github.com/ory/hydra/issues/1196)
 - cmd: Replace checkDependency with privates & getter/setter [\#1121](https://github.com/ory/hydra/issues/1121)
@@ -778,6 +796,7 @@
 **Closed issues:**
 
 - sql: Scan error on column index 13, name \"login\_challenge\": unsupported Scan, storing driver.Value type \<nil\> into type \*string [\#1240](https://github.com/ory/hydra/issues/1240)
+- Security: bump Golang version to 1.11.3 \(CVE-2018-16875\) [\#1238](https://github.com/ory/hydra/issues/1238)
 - Why is the Ory Hydra Docker image nearly 1GB in size? [\#1237](https://github.com/ory/hydra/issues/1237)
 - Feature request: Database migrations without downtime [\#1236](https://github.com/ory/hydra/issues/1236)
 - typo in "building from source" [\#1235](https://github.com/ory/hydra/issues/1235)
@@ -807,7 +826,6 @@
 - Support binding frontend/backend to unix sockets [\#1230](https://github.com/ory/hydra/pull/1230) ([jayme-github](https://github.com/jayme-github))
 - Fix help output of hydra serve [\#1229](https://github.com/ory/hydra/pull/1229) ([jayme-github](https://github.com/jayme-github))
 - ci: Fix flaky sql migration tests [\#1228](https://github.com/ory/hydra/pull/1228) ([aeneasr](https://github.com/aeneasr))
-- Fix \#1199: Generated composer autoloader non-functional [\#1200](https://github.com/ory/hydra/pull/1200) ([Takuto88](https://github.com/Takuto88))
 
 ## [v1.0.0-rc.4+oryOS.9](https://github.com/ory/hydra/tree/v1.0.0-rc.4+oryOS.9) (2018-12-12)
 [Full Changelog](https://github.com/ory/hydra/compare/v1.0.0-rc.3+oryOS.9...v1.0.0-rc.4+oryOS.9)
@@ -857,6 +875,7 @@
 **Merged pull requests:**
 
 - oauth2: Use html templates in fallback endpoints [\#1202](https://github.com/ory/hydra/pull/1202) ([aeneasr](https://github.com/aeneasr))
+- Fix \#1199: Generated composer autoloader non-functional [\#1200](https://github.com/ory/hydra/pull/1200) ([Takuto88](https://github.com/Takuto88))
 - Migrate links from old docs to new docs [\#1197](https://github.com/ory/hydra/pull/1197) ([techthumb](https://github.com/techthumb))
 - Fixed tutorial link in README.md [\#1193](https://github.com/ory/hydra/pull/1193) ([jimmystridh](https://github.com/jimmystridh))
 - setup: add instructions for updating the `hydra-migrate` service to use mysql instead of postgres [\#1192](https://github.com/ory/hydra/pull/1192) ([aaslamin](https://github.com/aaslamin))
@@ -906,7 +925,6 @@
 - oauth2: Tables oidc, code, openid, refresh are missing indices [\#1140](https://github.com/ory/hydra/issues/1140)
 - consent: SQL field `subject\_obfuscated` does not have an index [\#1138](https://github.com/ory/hydra/issues/1138)
 - Setting up a fresh hydra installation results in panic [\#1137](https://github.com/ory/hydra/issues/1137)
-- Copy-paste error in manager\_0\_sql\_migrations\_test.go [\#1135](https://github.com/ory/hydra/issues/1135)
 - cmd: Error message regarding IssuerURL should contain environment variable name [\#1133](https://github.com/ory/hydra/issues/1133)
 - client: Deleting a client should delete all associated data too [\#1131](https://github.com/ory/hydra/issues/1131)
 - CORS\\_ALLOWED\\_ORIGINS doesn't respect wildcards [\#1073](https://github.com/ory/hydra/issues/1073)
@@ -1012,7 +1030,6 @@
 - Move dependencies to ory/x [\#1095](https://github.com/ory/hydra/pull/1095) ([aeneasr](https://github.com/aeneasr))
 - docs: Updates issue and pull request templates [\#1094](https://github.com/ory/hydra/pull/1094) ([aeneasr](https://github.com/aeneasr))
 - Add schema changes introduced to UPGRADE.md [\#1082](https://github.com/ory/hydra/pull/1082) ([aaslamin](https://github.com/aaslamin))
-- sql: Add auto-increment PKs [\#1078](https://github.com/ory/hydra/pull/1078) ([aeneasr](https://github.com/aeneasr))
 - tracing: use context aware database methods [\#1071](https://github.com/ory/hydra/pull/1071) ([aaslamin](https://github.com/aaslamin))
 - Add missing indices to resolve \#1067 [\#1069](https://github.com/ory/hydra/pull/1069) ([aaslamin](https://github.com/aaslamin))
 - change go-resty import path for gopkg.in/resty.v1 [\#1064](https://github.com/ory/hydra/pull/1064) ([pierredavidbelanger](https://github.com/pierredavidbelanger))
@@ -1035,7 +1052,6 @@
 
 **Implemented enhancements:**
 
-- Duplicate entry error for second consent request [\#1007](https://github.com/ory/hydra/issues/1007)
 - cmd: Print version when booting up [\#987](https://github.com/ory/hydra/issues/987)
 - client: client specific CORS settings [\#957](https://github.com/ory/hydra/issues/957)
 - sql: jsonb support for postgres [\#516](https://github.com/ory/hydra/issues/516)
@@ -1045,7 +1061,6 @@
 - jwk: Add ability to rotate SYSTEM\_SECRET  [\#1012](https://github.com/ory/hydra/pull/1012) ([aeneasr](https://github.com/aeneasr))
 - vendor: Upgrade sqlcon to 0.0.6 [\#1008](https://github.com/ory/hydra/pull/1008) ([aeneasr](https://github.com/aeneasr))
 - cmd: Use viper for cors detection [\#998](https://github.com/ory/hydra/pull/998) ([aeneasr](https://github.com/aeneasr))
-- cmd: Disable CORS by default [\#997](https://github.com/ory/hydra/pull/997) ([aeneasr](https://github.com/aeneasr))
 - cmd: Add version to banner [\#995](https://github.com/ory/hydra/pull/995) ([aeneasr](https://github.com/aeneasr))
 - sdk: Add new methods to SDK interface [\#994](https://github.com/ory/hydra/pull/994) ([aeneasr](https://github.com/aeneasr))
 
@@ -1058,7 +1073,6 @@
 - MySQL/MariDB broken on default Debian installations [\#377](https://github.com/ory/hydra/issues/377)
 - cmd: Clarify HYDRA\_ADMIN\_URL in missing endpoint message [\#1018](https://github.com/ory/hydra/pull/1018) ([aeneasr](https://github.com/aeneasr))
 - oauth2: Accept expired JWTs as id\_token\_hint [\#1017](https://github.com/ory/hydra/pull/1017) ([aeneasr](https://github.com/aeneasr))
-- cmd: Disable CORS by default [\#997](https://github.com/ory/hydra/pull/997) ([aeneasr](https://github.com/aeneasr))
 - consent: Populate consent session with default values [\#989](https://github.com/ory/hydra/pull/989) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
@@ -1072,6 +1086,7 @@
 
 **Merged pull requests:**
 
+- sql: Add auto-increment PKs [\#1078](https://github.com/ory/hydra/pull/1078) ([aeneasr](https://github.com/aeneasr))
 - docker: Update compose definitions [\#1020](https://github.com/ory/hydra/pull/1020) ([aeneasr](https://github.com/aeneasr))
 - config: Fix use of uninitialized logger [\#1015](https://github.com/ory/hydra/pull/1015) ([vHanda](https://github.com/vHanda))
 - cmd: Replace aeneasr/cors with rs/cors [\#1011](https://github.com/ory/hydra/pull/1011) ([aeneasr](https://github.com/aeneasr))
@@ -1098,6 +1113,7 @@
 - cmd: Add option to specify new oidc parameters in client [\#935](https://github.com/ory/hydra/issues/935)
 - consent: Obtain previously selected scopes [\#902](https://github.com/ory/hydra/issues/902)
 - oauth2: allow issuing of JWT access tokens [\#248](https://github.com/ory/hydra/issues/248)
+- cmd: Disable CORS by default [\#997](https://github.com/ory/hydra/pull/997) ([aeneasr](https://github.com/aeneasr))
 - oauth2: Add scope to introspection test suite [\#941](https://github.com/ory/hydra/pull/941) ([aeneasr](https://github.com/aeneasr))
 -  consent: Add logout api endpoint [\#984](https://github.com/ory/hydra/pull/984) ([aeneasr](https://github.com/aeneasr))
 - sdk: Upgrade superagent to 3.7.0 [\#983](https://github.com/ory/hydra/pull/983) ([aeneasr](https://github.com/aeneasr))
@@ -1115,6 +1131,7 @@
 - oauth2: Introspect response is empty when `active` is false. [\#964](https://github.com/ory/hydra/issues/964)
 - consent: MemoryManager should return `errNoPreviousConsentFound` when no previous consent was found [\#959](https://github.com/ory/hydra/issues/959)
 - consent: Auth session should check for `pkg.ErrNotFound`, not `sql.ErrNoRows` [\#944](https://github.com/ory/hydra/issues/944)
+- cmd: Disable CORS by default [\#997](https://github.com/ory/hydra/pull/997) ([aeneasr](https://github.com/aeneasr))
 - sdk: Add AdminURL and PublicURL to configuration [\#968](https://github.com/ory/hydra/pull/968) ([aeneasr](https://github.com/aeneasr))
 - cmd: Introduce public and administrative ports [\#963](https://github.com/ory/hydra/pull/963) ([aeneasr](https://github.com/aeneasr))
 - consent: Properly identify revoked login sessions [\#945](https://github.com/ory/hydra/pull/945) ([aeneasr](https://github.com/aeneasr))
@@ -1208,6 +1225,7 @@
 - go get return error [\#913](https://github.com/ory/hydra/issues/913)
 - Can't create clients using the CLI [\#911](https://github.com/ory/hydra/issues/911)
 - is hydra can build on window ? [\#910](https://github.com/ory/hydra/issues/910)
+- cmd: Add flag to allow reading database url in migration command from env [\#896](https://github.com/ory/hydra/issues/896)
 - Let's improve the docs! [\#385](https://github.com/ory/hydra/issues/385)
 - Add benchmarks to documentation [\#161](https://github.com/ory/hydra/issues/161)
 
@@ -1235,10 +1253,6 @@
 **Implemented enhancements:**
 
 - cmd: Allows reading database from env in migrate sql [\#898](https://github.com/ory/hydra/pull/898) ([aeneasr](https://github.com/aeneasr))
-
-**Closed issues:**
-
-- cmd: Add flag to allow reading database url in migration command from env [\#896](https://github.com/ory/hydra/issues/896)
 
 **Merged pull requests:**
 
@@ -1313,7 +1327,6 @@
 - oauth2: Resolve broken prompt parameter [\#843](https://github.com/ory/hydra/issues/843)
 - oauth2: Duplicate requests to /oauth2/token cause 500 [\#828](https://github.com/ory/hydra/issues/828)
 - consent app: Restart consent flow [\#809](https://github.com/ory/hydra/issues/809)
-- Hydra connect fails when the client secret contains "%" [\#631](https://github.com/ory/hydra/issues/631)
 - Health and test improvements [\#891](https://github.com/ory/hydra/pull/891) ([aeneasr](https://github.com/aeneasr))
 - Resolves various issues related to OAuth2 [\#890](https://github.com/ory/hydra/pull/890) ([aeneasr](https://github.com/aeneasr))
 - Improves OpenID Connect Conformity [\#882](https://github.com/ory/hydra/pull/882) ([aeneasr](https://github.com/aeneasr))
@@ -1363,10 +1376,8 @@
 - add /health/version endpoint [\#845](https://github.com/ory/hydra/pull/845) ([zepatrik](https://github.com/zepatrik))
 - Deprecate connect [\#842](https://github.com/ory/hydra/pull/842) ([aeneasr](https://github.com/aeneasr))
 - Move policy merged [\#830](https://github.com/ory/hydra/pull/830) ([aeneasr](https://github.com/aeneasr))
-- \[Prometheus\] Add new prometheus metrics and metrics endpoint [\#827](https://github.com/ory/hydra/pull/827) ([dolbik](https://github.com/dolbik))
 - 1.0.x [\#825](https://github.com/ory/hydra/pull/825) ([aeneasr](https://github.com/aeneasr))
 - Merge from 0.11.x [\#824](https://github.com/ory/hydra/pull/824) ([aeneasr](https://github.com/aeneasr))
-- docs: Moves documentation to new repository. [\#800](https://github.com/ory/hydra/pull/800) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.11.12](https://github.com/ory/hydra/tree/v0.11.12) (2018-04-08)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.11.10...v0.11.12)
@@ -1383,12 +1394,17 @@
 **Merged pull requests:**
 
 - Resolves dep and tests issues [\#821](https://github.com/ory/hydra/pull/821) ([aeneasr](https://github.com/aeneasr))
+- docs: Updates banner in readme [\#808](https://github.com/ory/hydra/pull/808) ([aeneasr](https://github.com/aeneasr))
 - Activating Open Collective [\#805](https://github.com/ory/hydra/pull/805) ([monkeywithacupcake](https://github.com/monkeywithacupcake))
 - metrics: Improves naming of traits  [\#804](https://github.com/ory/hydra/pull/804) ([aeneasr](https://github.com/aeneasr))
 - 0.11 [\#796](https://github.com/ory/hydra/pull/796) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.11.10](https://github.com/ory/hydra/tree/v0.11.10) (2018-03-19)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.11.9...v0.11.10)
+
+**Fixed bugs:**
+
+- cmd: Resolves an issue with broken build time display [\#799](https://github.com/ory/hydra/pull/799) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
 
@@ -1398,7 +1414,6 @@
 
 - Minor code cleanup [\#815](https://github.com/ory/hydra/pull/815) ([euank](https://github.com/euank))
 - docs: Resolves broken swagger definitions [\#812](https://github.com/ory/hydra/pull/812) ([aeneasr](https://github.com/aeneasr))
-- docs: Updates banner in readme [\#808](https://github.com/ory/hydra/pull/808) ([aeneasr](https://github.com/aeneasr))
 - Update links to discord and readme [\#806](https://github.com/ory/hydra/pull/806) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.11.9](https://github.com/ory/hydra/tree/v0.11.9) (2018-03-10)
@@ -1412,7 +1427,6 @@
 **Fixed bugs:**
 
 - docker: Build time always return time.Now\(\) [\#792](https://github.com/ory/hydra/issues/792)
-- cmd: Resolves an issue with broken build time display [\#799](https://github.com/ory/hydra/pull/799) ([aeneasr](https://github.com/aeneasr))
 - cmd: Adds OpenID Connect refresh handler [\#797](https://github.com/ory/hydra/pull/797) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
@@ -1421,8 +1435,10 @@
 
 **Merged pull requests:**
 
+- \[Prometheus\] Add new prometheus metrics and metrics endpoint [\#827](https://github.com/ory/hydra/pull/827) ([dolbik](https://github.com/dolbik))
 - metrics: Improves naming of traits [\#803](https://github.com/ory/hydra/pull/803) ([aeneasr](https://github.com/aeneasr))
 - docs: Resolves broken images and build [\#801](https://github.com/ory/hydra/pull/801) ([aeneasr](https://github.com/aeneasr))
+- docs: Moves documentation to new repository. [\#800](https://github.com/ory/hydra/pull/800) ([aeneasr](https://github.com/aeneasr))
 - all: Updates license headers [\#793](https://github.com/ory/hydra/pull/793) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.11.7](https://github.com/ory/hydra/tree/v0.11.7) (2018-03-03)
@@ -1515,10 +1531,13 @@
 ## [v0.11.2](https://github.com/ory/hydra/tree/v0.11.2) (2018-01-22)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.11.1...v0.11.2)
 
+**Fixed bugs:**
+
+- client: Returns 404 only when policy allows getting a client [\#751](https://github.com/ory/hydra/pull/751) ([aeneasr](https://github.com/aeneasr))
+
 **Merged pull requests:**
 
 - oauth2: Protects consent flow against session fixation [\#754](https://github.com/ory/hydra/pull/754) ([aeneasr](https://github.com/aeneasr))
-- add a save way to get the ClusterURL and append to it [\#748](https://github.com/ory/hydra/pull/748) ([zepatrik](https://github.com/zepatrik))
 
 ## [v0.11.1](https://github.com/ory/hydra/tree/v0.11.1) (2018-01-18)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.11.0...v0.11.1)
@@ -1529,7 +1548,6 @@
 
 **Fixed bugs:**
 
-- client: Returns 404 only when policy allows getting a client [\#751](https://github.com/ory/hydra/pull/751) ([aeneasr](https://github.com/aeneasr))
 -  Resolves issues with pagination [\#750](https://github.com/ory/hydra/pull/750) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
@@ -1537,6 +1555,10 @@
 - Timezone Issue with new consent flow in 0.10? [\#735](https://github.com/ory/hydra/issues/735)
 - policies: change effect type from string to boolean [\#666](https://github.com/ory/hydra/issues/666)
 - cmd: `hydra connect --url` should work with and without trailing slash [\#650](https://github.com/ory/hydra/issues/650)
+
+**Merged pull requests:**
+
+- add a save way to get the ClusterURL and append to it [\#748](https://github.com/ory/hydra/pull/748) ([zepatrik](https://github.com/zepatrik))
 
 ## [v0.11.0](https://github.com/ory/hydra/tree/v0.11.0) (2018-01-08)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.10...v0.11.0)
@@ -1548,6 +1570,7 @@
 - oauth2: Print debug message to logs and evaluate transmitting it to clients too [\#715](https://github.com/ory/hydra/issues/715)
 - groups: Add ability to list all groups, not just by member [\#734](https://github.com/ory/hydra/pull/734) ([aeneasr](https://github.com/aeneasr))
 - sdk: Adds php registry dummy [\#733](https://github.com/ory/hydra/pull/733) ([aeneasr](https://github.com/aeneasr))
+- oauth2: Prints debug message to logs and evaluate transmitting it to clients too [\#727](https://github.com/ory/hydra/pull/727) ([aeneasr](https://github.com/aeneasr))
 - vendor: Adds offline\_access scope alias [\#724](https://github.com/ory/hydra/pull/724) ([aeneasr](https://github.com/aeneasr))
 
 **Fixed bugs:**
@@ -1578,7 +1601,6 @@
 **Fixed bugs:**
 
 - Misleading error message when using the SDK [\#686](https://github.com/ory/hydra/issues/686)
-- sdk/go: Resolves incorrect error message [\#713](https://github.com/ory/hydra/pull/713) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
 
@@ -1599,6 +1621,10 @@
 **Implemented enhancements:**
 
 - Reintroduce alpine based image with shell [\#703](https://github.com/ory/hydra/issues/703)
+
+**Fixed bugs:**
+
+- sdk/go: Resolves incorrect error message [\#713](https://github.com/ory/hydra/pull/713) ([aeneasr](https://github.com/aeneasr))
 
 **Merged pull requests:**
 
@@ -1673,7 +1699,6 @@
 - oauth2: Make sub explicit in the database [\#658](https://github.com/ory/hydra/issues/658)
 - oauth2: Add access control to token introspection endpoint [\#655](https://github.com/ory/hydra/issues/655)
 - all: make policy resource and action names configurable [\#640](https://github.com/ory/hydra/issues/640)
-- oauth2: Prints debug message to logs and evaluate transmitting it to clients too [\#727](https://github.com/ory/hydra/pull/727) ([aeneasr](https://github.com/aeneasr))
 - Subject field [\#674](https://github.com/ory/hydra/pull/674) ([aeneasr](https://github.com/aeneasr))
 - Add changelog [\#673](https://github.com/ory/hydra/pull/673) ([aeneasr](https://github.com/aeneasr))
 
@@ -1682,6 +1707,7 @@
 - oauth2: Token revokation should check client id before revoking tokens [\#676](https://github.com/ory/hydra/issues/676)
 - cli/policies: removing a policy subject adds the subject Instead [\#662](https://github.com/ory/hydra/issues/662)
 - jwk: Rename ES521 key generation algorithm to ES512 [\#651](https://github.com/ory/hydra/issues/651)
+- Hydra connect fails when the client secret contains "%" [\#631](https://github.com/ory/hydra/issues/631)
 - oauth2: Fixes clients being able to revoke any token [\#677](https://github.com/ory/hydra/pull/677) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
@@ -1698,7 +1724,6 @@
 - pkg: Adds test for LogError [\#682](https://github.com/ory/hydra/pull/682) ([aeneasr](https://github.com/aeneasr))
 - docs: Adds ACP best practices [\#681](https://github.com/ory/hydra/pull/681) ([aeneasr](https://github.com/aeneasr))
 - oauth2: Requires firewall check for introspecting access tokens [\#678](https://github.com/ory/hydra/pull/678) ([aeneasr](https://github.com/aeneasr))
-- Makes policy resource names prefixes configurable [\#672](https://github.com/ory/hydra/pull/672) ([aeneasr](https://github.com/aeneasr))
 - docs: Adds consent state machine [\#671](https://github.com/ory/hydra/pull/671) ([aeneasr](https://github.com/aeneasr))
 - docs: Make space optional in scope regex \(\#661\) [\#668](https://github.com/ory/hydra/pull/668) ([pnicolcev-tulipretail](https://github.com/pnicolcev-tulipretail))
 - Various minor fixes [\#667](https://github.com/ory/hydra/pull/667) ([aeneasr](https://github.com/aeneasr))
@@ -1738,7 +1763,7 @@
 - vendor: Upgraded ladon and dockertest versions [\#663](https://github.com/ory/hydra/pull/663) ([aeneasr](https://github.com/aeneasr))
 - pkg: Make low entropy RSA key generation explicit in function name [\#656](https://github.com/ory/hydra/pull/656) ([aeneasr](https://github.com/aeneasr))
 - docs: Update hydra versions [\#649](https://github.com/ory/hydra/pull/649) ([aeneasr](https://github.com/aeneasr))
-- cmd: require url-encoding of root client id and secret [\#641](https://github.com/ory/hydra/pull/641) ([aeneasr](https://github.com/aeneasr))
+- fix health link in docs [\#637](https://github.com/ory/hydra/pull/637) ([DallanQ](https://github.com/DallanQ))
 
 ## [v0.10.0-alpha.18](https://github.com/ory/hydra/tree/v0.10.0-alpha.18) (2017-11-06)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.17...v0.10.0-alpha.18)
@@ -1751,6 +1776,7 @@
 
 **Merged pull requests:**
 
+- Makes policy resource names prefixes configurable [\#672](https://github.com/ory/hydra/pull/672) ([aeneasr](https://github.com/aeneasr))
 - Fix static build [\#648](https://github.com/ory/hydra/pull/648) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.10.0-alpha.15](https://github.com/ory/hydra/tree/v0.10.0-alpha.15) (2017-11-06)
@@ -1767,6 +1793,10 @@
 
 - sql/postgres: wherever limit/offset is used, include ORDER BY clause [\#619](https://github.com/ory/hydra/issues/619)
 - oauth2: fix racy memory consent manager with RW mutex [\#600](https://github.com/ory/hydra/issues/600)
+
+**Merged pull requests:**
+
+- Fix racy behaviour in oauth2 memory managers [\#646](https://github.com/ory/hydra/pull/646) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.10.0-alpha.13](https://github.com/ory/hydra/tree/v0.10.0-alpha.13) (2017-11-06)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.11...v0.10.0-alpha.13)
@@ -1793,8 +1823,7 @@
 **Merged pull requests:**
 
 - Add license header to all source files [\#644](https://github.com/ory/hydra/pull/644) ([aeneasr](https://github.com/aeneasr))
-- fix health link in docs [\#637](https://github.com/ory/hydra/pull/637) ([DallanQ](https://github.com/DallanQ))
-- updated links to apiary as the old ones didn't work [\#626](https://github.com/ory/hydra/pull/626) ([abusaidm](https://github.com/abusaidm))
+- cmd: require url-encoding of root client id and secret [\#641](https://github.com/ory/hydra/pull/641) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.10.0-alpha.10](https://github.com/ory/hydra/tree/v0.10.0-alpha.10) (2017-10-26)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.9...v0.10.0-alpha.10)
@@ -1825,8 +1854,6 @@
 - tests: run database tests in parallel [\#632](https://github.com/ory/hydra/pull/632) ([aeneasr](https://github.com/aeneasr))
 - Use recommendations made from cryptopasta repository [\#630](https://github.com/ory/hydra/pull/630) ([aeneasr](https://github.com/aeneasr))
 - Support ES256 JWK Algo [\#628](https://github.com/ory/hydra/pull/628) ([joshuarubin](https://github.com/joshuarubin))
-- docs: fixed spelling and wording [\#624](https://github.com/ory/hydra/pull/624) ([abusaidm](https://github.com/abusaidm))
-- add ability to list all groups [\#612](https://github.com/ory/hydra/pull/612) ([joshuarubin](https://github.com/joshuarubin))
 
 ## [v0.9.16](https://github.com/ory/hydra/tree/v0.9.16) (2017-10-23)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.8...v0.9.16)
@@ -1838,8 +1865,11 @@
 
 **Merged pull requests:**
 
+- updated links to apiary as the old ones didn't work [\#626](https://github.com/ory/hydra/pull/626) ([abusaidm](https://github.com/abusaidm))
 - docs: updated hydra version in the tutorial to v0.10.0-alpha.8 and consent app to v0.10.0-alpha.9 [\#625](https://github.com/ory/hydra/pull/625) ([abusaidm](https://github.com/abusaidm))
+- docs: fixed spelling and wording [\#624](https://github.com/ory/hydra/pull/624) ([abusaidm](https://github.com/abusaidm))
 - docs: fix bash command and version used in tutorial [\#622](https://github.com/ory/hydra/pull/622) ([abusaidm](https://github.com/abusaidm))
+- add ability to list all groups [\#612](https://github.com/ory/hydra/pull/612) ([joshuarubin](https://github.com/joshuarubin))
 
 ## [v0.10.0-alpha.8](https://github.com/ory/hydra/tree/v0.10.0-alpha.8) (2017-10-18)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.9.15...v0.10.0-alpha.8)
@@ -1851,7 +1881,6 @@
 
 **Merged pull requests:**
 
-- Fix racy behaviour in oauth2 memory managers [\#646](https://github.com/ory/hydra/pull/646) ([aeneasr](https://github.com/aeneasr))
 - cmd/server: SQLConnection should load SQLRequestManager [\#618](https://github.com/ory/hydra/pull/618) ([aeneasr](https://github.com/aeneasr))
 - Clean up helpers and increase test coverage [\#611](https://github.com/ory/hydra/pull/611) ([aeneasr](https://github.com/aeneasr))
 - sdk: format js sdk and remove mock tests [\#609](https://github.com/ory/hydra/pull/609) ([aeneasr](https://github.com/aeneasr))
@@ -1862,7 +1891,6 @@
 **Merged pull requests:**
 
 - Support dep [\#606](https://github.com/ory/hydra/pull/606) ([joshuarubin](https://github.com/joshuarubin))
-- README.md: hydra container doesn't include bash [\#548](https://github.com/ory/hydra/pull/548) ([srenatus](https://github.com/srenatus))
 
 ## [v0.9.14](https://github.com/ory/hydra/tree/v0.9.14) (2017-10-06)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.0-alpha.7...v0.9.14)
@@ -1906,8 +1934,6 @@
 - warden: remove deprecated http manager [\#601](https://github.com/ory/hydra/pull/601) ([aeneasr](https://github.com/aeneasr))
 - docs: fix sdk links [\#599](https://github.com/ory/hydra/pull/599) ([aeneasr](https://github.com/aeneasr))
 - travis: re-add goveralls [\#598](https://github.com/ory/hydra/pull/598) ([aeneasr](https://github.com/aeneasr))
-- travis: fix binary building [\#596](https://github.com/ory/hydra/pull/596) ([aeneasr](https://github.com/aeneasr))
-- vendor: update various dependencies [\#579](https://github.com/ory/hydra/pull/579) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.10.0-alpha.1](https://github.com/ory/hydra/tree/v0.10.0-alpha.1) (2017-10-05)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.9.13...v0.10.0-alpha.1)
@@ -1929,6 +1955,7 @@
 
 **Merged pull requests:**
 
+- travis: fix binary building [\#596](https://github.com/ory/hydra/pull/596) ([aeneasr](https://github.com/aeneasr))
 - cmd/cli: typo Connection -\> Policy [\#592](https://github.com/ory/hydra/pull/592) ([ljagiello](https://github.com/ljagiello))
 - sdk: switch to swagger codegen sdk [\#585](https://github.com/ory/hydra/pull/585) ([aeneasr](https://github.com/aeneasr))
 - 0.10.0 [\#557](https://github.com/ory/hydra/pull/557) ([aeneasr](https://github.com/aeneasr))
@@ -1968,6 +1995,7 @@
 
 - health: disable TLS restriction for health check [\#587](https://github.com/ory/hydra/pull/587) ([aeneasr](https://github.com/aeneasr))
 - cmd: `token user` should use clusterurl instead of empty string [\#582](https://github.com/ory/hydra/pull/582) ([aeneasr](https://github.com/aeneasr))
+- vendor: update various dependencies [\#579](https://github.com/ory/hydra/pull/579) ([aeneasr](https://github.com/aeneasr))
 - Update to ladon 0.8.2 [\#570](https://github.com/ory/hydra/pull/570) ([olivierdeckers](https://github.com/olivierdeckers))
 - install.md: port typo [\#566](https://github.com/ory/hydra/pull/566) ([rnback](https://github.com/rnback))
 - oauth2: give meaningful hint when subject claim is empty [\#554](https://github.com/ory/hydra/pull/554) ([aeneasr](https://github.com/aeneasr))
@@ -1982,6 +2010,7 @@
 **Merged pull requests:**
 
 - warden: refresh tokens are no longer proof of authZ [\#553](https://github.com/ory/hydra/pull/553) ([aeneasr](https://github.com/aeneasr))
+- README.md: hydra container doesn't include bash [\#548](https://github.com/ory/hydra/pull/548) ([srenatus](https://github.com/srenatus))
 - docs: fix typo in tutorial [\#547](https://github.com/ory/hydra/pull/547) ([aeneasr](https://github.com/aeneasr))
 - cmd/token/user: fix auth and token-url mixup [\#546](https://github.com/ory/hydra/pull/546) ([aeneasr](https://github.com/aeneasr))
 - docs: update docs [\#545](https://github.com/ory/hydra/pull/545) ([aeneasr](https://github.com/aeneasr))
@@ -2016,7 +2045,6 @@
 - oauth2: form-urldecode authorization basic header [\#537](https://github.com/ory/hydra/pull/537) ([aeneasr](https://github.com/aeneasr))
 - \[DOC\] Update "Build from source" section to actual state [\#534](https://github.com/ory/hydra/pull/534) ([dolbik](https://github.com/dolbik))
 - cmd/host: move status info to dedicated endpoint [\#533](https://github.com/ory/hydra/pull/533) ([aeneasr](https://github.com/aeneasr))
-- cmd: resolve issuer test issue [\#522](https://github.com/ory/hydra/pull/522) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.9.9](https://github.com/ory/hydra/tree/v0.9.9) (2017-06-17)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.9.8...v0.9.9)
@@ -2076,6 +2104,7 @@
 
 **Merged pull requests:**
 
+- cmd: resolve issuer test issue [\#522](https://github.com/ory/hydra/pull/522) ([aeneasr](https://github.com/aeneasr))
 - all: improve test exports [\#521](https://github.com/ory/hydra/pull/521) ([aeneasr](https://github.com/aeneasr))
 - docs: start writing faq from gitter [\#504](https://github.com/ory/hydra/pull/504) ([aeneasr](https://github.com/aeneasr))
 
@@ -2297,7 +2326,6 @@
 - Add example about securing the consent app [\#450](https://github.com/ory/hydra/pull/450) ([matteosuppo](https://github.com/matteosuppo))
 - Allow setting SkipTLSVerify Option value [\#448](https://github.com/ory/hydra/pull/448) ([faxal](https://github.com/faxal))
 - 0.8.0: Towards production friendliness [\#445](https://github.com/ory/hydra/pull/445) ([aeneasr](https://github.com/aeneasr))
-- Update README.md [\#409](https://github.com/ory/hydra/pull/409) ([joelpickup](https://github.com/joelpickup))
 
 ## [v0.7.13](https://github.com/ory/hydra/tree/v0.7.13) (2017-05-03)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.7.12...v0.7.13)
@@ -2368,6 +2396,7 @@
 - docs: resolve broken build instructions in readme - closes \#420 [\#421](https://github.com/ory/hydra/pull/421) ([aeneasr](https://github.com/aeneasr))
 - Dropping brackets in Create Client example [\#415](https://github.com/ory/hydra/pull/415) ([pbarker](https://github.com/pbarker))
 - Update bash command in tutorial [\#412](https://github.com/ory/hydra/pull/412) ([pbarker](https://github.com/pbarker))
+- Update README.md [\#409](https://github.com/ory/hydra/pull/409) ([joelpickup](https://github.com/joelpickup))
 - docs: changes apiary url to current version [\#407](https://github.com/ory/hydra/pull/407) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.7.9](https://github.com/ory/hydra/tree/v0.7.9) (2017-04-02)
@@ -2485,16 +2514,13 @@
 ## [v0.7.1](https://github.com/ory/hydra/tree/v0.7.1) (2016-12-30)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.7.0...v0.7.1)
 
-**Implemented enhancements:**
-
-- policy: provide rest endpoint for policy updates [\#305](https://github.com/ory/hydra/issues/305)
-
 ## [v0.7.0](https://github.com/ory/hydra/tree/v0.7.0) (2016-12-30)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.6.10...v0.7.0)
 
 **Implemented enhancements:**
 
 - Implement RemoveSubjectFromPolicy and RemoveResourceFromPolicy [\#336](https://github.com/ory/hydra/issues/336)
+- policy: provide rest endpoint for policy updates [\#305](https://github.com/ory/hydra/issues/305)
 - 0.7.0: SQL Migrate, Groups, Hardening [\#329](https://github.com/ory/hydra/pull/329) ([aeneasr](https://github.com/aeneasr))
 
 **Fixed bugs:**
@@ -2695,6 +2721,7 @@
 
 - cmd: hydra help host profiling typo [\#274](https://github.com/ory/hydra/issues/274)
 - cmd: hydra help host typos [\#272](https://github.com/ory/hydra/issues/272)
+- When invalid/expired token is used for /warden/allowed endpoint, status 500 is returned [\#262](https://github.com/ory/hydra/issues/262)
 
 **Closed issues:**
 
@@ -2730,10 +2757,6 @@
 ## [v0.5.2](https://github.com/ory/hydra/tree/v0.5.2) (2016-09-23)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.5.0...v0.5.2)
 
-**Implemented enhancements:**
-
-- client: add ability to update client [\#250](https://github.com/ory/hydra/issues/250)
-
 ## [v0.5.0](https://github.com/ory/hydra/tree/v0.5.0) (2016-09-22)
 [Full Changelog](https://github.com/ory/hydra/compare/v0.5.1...v0.5.0)
 
@@ -2744,6 +2767,7 @@
 
 - oauth2: include original request query parameters in the consent challenge [\#256](https://github.com/ory/hydra/issues/256)
 - Need a better health check for a load balancer [\#251](https://github.com/ory/hydra/issues/251)
+- client: add ability to update client [\#250](https://github.com/ory/hydra/issues/250)
 - oauth2: allow access token validation for public clients [\#245](https://github.com/ory/hydra/issues/245)
 - all: improve error messages regarding token validation [\#244](https://github.com/ory/hydra/issues/244)
 - all: resolve naming inconsistencies in jwk set names used in hydra [\#239](https://github.com/ory/hydra/issues/239)
@@ -2754,7 +2778,6 @@
 
 **Fixed bugs:**
 
-- When invalid/expired token is used for /warden/allowed endpoint, status 500 is returned [\#262](https://github.com/ory/hydra/issues/262)
 - docs: fix images in readme [\#261](https://github.com/ory/hydra/issues/261)
 - Bad HTML encoding of the scope parameter [\#259](https://github.com/ory/hydra/issues/259)
 - docs: images are broken [\#258](https://github.com/ory/hydra/issues/258)
@@ -2873,7 +2896,6 @@
 
 **Implemented enhancements:**
 
-- warden sdk should not make distinction between token and request [\#190](https://github.com/ory/hydra/issues/190)
 - 0.3.0 [\#195](https://github.com/ory/hydra/pull/195) ([aeneasr](https://github.com/aeneasr))
 
 **Fixed bugs:**
@@ -2885,6 +2907,7 @@
 
 **Implemented enhancements:**
 
+- warden sdk should not make distinction between token and request [\#190](https://github.com/ory/hydra/issues/190)
 - core scope should not be mandatory [\#189](https://github.com/ory/hydra/issues/189)
 - id token claims should be set by consent challenge `id\_token` claim [\#188](https://github.com/ory/hydra/issues/188)
 - provide default consent endpoint in hydra [\#185](https://github.com/ory/hydra/issues/185)
@@ -2916,6 +2939,7 @@
 - Resolve rethinkdb connection when idle [\#148](https://github.com/ory/hydra/pull/148) ([aeneasr](https://github.com/aeneasr))
 - all: resolve issues with the sdk and cli [\#142](https://github.com/ory/hydra/pull/142) ([aeneasr](https://github.com/aeneasr))
 - cli: add token validation [\#134](https://github.com/ory/hydra/pull/134) ([aeneasr](https://github.com/aeneasr))
+- Add wrapper library for HTTP Managers [\#130](https://github.com/ory/hydra/pull/130) ([faxal](https://github.com/faxal))
 
 **Fixed bugs:**
 
@@ -2970,7 +2994,6 @@
 **Implemented enhancements:**
 
 - Connect to rethinkdb over SSL with self-signed certificate [\#114](https://github.com/ory/hydra/issues/114)
-- CLI should have `-dry` option to show what the HTTP request looks like [\#99](https://github.com/ory/hydra/issues/99)
 
 **Fixed bugs:**
 
@@ -3013,6 +3036,7 @@
 
 **Implemented enhancements:**
 
+- CLI should have `-dry` option to show what the HTTP request looks like [\#99](https://github.com/ory/hydra/issues/99)
 - Add offline scope for refresh tokens [\#97](https://github.com/ory/hydra/issues/97)
 - extend jwk cert store [\#92](https://github.com/ory/hydra/issues/92)
 - Creating clients with predefined credentials [\#91](https://github.com/ory/hydra/issues/91)
@@ -3021,7 +3045,6 @@
 - Update GoRethink imports [\#78](https://github.com/ory/hydra/issues/78)
 - link exemplary policies in the docs [\#75](https://github.com/ory/hydra/issues/75)
 - support SAML in addition to OAuth2 [\#29](https://github.com/ory/hydra/issues/29)
-- Add wrapper library for HTTP Managers [\#130](https://github.com/ory/hydra/pull/130) ([faxal](https://github.com/faxal))
 - 0.1-beta2 [\#90](https://github.com/ory/hydra/pull/90) ([aeneasr](https://github.com/aeneasr))
 - vendor: switch to versioned gorethink api [\#81](https://github.com/ory/hydra/pull/81) ([aeneasr](https://github.com/aeneasr))
 

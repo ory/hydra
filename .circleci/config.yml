@@ -485,7 +485,6 @@ workflows:
           requires:
             - test
             - format
-            - release-docs
           filters:
             tags:
               only: /.*/

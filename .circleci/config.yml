@@ -346,7 +346,14 @@ jobs:
       - checkout
       - run: gem install github_changelog_generator -v 1.14.3
       - run: sudo npm i -g doctoc
-      - run: github_changelog_generator -u ory -p hydra -o CHANGELOG.md --token $GITHUB_TOKEN
+      - restore_cache:
+          keys:
+            - changelog-v1
+      - run: github_changelog_generator -u ory -p hydra -o CHANGELOG.md --token $GITHUB_TOKEN --cache-file /tmp/github_changelog_generator
+      - save_cache:
+          key: changelog-v1
+          paths:
+            - "/tmp/github_changelog_generator"
       - run: doctoc CHANGELOG.md
       - run: git config --global user.email "office+ci@ory.sh"
       - run: git config --global user.name "ORY Continuous Integration"
@@ -478,7 +485,6 @@ workflows:
           requires:
             - test
             - format
-            - release-sdk
           filters:
             tags:
               only: /.*/

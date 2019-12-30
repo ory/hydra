@@ -609,7 +609,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 }
 
 func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject)
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return nil, err
 	}
@@ -631,7 +631,7 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 }
 
 func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, subject, sid string) error {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return err
 	}

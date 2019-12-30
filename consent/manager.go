@@ -61,8 +61,8 @@ type Manager interface {
 	CreateForcedObfuscatedLoginSession(ctx context.Context, session *ForcedObfuscatedLoginSession) error
 	GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedLoginSession, error)
 
-	ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error)
-	ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error)
+	ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
+	ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
 
 	CreateLogoutRequest(ctx context.Context, request *LogoutRequest) error
 	GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error)

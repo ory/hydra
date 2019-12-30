@@ -319,12 +319,21 @@ jobs:
       - run: ./test/e2e/circle-ci.bash plugin
       - run: ./test/e2e/circle-ci.bash plugin-jwt
 
-  release-npm:
+  release-sdk:
     docker:
-      - image: circleci/node:8.9.3
+      - image: circleci/openjdk:10-jdk-node
     working_directory: ~/hydra
     steps:
       - checkout
+      - run: make sdk
+      - run: git config --global user.email "office+ci@ory.sh"
+      - run: git config --global user.name "ORY Continuous Integration"
+      - run: git pull -ff
+      - run: |
+          git commit -a -m "sdk: Update code-generated SDKs $(git describe --tags) [ci skip]"
+      - run: git remote rm origin
+      - run: git remote add origin https://arekkas:$GITHUB_TOKEN@github.com/ory/hydra.git
+      - run: git push origin HEAD:master
       - run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run: |
           npm version -f --no-git-tag-version $CIRCLE_TAG
@@ -339,9 +348,10 @@ jobs:
       - run: sudo npm i -g doctoc
       - run: github_changelog_generator -u ory -p hydra -o CHANGELOG.md --token $GITHUB_TOKEN
       - run: doctoc CHANGELOG.md
-      - run: git config --global user.email "circleci@ory.am"
+      - run: git config --global user.email "office+ci@ory.sh"
       - run: git config --global user.name "ORY Continuous Integration"
       - run: git add CHANGELOG.md
+      - run: git pull -ff
       - run: |
           git commit -m "docs: Incorporates changes from version $(git describe --tags) [ci skip]" -- CHANGELOG.md
       - run: git remote rm origin
@@ -354,7 +364,7 @@ jobs:
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
-      - run: git config --global user.email "hi@ory.am"
+      - run: git config --global user.email "office+ci@ory.sh"
       - run: git config --global user.name "ORY Continuous Integration"
       - run: "git clone https://arekkas:$DOCS_TOKEN_PUSH@github.com/ory/docs.git ../docs"
       - run: "cp ./docs/api.swagger.json ../docs/apis/hydra.json"
@@ -456,7 +466,7 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-      - release-npm:
+      - release-sdk:
           requires:
             - release
           filters:
@@ -468,6 +478,7 @@ workflows:
           requires:
             - test
             - format
+            - release-sdk
           filters:
             tags:
               only: /.*/

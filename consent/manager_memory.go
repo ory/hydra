@@ -459,13 +459,13 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 	return nil, errors.WithStack(x.ErrNotFound)
 }
 
-func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 
 	var rs []client.Client
 	for _, cr := range m.consentRequests {
-		if cr.Subject == subject && len(cr.Client.FrontChannelLogoutURI) > 0 {
+		if cr.Subject == subject && len(cr.Client.FrontChannelLogoutURI) > 0 && cr.LoginSessionID == sid {
 			rs = append(rs, *cr.Client)
 		}
 	}
@@ -473,7 +473,7 @@ func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx c
 	return rs, nil
 }
 
-func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 
@@ -481,7 +481,7 @@ func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx co
 
 	var rs []client.Client
 	for _, cr := range m.consentRequests {
-		if cr.Subject == subject && len(cr.Client.BackChannelLogoutURI) > 0 && !clientsMap[cr.Client.GetID()] {
+		if cr.Subject == subject && len(cr.Client.BackChannelLogoutURI) > 0 && !clientsMap[cr.Client.GetID()] && cr.LoginSessionID == sid {
 			rs = append(rs, *cr.Client)
 			clientsMap[cr.Client.GetID()] = true
 		}

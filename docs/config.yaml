@@ -141,7 +141,7 @@ serve:
   # admin controls the admin daemon serving admin API endpoints like /jwk, /client, ...
   admin:
     # The port to listen on. Defaults to 4445
-    port: 4444
+    port: 4445
     # The interface or unix socket ORY Hydra should listen and handle administrative API requests on.
     # Use the prefix "unix:" to specify a path to a unix socket.
     # Leave empty to listen on all interfaces.

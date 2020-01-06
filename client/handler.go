@@ -31,7 +31,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/pagination"
-	"github.com/ory/x/randx"
 )
 
 type Handler struct {
@@ -87,12 +86,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	}
 
 	if len(c.Secret) == 0 {
-		secret, err := randx.RuneSequence(12, []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-.~"))
+		secretb, err := x.GenerateSecret(26)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, errors.WithStack(err))
 			return
 		}
-		c.Secret = string(secret)
+		c.Secret = string(secretb)
 	}
 
 	if err := h.r.ClientValidator().Validate(&c); err != nil {

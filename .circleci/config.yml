@@ -1,7 +1,8 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+
+orbs:
+  changelog: ory/changelog@0.0.3
+
 jobs:
   format:
     docker:
@@ -415,8 +416,7 @@ jobs:
       - run: curl -sL https://git.io/goreleaser | bash
 
 workflows:
-  version: 2
-  "test, build, push, and deploy":
+  bdt:
     jobs:
       - format:
           filters:
@@ -481,7 +481,7 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-      - release-changelog:
+      - changelog/generate:
           requires:
             - test
             - format

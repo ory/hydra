@@ -89,35 +89,10 @@ gen: mocks sqlbin sdk
 sdk:
 		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x sdk
 		$$(go env GOPATH)/bin/swagger validate ./docs/api.swagger.json
-
-		rm -rf ./sdk/go/hydra/client
-		rm -rf ./sdk/go/hydra/models
-		rm -rf ./sdk/js/swagger
-		rm -rf ./sdk/php/swagger
-		rm -rf ./sdk/java
-
+		rm -rf ./sdk/go/hydra
 		$$(go env GOPATH)/bin/swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
-		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger
-		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l php -o sdk/php/ \
-			--invoker-package Hydra\\SDK --git-repo-id swagger --git-user-id ory --additional-properties "packagePath=swagger,description=Client for Hydra"
-		java -DapiTests=false -DmodelTests=false -jar scripts/swagger-codegen-cli-2.2.3.jar generate \
-			--input-spec ./docs/api.swagger.json \
-			--lang java \
-			--library resttemplate \
-			--group-id com.github.ory \
-			--artifact-id hydra-client-resttemplate \
-			--invoker-package com.github.ory.hydra \
-			--api-package com.github.ory.hydra.api \
-			--model-package com.github.ory.hydra.model \
-			--output ./sdk/java/hydra-client-resttemplate
-
 		make format
 
-		rm -f ./sdk/js/swagger/package.json
-		rm -rf ./sdk/js/swagger/test
-		rm -f ./sdk/php/swagger/composer.json ./sdk/php/swagger/phpunit.xml.dist
-		rm -rf ./sdk/php/swagger/test
-		rm -rf ./vendor
 
 .PHONY: install-stable
 install-stable:

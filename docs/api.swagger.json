@@ -1703,7 +1703,7 @@
             "oauth2": []
           }
         ],
-        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!",
+        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1818,7 +1818,7 @@
     },
     "/version": {
       "get": {
-        "description": "This endpoint returns the service version typically notated using semantic versioning.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
+        "description": "This endpoint returns the service version typically notated using semantic versioning.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
         "produces": [
           "application/json"
         ],
@@ -1839,6 +1839,329 @@
     }
   },
   "definitions": {
+    "AttributeTypeAndValue": {
+      "description": "AttributeTypeAndValue mirrors the ASN.1 structure of the same name in\nRFC 5280, Section 4.1.2.4.",
+      "type": "object",
+      "properties": {
+        "Type": {
+          "$ref": "#/definitions/ObjectIdentifier"
+        },
+        "Value": {
+          "type": "object"
+        }
+      },
+      "x-go-package": "crypto/x509/pkix"
+    },
+    "Certificate": {
+      "type": "object",
+      "title": "A Certificate represents an X.509 certificate.",
+      "properties": {
+        "AuthorityKeyId": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "BasicConstraintsValid": {
+          "description": "BasicConstraintsValid indicates whether IsCA, MaxPathLen,\nand MaxPathLenZero are valid.",
+          "type": "boolean"
+        },
+        "CRLDistributionPoints": {
+          "description": "CRL Distribution Points",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "DNSNames": {
+          "description": "Subject Alternate Name values. (Note that these values may not be valid\nif invalid values were contained within a parsed certificate. For\nexample, an element of DNSNames may not be a valid DNS domain name.)",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "EmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExcludedDNSDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExcludedEmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExcludedIPRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IPNet"
+          }
+        },
+        "ExcludedURIDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ExtKeyUsage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExtKeyUsage"
+          }
+        },
+        "Extensions": {
+          "description": "Extensions contains raw X.509 extensions. When parsing certificates,\nthis can be used to extract non-critical extensions that are not\nparsed by this package. When marshaling certificates, the Extensions\nfield is ignored, see ExtraExtensions.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Extension"
+          }
+        },
+        "ExtraExtensions": {
+          "description": "ExtraExtensions contains extensions to be copied, raw, into any\nmarshaled certificates. Values override any extensions that would\notherwise be produced based on the other fields. The ExtraExtensions\nfield is not populated when parsing certificates, see Extensions.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Extension"
+          }
+        },
+        "IPAddresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IP"
+          }
+        },
+        "IsCA": {
+          "type": "boolean"
+        },
+        "Issuer": {
+          "$ref": "#/definitions/Name"
+        },
+        "IssuingCertificateURL": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "KeyUsage": {
+          "$ref": "#/definitions/KeyUsage"
+        },
+        "MaxPathLen": {
+          "description": "MaxPathLen and MaxPathLenZero indicate the presence and\nvalue of the BasicConstraints' \"pathLenConstraint\".\n\nWhen parsing a certificate, a positive non-zero MaxPathLen\nmeans that the field was specified, -1 means it was unset,\nand MaxPathLenZero being true mean that the field was\nexplicitly set to zero. The case of MaxPathLen==0 with MaxPathLenZero==false\nshould be treated equivalent to -1 (unset).\n\nWhen generating a certificate, an unset pathLenConstraint\ncan be requested with either MaxPathLen == -1 or using the\nzero value for both MaxPathLen and MaxPathLenZero.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "MaxPathLenZero": {
+          "description": "MaxPathLenZero indicates that BasicConstraintsValid==true\nand MaxPathLen==0 should be interpreted as an actual\nmaximum path length of zero. Otherwise, that combination is\ninterpreted as MaxPathLen not being set.",
+          "type": "boolean"
+        },
+        "NotBefore": {
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "NotAfter"
+        },
+        "OCSPServer": {
+          "description": "RFC 5280, 4.2.2.1 (Authority Information Access)",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "PermittedDNSDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "PermittedDNSDomainsCritical": {
+          "description": "Name constraints",
+          "type": "boolean"
+        },
+        "PermittedEmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "PermittedIPRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IPNet"
+          }
+        },
+        "PermittedURIDomains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "PolicyIdentifiers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObjectIdentifier"
+          }
+        },
+        "PublicKey": {
+          "type": "object"
+        },
+        "PublicKeyAlgorithm": {
+          "$ref": "#/definitions/PublicKeyAlgorithm"
+        },
+        "Raw": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "RawIssuer": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "RawSubject": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "RawSubjectPublicKeyInfo": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "RawTBSCertificate": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "SerialNumber": {
+          "$ref": "#/definitions/Int"
+        },
+        "Signature": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "SignatureAlgorithm": {
+          "$ref": "#/definitions/SignatureAlgorithm"
+        },
+        "Subject": {
+          "$ref": "#/definitions/Name"
+        },
+        "SubjectKeyId": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        },
+        "URIs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/URL"
+          }
+        },
+        "UnhandledCriticalExtensions": {
+          "description": "UnhandledCriticalExtensions contains a list of extension IDs that\nwere not (fully) processed when parsing. Verify will fail if this\nslice is non-empty, unless verification is delegated to an OS\nlibrary which understands all the critical extensions.\n\nUsers can access these extensions using Extensions and can remove\nelements from this slice if they believe that they have been\nhandled.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObjectIdentifier"
+          }
+        },
+        "UnknownExtKeyUsage": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ObjectIdentifier"
+          }
+        },
+        "Version": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "x-go-package": "crypto/x509"
+    },
+    "ExtKeyUsage": {
+      "description": "Each of the ExtKeyUsage* constants define a unique action.",
+      "type": "integer",
+      "format": "int64",
+      "title": "ExtKeyUsage represents an extended set of actions that are valid for a given key.",
+      "x-go-package": "crypto/x509"
+    },
+    "Extension": {
+      "description": "Extension represents the ASN.1 structure of the same name. See RFC\n5280, section 4.2.",
+      "type": "object",
+      "properties": {
+        "Critical": {
+          "type": "boolean"
+        },
+        "Id": {
+          "$ref": "#/definitions/ObjectIdentifier"
+        },
+        "Value": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8"
+          }
+        }
+      },
+      "x-go-package": "crypto/x509/pkix"
+    },
+    "IP": {
+      "description": "Note that in this documentation, referring to an\nIP address as an IPv4 address or an IPv6 address\nis a semantic property of the address, not just the\nlength of the byte slice: a 16-byte slice can still\nbe an IPv4 address.",
+      "type": "array",
+      "title": "An IP is a single IP address, a slice of bytes.\nFunctions in this package accept either 4-byte (IPv4)\nor 16-byte (IPv6) slices as input.",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "net"
+    },
+    "IPMask": {
+      "type": "array",
+      "title": "An IP mask is an IP address.",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "net"
+    },
+    "IPNet": {
+      "type": "object",
+      "title": "An IPNet represents an IP network.",
+      "properties": {
+        "IP": {
+          "$ref": "#/definitions/IP"
+        },
+        "Mask": {
+          "$ref": "#/definitions/IPMask"
+        }
+      },
+      "x-go-package": "net"
+    },
+    "Int": {
+      "description": "Operations always take pointer arguments (*Int) rather\nthan Int values, and each unique Int value requires\nits own unique *Int pointer. To \"copy\" an Int value,\nan existing (or newly allocated) Int must be set to\na new value using the Int.Set method; shallow copies\nof Ints are not supported and may lead to errors.",
+      "type": "object",
+      "title": "An Int represents a signed multi-precision integer.\nThe zero value for an Int represents the value 0.",
+      "x-go-package": "math/big"
+    },
     "JSONWebKey": {
       "type": "object",
       "required": [
@@ -1960,6 +2283,65 @@
       "x-go-name": "swaggerJSONWebKeySet",
       "x-go-package": "gopkg.in/square/go-jose.v2"
     },
+    "KeyUsage": {
+      "description": "KeyUsage represents the set of actions that are valid for a given key. It's\na bitmap of the KeyUsage* constants.",
+      "type": "integer",
+      "format": "int64",
+      "x-go-package": "crypto/x509"
+    },
+    "Name": {
+      "description": "Name represents an X.509 distinguished name. This only includes the common\nelements of a DN. When parsing, all elements are stored in Names and\nnon-standard elements can be extracted from there. When marshaling, elements\nin ExtraNames are appended and override other values with the same OID.",
+      "type": "object",
+      "properties": {
+        "Country": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "OrganizationalUnit"
+        },
+        "ExtraNames": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AttributeTypeAndValue"
+          }
+        },
+        "Locality": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Province"
+        },
+        "Names": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AttributeTypeAndValue"
+          }
+        },
+        "SerialNumber": {
+          "type": "string",
+          "x-go-name": "CommonName"
+        },
+        "StreetAddress": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "PostalCode"
+        }
+      },
+      "x-go-package": "crypto/x509/pkix"
+    },
+    "ObjectIdentifier": {
+      "type": "array",
+      "title": "An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "x-go-package": "encoding/asn1"
+    },
     "PreviousConsentSession": {
       "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
@@ -1999,6 +2381,66 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/consent"
+    },
+    "PublicKeyAlgorithm": {
+      "type": "integer",
+      "format": "int64",
+      "x-go-package": "crypto/x509"
+    },
+    "RawMessage": {
+      "description": "It implements Marshaler and Unmarshaler and can\nbe used to delay JSON decoding or precompute a JSON encoding.",
+      "type": "array",
+      "title": "RawMessage is a raw encoded JSON value.",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "encoding/json"
+    },
+    "SignatureAlgorithm": {
+      "type": "integer",
+      "format": "int64",
+      "x-go-package": "crypto/x509"
+    },
+    "URL": {
+      "description": "The general form represented is:\n\n[scheme:][//[userinfo@]host][/]path[?query][#fragment]\n\nURLs that do not start with a slash after the scheme are interpreted as:\n\nscheme:opaque[?query][#fragment]\n\nNote that the Path field is stored in decoded form: /%47%6f%2f becomes /Go/.\nA consequence is that it is impossible to tell which slashes in the Path were\nslashes in the raw URL and which were %2f. This distinction is rarely important,\nbut when it is, the code should use RawPath, an optional field which only gets\nset if the default encoding is different from Path.\n\nURL's String method uses the EscapedPath method to obtain the path. See the\nEscapedPath method for more details.",
+      "type": "object",
+      "title": "A URL represents a parsed URL (technically, a URI reference).",
+      "properties": {
+        "ForceQuery": {
+          "type": "boolean"
+        },
+        "Fragment": {
+          "type": "string"
+        },
+        "Host": {
+          "type": "string"
+        },
+        "Opaque": {
+          "type": "string"
+        },
+        "Path": {
+          "type": "string"
+        },
+        "RawPath": {
+          "type": "string"
+        },
+        "RawQuery": {
+          "type": "string"
+        },
+        "Scheme": {
+          "type": "string"
+        },
+        "User": {
+          "$ref": "#/definitions/Userinfo"
+        }
+      },
+      "x-go-package": "net/url"
+    },
+    "Userinfo": {
+      "description": "The Userinfo type is an immutable encapsulation of username and\npassword details for a URL. An existing Userinfo value is guaranteed\nto have a username set (potentially empty, as allowed by RFC 2396),\nand optionally a password.",
+      "type": "object",
+      "x-go-package": "net/url"
     },
     "acceptConsentRequest": {
       "type": "object",
@@ -2482,12 +2924,7 @@
           "x-go-name": "LogoURI"
         },
         "metadata": {
-          "description": "Metadata is arbitrary data.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Metadata"
+          "$ref": "#/definitions/RawMessage"
         },
         "owner": {
           "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
@@ -3135,7 +3572,7 @@
       "authorizationUrl": "/oauth2/auth",
       "tokenUrl": "/oauth2/token",
       "scopes": {
-        "offline": "A scope required when requesting refresh tokens (alias for `offline`)",
+        "offline": "A scope required when requesting refresh tokens (alias for `offline_access`)",
         "offline_access": "A scope required when requesting refresh tokens",
         "openid": "Request an OpenID Connect ID Token"
       }

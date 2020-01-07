@@ -21,3 +21,4 @@ LICENSE.txt
 ./hydra
 !./hydra/
 hydra-login-consent-node
+./cypress/screenshots

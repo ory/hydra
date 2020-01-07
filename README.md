@@ -66,6 +66,17 @@ able to securely manage JSON Web Keys.
   - [Upgrading and Changelog](#upgrading-and-changelog)
   - [Command line documentation](#command-line-documentation)
   - [Develop](#develop)
+    - [Dependencies](#dependencies)
+    - [Workflows](#workflows)
+      - [Install Tools](#install-tools)
+    - [Formatting Code](#formatting-code)
+    - [Running Tests](#running-tests)
+      - [Short Tests](#short-tests)
+      - [Regular Tests](#regular-tests)
+    - [E2E Tests](#e2e-tests)
+    - [Making SQL Changes](#making-sql-changes)
+    - [Build Docker](#build-docker)
+    - [Run the Docker Compose quickstarts](#run-the-docker-compose-quickstarts)
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
 - [Blog posts & articles](#blog-posts--articles)
 
@@ -314,29 +325,145 @@ Run `hydra -h` or `hydra help`.
 
 ### Develop
 
-Developing with ORY Hydra is as easy as:
+We encourage all contributions and encourage you to read our [contribution guidelines](./CONTRIBUTING.md)
 
+#### Dependencies
+
+You need Go 1.13+ with `GO111MODULE=on` and (for the test suites):
+
+- Docker and Docker Compose
+- Makefile
+- NodeJS / npm
+
+It is possible to develop ORY Hydra on Windows, but please be aware that all guides assume a Unix shell like bash or zsh.
+
+#### Workflows
+
+##### Install Tools
+
+When cloning ORY Hydra, run `make tools`. It will download several required dependencies. If you haven't run the command
+in a while it's probably a good idea to run it again.
+
+#### Formatting Code
+
+You can format all code using `make format`. Our CI checks if your code is properly formatted.
+
+#### Running Tests
+
+There are three types of tests you can run:
+
+- Short tests (do not require a SQL database like PostgreSQL)
+- Regular tests (do require PostgreSQL, MySQL, CockroachDB)
+- End to end tests (do require databases and will use a test browser)
+
+##### Short Tests
+
+Short tests run fairly quickly. You can either test all of the code at once
+
+```shell script
+go test -short ./...
 ```
-go get -d -u github.com/ory/hydra
-cd $GOPATH/src/github.com/ory/hydra
-make init
-export GO111MODULE=on
-## With database
+
+or test just a specific module:
+
+```shell script
+cd client; go test -short .
+```
+
+##### Regular Tests
+
+Regular tests require a database set up. Our test suite is able to work with docker directly (using [ory/dockertest](https://github.com/ory/dockertest))
+but we encourage to use the Makefile instead. Using dockertest can bloat the number of Docker Images on your system
+and are quite slow. Instead we recommend doing:
+
+```shell script
 make test
-## Without database
-make quicktest
 ```
 
-Then run it with in-memory database:
+Please be aware that `make test` recreates the databases every time you run `make test`. This can be annoying if
+you are trying to fix something very specific and need the database tests all the time. In that case we
+suggest that you initialize the databases with:
+
+```shell script
+make resetdb
+export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
+export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable'
+export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
+```
+
+Then you can run `go test` as often as you'd like:
+
+```shell script
+go test ./...
+
+# or in a module:
+cd client; go test .
+```
+
+#### E2E Tests
+
+The E2E tests use [Cypress](https://www.cypress.io) to run full browser tests. You can execute these tests with:
 
 ```
-DSN=memory go run main.go serve all
+make e2e
 ```
 
-**Notes**
+The runner will not show the Browser window, as it runs in the CI Mode (background). That makes debugging these
+type of tests very difficult, but thankfully you can run the e2e test in the browser which helps with debugging! Just run:
 
-* We changed organization name from `ory-am` to `ory`. In order to keep backward compatibility, we did not rename Go packages.
-* You can ignore warnings similar to `package github.com/ory/hydra/cmd/server: case-insensitive import collision: "github.com/sirupsen/logrus" and "github.com/sirupsen/logrus"`.
+```shell script
+./test/e2e/circle-ci.bash memory --watch
+
+# Or for the JSON Web Token Access Token strategy:
+# ./test/e2e/circle-ci.bash memory-jwt --watch
+```
+
+or if you would like to test one of the databases:
+
+```shell script
+make resetdb
+export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
+export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable'
+export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
+
+# You can test against each individual database:
+./test/e2e/circle-ci.bash postgres --watch
+./test/e2e/circle-ci.bash memory --watch
+./test/e2e/circle-ci.bash mysql --watch
+# ...
+```
+
+Once you run the script, a Cypress window will appear. Hit the button "Run all Specs"!
+
+The code for these tests is located in [./cypress/integration](./cypress/integration) and
+[./cypress/support](./cypress/support) and
+[./cypress/helpers](./cypress/helpers). The website you're seeing is located in
+[./test/e2e/oauth2-client](./test/e2e/oauth2-client).
+
+#### Making SQL Changes
+
+We embed the SQL files into the binary. If you make changes to any `.sql` file, you need to run:
+
+```shell script
+make sqlbin
+```
+
+#### Build Docker
+
+You can build a development Docker Image using:
+
+```shell script
+make docker
+```
+
+#### Run the Docker Compose quickstarts
+
+If you wish to check your code changes against any of the docker-compose quickstart files, run:
+
+```shell script
+make docker
+docker compose -f quickstart.yml up # ....
+```
 
 ## Libraries and third-party projects
 

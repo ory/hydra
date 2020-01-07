@@ -24,23 +24,23 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/pointerx"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/sdk/go/hydra/client"
+	"github.com/ory/hydra/internal/httpclient/client"
 )
 
 var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.HandledLoginRequest{
+			v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")).WithBody(&models.AcceptLoginRequest{
 				Subject:     pointerx.String("user"),
 				Remember:    remember,
 				RememberFor: 0,
-				ACR:         "1",
+				Acr:         "1",
 			}))
 			require.NoError(t, err)
 			require.NotEmpty(t, v.Payload.RedirectTo)
@@ -52,11 +52,11 @@ var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t 
 var passAuthorization = func(apiClient *client.OryHydra, remember bool) func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 	return func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
-			v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")).WithBody(&models.HandledConsentRequest{
-				GrantedScope: []string{"scope-a"},
-				Remember:     remember,
-				RememberFor:  0,
-				Session: &models.ConsentRequestSessionData{
+			v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")).WithBody(&models.AcceptConsentRequest{
+				GrantScope:  []string{"scope-a"},
+				Remember:    remember,
+				RememberFor: 0,
+				Session: &models.ConsentRequestSession{
 					AccessToken: map[string]interface{}{"foo": "bar"},
 					IDToken:     map[string]interface{}{"bar": "baz"},
 				},

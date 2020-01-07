@@ -3,7 +3,7 @@ SHELL=/bin/bash -o pipefail
 .PHONY: tools
 tools:
 		npm i
-		go install github.com/ory/go-acc github.com/ory/x/tools/listx github.com/go-swagger/go-swagger/cmd/swagger github.com/go-bindata/go-bindata/go-bindata github.com/sqs/goreturns
+		go install github.com/ory/go-acc github.com/ory/x/tools/listx github.com/go-swagger/go-swagger/cmd/swagger github.com/go-bindata/go-bindata/go-bindata github.com/sqs/goreturns github.com/ory/sdk/swagutil
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
@@ -87,10 +87,12 @@ gen: mocks sqlbin sdk
 # Generates the SDKs
 .PHONY: sdk
 sdk:
-		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x sdk
+		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x internal/httpclient
+		$$(go env GOPATH)/bin/swagutil sanitize ./docs/api.swagger.json
 		$$(go env GOPATH)/bin/swagger validate ./docs/api.swagger.json
-		rm -rf ./sdk/go/hydra
-		$$(go env GOPATH)/bin/swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
+		rm -rf internal/httpclient
+		mkdir -p internal/httpclient
+		$$(go env GOPATH)/bin/swagger generate client -f ./docs/api.swagger.json -t internal/httpclient -A Ory_Hydra
 		make format
 
 

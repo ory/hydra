@@ -111,7 +111,6 @@
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Limit",
             "description": "The maximum amount of policies returned.",
             "name": "limit",
             "in": "query"
@@ -119,7 +118,6 @@
           {
             "type": "integer",
             "format": "int64",
-            "x-go-name": "Offset",
             "description": "The offset from where to start looking.",
             "name": "offset",
             "in": "query"
@@ -214,7 +212,6 @@
           {
             "uniqueItems": true,
             "type": "string",
-            "x-go-name": "ID",
             "description": "The id of the OAuth 2.0 Client.",
             "name": "id",
             "in": "path",
@@ -262,7 +259,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "ID",
             "name": "id",
             "in": "path",
             "required": true
@@ -312,7 +308,6 @@
           {
             "uniqueItems": true,
             "type": "string",
-            "x-go-name": "ID",
             "description": "The id of the OAuth 2.0 Client.",
             "name": "id",
             "in": "path",
@@ -413,7 +408,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -467,7 +461,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -528,7 +521,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -589,7 +581,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -642,7 +633,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "KID",
             "description": "The kid of the desired key",
             "name": "kid",
             "in": "path",
@@ -650,7 +640,6 @@
           },
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -698,7 +687,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "KID",
             "description": "The kid of the desired key",
             "name": "kid",
             "in": "path",
@@ -706,7 +694,6 @@
           },
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -767,7 +754,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "KID",
             "description": "The kid of the desired key",
             "name": "kid",
             "in": "path",
@@ -775,7 +761,6 @@
           },
           {
             "type": "string",
-            "x-go-name": "Set",
             "description": "The set",
             "name": "set",
             "in": "path",
@@ -880,7 +865,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "consent_challenge",
             "in": "query",
             "required": true
@@ -935,7 +919,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "consent_challenge",
             "in": "query",
             "required": true
@@ -991,7 +974,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "consent_challenge",
             "in": "query",
             "required": true
@@ -1047,7 +1029,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "login_challenge",
             "in": "query",
             "required": true
@@ -1108,7 +1089,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "login_challenge",
             "in": "query",
             "required": true
@@ -1170,7 +1150,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "login_challenge",
             "in": "query",
             "required": true
@@ -1229,7 +1208,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "logout_challenge",
             "in": "query",
             "required": true
@@ -1275,7 +1253,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "logout_challenge",
             "in": "query",
             "required": true
@@ -1321,7 +1298,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Challenge",
             "name": "logout_challenge",
             "in": "query",
             "required": true
@@ -1374,7 +1350,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Subject",
             "name": "subject",
             "in": "query",
             "required": true
@@ -1424,7 +1399,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Subject",
             "description": "The subject (Subject) who's consent sessions should be deleted.",
             "name": "subject",
             "in": "query",
@@ -1432,7 +1406,6 @@
           },
           {
             "type": "string",
-            "x-go-name": "Client",
             "description": "If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID",
             "name": "client",
             "in": "query"
@@ -1484,7 +1457,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Subject",
             "name": "subject",
             "in": "query",
             "required": true
@@ -1587,7 +1559,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Token",
             "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\"\nvalue returned.",
             "name": "token",
             "in": "formData",
@@ -1595,7 +1566,6 @@
           },
           {
             "type": "string",
-            "x-go-name": "Scope",
             "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.",
             "name": "scope",
             "in": "formData"
@@ -1649,7 +1619,6 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "Token",
             "name": "token",
             "in": "formData",
             "required": true
@@ -1722,32 +1691,27 @@
         "parameters": [
           {
             "type": "string",
-            "x-go-name": "GrantType",
             "name": "grant_type",
             "in": "formData",
             "required": true
           },
           {
             "type": "string",
-            "x-go-name": "Code",
             "name": "code",
             "in": "formData"
           },
           {
             "type": "string",
-            "x-go-name": "RefreshToken",
             "name": "refresh_token",
             "in": "formData"
           },
           {
             "type": "string",
-            "x-go-name": "RedirectURI",
             "name": "redirect_uri",
             "in": "formData"
           },
           {
             "type": "string",
-            "x-go-name": "ClientID",
             "name": "client_id",
             "in": "formData"
           }
@@ -1838,7 +1802,7 @@
       }
     }
   },
-  "definitions": {
+  "definitions": {"UUID":{"type": "string", "format": "uuid4"},
     "JSONWebKey": {
       "type": "object",
       "required": [
@@ -1851,80 +1815,65 @@
         "alg": {
           "description": "The \"alg\" (algorithm) parameter identifies the algorithm intended for\nuse with the key.  The values used should either be registered in the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.",
           "type": "string",
-          "x-go-name": "Alg",
           "example": "RS256"
         },
         "crv": {
           "type": "string",
-          "x-go-name": "Crv",
           "example": "P-256"
         },
         "d": {
           "type": "string",
-          "x-go-name": "D",
           "example": "T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE"
         },
         "dp": {
           "type": "string",
-          "x-go-name": "Dp",
           "example": "G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0"
         },
         "dq": {
           "type": "string",
-          "x-go-name": "Dq",
           "example": "s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk"
         },
         "e": {
           "type": "string",
-          "x-go-name": "E",
           "example": "AQAB"
         },
         "k": {
           "type": "string",
-          "x-go-name": "K",
           "example": "GawgguFyGrWKav7AX4VKUg"
         },
         "kid": {
           "description": "The \"kid\" (key ID) parameter is used to match a specific key.  This\nis used, for instance, to choose among a set of keys within a JWK Set\nduring key rollover.  The structure of the \"kid\" value is\nunspecified.  When \"kid\" values are used within a JWK Set, different\nkeys within the JWK Set SHOULD use distinct \"kid\" values.  (One\nexample in which different keys might use the same \"kid\" value is if\nthey have different \"kty\" (key type) values but are considered to be\nequivalent alternatives by the application using them.)  The \"kid\"\nvalue is a case-sensitive string.",
           "type": "string",
-          "x-go-name": "Kid",
           "example": "1603dfe0af8f4596"
         },
         "kty": {
           "description": "The \"kty\" (key type) parameter identifies the cryptographic algorithm\nfamily used with the key, such as \"RSA\" or \"EC\". \"kty\" values should\neither be registered in the IANA \"JSON Web Key Types\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.  The \"kty\" value is a case-sensitive string.",
           "type": "string",
-          "x-go-name": "Kty",
           "example": "RSA"
         },
         "n": {
           "type": "string",
-          "x-go-name": "N",
           "example": "vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0"
         },
         "p": {
           "type": "string",
-          "x-go-name": "P",
           "example": "6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ"
         },
         "q": {
           "type": "string",
-          "x-go-name": "Q",
           "example": "0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ"
         },
         "qi": {
           "type": "string",
-          "x-go-name": "Qi",
           "example": "GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU"
         },
         "use": {
           "description": "Use (\"public key use\") identifies the intended use of\nthe public key. The \"use\" parameter is employed to indicate whether\na public key is used for encrypting data or verifying the signature\non data. Values are commonly \"sig\" (signature) or \"enc\" (encryption).",
           "type": "string",
-          "x-go-name": "Use",
           "example": "sig"
         },
         "x": {
           "type": "string",
-          "x-go-name": "X",
           "example": "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU"
         },
         "x5c": {
@@ -1932,33 +1881,25 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "X5c"
+          }
         },
         "y": {
           "type": "string",
-          "x-go-name": "Y",
           "example": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0"
         }
-      },
-      "x-go-name": "swaggerJSONWebKey",
-      "x-go-package": "github.com/ory/hydra/jwk"
+      }
     },
     "JSONWebKeySet": {
       "type": "object",
-      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/JSONWebKey"
-          },
-          "x-go-name": "Keys"
+          }
         }
-      },
-      "x-go-name": "swaggerJSONWebKeySet",
-      "x-go-package": "gopkg.in/square/go-jose.v2"
+      }
     },
     "PreviousConsentSession": {
       "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
@@ -1972,43 +1913,28 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "GrantedAudience"
+          }
         },
         "grant_scope": {
           "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "GrantedScope"
+          }
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
-          "type": "boolean",
-          "x-go-name": "Remember"
+          "type": "boolean"
         },
         "remember_for": {
           "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "RememberFor"
+          "format": "int64"
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
         }
-      },
-      "x-go-package": "github.com/ory/hydra/consent"
-    },
-    "RawMessage": {
-      "description": "It implements Marshaler and Unmarshaler and can\nbe used to delay JSON decoding or precompute a JSON encoding.",
-      "type": "array",
-      "title": "RawMessage is a raw encoded JSON value.",
-      "items": {
-        "type": "integer",
-        "format": "uint8"
-      },
-      "x-go-package": "encoding/json"
+      }
     },
     "acceptConsentRequest": {
       "type": "object",
@@ -2019,34 +1945,28 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "GrantedAudience"
+          }
         },
         "grant_scope": {
           "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "GrantedScope"
+          }
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
-          "type": "boolean",
-          "x-go-name": "Remember"
+          "type": "boolean"
         },
         "remember_for": {
           "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "RememberFor"
+          "format": "int64"
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
         }
-      },
-      "x-go-name": "HandledConsentRequest",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "acceptLoginRequest": {
       "type": "object",
@@ -2057,41 +1977,33 @@
       "properties": {
         "acr": {
           "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
-          "type": "string",
-          "x-go-name": "ACR"
+          "type": "string"
         },
         "context": {
           "description": "Context is an optional object which can hold arbitrary data. The data will be made available when fetching the\nconsent request under the \"context\" field. This is useful in scenarios where login and consent endpoints share\ndata.",
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          },
-          "x-go-name": "Context"
+          }
         },
         "force_subject_identifier": {
           "description": "ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID\nConnect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.\n\nPlease note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the\nsub claim in the OAuth 2.0 Introspection.\n\nPer default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself\nyou can use this field. Please note that setting this field has no effect if `pairwise` is not configured in\nORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's\nconfiguration).\n\nPlease also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies\nthat you have to compute this value on every authentication process (probably depending on the client ID or some\nother unique value).\n\nIf you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.",
-          "type": "string",
-          "x-go-name": "ForceSubjectIdentifier"
+          "type": "string"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she\nwill not be asked to log in again.",
-          "type": "boolean",
-          "x-go-name": "Remember"
+          "type": "boolean"
         },
         "remember_for": {
           "description": "RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered for the duration of the browser session (using a session cookie).",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "RememberFor"
+          "format": "int64"
         },
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated.",
-          "type": "string",
-          "x-go-name": "Subject"
+          "type": "string"
         }
-      },
-      "x-go-name": "HandledLoginRequest",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "completedRequest": {
       "type": "object",
@@ -2099,12 +2011,9 @@
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
-          "type": "string",
-          "x-go-name": "RedirectTo"
+          "type": "string"
         }
-      },
-      "x-go-name": "RequestHandlerResponse",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "consentRequest": {
       "type": "object",
@@ -2112,13 +2021,11 @@
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
-          "type": "string",
-          "x-go-name": "ACR"
+          "type": "string"
         },
         "challenge": {
           "description": "Challenge is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
-          "type": "string",
-          "x-go-name": "Challenge"
+          "type": "string"
         },
         "client": {
           "$ref": "#/definitions/oAuth2Client"
@@ -2128,56 +2035,46 @@
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          },
-          "x-go-name": "Context"
+          }
         },
         "login_challenge": {
           "description": "LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate\na login and consent request in the login \u0026 consent app.",
-          "type": "string",
-          "x-go-name": "LoginChallenge"
+          "type": "string"
         },
         "login_session_id": {
           "description": "LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
-          "type": "string",
-          "x-go-name": "LoginSessionID"
+          "type": "string"
         },
         "oidc_context": {
           "$ref": "#/definitions/openIDConnectContext"
         },
         "request_url": {
           "description": "RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which\ninitiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but\nmight come in handy if you want to deal with additional request parameters.",
-          "type": "string",
-          "x-go-name": "RequestURL"
+          "type": "string"
         },
         "requested_access_token_audience": {
           "description": "RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "RequestedAudience"
+          }
         },
         "requested_scope": {
           "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "RequestedScope"
+          }
         },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
-          "type": "boolean",
-          "x-go-name": "Skip"
+          "type": "boolean"
         },
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope\nrequested by the OAuth 2.0 client.",
-          "type": "string",
-          "x-go-name": "Subject"
+          "type": "string"
         }
-      },
-      "x-go-name": "ConsentRequest",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "consentRequestSession": {
       "type": "object",
@@ -2188,20 +2085,16 @@
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          },
-          "x-go-name": "AccessToken"
+          }
         },
         "id_token": {
           "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!",
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          },
-          "x-go-name": "IDToken"
+          }
         }
-      },
-      "x-go-name": "ConsentRequestSessionData",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "flushInactiveOAuth2TokensRequest": {
       "type": "object",
@@ -2209,12 +2102,9 @@
         "notAfter": {
           "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "NotAfter"
+          "format": "date-time"
         }
-      },
-      "x-go-name": "FlushInactiveOAuth2TokensRequest",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      }
     },
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
@@ -2227,30 +2117,25 @@
         "debug": {
           "description": "Debug contains debug information. This is usually not available and has to be enabled.",
           "type": "string",
-          "x-go-name": "Debug",
           "example": "The database adapter was unable to find the element"
         },
         "error": {
           "description": "Name is the error name.",
           "type": "string",
-          "x-go-name": "Name",
           "example": "The requested resource could not be found"
         },
         "error_description": {
           "description": "Description contains further information on the nature of the error.",
           "type": "string",
-          "x-go-name": "Description",
           "example": "Object with ID 12345 does not exist"
         },
         "status_code": {
           "description": "Code represents the error status code (404, 403, 401, ...).",
           "type": "integer",
           "format": "int64",
-          "x-go-name": "Code",
           "example": 404
         }
-      },
-      "x-go-package": "github.com/ory/hydra"
+      }
     },
     "healthNotReadyStatus": {
       "type": "object",
@@ -2260,24 +2145,18 @@
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          },
-          "x-go-name": "Errors"
+          }
         }
-      },
-      "x-go-name": "swaggerNotReadyStatus",
-      "x-go-package": "github.com/ory/x/healthx"
+      }
     },
     "healthStatus": {
       "type": "object",
       "properties": {
         "status": {
           "description": "Status always contains \"ok\".",
-          "type": "string",
-          "x-go-name": "Status"
+          "type": "string"
         }
-      },
-      "x-go-name": "swaggerHealthStatus",
-      "x-go-package": "github.com/ory/x/healthx"
+      }
     },
     "jsonWebKeySetGeneratorRequest": {
       "type": "object",
@@ -2289,22 +2168,17 @@
       "properties": {
         "alg": {
           "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"",
-          "type": "string",
-          "x-go-name": "Algorithm"
+          "type": "string"
         },
         "kid": {
           "description": "The kid of the key to be created",
-          "type": "string",
-          "x-go-name": "KeyID"
+          "type": "string"
         },
         "use": {
           "description": "The \"use\" (public key use) parameter identifies the intended use of\nthe public key. The \"use\" parameter is employed to indicate whether\na public key is used for encrypting data or verifying the signature\non data. Valid values are \"enc\" and \"sig\".",
-          "type": "string",
-          "x-go-name": "Use"
+          "type": "string"
         }
-      },
-      "x-go-name": "createRequest",
-      "x-go-package": "github.com/ory/hydra/jwk"
+      }
     },
     "loginRequest": {
       "type": "object",
@@ -2312,8 +2186,7 @@
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
-          "type": "string",
-          "x-go-name": "Challenge"
+          "type": "string"
         },
         "client": {
           "$ref": "#/definitions/oAuth2Client"
@@ -2323,43 +2196,35 @@
         },
         "request_url": {
           "description": "RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which\ninitiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but\nmight come in handy if you want to deal with additional request parameters.",
-          "type": "string",
-          "x-go-name": "RequestURL"
+          "type": "string"
         },
         "requested_access_token_audience": {
           "description": "RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "RequestedAudience"
+          }
         },
         "requested_scope": {
           "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "RequestedScope"
+          }
         },
         "session_id": {
           "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
-          "type": "string",
-          "x-go-name": "SessionID"
+          "type": "string"
         },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.\n\nThis feature allows you to update / set session information.",
-          "type": "boolean",
-          "x-go-name": "Skip"
+          "type": "boolean"
         },
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope\nrequested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type\nwhen accepting the login request, or the request will fail.",
-          "type": "string",
-          "x-go-name": "Subject"
+          "type": "string"
         }
-      },
-      "x-go-name": "LoginRequest",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "logoutRequest": {
       "type": "object",
@@ -2367,27 +2232,21 @@
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
-          "type": "string",
-          "x-go-name": "RequestURL"
+          "type": "string"
         },
         "rp_initiated": {
           "description": "RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.",
-          "type": "boolean",
-          "x-go-name": "RPInitiated"
+          "type": "boolean"
         },
         "sid": {
           "description": "SessionID is the login session ID that was requested to log out.",
-          "type": "string",
-          "x-go-name": "SessionID"
+          "type": "string"
         },
         "subject": {
           "description": "Subject is the user for whom the logout was request.",
-          "type": "string",
-          "x-go-name": "Subject"
+          "type": "string"
         }
-      },
-      "x-go-name": "LogoutRequest",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "oAuth2Client": {
       "type": "object",
@@ -2398,76 +2257,63 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "AllowedCORSOrigins"
+          }
         },
         "audience": {
           "description": "Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits\nthe applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list\nof URLs. URLs MUST NOT contain whitespaces.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "Audience"
+          }
         },
         "backchannel_logout_session_required": {
           "description": "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout\nToken to identify the RP session with the OP when the backchannel_logout_uri is used.\nIf omitted, the default value is false.",
-          "type": "boolean",
-          "x-go-name": "BackChannelLogoutSessionRequired"
+          "type": "boolean"
         },
         "backchannel_logout_uri": {
           "description": "RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.",
-          "type": "string",
-          "x-go-name": "BackChannelLogoutURI"
+          "type": "string"
         },
         "client_id": {
           "description": "ClientID  is the id for this client.",
-          "type": "string",
-          "x-go-name": "ClientID"
+          "type": "string"
         },
         "client_name": {
           "description": "Name is the human-readable string name of the client to be presented to the\nend-user during authorization.",
-          "type": "string",
-          "x-go-name": "Name"
+          "type": "string"
         },
         "client_secret": {
           "description": "Secret is the client's secret. The secret will be included in the create request as cleartext, and then\nnever again. The secret is stored using BCrypt so it is impossible to recover it. Tell your users\nthat they need to write the secret down as it will not be made available again.",
-          "type": "string",
-          "x-go-name": "Secret"
+          "type": "string"
         },
         "client_secret_expires_at": {
           "description": "SecretExpiresAt is an integer holding the time at which the client\nsecret will expire or 0 if it will not expire. The time is\nrepresented as the number of seconds from 1970-01-01T00:00:00Z as\nmeasured in UTC until the date/time of expiration.\n\nThis feature is currently not supported and it's value will always\nbe set to 0.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "SecretExpiresAt"
+          "format": "int64"
         },
         "client_uri": {
           "description": "ClientURI is an URL string of a web page providing information about the client.\nIf present, the server SHOULD display this URL to the end-user in\na clickable fashion.",
-          "type": "string",
-          "x-go-name": "ClientURI"
+          "type": "string"
         },
         "contacts": {
           "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "Contacts"
+          }
         },
         "created_at": {
           "description": "CreatedAt returns the timestamp of the client's creation.",
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "CreatedAt"
+          "format": "date-time"
         },
         "frontchannel_logout_session_required": {
           "description": "Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be\nincluded to identify the RP session with the OP when the frontchannel_logout_uri is used.\nIf omitted, the default value is false.",
-          "type": "boolean",
-          "x-go-name": "FrontChannelLogoutSessionRequired"
+          "type": "boolean"
         },
         "frontchannel_logout_uri": {
           "description": "RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query\nparameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the\nrequest and to determine which of the potentially multiple sessions is to be logged out; if either is\nincluded, both MUST be.",
-          "type": "string",
-          "x-go-name": "FrontChannelLogoutURI"
+          "type": "string"
         },
         "grant_types": {
           "description": "GrantTypes is an array of grant types the client is allowed to use.",
@@ -2475,63 +2321,55 @@
           "pattern": "client_credentials|authorization_code|implicit|refresh_token",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "GrantTypes"
+          }
         },
         "jwks": {
           "$ref": "#/definitions/JSONWebKeySet"
         },
         "jwks_uri": {
           "description": "URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains\nthe signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the\nClient's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing\nand encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced\nJWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both\nsignatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used\nto provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST\nmatch those in the certificate.",
-          "type": "string",
-          "x-go-name": "JSONWebKeysURI"
+          "type": "string"
         },
         "logo_uri": {
           "description": "LogoURI is an URL string that references a logo for the client.",
-          "type": "string",
-          "x-go-name": "LogoURI"
+          "type": "string"
         },
         "metadata": {
-          "$ref": "#/definitions/RawMessage"
+          "description": "Metadata is arbitrary data.",
+          "type": "object"
         },
         "owner": {
           "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
-          "type": "string",
-          "x-go-name": "Owner"
+          "type": "string"
         },
         "policy_uri": {
           "description": "PolicyURI is a URL string that points to a human-readable privacy policy document\nthat describes how the deployment organization collects, uses,\nretains, and discloses personal data.",
-          "type": "string",
-          "x-go-name": "PolicyURI"
+          "type": "string"
         },
         "post_logout_redirect_uris": {
           "description": "Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the\npost_logout_redirect_uri parameter after a logout has been performed.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "PostLogoutRedirectURIs"
+          }
         },
         "redirect_uris": {
           "description": "RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "RedirectURIs"
+          }
         },
         "request_object_signing_alg": {
           "description": "JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects\nfrom this Client MUST be rejected, if not signed with this algorithm.",
-          "type": "string",
-          "x-go-name": "RequestObjectSigningAlgorithm"
+          "type": "string"
         },
         "request_uris": {
           "description": "Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the\ncontents of the files referenced by these URIs and not retrieve them at the time they are used in a request.\nOPs can require that request_uri values used be pre-registered with the require_request_uri_registration\ndiscovery parameter.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "RequestURIs"
+          }
         },
         "response_types": {
           "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
@@ -2539,49 +2377,39 @@
           "pattern": "id_token|code|token",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "ResponseTypes"
+          }
         },
         "scope": {
           "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
           "type": "string",
-          "pattern": "([a-zA-Z0-9\\.\\*]+\\s?)+",
-          "x-go-name": "Scope"
+          "pattern": "([a-zA-Z0-9\\.\\*]+\\s?)+"
         },
         "sector_identifier_uri": {
           "description": "URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a\nfile with a single JSON array of redirect_uri values.",
-          "type": "string",
-          "x-go-name": "SectorIdentifierURI"
+          "type": "string"
         },
         "subject_type": {
           "description": "SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a\nlist of the supported subject_type values for this server. Valid types include `pairwise` and `public`.",
-          "type": "string",
-          "x-go-name": "SubjectType"
+          "type": "string"
         },
         "token_endpoint_auth_method": {
           "description": "Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,\nclient_secret_basic, private_key_jwt, and none.",
-          "type": "string",
-          "x-go-name": "TokenEndpointAuthMethod"
+          "type": "string"
         },
         "tos_uri": {
           "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
-          "type": "string",
-          "x-go-name": "TermsOfServiceURI"
+          "type": "string"
         },
         "updated_at": {
           "description": "UpdatedAt returns the timestamp of the last update.",
           "type": "string",
-          "format": "date-time",
-          "x-go-name": "UpdatedAt"
+          "format": "date-time"
         },
         "userinfo_signed_response_alg": {
           "description": "JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT\n[JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims\nas a UTF-8 encoded JSON object using the application/json content-type.",
-          "type": "string",
-          "x-go-name": "UserinfoSignedResponseAlg"
+          "type": "string"
         }
-      },
-      "x-go-name": "Client",
-      "x-go-package": "github.com/ory/hydra/client"
+      }
     },
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
@@ -2593,114 +2421,91 @@
       "properties": {
         "active": {
           "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
-          "type": "boolean",
-          "x-go-name": "Active"
+          "type": "boolean"
         },
         "aud": {
           "description": "Audience contains a list of the token's intended audiences.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "Audience"
+          }
         },
         "client_id": {
           "description": "ClientID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
-          "type": "string",
-          "x-go-name": "ClientID"
+          "type": "string"
         },
         "exp": {
           "description": "Expires at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "ExpiresAt"
+          "format": "int64"
         },
         "ext": {
           "description": "Extra is arbitrary data set by the session.",
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          },
-          "x-go-name": "Extra"
+          }
         },
         "iat": {
           "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "IssuedAt"
+          "format": "int64"
         },
         "iss": {
           "description": "IssuerURL is a string representing the issuer of this token",
-          "type": "string",
-          "x-go-name": "Issuer"
+          "type": "string"
         },
         "nbf": {
           "description": "NotBefore is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token is not to be\nused before.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "NotBefore"
+          "format": "int64"
         },
         "obfuscated_subject": {
           "description": "ObfuscatedSubject is set when the subject identifier algorithm was set to \"pairwise\" during authorization.\nIt is the `sub` value of the ID Token that was issued.",
-          "type": "string",
-          "x-go-name": "ObfuscatedSubject"
+          "type": "string"
         },
         "scope": {
           "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
-          "type": "string",
-          "x-go-name": "Scope"
+          "type": "string"
         },
         "sub": {
           "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
-          "type": "string",
-          "x-go-name": "Subject"
+          "type": "string"
         },
         "token_type": {
           "description": "TokenType is the introspected token's type, for example `access_token` or `refresh_token`.",
-          "type": "string",
-          "x-go-name": "TokenType"
+          "type": "string"
         },
         "username": {
           "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
-          "type": "string",
-          "x-go-name": "Username"
+          "type": "string"
         }
-      },
-      "x-go-name": "Introspection",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      }
     },
     "oauth2TokenResponse": {
       "description": "The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
-          "type": "string",
-          "x-go-name": "AccessToken"
+          "type": "string"
         },
         "expires_in": {
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "ExpiresIn"
+          "format": "int64"
         },
         "id_token": {
-          "type": "string",
-          "x-go-name": "IdToken"
+          "type": "string"
         },
         "refresh_token": {
-          "type": "string",
-          "x-go-name": "RefreshToken"
+          "type": "string"
         },
         "scope": {
-          "type": "string",
-          "x-go-name": "Scope"
+          "type": "string"
         },
         "token_type": {
-          "type": "string",
-          "x-go-name": "TokenType"
+          "type": "string"
         }
-      },
-      "x-go-name": "swaggeroauth2TokenResponse",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      }
     },
     "oauthTokenResponse": {
       "description": "The token response",
@@ -2708,40 +2513,32 @@
       "properties": {
         "access_token": {
           "description": "The access token issued by the authorization server.",
-          "type": "string",
-          "x-go-name": "AccessToken"
+          "type": "string"
         },
         "expires_in": {
           "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "ExpiresIn"
+          "format": "int64"
         },
         "id_token": {
           "description": "To retrieve a refresh token request the id_token scope.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "IDToken"
+          "format": "int64"
         },
         "refresh_token": {
           "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
-          "type": "string",
-          "x-go-name": "RefreshToken"
+          "type": "string"
         },
         "scope": {
           "description": "The scope of the access token",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "Scope"
+          "format": "int64"
         },
         "token_type": {
           "description": "The type of the token issued",
-          "type": "string",
-          "x-go-name": "TokenType"
+          "type": "string"
         }
-      },
-      "x-go-name": "swaggerOAuthTokenResponse",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      }
     },
     "openIDConnectContext": {
       "type": "object",
@@ -2752,67 +2549,53 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "ACRValues"
+          }
         },
         "display": {
           "description": "Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User.\nThe defined values are:\npage: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode.\npopup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over.\ntouch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface.\nwap: The Authorization Server SHOULD display the authentication and consent UI consistent with a \"feature phone\" type display.\n\nThe Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display.",
-          "type": "string",
-          "x-go-name": "Display"
+          "type": "string"
         },
         "id_token_hint_claims": {
           "description": "IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the\nEnd-User's current or past authenticated session with the Client.",
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          },
-          "x-go-name": "IDTokenHintClaims"
+          }
         },
         "login_hint": {
           "description": "LoginHint hints about the login identifier the End-User might use to log in (if necessary).\nThis hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier)\nand then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a\nphone number in the format specified for the phone_number Claim. The use of this parameter is optional.",
-          "type": "string",
-          "x-go-name": "LoginHint"
+          "type": "string"
         },
         "ui_locales": {
           "description": "UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a\nspace-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value\n\"fr-CA fr en\" represents a preference for French as spoken in Canada, then French (without a region designation),\nfollowed by English (without a region designation). An error SHOULD NOT result if some or all of the requested\nlocales are not supported by the OpenID Provider.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "UILocales"
+          }
         }
-      },
-      "x-go-name": "OpenIDConnectContext",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "rejectRequest": {
       "type": "object",
       "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
-          "type": "string",
-          "x-go-name": "Name"
+          "type": "string"
         },
         "error_debug": {
-          "type": "string",
-          "x-go-name": "Debug"
+          "type": "string"
         },
         "error_description": {
-          "type": "string",
-          "x-go-name": "Description"
+          "type": "string"
         },
         "error_hint": {
-          "type": "string",
-          "x-go-name": "Hint"
+          "type": "string"
         },
         "status_code": {
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "Code"
+          "format": "int64"
         }
-      },
-      "x-go-name": "RequestDeniedError",
-      "x-go-package": "github.com/ory/hydra/consent"
+      }
     },
     "userinfoResponse": {
       "description": "The userinfo response",
@@ -2820,115 +2603,91 @@
       "properties": {
         "birthdate": {
           "description": "End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format. The year MAY be 0000, indicating that it is omitted. To represent only the year, YYYY format is allowed. Note that depending on the underlying platform's date related function, providing just year can result in varying month and day, so the implementers need to take this factor into account to correctly process the dates.",
-          "type": "string",
-          "x-go-name": "Birthdate"
+          "type": "string"
         },
         "email": {
           "description": "End-User's preferred e-mail address. Its value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax. The RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.",
-          "type": "string",
-          "x-go-name": "Email"
+          "type": "string"
         },
         "email_verified": {
           "description": "True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.",
-          "type": "boolean",
-          "x-go-name": "EmailVerified"
+          "type": "boolean"
         },
         "family_name": {
           "description": "Surname(s) or last name(s) of the End-User. Note that in some cultures, people can have multiple family names or no family name; all can be present, with the names being separated by space characters.",
-          "type": "string",
-          "x-go-name": "FamilyName"
+          "type": "string"
         },
         "gender": {
           "description": "End-User's gender. Values defined by this specification are female and male. Other values MAY be used when neither of the defined values are applicable.",
-          "type": "string",
-          "x-go-name": "Gender"
+          "type": "string"
         },
         "given_name": {
           "description": "Given name(s) or first name(s) of the End-User. Note that in some cultures, people can have multiple given names; all can be present, with the names being separated by space characters.",
-          "type": "string",
-          "x-go-name": "GivenName"
+          "type": "string"
         },
         "locale": {
           "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag. This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase, separated by a dash. For example, en-US or fr-CA. As a compatibility note, some implementations have used an underscore as the separator rather than a dash, for example, en_US; Relying Parties MAY choose to accept this locale syntax as well.",
-          "type": "string",
-          "x-go-name": "Locale"
+          "type": "string"
         },
         "middle_name": {
           "description": "Middle name(s) of the End-User. Note that in some cultures, people can have multiple middle names; all can be present, with the names being separated by space characters. Also note that in some cultures, middle names are not used.",
-          "type": "string",
-          "x-go-name": "MiddleName"
+          "type": "string"
         },
         "name": {
           "description": "End-User's full name in displayable form including all name parts, possibly including titles and suffixes, ordered according to the End-User's locale and preferences.",
-          "type": "string",
-          "x-go-name": "Name"
+          "type": "string"
         },
         "nickname": {
           "description": "Casual name of the End-User that may or may not be the same as the given_name. For instance, a nickname value of Mike might be returned alongside a given_name value of Michael.",
-          "type": "string",
-          "x-go-name": "Nickname"
+          "type": "string"
         },
         "phone_number": {
           "description": "End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400. If the phone number contains an extension, it is RECOMMENDED that the extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.",
-          "type": "string",
-          "x-go-name": "PhoneNumber"
+          "type": "string"
         },
         "phone_number_verified": {
           "description": "True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any extensions MUST be represented in RFC 3966 format.",
-          "type": "boolean",
-          "x-go-name": "PhoneNumberVerified"
+          "type": "boolean"
         },
         "picture": {
           "description": "URL of the End-User's profile picture. This URL MUST refer to an image file (for example, a PNG, JPEG, or GIF image file), rather than to a Web page containing an image. Note that this URL SHOULD specifically reference a profile photo of the End-User suitable for displaying when describing the End-User, rather than an arbitrary photo taken by the End-User.",
-          "type": "string",
-          "x-go-name": "Picture"
+          "type": "string"
         },
         "preferred_username": {
           "description": "Non-unique shorthand name by which the End-User wishes to be referred to at the RP, such as janedoe or j.doe. This value MAY be any valid JSON string including special characters such as @, /, or whitespace.",
-          "type": "string",
-          "x-go-name": "PreferredUsername"
+          "type": "string"
         },
         "profile": {
           "description": "URL of the End-User's profile page. The contents of this Web page SHOULD be about the End-User.",
-          "type": "string",
-          "x-go-name": "Profile"
+          "type": "string"
         },
         "sub": {
           "description": "Subject - Identifier for the End-User at the IssuerURL.",
-          "type": "string",
-          "x-go-name": "Subject"
+          "type": "string"
         },
         "updated_at": {
           "description": "Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.",
           "type": "integer",
-          "format": "int64",
-          "x-go-name": "UpdatedAt"
+          "format": "int64"
         },
         "website": {
           "description": "URL of the End-User's Web page or blog. This Web page SHOULD contain information published by the End-User or an organization that the End-User is affiliated with.",
-          "type": "string",
-          "x-go-name": "Website"
+          "type": "string"
         },
         "zoneinfo": {
           "description": "String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone. For example, Europe/Paris or America/Los_Angeles.",
-          "type": "string",
-          "x-go-name": "Zoneinfo"
+          "type": "string"
         }
-      },
-      "x-go-name": "swaggeruserinfoResponsePayload",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      }
     },
     "version": {
       "type": "object",
       "properties": {
         "version": {
           "description": "Version is the service's version.",
-          "type": "string",
-          "x-go-name": "Version"
+          "type": "string"
         }
-      },
-      "x-go-name": "swaggerVersion",
-      "x-go-package": "github.com/ory/x/healthx"
+      }
     },
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
@@ -2947,124 +2706,104 @@
         "authorization_endpoint": {
           "description": "URL of the OP's OAuth 2.0 Authorization Endpoint.",
           "type": "string",
-          "x-go-name": "AuthURL",
           "example": "https://playground.ory.sh/ory-hydra/public/oauth2/auth"
         },
         "backchannel_logout_session_supported": {
           "description": "Boolean value specifying whether the OP can pass a sid (session ID) Claim in the Logout Token to identify the RP\nsession with the OP. If supported, the sid Claim is also included in ID Tokens issued by the OP",
-          "type": "boolean",
-          "x-go-name": "BackChannelLogoutSessionSupported"
+          "type": "boolean"
         },
         "backchannel_logout_supported": {
           "description": "Boolean value specifying whether the OP supports back-channel logout, with true indicating support.",
-          "type": "boolean",
-          "x-go-name": "BackChannelLogoutSupported"
+          "type": "boolean"
         },
         "claims_parameter_supported": {
           "description": "Boolean value specifying whether the OP supports use of the claims parameter, with true indicating support.",
-          "type": "boolean",
-          "x-go-name": "ClaimsParameterSupported"
+          "type": "boolean"
         },
         "claims_supported": {
           "description": "JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "ClaimsSupported"
+          }
         },
         "end_session_endpoint": {
           "description": "URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.",
-          "type": "string",
-          "x-go-name": "EndSessionEndpoint"
+          "type": "string"
         },
         "frontchannel_logout_session_supported": {
           "description": "Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify\nthe RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also\nincluded in ID Tokens issued by the OP.",
-          "type": "boolean",
-          "x-go-name": "FrontChannelLogoutSessionSupported"
+          "type": "boolean"
         },
         "frontchannel_logout_supported": {
           "description": "Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support.",
-          "type": "boolean",
-          "x-go-name": "FrontChannelLogoutSupported"
+          "type": "boolean"
         },
         "grant_types_supported": {
           "description": "JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "GrantTypesSupported"
+          }
         },
         "id_token_signing_alg_values_supported": {
           "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "IDTokenSigningAlgValuesSupported"
+          }
         },
         "issuer": {
           "description": "URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.\nIf IssuerURL discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.",
           "type": "string",
-          "x-go-name": "Issuer",
           "example": "https://playground.ory.sh/ory-hydra/public/"
         },
         "jwks_uri": {
           "description": "URL of the OP's JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate\nsignatures from the OP. The JWK Set MAY also contain the Server's encryption key(s), which are used by RPs\nto encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use)\nparameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key's intended usage.\nAlthough some algorithms allow the same key to be used for both signatures and encryption, doing so is\nNOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of\nkeys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.",
           "type": "string",
-          "x-go-name": "JWKsURI",
           "example": "https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json"
         },
         "registration_endpoint": {
           "description": "URL of the OP's Dynamic Client Registration Endpoint.",
           "type": "string",
-          "x-go-name": "RegistrationEndpoint",
           "example": "https://playground.ory.sh/ory-hydra/admin/client"
         },
         "request_parameter_supported": {
           "description": "Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.",
-          "type": "boolean",
-          "x-go-name": "RequestParameterSupported"
+          "type": "boolean"
         },
         "request_uri_parameter_supported": {
           "description": "Boolean value specifying whether the OP supports use of the request_uri parameter, with true indicating support.",
-          "type": "boolean",
-          "x-go-name": "RequestURIParameterSupported"
+          "type": "boolean"
         },
         "require_request_uri_registration": {
           "description": "Boolean value specifying whether the OP requires any request_uri values used to be pre-registered\nusing the request_uris registration parameter.",
-          "type": "boolean",
-          "x-go-name": "RequireRequestURIRegistration"
+          "type": "boolean"
         },
         "response_modes_supported": {
           "description": "JSON array containing a list of the OAuth 2.0 response_mode values that this OP supports.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "ResponseModesSupported"
+          }
         },
         "response_types_supported": {
           "description": "JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID\nProviders MUST support the code, id_token, and the token id_token Response Type values.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "ResponseTypes"
+          }
         },
         "revocation_endpoint": {
           "description": "URL of the authorization server's OAuth 2.0 revocation endpoint.",
-          "type": "string",
-          "x-go-name": "RevocationEndpoint"
+          "type": "string"
         },
         "scopes_supported": {
           "description": "SON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST\nsupport the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "ScopesSupported"
+          }
         },
         "subject_types_supported": {
           "description": "JSON array containing a list of the Subject Identifier types that this OP supports. Valid types include\npairwise and public.",
@@ -3072,13 +2811,11 @@
           "items": {
             "type": "string"
           },
-          "x-go-name": "SubjectTypes",
           "example": "public, pairwise"
         },
         "token_endpoint": {
           "description": "URL of the OP's OAuth 2.0 Token Endpoint",
           "type": "string",
-          "x-go-name": "TokenURL",
           "example": "https://playground.ory.sh/ory-hydra/public/oauth2/token"
         },
         "token_endpoint_auth_methods_supported": {
@@ -3086,25 +2823,20 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "TokenEndpointAuthMethodsSupported"
+          }
         },
         "userinfo_endpoint": {
           "description": "URL of the OP's UserInfo Endpoint.",
-          "type": "string",
-          "x-go-name": "UserinfoEndpoint"
+          "type": "string"
         },
         "userinfo_signing_alg_values_supported": {
           "description": "JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "x-go-name": "UserinfoSigningAlgValuesSupported"
+          }
         }
-      },
-      "x-go-name": "WellKnown",
-      "x-go-package": "github.com/ory/hydra/oauth2"
+      }
     }
   },
   "responses": {

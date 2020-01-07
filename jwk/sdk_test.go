@@ -25,9 +25,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ory/hydra/sdk/go/hydra/client"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
@@ -56,10 +56,10 @@ func TestJWKSDK(t *testing.T) {
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
-			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo").WithBody(&models.CreateRequest{
-				Algorithm: pointerx.String("HS256"),
-				KeyID:     pointerx.String("key-bar"),
-				Use:       pointerx.String("sig"),
+			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo").WithBody(&models.JSONWebKeySetGeneratorRequest{
+				Alg: pointerx.String("HS256"),
+				Kid: pointerx.String("key-bar"),
+				Use: pointerx.String("sig"),
 			}))
 			require.NoError(t, err)
 			require.Len(t, resultKeys.Payload.Keys, 1)
@@ -68,7 +68,7 @@ func TestJWKSDK(t *testing.T) {
 			assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
 		})
 
-		var resultKeys *models.SwaggerJSONWebKeySet
+		var resultKeys *models.JSONWebKeySet
 		t.Run("GetJwkSetKey after create", func(t *testing.T) {
 			result, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
 			require.NoError(t, err)
@@ -103,9 +103,9 @@ func TestJWKSDK(t *testing.T) {
 
 	t.Run("JWK Set", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
-			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo2").WithBody(&models.CreateRequest{
-				Algorithm: pointerx.String("HS256"),
-				KeyID:     pointerx.String("key-bar"),
+			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo2").WithBody(&models.JSONWebKeySetGeneratorRequest{
+				Alg: pointerx.String("HS256"),
+				Kid: pointerx.String("key-bar"),
 			}))
 			require.NoError(t, err)
 

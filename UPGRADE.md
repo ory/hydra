@@ -139,6 +139,31 @@ Do you want the latest features and patches without work and hassle? Are you loo
 secure deployment with zero effort? We can run it for you! If you're interested,
 [contact us now](mailto:hi@ory.sh)!
 
+## 1.2.0
+
+This release focuses on a rework of the SDK pipeline. First of all, we have introduced new SDKs for all popular programming
+languages and published them on their respective package repositories:
+
+- [Python](https://pypi.org/project/ory-hydra-client/)
+- [PHP](https://packagist.org/packages/ory/hydra-client)
+- [Go](https://github.com/ory/hydra-client-go)
+- [NodeJS](https://www.npmjs.com/package/@oryd/hydra-client) (with TypeScript)
+- [Java](https://search.maven.org/artifact/sh.ory.hydra/hydra-client)
+- [Ruby](https://rubygems.org/gems/ory-hydra-client)
+
+The SDKs hosted in this repository (under ./sdk/...) have been completely removed. Please use only the SDKs from the
+above sources from now on as it will also remove several issues that were caused by the previous SDK pipeline.
+
+Unfortunately, there were breaking changes introduced by the new SDK generation:
+
+- Several structs and fields have been renamed in the Go SDK. However, nothing else changed so upgrading should be a matter of
+half an hour if you made extensive use of the SDK, or several minutes if just one or two methods are being used.
+- All other SDKs changed to `openapi-generator`, which is a better maintained generator that creates
+better code than the one previously used. This manifests in TypeScript definitions for the NodeJS SDK and
+several other goodies. We do not have a proper migration path for those, unfortunately.
+
+If you have issues with upgrading the SDK, please let us know in an issue on this repository!
+
 ## 1.1.0
 
 Several indices have been added to the SQL Migrations. There are no backwards incompatible changes in this release

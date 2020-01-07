@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/public"
+	"github.com/ory/hydra/internal/httpclient/client/public"
 	"github.com/ory/x/urlx"
 
 	"github.com/ory/hydra/internal"
@@ -38,8 +38,8 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 
 	"github.com/ory/fosite"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/oauth2"
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 	"github.com/ory/hydra/x"
 )
 

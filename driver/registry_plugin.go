@@ -21,7 +21,9 @@ type RegistryPlugin struct {
 var _ Registry = new(RegistryPlugin)
 
 func init() {
-	dbal.RegisterDriver(NewRegistryPlugin())
+	dbal.RegisterDriver(func() dbal.Driver {
+		return NewRegistryPlugin()
+	})
 }
 
 func NewRegistryPlugin() *RegistryPlugin {

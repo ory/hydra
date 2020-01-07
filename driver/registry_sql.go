@@ -32,7 +32,9 @@ var _ Registry = new(RegistrySQL)
 var multiSpace = regexp.MustCompile("\\s+")
 
 func init() {
-	dbal.RegisterDriver(NewRegistrySQL())
+	dbal.RegisterDriver(func() dbal.Driver {
+		return NewRegistrySQL()
+	})
 }
 
 type schemaCreator interface {

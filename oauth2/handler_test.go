@@ -34,8 +34,8 @@ import (
 
 	"github.com/go-openapi/strfmt"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
@@ -56,8 +56,8 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/hydra/client"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/oauth2"
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
 )
 
 var lifespan = time.Hour

@@ -28,9 +28,9 @@ import (
 
 	"github.com/ory/x/pointerx"
 
-	"github.com/ory/hydra/sdk/go/hydra/client"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/urlx"
 
 	"github.com/ory/hydra/x"
@@ -167,8 +167,8 @@ func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models
 
 func compareSDKLogoutRequest(t *testing.T, expected *LogoutRequest, got *models.LogoutRequest) {
 	assert.EqualValues(t, expected.Subject, got.Subject)
-	assert.EqualValues(t, expected.SessionID, got.SessionID)
-	assert.EqualValues(t, expected.SessionID, got.SessionID)
+	assert.EqualValues(t, expected.SessionID, got.Sid)
+	assert.EqualValues(t, expected.SessionID, got.Sid)
 	assert.EqualValues(t, expected.RequestURL, got.RequestURL)
-	assert.EqualValues(t, expected.RPInitiated, got.RPInitiated)
+	assert.EqualValues(t, expected.RPInitiated, got.RpInitiated)
 }

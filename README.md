@@ -435,6 +435,11 @@ export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslm
 
 Once you run the script, a Cypress window will appear. Hit the button "Run all Specs"!
 
+The code for these tests is located in [./cypress/integration](./cypress/integration) and
+[./cypress/support](./cypress/support) and
+[./cypress/helpers](./cypress/helpers). The website you're seeing is located in
+[./test/e2e/oauth2-client](./test/e2e/oauth2-client).
+
 #### Making SQL Changes
 
 We embed the SQL files into the binary. If you make changes to any `.sql` file, you need to run:

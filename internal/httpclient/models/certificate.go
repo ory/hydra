@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Certificate Certificate A Certificate represents an X.509 certificate.
+// Certificate Certificate Certificate A Certificate represents an X.509 certificate.
 // swagger:model Certificate
 type Certificate struct {
 
@@ -100,6 +100,7 @@ type Certificate struct {
 	MaxPathLenZero bool `json:"MaxPathLenZero,omitempty"`
 
 	// not before
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	NotBefore strfmt.DateTime `json:"NotBefore,omitempty"`

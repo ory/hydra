@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// IPMask IPMask An IP mask is an IP address.
+// IPMask IPMask IPMask An IP mask is an IP address.
 // swagger:model IPMask
 type IPMask []uint8
 

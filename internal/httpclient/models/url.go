@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// URL URL A URL represents a parsed URL (technically, a URI reference).
+// URL URL URL A URL represents a parsed URL (technically, a URI reference).
 //
 // The general form represented is:
 //

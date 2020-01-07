@@ -1804,7 +1804,7 @@
   },
   "definitions": {
     "AttributeTypeAndValue": {
-      "description": "AttributeTypeAndValue AttributeTypeAndValue mirrors the ASN.1 structure of the same name in\nRFC 5280, Section 4.1.2.4.",
+      "description": "AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue mirrors the ASN.1 structure of the same name in\nRFC 5280, Section 4.1.2.4.",
       "type": "object",
       "properties": {
         "Type": {
@@ -1818,7 +1818,7 @@
     },
     "Certificate": {
       "type": "object",
-      "title": "Certificate A Certificate represents an X.509 certificate.",
+      "title": "Certificate Certificate A Certificate represents an X.509 certificate.",
       "properties": {
         "AuthorityKeyId": {
           "description": "authority key Id",
@@ -1936,7 +1936,7 @@
           "type": "boolean"
         },
         "NotBefore": {
-          "description": "not before\nFormat: date-time",
+          "description": "not before\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2095,10 +2095,10 @@
       "description": "Each of the ExtKeyUsage* constants define a unique action.",
       "type": "integer",
       "format": "int64",
-      "title": "ExtKeyUsage ExtKeyUsage represents an extended set of actions that are valid for a given key."
+      "title": "ExtKeyUsage ExtKeyUsage ExtKeyUsage represents an extended set of actions that are valid for a given key."
     },
     "Extension": {
-      "description": "Extension Extension represents the ASN.1 structure of the same name. See RFC\n5280, section 4.2.",
+      "description": "Extension Extension Extension represents the ASN.1 structure of the same name. See RFC\n5280, section 4.2.",
       "type": "object",
       "properties": {
         "Critical": {
@@ -2121,7 +2121,7 @@
     "IP": {
       "description": "Note that in this documentation, referring to an\nIP address as an IPv4 address or an IPv6 address\nis a semantic property of the address, not just the\nlength of the byte slice: a 16-byte slice can still\nbe an IPv4 address.",
       "type": "array",
-      "title": "IP An IP is a single IP address, a slice of bytes.\nFunctions in this package accept either 4-byte (IPv4)\nor 16-byte (IPv6) slices as input.",
+      "title": "IP IP An IP is a single IP address, a slice of bytes.\nFunctions in this package accept either 4-byte (IPv4)\nor 16-byte (IPv6) slices as input.",
       "items": {
         "type": "integer",
         "format": "uint8"
@@ -2129,7 +2129,7 @@
     },
     "IPMask": {
       "type": "array",
-      "title": "IPMask An IP mask is an IP address.",
+      "title": "IPMask IPMask An IP mask is an IP address.",
       "items": {
         "type": "integer",
         "format": "uint8"
@@ -2137,7 +2137,7 @@
     },
     "IPNet": {
       "type": "object",
-      "title": "IPNet An IPNet represents an IP network.",
+      "title": "IPNet IPNet An IPNet represents an IP network.",
       "properties": {
         "IP": {
           "$ref": "#/definitions/IP"
@@ -2150,10 +2150,10 @@
     "Int": {
       "description": "Operations always take pointer arguments (*Int) rather\nthan Int values, and each unique Int value requires\nits own unique *Int pointer. To \"copy\" an Int value,\nan existing (or newly allocated) Int must be set to\na new value using the Int.Set method; shallow copies\nof Ints are not supported and may lead to errors.",
       "type": "object",
-      "title": "Int An Int represents a signed multi-precision integer.\nThe zero value for an Int represents the value 0."
+      "title": "Int Int An Int represents a signed multi-precision integer.\nThe zero value for an Int represents the value 0."
     },
     "JSONWebKey": {
-      "description": "JSONWebKey JSON web key",
+      "description": "JSONWebKey JSONWebKey JSON web key",
       "type": "object",
       "required": [
         "use",
@@ -2264,12 +2264,12 @@
       }
     },
     "KeyUsage": {
-      "description": "KeyUsage KeyUsage represents the set of actions that are valid for a given key. It's\na bitmap of the KeyUsage* constants.",
+      "description": "KeyUsage KeyUsage KeyUsage represents the set of actions that are valid for a given key. It's\na bitmap of the KeyUsage* constants.",
       "type": "integer",
       "format": "int64"
     },
     "Name": {
-      "description": "Name Name represents an X.509 distinguished name. This only includes the common\nelements of a DN. When parsing, all elements are stored in Names and\nnon-standard elements can be extracted from there. When marshaling, elements\nin ExtraNames are appended and override other values with the same OID.",
+      "description": "Name Name Name represents an X.509 distinguished name. This only includes the common\nelements of a DN. When parsing, all elements are stored in Names and\nnon-standard elements can be extracted from there. When marshaling, elements\nin ExtraNames are appended and override other values with the same OID.",
       "type": "object",
       "properties": {
         "Country": {
@@ -2315,14 +2315,14 @@
     },
     "ObjectIdentifier": {
       "type": "array",
-      "title": "ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.",
+      "title": "ObjectIdentifier ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.",
       "items": {
         "type": "integer",
         "format": "int64"
       }
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -2357,19 +2357,19 @@
       }
     },
     "PublicKeyAlgorithm": {
-      "description": "PublicKeyAlgorithm public key algorithm",
+      "description": "PublicKeyAlgorithm PublicKeyAlgorithm public key algorithm",
       "type": "integer",
       "format": "int64"
     },
     "SignatureAlgorithm": {
-      "description": "SignatureAlgorithm signature algorithm",
+      "description": "SignatureAlgorithm SignatureAlgorithm signature algorithm",
       "type": "integer",
       "format": "int64"
     },
     "URL": {
       "description": "The general form represented is:\n\n[scheme:][//[userinfo@]host][/]path[?query][#fragment]\n\nURLs that do not start with a slash after the scheme are interpreted as:\n\nscheme:opaque[?query][#fragment]\n\nNote that the Path field is stored in decoded form: /%47%6f%2f becomes /Go/.\nA consequence is that it is impossible to tell which slashes in the Path were\nslashes in the raw URL and which were %2f. This distinction is rarely important,\nbut when it is, the code should use RawPath, an optional field which only gets\nset if the default encoding is different from Path.\n\nURL's String method uses the EscapedPath method to obtain the path. See the\nEscapedPath method for more details.",
       "type": "object",
-      "title": "URL A URL represents a parsed URL (technically, a URI reference).",
+      "title": "URL URL A URL represents a parsed URL (technically, a URI reference).",
       "properties": {
         "ForceQuery": {
           "description": "force query",
@@ -2410,12 +2410,12 @@
     },
     "UUID": {"type": "string", "format": "uuid4"},
     "Userinfo": {
-      "description": "Userinfo The Userinfo type is an immutable encapsulation of username and\npassword details for a URL. An existing Userinfo value is guaranteed\nto have a username set (potentially empty, as allowed by RFC 2396),\nand optionally a password.",
+      "description": "Userinfo Userinfo The Userinfo type is an immutable encapsulation of username and\npassword details for a URL. An existing Userinfo value is guaranteed\nto have a username set (potentially empty, as allowed by RFC 2396),\nand optionally a password.",
       "type": "object"
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2447,7 +2447,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2494,7 +2494,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing consent request.",
+      "title": "ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2555,7 +2555,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2574,11 +2574,11 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
+      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
@@ -2587,7 +2587,7 @@
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "GenericError Error response",
+      "title": "GenericError GenericError Error response",
       "required": [
         "error"
       ],
@@ -2616,6 +2616,7 @@
       }
     },
     "healthNotReadyStatus": {
+      "description": "HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2628,6 +2629,7 @@
       }
     },
     "healthStatus": {
+      "description": "HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2637,7 +2639,7 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
+      "description": "JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
@@ -2661,7 +2663,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing login request.",
+      "title": "LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2707,7 +2709,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "Contains information about an ongoing logout request.",
+      "title": "LogoutRequest Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2729,7 +2731,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "description": "AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
@@ -2782,7 +2784,7 @@
           }
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2880,7 +2882,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2893,7 +2895,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2962,7 +2964,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "The Access Token Response",
+      "description": "Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -3062,7 +3064,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "RejectRequest The request payload used to accept a login or consent request.",
+      "title": "RejectRequest RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",
@@ -3088,7 +3090,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "The userinfo response",
+      "description": "UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -3171,6 +3173,7 @@
       }
     },
     "version": {
+      "description": "Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -3182,15 +3185,15 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown represents important OpenID Connect discovery metadata",
       "required": [
-        "issuer",
         "authorization_endpoint",
-        "token_endpoint",
+        "id_token_signing_alg_values_supported",
+        "issuer",
         "jwks_uri",
-        "subject_types_supported",
         "response_types_supported",
-        "id_token_signing_alg_values_supported"
+        "subject_types_supported",
+        "token_endpoint"
       ],
       "properties": {
         "authorization_endpoint": {

@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// IP IP An IP is a single IP address, a slice of bytes.
+// IP IP IP An IP is a single IP address, a slice of bytes.
 // Functions in this package accept either 4-byte (IPv4)
 // or 16-byte (IPv6) slices as input.
 //

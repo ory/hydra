@@ -369,83 +369,83 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-memory:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-postgres:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-mysql:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-cockroach:
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e-plugin:
-          filters:
-            tags:
-              only: /.*/
-      - benchmark:
-          # Avoids race conditions when pushing
-          requires:
-            - release
-            - sdk/release
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-      - release:
-          requires:
-            - test
-            - format
-            - test-e2e-memory
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
-            - test-e2e-plugin
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
-      - changelog/generate:
-          requires:
-            - test
-            - format
-            - sdk/generate
-            - test-e2e-memory
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
-            - test-e2e-plugin
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only: master
+#      - test-e2e-memory:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-e2e-postgres:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-e2e-mysql:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-e2e-cockroach:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-e2e-plugin:
+#          filters:
+#            tags:
+#              only: /.*/
+#      - benchmark:
+#          # Avoids race conditions when pushing
+#          requires:
+#            - release
+#            - sdk/release
+#          filters:
+#            tags:
+#              only: /.*/
+#            branches:
+#              ignore: /.*/
+#      - release:
+#          requires:
+#            - test
+#            - format
+#            - test-e2e-memory
+#            - test-e2e-postgres
+#            - test-e2e-mysql
+#            - test-e2e-cockroach
+#            - test-e2e-plugin
+#          filters:
+#            tags:
+#              only: /.*/
+#            branches:
+#              ignore: /.*/
+#      - changelog/generate:
+#          requires:
+#            - test
+#            - format
+#            - sdk/generate
+#            - test-e2e-memory
+#            - test-e2e-postgres
+#            - test-e2e-mysql
+#            - test-e2e-cockroach
+#            - test-e2e-plugin
+#          filters:
+#            tags:
+#              only: /.*/
+#            branches:
+#              only: master
       - sdk/generate:
           appname: Ory_Hydra
-          requires:
-            - test
-            - format
-            - test-e2e-memory
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
-            - test-e2e-plugin
-      - sdk/release:
-          requires:
-            - test
-            - format
-            - sdk/generate
-            - release
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
+#          requires:
+#            - test
+#            - format
+#            - test-e2e-memory
+#            - test-e2e-postgres
+#            - test-e2e-mysql
+#            - test-e2e-cockroach
+#            - test-e2e-plugin
+#      - sdk/release:
+#          requires:
+#            - test
+#            - format
+#            - sdk/generate
+#            - release
+#          filters:
+#            tags:
+#              only: /.*/
+#            branches:
+#              ignore: /.*/

@@ -5,12 +5,12 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.2
-	github.com/go-openapi/runtime v0.19.4
-	github.com/go-openapi/strfmt v0.19.2
-	github.com/go-openapi/swag v0.19.4
-	github.com/go-openapi/validate v0.19.2
+	github.com/go-openapi/runtime v0.19.5
+	github.com/go-openapi/strfmt v0.19.3
+	github.com/go-openapi/swag v0.19.5
+	github.com/go-openapi/validate v0.19.3
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/go-swagger/go-swagger v0.20.0
+	github.com/go-swagger/go-swagger v0.21.0
 	github.com/gobuffalo/packd v0.0.0-20190315124812-a385830c7fc0 // indirect
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobwas/glob v0.2.3
@@ -50,9 +50,9 @@ require (
 	github.com/uber/jaeger-client-go v2.16.0+incompatible
 	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
-	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
+	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20190816200558-6889da9d5479
+	golang.org/x/tools v0.0.0-20190907020128-2ca718005c18
 	gopkg.in/square/go-jose.v2 v2.3.1
 )
 

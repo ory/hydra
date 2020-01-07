@@ -431,13 +431,13 @@ workflows:
       - sdk/generate:
           appname: Ory_Hydra
           requires:
-            - test
-            - format
-            - test-e2e-memory
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
-            - test-e2e-plugin
+#            - test
+#            - format
+#            - test-e2e-memory
+#            - test-e2e-postgres
+#            - test-e2e-mysql
+#            - test-e2e-cockroach
+#            - test-e2e-plugin
       - sdk/release:
           requires:
             - test

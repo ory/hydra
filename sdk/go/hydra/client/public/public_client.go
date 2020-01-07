@@ -152,7 +152,7 @@ request entity-body.
 > Do not implement a client for this endpoint yourself. Use a library. There are many libraries
 > available for any programming language. You can find a list of libraries here: https://oauth.net/code/
 >
-> Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
+> Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
 */
 func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*Oauth2TokenOK, error) {
 	// TODO: Validate the params before sending

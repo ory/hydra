@@ -1703,7 +1703,7 @@
             "oauth2": []
           }
         ],
-        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do not the the Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!",
+        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1818,7 +1818,7 @@
     },
     "/version": {
       "get": {
-        "description": "This endpoint returns the service version typically notated using semantic versioning.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
+        "description": "This endpoint returns the service version typically notated using semantic versioning.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
         "produces": [
           "application/json"
         ],
@@ -1999,6 +1999,16 @@
         }
       },
       "x-go-package": "github.com/ory/hydra/consent"
+    },
+    "RawMessage": {
+      "description": "It implements Marshaler and Unmarshaler and can\nbe used to delay JSON decoding or precompute a JSON encoding.",
+      "type": "array",
+      "title": "RawMessage is a raw encoded JSON value.",
+      "items": {
+        "type": "integer",
+        "format": "uint8"
+      },
+      "x-go-package": "encoding/json"
     },
     "acceptConsentRequest": {
       "type": "object",
@@ -2482,12 +2492,7 @@
           "x-go-name": "LogoURI"
         },
         "metadata": {
-          "description": "Metadata is arbitrary data.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
-          "x-go-name": "Metadata"
+          "$ref": "#/definitions/RawMessage"
         },
         "owner": {
           "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
@@ -3135,7 +3140,7 @@
       "authorizationUrl": "/oauth2/auth",
       "tokenUrl": "/oauth2/token",
       "scopes": {
-        "offline": "A scope required when requesting refresh tokens (alias for `offline`)",
+        "offline": "A scope required when requesting refresh tokens (alias for `offline_access`)",
         "offline_access": "A scope required when requesting refresh tokens",
         "openid": "Request an OpenID Connect ID Token"
       }

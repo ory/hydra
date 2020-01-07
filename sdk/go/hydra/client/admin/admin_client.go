@@ -634,9 +634,6 @@ This endpoint returns the service version typically notated using semantic versi
 
 If the service supports TLS Edge Termination, this endpoint does not require the
 `X-Forwarded-Proto` header to be set.
-
-Be aware that if you are running multiple nodes of this service, the health status will never
-refer to the cluster state, only to a single instance.
 */
 func (a *Client) GetVersion(params *GetVersionParams) (*GetVersionOK, error) {
 	// TODO: Validate the params before sending

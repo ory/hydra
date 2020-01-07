@@ -409,9 +409,7 @@ make e2e
 ```
 
 The runner will not show the Browser window, as it runs in the CI Mode (background). That makes debugging these
-type of tests very difficult, but thankfully you can run the e2e test in the browser which helps with debugging!
-
-You can however open a browser window that helps with debugging! Just run:
+type of tests very difficult, but thankfully you can run the e2e test in the browser which helps with debugging! Just run:
 
 ```shell script
 ./test/e2e/circle-ci.bash memory --watch

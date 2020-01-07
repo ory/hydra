@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   changelog: ory/changelog@0.0.3
-  sdk: ory/sdk@0.0.5
+  sdk: ory/sdk@0.0.6
 
 jobs:
   format:
@@ -418,6 +418,11 @@ workflows:
             - test
             - format
             - sdk/generate
+            - test-e2e-memory
+            - test-e2e-postgres
+            - test-e2e-mysql
+            - test-e2e-cockroach
+            - test-e2e-plugin
           filters:
             tags:
               only: /.*/
@@ -428,6 +433,11 @@ workflows:
           requires:
             - test
             - format
+            - test-e2e-memory
+            - test-e2e-postgres
+            - test-e2e-mysql
+            - test-e2e-cockroach
+            - test-e2e-plugin
       - sdk/release:
           requires:
             - test

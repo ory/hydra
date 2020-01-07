@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   changelog: ory/changelog@0.0.3
-  sdk: ory/sdk@0.1.0
+  sdk: ory/sdk@0.1.2
 
 jobs:
   format:

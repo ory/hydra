@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// OauthTokenResponse The token response
+// OauthTokenResponse OauthTokenResponse The token response
 // swagger:model oauthTokenResponse
 type OauthTokenResponse struct {
 

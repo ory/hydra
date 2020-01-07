@@ -1802,14 +1802,19 @@
       }
     }
   },
-  "definitions": {"UUID":{"type": "string", "format": "uuid4"},
+  "definitions": {
+    "DateTime": {
+      "description": "DateTime is a time but it serializes to ISO8601 format with millis\nIt knows how to read 3 different variations of a RFC3339 date time.\nMost APIs we encounter want either millisecond or second precision times.\nThis just tries to make it worry-free.",
+      "type": "string",
+      "format": "date-time"
+    },
     "JSONWebKey": {
       "type": "object",
       "required": [
-        "use",
-        "kty",
+        "alg",
         "kid",
-        "alg"
+        "kty",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -1903,7 +1908,7 @@
       }
     },
     "PreviousConsentSession": {
-      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -1937,6 +1942,7 @@
         }
       }
     },
+    "UUID": {"type": "string", "format": "uuid4"},
     "acceptConsentRequest": {
       "type": "object",
       "title": "The request payload used to accept a consent request.",
@@ -2008,7 +2014,7 @@
     },
     "completedRequest": {
       "type": "object",
-      "title": "The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -2018,7 +2024,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing consent request.",
+      "title": "ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2079,7 +2085,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2098,10 +2104,11 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
+      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
@@ -2139,6 +2146,7 @@
       }
     },
     "healthNotReadyStatus": {
+      "description": "HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2160,6 +2168,7 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
+      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
@@ -2484,32 +2493,38 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "The Access Token Response",
+      "description": "Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
+          "description": "access token",
           "type": "string"
         },
         "expires_in": {
+          "description": "expires in",
           "type": "integer",
           "format": "int64"
         },
         "id_token": {
+          "description": "id token",
           "type": "string"
         },
         "refresh_token": {
+          "description": "refresh token",
           "type": "string"
         },
         "scope": {
+          "description": "scope",
           "type": "string"
         },
         "token_type": {
+          "description": "token type",
           "type": "string"
         }
       }
     },
     "oauthTokenResponse": {
-      "description": "The token response",
+      "description": "OauthTokenResponse The token response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2578,28 +2593,33 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "The request payload used to accept a login or consent request.",
+      "title": "RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
+          "description": "error",
           "type": "string"
         },
         "error_debug": {
+          "description": "error debug",
           "type": "string"
         },
         "error_description": {
+          "description": "error description",
           "type": "string"
         },
         "error_hint": {
+          "description": "error hint",
           "type": "string"
         },
         "status_code": {
+          "description": "status code",
           "type": "integer",
           "format": "int64"
         }
       }
     },
     "userinfoResponse": {
-      "description": "The userinfo response",
+      "description": "UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -2695,13 +2715,13 @@
       "type": "object",
       "title": "WellKnown represents important OpenID Connect discovery metadata",
       "required": [
-        "issuer",
         "authorization_endpoint",
-        "token_endpoint",
+        "id_token_signing_alg_values_supported",
+        "issuer",
         "jwks_uri",
-        "subject_types_supported",
         "response_types_supported",
-        "id_token_signing_alg_values_supported"
+        "subject_types_supported",
+        "token_endpoint"
       ],
       "properties": {
         "authorization_endpoint": {

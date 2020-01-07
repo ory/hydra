@@ -1896,7 +1896,6 @@
     },
     "JSONWebKeySet": {
       "type": "object",
-      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -1908,7 +1907,7 @@
       }
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -1945,7 +1944,7 @@
     "UUID": {"type": "string", "format": "uuid4"},
     "acceptConsentRequest": {
       "type": "object",
-      "title": "The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2024,7 +2023,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "ConsentRequest Contains information on an ongoing consent request.",
+      "title": "Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2085,7 +2084,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "ConsentRequestSession Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession ConsentRequestSession ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2104,11 +2103,10 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
           "format": "date-time"
         }
@@ -2146,7 +2144,7 @@
       }
     },
     "healthNotReadyStatus": {
-      "description": "HealthNotReadyStatus health not ready status",
+      "description": "HealthNotReadyStatus HealthNotReadyStatus HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2238,7 +2236,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "Contains information about an ongoing logout request.",
+      "title": "LogoutRequest Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2424,7 +2422,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2493,7 +2491,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse The Access Token Response",
+      "description": "The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2524,7 +2522,7 @@
       }
     },
     "oauthTokenResponse": {
-      "description": "OauthTokenResponse The token response",
+      "description": "The token response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2593,7 +2591,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "RejectRequest The request payload used to accept a login or consent request.",
+      "title": "RejectRequest RejectRequest RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",
@@ -2619,7 +2617,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "UserinfoResponse The userinfo response",
+      "description": "The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -2702,6 +2700,7 @@
       }
     },
     "version": {
+      "description": "Version Version Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -2713,15 +2712,15 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
-        "authorization_endpoint",
-        "id_token_signing_alg_values_supported",
         "issuer",
+        "authorization_endpoint",
+        "token_endpoint",
         "jwks_uri",
-        "response_types_supported",
         "subject_types_supported",
-        "token_endpoint"
+        "response_types_supported",
+        "id_token_signing_alg_values_supported"
       ],
       "properties": {
         "authorization_endpoint": {

@@ -430,7 +430,7 @@ workflows:
               only: master
       - sdk/generate:
           appname: Ory_Hydra
-          requires:
+#          requires:
 #            - test
 #            - format
 #            - test-e2e-memory

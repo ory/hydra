@@ -32,7 +32,7 @@ require (
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.2
-	github.com/ory/sdk/swagutil v0.0.0-20200106210951-c55fbf6daa12 // indirect
+	github.com/ory/sdk/swagutil v0.0.0-20200106210951-c55fbf6daa12
 	github.com/ory/viper v1.5.6
 	github.com/ory/x v0.0.88
 	github.com/pborman/uuid v1.2.0
@@ -54,7 +54,6 @@ require (
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/tools v0.0.0-20191224055732-dd894d0a8a40
-	google.golang.org/grpc v1.22.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
 )
 

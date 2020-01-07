@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-swagger/go-swagger/cmd/swagger"
 	_ "github.com/gobuffalo/packr/packr"
 	_ "github.com/golang/mock/mockgen"
+	_ "github.com/sdk/swagutil"
 	_ "github.com/sqs/goreturns"
 	_ "golang.org/x/tools/cmd/goimports"
 	_ "golang.org/x/tools/cmd/stringer"

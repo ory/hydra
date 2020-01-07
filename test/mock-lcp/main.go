@@ -26,12 +26,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
 )
 
 var hydraURL = urlx.ParseOrPanic(os.Getenv("HYDRA_ADMIN_URL"))
@@ -45,7 +45,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 	}
 	lr := res.Payload
 
-	var v *models.RequestHandlerResponse
+	var v *models.CompletedRequest
 	if strings.Contains(lr.RequestURL, "mockLogin=accept") {
 		remember := false
 		if strings.Contains(lr.RequestURL, "rememberLogin=yes") {
@@ -55,7 +55,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 		var vr *admin.AcceptLoginRequestOK
 		vr, err = client.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 			WithLoginChallenge(challenge).
-			WithBody(&models.HandledLoginRequest{
+			WithBody(&models.AcceptLoginRequest{
 				Subject:  pointerx.String("the-subject"),
 				Remember: remember,
 			}))
@@ -66,8 +66,8 @@ func login(rw http.ResponseWriter, r *http.Request) {
 		var vr *admin.RejectLoginRequestOK
 		vr, err = client.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
 			WithLoginChallenge(challenge).
-			WithBody(&models.RequestDeniedError{
-				Name: "invalid_request",
+			WithBody(&models.RejectRequest{
+				Error: "invalid_request",
 			}))
 		if vr != nil {
 			v = vr.Payload
@@ -88,7 +88,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 	}
 	o := rrr.Payload
 
-	var v *models.RequestHandlerResponse
+	var v *models.CompletedRequest
 	if strings.Contains(o.RequestURL, "mockConsent=accept") {
 		remember := false
 		if strings.Contains(o.RequestURL, "rememberConsent=yes") {
@@ -102,10 +102,10 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 		var vr *admin.AcceptConsentRequestOK
 		vr, err = client.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 			WithConsentChallenge(challenge).
-			WithBody(&models.HandledConsentRequest{
-				GrantedScope: o.RequestedScope,
-				Remember:     remember,
-				Session: &models.ConsentRequestSessionData{
+			WithBody(&models.AcceptConsentRequest{
+				GrantScope: o.RequestedScope,
+				Remember:   remember,
+				Session: &models.ConsentRequestSession{
 					AccessToken: map[string]interface{}{"foo": value},
 					IDToken:     map[string]interface{}{"baz": value},
 				},
@@ -118,8 +118,8 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 		vr, err = client.Admin.RejectConsentRequest(
 			admin.NewRejectConsentRequestParams().WithConsentChallenge(challenge).
 				WithBody(
-					&models.RequestDeniedError{
-						Name: "invalid_request",
+					&models.RejectRequest{
+						Error: "invalid_request",
 					}),
 		)
 		if vr != nil {

@@ -10,7 +10,7 @@ require (
 	github.com/go-openapi/swag v0.19.5
 	github.com/go-openapi/validate v0.19.3
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/go-swagger/go-swagger v0.21.0
+	github.com/go-swagger/go-swagger v0.21.1-0.20200107003254-1c98855b472d
 	github.com/gobuffalo/packd v0.0.0-20190315124812-a385830c7fc0 // indirect
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobwas/glob v0.2.3
@@ -32,8 +32,9 @@ require (
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.2
+	github.com/ory/sdk/swagutil v0.0.0-20200106210951-c55fbf6daa12 // indirect
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.85
+	github.com/ory/x v0.0.88
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.8.1
@@ -50,9 +51,10 @@ require (
 	github.com/uber/jaeger-client-go v2.16.0+incompatible
 	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
-	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739
+	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20190907020128-2ca718005c18
+	golang.org/x/tools v0.0.0-20191224055732-dd894d0a8a40
+	google.golang.org/grpc v1.22.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
 )
 

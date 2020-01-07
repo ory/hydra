@@ -48,17 +48,18 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/urlx"
+
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/ory/x/urlx"
 )
 
 func newCookieJar() http.CookieJar {
@@ -99,7 +100,7 @@ func acceptLogin(apiClient *hydra.OryHydra, subject string, expectSkip bool, exp
 
 			vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-				WithBody(&models.HandledLoginRequest{Subject: pointerx.String(subject)}))
+				WithBody(&models.AcceptLoginRequest{Subject: pointerx.String(subject)}))
 			require.NoError(t, err)
 
 			v := vr.Payload
@@ -121,9 +122,9 @@ func acceptConsent(apiClient *hydra.OryHydra, scope []string, expectSkip bool, e
 
 			vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 				WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-				WithBody(&models.HandledConsentRequest{
-					GrantedScope: scope,
-					Session: &models.ConsentRequestSessionData{
+				WithBody(&models.AcceptConsentRequest{
+					GrantScope: scope,
+					Session: &models.ConsentRequestSession{
 						AccessToken: map[string]interface{}{"foo": "bar"},
 						IDToken:     map[string]interface{}{"bar": "baz"},
 					},
@@ -306,8 +307,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.Empty(t, rr.Payload.Subject)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
-											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
+										WithBody(&models.AcceptLoginRequest{
+											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, Acr: "1",
 											Context: map[string]interface{}{"context": "bar"},
 										}))
 									require.NoError(t, err)
@@ -323,10 +324,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.Equal(t, map[string]interface{}{"context": "bar"}, rr.Payload.Context)
 									v, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
-											GrantedAudience: rr.Payload.RequestedAudience,
-											Session: &models.ConsentRequestSessionData{
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
+											GrantAccessTokenAudience: rr.Payload.RequestedAccessTokenAudience,
+											Session: &models.ConsentRequestSession{
 												AccessToken: map[string]interface{}{"foo": "bar"},
 												IDToken:     map[string]interface{}{"bar": "baz"},
 											},
@@ -372,8 +373,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
-											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
+										WithBody(&models.AcceptLoginRequest{
+											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, Acr: "1",
 										}))
 									require.NoError(t, err)
 									require.NotEmpty(t, v.Payload.RedirectTo)
@@ -388,10 +389,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
-											GrantedAudience: rr.RequestedAudience,
-											Session:         &models.ConsentRequestSessionData{},
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
+											GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+											Session:                  &models.ConsentRequestSession{},
 										}))
 									require.NoError(t, err)
 									v := vr.Payload
@@ -429,8 +430,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
-											Subject: pointerx.String(""), Remember: false, RememberFor: 0, ACR: "1",
+										WithBody(&models.AcceptLoginRequest{
+											Subject: pointerx.String(""), Remember: false, RememberFor: 0, Acr: "1",
 										}))
 									require.Error(t, err)
 									require.NotEmpty(t, v.Payload.RedirectTo)
@@ -466,8 +467,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
-											Subject: pointerx.String("user-a"), Remember: false, RememberFor: 0, ACR: "1",
+										WithBody(&models.AcceptLoginRequest{
+											Subject: pointerx.String("user-a"), Remember: false, RememberFor: 0, Acr: "1",
 										}))
 									require.NoError(t, err)
 
@@ -483,10 +484,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
-											GrantedAudience: rr.RequestedAudience,
-											Session:         &models.ConsentRequestSessionData{},
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
+											GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+											Session:                  &models.ConsentRequestSession{},
 										}))
 									require.NoError(t, err)
 									v := vr.Payload
@@ -527,18 +528,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									assert.False(t, rr.Skip)
 									assert.Empty(t, rr.Subject)
-									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAudience)
+									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAccessTokenAudience)
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
-									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectURIs)
+									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
 									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestURL)
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
+										WithBody(&models.AcceptLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0,
 										}))
 
@@ -558,18 +559,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
-									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectURIs)
-									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAudience)
+									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
+									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAccessTokenAudience)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
-											GrantedAudience: rr.RequestedAudience,
-											Session: &models.ConsentRequestSessionData{
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "offline", "openid"}, Remember: false, RememberFor: 0,
+											GrantAccessTokenAudience: rr.RequestedAccessTokenAudience,
+											Session: &models.ConsentRequestSession{
 												AccessToken: map[string]interface{}{"foo": "bar"},
 												IDToken:     map[string]interface{}{"bar": "baz"},
 											},
@@ -601,13 +602,13 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									body, err := ioutil.ReadAll(res.Body)
 									require.NoError(t, err)
 
-									var r models.Introspection
+									var r models.OAuth2TokenIntrospection
 									require.NoError(t, json.Unmarshal(body, &r))
 									assert.EqualValues(t, "e2e-app-client"+km+strat.d, r.ClientID)
-									assert.EqualValues(t, "user-a", r.Subject)
-									assert.EqualValues(t, []string{"https://api.ory.sh/"}, r.Audience)
+									assert.EqualValues(t, "user-a", r.Sub)
+									assert.EqualValues(t, []string{"https://api.ory.sh/"}, r.Aud)
 									assert.EqualValues(t, "hydra offline openid", r.Scope)
-									assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", r.Extra))
+									assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", r.Ext))
 									return
 								}
 
@@ -647,14 +648,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
-									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectURIs)
+									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
 									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
+										WithBody(&models.AcceptLoginRequest{
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0,
 										}))
 									require.NoError(t, err)
@@ -675,16 +676,16 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
-									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectURIs)
+									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
 									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
-											Session: &models.ConsentRequestSessionData{
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "offline", "openid"}, Remember: true, RememberFor: 0,
+											Session: &models.ConsentRequestSession{
 												AccessToken: map[string]interface{}{"foo": "bar"},
 												IDToken:     map[string]interface{}{"bar": "baz"},
 											},
@@ -761,13 +762,13 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									body, err := ioutil.ReadAll(res.Body)
 									require.NoError(t, err)
 
-									var r models.Introspection
+									var r models.OAuth2TokenIntrospection
 									require.NoError(t, json.Unmarshal(body, &r))
 									assert.EqualValues(t, "e2e-app-client"+km+strat.d, r.ClientID)
-									assert.EqualValues(t, "user-a", r.Subject)
-									assert.Empty(t, r.Audience)
+									assert.EqualValues(t, "user-a", r.Sub)
+									assert.Empty(t, r.Aud)
 									assert.EqualValues(t, "hydra offline", r.Scope)
-									assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", r.Extra))
+									assert.EqualValues(t, "map[foo:bar]", fmt.Sprintf("%s", r.Ext))
 									return
 								}
 
@@ -870,7 +871,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
+										WithBody(&models.AcceptLoginRequest{
 											Subject: pointerx.String("user-a"),
 										}))
 									require.NoError(t, err)
@@ -891,9 +892,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "openid"},
-											Session: &models.ConsentRequestSessionData{
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "openid"},
+											Session: &models.ConsentRequestSession{
 												AccessToken: map[string]interface{}{"foo": "bar"},
 												IDToken:     map[string]interface{}{"bar": "baz"},
 											},
@@ -929,11 +930,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									rr := rrr.Payload
 									assert.False(t, rr.Skip)
 									assert.EqualValues(t, "", rr.Subject)
-									assert.Empty(t, rr.Client.Secret)
+									assert.Empty(t, rr.Client.ClientSecret)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
+										WithBody(&models.AcceptLoginRequest{
 											Subject: pointerx.String("user-a"),
 										}))
 									require.NoError(t, err)
@@ -950,13 +951,13 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									rr := rrr.Payload
 									assert.True(t, rr.Skip)
 									assert.EqualValues(t, "user-a", rr.Subject)
-									assert.Empty(t, rr.Client.Secret)
+									assert.Empty(t, rr.Client.ClientSecret)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "openid"},
-											Session: &models.ConsentRequestSessionData{
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "openid"},
+											Session: &models.ConsentRequestSession{
 												AccessToken: map[string]interface{}{"foo": "bar"},
 												IDToken:     map[string]interface{}{"bar": "baz"},
 											},
@@ -1006,7 +1007,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						{
 							d:       "should not cause issues if max_age is very low and consent takes a long time",
 							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=1",
-							//cj:      persistentCJ,
+							// cj:      persistentCJ,
 							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
@@ -1016,8 +1017,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
-										WithBody(&models.HandledLoginRequest{
-											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, ACR: "1",
+										WithBody(&models.AcceptLoginRequest{
+											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, Acr: "1",
 										}))
 									require.NoError(t, err)
 									v := vr.Payload
@@ -1033,9 +1034,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
 										WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
-										WithBody(&models.HandledConsentRequest{
-											GrantedScope: []string{"hydra", "openid"},
-											Session: &models.ConsentRequestSessionData{
+										WithBody(&models.AcceptConsentRequest{
+											GrantScope: []string{"hydra", "openid"},
+											Session: &models.ConsentRequestSession{
 												AccessToken: map[string]interface{}{"foo": "bar"},
 												IDToken:     map[string]interface{}{"bar": "baz"},
 											},

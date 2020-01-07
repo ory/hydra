@@ -37,8 +37,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/urlx"
 )
@@ -203,12 +203,12 @@ func checkTokenResponse(token oauth2token) {
 		log.Fatalf("Expected token to be active: %s", token.AccessToken)
 	}
 
-	if intro.Subject != "the-subject" {
-		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Subject)
+	if intro.Sub != "the-subject" {
+		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
 	}
 
-	if intro.Extra["foo"] != expectedValue {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Extra["foo"])
+	if intro.Ext["foo"] != expectedValue {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext["foo"])
 	}
 
 	idt := fmt.Sprintf("%s", token.IDToken)

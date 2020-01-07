@@ -26,9 +26,9 @@ import (
 
 	"github.com/go-openapi/strfmt"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/client/public"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/client/public"
+	"github.com/ory/hydra/internal/httpclient/models"
 
 	"github.com/spf13/cobra"
 

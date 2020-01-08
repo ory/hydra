@@ -125,7 +125,13 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/oAuth2ClientList"
+            "description": "A list of clients.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/oAuth2Client"
+              }
+            }
           },
           "500": {
             "description": "genericError",
@@ -316,7 +322,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "404": {
             "description": "genericError",
@@ -589,7 +595,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
             "description": "genericError",
@@ -769,7 +775,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
             "description": "genericError",
@@ -805,7 +811,7 @@
         "operationId": "prometheus",
         "responses": {
           "200": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           }
         }
       }
@@ -827,7 +833,7 @@
         "operationId": "oauthAuth",
         "responses": {
           "302": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
             "description": "genericError",
@@ -1312,7 +1318,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "404": {
             "description": "genericError",
@@ -1357,7 +1363,13 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/handledConsentRequestList"
+            "description": "A list of used consent requests.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PreviousConsentSession"
+              }
+            }
           },
           "400": {
             "description": "genericError",
@@ -1413,7 +1425,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "400": {
             "description": "genericError",
@@ -1464,7 +1476,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "400": {
             "description": "genericError",
@@ -1513,7 +1525,7 @@
         ],
         "responses": {
           "204": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
             "description": "genericError",
@@ -1626,7 +1638,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
             "description": "genericError",
@@ -1657,7 +1669,7 @@
         "operationId": "disconnectUser",
         "responses": {
           "302": {
-            "$ref": "#/responses/emptyResponse"
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           }
         }
       }
@@ -1804,7 +1816,7 @@
   },
   "definitions": {
     "AttributeTypeAndValue": {
-      "description": "AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue mirrors the ASN.1 structure of the same name in\nRFC 5280, Section 4.1.2.4.",
+      "description": "AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue mirrors the ASN.1 structure of the same name in\nRFC 5280, Section 4.1.2.4.",
       "type": "object",
       "properties": {
         "Type": {
@@ -1816,289 +1828,14 @@
         }
       }
     },
-    "Certificate": {
-      "type": "object",
-      "title": "Certificate Certificate Certificate A Certificate represents an X.509 certificate.",
-      "properties": {
-        "AuthorityKeyId": {
-          "description": "authority key Id",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "BasicConstraintsValid": {
-          "description": "BasicConstraintsValid indicates whether IsCA, MaxPathLen,\nand MaxPathLenZero are valid.",
-          "type": "boolean"
-        },
-        "CRLDistributionPoints": {
-          "description": "CRL Distribution Points",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "DNSNames": {
-          "description": "Subject Alternate Name values. (Note that these values may not be valid\nif invalid values were contained within a parsed certificate. For\nexample, an element of DNSNames may not be a valid DNS domain name.)",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "EmailAddresses": {
-          "description": "email addresses",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ExcludedDNSDomains": {
-          "description": "excluded DNS domains",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ExcludedEmailAddresses": {
-          "description": "excluded email addresses",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ExcludedIPRanges": {
-          "description": "excluded IP ranges",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/IPNet"
-          }
-        },
-        "ExcludedURIDomains": {
-          "description": "excluded URI domains",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "ExtKeyUsage": {
-          "description": "ext key usage",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ExtKeyUsage"
-          }
-        },
-        "Extensions": {
-          "description": "Extensions contains raw X.509 extensions. When parsing certificates,\nthis can be used to extract non-critical extensions that are not\nparsed by this package. When marshaling certificates, the Extensions\nfield is ignored, see ExtraExtensions.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Extension"
-          }
-        },
-        "ExtraExtensions": {
-          "description": "ExtraExtensions contains extensions to be copied, raw, into any\nmarshaled certificates. Values override any extensions that would\notherwise be produced based on the other fields. The ExtraExtensions\nfield is not populated when parsing certificates, see Extensions.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Extension"
-          }
-        },
-        "IPAddresses": {
-          "description": "IP addresses",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/IP"
-          }
-        },
-        "IsCA": {
-          "description": "is c a",
-          "type": "boolean"
-        },
-        "Issuer": {
-          "$ref": "#/definitions/Name"
-        },
-        "IssuingCertificateURL": {
-          "description": "issuing certificate URL",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "KeyUsage": {
-          "$ref": "#/definitions/KeyUsage"
-        },
-        "MaxPathLen": {
-          "description": "MaxPathLen and MaxPathLenZero indicate the presence and\nvalue of the BasicConstraints' \"pathLenConstraint\".\n\nWhen parsing a certificate, a positive non-zero MaxPathLen\nmeans that the field was specified, -1 means it was unset,\nand MaxPathLenZero being true mean that the field was\nexplicitly set to zero. The case of MaxPathLen==0 with MaxPathLenZero==false\nshould be treated equivalent to -1 (unset).\n\nWhen generating a certificate, an unset pathLenConstraint\ncan be requested with either MaxPathLen == -1 or using the\nzero value for both MaxPathLen and MaxPathLenZero.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "MaxPathLenZero": {
-          "description": "MaxPathLenZero indicates that BasicConstraintsValid==true\nand MaxPathLen==0 should be interpreted as an actual\nmaximum path length of zero. Otherwise, that combination is\ninterpreted as MaxPathLen not being set.",
-          "type": "boolean"
-        },
-        "NotBefore": {
-          "description": "not before\nFormat: date-time\nFormat: date-time\nFormat: date-time",
-          "type": "string",
-          "format": "date-time"
-        },
-        "OCSPServer": {
-          "description": "RFC 5280, 4.2.2.1 (Authority Information Access)",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "PermittedDNSDomains": {
-          "description": "permitted DNS domains",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "PermittedDNSDomainsCritical": {
-          "description": "Name constraints",
-          "type": "boolean"
-        },
-        "PermittedEmailAddresses": {
-          "description": "permitted email addresses",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "PermittedIPRanges": {
-          "description": "permitted IP ranges",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/IPNet"
-          }
-        },
-        "PermittedURIDomains": {
-          "description": "permitted URI domains",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "PolicyIdentifiers": {
-          "description": "policy identifiers",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ObjectIdentifier"
-          }
-        },
-        "PublicKey": {
-          "description": "public key",
-          "type": "object"
-        },
-        "PublicKeyAlgorithm": {
-          "$ref": "#/definitions/PublicKeyAlgorithm"
-        },
-        "Raw": {
-          "description": "raw",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "RawIssuer": {
-          "description": "raw issuer",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "RawSubject": {
-          "description": "raw subject",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "RawSubjectPublicKeyInfo": {
-          "description": "raw subject public key info",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "RawTBSCertificate": {
-          "description": "raw t b s certificate",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "SerialNumber": {
-          "$ref": "#/definitions/Int"
-        },
-        "Signature": {
-          "description": "signature",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "SignatureAlgorithm": {
-          "$ref": "#/definitions/SignatureAlgorithm"
-        },
-        "Subject": {
-          "$ref": "#/definitions/Name"
-        },
-        "SubjectKeyId": {
-          "description": "subject key Id",
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "format": "uint8"
-          }
-        },
-        "URIs": {
-          "description": "u r is",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/URL"
-          }
-        },
-        "UnhandledCriticalExtensions": {
-          "description": "UnhandledCriticalExtensions contains a list of extension IDs that\nwere not (fully) processed when parsing. Verify will fail if this\nslice is non-empty, unless verification is delegated to an OS\nlibrary which understands all the critical extensions.\n\nUsers can access these extensions using Extensions and can remove\nelements from this slice if they believe that they have been\nhandled.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ObjectIdentifier"
-          }
-        },
-        "UnknownExtKeyUsage": {
-          "description": "unknown ext key usage",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ObjectIdentifier"
-          }
-        },
-        "Version": {
-          "description": "version",
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
-    "DateTime": {
-      "description": "DateTime is a time but it serializes to ISO8601 format with millis\nIt knows how to read 3 different variations of a RFC3339 date time.\nMost APIs we encounter want either millisecond or second precision times.\nThis just tries to make it worry-free.",
-      "type": "string",
-      "format": "date-time"
-    },
     "ExtKeyUsage": {
       "description": "Each of the ExtKeyUsage* constants define a unique action.",
       "type": "integer",
       "format": "int64",
-      "title": "ExtKeyUsage ExtKeyUsage ExtKeyUsage ExtKeyUsage represents an extended set of actions that are valid for a given key."
+      "title": "ExtKeyUsage ExtKeyUsage ExtKeyUsage ExtKeyUsage ExtKeyUsage represents an extended set of actions that are valid for a given key."
     },
     "Extension": {
-      "description": "Extension Extension Extension Extension represents the ASN.1 structure of the same name. See RFC\n5280, section 4.2.",
+      "description": "Extension Extension Extension Extension Extension represents the ASN.1 structure of the same name. See RFC\n5280, section 4.2.",
       "type": "object",
       "properties": {
         "Critical": {
@@ -2121,7 +1858,7 @@
     "IP": {
       "description": "Note that in this documentation, referring to an\nIP address as an IPv4 address or an IPv6 address\nis a semantic property of the address, not just the\nlength of the byte slice: a 16-byte slice can still\nbe an IPv4 address.",
       "type": "array",
-      "title": "IP IP IP An IP is a single IP address, a slice of bytes.\nFunctions in this package accept either 4-byte (IPv4)\nor 16-byte (IPv6) slices as input.",
+      "title": "IP IP IP IP An IP is a single IP address, a slice of bytes.\nFunctions in this package accept either 4-byte (IPv4)\nor 16-byte (IPv6) slices as input.",
       "items": {
         "type": "integer",
         "format": "uint8"
@@ -2129,7 +1866,7 @@
     },
     "IPMask": {
       "type": "array",
-      "title": "IPMask IPMask IPMask An IP mask is an IP address.",
+      "title": "IPMask IPMask IPMask IPMask An IP mask is an IP address.",
       "items": {
         "type": "integer",
         "format": "uint8"
@@ -2137,7 +1874,7 @@
     },
     "IPNet": {
       "type": "object",
-      "title": "IPNet IPNet IPNet An IPNet represents an IP network.",
+      "title": "IPNet IPNet IPNet IPNet An IPNet represents an IP network.",
       "properties": {
         "IP": {
           "$ref": "#/definitions/IP"
@@ -2150,7 +1887,7 @@
     "Int": {
       "description": "Operations always take pointer arguments (*Int) rather\nthan Int values, and each unique Int value requires\nits own unique *Int pointer. To \"copy\" an Int value,\nan existing (or newly allocated) Int must be set to\na new value using the Int.Set method; shallow copies\nof Ints are not supported and may lead to errors.",
       "type": "object",
-      "title": "Int Int Int An Int represents a signed multi-precision integer.\nThe zero value for an Int represents the value 0."
+      "title": "Int Int Int Int An Int represents a signed multi-precision integer.\nThe zero value for an Int represents the value 0."
     },
     "JSONWebKey": {
       "type": "object",
@@ -2239,7 +1976,6 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSON web key set",
       "type": "object",
       "properties": {
         "keys": {
@@ -2252,12 +1988,12 @@
       }
     },
     "KeyUsage": {
-      "description": "KeyUsage KeyUsage KeyUsage KeyUsage represents the set of actions that are valid for a given key. It's\na bitmap of the KeyUsage* constants.",
+      "description": "KeyUsage KeyUsage KeyUsage KeyUsage KeyUsage represents the set of actions that are valid for a given key. It's\na bitmap of the KeyUsage* constants.",
       "type": "integer",
       "format": "int64"
     },
     "Name": {
-      "description": "Name Name Name Name represents an X.509 distinguished name. This only includes the common\nelements of a DN. When parsing, all elements are stored in Names and\nnon-standard elements can be extracted from there. When marshaling, elements\nin ExtraNames are appended and override other values with the same OID.",
+      "description": "Name Name Name Name Name represents an X.509 distinguished name. This only includes the common\nelements of a DN. When parsing, all elements are stored in Names and\nnon-standard elements can be extracted from there. When marshaling, elements\nin ExtraNames are appended and override other values with the same OID.",
       "type": "object",
       "properties": {
         "Country": {
@@ -2303,14 +2039,14 @@
     },
     "ObjectIdentifier": {
       "type": "array",
-      "title": "ObjectIdentifier ObjectIdentifier ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.",
+      "title": "ObjectIdentifier ObjectIdentifier ObjectIdentifier ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.",
       "items": {
         "type": "integer",
         "format": "int64"
       }
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -2345,19 +2081,19 @@
       }
     },
     "PublicKeyAlgorithm": {
-      "description": "PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm public key algorithm",
+      "description": "PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm public key algorithm",
       "type": "integer",
       "format": "int64"
     },
     "SignatureAlgorithm": {
-      "description": "SignatureAlgorithm SignatureAlgorithm SignatureAlgorithm signature algorithm",
+      "description": "SignatureAlgorithm SignatureAlgorithm SignatureAlgorithm SignatureAlgorithm signature algorithm",
       "type": "integer",
       "format": "int64"
     },
     "URL": {
       "description": "The general form represented is:\n\n[scheme:][//[userinfo@]host][/]path[?query][#fragment]\n\nURLs that do not start with a slash after the scheme are interpreted as:\n\nscheme:opaque[?query][#fragment]\n\nNote that the Path field is stored in decoded form: /%47%6f%2f becomes /Go/.\nA consequence is that it is impossible to tell which slashes in the Path were\nslashes in the raw URL and which were %2f. This distinction is rarely important,\nbut when it is, the code should use RawPath, an optional field which only gets\nset if the default encoding is different from Path.\n\nURL's String method uses the EscapedPath method to obtain the path. See the\nEscapedPath method for more details.",
       "type": "object",
-      "title": "URL URL URL A URL represents a parsed URL (technically, a URI reference).",
+      "title": "URL URL URL URL A URL represents a parsed URL (technically, a URI reference).",
       "properties": {
         "ForceQuery": {
           "description": "force query",
@@ -2396,14 +2132,13 @@
         }
       }
     },
-    "UUID": {"type": "string", "format": "uuid4"},
     "Userinfo": {
-      "description": "Userinfo Userinfo Userinfo The Userinfo type is an immutable encapsulation of username and\npassword details for a URL. An existing Userinfo value is guaranteed\nto have a username set (potentially empty, as allowed by RFC 2396),\nand optionally a password.",
+      "description": "Userinfo Userinfo Userinfo Userinfo The Userinfo type is an immutable encapsulation of username and\npassword details for a URL. An existing Userinfo value is guaranteed\nto have a username set (potentially empty, as allowed by RFC 2396),\nand optionally a password.",
       "type": "object"
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2435,7 +2170,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2472,7 +2207,7 @@
     },
     "completedRequest": {
       "type": "object",
-      "title": "The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -2482,7 +2217,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
+      "title": "ConsentRequest ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2543,7 +2278,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2574,7 +2309,7 @@
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "GenericError GenericError GenericError Error response",
+      "title": "GenericError GenericError GenericError GenericError Error response",
       "required": [
         "error"
       ],
@@ -2603,7 +2338,6 @@
       }
     },
     "healthNotReadyStatus": {
-      "description": "HealthNotReadyStatus HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2616,7 +2350,6 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2626,11 +2359,12 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
+      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
-        "kid",
-        "use"
+        "use",
+        "kid"
       ],
       "properties": {
         "alg": {
@@ -2649,7 +2383,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing login request.",
+      "title": "LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2695,7 +2429,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
+      "title": "LogoutRequest LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2717,7 +2451,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "description": "AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
@@ -2770,7 +2504,7 @@
           }
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2868,7 +2602,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2881,7 +2615,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2980,42 +2714,9 @@
         }
       }
     },
-    "oauthTokenResponse": {
-      "description": "OauthTokenResponse The token response",
-      "type": "object",
-      "properties": {
-        "access_token": {
-          "description": "The access token issued by the authorization server.",
-          "type": "string"
-        },
-        "expires_in": {
-          "description": "The lifetime in seconds of the access token.  For\nexample, the value \"3600\" denotes that the access token will\nexpire in one hour from the time the response was generated.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "id_token": {
-          "description": "To retrieve a refresh token request the id_token scope.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "refresh_token": {
-          "description": "The refresh token, which can be used to obtain new\naccess tokens. To retrieve it add the scope \"offline\" to your access token request.",
-          "type": "string"
-        },
-        "scope": {
-          "description": "The scope of the access token",
-          "type": "integer",
-          "format": "int64"
-        },
-        "token_type": {
-          "description": "The type of the token issued",
-          "type": "string"
-        }
-      }
-    },
     "openIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -3050,7 +2751,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "RejectRequest RejectRequest RejectRequest The request payload used to accept a login or consent request.",
+      "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",
@@ -3076,7 +2777,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "UserinfoResponse UserinfoResponse The userinfo response",
+      "description": "The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -3159,7 +2860,6 @@
       }
     },
     "version": {
-      "description": "Version Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -3171,7 +2871,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",
@@ -3314,29 +3014,6 @@
           "items": {
             "type": "string"
           }
-        }
-      }
-    }
-  },
-  "responses": {
-    "emptyResponse": {
-      "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
-    },
-    "handledConsentRequestList": {
-      "description": "A list of used consent requests.",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/PreviousConsentSession"
-        }
-      }
-    },
-    "oAuth2ClientList": {
-      "description": "A list of clients.",
-      "schema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/oAuth2Client"
         }
       }
     }

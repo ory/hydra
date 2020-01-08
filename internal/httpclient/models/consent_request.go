@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ConsentRequest ConsentRequest ConsentRequest Contains information on an ongoing consent request.
+// ConsentRequest ConsentRequest ConsentRequest ConsentRequest Contains information on an ongoing consent request.
 // swagger:model consentRequest
 type ConsentRequest struct {
 

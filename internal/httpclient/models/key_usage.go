@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// KeyUsage KeyUsage KeyUsage KeyUsage KeyUsage represents the set of actions that are valid for a given key. It's
+// KeyUsage KeyUsage KeyUsage KeyUsage KeyUsage KeyUsage represents the set of actions that are valid for a given key. It's
 // a bitmap of the KeyUsage* constants.
 // swagger:model KeyUsage
 type KeyUsage int64

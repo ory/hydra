@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm public key algorithm
+// PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm PublicKeyAlgorithm public key algorithm
 // swagger:model PublicKeyAlgorithm
 type PublicKeyAlgorithm int64
 

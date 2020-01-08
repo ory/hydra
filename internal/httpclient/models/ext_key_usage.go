@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// ExtKeyUsage ExtKeyUsage ExtKeyUsage ExtKeyUsage represents an extended set of actions that are valid for a given key.
+// ExtKeyUsage ExtKeyUsage ExtKeyUsage ExtKeyUsage ExtKeyUsage represents an extended set of actions that are valid for a given key.
 //
 // Each of the ExtKeyUsage* constants define a unique action.
 // swagger:model ExtKeyUsage

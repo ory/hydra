@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// IPNet IPNet IPNet An IPNet represents an IP network.
+// IPNet IPNet IPNet IPNet An IPNet represents an IP network.
 // swagger:model IPNet
 type IPNet struct {
 

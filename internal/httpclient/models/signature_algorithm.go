@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// SignatureAlgorithm SignatureAlgorithm SignatureAlgorithm signature algorithm
+// SignatureAlgorithm SignatureAlgorithm SignatureAlgorithm SignatureAlgorithm signature algorithm
 // swagger:model SignatureAlgorithm
 type SignatureAlgorithm int64
 

@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// ObjectIdentifier ObjectIdentifier ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.
+// ObjectIdentifier ObjectIdentifier ObjectIdentifier ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.
 // swagger:model ObjectIdentifier
 type ObjectIdentifier []int64
 

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Extension Extension Extension Extension represents the ASN.1 structure of the same name. See RFC
+// Extension Extension Extension Extension Extension represents the ASN.1 structure of the same name. See RFC
 // 5280, section 4.2.
 // swagger:model Extension
 type Extension struct {

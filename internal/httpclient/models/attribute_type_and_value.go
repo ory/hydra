@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue mirrors the ASN.1 structure of the same name in
+// AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue AttributeTypeAndValue mirrors the ASN.1 structure of the same name in
 // RFC 5280, Section 4.1.2.4.
 // swagger:model AttributeTypeAndValue
 type AttributeTypeAndValue struct {

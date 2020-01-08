@@ -45,7 +45,7 @@ require (
 	github.com/ory/fosite v0.10.1-0.20191218201927-75c261d8b590
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.1.1
-	github.com/ory/ladon v0.8.10
+	github.com/ory/ladon v0.8.9
 	github.com/ory/pagination v0.0.2-0.20180227110002-05947c3e39e2
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
 	github.com/pelletier/go-toml v1.0.2-0.20171001224747-2009e44b6f18

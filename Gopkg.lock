@@ -37,6 +37,50 @@
   version = "v6"
 
 [[projects]]
+  digest = "1:89029f0857ef1dd9b71378dbab1b4941e24c087820ebd9b48bf05e1f979a9297"
+  name = "github.com/aws/aws-sdk-go"
+  packages = [
+    "aws",
+    "aws/awserr",
+    "aws/awsutil",
+    "aws/client",
+    "aws/client/metadata",
+    "aws/corehandlers",
+    "aws/credentials",
+    "aws/credentials/ec2rolecreds",
+    "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
+    "aws/credentials/stscreds",
+    "aws/csm",
+    "aws/defaults",
+    "aws/ec2metadata",
+    "aws/endpoints",
+    "aws/request",
+    "aws/session",
+    "aws/signer/v4",
+    "internal/ini",
+    "internal/sdkio",
+    "internal/sdkmath",
+    "internal/sdkrand",
+    "internal/sdkuri",
+    "internal/shareddefaults",
+    "internal/strings",
+    "private/protocol",
+    "private/protocol/json/jsonutil",
+    "private/protocol/jsonrpc",
+    "private/protocol/query",
+    "private/protocol/query/queryutil",
+    "private/protocol/rest",
+    "private/protocol/xml/xmlutil",
+    "service/secretsmanager",
+    "service/sts",
+    "service/sts/stsiface",
+  ]
+  pruneopts = "UT"
+  revision = "5e0262aba097d913e4df71300fe49ef5ce5276db"
+  version = "v1.27.3"
+
+[[projects]]
   digest = "1:2209584c0f7c9b68c23374e659357ab546e1b70eec2761f03280f69a8fd23d77"
   name = "github.com/cenkalti/backoff"
   packages = ["."]
@@ -53,9 +97,12 @@
   revision = "7f53d412b9eb1cbf744c2063185d703a0ee34700"
 
 [[projects]]
-  digest = "1:d941401c29307046cf12935fdcf24e0cb04c95112baccceab7ce2c6f6cbce2e2"
+  digest = "1:520f0c8c816e87ec39d143b177a5d1636507c37a6e64980f0fff6924246d56d1"
   name = "github.com/coupa/foundation-go"
-  packages = ["metrics"]
+  packages = [
+    "config",
+    "metrics",
+  ]
   pruneopts = "UT"
   revision = "3f11d091be70de3421453511d15dc171fcd83ce0"
   version = "v1.2.2"
@@ -114,12 +161,20 @@
   revision = "130e6b02ab059e7b717a096f397c5b60111cae74"
 
 [[projects]]
-  digest = "1:160eabf7a69910fd74f29c692718bc2437c1c1c7d4c9dea9712357752a70e5df"
+  digest = "1:582b704bebaa06b48c29b0cec224a6058a09c86883aaddabde889cd1a5f73e1b"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0cd6bf5da1e1c83f8b45653022c74f71af0538a4"
+  version = "v1.1.1"
+
+[[projects]]
+  digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
   name = "github.com/gorilla/context"
   packages = ["."]
   pruneopts = "UT"
-  revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
-  version = "v1.1"
+  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:e72d1ebb8d395cf9f346fd9cbc652e5ae222dd85e0ac842dc57f175abed6d195"
@@ -182,11 +237,11 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:2bf6fb52354b7f2f3d2bc4c0c0f5e6c5d11aea4b791a9fdc93dbc9978c23a4f0"
-  name = "github.com/jehiah/go-strftime"
+  digest = "1:bb81097a5b62634f3e9fec1014657855610c82d19b9a40c17612e32651e35dca"
+  name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   pruneopts = "UT"
-  revision = "834e15c05a45371503440cc195bbd05c9a0968d9"
+  revision = "c2b33e84"
 
 [[projects]]
   branch = "master"
@@ -256,12 +311,12 @@
   revision = "c48cc78d482608239f6c4c92a4abd87eb8761c90"
 
 [[projects]]
-  branch = "master"
   digest = "1:7aefb397a53fc437c90f0fdb3e1419c751c5a3a165ced52325d5d797edf1aca6"
   name = "github.com/moul/http2curl"
   packages = ["."]
   pruneopts = "UT"
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:1919e36a53e2297eca9d3516ca358dec92257fe0de3361351e09400c91d65d5e"
@@ -527,6 +582,14 @@
   version = "v1.1.4"
 
 [[projects]]
+  digest = "1:f4b32291cad5efac2bfdba89ccde6aa04618b62ce06c1a571da2dc4f3f2677fb"
+  name = "github.com/subosito/gotenv"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2ef7124db659d49edac6aa459693a15ae36c671a"
+  version = "v1.2.0"
+
+[[projects]]
   digest = "1:c3ff4777507a3a6df553462220e76f25392ab95eaac5682889a0a20c7b8aa844"
   name = "github.com/toqueteos/webbrowser"
   packages = ["."]
@@ -649,6 +712,14 @@
   version = "v1.7.1"
 
 [[projects]]
+  digest = "1:c4b5592c342f273e18de68e16957f536f6648f2e90c9d7ece653ac90c22079a9"
+  name = "gopkg.in/ini.v1"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "94291fffe2b14f4632ec0e67c1bfecfc1287a168"
+  version = "v1.51.1"
+
+[[projects]]
   digest = "1:e2fdcd941fac1d6cc11cd4ee246de811e3564e03ccc5acc2bcdb7c9b31ad0d25"
   name = "gopkg.in/square/go-jose.v2"
   packages = [
@@ -670,6 +741,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/coupa/foundation-go/config",
     "github.com/coupa/foundation-go/metrics",
     "github.com/dgrijalva/jwt-go",
     "github.com/go-sql-driver/mysql",

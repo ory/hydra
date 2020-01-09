@@ -27,7 +27,7 @@ type Client struct {
 }
 
 /*
-AcceptConsentRequest accepts an consent request
+AcceptConsentRequest accepts a consent request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -78,7 +78,7 @@ func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*Acce
 }
 
 /*
-AcceptLoginRequest accepts an login request
+AcceptLoginRequest accepts a login request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -512,7 +512,7 @@ func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKe
 }
 
 /*
-GetLoginRequest gets an login request
+GetLoginRequest gets a login request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -870,7 +870,7 @@ func (a *Client) Prometheus(params *PrometheusParams) (*PrometheusOK, error) {
 }
 
 /*
-RejectConsentRequest rejects an consent request
+RejectConsentRequest rejects a consent request
 
 When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if

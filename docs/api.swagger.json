@@ -920,7 +920,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept an consent request",
+        "summary": "Accept a consent request",
         "operationId": "acceptConsentRequest",
         "parameters": [
           {
@@ -975,7 +975,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject an consent request",
+        "summary": "Reject a consent request",
         "operationId": "rejectConsentRequest",
         "parameters": [
           {
@@ -1030,7 +1030,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get an login request",
+        "summary": "Get a login request",
         "operationId": "getLoginRequest",
         "parameters": [
           {
@@ -1090,7 +1090,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept an login request",
+        "summary": "Accept a login request",
         "operationId": "acceptLoginRequest",
         "parameters": [
           {
@@ -1816,7 +1816,7 @@
   },
   "definitions": {
     "JSONWebKey": {
-      "description": "JSONWebKey JSONWebKey JSON web key",
+      "description": "JSONWebKey JSONWebKey JSONWebKey JSON web key",
       "type": "object",
       "required": [
         "use",
@@ -1915,8 +1915,8 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSON web key set",
       "type": "object",
+      "title": "JSONWebKeySet represents a JWK Set object.",
       "properties": {
         "keys": {
           "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -1927,16 +1927,8 @@
         }
       }
     },
-    "ObjectIdentifier": {
-      "type": "array",
-      "title": "ObjectIdentifier ObjectIdentifier ObjectIdentifier ObjectIdentifier ObjectIdentifier ObjectIdentifier An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.",
-      "items": {
-        "type": "integer",
-        "format": "int64"
-      }
-    },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -1972,7 +1964,7 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -2004,7 +1996,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2041,7 +2033,7 @@
     },
     "completedRequest": {
       "type": "object",
-      "title": "The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -2112,7 +2104,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2131,10 +2123,11 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
+      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
@@ -2143,7 +2136,7 @@
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "Error response",
+      "title": "GenericError Error response",
       "required": [
         "error"
       ],
@@ -2172,7 +2165,7 @@
       }
     },
     "healthNotReadyStatus": {
-      "description": "HealthNotReadyStatus health not ready status",
+      "description": "HealthNotReadyStatus HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2185,7 +2178,6 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2195,12 +2187,11 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
-        "use",
-        "kid"
+        "kid",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -2219,7 +2210,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "LoginRequest LoginRequest LoginRequest Contains information on an ongoing login request.",
+      "title": "LoginRequest LoginRequest LoginRequest LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2265,7 +2256,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest LogoutRequest LogoutRequest LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
+      "title": "Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2287,7 +2278,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "description": "AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
@@ -2340,7 +2331,7 @@
           }
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2438,7 +2429,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2451,7 +2442,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2520,7 +2511,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "The Access Token Response",
+      "description": "Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2552,7 +2543,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2587,7 +2578,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "RejectRequest RejectRequest The request payload used to accept a login or consent request.",
+      "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",
@@ -2696,7 +2687,7 @@
       }
     },
     "version": {
-      "description": "Version version",
+      "description": "Version Version version",
       "type": "object",
       "properties": {
         "version": {

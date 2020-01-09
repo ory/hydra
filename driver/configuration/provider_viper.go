@@ -67,6 +67,8 @@ const (
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
 	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
+	ViperKeyLogHeaderTraceID               = "log.header.trace_id"
+	ViperKeyLogHeaderSpanID                = "log.header.span_id"
 )
 
 func init() {
@@ -412,4 +414,12 @@ func (v *ViperProvider) ShareOAuth2Debug() bool {
 
 func (v *ViperProvider) PKCEEnforced() bool {
 	return viperx.GetBool(v.l, ViperKeyPKCEEnforced, false, "OAUTH2_PKCE_ENFORCED")
+}
+
+func (v *ViperProvider) LogHeaderTraceID() string {
+	return viperx.GetString(v.l, ViperKeyLogHeaderTraceID, "", "LOG_HEADER_TRACE_ID")
+}
+
+func (v *ViperProvider) LogHeaderSpanID() string {
+	return viperx.GetString(v.l, ViperKeyLogHeaderSpanID, "", "LOG_HEADER_SPAN_ID")
 }

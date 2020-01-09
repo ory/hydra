@@ -154,6 +154,29 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 	}
 }
 
+func setTracingLogger(d driver.Driver, logger *negronilogrus.Middleware) {
+	headers := make(map[string]string)
+
+	if d.Configuration().LogHeaderTraceID() != "" {
+		headers["trace_id"] = d.Configuration().LogHeaderTraceID()
+	}
+	if d.Configuration().LogHeaderSpanID() != "" {
+		headers["span_id"] = d.Configuration().LogHeaderSpanID()
+	}
+
+	if len(headers) == 0 {
+		return
+	}
+
+	logger.Before = func(entry *logrus.Entry, r *http.Request, _ string) *logrus.Entry {
+		fields := make(map[string]interface{})
+		for key, headerKey := range headers {
+			fields[key] = r.Header.Get(headerKey)
+		}
+		return entry.WithFields(fields)
+	}
+}
+
 func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(d.Registry().BuildVersion()))
 
@@ -176,6 +199,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		adminLogger.ExcludeURL(healthx.AliveCheckPath)
 		adminLogger.ExcludeURL(healthx.ReadyCheckPath)
 	}
+	setTracingLogger(d, adminLogger)
 
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.Registry().PrometheusManager())
@@ -188,6 +212,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicLogger.ExcludeURL(healthx.AliveCheckPath)
 		publicLogger.ExcludeURL(healthx.ReadyCheckPath)
 	}
+	setTracingLogger(d, publicLogger)
 
 	publicmw.Use(publicLogger)
 	publicmw.Use(d.Registry().PrometheusManager())

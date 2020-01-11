@@ -156,17 +156,21 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 }
 
 func setTracingLogger(logger *reqlog.Middleware) {
+	// To avoid cyclic execution
+	before := logger.Before
 	logger.Before = func(entry *logrus.Entry, r *http.Request, remoteAddr string) *logrus.Entry {
+		fields := before(entry, r, remoteAddr)
+
 		_, _, spanCtx := httptrace.Extract(r.Context(), r)
-		fields := logrus.Fields{
-			"request":  r.RequestURI,
-			"method":   r.Method,
-			"remote":   remoteAddr,
-			"trace_id": spanCtx.TraceIDString(),
-			"span_id":  spanCtx.SpanIDString(),
+
+		if spanCtx.HasTraceID() {
+			fields = fields.WithField("trace_id", spanCtx.TraceIDString())
+		}
+		if spanCtx.HasSpanID() {
+			fields = fields.WithField("trace_id", spanCtx.SpanIDString())
 		}
 
-		return entry.WithFields(fields)
+		return fields
 	}
 }
 

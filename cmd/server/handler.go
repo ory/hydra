@@ -34,12 +34,13 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/reqlog"
 
 	"github.com/julienschmidt/httprouter"
-	negronilogrus "github.com/meatballhat/negroni-logrus"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
+	"go.opentelemetry.io/otel/plugin/httptrace"
 
 	"github.com/ory/graceful"
 	"github.com/ory/hydra/client"
@@ -154,6 +155,25 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 	}
 }
 
+func setTracingLogger(logger *reqlog.Middleware) {
+	// To avoid cyclic execution
+	before := logger.Before
+	logger.Before = func(entry *logrus.Entry, r *http.Request, remoteAddr string) *logrus.Entry {
+		fields := before(entry, r, remoteAddr)
+
+		_, _, spanCtx := httptrace.Extract(r.Context(), r)
+
+		if spanCtx.HasTraceID() {
+			fields = fields.WithField("trace_id", spanCtx.TraceIDString())
+		}
+		if spanCtx.HasSpanID() {
+			fields = fields.WithField("trace_id", spanCtx.SpanIDString())
+		}
+
+		return fields
+	}
+}
+
 func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(d.Registry().BuildVersion()))
 
@@ -168,26 +188,26 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicmw.Use(tracer)
 	}
 
-	adminLogger := negronilogrus.NewMiddlewareFromLogger(
+	adminLogger := reqlog.NewMiddlewareFromLogger(
 		d.Registry().Logger().(*logrus.Logger),
 		fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()),
 	)
 	if d.Configuration().AdminDisableHealthAccessLog() {
-		adminLogger.ExcludeURL(healthx.AliveCheckPath)
-		adminLogger.ExcludeURL(healthx.ReadyCheckPath)
+		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
+	setTracingLogger(adminLogger)
 
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.Registry().PrometheusManager())
 
-	publicLogger := negronilogrus.NewMiddlewareFromLogger(
+	publicLogger := reqlog.NewMiddlewareFromLogger(
 		d.Registry().Logger().(*logrus.Logger),
 		fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String()),
 	)
 	if d.Configuration().PublicDisableHealthAccessLog() {
-		publicLogger.ExcludeURL(healthx.AliveCheckPath)
-		publicLogger.ExcludeURL(healthx.ReadyCheckPath)
+		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
+	setTracingLogger(publicLogger)
 
 	publicmw.Use(publicLogger)
 	publicmw.Use(d.Registry().PrometheusManager())

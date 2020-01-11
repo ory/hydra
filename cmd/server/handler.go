@@ -34,9 +34,9 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/reqlog"
 
 	"github.com/julienschmidt/httprouter"
-	negronilogrus "github.com/meatballhat/negroni-logrus"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
@@ -155,7 +155,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 	}
 }
 
-func setTracingLogger(logger *negronilogrus.Middleware) {
+func setTracingLogger(logger *reqlog.Middleware) {
 	logger.Before = func(entry *logrus.Entry, r *http.Request, remoteAddr string) *logrus.Entry {
 		_, _, spanCtx := httptrace.Extract(r.Context(), r)
 		fields := logrus.Fields{
@@ -184,26 +184,24 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicmw.Use(tracer)
 	}
 
-	adminLogger := negronilogrus.NewMiddlewareFromLogger(
+	adminLogger := reqlog.NewMiddlewareFromLogger(
 		d.Registry().Logger().(*logrus.Logger),
 		fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()),
 	)
 	if d.Configuration().AdminDisableHealthAccessLog() {
-		adminLogger.ExcludeURL(healthx.AliveCheckPath)
-		adminLogger.ExcludeURL(healthx.ReadyCheckPath)
+		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 	setTracingLogger(adminLogger)
 
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.Registry().PrometheusManager())
 
-	publicLogger := negronilogrus.NewMiddlewareFromLogger(
+	publicLogger := reqlog.NewMiddlewareFromLogger(
 		d.Registry().Logger().(*logrus.Logger),
 		fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String()),
 	)
 	if d.Configuration().PublicDisableHealthAccessLog() {
-		publicLogger.ExcludeURL(healthx.AliveCheckPath)
-		publicLogger.ExcludeURL(healthx.ReadyCheckPath)
+		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 	setTracingLogger(publicLogger)
 

@@ -59,8 +59,6 @@ type Provider interface {
 	LoginURL() *url.URL
 	LogoutURL() *url.URL
 	PKCEEnforced() bool
-	LogTracingPublic() bool
-	LogTracingAdmin() bool
 }
 
 func MustValidate(l logrus.FieldLogger, p Provider) {

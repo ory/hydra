@@ -79,14 +79,6 @@ log:
   level: info
   # Sets the log format. Leave it undefined for text based log format, or set to "json" for JSON formatting.
   format: json
-  # Enable traceable logging
-  # Set HTTP `Traceparent` Header to log tracing id and span id.
-  # The `Traceparent` header contains the following fields: `version`, `trace-id`, `span-id`, and `trace-options`.
-  # Example: `Traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-00`
-  # https://github.com/opentracing/specification/blob/master/rfc/trace_identifiers.md
-  tracing:
-    public: true
-    admin: true
 
 # serve controls the configuration for the http(s) daemon(s).
 serve:

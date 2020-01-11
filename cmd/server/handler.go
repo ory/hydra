@@ -155,7 +155,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 	}
 }
 
-func setTracingLogger(d driver.Driver, logger *negronilogrus.Middleware) {
+func setTracingLogger(logger *negronilogrus.Middleware) {
 	logger.Before = func(entry *logrus.Entry, r *http.Request, remoteAddr string) *logrus.Entry {
 		_, _, spanCtx := httptrace.Extract(r.Context(), r)
 		fields := logrus.Fields{
@@ -192,9 +192,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		adminLogger.ExcludeURL(healthx.AliveCheckPath)
 		adminLogger.ExcludeURL(healthx.ReadyCheckPath)
 	}
-	if d.Configuration().LogTracingAdmin() {
-		setTracingLogger(d, adminLogger)
-	}
+	setTracingLogger(adminLogger)
 
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.Registry().PrometheusManager())
@@ -207,9 +205,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicLogger.ExcludeURL(healthx.AliveCheckPath)
 		publicLogger.ExcludeURL(healthx.ReadyCheckPath)
 	}
-	if d.Configuration().LogTracingPublic() {
-		setTracingLogger(d, publicLogger)
-	}
+	setTracingLogger(publicLogger)
 
 	publicmw.Use(publicLogger)
 	publicmw.Use(d.Registry().PrometheusManager())

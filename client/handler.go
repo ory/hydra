@@ -204,6 +204,10 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	pagination.Header(w, r.URL, n, limit, offset)
 
+	if c == nil {
+		c = []Client{}
+	}
+
 	h.r.Writer().Write(w, r, c)
 }
 

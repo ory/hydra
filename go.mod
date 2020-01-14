@@ -19,6 +19,7 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.3.1
 	github.com/golangci/golangci-lint v1.22.2 // indirect
+	github.com/google/uuid v1.1.1
 	github.com/gorilla/sessions v1.1.4-0.20181208214519-12bd4761fc66
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/imdario/mergo v0.0.0-20171009183408-7fe0c75c13ab

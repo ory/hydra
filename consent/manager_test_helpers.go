@@ -26,10 +26,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/x"
 )
@@ -86,7 +88,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
 		GrantedAudience: []string{"auda" + key, "audb" + key},
 		Error:           err,
-		//WasUsed:         true,
+		// WasUsed:         true,
 	}
 
 	return c, h
@@ -156,29 +158,96 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Subject:                c.Subject,
 		ACR:                    "acr",
 		ForceSubjectIdentifier: "forced-subject",
-		//WasUsed:                false,
+		WasUsed:                false,
 	}
 
 	return c, h
 }
 
-func mockCreateLoginSessions(m Manager, subject string) (loginSessions []LoginSession, err error) {
-	for i := 0; i < 2; i++ {
-		fakeLoginSession := LoginSession{
-			ID:              fmt.Sprintf("fk-login-session-%s-%d", subject, i),
-			AuthenticatedAt: time.Now(),
-			Subject:         fmt.Sprintf("subject%s", subject),
+func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *HandledConsentRequest {
+	var rde *RequestDeniedError
+	if hasError {
+		rde = &RequestDeniedError{
+			Name:        "error_name",
+			Description: "error_description",
+			Hint:        "error_hint",
+			Code:        100,
+			Debug:       "error_debug",
 		}
-		err := m.CreateLoginSession(context.TODO(), &fakeLoginSession)
-		if err != nil {
-			return nil, err
-		}
-
-		loginSessions = append(loginSessions, fakeLoginSession)
 	}
 
-	return loginSessions, nil
+	h := &HandledConsentRequest{
+		ConsentRequest:  c,
+		RememberFor:     rememberFor,
+		Remember:        remember,
+		Challenge:       c.Challenge,
+		RequestedAt:     time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt: authAt,
+		GrantedScope:    []string{"scopea", "scopeb"},
+		GrantedAudience: []string{"auda", "audb"},
+		Error:           rde,
+		WasUsed:         false,
+	}
 
+	_, err := m.HandleConsentRequest(context.Background(), c.Challenge, h)
+	require.NoError(t, err)
+	return h
+}
+
+// SaneMockConsentRequest does the same thing as MockConsentRequest but uses less insanity and implicit dependencies.
+func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool) (c *ConsentRequest) {
+	c = &ConsentRequest{
+		RequestedScope:    []string{"scopea", "scopeb"},
+		RequestedAudience: []string{"auda", "audb"},
+		Skip:              skip,
+		Subject:           ar.Subject,
+		OpenIDConnectContext: &OpenIDConnectContext{
+			ACRValues: []string{"1", "2"},
+			UILocales: []string{"fr", "de"},
+			Display:   "popup",
+		},
+		Client:                 ar.Client,
+		RequestURL:             "https://request-url/path",
+		LoginChallenge:         ar.Challenge,
+		LoginSessionID:         ar.SessionID,
+		ForceSubjectIdentifier: "forced-subject",
+		SubjectIdentifier:      "forced-subject",
+		ACR:                    "1",
+		AuthenticatedAt:        time.Now().UTC().Add(-time.Hour),
+		RequestedAt:            time.Now().UTC().Add(-time.Hour),
+		Context:                map[string]interface{}{"foo": "bar"},
+
+		Challenge: uuid.New().String(),
+		Verifier:  uuid.New().String(),
+		CSRF:      uuid.New().String(),
+	}
+
+	require.NoError(t, m.CreateConsentRequest(context.Background(), c))
+	return c
+}
+
+// SaneMockAuthRequest does the same thing as MockAuthRequest but uses less insanity and implicit dependencies.
+func SaneMockAuthRequest(t *testing.T, m Manager, ls *LoginSession, cl *client.Client) (c *LoginRequest) {
+	c = &LoginRequest{
+		OpenIDConnectContext: &OpenIDConnectContext{
+			ACRValues: []string{"1", "2"},
+			UILocales: []string{"fr", "de"},
+			Display:   "popup",
+		},
+		RequestedAt:    time.Now().UTC().Add(-time.Hour),
+		Client:         cl,
+		Subject:        ls.Subject,
+		RequestURL:     "https://request-url/path",
+		Skip:           true,
+		RequestedScope: []string{"scopea", "scopeb"},
+		SessionID:      ls.ID,
+
+		CSRF:      uuid.New().String(),
+		Challenge: uuid.New().String(),
+		Verifier:  uuid.New().String(),
+	}
+	require.NoError(t, m.CreateLoginRequest(context.Background(), c))
+	return c
 }
 
 func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.FositeStorer) func(t *testing.T) {
@@ -589,191 +658,88 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				require.EqualError(t, err, x.ErrNotFound.Error())
 			})
 
-			t.Run("case=ListUserAuthenticatedClientsWithFrontChannelLogout", func(t *testing.T) {
-				identity1 := "LUACWFCL"
-				identity2 := "LUBCWFCL"
-				identity1Sessions, err := mockCreateLoginSessions(m, identity1)
-				identity2Sessions, err := mockCreateLoginSessions(m, identity2)
+			t.Run("case=ListUserAuthenticatedClientsWithFrontAndBackChannelLogout", func(t *testing.T) {
+				// The idea of this test is to create two identities (subjects) with 4 sessions each, where
+				// only some sessions have been associated with a client that has a front channel logout url
 
-				require.NoError(t, err)
-
-				identities := map[string][]LoginSession{
-					identity1: identity1Sessions,
-					identity2: identity2Sessions,
+				subjects := make([]string, 1)
+				for k := range subjects {
+					subjects[k] = fmt.Sprintf("subject-ListUserAuthenticatedClientsWithFrontAndBackChannelLogout-%d", k)
 				}
 
-				for identity, sessions := range identities {
-					j, k := 0, 1
-					for (j < 2) && (k >= 0) {
-						c, h := MockConsentRequest(fmt.Sprintf("%s-%d", identity, j), false, 0, false, false, false)
+				sessions := make([]LoginSession, len(subjects)*1)
+				frontChannels := map[string][]client.Client{}
+				backChannels := map[string][]client.Client{}
+				for k := range sessions {
+					id := uuid.New().String()
+					subject := subjects[k%len(subjects)]
+					t.Run(fmt.Sprintf("create/session=%s/subject=%s", id, subject), func(t *testing.T) {
+						ls := &LoginSession{
+							ID:              id,
+							AuthenticatedAt: time.Now(),
+							Subject:         subject,
+						}
+						require.NoError(t, m.CreateLoginSession(context.Background(), ls))
 
-						c.Client.FrontChannelLogoutURI = fmt.Sprintf("http://some-url.com/%s-%d", identity, j)
-						c.LoginSessionID = sessions[j].ID
-						c.Subject = fmt.Sprintf("subject%s", identity)
-						clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+						cl := &client.Client{ClientID: uuid.New().String()}
+						switch k % 4 {
+						case 0:
+							cl.FrontChannelLogoutURI = "http://some-url.com/"
+							frontChannels[id] = append(frontChannels[id], *cl)
+						case 1:
+							cl.BackChannelLogoutURI = "http://some-url.com/"
+							backChannels[id] = append(backChannels[id], *cl)
+						case 2:
+							cl.FrontChannelLogoutURI = "http://some-url.com/"
+							cl.BackChannelLogoutURI = "http://some-url.com/"
+							frontChannels[id] = append(frontChannels[id], *cl)
+							backChannels[id] = append(backChannels[id], *cl)
+						}
+						require.NoError(t, clientManager.CreateClient(context.Background(), cl))
 
-						lc, _ := MockAuthRequest(fmt.Sprintf("%s-%d", identity, j), true)
-						lc.Challenge = fmt.Sprintf("fk-login-challenge-%s-%d", identity, j)
-						lc.SessionID = sessions[j].ID
-						require.NoError(t, m.CreateLoginRequest(context.TODO(), lc))
+						ar := SaneMockAuthRequest(t, m, ls, cl)
+						cr := SaneMockConsentRequest(t, m, ar, false)
+						_ = SaneMockHandleConsentRequest(t, m, cr, time.Time{}, 0, false, false)
 
-						require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
-						_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
-						require.NoError(t, err)
+						sessions[k] = *ls
+					})
+				}
 
-						clients, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), "subject"+identity, sessions[j].ID)
+				for _, ls := range sessions {
+					check := func(t *testing.T, expected map[string][]client.Client, actual []client.Client) {
+						es, ok := expected[ls.ID]
+						if !ok {
+							require.Len(t, actual, 0)
+							return
+						}
+						require.Len(t, actual, len(es))
 
-						require.NoError(t, err)
-
-						require.Len(t, clients, 1)
-						assert.EqualValues(t, fmt.Sprintf("http://some-url.com/%s-%d", identity, j), clients[0].FrontChannelLogoutURI)
-						assert.EqualValues(t, fmt.Sprintf("fk-client-%s-%d", identity, j), clients[0].ClientID)
-
-						//Negative testing
-						clients, err = m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), "subject"+identity, sessions[j].ID)
-						require.NoError(t, err)
-
-						require.Len(t, clients, 1)
-						assert.NotEqual(t, fmt.Sprintf("fk-client-%s-%d", identity, k), clients[0].ClientID)
-
-						j++
-						k--
+						for _, e := range es {
+							var found bool
+							for _, a := range actual {
+								if e.ClientID == a.ClientID {
+									found = true
+								}
+								assert.Equal(t, e.ClientID, a.ClientID)
+								assert.Equal(t, e.FrontChannelLogoutURI, a.FrontChannelLogoutURI)
+								assert.Equal(t, e.BackChannelLogoutURI, a.BackChannelLogoutURI)
+							}
+							require.True(t, found)
+						}
 					}
-				}
-			})
 
-			t.Run("case=ListUserAuthenticatedClientsWithFrontChannelLogout-duplicateLogin", func(t *testing.T) {
-				c, h := MockConsentRequest("LUACWFCL-DUPLICCATE", false, 0, false, false, false)
-				c.Client.FrontChannelLogoutURI = "http://some-url.com/"
-
-				fakeLoginSession := LoginSession{
-					ID:              "fk-login-session-LUACWFCL-DUPLICCATE",
-					AuthenticatedAt: time.Now(),
-					Subject:         "subjectLUACWFCL-DUPLICCATE",
-				}
-				err = m.CreateLoginSession(context.TODO(), &fakeLoginSession)
-				clientManager.CreateClient(context.TODO(), c.Client)
-
-				for i := 0; i < 2; i++ {
-					lc, _ := MockAuthRequest("LUACWFCL-DUPLICCATE", true)
-					lc.Challenge = fmt.Sprintf("fk-login-challenge-LUACWFCL-DUPLICCATE-%d", i)
-					lc.Verifier = fmt.Sprintf("fk-login-verifier-LUACWFCL-DUPLICCATE-%d", i)
-					lc.SessionID = fakeLoginSession.ID
-					require.NoError(t, m.CreateLoginRequest(context.TODO(), lc))
-
-					c.Challenge = fmt.Sprintf("challenge-LUACWFCL-DUPLICCATE-%d", i)
-					c.LoginChallenge = fmt.Sprintf("fk-login-challenge-LUACWFCL-DUPLICCATE-%d", i)
-					c.Verifier = fmt.Sprintf("verifiers-LUACWFCL-DUPLICCATE-%d", i)
-					c.Subject = fmt.Sprintf("subjectLUACWFCL-DUPLICCATE-%d", i)
-					c.LoginSessionID = fakeLoginSession.ID
-					require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
-
-					h.Challenge = fmt.Sprintf("challenge-LUACWFCL-DUPLICCATE-%d", i)
-					_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
-					require.NoError(t, err)
-				}
-
-				clients, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), fakeLoginSession.Subject+"-0", fakeLoginSession.ID)
-				require.NoError(t, err)
-
-				require.Len(t, clients, 1)
-				assert.EqualValues(t, "http://some-url.com/", clients[0].FrontChannelLogoutURI)
-				assert.EqualValues(t, "fk-client-LUACWFCL-DUPLICCATE", clients[0].ClientID)
-			})
-
-			t.Run("case=ListUserAuthenticatedClientsWithBackChannelLogout", func(t *testing.T) {
-				identity1 := "LUACWFCLBAC"
-				identity2 := "LUBCWFCLBAC"
-				identity1Sessions, err := mockCreateLoginSessions(m, identity1)
-				identity2Sessions, err := mockCreateLoginSessions(m, identity2)
-
-				require.NoError(t, err)
-
-				identities := map[string][]LoginSession{
-					identity1: identity1Sessions,
-					identity2: identity2Sessions,
-				}
-
-				for identity, sessions := range identities {
-					j, k := 0, 1
-					for (j < 2) && (k >= 0) {
-						c, h := MockConsentRequest(fmt.Sprintf("%s-%d", identity, j), false, 0, false, false, false)
-
-						c.Client.BackChannelLogoutURI = fmt.Sprintf("http://some-url.com/%s-%d", identity, j)
-						c.LoginSessionID = sessions[j].ID
-						c.Subject = fmt.Sprintf("subject%s", identity)
-						clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
-
-						lc, _ := MockAuthRequest(fmt.Sprintf("%s-%d", identity, j), true)
-						lc.Challenge = fmt.Sprintf("fk-login-challenge-%s-%d", identity, j)
-						lc.SessionID = sessions[j].ID
-						require.NoError(t, m.CreateLoginRequest(context.TODO(), lc))
-
-						require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
-						_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
+					t.Run(fmt.Sprintf("method=ListUserAuthenticatedClientsWithFrontChannelLogout/session=%s/subject=%s", ls.ID, ls.Subject), func(t *testing.T) {
+						actual, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.TODO(), ls.Subject, ls.ID)
 						require.NoError(t, err)
+						check(t, frontChannels, actual)
+					})
 
-						clients, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), "subject"+identity, sessions[j].ID)
-
+					t.Run(fmt.Sprintf("method=ListUserAuthenticatedClientsWithBackChannelLogout/session=%s", ls.ID), func(t *testing.T) {
+						actual, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), ls.Subject, ls.ID)
 						require.NoError(t, err)
-
-						require.Len(t, clients, 1)
-						assert.EqualValues(t, fmt.Sprintf("http://some-url.com/%s-%d", identity, j), clients[0].BackChannelLogoutURI)
-						assert.EqualValues(t, fmt.Sprintf("fk-client-%s-%d", identity, j), clients[0].ClientID)
-
-						//Negative testing
-						clients, err = m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), "subject"+identity, sessions[j].ID)
-						require.NoError(t, err)
-
-						require.Len(t, clients, 1)
-						assert.NotEqual(t, fmt.Sprintf("fk-client-%s-%d", identity, k), clients[0].ClientID)
-
-						j++
-						k--
-					}
+						check(t, backChannels, actual)
+					})
 				}
-			})
-
-			t.Run("case=ListUserAuthenticatedClientsWithBackChannelLogout-duplicateLogin", func(t *testing.T) {
-				c, h := MockConsentRequest("LUACWFBL-DUPLICCATE", false, 0, false, false, false)
-				c.Client.BackChannelLogoutURI = "http://some-url.com/"
-				fakeLoginSession := LoginSession{
-					ID:              "fk-login-session-LUACWFBL-DUPLICCATE",
-					AuthenticatedAt: time.Now(),
-					Subject:         "subjectLUACWFBL-DUPLICCATE",
-				}
-
-				c.Subject = "subjectLUACWFBL-DUPLICCATE"
-				c.LoginSessionID = fakeLoginSession.ID
-				err = m.CreateLoginSession(context.TODO(), &fakeLoginSession)
-				require.NoError(t, err)
-				clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
-
-				for i := 0; i < 2; i++ {
-					lc, _ := MockAuthRequest("LUACWFBL-DUPLICCATE", true)
-					lc.Challenge = fmt.Sprintf("fk-login-challenge-LUACWFBL-DUPLICCATE-%d", i)
-					lc.Verifier = fmt.Sprintf("fk-login-verifier-LUACWFBL-DUPLICCATE-%d", i)
-
-					lc.SessionID = fakeLoginSession.ID
-					require.NoError(t, m.CreateLoginRequest(context.TODO(), lc))
-
-					c.Challenge = fmt.Sprintf("challenge-LUACWFBL-DUPLICCATE-%d", i)
-					c.LoginChallenge = fmt.Sprintf("fk-login-challenge-LUACWFBL-DUPLICCATE-%d", i)
-					c.Verifier = fmt.Sprintf("verifiers-LUACWFBL-DUPLICCATE-%d", i)
-
-					require.NoError(t, m.CreateConsentRequest(context.TODO(), c))
-
-					h.Challenge = fmt.Sprintf("challenge-LUACWFBL-DUPLICCATE-%d", i)
-					_, err = m.HandleConsentRequest(context.TODO(), c.Challenge, h)
-					require.NoError(t, err)
-				}
-
-				clients, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.TODO(), "subjectLUACWFBL-DUPLICCATE", "fk-login-session-LUACWFBL-DUPLICCATE")
-				require.NoError(t, err)
-
-				require.Len(t, clients, 1)
-				assert.EqualValues(t, "http://some-url.com/", clients[0].BackChannelLogoutURI)
-				assert.EqualValues(t, "fk-client-LUACWFBL-DUPLICCATE", clients[0].ClientID)
 			})
 
 			t.Run("case=LogoutRequest", func(t *testing.T) {

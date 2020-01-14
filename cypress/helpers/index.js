@@ -61,8 +61,8 @@ export const deleteClients = () =>
   })
     .then(isStatusOk)
     .then(res => res.json())
-    .then(body => {
-      body.forEach(({ client_id }) => deleteClient(client_id));
+    .then((body = []) => {
+      (body || []).forEach(({ client_id }) => deleteClient(client_id));
     });
 
 const deleteClient = client_id =>

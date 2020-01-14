@@ -48,6 +48,9 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
@@ -57,8 +60,6 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/urlx"
 )
 
 func mustRSAKey() *rsa.PrivateKey {
@@ -232,6 +233,7 @@ func TestStrategyLogout(t *testing.T) {
 		d                string
 		params           url.Values
 		subject          string
+		sessionID        string
 		lph              func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
 		expectSession    *HandledConsentRequest
 		expectBody       string
@@ -304,8 +306,9 @@ func TestStrategyLogout(t *testing.T) {
 					}
 				},
 			},
-			jar:     newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-2", "logout-subject-2"),
-			subject: "logout-subject-2",
+			jar:       newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-2", "logout-subject-2"),
+			subject:   "logout-subject-2",
+			sessionID: "logout-session-2",
 		},
 		{
 			d:                "should error when rp-flow without valid id token",
@@ -473,6 +476,7 @@ func TestStrategyLogout(t *testing.T) {
 				}))
 				servers[k] = httptest.NewServer(n)
 				c, hc := MockConsentRequest(uuid.New(), true, 100, false, false, true)
+				c.LoginSessionID = tc.sessionID
 				c.Client.BackChannelLogoutURI = servers[k].URL
 				c.Subject = tc.subject
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), c))

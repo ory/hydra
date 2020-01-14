@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// JSONWebKeySet JSONWebKeySet represents a JWK Set object.
+// JSONWebKeySet JSON web key set
 // swagger:model JSONWebKeySet
 type JSONWebKeySet struct {
 

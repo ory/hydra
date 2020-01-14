@@ -186,6 +186,7 @@ github.com/go-stack/stack v1.8.0 h1:5SgMzNM5HxrEjV0ww2lTmX6E2Izsfxas4+YHWRs3Lsk=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/go-swagger/go-swagger v0.20.0 h1:nYaNsHAGa+r5u6JlcN1Zh6X7zNoOo36Shs8PHU1+G2M=
 github.com/go-swagger/go-swagger v0.20.0/go.mod h1:ylaOr/j+CVsLUsIEhQA49ewFKvVwVSQqVCdDdALNcCw=
+github.com/go-swagger/go-swagger v0.21.1-0.20200107003254-1c98855b472d h1:x6bMs6miV7mzMbdArYk/APT4+TyySD94rot1au2ku60=
 github.com/go-swagger/go-swagger v0.21.1-0.20200107003254-1c98855b472d/go.mod h1:20SBEAunNzw1wD1ZPvWy5xQAxTcCB0UVDVOPeReIayA=
 github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013 h1:l9rI6sNaZgNC0LnF3MiE+qTmyBA/tZAg1rtyrGbUMK0=
 github.com/go-swagger/scan-repo-boundary v0.0.0-20180623220736-973b3573c013/go.mod h1:b65mBPzqzZWxOZGxSWrqs4GInLIn+u99Q9q7p+GKni0=
@@ -688,6 +689,8 @@ github.com/ory/sdk/swagutil v0.0.0-20200108105435-05ff711a8efb h1:RBptWdx27DdGJf
 github.com/ory/sdk/swagutil v0.0.0-20200108105435-05ff711a8efb/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
 github.com/ory/sdk/swagutil v0.0.0-20200108122515-375eeddba1e8 h1:HgdLBUUFatzSA2EVV2zyBbSYZW8+ccyYnriIGmWR+CE=
 github.com/ory/sdk/swagutil v0.0.0-20200108122515-375eeddba1e8/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
+github.com/ory/sdk/swagutil v0.0.0-20200113182044-f6518ab8017d h1:AVIzsXij0v8DoVLAZw9Yo7RXVhM0H53ql3DosRkH5rg=
+github.com/ory/sdk/swagutil v0.0.0-20200113182044-f6518ab8017d/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
 github.com/ory/viper v1.5.6 h1:w4ceGgWwWLzAFYQ7bHaDZmwNsAto2JPVdyQjQnn7VWI=
 github.com/ory/viper v1.5.6/go.mod h1:TYmpFpKLxjQwvT4f0QPpkOn4sDXU1kDgAwJpgLYiQ28=
 github.com/ory/x v0.0.85 h1:AslLr2Efv6f7AT1tzn0RuX+sOri6h74phSh5lSeMqC4=

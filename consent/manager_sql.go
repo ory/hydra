@@ -528,7 +528,7 @@ func (m *SQLManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx conte
 
 func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) ([]client.Client, error) {
 	var ids []string
-	if err := m.DB.SelectContext(ctx, &ids, m.DB.Rebind(fmt.Sprintf(`SELECT DISTINCT(c.id) FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) JOIN hydra_oauth2_authentication_session AS s ON (r.login_session_id = s.id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND s.id = ?`, channel, channel)), subject, sid); err != nil {
+	if err := m.DB.SelectContext(ctx, &ids, m.DB.Rebind(fmt.Sprintf(`SELECT DISTINCT(c.id) FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND r.login_session_id = ?`, channel, channel)), subject, sid); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}

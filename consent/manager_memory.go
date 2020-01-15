@@ -30,8 +30,9 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
+
+	"github.com/ory/hydra/x"
 )
 
 type MemoryManager struct {
@@ -459,29 +460,37 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 	return nil, errors.WithStack(x.ErrNotFound)
 }
 
-func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 
+	preventDupes := make(map[string]bool)
 	var rs []client.Client
 	for _, cr := range m.consentRequests {
-		if cr.Subject == subject && len(cr.Client.FrontChannelLogoutURI) > 0 {
+		if cr.Subject == subject &&
+			len(cr.Client.FrontChannelLogoutURI) > 0 &&
+			cr.LoginSessionID == sid &&
+			!preventDupes[cr.Client.GetID()] {
+
 			rs = append(rs, *cr.Client)
+			preventDupes[cr.Client.GetID()] = true
 		}
 	}
 
 	return rs, nil
 }
 
-func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
+func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
 	m.m["consentRequests"].RLock()
 	defer m.m["consentRequests"].RUnlock()
 
 	clientsMap := make(map[string]bool)
-
 	var rs []client.Client
 	for _, cr := range m.consentRequests {
-		if cr.Subject == subject && len(cr.Client.BackChannelLogoutURI) > 0 && !clientsMap[cr.Client.GetID()] {
+		if cr.Subject == subject &&
+			cr.LoginSessionID == sid &&
+			len(cr.Client.BackChannelLogoutURI) > 0 &&
+			!(clientsMap[cr.Client.GetID()]) {
 			rs = append(rs, *cr.Client)
 			clientsMap[cr.Client.GetID()] = true
 		}

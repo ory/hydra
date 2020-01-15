@@ -401,6 +401,11 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /master/
       - sdk/release:
           requires:
             - test

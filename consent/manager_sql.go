@@ -518,17 +518,17 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 	return aa, nil
 }
 
-func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
-	return m.listUserAuthenticatedClients(ctx, subject, "front")
+func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
+	return m.listUserAuthenticatedClients(ctx, subject, sid, "front")
 }
 
-func (m *SQLManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.Client, error) {
-	return m.listUserAuthenticatedClients(ctx, subject, "back")
+func (m *SQLManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
+	return m.listUserAuthenticatedClients(ctx, subject, sid, "back")
 }
 
-func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject string, channel string) ([]client.Client, error) {
+func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) ([]client.Client, error) {
 	var ids []string
-	if err := m.DB.SelectContext(ctx, &ids, m.DB.Rebind(fmt.Sprintf(`SELECT DISTINCT(c.id) FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' and c.%schannel_logout_uri IS NOT NULL`, channel, channel)), subject); err != nil {
+	if err := m.DB.SelectContext(ctx, &ids, m.DB.Rebind(fmt.Sprintf(`SELECT DISTINCT(c.id) FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND r.login_session_id = ?`, channel, channel)), subject, sid); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}

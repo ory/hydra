@@ -609,7 +609,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 }
 
 func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject)
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return nil, err
 	}
@@ -631,7 +631,7 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 }
 
 func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, subject, sid string) error {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return err
 	}
@@ -900,8 +900,17 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 	}
 
 	if !lr.RPInitiated {
+		// If this is true it means that no id_token_hint was given, so the session id and subject id
+		// came from an original cookie.
+
 		session, err := s.authenticationSession(w, r)
 		if errors.Cause(err) == ErrNoAuthenticationSessionFound {
+			// If we end up here it means that the cookie was revoked between the initial logout request
+			// and ending up here - possibly due to a duplicate submit. In that case, we really have nothing to
+			// do because the logout was already completed, apparently!
+
+			// We also won't call any front- or back-channel logouts because that would mean we had called them twice!
+
 			// OP initiated log out but no session was found. So let's just redirect back...
 			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
 			return nil, errors.WithStack(ErrAbortOAuth2Request)
@@ -909,18 +918,18 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 			return nil, err
 		}
 
-		if err := s.revokeAuthenticationSession(w, r); err != nil {
-			return nil, err
-		}
-
 		if session.Subject != lr.Subject {
-			// Seems like the session changed mid-flight, so we won't revoke the login cookie...
+			// If we end up here it means that the authentication cookie changed between the initial logout request
+			// and landing here. That could happen because the user signed in in another browser window. In that
+			// case there isn't really a lot to do because we don't want to sign out a different ID, so let's just
+			// go to the post redirect uri without actually doing anything!
 			http.Redirect(w, r, lr.PostLogoutRedirectURI, http.StatusFound)
 			return nil, errors.WithStack(ErrAbortOAuth2Request)
 		}
 	}
 
-	if err := s.revokeAuthenticationSession(w, r); err != nil {
+	urls, err := s.generateFrontChannelLogoutURLs(r.Context(), lr.Subject, lr.SessionID)
+	if err != nil {
 		return nil, err
 	}
 
@@ -928,8 +937,7 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		return nil, err
 	}
 
-	urls, err := s.generateFrontChannelLogoutURLs(r.Context(), lr.Subject, lr.SessionID)
-	if err != nil {
+	if err := s.revokeAuthenticationSession(w, r); err != nil {
 		return nil, err
 	}
 

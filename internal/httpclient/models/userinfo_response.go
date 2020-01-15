@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// UserinfoResponse The userinfo response
+// UserinfoResponse UserinfoResponse UserinfoResponse UserinfoResponse The userinfo response
 // swagger:model userinfoResponse
 type UserinfoResponse struct {
 

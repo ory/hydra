@@ -1,13 +1,16 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/pkg"
 	"github.com/pborman/uuid"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -103,4 +106,119 @@ func TestExecute(t *testing.T) {
 			}
 		})
 	}
+}
+
+var secrets map[string]string
+var errorManagerErr error
+
+type FakeManager struct {
+}
+
+func (m FakeManager) GetSecrets(name string) (map[string]string, []byte, error) {
+	return secrets, nil, nil
+}
+
+type ErrorManager struct {
+}
+
+func (m ErrorManager) GetSecrets(name string) (map[string]string, []byte, error) {
+	return nil, nil, errorManagerErr
+}
+
+func TestSetupAppCerts(t *testing.T) {
+	sManager = FakeManager{}
+	os.Setenv("AWS_APP_CERTS_SECRET_NAME", "some")
+	secrets = map[string]string{
+		pkg.AppSSLCert: "hello",
+		pkg.AppSSLKey:  "there",
+	}
+	setupAppCerts()
+	assert.Equal(t, "hello", os.Getenv("HTTPS_TLS_CERT"))
+	assert.Equal(t, "there", os.Getenv("HTTPS_TLS_KEY"))
+
+	os.Unsetenv("AWS_APP_CERTS_SECRET_NAME")
+	os.Unsetenv("HTTPS_TLS_CERT")
+	os.Unsetenv("HTTPS_TLS_KEY")
+	viper.Reset()
+}
+
+func TestSetupAppCertsWithNoSecretName(t *testing.T) {
+	sManager = FakeManager{}
+	os.Unsetenv("AWS_APP_CERTS_SECRET_NAME")
+	assert.Nil(t, setupAppCerts())
+}
+
+func TestSetupAppCertsWithSecretError(t *testing.T) {
+	sManager = ErrorManager{}
+	os.Setenv("AWS_APP_CERTS_SECRET_NAME", "some")
+	errorManagerErr = errors.New("hi")
+
+	err := setupAppCerts()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "Error getting app certs from Secrets Manager: hi")
+
+	os.Unsetenv("AWS_APP_CERTS_SECRET_NAME")
+}
+
+func TestSetupAppCertsWithNoSSLData(t *testing.T) {
+	sManager = FakeManager{}
+	os.Setenv("AWS_APP_CERTS_SECRET_NAME", "some")
+	secrets = map[string]string{
+		pkg.AppSSLKey: "there",
+	}
+	err := setupAppCerts()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), fmt.Sprintf("App certificate (%s) on Secrets Manager (%s) not found", pkg.AppSSLCert, "some"))
+
+	secrets = map[string]string{
+		pkg.AppSSLCert: "hello",
+	}
+	err = setupAppCerts()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), fmt.Sprintf("App key (%s) on Secrets Manager (%s) not found", pkg.AppSSLKey, "some"))
+
+	os.Unsetenv("AWS_APP_CERTS_SECRET_NAME")
+}
+
+func TestSetupDBCerts(t *testing.T) {
+	sManager = FakeManager{}
+	os.Setenv("AWS_RDS_CERTS_SECRET_NAME", "some")
+	secrets = map[string]string{
+		pkg.RdsSSLCert: "how",
+	}
+	setupDBCerts()
+	assert.Equal(t, "how", viper.Get("RdsSSLCert").(string))
+
+	os.Unsetenv("AWS_RDS_CERTS_SECRET_NAME")
+	viper.Reset()
+}
+
+func TestSetupDBCertsWithNoSecret(t *testing.T) {
+	sManager = FakeManager{}
+	os.Unsetenv("AWS_RDS_CERTS_SECRET_NAME")
+	assert.Nil(t, setupDBCerts())
+}
+
+func TestSetupDBCertsWithSecretError(t *testing.T) {
+	sManager = ErrorManager{}
+	os.Setenv("AWS_RDS_CERTS_SECRET_NAME", "some")
+	errorManagerErr = errors.New("hi")
+
+	err := setupDBCerts()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), "Error getting rds certs from Secrets Manager: hi")
+
+	os.Unsetenv("AWS_RDS_CERTS_SECRET_NAME")
+}
+
+func TestSetupDBCertsWithNoSSLData(t *testing.T) {
+	sManager = FakeManager{}
+	os.Setenv("AWS_RDS_CERTS_SECRET_NAME", "some")
+	secrets = map[string]string{}
+
+	err := setupDBCerts()
+	assert.NotNil(t, err)
+	assert.Equal(t, err.Error(), fmt.Sprintf("RDS certificate (%s) on Secrets Manager (%s) not found", pkg.RdsSSLCert, "some"))
+
+	os.Unsetenv("AWS_APP_CERTS_SECRET_NAME")
 }

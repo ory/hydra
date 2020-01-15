@@ -57,6 +57,7 @@ type Config struct {
 	LogLevel               string `mapstructure:"LOG_LEVEL" yaml:"-"`
 	LogFormat              string `mapstructure:"LOG_FORMAT" yaml:"-"`
 	ForceHTTP              bool   `yaml:"-"`
+	RdsSSLCert             string `mapstructure:"RdsSSLCert" yaml:"-"`
 
 	BuildVersion string                  `yaml:"-"`
 	BuildHash    string                  `yaml:"-"`
@@ -217,6 +218,12 @@ func (c *Config) Context() *Context {
 		case "postgres":
 			fallthrough
 		case "mysql":
+			if c.RdsSSLCert != "" {
+				if err = RegisterMysqlTLS(c.RdsSSLCert); err != nil {
+					c.GetLogger().Fatalf("Error registering mysql cert: %v", err)
+				}
+				c.GetLogger().Infof("MySQL SSL cert registered")
+			}
 			connection = &SQLConnection{
 				URL: u,
 				L:   c.GetLogger(),

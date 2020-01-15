@@ -17,13 +17,13 @@ import (
 )
 
 var (
-	mysql    *url.URL
+	mysqlURL *url.URL
 	postgres *url.URL
 )
 var resources []*dockertest.Resource
 
 func TestMain(m *testing.M) {
-	mysql = bootstrapMySQL()
+	mysqlURL = bootstrapMySQL()
 	postgres = bootstrapPostgres()
 
 	s := m.Run()
@@ -57,19 +57,19 @@ func TestSQLConnection(t *testing.T) {
 		{
 			d: "mysql raw",
 			s: &SQLConnection{
-				URL: mysql,
+				URL: mysqlURL,
 			},
 		},
 		{
 			d: "mysql max_conn_lifetime",
 			s: &SQLConnection{
-				URL: merge(mysql, map[string]string{"max_conn_lifetime": "1h"}),
+				URL: merge(mysqlURL, map[string]string{"max_conn_lifetime": "1h"}),
 			},
 		},
 		{
 			d: "mysql max_conn_lifetime",
 			s: &SQLConnection{
-				URL: merge(mysql, map[string]string{"max_conn_lifetime": "1h", "max_idle_conns": "10", "max_conns": "10"}),
+				URL: merge(mysqlURL, map[string]string{"max_conn_lifetime": "1h", "max_idle_conns": "10", "max_conns": "10"}),
 			},
 		},
 		{

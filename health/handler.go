@@ -19,7 +19,7 @@ type Handler struct {
 
 func (h *Handler) SetRoutes(r *httprouter.Router) {
 	r.GET("/health", h.Health)
-	r.GET("/health/detailed", h.DetailedHealth)
+	r.GET("/v1/health/detailed", h.DetailedHealth)
 	r.GET("/health/stats", h.Statistics)
 }
 

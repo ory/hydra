@@ -1,7 +1,4 @@
 #!/bin/sh
-echo "Starting telegraf agent for statsd..."
-telegraf &
-sleep 3
 # NOTE: Never use TEST_SAND_MIGRATE_DB in production
 if [ "$TEST_SAND_MIGRATE_DB" == 'true' ]; then
     echo "migrating db..."

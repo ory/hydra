@@ -9,8 +9,10 @@ import (
 
 	"time"
 
+	conf "github.com/coupa/foundation-go/config"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/config"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -67,6 +69,19 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	smName := os.Getenv("AWSSM_NAME")
+	if smName != "" {
+		if os.Getenv("AWS_REGION") == "" {
+			//Default region to us-east-1
+			if err := os.Setenv("AWS_REGION", "us-east-1"); err != nil {
+				logrus.Fatalf("Error setting AWS_REGION: %v", err)
+			}
+		}
+		if err := conf.WriteSecretsToENV(smName); err != nil {
+			logrus.Fatalf("Error reading from Secrets Manager: %v", err)
+		}
+	}
+
 	if cfgFile != "" {
 		// enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)

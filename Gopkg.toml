@@ -65,8 +65,8 @@
   name = "github.com/mohae/deepcopy"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/moul/http2curl"
+  version = "1.0.0"
 
 [[constraint]]
   name = "github.com/oleiade/reflections"
@@ -91,7 +91,7 @@
 
 [[constraint]]
   name = "github.com/ory/ladon"
-  version = "0.8.10"
+  version = "0.8.9"
 
 [[constraint]]
   name = "github.com/pborman/uuid"
@@ -132,10 +132,6 @@
 [[constraint]]
   name = "gopkg.in/airbrake/gobrake.v2"
   version = "2.0.8"
-
-[[constraint]]
-  name = "gopkg.in/alexcesaro/statsd.v2"
-  version = "2.0.0"
 
 [prune]
   go-tests = true

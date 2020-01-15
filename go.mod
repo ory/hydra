@@ -7,6 +7,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5
 	github.com/asaskevich/govalidator v0.0.0-20170425121227-4918b99a7cb9
+	github.com/aws/aws-sdk-go v1.26.5 // indirect
 	github.com/cenkalti/backoff v2.0.0+incompatible
 	github.com/containerd/continuity v0.0.0-20180921161001-7f53d412b9eb
 	github.com/coupa/foundation-go v1.2.2
@@ -28,8 +29,10 @@ require (
 	github.com/jmoiron/sqlx v0.0.0-20180614180643-0dae4fefe7c0
 	github.com/julienschmidt/httprouter v1.1.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1
+	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v0.0.0-20171010183604-30d59eaf0152
 	github.com/magiconair/properties v1.7.4-0.20170902060319-8d7837e64d3c
+	github.com/mattn/go-sqlite3 v2.0.2+incompatible // indirect
 	github.com/meatballhat/negroni-logrus v0.0.0-20170801195057-31067281800f
 	github.com/mitchellh/mapstructure v0.0.0-20170523030023-d0303fe80992
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -42,7 +45,7 @@ require (
 	github.com/ory/fosite v0.10.1-0.20191218201927-75c261d8b590
 	github.com/ory/graceful v0.1.0
 	github.com/ory/herodot v0.1.1
-	github.com/ory/ladon v0.8.10
+	github.com/ory/ladon v0.8.9
 	github.com/ory/pagination v0.0.2-0.20180227110002-05947c3e39e2
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
 	github.com/pelletier/go-toml v1.0.2-0.20171001224747-2009e44b6f18
@@ -72,6 +75,7 @@ require (
 	google.golang.org/appengine v1.0.1-0.20171010223110-07f075729064
 	gopkg.in/airbrake/gobrake.v2 v2.0.8
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
+	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/gorp.v1 v1.7.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.0.0-20170812160011-eb3733d160e7

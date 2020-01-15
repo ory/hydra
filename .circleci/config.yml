@@ -380,7 +380,6 @@ workflows:
           requires:
             - test
             - format
-            - sdk/generate
             - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql

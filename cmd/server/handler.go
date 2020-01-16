@@ -167,7 +167,7 @@ func setTracingLogger(logger *reqlog.Middleware) {
 			fields = fields.WithField("trace_id", spanCtx.TraceIDString())
 		}
 		if spanCtx.HasSpanID() {
-			fields = fields.WithField("trace_id", spanCtx.SpanIDString())
+			fields = fields.WithField("span_id", spanCtx.SpanIDString())
 		}
 
 		return fields

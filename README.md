@@ -175,6 +175,12 @@ to our ecosystem. *If you think that your company deserves a spot here, reach ou
             <td align="center"><img height="32px" src="./docs/adopters/arduino.svg" alt="Arduino"></td>
             <td><a href="https://www.arduino.cc/">arduino.cc</a></td>
         </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>OrderMyGear</td>
+            <td align="center"><img height="32px" src="./docs/adopters/ordermygear.svg" alt="OrderMyGear"></td>
+            <td><a href="https://www.ordermygear.com/">ordermygear.com</a></td>
+        </tr>
     </tdbody>
 </table>
 

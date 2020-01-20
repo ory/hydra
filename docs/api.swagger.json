@@ -1816,7 +1816,7 @@
   },
   "definitions": {
     "JSONWebKey": {
-      "description": "JSONWebKey JSONWebKey JSON web key",
+      "description": "JSONWebKey JSONWebKey JSONWebKey JSON web key",
       "type": "object",
       "required": [
         "use",
@@ -1915,7 +1915,6 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSON web key set",
       "type": "object",
       "properties": {
         "keys": {
@@ -1928,7 +1927,7 @@
       }
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -1964,7 +1963,7 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -1996,7 +1995,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "AcceptLoginRequest AcceptLoginRequest AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "AcceptLoginRequest AcceptLoginRequest AcceptLoginRequest AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2043,7 +2042,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing consent request.",
+      "title": "ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2104,7 +2103,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "ConsentRequestSession ConsentRequestSession ConsentRequestSession ConsentRequestSession Used to pass session data to a consent request.",
+      "title": "Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2123,11 +2122,11 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
+      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
@@ -2177,7 +2176,6 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2187,12 +2185,11 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
-        "use",
-        "kid"
+        "kid",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -2211,7 +2208,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "LoginRequest Contains information on an ongoing login request.",
+      "title": "LoginRequest LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2279,7 +2276,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "description": "AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
@@ -2332,7 +2329,7 @@
           }
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2430,7 +2427,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2443,7 +2440,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2512,7 +2509,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
+      "description": "The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2544,7 +2541,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2579,7 +2576,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "The request payload used to accept a login or consent request.",
+      "title": "RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",
@@ -2605,7 +2602,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "UserinfoResponse UserinfoResponse UserinfoResponse The userinfo response",
+      "description": "UserinfoResponse UserinfoResponse UserinfoResponse UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -2688,7 +2685,7 @@
       }
     },
     "version": {
-      "description": "Version version",
+      "description": "Version Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -2700,7 +2697,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

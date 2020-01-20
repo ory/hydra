@@ -699,6 +699,7 @@ github.com/ory/x v0.0.85 h1:AslLr2Efv6f7AT1tzn0RuX+sOri6h74phSh5lSeMqC4=
 github.com/ory/x v0.0.85/go.mod h1:s44V8t3xyjWZREcU+mWlp4h302rTuM4aLXcW+y5FbQ8=
 github.com/ory/x v0.0.88 h1:epgeKh5kaT/89YQ9o/eIO3rgwmo3kOwyXcHJRZcZogI=
 github.com/ory/x v0.0.88/go.mod h1:wrnJRjIfYXFY/AUiuUlcIUpLBDxFtWc+8x6toAeLZXU=
+github.com/ory/x v0.0.89/go.mod h1:wrnJRjIfYXFY/AUiuUlcIUpLBDxFtWc+8x6toAeLZXU=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

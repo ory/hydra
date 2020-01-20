@@ -39,7 +39,7 @@ require (
 	github.com/ory/herodot v0.6.2
 	github.com/ory/sdk/swagutil v0.0.0-20200116101926-c5b88ce6e4bd
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.88
+	github.com/ory/x v0.0.89
 	github.com/pborman/uuid v1.2.0
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5

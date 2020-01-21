@@ -102,6 +102,7 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: time.Now(),
 		Challenge:   id,
 		RequestedAt: time.Now(),
+		HandledAt:   time.Now(),
 	})
 	require.NoError(t, err)
 }

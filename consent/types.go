@@ -97,6 +97,9 @@ type HandledConsentRequest struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
+	// HandledAt contains the timestamp the consent request was handled.
+	HandledAt time.Time `json:"handled_at"`
+
 	ConsentRequest  *ConsentRequest     `json:"-"`
 	Error           *RequestDeniedError `json:"-"`
 	Challenge       string              `json:"-"`
@@ -125,6 +128,7 @@ type PreviousConsentSession struct {
 	// authorization will be remembered indefinitely.
 	RememberFor int `json:"remember_for"`
 
+	HandledAt       time.Time           `json:"handled_at"`
 	ConsentRequest  *ConsentRequest     `json:"consent_request"`
 	Error           *RequestDeniedError `json:"-"`
 	Challenge       string              `json:"-"`

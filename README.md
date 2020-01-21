@@ -1,3 +1,5 @@
+<h1>This repo forked from ory/hydra</h1>
+<p>I am implementing <i>resource owner password grant type</i>. I agreed with hydra statements (read this article <a href="https://www.ory.sh/oauth2-for-mobile-app-spa-browser/">oauth2-for-mobile-app-spa-browser</a>, but I think it doesnt mean we had to remove resource <i>owner password grant type</i> features, because it can be used for internal/trusted application</p>
 <h1 align="center"><img src="./docs/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">

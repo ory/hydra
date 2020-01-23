@@ -25,6 +25,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/herodot"
+	"github.com/ory/x/sqlcon"
+
 	"github.com/ory/hydra/x"
 
 	"github.com/julienschmidt/httprouter"
@@ -230,6 +233,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //     Responses:
 //       200: oAuth2Client
+//		 401: genericError
 //       404: genericError
 //       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -237,6 +241,9 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
+		if errors.Cause(err) == sqlcon.ErrNoRows {
+			err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
+		}
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

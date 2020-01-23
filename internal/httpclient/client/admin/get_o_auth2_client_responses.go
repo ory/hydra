@@ -30,6 +30,12 @@ func (o *GetOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return result, nil
+	case 401:
+		result := NewGetOAuth2ClientUnauthorized()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 404:
 		result := NewGetOAuth2ClientNotFound()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -72,6 +78,39 @@ func (o *GetOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 func (o *GetOAuth2ClientOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.OAuth2Client)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetOAuth2ClientUnauthorized creates a GetOAuth2ClientUnauthorized with default headers values
+func NewGetOAuth2ClientUnauthorized() *GetOAuth2ClientUnauthorized {
+	return &GetOAuth2ClientUnauthorized{}
+}
+
+/*GetOAuth2ClientUnauthorized handles this case with default header values.
+
+genericError
+*/
+type GetOAuth2ClientUnauthorized struct {
+	Payload *models.GenericError
+}
+
+func (o *GetOAuth2ClientUnauthorized) Error() string {
+	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientUnauthorized  %+v", 401, o.Payload)
+}
+
+func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
+func (o *GetOAuth2ClientUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

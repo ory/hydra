@@ -38,7 +38,7 @@ const (
 	ViperKeyOIDCDiscoverySupportedScope   = "webfinger.oidc_discovery.supported_scope"
 	ViperKeyOIDCDiscoveryUserinfoEndpoint = "webfinger.oidc_discovery.userinfo_url"
 
-	ViperKeySubjectTypesSupported          = "oidc.subject_identifiers.enabled"
+	ViperKeySubjectTypesSupported          = "oidc.subject_identifiers.supported_types"
 	ViperKeyDefaultClientScope             = "oidc.dynamic_client_registration.default_scope"
 	ViperKeyDSN                            = "dsn"
 	ViperKeyBCryptCost                     = "oauth2.hashers.bcrypt.cost"

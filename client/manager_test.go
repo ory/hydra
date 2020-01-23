@@ -115,8 +115,8 @@ func TestManagers(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		t.Run("case=create-get-delete", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetDeleteClient(k, m))
+		t.Run("case=create-get-update-delete", func(t *testing.T) {
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m))
 		})
 
 		t.Run("case=autogenerate-key", func(t *testing.T) {

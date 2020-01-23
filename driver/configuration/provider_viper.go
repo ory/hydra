@@ -118,6 +118,7 @@ func (v *ViperProvider) SubjectTypesSupported() []string {
 		viperx.GetStringSlice(v.l,
 			ViperKeySubjectTypesSupported,
 			[]string{"public"},
+			"oidc.subject_identifiers.enabled",
 			"OIDC_SUBJECT_TYPES_SUPPORTED",
 		),
 		func(s string) bool {

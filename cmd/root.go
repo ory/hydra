@@ -12,7 +12,8 @@ import (
 	conf "github.com/coupa/foundation-go/config"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/config"
-	"github.com/sirupsen/logrus"
+	"github.com/ory/hydra/pkg"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -36,7 +37,21 @@ var RootCmd = &cobra.Command{
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
-var cmdHandler = cli.NewHandler(c)
+var (
+	cmdHandler                = cli.NewHandler(c)
+	sManager   SecretsManager = AwsSecretsManager{}
+)
+
+type SecretsManager interface {
+	GetSecrets(string) (map[string]string, []byte, error)
+}
+
+type AwsSecretsManager struct {
+}
+
+func (m AwsSecretsManager) GetSecrets(name string) (map[string]string, []byte, error) {
+	return conf.GetSecrets(name)
+}
 
 // Execute adds all child commands to the root command sets flags appropriately.
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -74,11 +89,11 @@ func initConfig() {
 		if os.Getenv("AWS_REGION") == "" {
 			//Default region to us-east-1
 			if err := os.Setenv("AWS_REGION", "us-east-1"); err != nil {
-				logrus.Fatalf("Error setting AWS_REGION: %v", err)
+				log.Fatalf("Error setting AWS_REGION: %v", err)
 			}
 		}
 		if err := conf.WriteSecretsToENV(smName); err != nil {
-			logrus.Fatalf("Error reading from Secrets Manager: %v", err)
+			log.Fatalf("Error reading from Secrets Manager: %v", err)
 		}
 	}
 
@@ -156,6 +171,14 @@ func initConfig() {
 		fmt.Printf(`Config file not found because "%s"`, err)
 		fmt.Println("")
 	}
+	if smName != "" {
+		if err := setupAppCerts(); err != nil {
+			log.Fatal(err)
+		}
+		if err := setupDBCerts(); err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	iss := viper.Get("ISSUER")
 	viper.Set("ISSUER", strings.TrimSuffix(iss.(string), "/"))
@@ -163,6 +186,58 @@ func initConfig() {
 	if err := viper.Unmarshal(c); err != nil {
 		fatal(fmt.Sprintf("Could not read config because %s.", err))
 	}
+}
+
+func setupAppCerts() error {
+	appcertsSecretName := os.Getenv("AWS_APP_CERTS_SECRET_NAME")
+	if appcertsSecretName == "" {
+		return nil
+	}
+	secrets, _, err := sManager.GetSecrets(appcertsSecretName)
+	if err != nil {
+		return fmt.Errorf("Error getting app certs from Secrets Manager: %v", err)
+	}
+
+	if viper.GetString("HTTPS_TLS_CERT") == "" {
+		pem := secrets[pkg.AppSSLCert]
+		if pem == "" {
+			return fmt.Errorf("App certificate (%s) on Secrets Manager (%s) not found", pkg.AppSSLCert, appcertsSecretName)
+		}
+		if err = os.Setenv("HTTPS_TLS_CERT", pkg.FixPemFormat(pem)); err != nil {
+			return fmt.Errorf("Error setting HTTPS_TLS_CERT with cert from secrets manager: %v", err)
+		}
+		log.Infof("Successfully set TLS cert from Secrets Manager")
+	}
+	if viper.GetString("HTTPS_TLS_KEY") == "" {
+		key := secrets[pkg.AppSSLKey]
+		if key == "" {
+			return fmt.Errorf("App key (%s) on Secrets Manager (%s) not found", pkg.AppSSLKey, appcertsSecretName)
+		}
+		if err = os.Setenv("HTTPS_TLS_KEY", pkg.FixPemFormat(key)); err != nil {
+			return fmt.Errorf("Error setting HTTPS_TLS_KEY with TLS key from secrets manager: %v", err)
+		}
+		log.Infof("Successfully set TLS key from Secrets Manager")
+	}
+	return nil
+}
+
+func setupDBCerts() error {
+	rdscertsSecretName := os.Getenv("AWS_RDS_CERTS_SECRET_NAME")
+	if rdscertsSecretName == "" {
+		return nil
+	}
+	secrets, _, err := sManager.GetSecrets(rdscertsSecretName)
+	if err != nil {
+		return fmt.Errorf("Error getting rds certs from Secrets Manager: %v", err)
+	}
+	pem := secrets[pkg.RdsSSLCert]
+	if pem == "" {
+		return fmt.Errorf("RDS certificate (%s) on Secrets Manager (%s) not found", pkg.RdsSSLCert, rdscertsSecretName)
+	}
+	pem = pkg.FixPemFormat(pem)
+	viper.Set("RdsSSLCert", pem)
+	log.Infof("Successfully set RDS cert from Secrets Manager")
+	return nil
 }
 
 func absPathify(inPath string) string {

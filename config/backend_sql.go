@@ -1,6 +1,8 @@
 package config
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	derrors "errors"
 	"net/url"
 	"runtime"
@@ -8,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/ory/hydra/pkg"
@@ -20,6 +22,15 @@ type SQLConnection struct {
 	db  *sqlx.DB
 	URL *url.URL
 	L   logrus.FieldLogger
+}
+
+func RegisterMysqlTLS(certs string) error {
+	rootCertPool := x509.NewCertPool()
+	pem := []byte(certs)
+	if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
+		return errors.New("MySQL failed to append PEM")
+	}
+	return mysql.RegisterTLSConfig("custom", &tls.Config{RootCAs: rootCertPool})
 }
 
 func cleanURLQuery(c *url.URL) *url.URL {

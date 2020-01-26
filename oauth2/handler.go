@@ -232,7 +232,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		UserinfoEndpoint:                   h.c.OIDCDiscoveryUserinfoEndpoint(),
 		TokenEndpointAuthMethodsSupported:  []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		IDTokenSigningAlgValuesSupported:   []string{"RS256"},
-		GrantTypesSupported:                []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
+		GrantTypesSupported:                []string{"authorization_code", "password", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:             []string{"query", "fragment"},
 		UserinfoSigningAlgValuesSupported:  []string{"none", "RS256"},
 		RequestParameterSupported:          true,
@@ -553,6 +553,37 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if accessRequest.GetGrantTypes().Exact("client_credentials") {
+		var accessTokenKeyID string
+		if h.c.AccessTokenStrategy() == "jwt" {
+			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
+			if err != nil {
+				x.LogError(err, h.r.Logger())
+				h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+				return
+			}
+		}
+
+		session.Subject = accessRequest.GetClient().GetID()
+		session.ClientID = accessRequest.GetClient().GetID()
+		session.KID = accessTokenKeyID
+		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.c.IssuerURL().String(), "/") + "/"
+		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
+
+		for _, scope := range accessRequest.GetRequestedScopes() {
+			if h.r.ScopeStrategy()(accessRequest.GetClient().GetScopes(), scope) {
+				accessRequest.GrantScope(scope)
+			}
+		}
+
+		for _, audience := range accessRequest.GetRequestedAudience() {
+			if h.r.AudienceStrategy()(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
+				accessRequest.GrantAudience(audience)
+			}
+		}
+	}
+
+	if accessRequest.GetGrantTypes().Exact("password") {
+
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy() == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())

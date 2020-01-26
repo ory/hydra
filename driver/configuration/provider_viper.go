@@ -67,6 +67,7 @@ const (
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
 	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
+	ViperKeyAuthURL                        = "urls.auth"
 )
 
 func init() {
@@ -342,6 +343,10 @@ func (v *ViperProvider) fallbackURL(path string, host string, port int) string {
 
 func (v *ViperProvider) LoginURL() *url.URL {
 	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLoginURL, v.publicFallbackURL("oauth2/fallbacks/login"), "OAUTH2_LOGIN_URL")))
+}
+
+func (v *ViperProvider) AuthURL() *url.URL {
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyAuthURL, v.publicFallbackURL("oauth2/fallbacks/auth"))))
 }
 
 func (v *ViperProvider) LogoutURL() *url.URL {

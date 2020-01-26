@@ -302,6 +302,10 @@ func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string,
 	return m.GetConsentRequest(ctx, challenge)
 }
 
+func (m *SQLManager) CreateConsent(ctx context.Context, r *HandledConsentRequest) (*ConsentRequest, error) {
+
+}
+
 func (m *SQLManager) replaceUnusedConsentRequest(ctx context.Context, challenge string, d *sqlHandledConsentRequest) (*ConsentRequest, error) {
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"UPDATE hydra_oauth2_consent_request_handled SET %s WHERE challenge=:challenge AND was_used=false",

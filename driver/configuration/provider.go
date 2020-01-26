@@ -58,6 +58,7 @@ type Provider interface {
 	LogoutRedirectURL() *url.URL
 	LoginURL() *url.URL
 	LogoutURL() *url.URL
+	AuthURL() *url.URL
 	PKCEEnforced() bool
 }
 

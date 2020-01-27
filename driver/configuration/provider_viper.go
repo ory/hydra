@@ -346,7 +346,7 @@ func (v *ViperProvider) LoginURL() *url.URL {
 }
 
 func (v *ViperProvider) LogoutURL() *url.URL {
-	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutURL, v.publicFallbackURL("oauth2/fallbacks/logout"))))
+	return urlRoot(urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyLogoutURL, v.publicFallbackURL("oauth2/fallbacks/logout"), "OAUTH2_LOGOUT_URL")))
 }
 
 func (v *ViperProvider) ConsentURL() *url.URL {

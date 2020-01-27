@@ -1,7 +1,6 @@
 module github.com/ory/hydra
 
 require (
-	github.com/Microsoft/go-winio v0.4.12 // indirect
 	github.com/bombsimon/wsl v1.2.8 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatih/color v1.9.0 // indirect
@@ -37,13 +36,13 @@ require (
 	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.2
-	github.com/ory/sdk/swagutil v0.0.0-20200116101926-c5b88ce6e4bd
+	github.com/ory/sdk/swagutil v0.0.0-20200123152503-0d50960e70bd
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.90
+	github.com/ory/x v0.0.91
 	github.com/pborman/uuid v1.2.0
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
 	github.com/prometheus/client_golang v1.1.0
 	github.com/rs/cors v1.6.0
@@ -60,9 +59,8 @@ require (
 	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v0.2.1
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
+	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/sys v0.0.0-20200107162124-548cf772de50 // indirect
 	golang.org/x/tools v0.0.0-20200110042803-e2f26524b78c
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1

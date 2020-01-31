@@ -332,7 +332,7 @@ Run `hydra -h` or `hydra help`.
 
 ### Develop
 
-We encourage all contributions and encourage you to read our [contribution guidelines](./CONTRIBUTING.md)
+We encourage all contributions and encourage you to read our [contribution guidelines](./CONTRIBUTING.md).
 
 #### Dependencies
 
@@ -365,7 +365,7 @@ There are three types of tests you can run:
 
 ##### Short Tests
 
-Short tests run fairly quickly. You can either test all of the code at once
+Short tests run fairly quickly. You can either test all of the code at once:
 
 ```shell script
 go test -short ./...

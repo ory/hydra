@@ -66,7 +66,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	}
 }
 
-func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
+func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		_, err := m.GetClient(ctx, "4321")

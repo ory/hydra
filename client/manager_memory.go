@@ -26,7 +26,6 @@ import (
 
 	"github.com/ory/hydra/x"
 
-	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -78,9 +77,6 @@ func (m *MemoryManager) UpdateClient(ctx context.Context, c *Client) error {
 			return errors.WithStack(err)
 		}
 		c.Secret = string(h)
-	}
-	if err := mergo.Merge(c, o); err != nil {
-		return errors.WithStack(err)
 	}
 
 	m.Lock()

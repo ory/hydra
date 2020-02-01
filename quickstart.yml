@@ -29,14 +29,14 @@ services:
       - URLS_LOGOUT=http://127.0.0.1:3000/logout
       - DSN=memory
       - SECRETS_SYSTEM=youReallyNeedToChangeThis
-      - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
-      - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
+      - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
+      - OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
     restart: unless-stopped
 
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.0.0-rc.10
+    image: oryd/hydra-login-consent-node:v1.1.1
     ports:
       - "3000:3000"
     restart: unless-stopped

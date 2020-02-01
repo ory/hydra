@@ -4,6 +4,7 @@ orbs:
   changelog: ory/changelog@0.0.5
   sdk: ory/sdk@0.1.15
   goreleaser: ory/goreleaser@0.0.8
+  nancy: ory/nancy@0.0.8
 
 jobs:
   format:
@@ -342,7 +343,13 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - nancy/test:
+        filters:
+          tags:
+            only: /.*/
       - test:
+          requires:
+            - nancy/test
           filters:
             tags:
               only: /.*/

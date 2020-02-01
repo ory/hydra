@@ -24,8 +24,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/ory/hydra/x"
-
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -56,7 +54,7 @@ func (m *MemoryManager) GetConcreteClient(ctx context.Context, id string) (*Clie
 		}
 	}
 
-	return nil, errors.WithStack(x.ErrNotFound)
+	return nil, errors.WithStack(sqlcon.ErrNoRows)
 }
 
 func (m *MemoryManager) GetClient(ctx context.Context, id string) (fosite.Client, error) {

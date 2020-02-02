@@ -263,25 +263,9 @@ Head over to the [ORY Developer Documentation](https://www.ory.sh/docs/next/hydr
 
 ## Ecosystem
 
-<a href="https://console.ory.sh/">
-    <img align="right" width="30%" src="docs/images/sec-console.png" alt="ORY Security Console">
-</a>
+<!--BEGIN ECOSYSTEM-->
 
-### ORY Security Console: Administrative User Interface
-
-The [ORY Security Console](https://console.ory.sh/) is a visual admin interface for managing ORY Hydra,
-ORY Oathkeeper, and ORY Keto.
-
-### ORY Oathkeeper: Identity & Access Proxy
-
-[ORY Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust Identity & Access Proxy (IAP) built
-on top of OAuth2 and ORY Hydra.
-
-### ORY Keto: Access Control Policies as a Server
-
-[ORY Keto](https://github.com/ory/keto) is a policy decision point. It uses a set of access control policies, similar
-to AWS IAM Policies, in order to determine whether a subject (user, application, service, car, ...) is authorized to
-perform a certain action on a resource.
+<!--END ECOSYSTEM-->
 
 ### Examples
 

@@ -7,7 +7,6 @@ package models
 
 import (
 	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/swag"
 )
 

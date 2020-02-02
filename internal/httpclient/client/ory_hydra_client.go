@@ -6,10 +6,10 @@ package client
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/runtime"
 	httptransport "github.com/go-openapi/runtime/client"
 
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/runtime"
+	"github.com/go-openapi/strfmt"
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/client/public"
@@ -57,11 +57,8 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *OryHydra {
 
 	cli := new(OryHydra)
 	cli.Transport = transport
-
 	cli.Admin = admin.New(transport, formats)
-
 	cli.Public = public.New(transport, formats)
-
 	return cli
 }
 
@@ -106,9 +103,9 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // OryHydra is a client for ory hydra
 type OryHydra struct {
-	Admin *admin.Client
+	Admin admin.ClientService
 
-	Public *public.Client
+	Public public.ClientService
 
 	Transport runtime.ClientTransport
 }
@@ -116,9 +113,6 @@ type OryHydra struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *OryHydra) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
-
 	c.Admin.SetTransport(transport)
-
 	c.Public.SetTransport(transport)
-
 }

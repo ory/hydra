@@ -8,13 +8,12 @@ package models
 import (
 	"strconv"
 
-	strfmt "github.com/go-openapi/strfmt"
-
 	"github.com/go-openapi/errors"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// JSONWebKeySet JSONWebKeySet represents a JWK Set object.
+// JSONWebKeySet JSON web key set
 // swagger:model JSONWebKeySet
 type JSONWebKeySet struct {
 

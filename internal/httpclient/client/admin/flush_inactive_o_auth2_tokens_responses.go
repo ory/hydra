@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	models "github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/hydra/internal/httpclient/models"
 )
 
 // FlushInactiveOAuth2TokensReader is a Reader for the FlushInactiveOAuth2Tokens structure.

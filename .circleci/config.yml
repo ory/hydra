@@ -1,9 +1,9 @@
 version: 2.1
 
 orbs:
-  changelog: ory/changelog@0.0.5
-  sdk: ory/sdk@0.1.15
-  goreleaser: ory/goreleaser@0.0.8
+  sdk: ory/sdk@0.1.20
+  changelog: ory/changelog@0.0.6
+  goreleaser: ory/goreleaser@0.0.26
   nancy: ory/nancy@0.0.8
 
 jobs:

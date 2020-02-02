@@ -199,9 +199,6 @@ Billy, Chancy Kennedy, Drozzy, Edwin Trejos, Howard Edidin, Ken Adler Oz Haven, 
 
 <!--END ADOPTERS-->
 
-
-
-
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -266,11 +263,6 @@ Head over to the [ORY Developer Documentation](https://www.ory.sh/docs/next/hydr
 <!--BEGIN ECOSYSTEM-->
 
 <!--END ECOSYSTEM-->
-
-### Examples
-
-The [ory/examples](https://github.com/ory/examples) repository contains numerous examples of setting up this project
-individually and together with other services from the ORY Ecosystem.
 
 ## Security
 

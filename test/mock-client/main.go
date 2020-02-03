@@ -211,7 +211,7 @@ func checkTokenResponse(token oauth2token) {
 		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext["foo"])
 	}
 
-	idt := fmt.Sprintf("%s", token.IDToken)
+	idt := token.IDToken
 	if len(idt) == 0 {
 		log.Fatalf("ID Token does not seem to be set: %+v", token)
 	}

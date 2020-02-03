@@ -700,8 +700,6 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, subject,
 				Warnf("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return
 		}
-
-		return
 	}
 
 	for _, t := range tasks {

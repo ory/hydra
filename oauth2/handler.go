@@ -37,11 +37,12 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/urlx"
 )
 
 const (
@@ -50,7 +51,7 @@ const (
 	DefaultPostLogoutPath = "/oauth2/fallbacks/logout/callback"
 	DefaultLogoutPath     = "/oauth2/fallbacks/logout"
 	DefaultErrorPath      = "/oauth2/fallbacks/error"
-	TokenPath             = "/oauth2/token"
+	TokenPath             = "/oauth2/token" // #nosec G101
 	AuthPath              = "/oauth2/auth"
 	LogoutPath            = "/oauth2/sessions/logout"
 
@@ -315,7 +316,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Header().Set("Content-Type", "application/jwt")
-		w.Write([]byte(token))
+		_, _ = w.Write([]byte(token))
 	} else if c.UserinfoSignedResponseAlg == "" || c.UserinfoSignedResponseAlg == "none" {
 		interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
 		delete(interim, "aud")

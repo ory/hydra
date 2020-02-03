@@ -289,6 +289,7 @@ func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
 		query = append(query, fmt.Sprintf("%s=:%s", param, param))
 	}
 
+	/* #nosec G201 - query is constructed using predefined variables only that are never modified */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -320,6 +321,7 @@ func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
 		return errors.WithStack(err)
 	}
 
+	/* #nosec G201 - sqlParams is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_client (%s) VALUES (%s)",
 		strings.Join(sqlParams, ", "),

@@ -115,12 +115,12 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 			delete(m.consentRequests, k)
 			m.m["consentRequests"].Unlock()
 
-			if err := m.r.OAuth2Storage().RevokeAccessToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+			if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
-			if err := m.r.OAuth2Storage().RevokeRefreshToken(nil, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+			if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
 				return err

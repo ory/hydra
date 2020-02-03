@@ -54,6 +54,7 @@ func newTransport(cmd *cobra.Command) *transport {
 	return &transport{
 		cmd: cmd,
 		Transport: httpx.NewResilientRoundTripper(
+			/* #nosec G402 - we want to support dev environments, hence tls trickery */
 			&http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
 			},

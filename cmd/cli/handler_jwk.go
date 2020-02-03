@@ -102,6 +102,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	use := flagx.MustGetString(cmd, "use")
 	client := &http.Client{}
 
+	/* #nosec G402 - we want to support dev environments, hence tls trickery */
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify"),

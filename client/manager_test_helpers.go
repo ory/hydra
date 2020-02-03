@@ -51,11 +51,11 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
-		m.CreateClient(ctx, &Client{
+		require.NoError(t, m.CreateClient(ctx, &Client{
 			ClientID:     "1234321",
 			Secret:       "secret",
 			RedirectURIs: []string{"http://redirect"},
-		})
+		}))
 
 		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
 		require.NotNil(t, err)
@@ -129,7 +129,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
 		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
-		//test if SecretExpiresAt was set properly
+		// test if SecretExpiresAt was set properly
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
 

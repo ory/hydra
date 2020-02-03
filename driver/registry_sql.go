@@ -3,7 +3,6 @@ package driver
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
@@ -28,8 +27,6 @@ type RegistrySQL struct {
 }
 
 var _ Registry = new(RegistrySQL)
-
-var multiSpace = regexp.MustCompile("\\s+")
 
 func init() {
 	dbal.RegisterDriver(func() dbal.Driver {

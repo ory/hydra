@@ -1940,6 +1940,10 @@
             "type": "string"
           }
         },
+        "handled_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
           "type": "boolean"
@@ -1971,6 +1975,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "handled_at": {
+          "description": "HandledAt contains the timestamp the consent request was handled.",
+          "type": "string",
+          "format": "date-time"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",

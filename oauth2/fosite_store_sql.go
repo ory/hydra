@@ -62,12 +62,14 @@ func NewFositeSQLStore(db *sqlx.DB, r InternalRegistry, c Configuration) *Fosite
 	return &FositeSQLStore{r: r, c: c, DB: db}
 }
 
+type tableName string
+
 const (
-	sqlTableOpenID  = "oidc"
-	sqlTableAccess  = "access"
-	sqlTableRefresh = "refresh"
-	sqlTableCode    = "code"
-	sqlTablePKCE    = "pkce"
+	sqlTableOpenID  tableName = "oidc"
+	sqlTableAccess  tableName = "access"
+	sqlTableRefresh tableName = "refresh"
+	sqlTableCode    tableName = "code"
+	sqlTablePKCE    tableName = "pkce"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -243,14 +245,14 @@ func (s *FositeSQLStore) GetConcreteClient(ctx context.Context, id string) (*cli
 }
 
 // hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
-func (s *FositeSQLStore) hashSignature(signature, table string) string {
+func (s *FositeSQLStore) hashSignature(signature string, table tableName) string {
 	if table == sqlTableAccess && s.c.IsUsingJWTAsAccessTokens() {
 		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
 	}
 	return signature
 }
 
-func (s *FositeSQLStore) createSession(ctx context.Context, signature string, requester fosite.Requester, table string) error {
+func (s *FositeSQLStore) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
 	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
@@ -259,6 +261,7 @@ func (s *FositeSQLStore) createSession(ctx context.Context, signature string, re
 		return err
 	}
 
+	/* #nosec G201 - sqlParams is a "constant" array */
 	query := fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_%s (%s) VALUES (%s)",
 		table,
@@ -279,11 +282,12 @@ func (s *FositeSQLStore) db(ctx context.Context) sqlxDB {
 	}
 }
 
-func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature string, session fosite.Session, table string) (fosite.Requester, error) {
+func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature string, session fosite.Session, table tableName) (fosite.Requester, error) {
 	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
 	var d sqlData
+	/* #nosec G201 - table is a fixed enum */
 	if err := db.GetContext(ctx, &d, db.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {
@@ -301,10 +305,11 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 	return d.toRequest(session, s.r.ClientManager(), s.r.Logger())
 }
 
-func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table string) error {
+func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table tableName) error {
 	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
+	/* #nosec G201 - table is a const */
 	if _, err := db.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err != nil {
 		return sqlcon.HandleError(err)
 	}
@@ -400,8 +405,9 @@ func (s *FositeSQLStore) RevokeAccessToken(ctx context.Context, id string) error
 	return s.revokeSession(ctx, id, sqlTableAccess)
 }
 
-func (s *FositeSQLStore) revokeSession(ctx context.Context, id string, table string) error {
+func (s *FositeSQLStore) revokeSession(ctx context.Context, id string, table tableName) error {
 	db := s.db(ctx)
+	/* #nosec G201 - table is a const enum */
 	if _, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	} else if err != nil {

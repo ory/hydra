@@ -95,7 +95,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 			remember = true
 		}
 		value := "bar"
-		if o.Skip == true {
+		if o.Skip {
 			value = "rab"
 		}
 

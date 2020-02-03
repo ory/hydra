@@ -356,7 +356,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
 					c, h := MockAuthRequest(tc.key, tc.authAt)
-					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+					require.NoError(t, clientManager.CreateClient(context.TODO(), c.Client)) // Ignore errors that are caused by duplication
 
 					_, err := m.GetLoginRequest(context.TODO(), "challenge"+tc.key)
 					require.Error(t, err)
@@ -406,7 +406,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
 					c, h := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt)
-					clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+					require.NoError(t, clientManager.CreateClient(context.TODO(), c.Client)) // Ignore errors that are caused by duplication
 
 					_, err := m.GetConsentRequest(context.TODO(), "challenge"+tc.key)
 					require.Error(t, err)
@@ -514,8 +514,8 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		t.Run("case=revoke-used-consent-request", func(t *testing.T) {
 			cr1, hcr1 := MockConsentRequest("rv1", false, 0, false, false, false)
 			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false)
-			clientManager.CreateClient(context.TODO(), cr1.Client)
-			clientManager.CreateClient(context.TODO(), cr2.Client)
+			require.NoError(t, clientManager.CreateClient(context.TODO(), cr1.Client))
+			require.NoError(t, clientManager.CreateClient(context.TODO(), cr2.Client))
 
 			require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
 			require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
@@ -524,10 +524,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			_, err = m.HandleConsentRequest(context.TODO(), "challengerv2", hcr2)
 			require.NoError(t, err)
 
-			fositeManager.CreateAccessTokenSession(context.TODO(), "trva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()})
-			fositeManager.CreateRefreshTokenSession(context.TODO(), "rrva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()})
-			fositeManager.CreateAccessTokenSession(context.TODO(), "trva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()})
-			fositeManager.CreateRefreshTokenSession(context.TODO(), "rrva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()})
+			require.NoError(t, fositeManager.CreateAccessTokenSession(context.TODO(), "trva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateRefreshTokenSession(context.TODO(), "rrva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateAccessTokenSession(context.TODO(), "trva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateRefreshTokenSession(context.TODO(), "rrva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()}))
 
 			for i, tc := range []struct {
 				subject string
@@ -579,8 +579,8 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
 			cr1, hcr1 := MockConsentRequest("rv1", true, 0, false, false, false)
 			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false)
-			clientManager.CreateClient(context.TODO(), cr1.Client)
-			clientManager.CreateClient(context.TODO(), cr2.Client)
+			require.NoError(t, clientManager.CreateClient(context.TODO(), cr1.Client))
+			require.NoError(t, clientManager.CreateClient(context.TODO(), cr2.Client))
 
 			require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
 			require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
@@ -632,7 +632,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			}
 
 			t.Run("case=obfuscated", func(t *testing.T) {
-				got, err := m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
+				_, err := m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
 				require.EqualError(t, err, x.ErrNotFound.Error())
 
 				expect := &ForcedObfuscatedLoginSession{
@@ -642,7 +642,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				}
 				require.NoError(t, m.CreateForcedObfuscatedLoginSession(context.TODO(), expect))
 
-				got, err = m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
+				got, err := m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
 				require.NoError(t, err)
 				assert.EqualValues(t, expect, got)
 
@@ -657,7 +657,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				require.NoError(t, err)
 				assert.EqualValues(t, expect, got)
 
-				got, err = m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
+				_, err = m.GetForcedObfuscatedLoginSession(context.TODO(), "fk-client-1", "obfuscated-1")
 				require.EqualError(t, err, x.ErrNotFound.Error())
 			})
 
@@ -761,7 +761,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					t.Run("key="+tc.key, func(t *testing.T) {
 						c := MockLogoutRequest(tc.key, tc.withClient)
 						if tc.withClient {
-							clientManager.CreateClient(context.TODO(), c.Client) // Ignore errors that are caused by duplication
+							require.NoError(t, clientManager.CreateClient(context.TODO(), c.Client)) // Ignore errors that are caused by duplication
 						}
 
 						_, err := m.GetLogoutRequest(context.TODO(), "challenge"+tc.key)

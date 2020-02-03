@@ -49,7 +49,6 @@ func HashStringSecret(secret string) []byte {
 // The system secret is being hashed to always match exactly the 32 bytes required by AEAD, even if the secret is long or
 // shorter.
 func HashByteSecret(secret []byte) []byte {
-	var r [32]byte
-	r = sha256.Sum256([]byte(secret))
+	r := sha256.Sum256(secret)
 	return r[:]
 }

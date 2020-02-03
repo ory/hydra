@@ -93,13 +93,10 @@ This command will help you to see if ORY Hydra has been configured properly.
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-		if flagx.MustGetBool(cmd, "skip-tls-verify") {
-			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
-			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			}})
-		}
+		/* #nosec G402 - we want to support dev environments, hence tls trickery */
+		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+		}})
 
 		isSSL := flagx.MustGetBool(cmd, "https")
 		port := flagx.MustGetInt(cmd, "port")
@@ -162,7 +159,7 @@ and success.`,
 		)
 
 		if !flagx.MustGetBool(cmd, "no-open") {
-			webbrowser.Open(serverLocation)
+			_ = webbrowser.Open(serverLocation) // ignore errors
 		}
 
 		fmt.Println("Setting up home route on " + serverLocation)
@@ -254,7 +251,7 @@ and success.`,
 			}{
 				AccessToken:  token.AccessToken,
 				RefreshToken: token.RefreshToken,
-				Expiry:       fmt.Sprintf("%s", token.Expiry.Format(time.RFC1123)),
+				Expiry:       token.Expiry.Format(time.RFC1123),
 				IDToken:      fmt.Sprintf("%v", idt),
 			})
 
@@ -262,11 +259,11 @@ and success.`,
 		})
 
 		if isSSL {
-			server.ListenAndServeTLS("", "")
+			err = server.ListenAndServeTLS("", "")
 		} else {
-			server.ListenAndServe()
+			err = server.ListenAndServe()
 		}
-
+		cmdx.Must(err, "%s", err)
 	},
 }
 

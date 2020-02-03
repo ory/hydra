@@ -49,9 +49,9 @@ const (
 	ViperKeyPublicListenOnPort             = "serve.public.port"
 	ViperKeyPublicDisableHealthAccessLog   = "serve.public.access_log.disable_for_health"
 	ViperKeyConsentRequestMaxAge           = "ttl.login_consent_request"
-	ViperKeyAccessTokenLifespan            = "ttl.access_token"
-	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token"
-	ViperKeyIDTokenLifespan                = "ttl.id_token"
+	ViperKeyAccessTokenLifespan            = "ttl.access_token"  // #nosec G101
+	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token" // #nosec G101
+	ViperKeyIDTokenLifespan                = "ttl.id_token"      // #nosec G101
 	ViperKeyAuthCodeLifespan               = "ttl.auth_code"
 	ViperKeyScopeStrategy                  = "strategies.scope"
 	ViperKeyGetCookieSecrets               = "secrets.cookie"

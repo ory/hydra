@@ -475,6 +475,7 @@ func testFositeSqlStoreTransactionCommitOpenIdConnectSession(m InternalRegistry)
 
 		// test delete within a transaction
 		ctx, err = txnStore.BeginTX(context.Background())
+		require.NoError(t, err)
 		err = m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature)
 		require.NoError(t, err)
 		err = txnStore.Commit(ctx)
@@ -517,6 +518,7 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m InternalRegistr
 		require.NoError(t, err)
 
 		ctx, err = txnStore.BeginTX(context.Background())
+		require.NoError(t, err)
 		err = m.OAuth2Storage().DeleteOpenIDConnectSession(ctx, signature2)
 		require.NoError(t, err)
 		err = txnStore.Rollback(ctx)
@@ -552,6 +554,7 @@ func doTestCommit(m InternalRegistry, t *testing.T,
 
 	// testrevoke within a transaction
 	ctx, err = txnStore.BeginTX(context.Background())
+	require.NoError(t, err)
 	err = revokeFn(ctx, signature)
 	require.NoError(t, err)
 	err = txnStore.Commit(ctx)
@@ -594,6 +597,7 @@ func doTestRollback(m InternalRegistry, t *testing.T,
 	require.NoError(t, err)
 
 	ctx, err = txnStore.BeginTX(context.Background())
+	require.NoError(t, err)
 	err = revokeFn(ctx, signature2)
 	require.NoError(t, err)
 	err = txnStore.Rollback(ctx)

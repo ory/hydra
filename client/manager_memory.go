@@ -141,11 +141,7 @@ func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clie
 	defer m.RUnlock()
 
 	start, end := pagination.Index(limit, offset, len(m.Clients))
-	for _, c := range m.Clients[start:end] {
-		clients = append(clients, c)
-	}
-
-	return clients, nil
+	return append(clients, m.Clients[start:end]...), nil
 }
 
 func (m *MemoryManager) CountClients(ctx context.Context) (n int, err error) {

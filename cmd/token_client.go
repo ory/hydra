@@ -63,24 +63,15 @@ been configured properly.
 This command should not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		/* #nosec G402 - we want to support dev environments, hence tls trickery */
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 			Transport: &transporter{
 				FakeTLSTermination: flagx.MustGetBool(cmd, "fake-tls-termination"),
-				Transport:          &http.Transport{},
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+				},
 			},
 		})
-
-		if flagx.MustGetBool(cmd, "skip-tls-verify") {
-			// fmt.Println("Warning: Skipping TLS Certificate Verification.")
-			ctx = context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-				Transport: &transporter{
-					FakeTLSTermination: true,
-					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-					},
-				},
-			})
-		}
 
 		scopes := flagx.MustGetStringSlice(cmd, "scope")
 		audience := flagx.MustGetStringSlice(cmd, "audience")

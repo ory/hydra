@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/errors"
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // PreviousConsentSession The response used to return used consent requests
@@ -24,6 +25,10 @@ type PreviousConsentSession struct {
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
 	GrantScope []string `json:"grant_scope"`
+
+	// handled at
+	// Format: date-time
+	HandledAt strfmt.DateTime `json:"handled_at,omitempty"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -42,6 +47,10 @@ func (m *PreviousConsentSession) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateConsentRequest(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateHandledAt(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -68,6 +77,19 @@ func (m *PreviousConsentSession) validateConsentRequest(formats strfmt.Registry)
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) validateHandledAt(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.HandledAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("handled_at", "body", "date-time", m.HandledAt.String(), formats); err != nil {
+		return err
 	}
 
 	return nil

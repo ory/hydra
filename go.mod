@@ -54,7 +54,7 @@ require (
 	go.opentelemetry.io/otel v0.2.1
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20200110042803-e2f26524b78c
+	golang.org/x/tools v0.0.0-20200203023011-6f24f261dadb
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
 )

@@ -5,29 +5,9 @@ orbs:
   changelog: ory/changelog@0.0.6
   goreleaser: ory/goreleaser@0.0.26
   nancy: ory/nancy@0.0.8
+  golangci: ory/nancy@0.0.1
 
 jobs:
-  format:
-    docker:
-      - image: circleci/golang:1.13
-        environment:
-          - GO111MODULE=on
-    working_directory: /go/src/github.com/ory/hydra
-    steps:
-      - checkout
-      - run: curl -L https://git.io/vp6lP | sh -s -- -b ./bin
-      - run: mv ./bin/* $GOPATH/bin
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go mod download
-      - run: go mod vendor
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
-      - run: GO111MODULE=off gometalinter --disable-all --enable=goimports --enable=vet --vendor ./...
-
   test:
     docker:
       - image: circleci/golang:1.13
@@ -339,7 +319,7 @@ jobs:
 workflows:
   bdt:
     jobs:
-      - format:
+      - golangci/lint:
           filters:
             tags:
               only: /.*/
@@ -386,7 +366,7 @@ workflows:
       - changelog/generate:
           requires:
             - test
-            - format
+            - golangci/lint
             - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql
@@ -401,7 +381,7 @@ workflows:
           appname: Ory_Hydra
           requires:
             - test
-            - format
+            - golangci/lint
             - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql
@@ -415,7 +395,7 @@ workflows:
       - sdk/release:
           requires:
             - test
-            - format
+            - golangci/lint
             - sdk/generate
             - goreleaser/release
           filters:
@@ -431,7 +411,7 @@ workflows:
           requires:
             - goreleaser/test
             - test
-            - format
+            - golangci/lint
             - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql

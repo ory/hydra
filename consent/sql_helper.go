@@ -98,6 +98,7 @@ var sqlParamsConsentRequestHandled = []string{
 	"session_access_token",
 	"session_id_token",
 	"was_used",
+	"handled_at",
 }
 var sqlParamsConsentRequestHandledUpdate = func() []string {
 	p := make([]string, len(sqlParamsConsentRequestHandled))
@@ -369,6 +370,7 @@ type sqlHandledConsentRequest struct {
 	RequestedAt        time.Time      `db:"requested_at"`
 	WasUsed            bool           `db:"was_used"`
 	AuthenticatedAt    *time.Time     `db:"authenticated_at"`
+	HandledAt          time.Time      `db:"handled_at"`
 }
 
 func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRequest, error) {
@@ -414,6 +416,7 @@ func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRe
 		RequestedAt:        c.RequestedAt,
 		WasUsed:            c.WasUsed,
 		AuthenticatedAt:    toMySQLDateHack(c.AuthenticatedAt),
+		HandledAt:          c.HandledAt,
 	}, nil
 }
 
@@ -451,6 +454,7 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 		Error:           e,
 		ConsentRequest:  r,
 		AuthenticatedAt: fromMySQLDateHack(s.AuthenticatedAt),
+		HandledAt:       s.HandledAt,
 	}, nil
 }
 

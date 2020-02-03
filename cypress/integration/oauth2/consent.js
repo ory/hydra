@@ -36,6 +36,13 @@ describe('OAuth 2.0 End-User Authorization', () => {
       .then(body => {
         expect(body.length).to.be.greaterThan(0);
         expect(hasConsent(client, body)).to.be.true;
+        body.forEach(consent => {
+          expect(
+            consent.handled_at.match(
+              /^[2-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+            )
+          ).not.to.be.empty;
+        });
       });
 
     cy.request(

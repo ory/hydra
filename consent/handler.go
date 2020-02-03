@@ -553,6 +553,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 	p.Challenge = challenge
 	p.RequestedAt = cr.RequestedAt
+	p.HandledAt = time.Now().UTC()
 
 	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &p)
 	if err != nil {
@@ -633,6 +634,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		Error:       &p,
 		Challenge:   challenge,
 		RequestedAt: hr.RequestedAt,
+		HandledAt:   time.Now().UTC(),
 	})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))

@@ -273,7 +273,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		return errors.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.ServesHTTPS(), s.c.CookieSameSiteMode()); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -444,6 +444,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		cookie.Options.MaxAge = session.RememberFor
 	}
 	cookie.Options.HttpOnly = true
+	cookie.Options.SameSite = s.c.CookieSameSiteMode()
 
 	if s.c.ServesHTTPS() {
 		cookie.Options.Secure = true
@@ -548,7 +549,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		return errors.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.ServesHTTPS()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.ServesHTTPS(), s.c.CookieSameSiteMode()); err != nil {
 		return errors.WithStack(err)
 	}
 

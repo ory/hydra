@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"net/http"
 	"net/url"
 	"time"
 
@@ -43,6 +44,7 @@ type Provider interface {
 	AdminDisableHealthAccessLog() bool
 	PublicListenOn() string
 	PublicDisableHealthAccessLog() bool
+	CookieSameSiteMode() http.SameSite
 	ConsentRequestMaxAge() time.Duration
 	AccessTokenLifespan() time.Duration
 	RefreshTokenLifespan() time.Duration

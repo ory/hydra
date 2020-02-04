@@ -3,6 +3,7 @@ package configuration
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -118,4 +119,15 @@ func TestViperProvider_IssuerURL(t *testing.T) {
 	viper.Set(ViperKeyIssuerURL, "http://hydra.localhost/")
 	p2 := NewViperProvider(l, false, nil)
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
+}
+
+func TestViperProvider_CookieSameSiteMode(t *testing.T) {
+	l := logrusx.New()
+	l.SetOutput(ioutil.Discard)
+
+	p := NewViperProvider(l, false, nil)
+	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
+
+	os.Setenv("COOKIE_SAME_SITE_MODE", "none")
+	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
 }

@@ -219,6 +219,9 @@ serve:
     # For more information head over to: https://www.ory.sh/docs/hydra/production#tls-termination
     allow_termination_from:
       - 127.0.0.1/32
+  cookies:
+    # specify the SameSite mode that cookies should be sent with
+    same_site_mode: Lax
 
 # dsn sets the data source name. This configures the backend where ORY Hydra persists data.
 #

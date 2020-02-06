@@ -1,4 +1,4 @@
-FROM golang:1.13.5-alpine
+FROM golang:1.13.7-alpine
 
 ARG git_tag
 ARG git_commit

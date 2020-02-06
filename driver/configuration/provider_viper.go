@@ -49,7 +49,7 @@ const (
 	ViperKeyPublicListenOnHost             = "serve.public.host"
 	ViperKeyPublicListenOnPort             = "serve.public.port"
 	ViperKeyPublicDisableHealthAccessLog   = "serve.public.access_log.disable_for_health"
-	ViperKeyCookieSameSiteMode             = "serve.cookie_same_site_mode"
+	ViperKeyCookieSameSiteMode             = "serve.cookies.same_site_mode"
 	ViperKeyConsentRequestMaxAge           = "ttl.login_consent_request"
 	ViperKeyAccessTokenLifespan            = "ttl.access_token"  // #nosec G101
 	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token" // #nosec G101

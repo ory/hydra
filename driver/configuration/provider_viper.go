@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -48,6 +49,7 @@ const (
 	ViperKeyPublicListenOnHost             = "serve.public.host"
 	ViperKeyPublicListenOnPort             = "serve.public.port"
 	ViperKeyPublicDisableHealthAccessLog   = "serve.public.access_log.disable_for_health"
+	ViperKeyCookieSameSiteMode             = "serve.cookies.same_site_mode"
 	ViperKeyConsentRequestMaxAge           = "ttl.login_consent_request"
 	ViperKeyAccessTokenLifespan            = "ttl.access_token"  // #nosec G101
 	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token" // #nosec G101
@@ -215,6 +217,20 @@ func (v *ViperProvider) adminHost() string {
 
 func (v *ViperProvider) adminPort() int {
 	return viperx.GetInt(v.l, ViperKeyAdminListenOnPort, 4445, "ADMIN_PORT")
+}
+
+func (v *ViperProvider) CookieSameSiteMode() http.SameSite {
+	sameSiteModeStr := viperx.GetString(v.l, ViperKeyCookieSameSiteMode, "default", "COOKIE_SAME_SITE_MODE")
+	switch strings.ToLower(sameSiteModeStr) {
+	case "lax":
+		return http.SameSiteLaxMode
+	case "strict":
+		return http.SameSiteStrictMode
+	case "none":
+		return http.SameSiteNoneMode
+	default:
+		return http.SameSiteDefaultMode
+	}
 }
 
 func (v *ViperProvider) ConsentRequestMaxAge() time.Duration {

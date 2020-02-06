@@ -61,13 +61,14 @@ func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []HandledCo
 	return nil
 }
 
-func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.Store, name, csrf string, secure bool) error {
+func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.Store, name, csrf string, secure bool, sameSiteMode http.SameSite) error {
 	// Errors can be ignored here, because we always get a session session back. Error typically means that the
 	// session doesn't exist yet.
 	session, _ := store.Get(r, name)
 	session.Values["csrf"] = csrf
 	session.Options.HttpOnly = true
 	session.Options.Secure = secure
+	session.Options.SameSite = sameSiteMode
 	if err := session.Save(r, w); err != nil {
 		return errors.WithStack(err)
 	}

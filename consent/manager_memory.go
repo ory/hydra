@@ -412,11 +412,14 @@ func (m *MemoryManager) GetLoginRequest(ctx context.Context, challenge string) (
 		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
+	m.m["handledAuthRequests"].Lock()
 	for _, h := range m.handledAuthRequests {
 		if h.Challenge == c.Challenge {
 			c.WasHandled = h.WasUsed
 		}
 	}
+	m.m["handledAuthRequests"].Unlock()
+
 	c.Client.ClientID = c.Client.GetID()
 	return &c, nil
 }

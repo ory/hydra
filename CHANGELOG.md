@@ -180,10 +180,12 @@
 
 **Closed issues:**
 
+- Concurrent map iteration and map write in memory mode [\#1721](https://github.com/ory/hydra/issues/1721)
 - Get Client Returns 404 Not Found [\#1617](https://github.com/ory/hydra/issues/1617)
 
 **Merged pull requests:**
 
+- consent: Fix concurrent write and read on map\(\#1721\) [\#1722](https://github.com/ory/hydra/pull/1722) ([rickwang7712](https://github.com/rickwang7712))
 - fix: Bump Go to 1.13 for e2e docker images [\#1720](https://github.com/ory/hydra/pull/1720) ([aeneasr](https://github.com/aeneasr))
 - feat: New setting to specify SameSite cookie mode [\#1718](https://github.com/ory/hydra/pull/1718) ([mattfawcett](https://github.com/mattfawcett))
 - ci: Move linter to golangci-lint [\#1717](https://github.com/ory/hydra/pull/1717) ([aeneasr](https://github.com/aeneasr))
@@ -1499,7 +1501,6 @@
 - docs: have a "running hydra in production" section [\#354](https://github.com/ory/hydra/issues/354)
 - docs: clarify that the consent app is responsible for implementing full OIDC [\#353](https://github.com/ory/hydra/issues/353)
 - docs: add auth0 seminar to docs [\#347](https://github.com/ory/hydra/issues/347)
-- docs: add bug bounty section to readme [\#84](https://github.com/ory/hydra/issues/84)
 - docs: add passport.js real-world example [\#83](https://github.com/ory/hydra/issues/83)
 
 **Merged pull requests:**
@@ -1880,6 +1881,7 @@
 - docs: Adds ACP best practices [\#681](https://github.com/ory/hydra/pull/681) ([aeneasr](https://github.com/aeneasr))
 - oauth2: Requires firewall check for introspecting access tokens [\#678](https://github.com/ory/hydra/pull/678) ([aeneasr](https://github.com/aeneasr))
 - Makes policy resource names prefixes configurable [\#672](https://github.com/ory/hydra/pull/672) ([aeneasr](https://github.com/aeneasr))
+- docs: Adds consent state machine [\#671](https://github.com/ory/hydra/pull/671) ([aeneasr](https://github.com/aeneasr))
 - docs: Make space optional in scope regex \(\#661\) [\#668](https://github.com/ory/hydra/pull/668) ([pnicolcev-tulipretail](https://github.com/pnicolcev-tulipretail))
 - Various minor fixes [\#667](https://github.com/ory/hydra/pull/667) ([aeneasr](https://github.com/aeneasr))
 - telemetry: Update telemetry identification [\#654](https://github.com/ory/hydra/pull/654) ([aeneasr](https://github.com/aeneasr))
@@ -1918,7 +1920,6 @@
 
 **Merged pull requests:**
 
-- docs: Adds consent state machine [\#671](https://github.com/ory/hydra/pull/671) ([aeneasr](https://github.com/aeneasr))
 - vendor: Upgraded ladon and dockertest versions [\#663](https://github.com/ory/hydra/pull/663) ([aeneasr](https://github.com/aeneasr))
 - pkg: Make low entropy RSA key generation explicit in function name [\#656](https://github.com/ory/hydra/pull/656) ([aeneasr](https://github.com/aeneasr))
 - docs: Update hydra versions [\#649](https://github.com/ory/hydra/pull/649) ([aeneasr](https://github.com/aeneasr))
@@ -3122,7 +3123,6 @@
 
 **Implemented enhancements:**
 
-- id token claims should be set by consent challenge `id\_token` claim [\#188](https://github.com/ory/hydra/issues/188)
 - 0.3.0 [\#195](https://github.com/ory/hydra/pull/195) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.2.0](https://github.com/ory/hydra/tree/v0.2.0) (2016-08-09)
@@ -3133,6 +3133,7 @@
 
 - warden sdk should not make distinction between token and request [\#190](https://github.com/ory/hydra/issues/190)
 - core scope should not be mandatory [\#189](https://github.com/ory/hydra/issues/189)
+- id token claims should be set by consent challenge `id\_token` claim [\#188](https://github.com/ory/hydra/issues/188)
 - provide default consent endpoint in hydra [\#185](https://github.com/ory/hydra/issues/185)
 - make bcrypt cost configurable [\#184](https://github.com/ory/hydra/issues/184)
 - make lifespans configurable [\#183](https://github.com/ory/hydra/issues/183)
@@ -3248,7 +3249,6 @@
 **Merged pull requests:**
 
 - all: update jwt-go to versioned package and update dependencies [\#111](https://github.com/ory/hydra/pull/111) ([aeneasr](https://github.com/aeneasr))
-- Mount warden handler [\#110](https://github.com/ory/hydra/pull/110) ([faxal](https://github.com/faxal))
 
 ## [0.1-beta.2](https://github.com/ory/hydra/tree/0.1-beta.2) (2016-06-14)
 
@@ -3277,15 +3277,18 @@
 
 **Closed issues:**
 
+- docs: add bug bounty section to readme [\#84](https://github.com/ory/hydra/issues/84)
 - document security architecture [\#82](https://github.com/ory/hydra/issues/82)
 - go install fails [\#77](https://github.com/ory/hydra/issues/77)
 - Security audit based on rfc6819 [\#42](https://github.com/ory/hydra/issues/42)
 
 **Merged pull requests:**
 
+- Mount warden handler [\#110](https://github.com/ory/hydra/pull/110) ([faxal](https://github.com/faxal))
 - Fix typo of weather [\#100](https://github.com/ory/hydra/pull/100) ([smurfpandey](https://github.com/smurfpandey))
 - readme: add security section [\#87](https://github.com/ory/hydra/pull/87) ([aeneasr](https://github.com/aeneasr))
 - Fix idiom in README [\#79](https://github.com/ory/hydra/pull/79) ([neuhaus](https://github.com/neuhaus))
+- Update README.md [\#54](https://github.com/ory/hydra/pull/54) ([leetal](https://github.com/leetal))
 
 ## [0.1-beta1](https://github.com/ory/hydra/tree/0.1-beta1) (2016-05-29)
 
@@ -3336,7 +3339,6 @@
 - Remove go get of govet in .travis.yml [\#67](https://github.com/ory/hydra/pull/67) ([sbani](https://github.com/sbani))
 - Hydra is now using Go 1.6 vendoring and is deployable to heroku [\#56](https://github.com/ory/hydra/pull/56) ([aeneasr](https://github.com/aeneasr))
 - Heroku [\#55](https://github.com/ory/hydra/pull/55) ([aeneasr](https://github.com/aeneasr))
-- Update README.md [\#54](https://github.com/ory/hydra/pull/54) ([leetal](https://github.com/leetal))
 - RethinkDB [\#53](https://github.com/ory/hydra/pull/53) ([leetal](https://github.com/leetal))
 - handler.go:300: no formatting directive in Sprintf call [\#52](https://github.com/ory/hydra/pull/52) ([QuentinPerez](https://github.com/QuentinPerez))
 - providers: added microsoft and improved existing providers [\#51](https://github.com/ory/hydra/pull/51) ([aeneasr](https://github.com/aeneasr))

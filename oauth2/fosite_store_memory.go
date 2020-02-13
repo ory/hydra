@@ -73,10 +73,13 @@ func (s *FositeMemoryStore) GetClient(ctx context.Context, id string) (fosite.Cl
 	return s.r.ClientManager().GetClient(ctx, id)
 }
 
-func (s *FositeMemoryStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
+func (s *FositeMemoryStore) Auth(ctx context.Context, id string, secret []byte) (*client.Client, error) { // changing function name for adding function Authenticate (bellow) that required for resource owner password grant type by ory/fosite
 	return s.r.ClientManager().Authenticate(ctx, id, secret)
 }
 
+func (s *FositeMemoryStore) Authenticate(ctx context.Context, username string, password string) error { // do nothing, authenticate process will be handled by api
+	return nil
+}
 func (s *FositeMemoryStore) CreateClient(ctx context.Context, c *client.Client) error {
 	return s.r.ClientManager().CreateClient(ctx, c)
 

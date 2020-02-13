@@ -128,7 +128,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.Fi
 	} else {
 		subject = r.GetSession().GetSubject()
 	}
-
+	fmt.Println(r.GetSession().GetSubject())
 	session, err := json.Marshal(r.GetSession())
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -205,8 +205,11 @@ func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Clien
 	return s.r.ClientManager().GetClient(ctx, id)
 }
 
-func (s *FositeSQLStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
+func (s *FositeSQLStore) Auth(ctx context.Context, id string, secret []byte) (*client.Client, error) { // changing function name for adding function Authenticate (bellow) that required for resource owner password grant type by ory/fosite
 	return s.r.ClientManager().Authenticate(ctx, id, secret)
+}
+func (s *FositeSQLStore) Authenticate(ctx context.Context, username string, password string) error { // do nothing, authenticate process will be handled by api
+	return nil
 }
 
 func (s *FositeSQLStore) CreateClient(ctx context.Context, c *client.Client) error {

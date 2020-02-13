@@ -1,0 +1,1 @@
+source .env && go run main.go serve all --dangerous-force-http

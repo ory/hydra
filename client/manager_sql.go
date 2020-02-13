@@ -361,7 +361,6 @@ func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients
 func (m *SQLManager) CountClients(ctx context.Context) (int, error) {
 	var n int
 	if err := m.DB.QueryRow("SELECT count(*) FROM hydra_client").Scan(&n); err != nil {
-		fmt.Println(err.Error())
 		return 0, sqlcon.HandleError(err)
 	}
 

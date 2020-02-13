@@ -39,7 +39,7 @@ type Manager interface {
 	GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error)
 	HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
 
-	CreateConsent(ctx context.Context, r *HandledConsentRequest) (*ConsentRequest, error)
+	// CreateConsent(ctx context.Context, r *HandledConsentRequest) (*ConsentRequest, error)
 
 	RevokeSubjectConsentSession(ctx context.Context, user string) error
 	RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error

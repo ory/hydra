@@ -51,7 +51,7 @@ type Client struct {
 
 	// GrantTypes is an array of grant types the client is allowed to use.
 	//
-	// Pattern: client_credentials|authorization_code|implicit|refresh_token
+	// Pattern: client_credentials|authorization_code|implicit|refresh_token|password
 	GrantTypes []string `json:"grant_types"`
 
 	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can

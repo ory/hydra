@@ -303,7 +303,7 @@ func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string,
 }
 
 func (m *SQLManager) CreateConsent(ctx context.Context, r *HandledConsentRequest) (*ConsentRequest, error) {
-
+	return nil, nil
 }
 
 func (m *SQLManager) replaceUnusedConsentRequest(ctx context.Context, challenge string, d *sqlHandledConsentRequest) (*ConsentRequest, error) {

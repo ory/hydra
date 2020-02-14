@@ -1,9 +1,9 @@
 version: 2.1
 
 orbs:
-  sdk: ory/sdk@0.1.20
+  sdk: ory/sdk@0.1.23
   changelog: ory/changelog@0.0.6
-  goreleaser: ory/goreleaser@0.0.26
+  goreleaser: ory/goreleaser@0.0.27
   nancy: ory/nancy@0.0.8
   golangci: ory/golangci@0.0.2
 

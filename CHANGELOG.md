@@ -1501,6 +1501,7 @@
 - docs: have a "running hydra in production" section [\#354](https://github.com/ory/hydra/issues/354)
 - docs: clarify that the consent app is responsible for implementing full OIDC [\#353](https://github.com/ory/hydra/issues/353)
 - docs: add auth0 seminar to docs [\#347](https://github.com/ory/hydra/issues/347)
+- docs: add bug bounty section to readme [\#84](https://github.com/ory/hydra/issues/84)
 - docs: add passport.js real-world example [\#83](https://github.com/ory/hydra/issues/83)
 
 **Merged pull requests:**
@@ -2414,7 +2415,6 @@
 - docs: add health check to swagger and resolve swagger issues [\#488](https://github.com/ory/hydra/pull/488) ([aeneasr](https://github.com/aeneasr))
 - jwk/handler: nest ac check and resolve stray log message [\#487](https://github.com/ory/hydra/pull/487) ([aeneasr](https://github.com/aeneasr))
 - pkg/errors: make ErrNotFound return a status code [\#486](https://github.com/ory/hydra/pull/486) ([aeneasr](https://github.com/aeneasr))
-- cmd/policies: description is a string field, not slice [\#485](https://github.com/ory/hydra/pull/485) ([aeneasr](https://github.com/aeneasr))
 - Vendor update [\#483](https://github.com/ory/hydra/pull/483) ([aeneasr](https://github.com/aeneasr))
 - vendor: update to latest versions [\#482](https://github.com/ory/hydra/pull/482) ([aeneasr](https://github.com/aeneasr))
 - client/manager: remove merging of stored and updated client [\#478](https://github.com/ory/hydra/pull/478) ([faxal](https://github.com/faxal))
@@ -2436,6 +2436,7 @@
 
 **Merged pull requests:**
 
+- cmd/policies: description is a string field, not slice [\#485](https://github.com/ory/hydra/pull/485) ([aeneasr](https://github.com/aeneasr))
 - fix spelling of challenge [\#471](https://github.com/ory/hydra/pull/471) ([sstarcher](https://github.com/sstarcher))
 - oauth2: remove unused implicit grant storage [\#469](https://github.com/ory/hydra/pull/469) ([aeneasr](https://github.com/aeneasr))
 
@@ -2534,7 +2535,6 @@
 
 - herodot: resolve issue with infinite loop caused by certain error chain [\#441](https://github.com/ory/hydra/issues/441)
 - "Could not fetch signing key for OpenID Connect" [\#439](https://github.com/ory/hydra/issues/439)
-- vendor: upgrade fosite to resolve regression issue [\#446](https://github.com/ory/hydra/pull/446) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
 
@@ -2550,6 +2550,7 @@
 
 **Fixed bugs:**
 
+- vendor: upgrade fosite to resolve regression issue [\#446](https://github.com/ory/hydra/pull/446) ([aeneasr](https://github.com/aeneasr))
 - herodot: resolve issue with infinite loop caused by certain error chain [\#442](https://github.com/ory/hydra/pull/442) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
@@ -2721,6 +2722,10 @@
 
 [Full Changelog](https://github.com/ory/hydra/compare/v0.7.0...v0.7.1)
 
+**Implemented enhancements:**
+
+- policy: provide rest endpoint for policy updates [\#305](https://github.com/ory/hydra/issues/305)
+
 ## [v0.7.0](https://github.com/ory/hydra/tree/v0.7.0) (2016-12-30)
 
 [Full Changelog](https://github.com/ory/hydra/compare/v0.6.10...v0.7.0)
@@ -2728,7 +2733,6 @@
 **Implemented enhancements:**
 
 - Implement RemoveSubjectFromPolicy and RemoveResourceFromPolicy [\#336](https://github.com/ory/hydra/issues/336)
-- policy: provide rest endpoint for policy updates [\#305](https://github.com/ory/hydra/issues/305)
 - 0.7.0: SQL Migrate, Groups, Hardening [\#329](https://github.com/ory/hydra/pull/329) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
@@ -2754,10 +2758,6 @@
 
 - cmd: add configuration options for `hydra token user` [\#327](https://github.com/ory/hydra/issues/327)
 - core: add api key flow [\#234](https://github.com/ory/hydra/issues/234)
-
-**Fixed bugs:**
-
--  openid: support response\_type=code id\_token - closes \#332 [\#333](https://github.com/ory/hydra/pull/333) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
 
@@ -2795,6 +2795,10 @@
 **Implemented enhancements:**
 
 - core: Redis backend [\#306](https://github.com/ory/hydra/issues/306)
+
+**Fixed bugs:**
+
+-  openid: support response\_type=code id\_token - closes \#332 [\#333](https://github.com/ory/hydra/pull/333) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
 
@@ -3225,7 +3229,6 @@
 **Merged pull requests:**
 
 - Connect to rethinkdb with a custom certificate [\#116](https://github.com/ory/hydra/pull/116) ([matteosuppo](https://github.com/matteosuppo))
-- dist: fix typos in exemplary policies [\#112](https://github.com/ory/hydra/pull/112) ([aeneasr](https://github.com/aeneasr))
 
 ## [0.1-beta.3](https://github.com/ory/hydra/tree/0.1-beta.3) (2016-06-20)
 
@@ -3249,6 +3252,7 @@
 **Merged pull requests:**
 
 - all: update jwt-go to versioned package and update dependencies [\#111](https://github.com/ory/hydra/pull/111) ([aeneasr](https://github.com/aeneasr))
+- Mount warden handler [\#110](https://github.com/ory/hydra/pull/110) ([faxal](https://github.com/faxal))
 
 ## [0.1-beta.2](https://github.com/ory/hydra/tree/0.1-beta.2) (2016-06-14)
 
@@ -3277,18 +3281,16 @@
 
 **Closed issues:**
 
-- docs: add bug bounty section to readme [\#84](https://github.com/ory/hydra/issues/84)
 - document security architecture [\#82](https://github.com/ory/hydra/issues/82)
 - go install fails [\#77](https://github.com/ory/hydra/issues/77)
 - Security audit based on rfc6819 [\#42](https://github.com/ory/hydra/issues/42)
 
 **Merged pull requests:**
 
-- Mount warden handler [\#110](https://github.com/ory/hydra/pull/110) ([faxal](https://github.com/faxal))
+- dist: fix typos in exemplary policies [\#112](https://github.com/ory/hydra/pull/112) ([aeneasr](https://github.com/aeneasr))
 - Fix typo of weather [\#100](https://github.com/ory/hydra/pull/100) ([smurfpandey](https://github.com/smurfpandey))
 - readme: add security section [\#87](https://github.com/ory/hydra/pull/87) ([aeneasr](https://github.com/aeneasr))
 - Fix idiom in README [\#79](https://github.com/ory/hydra/pull/79) ([neuhaus](https://github.com/neuhaus))
-- Update README.md [\#54](https://github.com/ory/hydra/pull/54) ([leetal](https://github.com/leetal))
 
 ## [0.1-beta1](https://github.com/ory/hydra/tree/0.1-beta1) (2016-05-29)
 
@@ -3339,6 +3341,7 @@
 - Remove go get of govet in .travis.yml [\#67](https://github.com/ory/hydra/pull/67) ([sbani](https://github.com/sbani))
 - Hydra is now using Go 1.6 vendoring and is deployable to heroku [\#56](https://github.com/ory/hydra/pull/56) ([aeneasr](https://github.com/aeneasr))
 - Heroku [\#55](https://github.com/ory/hydra/pull/55) ([aeneasr](https://github.com/aeneasr))
+- Update README.md [\#54](https://github.com/ory/hydra/pull/54) ([leetal](https://github.com/leetal))
 - RethinkDB [\#53](https://github.com/ory/hydra/pull/53) ([leetal](https://github.com/leetal))
 - handler.go:300: no formatting directive in Sprintf call [\#52](https://github.com/ory/hydra/pull/52) ([QuentinPerez](https://github.com/QuentinPerez))
 - providers: added microsoft and improved existing providers [\#51](https://github.com/ory/hydra/pull/51) ([aeneasr](https://github.com/aeneasr))

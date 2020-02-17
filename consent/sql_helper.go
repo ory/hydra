@@ -30,9 +30,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/ory/hydra/client"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/stringsx"
+
+	"github.com/ory/hydra/client"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -192,7 +193,7 @@ type sqlAuthenticationRequest struct {
 	RequestedAudience    sql.NullString `db:"requested_at_audience"`
 	Verifier             string         `db:"verifier"`
 	CSRF                 string         `db:"csrf"`
-	AuthenticatedAt      *time.Time     `db:"authenticated_at"`
+	AuthenticatedAt      sql.NullTime   `db:"authenticated_at"`
 	RequestedAt          time.Time      `db:"requested_at"`
 	LoginSessionID       sql.NullString `db:"login_session_id"`
 	Context              string         `db:"context"`
@@ -206,18 +207,18 @@ type sqlConsentRequest struct {
 	ForcedSubjectIdentifier string         `db:"forced_subject_identifier"`
 }
 
-func toMySQLDateHack(t time.Time) *time.Time {
+func toMySQLDateHack(t time.Time) sql.NullTime {
 	if t.IsZero() {
-		return nil
+		return sql.NullTime{}
 	}
-	return &t
+	return sql.NullTime{Time: t, Valid: true}
 }
 
-func fromMySQLDateHack(t *time.Time) time.Time {
-	if t == nil {
-		return time.Time{}
+func fromMySQLDateHack(t sql.NullTime) time.Time {
+	if t.Valid {
+		return t.Time
 	}
-	return *t
+	return time.Time{}
 }
 
 func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
@@ -369,8 +370,8 @@ type sqlHandledConsentRequest struct {
 	Challenge          string         `db:"challenge"`
 	RequestedAt        time.Time      `db:"requested_at"`
 	WasUsed            bool           `db:"was_used"`
-	AuthenticatedAt    *time.Time     `db:"authenticated_at"`
-	HandledAt          time.Time      `db:"handled_at"`
+	AuthenticatedAt    sql.NullTime   `db:"authenticated_at"`
+	HandledAt          sql.NullTime   `db:"handled_at"`
 }
 
 func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRequest, error) {
@@ -416,7 +417,7 @@ func newSQLHandledConsentRequest(c *HandledConsentRequest) (*sqlHandledConsentRe
 		RequestedAt:        c.RequestedAt,
 		WasUsed:            c.WasUsed,
 		AuthenticatedAt:    toMySQLDateHack(c.AuthenticatedAt),
-		HandledAt:          c.HandledAt,
+		HandledAt:          sql.NullTime{Time: c.HandledAt, Valid: true},
 	}, nil
 }
 
@@ -454,22 +455,22 @@ func (s *sqlHandledConsentRequest) toHandledConsentRequest(r *ConsentRequest) (*
 		Error:           e,
 		ConsentRequest:  r,
 		AuthenticatedAt: fromMySQLDateHack(s.AuthenticatedAt),
-		HandledAt:       s.HandledAt,
+		HandledAt:       s.HandledAt.Time,
 	}, nil
 }
 
 type sqlHandledLoginRequest struct {
-	Remember               bool       `db:"remember"`
-	RememberFor            int        `db:"remember_for"`
-	ACR                    string     `db:"acr"`
-	Subject                string     `db:"subject"`
-	Error                  string     `db:"error"`
-	Challenge              string     `db:"challenge"`
-	RequestedAt            time.Time  `db:"requested_at"`
-	WasUsed                bool       `db:"was_used"`
-	AuthenticatedAt        *time.Time `db:"authenticated_at"`
-	Context                string     `db:"context"`
-	ForceSubjectIdentifier string     `db:"forced_subject_identifier"`
+	Remember               bool         `db:"remember"`
+	RememberFor            int          `db:"remember_for"`
+	ACR                    string       `db:"acr"`
+	Subject                string       `db:"subject"`
+	Error                  string       `db:"error"`
+	Challenge              string       `db:"challenge"`
+	RequestedAt            time.Time    `db:"requested_at"`
+	WasUsed                bool         `db:"was_used"`
+	AuthenticatedAt        sql.NullTime `db:"authenticated_at"`
+	Context                string       `db:"context"`
+	ForceSubjectIdentifier string       `db:"forced_subject_identifier"`
 }
 
 func newSQLHandledLoginRequest(c *HandledLoginRequest) (*sqlHandledLoginRequest, error) {

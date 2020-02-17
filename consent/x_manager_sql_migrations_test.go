@@ -8,12 +8,13 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/dbal/migratest"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/dbal/migratest"
 )
 
 func TestXXMigrations(t *testing.T) {
@@ -60,6 +61,15 @@ func TestXXMigrations(t *testing.T) {
 				require.NoError(t, err, "%d-login-session-id", kk)
 				_, err = s.GetConsentRequest(context.TODO(), fmt.Sprintf("%d-challenge", kk))
 				require.NoError(t, err, "%d-challenge", kk)
+
+				rs, err := s.FindGrantedAndRememberedConsentRequests(context.TODO(), fmt.Sprintf("%d-client", kk), fmt.Sprintf("%d-subject", kk))
+				require.NoError(t, err, "%d-challenge %d-subject", kk, kk)
+				require.True(t, len(rs) > 0)
+
+				rs, err = s.FindSubjectsGrantedConsentRequests(context.TODO(), fmt.Sprintf("%d-subject", kk), 1, 0)
+				require.NoError(t, err, "%d-challenge %d-subject", kk, kk)
+				require.True(t, len(rs) > 0)
+
 				if step > 1 {
 					_, err = s.GetForcedObfuscatedLoginSession(context.TODO(), fmt.Sprintf("%d-client", kk), fmt.Sprintf("%d-obfuscated", kk))
 					require.NoError(t, err, "%d-client", kk)

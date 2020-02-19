@@ -38,6 +38,7 @@
           "description": "A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.",
           "items": {
             "type": "string",
+            "minLength": 1,
             "not": {
               "type": "string",
               "description": "does match all strings that contain two or more (*)",
@@ -51,7 +52,18 @@
                 "const": "*"
               }
             ]
-          }
+          },
+          "uniqueItems": true,
+          "default": [
+            "*"
+          ],
+          "examples": [
+            [
+              "https://example.com",
+              "https://*.example.com",
+              "https://*.foo.example.com"
+            ]
+          ]
         },
         "allowed_methods": {
           "type": "array",
@@ -168,7 +180,8 @@
             "error",
             "warn",
             "info",
-            "debug"
+            "debug",
+            "trace"
           ],
           "default": "info"
         },
@@ -303,7 +316,7 @@
         }
       ],
       "examples": [
-        "postgres://user:password@host:123/database"
+        "postgres://user:password@host:123/database?sslmode=verify"
       ]
     },
     "webfinger": {
@@ -322,6 +335,9 @@
               },
               "default": [
                 "hydra.openid.id-token"
+              ],
+              "examples": [
+                "hydra.jwt.access-token"
               ]
             }
           }
@@ -615,7 +631,7 @@
                   "type": "integer",
                   "description": "Sets the BCrypt cost. The higher the value, the more CPU time is being used to generate hashes.",
                   "default": 10,
-                  "minimum": 4
+                  "minimum": 8
                 }
               }
             }
@@ -677,8 +693,7 @@
       "description": "Enables profiling if set. For more details on profiling, head over to: https://blog.golang.org/profiling-go-programs",
       "enum": [
         "cpu",
-        "mem",
-        ""
+        "mem"
       ],
       "examples": [
         "cpu"
@@ -692,7 +707,6 @@
           "type": "string",
           "description": "Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.",
           "enum": [
-            "",
             "jaeger"
           ],
           "examples": [

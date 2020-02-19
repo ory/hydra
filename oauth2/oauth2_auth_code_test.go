@@ -38,20 +38,8 @@ import (
 	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
-
-	"github.com/ory/viper"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/x/pointerx"
-	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/ory/x/urlx"
-
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
@@ -60,6 +48,15 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
+	"github.com/ory/viper"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/urlx"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 func newCookieJar() http.CookieJar {

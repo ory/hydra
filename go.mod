@@ -2,6 +2,7 @@ module github.com/ory/hydra
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.2
 	github.com/go-openapi/runtime v0.19.5
@@ -12,6 +13,7 @@ require (
 	github.com/go-swagger/go-swagger v0.21.1-0.20200107003254-1c98855b472d
 	github.com/gobuffalo/packd v0.0.0-20190315124812-a385830c7fc0 // indirect
 	github.com/gobuffalo/packr v1.24.0
+	github.com/gobuffalo/packr/v2 v2.0.6
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.3.1
 	github.com/google/uuid v1.1.1
@@ -32,7 +34,7 @@ require (
 	github.com/ory/herodot v0.6.2
 	github.com/ory/sdk/swagutil v0.0.0-20200131170418-ead0c2285f93
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.93
+	github.com/ory/x v0.0.95
 	github.com/pborman/uuid v1.2.0
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
@@ -48,13 +50,12 @@ require (
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.4.0
 	github.com/toqueteos/webbrowser v1.2.0
-	github.com/uber/jaeger-client-go v2.16.0+incompatible
-	github.com/uber/jaeger-lib v2.0.0+incompatible // indirect
+	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v0.2.1
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20200203023011-6f24f261dadb
+	golang.org/x/tools v0.0.0-20200203215610-ab391d50b528
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
 )

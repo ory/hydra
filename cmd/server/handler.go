@@ -28,6 +28,14 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/fsnotify/fsnotify"
+
+	"github.com/ory/viper"
+
+	"github.com/gobuffalo/packr/v2"
+
+	"github.com/ory/x/viperx"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/driver"
@@ -74,10 +82,44 @@ func isDSNAllowed(d driver.Driver) {
 	}
 }
 
+var schemas = packr.New("schemas", "../../docs")
+
+func validateAndWatchViper(l *logrus.Logger) {
+	schema, err := schemas.Find("config.schema.json")
+	if err != nil {
+		l.WithError(err).Fatal("Unable to open configuration JSON Schema.")
+	}
+
+	if err := viperx.Validate("config.schema.json", schema); err != nil {
+		viperx.LoggerWithValidationErrorFields(l, err).
+			Fatal("The configuration is invalid and could not be loaded.")
+	}
+
+	viperx.AddWatcher(func(event fsnotify.Event) error {
+		if err := viperx.Validate("config.schema.json", schema); err != nil {
+			viperx.LoggerWithValidationErrorFields(l, err).
+				Error("The changed configuration is invalid and could not be loaded. Rolling back to the last working configuration revision. Please address the validation errors before restarting ORY Hydra.")
+			return viperx.ErrRollbackConfigurationChanges
+		}
+		return nil
+	})
+
+	viperx.WatchConfig(l, &viperx.WatchOptions{
+		Immutables: []string{"log", "serve", "dsn", "profiling"},
+		OnImmutableChange: func(key string) {
+			l.WithField("key", key).
+				WithField("reset_to", fmt.Sprintf("%v", viper.Get(key))).
+				Error("A configuration value marked as immutable has changed. Rolling back to the last working configuration revision. To reload the values please restart ORY Hydra.")
+		},
+	})
+}
+
 func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		logger := logrusx.New()
+		validateAndWatchViper(logger)
 		d := driver.NewDefaultDriver(
-			logrusx.New(),
+			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,
@@ -102,8 +144,10 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 
 func RunServePublic(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		logger := logrusx.New()
+		validateAndWatchViper(logger)
 		d := driver.NewDefaultDriver(
-			logrusx.New(),
+			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,
@@ -128,8 +172,10 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 
 func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		logger := logrusx.New()
+		validateAndWatchViper(logger)
 		d := driver.NewDefaultDriver(
-			logrusx.New(),
+			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,

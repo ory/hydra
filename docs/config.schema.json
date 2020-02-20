@@ -656,8 +656,11 @@
       "description": "The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys",
       "properties": {
         "system": {
-          "type": "array",
           "description": "The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
+          "default": [
+            "I AM NOT SECRET PLEASE REPLACE ME!!!"
+          ],
+          "type": "array",
           "items": {
             "type": "string",
             "minLength": 16
@@ -670,156 +673,156 @@
               "this-is-another-old-secret"
             ]
           ]
-        },
-        "cookie": {
-          "type": "array",
-          "description": "A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use\ta separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
-          "items": {
-            "type": "string",
-            "minLength": 16
-          },
-          "examples": [
-            [
-              "this-is-the-primary-secret",
-              "this-is-an-old-secret",
-              "this-is-another-old-secret"
-            ]
-          ]
         }
+      },
+      "cookie": {
+        "type": "array",
+        "description": "A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use\ta separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.",
+        "items": {
+          "type": "string",
+          "minLength": 16
+        },
+        "examples": [
+          [
+            "this-is-the-primary-secret",
+            "this-is-an-old-secret",
+            "this-is-another-old-secret"
+          ]
+        ]
       }
-    },
-    "profiling": {
-      "type": "string",
-      "description": "Enables profiling if set. For more details on profiling, head over to: https://blog.golang.org/profiling-go-programs",
-      "enum": [
-        "cpu",
-        "mem"
-      ],
-      "examples": [
-        "cpu"
-      ]
-    },
-    "tracing": {
-      "type": "object",
-      "description": "ORY Hydra supports distributed tracing.",
-      "properties": {
-        "provider": {
-          "type": "string",
-          "description": "Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.",
-          "enum": [
-            "jaeger"
-          ],
-          "examples": [
-            "jaeger"
-          ]
-        },
-        "service_name": {
-          "type": "string",
-          "description": "Specifies the service name to use on the tracer.",
-          "examples": [
-            "ORY Hydra"
-          ]
-        },
-        "providers": {
-          "type": "object",
-          "properties": {
-            "jaeger": {
-              "type": "object",
-              "description": "Configures the jaeger tracing backend.",
-              "properties": {
-                "local_agent_address": {
-                  "type": "string",
-                  "description": "The address of the jaeger-agent where spans should be sent to.",
-                  "oneOf": [
-                    {
-                      "pattern": "^\\[(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))]:([0-9]*)$"
-                    },
-                    {
-                      "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]*)$"
-                    }
-                  ],
-                  "examples": [
-                    "127.0.0.1:6831"
-                  ]
-                },
-                "propagation": {
-                  "type": "string",
-                  "description": "The tracing header format",
-                  "examples": [
-                    "jaeger"
-                  ]
-                },
-                "sampling": {
-                  "type": "object",
-                  "allOf": [
-                    {
-                      "oneOf": [
-                        {
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "description": "The type of the sampler you want to use.",
-                              "const": "const"
-                            },
-                            "value": {
-                              "type": "integer",
-                              "description": "The value passed to the sampler type that has been configured.",
-                              "enum": [
-                                0,
-                                1
-                              ]
-                            }
-                          }
-                        },
-                        {
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "description": "The type of the sampler you want to use.",
-                              "const": "rateLimiting"
-                            },
-                            "value": {
-                              "type": "integer",
-                              "description": "The value passed to the sampler type that has been configured.",
-                              "minimum": 0
-                            }
-                          }
-                        },
-                        {
-                          "properties": {
-                            "type": {
-                              "type": "string",
-                              "description": "The type of the sampler you want to use.",
-                              "const": "probabilistic"
-                            },
-                            "value": {
-                              "type": "number",
-                              "description": "The value passed to the sampler type that has been configured.",
-                              "minimum": 0,
-                              "maximum": 1
-                            }
+    }
+  },
+  "profiling": {
+    "type": "string",
+    "description": "Enables profiling if set. For more details on profiling, head over to: https://blog.golang.org/profiling-go-programs",
+    "enum": [
+      "cpu",
+      "mem"
+    ],
+    "examples": [
+      "cpu"
+    ]
+  },
+  "tracing": {
+    "type": "object",
+    "description": "ORY Hydra supports distributed tracing.",
+    "properties": {
+      "provider": {
+        "type": "string",
+        "description": "Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.",
+        "enum": [
+          "jaeger"
+        ],
+        "examples": [
+          "jaeger"
+        ]
+      },
+      "service_name": {
+        "type": "string",
+        "description": "Specifies the service name to use on the tracer.",
+        "examples": [
+          "ORY Hydra"
+        ]
+      },
+      "providers": {
+        "type": "object",
+        "properties": {
+          "jaeger": {
+            "type": "object",
+            "description": "Configures the jaeger tracing backend.",
+            "properties": {
+              "local_agent_address": {
+                "type": "string",
+                "description": "The address of the jaeger-agent where spans should be sent to.",
+                "oneOf": [
+                  {
+                    "pattern": "^\\[(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))]:([0-9]*)$"
+                  },
+                  {
+                    "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]*)$"
+                  }
+                ],
+                "examples": [
+                  "127.0.0.1:6831"
+                ]
+              },
+              "propagation": {
+                "type": "string",
+                "description": "The tracing header format",
+                "examples": [
+                  "jaeger"
+                ]
+              },
+              "sampling": {
+                "type": "object",
+                "allOf": [
+                  {
+                    "oneOf": [
+                      {
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "The type of the sampler you want to use.",
+                            "const": "const"
+                          },
+                          "value": {
+                            "type": "integer",
+                            "description": "The value passed to the sampler type that has been configured.",
+                            "enum": [
+                              0,
+                              1
+                            ]
                           }
                         }
-                      ]
-                    },
-                    {
-                      "properties": {
-                        "server_url": {
-                          "type": "string",
-                          "description": "The address of jaeger-agent's HTTP sampling server",
-                          "format": "uri"
+                      },
+                      {
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "The type of the sampler you want to use.",
+                            "const": "rateLimiting"
+                          },
+                          "value": {
+                            "type": "integer",
+                            "description": "The value passed to the sampler type that has been configured.",
+                            "minimum": 0
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "type": {
+                            "type": "string",
+                            "description": "The type of the sampler you want to use.",
+                            "const": "probabilistic"
+                          },
+                          "value": {
+                            "type": "number",
+                            "description": "The value passed to the sampler type that has been configured.",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
                         }
                       }
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "server_url": {
+                        "type": "string",
+                        "description": "The address of jaeger-agent's HTTP sampling server",
+                        "format": "uri"
+                      }
                     }
-                  ],
-                  "examples": [
-                    {
-                      "type": "const",
-                      "value": 1,
-                      "server_url": "http://localhost:5778/sampling"
-                    }
-                  ]
-                }
+                  }
+                ],
+                "examples": [
+                  {
+                    "type": "const",
+                    "value": 1,
+                    "server_url": "http://localhost:5778/sampling"
+                  }
+                ]
               }
             }
           }
@@ -827,4 +830,5 @@
       }
     }
   }
+}
 }

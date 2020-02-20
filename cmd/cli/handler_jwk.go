@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
@@ -184,7 +185,20 @@ func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 	m := configureClient(cmd)
 
-	_, err := m.Admin.DeleteJSONWebKeySet(admin.NewDeleteJSONWebKeySetParams().WithSet(args[0]))
+	params := admin.NewDeleteJSONWebKeySetParams().WithSet(args[0])
+
+	olderThan := flagx.MustGetString(cmd, "older-than")
+	if olderThan != "" {
+		const timeFormat = "2006-01-02"
+		before, err := time.Parse(timeFormat, olderThan)
+		if err != nil {
+			cmdx.Must(err, "Unable parse time format: %s", err)
+		}
+		beforeInt64 := before.Unix()
+		params.WithBefore(&beforeInt64)
+	}
+
+	_, err := m.Admin.DeleteJSONWebKeySet(params)
 	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Printf("JSON Web Key Set deleted: %s\n", args[0])
 }

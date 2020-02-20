@@ -33,4 +33,5 @@ var keysDeleteCmd = &cobra.Command{
 
 func init() {
 	keysCmd.AddCommand(keysDeleteCmd)
+	keysDeleteCmd.Flags().String("older-than", "", "Delete keys created before given date")
 }

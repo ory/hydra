@@ -13,7 +13,7 @@ import (
 
 	strfmt "github.com/go-openapi/strfmt"
 
-	"github.com/ory/hydra/internal/httpclient/models"
+	models "github.com/ory/hydra/internal/httpclient/models"
 )
 
 // GetJSONWebKeyReader is a Reader for the GetJSONWebKey structure.

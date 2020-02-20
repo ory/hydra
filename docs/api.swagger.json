@@ -424,6 +424,13 @@
             "name": "set",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "A unix timestamp to delete all old keys created before the time",
+            "name": "before",
+            "in": "query"
           }
         ],
         "responses": {
@@ -597,6 +604,13 @@
             "name": "set",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "A unix timestamp to delete all old keys created before the time",
+            "name": "before",
+            "in": "query"
           }
         ],
         "responses": {

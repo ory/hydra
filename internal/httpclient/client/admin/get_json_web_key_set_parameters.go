@@ -13,6 +13,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
+	"github.com/go-openapi/swag"
 
 	strfmt "github.com/go-openapi/strfmt"
 )
@@ -61,6 +62,11 @@ for the get Json web key set operation typically these are written to a http.Req
 */
 type GetJSONWebKeySetParams struct {
 
+	/*Before
+	  A unix timestamp to delete all old keys created before the time
+
+	*/
+	Before *int64
 	/*Set
 	  The set
 
@@ -105,6 +111,17 @@ func (o *GetJSONWebKeySetParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithBefore adds the before to the get Json web key set params
+func (o *GetJSONWebKeySetParams) WithBefore(before *int64) *GetJSONWebKeySetParams {
+	o.SetBefore(before)
+	return o
+}
+
+// SetBefore adds the before to the get Json web key set params
+func (o *GetJSONWebKeySetParams) SetBefore(before *int64) {
+	o.Before = before
+}
+
 // WithSet adds the set to the get Json web key set params
 func (o *GetJSONWebKeySetParams) WithSet(set string) *GetJSONWebKeySetParams {
 	o.SetSet(set)
@@ -123,6 +140,22 @@ func (o *GetJSONWebKeySetParams) WriteToRequest(r runtime.ClientRequest, reg str
 		return err
 	}
 	var res []error
+
+	if o.Before != nil {
+
+		// query param before
+		var qrBefore int64
+		if o.Before != nil {
+			qrBefore = *o.Before
+		}
+		qBefore := swag.FormatInt64(qrBefore)
+		if qBefore != "" {
+			if err := r.SetQueryParam("before", qBefore); err != nil {
+				return err
+			}
+		}
+
+	}
 
 	// path param set
 	if err := r.SetPathParam("set", o.Set); err != nil {

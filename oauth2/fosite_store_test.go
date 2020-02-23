@@ -26,8 +26,8 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"

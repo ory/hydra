@@ -1,8 +1,6 @@
 module github.com/ory/hydra
 
 require (
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
-	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.2
@@ -34,7 +32,7 @@ require (
 	github.com/ory/herodot v0.6.2
 	github.com/ory/sdk/swagutil v0.0.0-20200131170418-ead0c2285f93
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.93
+	github.com/ory/x v0.0.98
 	github.com/pborman/uuid v1.2.0
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
@@ -53,13 +51,10 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
-	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
-	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opentelemetry.io/otel v0.2.1
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/tools v0.0.0-20200203215610-ab391d50b528
-	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/square/go-jose.v2 v2.3.1
 )
@@ -68,7 +63,5 @@ replace git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110
 
 // Fix for https://github.com/golang/lint/issues/436
 replace github.com/golang/lint => github.com/golang/lint v0.0.0-20190227174305-8f45f776aaf1
-
-replace github.com/ory/x => github.com/glerchundi/x v0.0.97-0.20200221090043-7f3ebe7b46ec
 
 go 1.13

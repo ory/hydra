@@ -237,12 +237,6 @@
               "$ref": "#/definitions/genericError"
             }
           },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
           "500": {
             "description": "genericError",
             "schema": {

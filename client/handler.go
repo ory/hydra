@@ -233,8 +233,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //     Responses:
 //       200: oAuth2Client
-//		 401: genericError
-//       404: genericError
+//       401: genericError
 //       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")

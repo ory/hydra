@@ -183,10 +183,14 @@
 
 **Fixed bugs:**
 
+- fix\(client\): Remove 404 from GET responses [\#1746](https://github.com/ory/hydra/pull/1746) ([aeneasr](https://github.com/aeneasr))
 - fix: Add failing test case for \#1725 [\#1727](https://github.com/ory/hydra/pull/1727) ([aeneasr](https://github.com/aeneasr))
 
 **Closed issues:**
 
+- Integration with the Kratos user center error [\#1749](https://github.com/ory/hydra/issues/1749)
+- Status code 401 instead of 404 for clients not found in GET /clients/{id}  [\#1744](https://github.com/ory/hydra/issues/1744)
+- Docker  [\#1743](https://github.com/ory/hydra/issues/1743)
 - Add support for a NoSql as persistence layer [\#1740](https://github.com/ory/hydra/issues/1740)
 -  Hydra write to database: broken pipe [\#1599](https://github.com/ory/hydra/issues/1599)
 
@@ -1637,10 +1641,6 @@
 
 - docker: Build time always return time.Now\(\) [\#792](https://github.com/ory/hydra/issues/792)
 
-**Closed issues:**
-
-- docs: document difference between scopes and policies [\#590](https://github.com/ory/hydra/issues/590)
-
 **Merged pull requests:**
 
 - metrics: Improves naming of traits [\#803](https://github.com/ory/hydra/pull/803) ([aeneasr](https://github.com/aeneasr))
@@ -1696,6 +1696,7 @@
 - AWS Lambda Support? [\#749](https://github.com/ory/hydra/issues/749)
 - cmd/client: Ask for security newsletter sign up when using client side CLI [\#747](https://github.com/ory/hydra/issues/747)
 - oauth2: Add PKCE support [\#744](https://github.com/ory/hydra/issues/744)
+- docs: document difference between scopes and policies [\#590](https://github.com/ory/hydra/issues/590)
 
 ## [v0.11.4](https://github.com/ory/hydra/tree/v0.11.4) (2018-01-23)
 

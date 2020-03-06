@@ -32,7 +32,6 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/pointerx"
 
-	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	jose "gopkg.in/square/go-jose.v2"
@@ -66,7 +65,9 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	fmt.Println(formatResponse(res.Payload))
 }
 
-func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose.JSONWebKey {
+func toSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
+	var alg string
+
 	if jwk, ok := key.(*jose.JSONWebKey); ok {
 		key = jwk.Key
 		if jwk.KeyID != "" {
@@ -75,22 +76,15 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose
 		if jwk.Use != "" {
 			use = jwk.Use
 		}
-	}
-
-	var err error
-	var jwk *gojwk.Key
-	if public {
-		jwk, err = gojwk.PublicKey(key)
-		cmdx.Must(err, "Unable to convert public key to JSON Web Key because %s", err)
-	} else {
-		jwk, err = gojwk.PrivateKey(key)
-		cmdx.Must(err, "Unable to convert private key to JSON Web Key because %s", err)
+		if jwk.Algorithm != "" {
+			alg = jwk.Algorithm
+		}
 	}
 
 	return jose.JSONWebKey{
 		KeyID:     kid,
 		Use:       use,
-		Algorithm: jwk.Alg,
+		Algorithm: alg,
 		Key:       key,
 	}
 }
@@ -141,9 +135,9 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use, true))
+			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use))
 		} else {
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+uuid.New(), use, false))
+			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+uuid.New(), use))
 		}
 
 		fmt.Printf("Successfully loaded key from file: %s\n", path)

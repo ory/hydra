@@ -23,6 +23,9 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/jsonschema/v3"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/jsonschemax"
 	"net"
 	"net/http"
 	"strings"
@@ -84,6 +87,51 @@ func isDSNAllowed(d driver.Driver) {
 
 var schemas = packr.New("schemas", "../../docs")
 
+// LoggerWithValidationErrorFields adds all validation errors as fields to the logger.
+func LoggerWithValidationErrorFields(l logrus.FieldLogger, err error) logrus.FieldLogger {
+	entry := l
+
+	switch e := errorsx.Cause(err).(type) {
+	case *jsonschema.ValidationError:
+		pointer, message := jsonschemaFormatError(e)
+		entry = entry.
+			WithField("config_file", viper.ConfigFileUsed()).
+			WithField("config_key", pointer).
+			WithField("validation_error", message)
+
+		for idx, cause := range e.Causes {
+			pointer, message := jsonschemaFormatError(cause)
+			entry = entry.
+				WithField(fmt.Sprintf("[%d]config_key", idx), pointer).
+				WithField(fmt.Sprintf("[%d]validation_error", idx), message)
+		}
+	}
+
+	return entry
+}
+
+func jsonschemaFormatError(e *jsonschema.ValidationError) (pointer, message string) {
+	var err error
+
+	pointer = e.InstancePtr
+	message = e.Message
+	switch ctx := e.Context.(type) {
+	case *jsonschema.ValidationErrorContextRequired:
+		if len(ctx.Missing) > 0 {
+			message = "one or more required properties are missing"
+			pointer = ctx.Missing[0]
+		}
+	}
+
+	// We can ignore the error as it will simply echo the pointer.
+	pointer, err = jsonschemax.JSONPointerToDotNotation(pointer)
+	if err != nil {
+		pointer = e.InstancePtr
+	}
+
+	return
+}
+
 func validateAndWatchViper(l *logrus.Logger) {
 	schema, err := schemas.Find("config.schema.json")
 	if err != nil {
@@ -91,13 +139,14 @@ func validateAndWatchViper(l *logrus.Logger) {
 	}
 
 	if err := viperx.Validate("config.schema.json", schema); err != nil {
-		viperx.LoggerWithValidationErrorFields(l, err).
+		l.Logf(logrus.InfoLevel, "all config: %+v", viper.AllSettings())
+		LoggerWithValidationErrorFields(l, err).
 			Fatal("The configuration is invalid and could not be loaded.")
 	}
 
 	viperx.AddWatcher(func(event fsnotify.Event) error {
 		if err := viperx.Validate("config.schema.json", schema); err != nil {
-			viperx.LoggerWithValidationErrorFields(l, err).
+			LoggerWithValidationErrorFields(l, err).
 				Error("The changed configuration is invalid and could not be loaded. Rolling back to the last working configuration revision. Please address the validation errors before restarting ORY Hydra.")
 			return viperx.ErrRollbackConfigurationChanges
 		}

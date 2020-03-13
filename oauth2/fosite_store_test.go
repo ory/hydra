@@ -28,6 +28,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/viper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
@@ -76,37 +77,57 @@ func connectSQL(t *testing.T, conf *configuration.ViperProvider, dbName string, 
 }
 
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	tests := []struct {
+		name                   string
+		enableSessionEncrypted bool
+	}{
+		{
+			name:                   "DisableSessionEncrypted",
+			enableSessionEncrypted: false,
+		},
+		{
+			name:                   "EnableSessionEncrypted",
+			enableSessionEncrypted: true,
+		},
+	}
 
-	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
-	registries["memory"] = reg
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			conf := internal.NewConfigurationWithDefaults()
+			viper.Set(configuration.ViperKeyEncryptSessionData, tc.enableSessionEncrypted)
+			reg := internal.NewRegistry(conf)
 
-	if !testing.Short() {
-		var p, m, c *sqlx.DB
-		dockertest.Parallel([]func(){
-			func() {
-				p = connectToPG(t)
-			},
-			func() {
-				m = connectToMySQL(t)
-			},
-			func() {
-				c = connectToCRDB(t)
-			},
+			require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
+			registries["memory"] = reg
+
+			if !testing.Short() {
+				var p, m, c *sqlx.DB
+				dockertest.Parallel([]func(){
+					func() {
+						p = connectToPG(t)
+					},
+					func() {
+						m = connectToMySQL(t)
+					},
+					func() {
+						c = connectToCRDB(t)
+					},
+				})
+				registries["postgres"] = connectSQL(t, conf, "postgres", p)
+				registries["mysql"] = connectSQL(t, conf, "mysql", m)
+				registries["cockroach"] = connectSQL(t, conf, "cockroach", c)
+			}
+
+			for k, store := range registries {
+				TestHelperRunner(t, store, k)
+			}
+
+			for _, m := range registries {
+				if mm, ok := m.(*driver.RegistrySQL); ok {
+					x.CleanSQL(t, mm.DB())
+				}
+			}
 		})
-		registries["postgres"] = connectSQL(t, conf, "postgres", p)
-		registries["mysql"] = connectSQL(t, conf, "mysql", m)
-		registries["cockroach"] = connectSQL(t, conf, "cockroach", c)
-	}
 
-	for k, store := range registries {
-		TestHelperRunner(t, store, k)
-	}
-
-	for _, m := range registries {
-		if mm, ok := m.(*driver.RegistrySQL); ok {
-			x.CleanSQL(t, mm.DB())
-		}
 	}
 }

@@ -34,9 +34,11 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
@@ -45,8 +47,9 @@ import (
 type FositeSQLStore struct {
 	DB *sqlx.DB
 
-	r InternalRegistry
-	c Configuration
+	r  InternalRegistry
+	c  Configuration
+	kc *jwk.AEAD
 
 	HashSignature bool
 }
@@ -58,8 +61,8 @@ type sqlxDB interface {
 	GetContext(ctx context.Context, dest interface{}, query string, args ...interface{}) error
 }
 
-func NewFositeSQLStore(db *sqlx.DB, r InternalRegistry, c Configuration) *FositeSQLStore {
-	return &FositeSQLStore{r: r, c: c, DB: db}
+func NewFositeSQLStore(db *sqlx.DB, r InternalRegistry, c Configuration, kc *jwk.AEAD) *FositeSQLStore {
+	return &FositeSQLStore{r: r, c: c, kc: kc, DB: db}
 }
 
 type tableName string
@@ -123,7 +126,7 @@ type sqlData struct {
 	Session           []byte         `db:"session_data"`
 }
 
-func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.FieldLogger) (*sqlData, error) {
+func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*sqlData, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		logger.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -134,6 +137,14 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.Fi
 	session, err := json.Marshal(r.GetSession())
 	if err != nil {
 		return nil, errors.WithStack(err)
+	}
+
+	if c.EncryptSessionData() {
+		ciphertext, err := kc.Encrypt(session)
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+		session = []byte(ciphertext)
 	}
 
 	var challenge sql.NullString
@@ -163,9 +174,18 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, logger logrus.Fi
 	}, nil
 }
 
-func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, logger logrus.FieldLogger) (*fosite.Request, error) {
+func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, conf Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*fosite.Request, error) {
+	sess := s.Session
+	if !gjson.ValidBytes(sess) {
+		var err error
+		sess, err = kc.Decrypt(string(sess))
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
 	if session != nil {
-		if err := json.Unmarshal(s.Session, session); err != nil {
+		if err := json.Unmarshal(sess, session); err != nil {
 			return nil, errors.WithStack(err)
 		}
 	} else {
@@ -256,7 +276,7 @@ func (s *FositeSQLStore) createSession(ctx context.Context, signature string, re
 	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
-	data, err := sqlSchemaFromRequest(signature, requester, s.r.Logger())
+	data, err := sqlSchemaFromRequest(signature, requester, s.c, s.kc, s.r.Logger())
 	if err != nil {
 		return err
 	}
@@ -293,7 +313,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 	} else if err != nil {
 		return nil, sqlcon.HandleError(err)
 	} else if !d.Active && table == sqlTableCode {
-		if r, err := d.toRequest(session, s.r.ClientManager(), s.r.Logger()); err != nil {
+		if r, err := d.toRequest(session, s.r.ClientManager(), s.c, s.kc, s.r.Logger()); err != nil {
 			return nil, err
 		} else {
 			return r, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
@@ -302,7 +322,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 		return nil, errors.WithStack(fosite.ErrInactiveToken)
 	}
 
-	return d.toRequest(session, s.r.ClientManager(), s.r.Logger())
+	return d.toRequest(session, s.r.ClientManager(), s.c, s.kc, s.r.Logger())
 }
 
 func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, table tableName) error {

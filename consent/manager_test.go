@@ -72,9 +72,7 @@ func createSQL(t *testing.T,dbName string, db *sqlx.DB) driver.Registry {
 	x.CleanSQL(t, db)
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
-	if _, err := reg.CreateSchemas(dbName); err != nil {
-		panic(err)
-	}
+	require.NoError(t, reg.CreateSchemas(dbName), "db: %s", db.DriverName())
 
 	return reg
 }

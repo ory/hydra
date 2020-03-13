@@ -18,6 +18,7 @@ func resetConfig() {
 	viper.Set(configuration.ViperKeySubjectTypesSupported, nil)
 	viper.Set(configuration.ViperKeyDefaultClientScope, nil)
 	viper.Set(configuration.ViperKeyDSN, nil)
+	viper.Set(configuration.ViperKeyEncryptSessionData, true)
 	viper.Set(configuration.ViperKeyBCryptCost, nil)
 	viper.Set(configuration.ViperKeyAdminListenOnHost, nil)
 	viper.Set(configuration.ViperKeyAdminListenOnPort, nil)

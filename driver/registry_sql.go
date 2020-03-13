@@ -181,7 +181,7 @@ func (m *RegistrySQL) ConsentManager() consent.Manager {
 
 func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 	if m.fs == nil {
-		m.fs = oauth2.NewFositeSQLStore(m.DB(), m.r, m.c)
+		m.fs = oauth2.NewFositeSQLStore(m.DB(), m.r, m.c, m.KeyCipher())
 	}
 	return m.fs
 }

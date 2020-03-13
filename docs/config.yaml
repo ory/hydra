@@ -371,6 +371,9 @@ oauth2:
   pkce:
     # Set this to true if you want PKCE to be enforced for all clients.
     enforced: false
+  session:
+    # store encrypted data in database, default true
+    encrypt_at_rest: true
 
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated,
 # for more information on this topic navigate to:

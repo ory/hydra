@@ -379,7 +379,7 @@ workflows:
               only: master
       - sdk/generate:
           appname: Ory_Hydra
-          specargs: -x square/go-jose
+          specignorepgks: internal/httpclient,gopkg.in/square/go-jose.v2
           requires:
             - test
             - golangci/lint
@@ -394,7 +394,7 @@ workflows:
             branches:
               ignore: /master/
       - sdk/release:
-          specargs: -x square/go-jose
+          specignorepgks: internal/httpclient,gopkg.in/square/go-jose.v2
           requires:
             - test
             - golangci/lint

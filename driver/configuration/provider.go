@@ -37,6 +37,7 @@ type Provider interface {
 	OIDCDiscoveryUserinfoEndpoint() string
 	ShareOAuth2Debug() bool
 	DSN() string
+	EncryptSessionData() bool
 	BCryptCost() int
 	DataSourcePlugin() string
 	DefaultClientScope() []string

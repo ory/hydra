@@ -43,6 +43,7 @@ const (
 	ViperKeyDefaultClientScope             = "oidc.dynamic_client_registration.default_scope"
 	ViperKeyDSN                            = "dsn"
 	ViperKeyBCryptCost                     = "oauth2.hashers.bcrypt.cost"
+	ViperKeyEncryptSessionData             = "oauth2.session.encrypt_at_rest"
 	ViperKeyAdminListenOnHost              = "serve.admin.host"
 	ViperKeyAdminListenOnPort              = "serve.admin.port"
 	ViperKeyAdminDisableHealthAccessLog    = "serve.admin.access_log.disable_for_health"
@@ -175,6 +176,10 @@ func (v *ViperProvider) CORSOptions(iface string) cors.Options {
 
 func (v *ViperProvider) DSN() string {
 	return viperx.GetString(v.l, ViperKeyDSN, "", "DATABASE_URL")
+}
+
+func (v *ViperProvider) EncryptSessionData() bool {
+	return viperx.GetBool(v.l, ViperKeyEncryptSessionData, true)
 }
 
 func (v *ViperProvider) DataSourcePlugin() string {

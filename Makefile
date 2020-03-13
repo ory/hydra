@@ -85,7 +85,7 @@ gen: mocks sqlbin sdk
 # Generates the SDKs
 .PHONY: sdk
 sdk:
-		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x internal/httpclient
+		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x internal/httpclient,gopkg.in/square/go-jose.v2
 		$$(go env GOPATH)/bin/swagutil sanitize ./docs/api.swagger.json
 		$$(go env GOPATH)/bin/swagger flatten --with-flatten=remove-unused -o ./docs/api.swagger.json ./docs/api.swagger.json
 		$$(go env GOPATH)/bin/swagger validate ./docs/api.swagger.json

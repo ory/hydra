@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// JSONWebKeySet JSON web key set
+// JSONWebKeySet JSONWebKeySet JSON web key set
 // swagger:model JSONWebKeySet
 type JSONWebKeySet struct {
 

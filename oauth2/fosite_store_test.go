@@ -69,6 +69,7 @@ func connectToCRDB(t *testing.T) *sqlx.DB {
 }
 
 func connectSQL(t *testing.T, conf *configuration.ViperProvider, dbName string, db *sqlx.DB) driver.Registry {
+	x.CleanSQL(t, db)
 	reg := internal.NewRegistrySQL(conf, db)
 	_, err := reg.CreateSchemas(dbName)
 	require.NoError(t, err)
@@ -95,9 +96,9 @@ func TestManagers(t *testing.T) {
 				c = connectToCRDB(t)
 			},
 		})
-		registries["postgres"] = connectSQL(t, conf, "postgres", p)
 		registries["mysql"] = connectSQL(t, conf, "mysql", m)
 		registries["cockroach"] = connectSQL(t, conf, "cockroach", c)
+		registries["postgres"] = connectSQL(t, conf, "postgres", p)
 	}
 
 	for k, store := range registries {

@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PreviousConsentSession The response used to return used consent requests
+// PreviousConsentSession PreviousConsentSession The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 // swagger:model PreviousConsentSession
 type PreviousConsentSession struct {
@@ -27,6 +27,7 @@ type PreviousConsentSession struct {
 	GrantScope []string `json:"grant_scope"`
 
 	// handled at
+	// Format: date-time
 	// Format: date-time
 	HandledAt strfmt.DateTime `json:"handled_at,omitempty"`
 

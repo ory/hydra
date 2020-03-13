@@ -23,16 +23,18 @@ package client
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
+
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+	migrate "github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
-	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
-	"strings"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -212,7 +214,7 @@ func (m *SQLManager) CountClients(ctx context.Context) (int, error) {
 
 func setDefaults(c *Client) *Client {
 	if c.JSONWebKeys == nil {
-		c.JSONWebKeys = new(x.JSONWebKeySet)
+		c.JSONWebKeys = new(x.JoseJSONWebKeySet)
 	}
 
 	if c.Metadata == nil {

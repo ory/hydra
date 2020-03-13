@@ -13,25 +13,17 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for
-// "swagger generate spec" to generate only on definition of a
-// JSONWebKeySet. Since one with the same name is previously defined as
-// client.Client.JSONWebKeys and this one is last, this one will be
-// effectively written in the swagger spec.
+// JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet jose JSON web key set
 //
-// swagger:model JSONWebKeySet
-type JSONWebKeySet struct {
+// swagger:model JoseJSONWebKeySet
+type JoseJSONWebKeySet struct {
 
-	// The value of the "keys" parameter is an array of JWK values.  By
-	// default, the order of the JWK values within the array does not imply
-	// an order of preference among them, although applications of JWK Sets
-	// can choose to assign a meaning to the order for their purposes, if
-	// desired.
+	// keys
 	Keys []*JSONWebKey `json:"keys"`
 }
 
-// Validate validates this JSON web key set
-func (m *JSONWebKeySet) Validate(formats strfmt.Registry) error {
+// Validate validates this jose JSON web key set
+func (m *JoseJSONWebKeySet) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateKeys(formats); err != nil {
@@ -44,7 +36,7 @@ func (m *JSONWebKeySet) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *JSONWebKeySet) validateKeys(formats strfmt.Registry) error {
+func (m *JoseJSONWebKeySet) validateKeys(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Keys) { // not required
 		return nil
@@ -70,7 +62,7 @@ func (m *JSONWebKeySet) validateKeys(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *JSONWebKeySet) MarshalBinary() ([]byte, error) {
+func (m *JoseJSONWebKeySet) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -78,8 +70,8 @@ func (m *JSONWebKeySet) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *JSONWebKeySet) UnmarshalBinary(b []byte) error {
-	var res JSONWebKeySet
+func (m *JoseJSONWebKeySet) UnmarshalBinary(b []byte) error {
+	var res JoseJSONWebKeySet
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

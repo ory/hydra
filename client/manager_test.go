@@ -31,9 +31,9 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/x"
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 

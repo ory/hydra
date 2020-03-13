@@ -79,7 +79,7 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", JSONWebKeys: &x.JSONWebKeySet{JSONWebKeySet:new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{ClientID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{

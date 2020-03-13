@@ -28,8 +28,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/viper"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"

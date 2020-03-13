@@ -29,8 +29,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/x/dbal"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
 

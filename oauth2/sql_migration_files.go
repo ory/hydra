@@ -308,36 +308,37 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() ([]byte, error){
-	"migrations/sql/cockroach/9.sql": migrations_sql_cockroach_9_sql,
-	"migrations/sql/mysql/.gitkeep": migrations_sql_mysql_gitkeep,
-	"migrations/sql/mysql/10.sql": migrations_sql_mysql_10_sql,
-	"migrations/sql/mysql/5.sql": migrations_sql_mysql_5_sql,
-	"migrations/sql/mysql/6.sql": migrations_sql_mysql_6_sql,
-	"migrations/sql/mysql/7.sql": migrations_sql_mysql_7_sql,
-	"migrations/sql/mysql/9.sql": migrations_sql_mysql_9_sql,
+	"migrations/sql/cockroach/9.sql":   migrations_sql_cockroach_9_sql,
+	"migrations/sql/mysql/.gitkeep":    migrations_sql_mysql_gitkeep,
+	"migrations/sql/mysql/10.sql":      migrations_sql_mysql_10_sql,
+	"migrations/sql/mysql/5.sql":       migrations_sql_mysql_5_sql,
+	"migrations/sql/mysql/6.sql":       migrations_sql_mysql_6_sql,
+	"migrations/sql/mysql/7.sql":       migrations_sql_mysql_7_sql,
+	"migrations/sql/mysql/9.sql":       migrations_sql_mysql_9_sql,
 	"migrations/sql/postgres/.gitkeep": migrations_sql_postgres_gitkeep,
-	"migrations/sql/postgres/10.sql": migrations_sql_postgres_10_sql,
-	"migrations/sql/postgres/5.sql": migrations_sql_postgres_5_sql,
-	"migrations/sql/postgres/6.sql": migrations_sql_postgres_6_sql,
-	"migrations/sql/postgres/7.sql": migrations_sql_postgres_7_sql,
-	"migrations/sql/postgres/9.sql": migrations_sql_postgres_9_sql,
-	"migrations/sql/shared/1.sql": migrations_sql_shared_1_sql,
-	"migrations/sql/shared/2.sql": migrations_sql_shared_2_sql,
-	"migrations/sql/shared/3.sql": migrations_sql_shared_3_sql,
-	"migrations/sql/shared/4.sql": migrations_sql_shared_4_sql,
-	"migrations/sql/shared/8.sql": migrations_sql_shared_8_sql,
-	"migrations/sql/tests/.gitkeep": migrations_sql_tests_gitkeep,
+	"migrations/sql/postgres/10.sql":   migrations_sql_postgres_10_sql,
+	"migrations/sql/postgres/5.sql":    migrations_sql_postgres_5_sql,
+	"migrations/sql/postgres/6.sql":    migrations_sql_postgres_6_sql,
+	"migrations/sql/postgres/7.sql":    migrations_sql_postgres_7_sql,
+	"migrations/sql/postgres/9.sql":    migrations_sql_postgres_9_sql,
+	"migrations/sql/shared/1.sql":      migrations_sql_shared_1_sql,
+	"migrations/sql/shared/2.sql":      migrations_sql_shared_2_sql,
+	"migrations/sql/shared/3.sql":      migrations_sql_shared_3_sql,
+	"migrations/sql/shared/4.sql":      migrations_sql_shared_4_sql,
+	"migrations/sql/shared/8.sql":      migrations_sql_shared_8_sql,
+	"migrations/sql/tests/.gitkeep":    migrations_sql_tests_gitkeep,
 	"migrations/sql/tests/10_test.sql": migrations_sql_tests_10_test_sql,
-	"migrations/sql/tests/1_test.sql": migrations_sql_tests_1_test_sql,
-	"migrations/sql/tests/2_test.sql": migrations_sql_tests_2_test_sql,
-	"migrations/sql/tests/3_test.sql": migrations_sql_tests_3_test_sql,
-	"migrations/sql/tests/4_test.sql": migrations_sql_tests_4_test_sql,
-	"migrations/sql/tests/5_test.sql": migrations_sql_tests_5_test_sql,
-	"migrations/sql/tests/6_test.sql": migrations_sql_tests_6_test_sql,
-	"migrations/sql/tests/7_test.sql": migrations_sql_tests_7_test_sql,
-	"migrations/sql/tests/8_test.sql": migrations_sql_tests_8_test_sql,
-	"migrations/sql/tests/9_test.sql": migrations_sql_tests_9_test_sql,
+	"migrations/sql/tests/1_test.sql":  migrations_sql_tests_1_test_sql,
+	"migrations/sql/tests/2_test.sql":  migrations_sql_tests_2_test_sql,
+	"migrations/sql/tests/3_test.sql":  migrations_sql_tests_3_test_sql,
+	"migrations/sql/tests/4_test.sql":  migrations_sql_tests_4_test_sql,
+	"migrations/sql/tests/5_test.sql":  migrations_sql_tests_5_test_sql,
+	"migrations/sql/tests/6_test.sql":  migrations_sql_tests_6_test_sql,
+	"migrations/sql/tests/7_test.sql":  migrations_sql_tests_7_test_sql,
+	"migrations/sql/tests/8_test.sql":  migrations_sql_tests_8_test_sql,
+	"migrations/sql/tests/9_test.sql":  migrations_sql_tests_9_test_sql,
 }
+
 // AssetDir returns the file names below a certain
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
@@ -374,79 +375,51 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type _bintree_t struct {
-	Func func() ([]byte, error)
+	Func     func() ([]byte, error)
 	Children map[string]*_bintree_t
 }
+
 var _bintree = &_bintree_t{nil, map[string]*_bintree_t{
 	"migrations": &_bintree_t{nil, map[string]*_bintree_t{
 		"sql": &_bintree_t{nil, map[string]*_bintree_t{
 			"cockroach": &_bintree_t{nil, map[string]*_bintree_t{
-				"9.sql": &_bintree_t{migrations_sql_cockroach_9_sql, map[string]*_bintree_t{
-				}},
+				"9.sql": &_bintree_t{migrations_sql_cockroach_9_sql, map[string]*_bintree_t{}},
 			}},
 			"mysql": &_bintree_t{nil, map[string]*_bintree_t{
-				".gitkeep": &_bintree_t{migrations_sql_mysql_gitkeep, map[string]*_bintree_t{
-				}},
-				"10.sql": &_bintree_t{migrations_sql_mysql_10_sql, map[string]*_bintree_t{
-				}},
-				"5.sql": &_bintree_t{migrations_sql_mysql_5_sql, map[string]*_bintree_t{
-				}},
-				"6.sql": &_bintree_t{migrations_sql_mysql_6_sql, map[string]*_bintree_t{
-				}},
-				"7.sql": &_bintree_t{migrations_sql_mysql_7_sql, map[string]*_bintree_t{
-				}},
-				"9.sql": &_bintree_t{migrations_sql_mysql_9_sql, map[string]*_bintree_t{
-				}},
+				".gitkeep": &_bintree_t{migrations_sql_mysql_gitkeep, map[string]*_bintree_t{}},
+				"10.sql":   &_bintree_t{migrations_sql_mysql_10_sql, map[string]*_bintree_t{}},
+				"5.sql":    &_bintree_t{migrations_sql_mysql_5_sql, map[string]*_bintree_t{}},
+				"6.sql":    &_bintree_t{migrations_sql_mysql_6_sql, map[string]*_bintree_t{}},
+				"7.sql":    &_bintree_t{migrations_sql_mysql_7_sql, map[string]*_bintree_t{}},
+				"9.sql":    &_bintree_t{migrations_sql_mysql_9_sql, map[string]*_bintree_t{}},
 			}},
 			"postgres": &_bintree_t{nil, map[string]*_bintree_t{
-				".gitkeep": &_bintree_t{migrations_sql_postgres_gitkeep, map[string]*_bintree_t{
-				}},
-				"10.sql": &_bintree_t{migrations_sql_postgres_10_sql, map[string]*_bintree_t{
-				}},
-				"5.sql": &_bintree_t{migrations_sql_postgres_5_sql, map[string]*_bintree_t{
-				}},
-				"6.sql": &_bintree_t{migrations_sql_postgres_6_sql, map[string]*_bintree_t{
-				}},
-				"7.sql": &_bintree_t{migrations_sql_postgres_7_sql, map[string]*_bintree_t{
-				}},
-				"9.sql": &_bintree_t{migrations_sql_postgres_9_sql, map[string]*_bintree_t{
-				}},
+				".gitkeep": &_bintree_t{migrations_sql_postgres_gitkeep, map[string]*_bintree_t{}},
+				"10.sql":   &_bintree_t{migrations_sql_postgres_10_sql, map[string]*_bintree_t{}},
+				"5.sql":    &_bintree_t{migrations_sql_postgres_5_sql, map[string]*_bintree_t{}},
+				"6.sql":    &_bintree_t{migrations_sql_postgres_6_sql, map[string]*_bintree_t{}},
+				"7.sql":    &_bintree_t{migrations_sql_postgres_7_sql, map[string]*_bintree_t{}},
+				"9.sql":    &_bintree_t{migrations_sql_postgres_9_sql, map[string]*_bintree_t{}},
 			}},
 			"shared": &_bintree_t{nil, map[string]*_bintree_t{
-				"1.sql": &_bintree_t{migrations_sql_shared_1_sql, map[string]*_bintree_t{
-				}},
-				"2.sql": &_bintree_t{migrations_sql_shared_2_sql, map[string]*_bintree_t{
-				}},
-				"3.sql": &_bintree_t{migrations_sql_shared_3_sql, map[string]*_bintree_t{
-				}},
-				"4.sql": &_bintree_t{migrations_sql_shared_4_sql, map[string]*_bintree_t{
-				}},
-				"8.sql": &_bintree_t{migrations_sql_shared_8_sql, map[string]*_bintree_t{
-				}},
+				"1.sql": &_bintree_t{migrations_sql_shared_1_sql, map[string]*_bintree_t{}},
+				"2.sql": &_bintree_t{migrations_sql_shared_2_sql, map[string]*_bintree_t{}},
+				"3.sql": &_bintree_t{migrations_sql_shared_3_sql, map[string]*_bintree_t{}},
+				"4.sql": &_bintree_t{migrations_sql_shared_4_sql, map[string]*_bintree_t{}},
+				"8.sql": &_bintree_t{migrations_sql_shared_8_sql, map[string]*_bintree_t{}},
 			}},
 			"tests": &_bintree_t{nil, map[string]*_bintree_t{
-				".gitkeep": &_bintree_t{migrations_sql_tests_gitkeep, map[string]*_bintree_t{
-				}},
-				"10_test.sql": &_bintree_t{migrations_sql_tests_10_test_sql, map[string]*_bintree_t{
-				}},
-				"1_test.sql": &_bintree_t{migrations_sql_tests_1_test_sql, map[string]*_bintree_t{
-				}},
-				"2_test.sql": &_bintree_t{migrations_sql_tests_2_test_sql, map[string]*_bintree_t{
-				}},
-				"3_test.sql": &_bintree_t{migrations_sql_tests_3_test_sql, map[string]*_bintree_t{
-				}},
-				"4_test.sql": &_bintree_t{migrations_sql_tests_4_test_sql, map[string]*_bintree_t{
-				}},
-				"5_test.sql": &_bintree_t{migrations_sql_tests_5_test_sql, map[string]*_bintree_t{
-				}},
-				"6_test.sql": &_bintree_t{migrations_sql_tests_6_test_sql, map[string]*_bintree_t{
-				}},
-				"7_test.sql": &_bintree_t{migrations_sql_tests_7_test_sql, map[string]*_bintree_t{
-				}},
-				"8_test.sql": &_bintree_t{migrations_sql_tests_8_test_sql, map[string]*_bintree_t{
-				}},
-				"9_test.sql": &_bintree_t{migrations_sql_tests_9_test_sql, map[string]*_bintree_t{
-				}},
+				".gitkeep":    &_bintree_t{migrations_sql_tests_gitkeep, map[string]*_bintree_t{}},
+				"10_test.sql": &_bintree_t{migrations_sql_tests_10_test_sql, map[string]*_bintree_t{}},
+				"1_test.sql":  &_bintree_t{migrations_sql_tests_1_test_sql, map[string]*_bintree_t{}},
+				"2_test.sql":  &_bintree_t{migrations_sql_tests_2_test_sql, map[string]*_bintree_t{}},
+				"3_test.sql":  &_bintree_t{migrations_sql_tests_3_test_sql, map[string]*_bintree_t{}},
+				"4_test.sql":  &_bintree_t{migrations_sql_tests_4_test_sql, map[string]*_bintree_t{}},
+				"5_test.sql":  &_bintree_t{migrations_sql_tests_5_test_sql, map[string]*_bintree_t{}},
+				"6_test.sql":  &_bintree_t{migrations_sql_tests_6_test_sql, map[string]*_bintree_t{}},
+				"7_test.sql":  &_bintree_t{migrations_sql_tests_7_test_sql, map[string]*_bintree_t{}},
+				"8_test.sql":  &_bintree_t{migrations_sql_tests_8_test_sql, map[string]*_bintree_t{}},
+				"9_test.sql":  &_bintree_t{migrations_sql_tests_9_test_sql, map[string]*_bintree_t{}},
 			}},
 		}},
 	}},

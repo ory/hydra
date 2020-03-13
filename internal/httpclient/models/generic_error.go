@@ -7,7 +7,7 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
@@ -15,6 +15,7 @@ import (
 // GenericError Error response
 //
 // Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
+//
 // swagger:model genericError
 type GenericError struct {
 

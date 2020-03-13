@@ -146,18 +146,19 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() ([]byte, error){
-	"migrations/sql/cockroach/4.sql": migrations_sql_cockroach_4_sql,
-	"migrations/sql/mysql/4.sql": migrations_sql_mysql_4_sql,
-	"migrations/sql/postgres/4.sql": migrations_sql_postgres_4_sql,
-	"migrations/sql/shared/1.sql": migrations_sql_shared_1_sql,
-	"migrations/sql/shared/2.sql": migrations_sql_shared_2_sql,
-	"migrations/sql/shared/3.sql": migrations_sql_shared_3_sql,
-	"migrations/sql/tests/.gitkeep": migrations_sql_tests_gitkeep,
+	"migrations/sql/cockroach/4.sql":  migrations_sql_cockroach_4_sql,
+	"migrations/sql/mysql/4.sql":      migrations_sql_mysql_4_sql,
+	"migrations/sql/postgres/4.sql":   migrations_sql_postgres_4_sql,
+	"migrations/sql/shared/1.sql":     migrations_sql_shared_1_sql,
+	"migrations/sql/shared/2.sql":     migrations_sql_shared_2_sql,
+	"migrations/sql/shared/3.sql":     migrations_sql_shared_3_sql,
+	"migrations/sql/tests/.gitkeep":   migrations_sql_tests_gitkeep,
 	"migrations/sql/tests/1_test.sql": migrations_sql_tests_1_test_sql,
 	"migrations/sql/tests/2_test.sql": migrations_sql_tests_2_test_sql,
 	"migrations/sql/tests/3_test.sql": migrations_sql_tests_3_test_sql,
 	"migrations/sql/tests/4_test.sql": migrations_sql_tests_4_test_sql,
 }
+
 // AssetDir returns the file names below a certain
 // directory embedded in the file by go-bindata.
 // For example if you run go-bindata on data/... and data contains the
@@ -194,43 +195,33 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type _bintree_t struct {
-	Func func() ([]byte, error)
+	Func     func() ([]byte, error)
 	Children map[string]*_bintree_t
 }
+
 var _bintree = &_bintree_t{nil, map[string]*_bintree_t{
 	"migrations": &_bintree_t{nil, map[string]*_bintree_t{
 		"sql": &_bintree_t{nil, map[string]*_bintree_t{
 			"cockroach": &_bintree_t{nil, map[string]*_bintree_t{
-				"4.sql": &_bintree_t{migrations_sql_cockroach_4_sql, map[string]*_bintree_t{
-				}},
+				"4.sql": &_bintree_t{migrations_sql_cockroach_4_sql, map[string]*_bintree_t{}},
 			}},
 			"mysql": &_bintree_t{nil, map[string]*_bintree_t{
-				"4.sql": &_bintree_t{migrations_sql_mysql_4_sql, map[string]*_bintree_t{
-				}},
+				"4.sql": &_bintree_t{migrations_sql_mysql_4_sql, map[string]*_bintree_t{}},
 			}},
 			"postgres": &_bintree_t{nil, map[string]*_bintree_t{
-				"4.sql": &_bintree_t{migrations_sql_postgres_4_sql, map[string]*_bintree_t{
-				}},
+				"4.sql": &_bintree_t{migrations_sql_postgres_4_sql, map[string]*_bintree_t{}},
 			}},
 			"shared": &_bintree_t{nil, map[string]*_bintree_t{
-				"1.sql": &_bintree_t{migrations_sql_shared_1_sql, map[string]*_bintree_t{
-				}},
-				"2.sql": &_bintree_t{migrations_sql_shared_2_sql, map[string]*_bintree_t{
-				}},
-				"3.sql": &_bintree_t{migrations_sql_shared_3_sql, map[string]*_bintree_t{
-				}},
+				"1.sql": &_bintree_t{migrations_sql_shared_1_sql, map[string]*_bintree_t{}},
+				"2.sql": &_bintree_t{migrations_sql_shared_2_sql, map[string]*_bintree_t{}},
+				"3.sql": &_bintree_t{migrations_sql_shared_3_sql, map[string]*_bintree_t{}},
 			}},
 			"tests": &_bintree_t{nil, map[string]*_bintree_t{
-				".gitkeep": &_bintree_t{migrations_sql_tests_gitkeep, map[string]*_bintree_t{
-				}},
-				"1_test.sql": &_bintree_t{migrations_sql_tests_1_test_sql, map[string]*_bintree_t{
-				}},
-				"2_test.sql": &_bintree_t{migrations_sql_tests_2_test_sql, map[string]*_bintree_t{
-				}},
-				"3_test.sql": &_bintree_t{migrations_sql_tests_3_test_sql, map[string]*_bintree_t{
-				}},
-				"4_test.sql": &_bintree_t{migrations_sql_tests_4_test_sql, map[string]*_bintree_t{
-				}},
+				".gitkeep":   &_bintree_t{migrations_sql_tests_gitkeep, map[string]*_bintree_t{}},
+				"1_test.sql": &_bintree_t{migrations_sql_tests_1_test_sql, map[string]*_bintree_t{}},
+				"2_test.sql": &_bintree_t{migrations_sql_tests_2_test_sql, map[string]*_bintree_t{}},
+				"3_test.sql": &_bintree_t{migrations_sql_tests_3_test_sql, map[string]*_bintree_t{}},
+				"4_test.sql": &_bintree_t{migrations_sql_tests_4_test_sql, map[string]*_bintree_t{}},
 			}},
 		}},
 	}},

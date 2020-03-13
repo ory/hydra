@@ -30,9 +30,8 @@ import (
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-
-	"github.com/ory/hydra/x"
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/x"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
@@ -90,7 +89,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 			Contacts:                          []string{"aeneas1", "aeneas2"},
 			SecretExpiresAt:                   0,
 			SectorIdentifierURI:               "https://sector",
-			JSONWebKeys:                       &x.JSONWebKeySet{JSONWebKeySet:&jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}}},
+			JSONWebKeys:                       &x.JoseJSONWebKeySet{JSONWebKeySet: &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}}},
 			JSONWebKeysURI:                    "https://...",
 			TokenEndpointAuthMethod:           "none",
 			RequestURIs:                       []string{"foo", "bar"},

@@ -3,16 +3,20 @@ package x
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"github.com/pkg/errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
-type JSONWebKeySet struct {
+type JoseJSONWebKeySet struct {
+	// swagger:ignore
 	*jose.JSONWebKeySet
+
+	JSONWebKeys []JSONWebKey `json:"keys"`
 }
 
-func (n *JSONWebKeySet) Scan(value interface{}) error {
+func (n *JoseJSONWebKeySet) Scan(value interface{}) error {
 	v := fmt.Sprintf("%s", value)
 	if len(v) == 0 {
 		return nil
@@ -20,7 +24,7 @@ func (n *JSONWebKeySet) Scan(value interface{}) error {
 	return errors.WithStack(json.Unmarshal([]byte(v), n))
 }
 
-func (n JSONWebKeySet) Value() (driver.Value, error) {
+func (n JoseJSONWebKeySet) Value() (driver.Value, error) {
 	value, err := json.Marshal(&n)
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -31,7 +35,7 @@ func (n JSONWebKeySet) Value() (driver.Value, error) {
 type JSONRawMessage json.RawMessage
 
 func (n *JSONRawMessage) Scan(value interface{}) error {
-	*n = []byte(fmt.Sprintf("%s",value))
+	*n = []byte(fmt.Sprintf("%s", value))
 	return nil
 }
 

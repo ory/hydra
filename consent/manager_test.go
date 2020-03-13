@@ -68,11 +68,12 @@ func TestMain(m *testing.M) {
 	runner.Exit(m.Run())
 }
 
-func createSQL(t *testing.T,dbName string, db *sqlx.DB) driver.Registry {
+func createSQL(t *testing.T, dbName string, db *sqlx.DB) driver.Registry {
 	x.CleanSQL(t, db)
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
-	require.NoError(t, reg.CreateSchemas(dbName), "db: %s", db.DriverName())
+	_, err := reg.CreateSchemas(dbName)
+	require.NoError(t, err, "db: %s", db.DriverName())
 
 	return reg
 }
@@ -95,9 +96,9 @@ func TestManagers(t *testing.T) {
 				c = connectToCockroach(t)
 			},
 		})
-		regs["postgres"] = createSQL(t,"postgres", p)
-		regs["mysql"] = createSQL(t,"mysql", m)
-		regs["cockroach"] = createSQL(t,"cockroach", c)
+		regs["postgres"] = createSQL(t, "postgres", p)
+		regs["mysql"] = createSQL(t, "mysql", m)
+		regs["cockroach"] = createSQL(t, "cockroach", c)
 	}
 
 	for k, m := range regs {

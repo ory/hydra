@@ -9,7 +9,7 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 )
 
-// StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter string slice pipe delimiter
+// StringSlicePipeDelimiter StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.
 // swagger:model StringSlicePipeDelimiter
 type StringSlicePipeDelimiter []string
 

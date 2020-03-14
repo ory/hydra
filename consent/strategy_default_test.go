@@ -38,12 +38,13 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
-	"github.com/ory/x/sqlxx"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/urfave/negroni"
+
+	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/viper"
 

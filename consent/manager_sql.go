@@ -249,7 +249,7 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 	}
 
 	d.Client = c
-	return &d,nil
+	return &d, nil
 }
 
 func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) error {

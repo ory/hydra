@@ -393,8 +393,8 @@ type ConsentRequest struct {
 	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
-	Client *client.Client `json:"client" db:"-"`
-	ClientID string `json:"-" db:"client_id"`
+	Client   *client.Client `json:"client" db:"-"`
+	ClientID string         `json:"-" db:"client_id"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
@@ -419,13 +419,13 @@ type ConsentRequest struct {
 	Context x.JSONRawMessage `json:"context,omitempty" db:"context"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
-	ForceSubjectIdentifier string    `json:"-" db:"forced_subject_identifier"`
-	SubjectIdentifier      string    `json:"-" db:"-"`
-	Verifier               string    `json:"-" db:"verifier"`
-	CSRF                   string    `json:"-" db:"csrf"`
+	ForceSubjectIdentifier string         `json:"-" db:"forced_subject_identifier"`
+	SubjectIdentifier      string         `json:"-" db:"-"`
+	Verifier               string         `json:"-" db:"verifier"`
+	CSRF                   string         `json:"-" db:"csrf"`
 	AuthenticatedAt        sqlxx.NullTime `json:"-" db:"authenticated_at"`
-	RequestedAt            time.Time `json:"-" db:"requested_at"`
-	WasHandled             bool      `json:"-" db:"was_handled"`
+	RequestedAt            time.Time      `json:"-" db:"requested_at"`
+	WasHandled             bool           `json:"-" db:"was_handled"`
 }
 
 func (r *ConsentRequest) prepareSQL() *ConsentRequest {

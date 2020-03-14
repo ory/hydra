@@ -1814,7 +1814,6 @@
   },
   "definitions": {
     "JSONRawMessage": {
-      "description": "JSONRawMessage JSONRawMessage JSONRawMessage JSONRawMessage JSONRawMessage JSON raw message",
       "type": "object"
     },
     "JSONWebKey": {
@@ -1905,7 +1904,7 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+      "description": "JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
       "type": "object",
       "properties": {
         "keys": {
@@ -1918,11 +1917,11 @@
       }
     },
     "JoseJSONWebKeySet": {
-      "description": "JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet jose JSON web key set",
+      "description": "JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet jose JSON web key set",
       "type": "object"
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -1943,7 +1942,7 @@
           }
         },
         "handled_at": {
-          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -1962,7 +1961,7 @@
       }
     },
     "StringSlicePipeDelimiter": {
-      "description": "StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter string slice pipe delimiter",
+      "description": "StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter StringSlicePipeDelimiter string slice pipe delimiter",
       "type": "array",
       "items": {
         "type": "string"
@@ -1970,7 +1969,7 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
+      "title": "The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
@@ -1987,7 +1986,7 @@
           }
         },
         "handled_at": {
-          "description": "HandledAt contains the timestamp the consent request was handled.\nFormat: date-time\nFormat: date-time",
+          "description": "HandledAt contains the timestamp the consent request was handled.",
           "type": "string",
           "format": "date-time"
         },
@@ -2007,7 +2006,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "AcceptLoginRequest AcceptLoginRequest AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "AcceptLoginRequest AcceptLoginRequest AcceptLoginRequest AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2072,7 +2071,8 @@
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          }
+          },
+          "$ref": "#/definitions/JSONRawMessage"
         },
         "login_challenge": {
           "description": "LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate\na login and consent request in the login \u0026 consent app.",
@@ -2094,14 +2094,16 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
           "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -2146,7 +2148,7 @@
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "GenericError GenericError Error response",
+      "title": "Error response",
       "required": [
         "error"
       ],
@@ -2196,11 +2198,12 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
+      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
-        "kid",
-        "use"
+        "use",
+        "kid"
       ],
       "properties": {
         "alg": {
@@ -2240,14 +2243,16 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
           "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "session_id": {
           "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -2265,7 +2270,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest Contains information about an ongoing logout request.",
+      "title": "Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2287,7 +2292,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
@@ -2328,7 +2333,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2403,7 +2408,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2416,7 +2421,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2485,7 +2490,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
+      "description": "Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2517,7 +2522,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2661,6 +2666,7 @@
       }
     },
     "version": {
+      "description": "Version Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -2672,7 +2678,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

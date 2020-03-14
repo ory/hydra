@@ -546,7 +546,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
 			LoginSessionID:         as.LoginRequest.SessionID,
 			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
-			Context:               x.JSONRawMessage(as.Context),
+			Context:                x.JSONRawMessage(as.Context),
 		},
 	); err != nil {
 		return errors.WithStack(err)

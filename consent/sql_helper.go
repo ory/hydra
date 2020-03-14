@@ -130,58 +130,6 @@ var sqlParamsLogoutRequest = []string{
 	"rp_initiated",
 }
 
-type sqlLogoutRequest struct {
-	Challenge             string         `db:"challenge"`
-	Verifier              string         `db:"verifier"`
-	Subject               string         `db:"subject"`
-	SessionID             string         `db:"sid"`
-	RequestURL            string         `db:"request_url"`
-	PostLogoutRedirectURI string         `db:"redir_url"`
-	WasUsed               bool           `db:"was_used"`
-	Accepted              bool           `db:"accepted"`
-	Rejected              bool           `db:"rejected"`
-	Client                sql.NullString `db:"client_id"`
-	RPInitiated           bool           `db:"rp_initiated"`
-}
-
-func newSQLLogoutRequest(c *LogoutRequest) *sqlLogoutRequest {
-	var clientID sql.NullString
-	if c.Client != nil {
-		clientID = sql.NullString{
-			Valid:  true,
-			String: c.Client.ClientID,
-		}
-	}
-
-	return &sqlLogoutRequest{
-		Challenge:             c.Challenge,
-		Verifier:              c.Verifier,
-		Subject:               c.Subject,
-		SessionID:             c.SessionID,
-		RequestURL:            c.RequestURL,
-		PostLogoutRedirectURI: c.PostLogoutRedirectURI,
-		WasUsed:               c.WasUsed,
-		Accepted:              c.Accepted,
-		Client:                clientID,
-		RPInitiated:           c.RPInitiated,
-	}
-}
-
-func (r *sqlLogoutRequest) ToLogoutRequest(c *client.Client) *LogoutRequest {
-	return &LogoutRequest{
-		Challenge:             r.Challenge,
-		Verifier:              r.Verifier,
-		Subject:               r.Subject,
-		SessionID:             r.SessionID,
-		RequestURL:            r.RequestURL,
-		PostLogoutRedirectURI: r.PostLogoutRedirectURI,
-		WasUsed:               r.WasUsed,
-		Accepted:              r.Accepted,
-		Client:                c,
-		RPInitiated:           r.RPInitiated,
-	}
-}
-
 type sqlAuthenticationRequest struct {
 	OpenIDConnectContext string         `db:"oidc_context"`
 	Client               string         `db:"client_id"`

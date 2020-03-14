@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/ory/fosite"
@@ -239,25 +240,37 @@ type OpenIDConnectContext struct {
 type LogoutRequest struct {
 	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
 	// identify the session.
-	Challenge string `json:"-"`
+	Challenge string `json:"-" db:"challenge"`
 
 	// Subject is the user for whom the logout was request.
-	Subject string `json:"subject"`
+	Subject string `json:"subject" db:"subject"`
 
 	// SessionID is the login session ID that was requested to log out.
-	SessionID string `json:"sid,omitempty"`
+	SessionID string `json:"sid,omitempty" db:"sid"`
 
 	// RequestURL is the original Logout URL requested.
-	RequestURL string `json:"request_url"`
+	RequestURL string `json:"request_url" db:"request_url"`
 
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
-	RPInitiated bool `json:"rp_initiated"`
+	RPInitiated bool `json:"rp_initiated" db:"rp_initiated"`
 
-	Verifier              string         `json:"-"`
-	PostLogoutRedirectURI string         `json:"-"`
-	WasUsed               bool           `json:"-"`
-	Accepted              bool           `json:"-"`
-	Client                *client.Client `json:"-"`
+	Verifier              string         `json:"-" db:"verifier"`
+	PostLogoutRedirectURI string         `json:"-" db:"redir_url"`
+	WasUsed               bool           `json:"-" db:"was_used"`
+	Accepted              bool           `json:"-" db:"accepted"`
+	Rejected              bool           `db:"rejected" json:"-"`
+	ClientID              sql.NullString `json:"-" db:"client_id"`
+	Client                *client.Client `json:"-" db:"-"`
+}
+
+func (r *LogoutRequest) prepareSQL() *LogoutRequest {
+	if r.Client != nil {
+		r.ClientID = sql.NullString{
+			Valid:  true,
+			String: r.Client.ClientID,
+		}
+	}
+	return r
 }
 
 // Returned when the log out request was used.

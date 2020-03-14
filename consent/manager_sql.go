@@ -564,13 +564,12 @@ func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject, 
 }
 
 func (m *SQLManager) CreateLogoutRequest(ctx context.Context, r *LogoutRequest) error {
-	d := newSQLLogoutRequest(r)
 	/* #nosec G201 - sqlParamsLogoutRequest is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_logout_request (%s) VALUES (%s)",
 		strings.Join(sqlParamsLogoutRequest, ", "),
 		":"+strings.Join(sqlParamsLogoutRequest, ", :"),
-	), d); err != nil {
+	), r.prepareSQL()); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -593,29 +592,28 @@ func (m *SQLManager) RejectLogoutRequest(ctx context.Context, challenge string) 
 }
 
 func (m *SQLManager) GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
-	var d sqlLogoutRequest
-	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE challenge=? AND rejected=FALSE"), challenge); err != nil {
+	var lr LogoutRequest
+	if err := m.DB.GetContext(ctx, &lr, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE challenge=? AND rejected=FALSE"), challenge); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
 
-	if d.Client.Valid {
-		c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client.String)
+	if lr.ClientID.Valid {
+		var err error
+		lr.Client, err = m.r.ClientManager().GetConcreteClient(ctx, lr.ClientID.String)
 		if err != nil {
 			return nil, err
 		}
-
-		return d.ToLogoutRequest(c), nil
 	}
 
-	return d.ToLogoutRequest(nil), nil
+	return &lr, nil
 }
 
 func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {
-	var d sqlLogoutRequest
-	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE"), verifier); err != nil {
+	var lr LogoutRequest
+	if err := m.DB.GetContext(ctx, &lr, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE"), verifier); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}
@@ -626,5 +624,5 @@ func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verif
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.GetLogoutRequest(ctx, d.Challenge)
+	return m.GetLogoutRequest(ctx, lr.Challenge)
 }

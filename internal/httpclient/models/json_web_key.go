@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// JSONWebKey JSONWebKey JSON web key
+// JSONWebKey JSON web key
 // swagger:model JSONWebKey
 type JSONWebKey struct {
 

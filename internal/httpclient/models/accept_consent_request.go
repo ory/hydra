@@ -7,13 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// AcceptConsentRequest The request payload used to accept a consent request.
-//
+// AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.
 // swagger:model acceptConsentRequest
 type AcceptConsentRequest struct {
 
@@ -24,6 +23,7 @@ type AcceptConsentRequest struct {
 	GrantScope []string `json:"grant_scope"`
 
 	// HandledAt contains the timestamp the consent request was handled.
+	// Format: date-time
 	// Format: date-time
 	HandledAt strfmt.DateTime `json:"handled_at,omitempty"`
 

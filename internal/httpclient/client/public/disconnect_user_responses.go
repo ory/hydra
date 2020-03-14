@@ -9,7 +9,8 @@ import (
 	"fmt"
 
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/strfmt"
+
+	strfmt "github.com/go-openapi/strfmt"
 )
 
 // DisconnectUserReader is a Reader for the DisconnectUser structure.

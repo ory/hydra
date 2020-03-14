@@ -7,14 +7,13 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
+// PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
-//
 // swagger:model PreviousConsentSession
 type PreviousConsentSession struct {
 
@@ -28,6 +27,7 @@ type PreviousConsentSession struct {
 	GrantScope []string `json:"grant_scope"`
 
 	// handled at
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	// Format: date-time

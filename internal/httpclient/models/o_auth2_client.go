@@ -7,13 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // OAuth2Client Client represents an OAuth 2.0 Client.
-//
 // swagger:model oAuth2Client
 type OAuth2Client struct {
 
@@ -79,7 +78,7 @@ type OAuth2Client struct {
 	GrantTypes StringSlicePipeDelimiter `json:"grant_types,omitempty"`
 
 	// jwks
-	Jwks *JoseJSONWebKeySet `json:"jwks,omitempty"`
+	Jwks JoseJSONWebKeySet `json:"jwks,omitempty"`
 
 	// URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains
 	// the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the
@@ -176,10 +175,6 @@ func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateGrantTypes(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateJwks(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -285,24 +280,6 @@ func (m *OAuth2Client) validateGrantTypes(formats strfmt.Registry) error {
 			return ve.ValidateName("grant_types")
 		}
 		return err
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateJwks(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Jwks) { // not required
-		return nil
-	}
-
-	if m.Jwks != nil {
-		if err := m.Jwks.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwks")
-			}
-			return err
-		}
 	}
 
 	return nil

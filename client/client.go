@@ -252,6 +252,9 @@ func (c *Client) GetJSONWebKeysURI() string {
 }
 
 func (c *Client) GetJSONWebKeys() *jose.JSONWebKeySet {
+	if c.JSONWebKeys == nil {
+		return nil
+	}
 	return c.JSONWebKeys.JSONWebKeySet
 }
 

@@ -6,12 +6,11 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
-//
+// CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
 // swagger:model completedRequest
 type CompletedRequest struct {
 

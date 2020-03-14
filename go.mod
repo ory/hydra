@@ -1,8 +1,6 @@
 module github.com/ory/hydra
 
 require (
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
-	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
@@ -22,7 +20,6 @@ require (
 	github.com/jackc/pgx/v4 v4.4.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.2.0
-	github.com/kevinburke/go-bindata v3.16.0+incompatible // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -37,7 +34,6 @@ require (
 	github.com/ory/viper v1.5.6
 	github.com/ory/x v0.0.100
 	github.com/pborman/uuid v1.2.0
-	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
@@ -47,7 +43,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/segmentio/backo-go v0.0.0-20200129164019-23eae7c10bd3 // indirect
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v0.0.6
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.4.0
@@ -56,15 +51,12 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
-	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
-	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opentelemetry.io/otel v0.2.1
 	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
-	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/ini.v1 v1.54.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

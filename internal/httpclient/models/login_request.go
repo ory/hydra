@@ -7,12 +7,11 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// LoginRequest Contains information on an ongoing login request.
-//
+// LoginRequest LoginRequest Contains information on an ongoing login request.
 // swagger:model loginRequest
 type LoginRequest struct {
 

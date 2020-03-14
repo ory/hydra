@@ -6,12 +6,11 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // LogoutRequest Contains information about an ongoing logout request.
-//
 // swagger:model logoutRequest
 type LogoutRequest struct {
 

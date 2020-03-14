@@ -7,12 +7,11 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// ConsentRequest ConsentRequest Contains information on an ongoing consent request.
-//
+// ConsentRequest Contains information on an ongoing consent request.
 // swagger:model consentRequest
 type ConsentRequest struct {
 

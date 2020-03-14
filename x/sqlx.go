@@ -12,8 +12,6 @@ import (
 type JoseJSONWebKeySet struct {
 	// swagger:ignore
 	*jose.JSONWebKeySet
-
-	JSONWebKeys []JSONWebKey `json:"keys"`
 }
 
 func (n *JoseJSONWebKeySet) Scan(value interface{}) error {
@@ -24,8 +22,8 @@ func (n *JoseJSONWebKeySet) Scan(value interface{}) error {
 	return errors.WithStack(json.Unmarshal([]byte(v), n))
 }
 
-func (n JoseJSONWebKeySet) Value() (driver.Value, error) {
-	value, err := json.Marshal(&n)
+func (n *JoseJSONWebKeySet) Value() (driver.Value, error) {
+	value, err := json.Marshal(n)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -34,13 +32,13 @@ func (n JoseJSONWebKeySet) Value() (driver.Value, error) {
 
 type JSONRawMessage json.RawMessage
 
-func (n *JSONRawMessage) Scan(value interface{}) error {
-	*n = []byte(fmt.Sprintf("%s", value))
+func (m *JSONRawMessage) Scan(value interface{}) error {
+	*m = []byte(fmt.Sprintf("%s", value))
 	return nil
 }
 
-func (n JSONRawMessage) Value() (driver.Value, error) {
-	return string(n), nil
+func (m JSONRawMessage) Value() (driver.Value, error) {
+	return string(m), nil
 }
 
 // MarshalJSON returns m as the JSON encoding of m.

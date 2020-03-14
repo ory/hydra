@@ -381,8 +381,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 			ID:                req.GetID(),
 			RequestedAt:       req.GetRequestedAt(),
 			Client:            req.GetClient(),
-			RequestedAudience: []string(req.GetRequestedAudience()),
-			GrantedAudience:   []string(req.GetGrantedAudience()),
+			RequestedAudience: req.GetRequestedAudience(),
+			GrantedAudience:   req.GetGrantedAudience(),
 			RequestedScope:    req.GetRequestedScopes(),
 			GrantedScope:      req.GetGrantedScopes(),
 			Form:              req.GetRequestForm(),
@@ -391,7 +391,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 					Subject:     subjectIdentifier,
 					IssuedAt:    time.Now().UTC(),                // doesn't matter
 					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
-					AuthTime:    session.AuthenticatedAt,
+					AuthTime:    time.Time(session.AuthenticatedAt),
 					RequestedAt: session.RequestedAt,
 				},
 				Headers: &jwt.Headers{},
@@ -540,13 +540,13 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			Subject:                as.Subject,
 			Client:                 sanitizeClientFromRequest(ar),
 			RequestURL:             as.LoginRequest.RequestURL,
-			AuthenticatedAt:        sqlxx.NullTime(as.AuthenticatedAt),
+			AuthenticatedAt:        as.AuthenticatedAt,
 			RequestedAt:            as.RequestedAt,
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
 			LoginSessionID:         as.LoginRequest.SessionID,
 			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
-			Context:                x.JSONRawMessage(as.Context),
+			Context:                as.Context,
 		},
 	); err != nil {
 		return errors.WithStack(err)

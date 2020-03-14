@@ -192,7 +192,7 @@ type Client struct {
 	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty" db:"backchannel_logout_session_required"`
 
 	// Metadata is arbitrary data.
-	Metadata x.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
+	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
 }
 
 func (c *Client) GetID() string {

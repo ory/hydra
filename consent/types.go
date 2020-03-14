@@ -33,7 +33,6 @@ import (
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
 )
 
 const (
@@ -85,65 +84,108 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	}
 }
 
+func (e *RequestDeniedError) Scan(value interface{}) error {
+	v := fmt.Sprintf("%s", value)
+	if len(v) == 0 {
+		return nil
+	}
+	return errors.WithStack(json.Unmarshal([]byte(v), e))
+}
+
+func (e *RequestDeniedError) Value() (driver.Value, error) {
+	value, err := json.Marshal(e)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	return string(value), nil
+}
+
 // The request payload used to accept a consent request.
 //
 // swagger:model acceptConsentRequest
 type HandledConsentRequest struct {
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope []string `json:"grant_scope"`
+	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience []string `json:"grant_access_token_audience"`
+	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience" db:"granted_at_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session"`
+	Session *ConsentRequestSessionData `json:"session" db:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
-	Remember bool `json:"remember"`
+	Remember bool `json:"remember" db:"remember"`
 
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
-	RememberFor int `json:"remember_for"`
+	RememberFor int `json:"remember_for" db:"remember_for"`
 
 	// HandledAt contains the timestamp the consent request was handled.
-	HandledAt time.Time `json:"handled_at"`
+	HandledAt time.Time `json:"handled_at" db:"handled_at"`
 
-	ConsentRequest  *ConsentRequest     `json:"-"`
-	Error           *RequestDeniedError `json:"-"`
-	Challenge       string              `json:"-"`
-	RequestedAt     time.Time           `json:"-"`
-	AuthenticatedAt time.Time           `json:"-"`
-	WasUsed         bool                `json:"-"`
+	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
+	Error           *RequestDeniedError `json:"-" db:"error"`
+	Challenge       string              `json:"-" db:"challenge"`
+	RequestedAt     time.Time           `json:"-" db:"requested_at"`
+	AuthenticatedAt time.Time           `json:"-" db:"authenticated_at"`
+	WasUsed         bool                `json:"-" db:"was_used"`
+
+	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
+}
+
+func (r *HandledConsentRequest) prepareSQL() *HandledConsentRequest {
+	if r.Error == nil {
+		r.Error = new(RequestDeniedError)
+	}
+	return r
+}
+
+func (r *HandledConsentRequest) postSQL(cr *ConsentRequest) *HandledConsentRequest {
+	r.ConsentRequest = cr
+	if r.SessionAccessToken == nil {
+		r.SessionAccessToken = make(map[string]interface{})
+	}
+	if r.SessionIDToken == nil {
+		r.SessionIDToken = make(map[string]interface{})
+	}
+	r.Session = &ConsentRequestSessionData{AccessToken: r.SessionAccessToken, IDToken: r.SessionIDToken}
+	return r
 }
 
 // The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 type PreviousConsentSession struct {
-	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
-	GrantedScope []string `json:"grant_scope"`
+	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
+	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience []string `json:"grant_access_token_audience"`
+	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience" db:"granted_at_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session"`
+	Session *ConsentRequestSessionData `json:"session" db:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
-	Remember bool `json:"remember"`
+	Remember bool `json:"remember" db:"remember"`
 
 	// RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
-	RememberFor int `json:"remember_for"`
+	RememberFor int `json:"remember_for" db:"remember_for"`
 
-	HandledAt       time.Time           `json:"handled_at"`
-	ConsentRequest  *ConsentRequest     `json:"consent_request"`
-	Error           *RequestDeniedError `json:"-"`
-	Challenge       string              `json:"-"`
-	RequestedAt     time.Time           `json:"-"`
-	AuthenticatedAt time.Time           `json:"-"`
-	WasUsed         bool                `json:"-"`
+	// HandledAt contains the timestamp the consent request was handled.
+	HandledAt time.Time `json:"handled_at" db:"handled_at"`
+
+	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
+	Error           *RequestDeniedError `json:"-" db:"error"`
+	Challenge       string              `json:"-" db:"challenge"`
+	RequestedAt     time.Time           `json:"-" db:"requested_at"`
+	AuthenticatedAt time.Time           `json:"-" db:"authenticated_at"`
+	WasUsed         bool                `json:"-" db:"was_used"`
+
+	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
 }
 
 // HandledLoginRequest is the request payload used to accept a login request.
@@ -153,19 +195,19 @@ type HandledLoginRequest struct {
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
-	Remember bool `json:"remember"`
+	Remember bool `json:"remember" db:"remember"`
 
 	// RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
-	RememberFor int `json:"remember_for"`
+	RememberFor int `json:"remember_for" db:"remember_for"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
-	ACR string `json:"acr"`
+	ACR string `json:"acr" db:"acr"`
 
 	// Subject is the user ID of the end-user that authenticated.
 	// required: true
-	Subject string `json:"subject"`
+	Subject string `json:"subject" db:"subject"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -184,19 +226,34 @@ type HandledLoginRequest struct {
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
-	ForceSubjectIdentifier string `json:"force_subject_identifier"`
+	ForceSubjectIdentifier string `json:"force_subject_identifier" db:"forced_subject_identifier"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
-	Context json.RawMessage `json:"context"`
+	Context sqlxx.JSONRawMessage `json:"context" db:"context"`
 
-	LoginRequest    *LoginRequest       `json:"-"`
-	Error           *RequestDeniedError `json:"-"`
-	Challenge       string              `json:"-"`
-	RequestedAt     time.Time           `json:"-"`
-	AuthenticatedAt time.Time           `json:"-"`
-	WasUsed         bool                `json:"-"`
+	LoginRequest    *LoginRequest       `json:"-" db:"-"`
+	Error           *RequestDeniedError `json:"-" db:"error"`
+	Challenge       string              `json:"-" db:"challenge"`
+	RequestedAt     time.Time           `json:"-" db:"requested_at"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
+	WasUsed         bool                `json:"-" db:"was_used"`
+}
+
+func (r *HandledLoginRequest) postSQL(lr *LoginRequest) *HandledLoginRequest {
+	r.LoginRequest = lr
+	return r
+}
+
+func (r *HandledLoginRequest) prepareSQL() *HandledLoginRequest {
+	if r.Error == nil {
+		r.Error = new(RequestDeniedError)
+	}
+	if string(r.Context) == "" {
+		r.Context = sqlxx.JSONRawMessage("{}")
+	}
+	return r
 }
 
 // Contains optional information about the OpenID Connect request.
@@ -416,7 +473,7 @@ type ConsentRequest struct {
 	ACR string `json:"acr" db:"acr"`
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
-	Context x.JSONRawMessage `json:"context,omitempty" db:"context"`
+	Context sqlxx.JSONRawMessage `json:"context,omitempty" db:"context"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string         `json:"-" db:"forced_subject_identifier"`

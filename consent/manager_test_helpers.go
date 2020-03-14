@@ -61,7 +61,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		ACR:                    "1",
 		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
-		Context:                x.JSONRawMessage(`{"foo": "bar` + key + `"}`),
+		Context:                sqlxx.JSONRawMessage(`{"foo": "bar` + key + `"}`),
 	}
 
 	var err *RequestDeniedError
@@ -156,7 +156,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Remember:               true,
 		Challenge:              "challenge" + key,
 		RequestedAt:            time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:        authenticatedAt,
+		AuthenticatedAt:        sqlxx.NullTime(authenticatedAt),
 		Error:                  err,
 		Subject:                c.Subject,
 		ACR:                    "acr",
@@ -219,7 +219,7 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 		ACR:                    "1",
 		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
-		Context:                x.JSONRawMessage(`{"foo": "bar"}`),
+		Context:                sqlxx.JSONRawMessage(`{"foo": "bar"}`),
 
 		Challenge: uuid.New().String(),
 		Verifier:  uuid.New().String(),

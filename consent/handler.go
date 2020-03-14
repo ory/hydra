@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringsx"
 
 	"github.com/julienschmidt/httprouter"
@@ -161,7 +162,6 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	var a []PreviousConsentSession
-
 	for _, session := range s {
 		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
 		a = append(a, PreviousConsentSession(session))
@@ -337,9 +337,9 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 	if ar.Skip {
 		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
-		p.AuthenticatedAt = time.Time(ar.AuthenticatedAt)
+		p.AuthenticatedAt = ar.AuthenticatedAt
 	} else {
-		p.AuthenticatedAt = time.Now().UTC()
+		p.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC())
 	}
 	p.RequestedAt = ar.RequestedAt
 

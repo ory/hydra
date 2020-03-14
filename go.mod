@@ -3,6 +3,8 @@ module github.com/ory/hydra
 replace github.com/ory/x => ../x
 
 require (
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
+	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
@@ -34,7 +36,7 @@ require (
 	github.com/ory/herodot v0.6.2
 	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.100
+	github.com/ory/x v0.0.101
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -54,6 +56,7 @@ require (
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c // indirect
+	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.opentelemetry.io/otel v0.2.1
 	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect

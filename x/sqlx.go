@@ -30,32 +30,3 @@ func (n *JoseJSONWebKeySet) Value() (driver.Value, error) {
 	}
 	return string(value), nil
 }
-
-// swagger:type JSONWebKeySet
-type JSONRawMessage json.RawMessage
-
-func (m *JSONRawMessage) Scan(value interface{}) error {
-	*m = []byte(fmt.Sprintf("%s", value))
-	return nil
-}
-
-func (m JSONRawMessage) Value() (driver.Value, error) {
-	return string(m), nil
-}
-
-// MarshalJSON returns m as the JSON encoding of m.
-func (m JSONRawMessage) MarshalJSON() ([]byte, error) {
-	if m == nil {
-		return []byte("null"), nil
-	}
-	return m, nil
-}
-
-// UnmarshalJSON sets *m to a copy of data.
-func (m *JSONRawMessage) UnmarshalJSON(data []byte) error {
-	if m == nil {
-		return errors.New("json.RawMessage: UnmarshalJSON on nil pointer")
-	}
-	*m = append((*m)[0:0], data...)
-	return nil
-}

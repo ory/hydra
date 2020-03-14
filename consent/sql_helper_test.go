@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/x"
 )
 
 func TestMySQLHack(t *testing.T) {
@@ -79,7 +81,7 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		ForceSubjectIdentifier: "foo-id",
 		ACR:                    "acr",
 		WasUsed:                true,
-		Context:                map[string]interface{}{"foo": "bar"},
+		Context:                json.RawMessage(`{"foo":"bar"}`),
 	}
 
 	b1, err := newSQLHandledLoginRequest(b)
@@ -112,10 +114,10 @@ func TestSQLConsentConverter(t *testing.T) {
 		RequestedAudience:      []string{"auda", "audb"},
 		Verifier:               "verifier",
 		CSRF:                   "csrf",
-		AuthenticatedAt:        time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 		LoginChallenge:         "login-challenge",
 		LoginSessionID:         "login-session-id",
-		Context:                map[string]interface{}{},
+		Context:                x.JSONRawMessage(`{}`),
 	}
 
 	b := &HandledConsentRequest{
@@ -140,15 +142,8 @@ func TestSQLConsentConverter(t *testing.T) {
 		},
 	}
 
-	a1, err := newSQLConsentRequest(a)
-	require.NoError(t, err)
-
 	b1, err := newSQLHandledConsentRequest(b)
 	require.NoError(t, err)
-
-	a2, err := a1.toConsentRequest(a.Client)
-	require.NoError(t, err)
-	assert.EqualValues(t, a, a2)
 
 	b2, err := b1.toHandledConsentRequest(a)
 	require.NoError(t, err)

@@ -540,13 +540,13 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			Subject:                as.Subject,
 			Client:                 sanitizeClientFromRequest(ar),
 			RequestURL:             as.LoginRequest.RequestURL,
-			AuthenticatedAt:        as.AuthenticatedAt,
+			AuthenticatedAt:        sqlxx.NullTime(as.AuthenticatedAt),
 			RequestedAt:            as.RequestedAt,
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
-			LoginSessionID:         as.LoginRequest.SessionID.String(),
-			LoginChallenge:         as.LoginRequest.Challenge,
-			Context:                as.Context,
+			LoginSessionID:         as.LoginRequest.SessionID,
+			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
+			Context:               x.JSONRawMessage(as.Context),
 		},
 	); err != nil {
 		return errors.WithStack(err)
@@ -582,7 +582,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
-	if session.ConsentRequest.AuthenticatedAt.IsZero() {
+	if time.Time(session.ConsentRequest.AuthenticatedAt).IsZero() {
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The authenticatedAt value was not set."))
 	}
 
@@ -608,7 +608,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 
 	session.ConsentRequest.SubjectIdentifier = pw
-	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
+	session.AuthenticatedAt = time.Time(session.ConsentRequest.AuthenticatedAt)
 	return session, nil
 }
 

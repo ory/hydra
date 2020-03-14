@@ -38,6 +38,7 @@ import (
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
+	"github.com/ory/x/sqlxx"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -476,7 +477,7 @@ func TestStrategyLogout(t *testing.T) {
 				}))
 				servers[k] = httptest.NewServer(n)
 				c, hc := MockConsentRequest(uuid.New(), true, 100, false, false, true)
-				c.LoginSessionID = tc.sessionID
+				c.LoginSessionID = sqlxx.NullString(tc.sessionID)
 				c.Client.BackChannelLogoutURI = servers[k].URL
 				c.Subject = tc.subject
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), c))

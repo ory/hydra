@@ -472,7 +472,7 @@ func (m *MemoryManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx c
 	for _, cr := range m.consentRequests {
 		if cr.Subject == subject &&
 			len(cr.Client.FrontChannelLogoutURI) > 0 &&
-			cr.LoginSessionID == sid &&
+			cr.LoginSessionID.String() == sid &&
 			!preventDupes[cr.Client.GetID()] {
 
 			rs = append(rs, *cr.Client)
@@ -491,7 +491,7 @@ func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx co
 	var rs []client.Client
 	for _, cr := range m.consentRequests {
 		if cr.Subject == subject &&
-			cr.LoginSessionID == sid &&
+			cr.LoginSessionID.String() == sid &&
 			len(cr.Client.BackChannelLogoutURI) > 0 &&
 			!(clientsMap[cr.Client.GetID()]) {
 			rs = append(rs, *cr.Client)

@@ -90,8 +90,8 @@ var flushRequests = []*fosite.Request{
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{ClientID: "foobar"}
 	cr := &consent.ConsentRequest{
-		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: id,
-		Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now(),
+		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: sqlxx.NullString(id),
+		Challenge: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now(),
 	}
 
 	if createClient {

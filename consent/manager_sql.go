@@ -220,17 +220,12 @@ func (m *SQLManager) GetForcedObfuscatedLoginSession(ctx context.Context, client
 }
 
 func (m *SQLManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest) error {
-	d, err := newSQLConsentRequest(c)
-	if err != nil {
-		return err
-	}
-
 	/* #nosec G201 - sqlParamsConsentRequest is "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_consent_request (%s) VALUES (%s)",
 		strings.Join(sqlParamsConsentRequest, ", "),
 		":"+strings.Join(sqlParamsConsentRequest, ", :"),
-	), d); err != nil {
+	), c.prepareSQL()); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -238,7 +233,7 @@ func (m *SQLManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest
 }
 
 func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error) {
-	var d sqlConsentRequest
+	var d ConsentRequest
 	err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_consent_request r "+
 		"LEFT JOIN hydra_oauth2_consent_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
 	if err != nil {
@@ -248,12 +243,13 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.ClientID)
 	if err != nil {
 		return nil, err
 	}
 
-	return d.toConsentRequest(c)
+	d.Client = c
+	return &d,nil
 }
 
 func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) error {

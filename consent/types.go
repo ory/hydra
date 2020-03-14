@@ -33,6 +33,7 @@ import (
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/x"
 )
 
 const (
@@ -188,7 +189,7 @@ type HandledLoginRequest struct {
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
-	Context map[string]interface{} `json:"context"`
+	Context json.RawMessage `json:"context"`
 
 	LoginRequest    *LoginRequest       `json:"-"`
 	Error           *RequestDeniedError `json:"-"`
@@ -370,60 +371,69 @@ func (r *LoginRequest) prepareSQL() *LoginRequest {
 type ConsentRequest struct {
 	// Challenge is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
-	Challenge string `json:"challenge"`
+	Challenge string `json:"challenge" db:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	RequestedScope []string `json:"requested_scope"`
+	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
 
 	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
-	RequestedAudience []string `json:"requested_access_token_audience"`
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
-	Skip bool `json:"skip"`
+	Skip bool `json:"skip" db:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client.
-	Subject string `json:"subject"`
+	Subject string `json:"subject" db:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context"`
+	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
-	Client *client.Client `json:"client"`
+	Client *client.Client `json:"client" db:"-"`
+	ClientID string `json:"-" db:"client_id"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
-	RequestURL string `json:"request_url"`
+	RequestURL string `json:"request_url" db:"request_url"`
 
 	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
 	// a login and consent request in the login & consent app.
-	LoginChallenge string `json:"login_challenge"`
+	LoginChallenge sqlxx.NullString `json:"login_challenge" db:"login_challenge"`
 
 	// LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
-	LoginSessionID string `json:"login_session_id"`
+	LoginSessionID sqlxx.NullString `json:"login_session_id" db:"login_session_id"`
 
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
-	ACR string `json:"acr"`
+	ACR string `json:"acr" db:"acr"`
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
-	Context map[string]interface{} `json:"context,omitempty"`
+	Context x.JSONRawMessage `json:"context,omitempty" db:"context"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
-	ForceSubjectIdentifier string    `json:"-"`
-	SubjectIdentifier      string    `json:"-"`
-	Verifier               string    `json:"-"`
-	CSRF                   string    `json:"-"`
-	AuthenticatedAt        time.Time `json:"-"`
-	RequestedAt            time.Time `json:"-"`
-	WasHandled             bool      `json:"-"`
+	ForceSubjectIdentifier string    `json:"-" db:"forced_subject_identifier"`
+	SubjectIdentifier      string    `json:"-" db:"-"`
+	Verifier               string    `json:"-" db:"verifier"`
+	CSRF                   string    `json:"-" db:"csrf"`
+	AuthenticatedAt        sqlxx.NullTime `json:"-" db:"authenticated_at"`
+	RequestedAt            time.Time `json:"-" db:"requested_at"`
+	WasHandled             bool      `json:"-" db:"was_handled"`
+}
+
+func (r *ConsentRequest) prepareSQL() *ConsentRequest {
+	if r.Client == nil {
+		return r
+	}
+	r.ClientID = r.Client.ClientID
+	return r
 }
 
 // Used to pass session data to a consent request.

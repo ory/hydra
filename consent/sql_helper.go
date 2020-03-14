@@ -32,8 +32,6 @@ import (
 
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/stringsx"
-
-	"github.com/ory/hydra/client"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -130,31 +128,6 @@ var sqlParamsLogoutRequest = []string{
 	"rp_initiated",
 }
 
-type sqlAuthenticationRequest struct {
-	OpenIDConnectContext string         `db:"oidc_context"`
-	Client               string         `db:"client_id"`
-	Subject              string         `db:"subject"`
-	RequestURL           string         `db:"request_url"`
-	Skip                 bool           `db:"skip"`
-	Challenge            string         `db:"challenge"`
-	RequestedScope       string         `db:"requested_scope"`
-	RequestedAudience    sql.NullString `db:"requested_at_audience"`
-	Verifier             string         `db:"verifier"`
-	CSRF                 string         `db:"csrf"`
-	AuthenticatedAt      sql.NullTime   `db:"authenticated_at"`
-	RequestedAt          time.Time      `db:"requested_at"`
-	LoginSessionID       sql.NullString `db:"login_session_id"`
-	Context              string         `db:"context"`
-	WasHandled           bool           `db:"was_handled"`
-}
-
-type sqlConsentRequest struct {
-	sqlAuthenticationRequest
-	LoginChallenge          sql.NullString `db:"login_challenge"`
-	ACR                     string         `db:"acr"`
-	ForcedSubjectIdentifier string         `db:"forced_subject_identifier"`
-}
-
 func toMySQLDateHack(t time.Time) sql.NullTime {
 	if t.IsZero() {
 		return sql.NullTime{}
@@ -167,89 +140,6 @@ func fromMySQLDateHack(t sql.NullTime) time.Time {
 		return t.Time
 	}
 	return time.Time{}
-}
-
-func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
-	oidc, err := json.Marshal(c.OpenIDConnectContext)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	var sessionID sql.NullString
-	if len(c.LoginSessionID) > 0 {
-		sessionID = sql.NullString{
-			Valid:  true,
-			String: c.LoginSessionID,
-		}
-	}
-
-	if c.Context == nil {
-		c.Context = map[string]interface{}{}
-	}
-
-	context, err := json.Marshal(c.Context)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &sqlConsentRequest{
-		sqlAuthenticationRequest: sqlAuthenticationRequest{
-			OpenIDConnectContext: string(oidc),
-			Client:               c.Client.GetID(),
-			Subject:              c.Subject,
-			RequestURL:           c.RequestURL,
-			Skip:                 c.Skip,
-			Challenge:            c.Challenge,
-			RequestedScope:       strings.Join(c.RequestedScope, "|"),
-			RequestedAudience:    sql.NullString{Valid: true, String: strings.Join(c.RequestedAudience, "|")},
-			Verifier:             c.Verifier,
-			CSRF:                 c.CSRF,
-			AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
-			RequestedAt:          c.RequestedAt,
-			LoginSessionID:       sessionID,
-			Context:              string(context),
-		},
-		LoginChallenge:          sql.NullString{Valid: true, String: c.LoginChallenge},
-		ForcedSubjectIdentifier: c.ForceSubjectIdentifier,
-		ACR:                     c.ACR,
-	}, nil
-}
-
-func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentRequest, error) {
-	var oidc OpenIDConnectContext
-	var context map[string]interface{}
-	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	if s.Context == "" {
-		s.Context = "{}"
-	}
-
-	if err := json.Unmarshal([]byte(s.Context), &context); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &ConsentRequest{
-		OpenIDConnectContext:   &oidc,
-		Client:                 client,
-		Subject:                s.Subject,
-		RequestURL:             s.RequestURL,
-		Skip:                   s.Skip,
-		Challenge:              s.Challenge,
-		RequestedScope:         stringsx.Splitx(s.RequestedScope, "|"),
-		RequestedAudience:      stringsx.Splitx(s.RequestedAudience.String, "|"),
-		Verifier:               s.Verifier,
-		CSRF:                   s.CSRF,
-		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
-		ForceSubjectIdentifier: s.ForcedSubjectIdentifier,
-		RequestedAt:            s.RequestedAt,
-		WasHandled:             s.WasHandled,
-		LoginSessionID:         s.LoginSessionID.String,
-		LoginChallenge:         s.LoginChallenge.String,
-		Context:                context,
-		ACR:                    s.ACR,
-	}, nil
 }
 
 type sqlHandledConsentRequest struct {
@@ -411,11 +301,6 @@ func (s *sqlHandledLoginRequest) toHandledLoginRequest(a *LoginRequest) (*Handle
 		}
 	}
 
-	var context map[string]interface{}
-	if err := json.Unmarshal([]byte(s.Context), &context); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
 	return &HandledLoginRequest{
 		ForceSubjectIdentifier: s.ForceSubjectIdentifier,
 		RememberFor:            s.RememberFor,
@@ -426,7 +311,7 @@ func (s *sqlHandledLoginRequest) toHandledLoginRequest(a *LoginRequest) (*Handle
 		ACR:                    s.ACR,
 		Error:                  e,
 		LoginRequest:           a,
-		Context:                context,
+		Context:                json.RawMessage(s.Context),
 		Subject:                s.Subject,
 		AuthenticatedAt:        fromMySQLDateHack(s.AuthenticatedAt),
 	}, nil

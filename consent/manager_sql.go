@@ -34,9 +34,10 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
+
+	"github.com/ory/hydra/x"
 )
 
 type SQLManager struct {
@@ -256,17 +257,12 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 }
 
 func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) error {
-	d, err := newSQLAuthenticationRequest(c)
-	if err != nil {
-		return err
-	}
-
 	/* #nosec G201 - sqlParamsAuthenticationRequest is "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_request (%s) VALUES (%s)",
 		strings.Join(sqlParamsAuthenticationRequest, ", "),
 		":"+strings.Join(sqlParamsAuthenticationRequest, ", :"),
-	), d); err != nil {
+	), c.prepareSQL()); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -274,7 +270,7 @@ func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) er
 }
 
 func (m *SQLManager) GetLoginRequest(ctx context.Context, challenge string) (*LoginRequest, error) {
-	var d sqlAuthenticationRequest
+	var d LoginRequest
 	err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_authentication_request r "+
 		"LEFT JOIN hydra_oauth2_authentication_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
 	if err != nil {
@@ -284,12 +280,13 @@ func (m *SQLManager) GetLoginRequest(ctx context.Context, challenge string) (*Lo
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.ClientID)
 	if err != nil {
 		return nil, err
 	}
 
-	return d.toAuthenticationRequest(c)
+	d.Client = c
+	return &d, nil
 }
 
 func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {

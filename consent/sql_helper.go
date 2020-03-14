@@ -215,61 +215,6 @@ func newSQLConsentRequest(c *ConsentRequest) (*sqlConsentRequest, error) {
 	}, nil
 }
 
-func newSQLAuthenticationRequest(c *LoginRequest) (*sqlAuthenticationRequest, error) {
-	oidc, err := json.Marshal(c.OpenIDConnectContext)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	var sessionID sql.NullString
-	if len(c.SessionID) > 0 {
-		sessionID = sql.NullString{
-			Valid:  true,
-			String: c.SessionID,
-		}
-	}
-
-	return &sqlAuthenticationRequest{
-		OpenIDConnectContext: string(oidc),
-		Client:               c.Client.GetID(),
-		Subject:              c.Subject,
-		RequestURL:           c.RequestURL,
-		Skip:                 c.Skip,
-		Challenge:            c.Challenge,
-		RequestedScope:       strings.Join(c.RequestedScope, "|"),
-		RequestedAudience:    sql.NullString{Valid: true, String: strings.Join(c.RequestedAudience, "|")},
-		Verifier:             c.Verifier,
-		CSRF:                 c.CSRF,
-		AuthenticatedAt:      toMySQLDateHack(c.AuthenticatedAt),
-		RequestedAt:          c.RequestedAt,
-		LoginSessionID:       sessionID,
-	}, nil
-}
-
-func (s *sqlAuthenticationRequest) toAuthenticationRequest(client *client.Client) (*LoginRequest, error) {
-	var oidc OpenIDConnectContext
-	if err := json.Unmarshal([]byte(s.OpenIDConnectContext), &oidc); err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &LoginRequest{
-		OpenIDConnectContext: &oidc,
-		Client:               client,
-		Subject:              s.Subject,
-		RequestURL:           s.RequestURL,
-		Skip:                 s.Skip,
-		Challenge:            s.Challenge,
-		RequestedScope:       stringsx.Splitx(s.RequestedScope, "|"),
-		RequestedAudience:    stringsx.Splitx(s.RequestedAudience.String, "|"),
-		Verifier:             s.Verifier,
-		CSRF:                 s.CSRF,
-		AuthenticatedAt:      fromMySQLDateHack(s.AuthenticatedAt),
-		RequestedAt:          s.RequestedAt,
-		WasHandled:           s.WasHandled,
-		SessionID:            s.LoginSessionID.String,
-	}, nil
-}
-
 func (s *sqlConsentRequest) toConsentRequest(client *client.Client) (*ConsentRequest, error) {
 	var oidc OpenIDConnectContext
 	var context map[string]interface{}

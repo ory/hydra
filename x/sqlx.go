@@ -9,6 +9,7 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 )
 
+// swagger:type JSONWebKeySet
 type JoseJSONWebKeySet struct {
 	// swagger:ignore
 	*jose.JSONWebKeySet
@@ -30,6 +31,7 @@ func (n *JoseJSONWebKeySet) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
+// swagger:type JSONWebKeySet
 type JSONRawMessage json.RawMessage
 
 func (m *JSONRawMessage) Scan(value interface{}) error {

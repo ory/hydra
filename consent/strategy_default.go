@@ -35,17 +35,20 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/x/httpx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/mapx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/x"
 )
 
 const (
@@ -258,9 +261,9 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			Subject:           subject,
 			Client:            sanitizeClientFromRequest(ar),
 			RequestURL:        iu.String(),
-			AuthenticatedAt:   authenticatedAt,
+			AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
 			RequestedAt:       time.Now().UTC(),
-			SessionID:         sessionID,
+			SessionID:         sqlxx.NullString(sessionID),
 			OpenIDConnectContext: &OpenIDConnectContext{
 				IDTokenHintClaims: idTokenHintClaims,
 				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
@@ -367,7 +370,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	sessionID := session.LoginRequest.SessionID
+	sessionID := session.LoginRequest.SessionID.String()
 
 	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
@@ -541,7 +544,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			RequestedAt:            as.RequestedAt,
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
-			LoginSessionID:         as.LoginRequest.SessionID,
+			LoginSessionID:         as.LoginRequest.SessionID.String(),
 			LoginChallenge:         as.LoginRequest.Challenge,
 			Context:                as.Context,
 		},

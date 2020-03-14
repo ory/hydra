@@ -30,6 +30,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/fosite"
 
 	"github.com/ory/hydra/client"
@@ -89,7 +91,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		GrantedAudience: []string{"auda" + key, "audb" + key},
 		Error:           err,
 		HandledAt:       time.Now().UTC(),
-		//WasUsed:         true,
+		// WasUsed:         true,
 	}
 
 	return c, h
@@ -132,7 +134,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Verifier:       "verifier" + key,
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		CSRF:           "csrf" + key,
-		SessionID:      "fk-login-session-" + key,
+		SessionID:      sqlxx.NullString("fk-login-session-" + key),
 	}
 
 	var err = &RequestDeniedError{
@@ -211,7 +213,7 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 		Client:                 ar.Client,
 		RequestURL:             "https://request-url/path",
 		LoginChallenge:         ar.Challenge,
-		LoginSessionID:         ar.SessionID,
+		LoginSessionID:         string(ar.SessionID),
 		ForceSubjectIdentifier: "forced-subject",
 		SubjectIdentifier:      "forced-subject",
 		ACR:                    "1",
@@ -242,7 +244,7 @@ func SaneMockAuthRequest(t *testing.T, m Manager, ls *LoginSession, cl *client.C
 		RequestURL:     "https://request-url/path",
 		Skip:           true,
 		RequestedScope: []string{"scopea", "scopeb"},
-		SessionID:      ls.ID,
+		SessionID:      sqlxx.NullString(ls.ID),
 
 		CSRF:      uuid.New().String(),
 		Challenge: uuid.New().String(),
@@ -268,7 +270,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					Challenge:       fmt.Sprintf("fk-login-challenge-%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)},
-					AuthenticatedAt: time.Now(),
+					AuthenticatedAt: sqlxx.NullTime(time.Now()),
 					RequestedAt:     time.Now(),
 				}))
 			}

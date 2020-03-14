@@ -32,9 +32,10 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
 	"github.com/ory/x/urlx"
+
+	"github.com/ory/hydra/x"
 )
 
 type Handler struct {
@@ -336,7 +337,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 	if ar.Skip {
 		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
-		p.AuthenticatedAt = ar.AuthenticatedAt
+		p.AuthenticatedAt = time.Time(ar.AuthenticatedAt)
 	} else {
 		p.AuthenticatedAt = time.Now().UTC()
 	}

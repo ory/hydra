@@ -22,9 +22,16 @@ package consent
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/hydra/client"
 )
 
@@ -234,6 +241,19 @@ type OpenIDConnectContext struct {
 	LoginHint string `json:"login_hint,omitempty"`
 }
 
+func (n *OpenIDConnectContext) Scan(value interface{}) error {
+	v := fmt.Sprintf("%s", value)
+	if len(v) == 0 {
+		return nil
+	}
+	return errors.WithStack(json.Unmarshal([]byte(v), n))
+}
+
+func (n *OpenIDConnectContext) Value() (driver.Value, error) {
+	value, err := json.Marshal(n)
+	return value, errors.WithStack(err)
+}
+
 // Contains information about an ongoing logout request.
 //
 // swagger:model logoutRequest
@@ -287,49 +307,61 @@ type LogoutResult struct {
 type LoginRequest struct {
 	// Challenge is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
-	Challenge string `json:"challenge"`
+	Challenge string `json:"challenge" db:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	RequestedScope []string `json:"requested_scope"`
+	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
 
 	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
-	RequestedAudience []string `json:"requested_access_token_audience"`
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
 	//
 	// This feature allows you to update / set session information.
-	Skip bool `json:"skip"`
+	Skip bool `json:"skip" db:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
 	// when accepting the login request, or the request will fail.
-	Subject string `json:"subject"`
+	Subject string `json:"subject" db:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context"`
+	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	Client *client.Client `json:"client"`
 
+	ClientID string `json:"-" db:"client_id"`
+
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
-	RequestURL string `json:"request_url"`
+	RequestURL string `json:"request_url" db:"request_url"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
-	SessionID string `json:"session_id"`
+	SessionID sqlxx.NullString `json:"session_id" db:"login_session_id"`
 
-	ForceSubjectIdentifier string    `json:"-"` // this is here but has no meaning apart from sql_helper working properly.
-	Verifier               string    `json:"-"`
-	CSRF                   string    `json:"-"`
-	AuthenticatedAt        time.Time `json:"-"`
-	RequestedAt            time.Time `json:"-"`
-	WasHandled             bool      `json:"-"`
+	ForceSubjectIdentifier string `json:"-" db:"-"` // this is here but has no meaning apart from sql_helper working properly.
+	Verifier               string `json:"-" db:"verifier"`
+	CSRF                   string `json:"-" db:"csrf"`
+
+	AuthenticatedAt sqlxx.NullTime `json:"-" db:"authenticated_at"`
+	RequestedAt     time.Time      `json:"-" db:"requested_at"`
+	WasHandled      bool           `json:"-" db:"was_handled"`
+	Context         string         `json:"-" db:"context"`
+}
+
+func (r *LoginRequest) prepareSQL() *LoginRequest {
+	if r.Client == nil {
+		return r
+	}
+	r.ClientID = r.Client.ClientID
+	return r
 }
 
 // Contains information on an ongoing consent request.
@@ -408,7 +440,7 @@ type ConsentRequestSessionData struct {
 	// by anyone that has access to the ID Challenge. Use with care!
 	IDToken map[string]interface{} `json:"id_token"`
 
-	//UserInfo map[string]interface{} `json:"userinfo"`
+	// UserInfo map[string]interface{} `json:"userinfo"`
 }
 
 func NewConsentRequestSessionData() *ConsentRequestSessionData {

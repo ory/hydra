@@ -27,6 +27,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/hydra/client"
 )
 
@@ -45,7 +47,7 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 			IDTokenHintClaims: map[string]interface{}{"foo": "bar"},
 			Display:           "popup",
 		},
-		AuthenticatedAt:   time.Now().UTC().Add(-time.Minute),
+		AuthenticatedAt:   sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 		RequestedAt:       time.Now().UTC().Add(-time.Hour),
 		Client:            &client.Client{ClientID: "client"},
 		Subject:           "subject",
@@ -80,15 +82,8 @@ func TestSQLAuthenticationConverter(t *testing.T) {
 		Context:                map[string]interface{}{"foo": "bar"},
 	}
 
-	a1, err := newSQLAuthenticationRequest(a)
-	require.NoError(t, err)
-
 	b1, err := newSQLHandledLoginRequest(b)
 	require.NoError(t, err)
-
-	a2, err := a1.toAuthenticationRequest(a.Client)
-	require.NoError(t, err)
-	assert.EqualValues(t, a, a2)
 
 	b2, err := b1.toHandledLoginRequest(a)
 	require.NoError(t, err)

@@ -2,8 +2,6 @@ module github.com/ory/hydra
 
 go 1.14
 
-replace github.com/ory/x => ../x
-
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -36,7 +34,7 @@ require (
 	github.com/ory/herodot v0.6.2
 	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.101
+	github.com/ory/x v0.0.102
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -61,7 +59,6 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
-	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/ini.v1 v1.54.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

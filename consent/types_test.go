@@ -43,7 +43,7 @@ func TestToRFCError(t *testing.T) {
 		{
 			input: &RequestDeniedError{valid: true},
 			expect: &fosite.RFC6749Error{
-				Name:        consentRequestDeniedErrorName,
+				Name:        "request was denied",
 				Description: "",
 				Hint:        "",
 				Code:        fosite.ErrInvalidRequest.Code,

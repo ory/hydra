@@ -151,7 +151,7 @@ type HandledConsentRequest struct {
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	Challenge       string              `json:"-" db:"challenge"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt time.Time           `json:"-" db:"authenticated_at"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 	WasUsed         bool                `json:"-" db:"was_used"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
@@ -205,7 +205,7 @@ type PreviousConsentSession struct {
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	Challenge       string              `json:"-" db:"challenge"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
-	AuthenticatedAt time.Time           `json:"-" db:"authenticated_at"`
+	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 	WasUsed         bool                `json:"-" db:"was_used"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`

@@ -610,7 +610,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 
 	session.ConsentRequest.SubjectIdentifier = pw
-	session.AuthenticatedAt = time.Time(session.ConsentRequest.AuthenticatedAt)
+	session.AuthenticatedAt = session.ConsentRequest.AuthenticatedAt
 	return session, nil
 }
 

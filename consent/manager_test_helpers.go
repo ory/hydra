@@ -76,9 +76,9 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		}
 	}
 
-	var authenticatedAt time.Time
+	var authenticatedAt sqlxx.NullTime
 	if authAt {
-		time.Now().UTC().Add(-time.Minute)
+		authenticatedAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Minute))
 	}
 
 	h = &HandledConsentRequest{
@@ -188,7 +188,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		Remember:        remember,
 		Challenge:       c.Challenge,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt: authAt,
+		AuthenticatedAt: sqlxx.NullTime(authAt),
 		GrantedScope:    []string{"scopea", "scopeb"},
 		GrantedAudience: []string{"auda", "audb"},
 		Error:           rde,

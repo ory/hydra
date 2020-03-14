@@ -71,7 +71,7 @@ type RequestDeniedError struct {
 }
 
 func (e *RequestDeniedError) IsError() bool {
-	return e == nil || e.valid
+	return e != nil && e.valid
 }
 
 func (e *RequestDeniedError) SetDefaults(name string) {

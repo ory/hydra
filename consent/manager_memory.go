@@ -244,7 +244,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 			continue
 		}
 
-		if c.Error != nil {
+		if c.HasError() {
 			continue
 		}
 
@@ -289,7 +289,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 			continue
 		}
 
-		if c.Error != nil {
+		if c.HasError() {
 			continue
 		}
 
@@ -331,7 +331,7 @@ func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context,
 			continue
 		}
 
-		if c.Error != nil {
+		if c.HasError() {
 			continue
 		}
 

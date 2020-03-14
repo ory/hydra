@@ -408,6 +408,8 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
+	p.valid = true
+	p.SetDefaults(loginRequestDeniedErrorName)
 	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -625,6 +627,8 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
+	p.valid = true
+	p.SetDefaults(consentRequestDeniedErrorName)
 	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))

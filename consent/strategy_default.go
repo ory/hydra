@@ -340,7 +340,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	if session.Error != nil {
+	if session.HasError() {
+		session.Error.SetDefaults(loginRequestDeniedErrorName)
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
@@ -578,7 +579,8 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The consent request has expired, please try again."))
 	}
 
-	if session.Error != nil {
+	if session.HasError() {
+		session.Error.SetDefaults(consentRequestDeniedErrorName)
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 

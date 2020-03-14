@@ -347,7 +347,6 @@ func (m *SQLManager) VerifyAndInvalidateConsentRequest(ctx context.Context, veri
 }
 
 func (m *SQLManager) HandleLoginRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
-
 	/* #nosec G201 - sqlParamsAuthenticationRequestHandled is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_request_handled (%s) VALUES (%s)",

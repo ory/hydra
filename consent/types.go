@@ -25,6 +25,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/pkg/errors"
@@ -36,7 +37,8 @@ import (
 )
 
 const (
-	requestDeniedErrorName = "consent request denied"
+	consentRequestDeniedErrorName = "consent request denied"
+	loginRequestDeniedErrorName   = "login request denied"
 )
 
 // The response payload sent when accepting or rejecting a login or consent request.
@@ -64,11 +66,27 @@ type RequestDeniedError struct {
 	Hint        string `json:"error_hint,omitempty"`
 	Code        int    `json:"status_code,omitempty"`
 	Debug       string `json:"error_debug,omitempty"`
+
+	valid bool
+}
+
+func (e *RequestDeniedError) IsError() bool {
+	return e == nil || e.valid
+}
+
+func (e *RequestDeniedError) SetDefaults(name string) {
+	if e.Name == "" {
+		e.Name = name
+	}
+
+	if e.Code == 0 {
+		e.Code = http.StatusBadRequest
+	}
 }
 
 func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	if e.Name == "" {
-		e.Name = requestDeniedErrorName
+		e.Name = "request was denied"
 	}
 
 	if e.Code == 0 {
@@ -86,17 +104,22 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 
 func (e *RequestDeniedError) Scan(value interface{}) error {
 	v := fmt.Sprintf("%s", value)
-	if len(v) == 0 {
+	if len(v) == 0 || v == "{}" {
 		return nil
 	}
 	return errors.WithStack(json.Unmarshal([]byte(v), e))
 }
 
 func (e *RequestDeniedError) Value() (driver.Value, error) {
+	if e == nil {
+		return "{}", nil
+	}
+
 	value, err := json.Marshal(e)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
+
 	return string(value), nil
 }
 
@@ -135,10 +158,11 @@ type HandledConsentRequest struct {
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
 }
 
+func (r *HandledConsentRequest) HasError() bool {
+	return r.Error.IsError()
+}
+
 func (r *HandledConsentRequest) prepareSQL() *HandledConsentRequest {
-	if r.Error == nil {
-		r.Error = new(RequestDeniedError)
-	}
 	return r
 }
 
@@ -241,15 +265,16 @@ type HandledLoginRequest struct {
 	WasUsed         bool                `json:"-" db:"was_used"`
 }
 
+func (r *HandledLoginRequest) HasError() bool {
+	return r.Error.IsError()
+}
+
 func (r *HandledLoginRequest) postSQL(lr *LoginRequest) *HandledLoginRequest {
 	r.LoginRequest = lr
 	return r
 }
 
 func (r *HandledLoginRequest) prepareSQL() *HandledLoginRequest {
-	if r.Error == nil {
-		r.Error = new(RequestDeniedError)
-	}
 	if string(r.Context) == "" {
 		r.Context = sqlxx.JSONRawMessage("{}")
 	}

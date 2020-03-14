@@ -145,7 +145,7 @@ type HandledConsentRequest struct {
 	RememberFor int `json:"remember_for" db:"remember_for"`
 
 	// HandledAt contains the timestamp the consent request was handled.
-	HandledAt time.Time `json:"handled_at" db:"handled_at"`
+	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
 	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
@@ -199,7 +199,7 @@ type PreviousConsentSession struct {
 	RememberFor int `json:"remember_for" db:"remember_for"`
 
 	// HandledAt contains the timestamp the consent request was handled.
-	HandledAt time.Time `json:"handled_at" db:"handled_at"`
+	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
 	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`

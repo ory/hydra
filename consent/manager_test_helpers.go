@@ -91,7 +91,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
 		GrantedAudience: []string{"auda" + key, "audb" + key},
 		Error:           err,
-		HandledAt:       time.Now().UTC(),
+		HandledAt:       sqlxx.NullTime(time.Now().UTC()),
 		// WasUsed:         true,
 	}
 
@@ -193,7 +193,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		GrantedAudience: []string{"auda", "audb"},
 		Error:           rde,
 		WasUsed:         false,
-		HandledAt:       time.Now().UTC().Add(-time.Minute),
+		HandledAt:       sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
 	_, err := m.HandleConsentRequest(context.Background(), c.Challenge, h)
@@ -425,7 +425,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					got1, err = m.HandleConsentRequest(context.TODO(), "challenge"+tc.key, h)
 					require.NoError(t, err)
-					require.Equal(t, time.Now().UTC().Round(time.Minute), h.HandledAt.Round(time.Minute))
+					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
 					compareConsentRequest(t, c, got1)
 
 					_, err = m.HandleConsentRequest(context.TODO(), "challenge"+tc.key, h)

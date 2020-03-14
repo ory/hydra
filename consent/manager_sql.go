@@ -506,7 +506,7 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 		result = append(result, *v.postSQL(r))
 	}
 
-	if len(requests) == 0 {
+	if len(result) == 0 {
 		return nil, errors.WithStack(ErrNoPreviousConsentFound)
 	}
 

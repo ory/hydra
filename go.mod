@@ -2,6 +2,8 @@ module github.com/ory/hydra
 
 go 1.14
 
+replace github.com/ory/x => ../x
+
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -59,6 +61,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
+	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/ini.v1 v1.54.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

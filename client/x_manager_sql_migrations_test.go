@@ -29,16 +29,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
-
-func CleanTestDB(t *testing.T, db *sqlx.DB) {
-	_, err := db.Exec("DROP TABLE IF EXISTS hydra_client_migration")
-	t.Logf("Unable to execute clean up query: %s", err)
-	_, err = db.Exec("DROP TABLE IF EXISTS hydra_client")
-	t.Logf("Unable to execute clean up query: %s", err)
-}
 
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
@@ -52,7 +46,7 @@ func TestXXMigrations(t *testing.T) {
 		t,
 		migratest.MigrationSchemas{Migrations},
 		migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", Migrations, AssetNames(), Asset)},
-		CleanTestDB, CleanTestDB,
+		x.CleanSQL, x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, _, step, steps int) {
 			if dbName == "cockroach" {
 				step += 12

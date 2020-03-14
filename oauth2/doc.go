@@ -69,7 +69,9 @@ type WellKnown struct {
 	// pairwise and public.
 	//
 	// required: true
-	// example: public, pairwise
+	// example:
+	//   - public
+	//   - pairwise
 	SubjectTypes []string `json:"subject_types_supported"`
 
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID

@@ -216,7 +216,6 @@
         "operationId": "getOAuth2Client",
         "parameters": [
           {
-            "uniqueItems": true,
             "type": "string",
             "description": "The id of the OAuth 2.0 Client.",
             "name": "id",
@@ -312,7 +311,6 @@
         "operationId": "deleteOAuth2Client",
         "parameters": [
           {
-            "uniqueItems": true,
             "type": "string",
             "description": "The id of the OAuth 2.0 Client.",
             "name": "id",
@@ -1815,14 +1813,18 @@
     }
   },
   "definitions": {
+    "JSONRawMessage": {
+      "description": "JSONRawMessage JSON raw message",
+      "type": "object"
+    },
     "JSONWebKey": {
-      "description": "JSONWebKey JSON web key",
+      "description": "It is important that this model object is named JSONWebKey for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKey.",
       "type": "object",
       "required": [
-        "use",
-        "kty",
+        "alg",
         "kid",
-        "alg"
+        "kty",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -1831,32 +1833,26 @@
           "example": "RS256"
         },
         "crv": {
-          "description": "crv",
           "type": "string",
           "example": "P-256"
         },
         "d": {
-          "description": "d",
           "type": "string",
           "example": "T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE"
         },
         "dp": {
-          "description": "dp",
           "type": "string",
           "example": "G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0"
         },
         "dq": {
-          "description": "dq",
           "type": "string",
           "example": "s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk"
         },
         "e": {
-          "description": "e",
           "type": "string",
           "example": "AQAB"
         },
         "k": {
-          "description": "k",
           "type": "string",
           "example": "GawgguFyGrWKav7AX4VKUg"
         },
@@ -1871,22 +1867,18 @@
           "example": "RSA"
         },
         "n": {
-          "description": "n",
           "type": "string",
           "example": "vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0"
         },
         "p": {
-          "description": "p",
           "type": "string",
           "example": "6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ"
         },
         "q": {
-          "description": "q",
           "type": "string",
           "example": "0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ"
         },
         "qi": {
-          "description": "qi",
           "type": "string",
           "example": "GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU"
         },
@@ -1896,7 +1888,6 @@
           "example": "sig"
         },
         "x": {
-          "description": "x",
           "type": "string",
           "example": "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU"
         },
@@ -1908,14 +1899,13 @@
           }
         },
         "y": {
-          "description": "y",
           "type": "string",
           "example": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0"
         }
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSON web key set",
+      "description": "JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
       "type": "object",
       "properties": {
         "keys": {
@@ -1927,8 +1917,17 @@
         }
       }
     },
+    "JoseJSONWebKeySet": {
+      "description": "JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet JoseJSONWebKeySet jose JSON web key set",
+      "type": "object"
+    },
+    "NullTime": {
+      "type": "string",
+      "format": "date-time",
+      "title": "NullTime implements sql.NullTime functionality."
+    },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -1949,7 +1948,7 @@
           }
         },
         "handled_at": {
-          "description": "handled at\nFormat: date-time",
+          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -1967,6 +1966,13 @@
         }
       }
     },
+    "StringSlicePipeDelimiter": {
+      "type": "array",
+      "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
+      "items": {
+        "type": "string"
+      }
+    },
     "acceptConsentRequest": {
       "type": "object",
       "title": "The request payload used to accept a consent request.",
@@ -1976,19 +1982,22 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "grant_scope": {
           "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "description": "HandledAt contains the timestamp the consent request was handled.",
+          "description": "HandledAt contains the timestamp the consent request was handled.\nFormat: date-time",
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "$ref": "#/definitions/NullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2006,7 +2015,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2020,7 +2029,8 @@
           "type": "object",
           "additionalProperties": {
             "type": "object"
-          }
+          },
+          "$ref": "#/definitions/JSONRawMessage"
         },
         "force_subject_identifier": {
           "description": "ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID\nConnect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.\n\nPlease note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the\nsub claim in the OAuth 2.0 Introspection.\n\nPer default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself\nyou can use this field. Please note that setting this field has no effect if `pairwise` is not configured in\nORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's\nconfiguration).\n\nPlease also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies\nthat you have to compute this value on every authentication process (probably depending on the client ID or some\nother unique value).\n\nIf you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.",
@@ -2053,7 +2063,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing consent request.",
+      "title": "ConsentRequest Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2067,11 +2077,7 @@
           "$ref": "#/definitions/oAuth2Client"
         },
         "context": {
-          "description": "Context contains arbitrary information set by the login endpoint or is empty if not set.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          }
+          "$ref": "#/definitions/JSONRawMessage"
         },
         "login_challenge": {
           "description": "LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate\na login and consent request in the login \u0026 consent app.",
@@ -2089,18 +2095,18 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "description": "RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
-          "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -2175,7 +2181,6 @@
       }
     },
     "healthNotReadyStatus": {
-      "description": "HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2198,12 +2203,11 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
-        "use",
-        "kid"
+        "kid",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -2243,14 +2247,16 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
           "description": "RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.",
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "session_id": {
           "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -2268,7 +2274,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest Contains information about an ongoing logout request.",
+      "title": "Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2290,21 +2296,13 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
-          "description": "AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests\nto the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)\nwill be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.\nBe aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "audience": {
-          "description": "Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits\nthe applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list\nof URLs. URLs MUST NOT contain whitespaces.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "backchannel_logout_session_required": {
           "description": "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout\nToken to identify the RP session with the OP when the backchannel_logout_uri is used.\nIf omitted, the default value is false.",
@@ -2336,14 +2334,10 @@
           "type": "string"
         },
         "contacts": {
-          "description": "Contacts is a array of strings representing ways to contact people responsible\nfor this client, typically email addresses.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2356,15 +2350,10 @@
           "type": "string"
         },
         "grant_types": {
-          "description": "GrantTypes is an array of grant types the client is allowed to use.",
-          "type": "array",
-          "pattern": "client_credentials|authorization_code|implicit|refresh_token",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "jwks": {
-          "$ref": "#/definitions/JSONWebKeySet"
+          "$ref": "#/definitions/JoseJSONWebKeySet"
         },
         "jwks_uri": {
           "description": "URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains\nthe signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the\nClient's encryption keys(s), which are used by the Server to encrypt responses to the Client. When both signing\nand encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced\nJWK Set to indicate each key's intended usage. Although some algorithms allow the same key to be used for both\nsignatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used\nto provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST\nmatch those in the certificate.",
@@ -2375,8 +2364,7 @@
           "type": "string"
         },
         "metadata": {
-          "description": "Metadata is arbitrary data.",
-          "type": "object"
+          "$ref": "#/definitions/JSONRawMessage"
         },
         "owner": {
           "description": "Owner is a string identifying the owner of the OAuth 2.0 Client.",
@@ -2387,37 +2375,20 @@
           "type": "string"
         },
         "post_logout_redirect_uris": {
-          "description": "Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the\npost_logout_redirect_uri parameter after a logout has been performed.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "redirect_uris": {
-          "description": "RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "request_object_signing_alg": {
           "description": "JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects\nfrom this Client MUST be rejected, if not signed with this algorithm.",
           "type": "string"
         },
         "request_uris": {
-          "description": "Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the\ncontents of the files referenced by these URIs and not retrieve them at the time they are used in a request.\nOPs can require that request_uri values used be pre-registered with the require_request_uri_registration\ndiscovery parameter.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "response_types": {
-          "description": "ResponseTypes is an array of the OAuth 2.0 response type strings that the client can\nuse at the authorization endpoint.",
-          "type": "array",
-          "pattern": "id_token|code|token",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "scope": {
           "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
@@ -2441,7 +2412,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2555,7 +2526,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "Contains optional information about the OpenID Connect request.",
+      "title": "OpenIDConnectContext Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2590,7 +2561,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "The request payload used to accept a login or consent request.",
+      "title": "RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",
@@ -2699,7 +2670,6 @@
       }
     },
     "version": {
-      "description": "Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -2711,7 +2681,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",
@@ -2829,8 +2799,7 @@
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "example": "public, pairwise"
+          }
         },
         "token_endpoint": {
           "description": "URL of the OP's OAuth 2.0 Token Endpoint",

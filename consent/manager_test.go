@@ -47,27 +47,18 @@ var regs = make(map[string]driver.Registry)
 func connectToPostgres(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestPostgreSQL()
 	require.NoError(t, err)
-	t.Logf("Cleaning postgres db...")
-	x.CleanSQL(t, db)
-	t.Logf("Cleaned postgres db")
 	return db
 }
 
 func connectToMySQL(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestMySQL()
 	require.NoError(t, err)
-	t.Logf("Cleaning mysql db...")
-	x.CleanSQL(t, db)
-	t.Logf("Cleaned mysql db")
 	return db
 }
 
 func connectToCockroach(t *testing.T) *sqlx.DB {
 	db, err := dockertest.ConnectToTestCockroachDB()
 	require.NoError(t, err)
-	t.Logf("Cleaning cockroach db...")
-	x.CleanSQL(t, db)
-	t.Logf("Cleaned cockroach db")
 	return db
 }
 
@@ -77,12 +68,12 @@ func TestMain(m *testing.M) {
 	runner.Exit(m.Run())
 }
 
-func createSQL(dbName string, db *sqlx.DB) driver.Registry {
+func createSQL(t *testing.T, dbName string, db *sqlx.DB) driver.Registry {
+	x.CleanSQL(t, db)
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistrySQL(conf, db)
-	if _, err := reg.CreateSchemas(dbName); err != nil {
-		panic(err)
-	}
+	_, err := reg.CreateSchemas(dbName)
+	require.NoError(t, err, "db: %s", db.DriverName())
 
 	return reg
 }
@@ -105,9 +96,9 @@ func TestManagers(t *testing.T) {
 				c = connectToCockroach(t)
 			},
 		})
-		regs["postgres"] = createSQL("postgres", p)
-		regs["mysql"] = createSQL("mysql", m)
-		regs["cockroach"] = createSQL("cockroach", c)
+		regs["postgres"] = createSQL(t, "postgres", p)
+		regs["mysql"] = createSQL(t, "mysql", m)
+		regs["cockroach"] = createSQL(t, "cockroach", c)
 	}
 
 	for k, m := range regs {

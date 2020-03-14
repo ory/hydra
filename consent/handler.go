@@ -26,15 +26,17 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringsx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/pagination"
 	"github.com/ory/x/urlx"
+
+	"github.com/ory/hydra/x"
 )
 
 type Handler struct {
@@ -160,7 +162,6 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	var a []PreviousConsentSession
-
 	for _, session := range s {
 		session.ConsentRequest.Client = sanitizeClient(session.ConsentRequest.Client)
 		a = append(a, PreviousConsentSession(session))
@@ -338,7 +339,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
 		p.AuthenticatedAt = ar.AuthenticatedAt
 	} else {
-		p.AuthenticatedAt = time.Now().UTC()
+		p.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC())
 	}
 	p.RequestedAt = ar.RequestedAt
 
@@ -407,6 +408,8 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
+	p.valid = true
+	p.SetDefaults(loginRequestDeniedErrorName)
 	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -553,7 +556,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 	p.Challenge = challenge
 	p.RequestedAt = cr.RequestedAt
-	p.HandledAt = time.Now().UTC()
+	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
 	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &p)
 	if err != nil {
@@ -624,6 +627,8 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
+	p.valid = true
+	p.SetDefaults(consentRequestDeniedErrorName)
 	hr, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))
@@ -634,7 +639,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		Error:       &p,
 		Challenge:   challenge,
 		RequestedAt: hr.RequestedAt,
-		HandledAt:   time.Now().UTC(),
+		HandledAt:   sqlxx.NullTime(time.Now().UTC()),
 	})
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errors.WithStack(err))

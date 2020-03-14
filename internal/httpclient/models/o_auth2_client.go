@@ -12,20 +12,15 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.
+// OAuth2Client OAuth2Client OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.
 // swagger:model oAuth2Client
 type OAuth2Client struct {
 
-	// AllowedCORSOrigins are one or more URLs (scheme://host[:port]) which are allowed to make CORS requests
-	// to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)
-	// will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.
-	// Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
-	AllowedCorsOrigins []string `json:"allowed_cors_origins"`
+	// allowed cors origins
+	AllowedCorsOrigins StringSlicePipeDelimiter `json:"allowed_cors_origins,omitempty"`
 
-	// Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits
-	// the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list
-	// of URLs. URLs MUST NOT contain whitespaces.
-	Audience []string `json:"audience"`
+	// audience
+	Audience StringSlicePipeDelimiter `json:"audience,omitempty"`
 
 	// Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
 	// Token to identify the RP session with the OP when the backchannel_logout_uri is used.
@@ -61,11 +56,12 @@ type OAuth2Client struct {
 	// a clickable fashion.
 	ClientURI string `json:"client_uri,omitempty"`
 
-	// Contacts is a array of strings representing ways to contact people responsible
-	// for this client, typically email addresses.
-	Contacts []string `json:"contacts"`
+	// contacts
+	Contacts StringSlicePipeDelimiter `json:"contacts,omitempty"`
 
 	// CreatedAt returns the timestamp of the client's creation.
+	// Format: date-time
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
@@ -81,12 +77,11 @@ type OAuth2Client struct {
 	// included, both MUST be.
 	FrontchannelLogoutURI string `json:"frontchannel_logout_uri,omitempty"`
 
-	// GrantTypes is an array of grant types the client is allowed to use.
-	// Pattern: client_credentials|authorization_code|implicit|refresh_token
-	GrantTypes []string `json:"grant_types"`
+	// grant types
+	GrantTypes StringSlicePipeDelimiter `json:"grant_types,omitempty"`
 
 	// jwks
-	Jwks *JSONWebKeySet `json:"jwks,omitempty"`
+	Jwks JoseJSONWebKeySet `json:"jwks,omitempty"`
 
 	// URL for the Client's JSON Web Key Set [JWK] document. If the Client signs requests to the Server, it contains
 	// the signing key(s) the Server uses to validate signatures from the Client. The JWK Set MAY also contain the
@@ -101,8 +96,8 @@ type OAuth2Client struct {
 	// LogoURI is an URL string that references a logo for the client.
 	LogoURI string `json:"logo_uri,omitempty"`
 
-	// Metadata is arbitrary data.
-	Metadata interface{} `json:"metadata,omitempty"`
+	// metadata
+	Metadata JSONRawMessage `json:"metadata,omitempty"`
 
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.
 	Owner string `json:"owner,omitempty"`
@@ -112,27 +107,21 @@ type OAuth2Client struct {
 	// retains, and discloses personal data.
 	PolicyURI string `json:"policy_uri,omitempty"`
 
-	// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the
-	// post_logout_redirect_uri parameter after a logout has been performed.
-	PostLogoutRedirectUris []string `json:"post_logout_redirect_uris"`
+	// post logout redirect uris
+	PostLogoutRedirectUris StringSlicePipeDelimiter `json:"post_logout_redirect_uris,omitempty"`
 
-	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
-	RedirectUris []string `json:"redirect_uris"`
+	// redirect uris
+	RedirectUris StringSlicePipeDelimiter `json:"redirect_uris,omitempty"`
 
 	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
 	// from this Client MUST be rejected, if not signed with this algorithm.
 	RequestObjectSigningAlg string `json:"request_object_signing_alg,omitempty"`
 
-	// Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the
-	// contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
-	// OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
-	// discovery parameter.
-	RequestUris []string `json:"request_uris"`
+	// request uris
+	RequestUris StringSlicePipeDelimiter `json:"request_uris,omitempty"`
 
-	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can
-	// use at the authorization endpoint.
-	// Pattern: id_token|code|token
-	ResponseTypes []string `json:"response_types"`
+	// response types
+	ResponseTypes StringSlicePipeDelimiter `json:"response_types,omitempty"`
 
 	// Scope is a string containing a space-separated list of scope values (as
 	// described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
@@ -161,6 +150,8 @@ type OAuth2Client struct {
 	// UpdatedAt returns the timestamp of the last update.
 	// Format: date-time
 	// Format: date-time
+	// Format: date-time
+	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`
 
 	// JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT
@@ -173,6 +164,18 @@ type OAuth2Client struct {
 func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAllowedCorsOrigins(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateAudience(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateContacts(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCreatedAt(formats); err != nil {
 		res = append(res, err)
 	}
@@ -181,7 +184,15 @@ func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateJwks(formats); err != nil {
+	if err := m.validatePostLogoutRedirectUris(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRedirectUris(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRequestUris(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -200,6 +211,54 @@ func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *OAuth2Client) validateAllowedCorsOrigins(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AllowedCorsOrigins) { // not required
+		return nil
+	}
+
+	if err := m.AllowedCorsOrigins.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("allowed_cors_origins")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OAuth2Client) validateAudience(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Audience) { // not required
+		return nil
+	}
+
+	if err := m.Audience.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OAuth2Client) validateContacts(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Contacts) { // not required
+		return nil
+	}
+
+	if err := m.Contacts.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("contacts")
+		}
+		return err
+	}
+
 	return nil
 }
 
@@ -222,22 +281,59 @@ func (m *OAuth2Client) validateGrantTypes(formats strfmt.Registry) error {
 		return nil
 	}
 
+	if err := m.GrantTypes.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_types")
+		}
+		return err
+	}
+
 	return nil
 }
 
-func (m *OAuth2Client) validateJwks(formats strfmt.Registry) error {
+func (m *OAuth2Client) validatePostLogoutRedirectUris(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Jwks) { // not required
+	if swag.IsZero(m.PostLogoutRedirectUris) { // not required
 		return nil
 	}
 
-	if m.Jwks != nil {
-		if err := m.Jwks.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwks")
-			}
-			return err
+	if err := m.PostLogoutRedirectUris.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("post_logout_redirect_uris")
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OAuth2Client) validateRedirectUris(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.RedirectUris) { // not required
+		return nil
+	}
+
+	if err := m.RedirectUris.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("redirect_uris")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *OAuth2Client) validateRequestUris(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.RequestUris) { // not required
+		return nil
+	}
+
+	if err := m.RequestUris.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("request_uris")
+		}
+		return err
 	}
 
 	return nil
@@ -247,6 +343,13 @@ func (m *OAuth2Client) validateResponseTypes(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.ResponseTypes) { // not required
 		return nil
+	}
+
+	if err := m.ResponseTypes.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("response_types")
+		}
+		return err
 	}
 
 	return nil

@@ -662,7 +662,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		Subject:                             session.ConsentRequest.SubjectIdentifier,
 		Issuer:                              strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
 		IssuedAt:                            time.Now().UTC(),
-		AuthTime:                            session.AuthenticatedAt,
+		AuthTime:                            time.Time(session.AuthenticatedAt),
 		RequestedAt:                         session.RequestedAt,
 		Extra:                               session.Session.IDToken,
 		AuthenticationContextClassReference: session.ConsentRequest.ACR,

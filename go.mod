@@ -1,16 +1,18 @@
 module github.com/ory/hydra
 
+go 1.14
+
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
-	github.com/go-openapi/errors v0.19.2
-	github.com/go-openapi/runtime v0.19.5
-	github.com/go-openapi/strfmt v0.19.3
-	github.com/go-openapi/swag v0.19.5
-	github.com/go-openapi/validate v0.19.3
+	github.com/go-openapi/errors v0.19.3
+	github.com/go-openapi/runtime v0.19.11
+	github.com/go-openapi/strfmt v0.19.4
+	github.com/go-openapi/swag v0.19.7
+	github.com/go-openapi/validate v0.19.6
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/go-swagger/go-swagger v0.21.1-0.20200107003254-1c98855b472d
-	github.com/gobuffalo/packd v0.0.0-20190315124812-a385830c7fc0 // indirect
+	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.3.1
@@ -27,14 +29,13 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/ory/fosite v0.30.2
-	github.com/ory/go-acc v0.0.0-20181118080137-ddc355013f90
+	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.6.2
-	github.com/ory/sdk/swagutil v0.0.0-20200131170418-ead0c2285f93
+	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
 	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.98
+	github.com/ory/x v0.0.102
 	github.com/pborman/uuid v1.2.0
-	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
@@ -44,26 +45,20 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/segmentio/backo-go v0.0.0-20200129164019-23eae7c10bd3 // indirect
 	github.com/sirupsen/logrus v1.4.2
-	github.com/spf13/cast v1.3.1 // indirect
-	github.com/spf13/cobra v0.0.5
+	github.com/spf13/cobra v0.0.6
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.4.0
-	github.com/tidwall/gjson v1.6.0 // indirect
+	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v0.2.1
-	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad
-	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	golang.org/x/tools v0.0.0-20200203215610-ab391d50b528
-	gopkg.in/ini.v1 v1.51.1 // indirect
-	gopkg.in/square/go-jose.v2 v2.3.1
+	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
+	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
+	gopkg.in/ini.v1 v1.54.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.4.1
 )
-
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.0.0-20180902110319-2566ecd5d999
-
-// Fix for https://github.com/golang/lint/issues/436
-replace github.com/golang/lint => github.com/golang/lint v0.0.0-20190227174305-8f45f776aaf1
-
-go 1.13

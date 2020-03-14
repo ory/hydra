@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ConsentRequest Contains information on an ongoing consent request.
+// ConsentRequest ConsentRequest Contains information on an ongoing consent request.
 // swagger:model consentRequest
 type ConsentRequest struct {
 
@@ -26,8 +26,8 @@ type ConsentRequest struct {
 	// client
 	Client *OAuth2Client `json:"client,omitempty"`
 
-	// Context contains arbitrary information set by the login endpoint or is empty if not set.
-	Context map[string]interface{} `json:"context,omitempty"`
+	// context
+	Context JSONRawMessage `json:"context,omitempty"`
 
 	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate
 	// a login and consent request in the login & consent app.
@@ -47,11 +47,11 @@ type ConsentRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url,omitempty"`
 
-	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
-	RequestedAccessTokenAudience []string `json:"requested_access_token_audience"`
+	// requested access token audience
+	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
 
-	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	RequestedScope []string `json:"requested_scope"`
+	// requested scope
+	RequestedScope []string `json:"requested_scope,omitempty"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the

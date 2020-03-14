@@ -31,10 +31,10 @@ type LoginRequest struct {
 	RequestURL string `json:"request_url,omitempty"`
 
 	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
-	RequestedAccessTokenAudience []string `json:"requested_access_token_audience"`
+	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	RequestedScope []string `json:"requested_scope"`
+	RequestedScope []string `json:"requested_scope,omitempty"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)

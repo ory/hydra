@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/ory/fosite/storage"
+	"github.com/ory/x/sqlxx"
 
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
@@ -37,9 +38,10 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
+	"github.com/ory/x/sqlcon"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/x/sqlcon"
 )
 
 var defaultRequest = fosite.Request{
@@ -88,21 +90,21 @@ var flushRequests = []*fosite.Request{
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{ClientID: "foobar"}
 	cr := &consent.ConsentRequest{
-		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: id,
-		Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now(),
+		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: sqlxx.NullString(id),
+		Challenge: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now(),
 	}
 
 	if createClient {
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), cl))
 	}
 
-	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: time.Now(), RequestedAt: time.Now()}))
+	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), Challenge: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
 	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
 	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
-		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: time.Now(),
+		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: sqlxx.NullTime(time.Now()),
 		Challenge:   id,
 		RequestedAt: time.Now(),
-		HandledAt:   time.Now(),
+		HandledAt:   sqlxx.NullTime(time.Now()),
 	})
 	require.NoError(t, err)
 }

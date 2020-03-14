@@ -33,6 +33,7 @@ import (
 
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
@@ -105,7 +106,7 @@ func TestManagers(t *testing.T) {
 	for k, m := range clientManagers {
 		s, ok := m.(*SQLManager)
 		if ok {
-			CleanTestDB(t, s.DB)
+			x.CleanSQL(t, s.DB)
 			x, err := s.CreateSchemas(k)
 			if err != nil {
 				t.Fatal("Could not create schemas", err.Error())
@@ -128,7 +129,7 @@ func TestManagers(t *testing.T) {
 		})
 
 		if ok {
-			CleanTestDB(t, s.DB)
+			x.CleanSQL(t, s.DB)
 		}
 	}
 }

@@ -28,8 +28,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/viper"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
@@ -70,6 +71,7 @@ func connectToCRDB(t *testing.T) *sqlx.DB {
 }
 
 func connectSQL(t *testing.T, conf *configuration.ViperProvider, dbName string, db *sqlx.DB) driver.Registry {
+	x.CleanSQL(t, db)
 	reg := internal.NewRegistrySQL(conf, db)
 	_, err := reg.CreateSchemas(dbName)
 	require.NoError(t, err)

@@ -163,6 +163,10 @@ func (r *HandledConsentRequest) HasError() bool {
 }
 
 func (r *HandledConsentRequest) prepareSQL() *HandledConsentRequest {
+	if r.Session != nil {
+		r.SessionAccessToken = r.Session.AccessToken
+		r.SessionIDToken = r.Session.IDToken
+	}
 	return r
 }
 

@@ -503,7 +503,8 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 			continue
 		}
 
-		result = append(result, *v.postSQL(r))
+		v.postSQL(r)
+		result = append(result, v)
 	}
 
 	if len(result) == 0 {

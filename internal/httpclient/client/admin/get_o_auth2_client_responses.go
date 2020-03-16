@@ -36,12 +36,6 @@ func (o *GetOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return nil, result
-	case 404:
-		result := NewGetOAuth2ClientNotFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 500:
 		result := NewGetOAuth2ClientInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -109,39 +103,6 @@ func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.GenericError {
 }
 
 func (o *GetOAuth2ClientUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.GenericError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewGetOAuth2ClientNotFound creates a GetOAuth2ClientNotFound with default headers values
-func NewGetOAuth2ClientNotFound() *GetOAuth2ClientNotFound {
-	return &GetOAuth2ClientNotFound{}
-}
-
-/*GetOAuth2ClientNotFound handles this case with default header values.
-
-genericError
-*/
-type GetOAuth2ClientNotFound struct {
-	Payload *models.GenericError
-}
-
-func (o *GetOAuth2ClientNotFound) Error() string {
-	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientNotFound  %+v", 404, o.Payload)
-}
-
-func (o *GetOAuth2ClientNotFound) GetPayload() *models.GenericError {
-	return o.Payload
-}
-
-func (o *GetOAuth2ClientNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
 

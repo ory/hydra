@@ -28,9 +28,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
+
+	"github.com/ory/hydra/x"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
@@ -43,7 +45,7 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 			TermsOfServiceURI: "foo",
 		}
 		assert.NoError(t, m.CreateClient(ctx, c))
-		//assert.NotEmpty(t, c.ID)
+		// assert.NotEmpty(t, c.ID)
 		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }
@@ -88,7 +90,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 			Contacts:                          []string{"aeneas1", "aeneas2"},
 			SecretExpiresAt:                   0,
 			SectorIdentifierURI:               "https://sector",
-			JSONWebKeys:                       &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}},
+			JSONWebKeys:                       &x.JoseJSONWebKeySet{JSONWebKeySet: &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}}},
 			JSONWebKeysURI:                    "https://...",
 			TokenEndpointAuthMethod:           "none",
 			RequestURIs:                       []string{"foo", "bar"},
@@ -146,6 +148,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 			Secret:            "secret-new",
 			RedirectURIs:      []string{"http://redirect/new"},
 			TermsOfServiceURI: "bar",
+			JSONWebKeys:       new(x.JoseJSONWebKeySet),
 		})
 		require.NoError(t, err)
 
@@ -206,7 +209,8 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 	}
 
 	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {
-		assert.EqualValues(t, expected.JSONWebKeys.Keys, actual.GetJSONWebKeys().Keys)
+		require.NotNil(t, expected.JSONWebKeys)
+		assert.EqualValues(t, expected.JSONWebKeys.JSONWebKeySet, actual.GetJSONWebKeys())
 		assert.EqualValues(t, expected.JSONWebKeysURI, actual.GetJSONWebKeysURI())
 		assert.EqualValues(t, expected.TokenEndpointAuthMethod, actual.GetTokenEndpointAuthMethod())
 		assert.EqualValues(t, expected.RequestURIs, actual.GetRequestURIs())

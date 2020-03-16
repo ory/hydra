@@ -30,6 +30,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/fosite"
 
 	"github.com/ory/hydra/client"
@@ -50,16 +52,16 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		},
 		Client:                 &client.Client{ClientID: "fk-client-" + key},
 		RequestURL:             "https://request-url/path" + key,
-		LoginChallenge:         "fk-login-challenge-" + key,
-		LoginSessionID:         "fk-login-session-" + key,
+		LoginChallenge:         sqlxx.NullString("fk-login-challenge-" + key),
+		LoginSessionID:         sqlxx.NullString("fk-login-session-" + key),
 		ForceSubjectIdentifier: "forced-subject",
 		SubjectIdentifier:      "forced-subject",
 		Verifier:               "verifier" + key,
 		CSRF:                   "csrf" + key,
 		ACR:                    "1",
-		AuthenticatedAt:        time.Now().UTC().Add(-time.Hour),
+		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
-		Context:                map[string]interface{}{"foo": "bar" + key},
+		Context:                sqlxx.JSONRawMessage(`{"foo": "bar` + key + `"}`),
 	}
 
 	var err *RequestDeniedError
@@ -70,12 +72,13 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			Hint:        "error_hint,omitempty" + key,
 			Code:        100,
 			Debug:       "error_debug,omitempty" + key,
+			valid:       true,
 		}
 	}
 
-	var authenticatedAt time.Time
+	var authenticatedAt sqlxx.NullTime
 	if authAt {
-		time.Now().UTC().Add(-time.Minute)
+		authenticatedAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Minute))
 	}
 
 	h = &HandledConsentRequest{
@@ -88,8 +91,8 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
 		GrantedAudience: []string{"auda" + key, "audb" + key},
 		Error:           err,
-		HandledAt:       time.Now().UTC(),
-		//WasUsed:         true,
+		HandledAt:       sqlxx.NullTime(time.Now().UTC()),
+		// WasUsed:         true,
 	}
 
 	return c, h
@@ -132,7 +135,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Verifier:       "verifier" + key,
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		CSRF:           "csrf" + key,
-		SessionID:      "fk-login-session-" + key,
+		SessionID:      sqlxx.NullString("fk-login-session-" + key),
 	}
 
 	var err = &RequestDeniedError{
@@ -141,6 +144,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Hint:        "error_hint,omitempty" + key,
 		Code:        100,
 		Debug:       "error_debug,omitempty" + key,
+		valid:       true,
 	}
 
 	var authenticatedAt time.Time
@@ -154,7 +158,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Remember:               true,
 		Challenge:              "challenge" + key,
 		RequestedAt:            time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt:        authenticatedAt,
+		AuthenticatedAt:        sqlxx.NullTime(authenticatedAt),
 		Error:                  err,
 		Subject:                c.Subject,
 		ACR:                    "acr",
@@ -174,6 +178,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 			Hint:        "error_hint",
 			Code:        100,
 			Debug:       "error_debug",
+			valid:       true,
 		}
 	}
 
@@ -183,12 +188,12 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		Remember:        remember,
 		Challenge:       c.Challenge,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
-		AuthenticatedAt: authAt,
+		AuthenticatedAt: sqlxx.NullTime(authAt),
 		GrantedScope:    []string{"scopea", "scopeb"},
 		GrantedAudience: []string{"auda", "audb"},
 		Error:           rde,
 		WasUsed:         false,
-		HandledAt:       time.Now().UTC().Add(-time.Minute),
+		HandledAt:       sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
 	_, err := m.HandleConsentRequest(context.Background(), c.Challenge, h)
@@ -210,14 +215,14 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 		},
 		Client:                 ar.Client,
 		RequestURL:             "https://request-url/path",
-		LoginChallenge:         ar.Challenge,
+		LoginChallenge:         sqlxx.NullString(ar.Challenge),
 		LoginSessionID:         ar.SessionID,
 		ForceSubjectIdentifier: "forced-subject",
 		SubjectIdentifier:      "forced-subject",
 		ACR:                    "1",
-		AuthenticatedAt:        time.Now().UTC().Add(-time.Hour),
+		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
-		Context:                map[string]interface{}{"foo": "bar"},
+		Context:                sqlxx.JSONRawMessage(`{"foo": "bar"}`),
 
 		Challenge: uuid.New().String(),
 		Verifier:  uuid.New().String(),
@@ -242,7 +247,7 @@ func SaneMockAuthRequest(t *testing.T, m Manager, ls *LoginSession, cl *client.C
 		RequestURL:     "https://request-url/path",
 		Skip:           true,
 		RequestedScope: []string{"scopea", "scopeb"},
-		SessionID:      ls.ID,
+		SessionID:      sqlxx.NullString(ls.ID),
 
 		CSRF:      uuid.New().String(),
 		Challenge: uuid.New().String(),
@@ -268,7 +273,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					Challenge:       fmt.Sprintf("fk-login-challenge-%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)},
-					AuthenticatedAt: time.Now(),
+					AuthenticatedAt: sqlxx.NullTime(time.Now()),
 					RequestedAt:     time.Now(),
 				}))
 			}
@@ -420,7 +425,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					got1, err = m.HandleConsentRequest(context.TODO(), "challenge"+tc.key, h)
 					require.NoError(t, err)
-					require.Equal(t, time.Now().UTC().Round(time.Minute), h.HandledAt.Round(time.Minute))
+					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
 					compareConsentRequest(t, c, got1)
 
 					_, err = m.HandleConsentRequest(context.TODO(), "challenge"+tc.key, h)

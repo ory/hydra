@@ -426,7 +426,7 @@ export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslm
 Then you can run `go test` as often as you'd like:
 
 ```shell script
-go test ./...
+go test -p 1 ./...
 
 # or in a module:
 cd client; go test .

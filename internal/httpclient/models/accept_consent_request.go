@@ -9,7 +9,6 @@ import (
 	"github.com/go-openapi/errors"
 	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // AcceptConsentRequest The request payload used to accept a consent request.
@@ -17,14 +16,15 @@ import (
 type AcceptConsentRequest struct {
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantAccessTokenAudience []string `json:"grant_access_token_audience"`
+	GrantAccessTokenAudience []string `json:"grant_access_token_audience,omitempty"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantScope []string `json:"grant_scope"`
+	GrantScope []string `json:"grant_scope,omitempty"`
 
 	// HandledAt contains the timestamp the consent request was handled.
 	// Format: date-time
-	HandledAt strfmt.DateTime `json:"handled_at,omitempty"`
+	// Format: date-time
+	HandledAt NullTime `json:"handled_at,omitempty"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -62,7 +62,10 @@ func (m *AcceptConsentRequest) validateHandledAt(formats strfmt.Registry) error 
 		return nil
 	}
 
-	if err := validate.FormatOf("handled_at", "body", "date-time", m.HandledAt.String(), formats); err != nil {
+	if err := m.HandledAt.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("handled_at")
+		}
 		return err
 	}
 

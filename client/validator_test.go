@@ -35,6 +35,7 @@ import (
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 )
 
 func TestValidate(t *testing.T) {
@@ -78,7 +79,7 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{ClientID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
@@ -96,7 +97,7 @@ func TestValidate(t *testing.T) {
 		{
 			in: &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, []string{"https://foo/"}, c.PostLogoutRedirectURIs)
+				assert.Equal(t, []string{"https://foo/"}, []string(c.PostLogoutRedirectURIs))
 			},
 		},
 		{

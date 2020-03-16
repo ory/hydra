@@ -22,7 +22,6 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -31,12 +30,11 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
-	"github.com/ory/x/stringsx"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -55,42 +53,6 @@ func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 type SQLManager struct {
 	r  InternalRegistry
 	DB *sqlx.DB
-}
-
-type sqlData struct {
-	PK                                int64     `db:"pk"`
-	ID                                string    `db:"id"`
-	Name                              string    `db:"client_name"`
-	Secret                            string    `db:"client_secret"`
-	RedirectURIs                      string    `db:"redirect_uris"`
-	GrantTypes                        string    `db:"grant_types"`
-	ResponseTypes                     string    `db:"response_types"`
-	Scope                             string    `db:"scope"`
-	Owner                             string    `db:"owner"`
-	PolicyURI                         string    `db:"policy_uri"`
-	TermsOfServiceURI                 string    `db:"tos_uri"`
-	ClientURI                         string    `db:"client_uri"`
-	LogoURI                           string    `db:"logo_uri"`
-	Contacts                          string    `db:"contacts"`
-	SecretExpiresAt                   int       `db:"client_secret_expires_at"`
-	SectorIdentifierURI               string    `db:"sector_identifier_uri"`
-	JSONWebKeysURI                    string    `db:"jwks_uri"`
-	JSONWebKeys                       string    `db:"jwks"`
-	TokenEndpointAuthMethod           string    `db:"token_endpoint_auth_method"`
-	RequestURIs                       string    `db:"request_uris"`
-	SubjectType                       string    `db:"subject_type"`
-	RequestObjectSigningAlgorithm     string    `db:"request_object_signing_alg"`
-	UserinfoSignedResponseAlg         string    `db:"userinfo_signed_response_alg"`
-	AllowedCORSOrigins                string    `db:"allowed_cors_origins"`
-	Audience                          string    `db:"audience"`
-	UpdatedAt                         time.Time `db:"updated_at"`
-	CreatedAt                         time.Time `db:"created_at"`
-	FrontChannelLogoutURI             string    `db:"frontchannel_logout_uri"`
-	FrontChannelLogoutSessionRequired bool      `db:"frontchannel_logout_session_required"`
-	PostLogoutRedirectURIs            string    `db:"post_logout_redirect_uris"`
-	BackChannelLogoutURI              string    `db:"backchannel_logout_uri"`
-	BackChannelLogoutSessionRequired  bool      `db:"backchannel_logout_session_required"`
-	Metadata                          []byte    `db:"metadata"`
 }
 
 var sqlParams = []string{
@@ -128,113 +90,6 @@ var sqlParams = []string{
 	"metadata",
 }
 
-func sqlDataFromClient(d *Client) (*sqlData, error) {
-	jwks := ""
-
-	if d.JSONWebKeys != nil {
-		out, err := json.Marshal(d.JSONWebKeys)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-		jwks = string(out)
-	}
-
-	var createdAt, updatedAt = d.CreatedAt, d.UpdatedAt
-
-	if d.CreatedAt.IsZero() {
-		createdAt = time.Now()
-	}
-
-	if d.UpdatedAt.IsZero() {
-		updatedAt = time.Now()
-	}
-
-	metadata, err := json.Marshal(d.Metadata)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &sqlData{
-		ID:                                d.GetID(),
-		Name:                              d.Name,
-		Secret:                            d.Secret,
-		RedirectURIs:                      strings.Join(d.RedirectURIs, "|"),
-		Audience:                          strings.Join(d.Audience, "|"),
-		GrantTypes:                        strings.Join(d.GrantTypes, "|"),
-		ResponseTypes:                     strings.Join(d.ResponseTypes, "|"),
-		Scope:                             d.Scope,
-		Owner:                             d.Owner,
-		PolicyURI:                         d.PolicyURI,
-		TermsOfServiceURI:                 d.TermsOfServiceURI,
-		ClientURI:                         d.ClientURI,
-		LogoURI:                           d.LogoURI,
-		Contacts:                          strings.Join(d.Contacts, "|"),
-		SecretExpiresAt:                   d.SecretExpiresAt,
-		SectorIdentifierURI:               d.SectorIdentifierURI,
-		JSONWebKeysURI:                    d.JSONWebKeysURI,
-		JSONWebKeys:                       jwks,
-		TokenEndpointAuthMethod:           d.TokenEndpointAuthMethod,
-		RequestObjectSigningAlgorithm:     d.RequestObjectSigningAlgorithm,
-		RequestURIs:                       strings.Join(d.RequestURIs, "|"),
-		UserinfoSignedResponseAlg:         d.UserinfoSignedResponseAlg,
-		SubjectType:                       d.SubjectType,
-		AllowedCORSOrigins:                strings.Join(d.AllowedCORSOrigins, "|"),
-		CreatedAt:                         createdAt.Round(time.Second),
-		UpdatedAt:                         updatedAt.Round(time.Second),
-		FrontChannelLogoutURI:             d.FrontChannelLogoutURI,
-		FrontChannelLogoutSessionRequired: d.FrontChannelLogoutSessionRequired,
-		PostLogoutRedirectURIs:            strings.Join(d.PostLogoutRedirectURIs, "|"),
-		BackChannelLogoutURI:              d.BackChannelLogoutURI,
-		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired,
-		Metadata:                          []byte(metadata),
-	}, nil
-}
-
-func (d *sqlData) ToClient() (*Client, error) {
-	c := &Client{
-		ClientID:                          d.ID,
-		Name:                              d.Name,
-		Secret:                            d.Secret,
-		Audience:                          stringsx.Splitx(d.Audience, "|"),
-		RedirectURIs:                      stringsx.Splitx(d.RedirectURIs, "|"),
-		GrantTypes:                        stringsx.Splitx(d.GrantTypes, "|"),
-		ResponseTypes:                     stringsx.Splitx(d.ResponseTypes, "|"),
-		Scope:                             d.Scope,
-		Owner:                             d.Owner,
-		PolicyURI:                         d.PolicyURI,
-		TermsOfServiceURI:                 d.TermsOfServiceURI,
-		ClientURI:                         d.ClientURI,
-		LogoURI:                           d.LogoURI,
-		Contacts:                          stringsx.Splitx(d.Contacts, "|"),
-		SecretExpiresAt:                   d.SecretExpiresAt,
-		SectorIdentifierURI:               d.SectorIdentifierURI,
-		JSONWebKeysURI:                    d.JSONWebKeysURI,
-		TokenEndpointAuthMethod:           d.TokenEndpointAuthMethod,
-		RequestObjectSigningAlgorithm:     d.RequestObjectSigningAlgorithm,
-		RequestURIs:                       stringsx.Splitx(d.RequestURIs, "|"),
-		UserinfoSignedResponseAlg:         d.UserinfoSignedResponseAlg,
-		SubjectType:                       d.SubjectType,
-		AllowedCORSOrigins:                stringsx.Splitx(d.AllowedCORSOrigins, "|"),
-		CreatedAt:                         d.CreatedAt,
-		UpdatedAt:                         d.UpdatedAt,
-		FrontChannelLogoutURI:             d.FrontChannelLogoutURI,
-		FrontChannelLogoutSessionRequired: d.FrontChannelLogoutSessionRequired,
-		PostLogoutRedirectURIs:            stringsx.Splitx(d.PostLogoutRedirectURIs, "|"),
-		BackChannelLogoutURI:              d.BackChannelLogoutURI,
-		BackChannelLogoutSessionRequired:  d.BackChannelLogoutSessionRequired, //
-		Metadata:                          d.Metadata,
-	}
-
-	if d.JSONWebKeys != "" {
-		c.JSONWebKeys = new(jose.JSONWebKeySet)
-		if err := json.Unmarshal([]byte(d.JSONWebKeys), &c.JSONWebKeys); err != nil {
-			return nil, errors.WithStack(err)
-		}
-	}
-
-	return c, nil
-}
-
 func (m *SQLManager) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
 	migrate.SetTable("hydra_client_migration")
 	plan, _, err := migrate.PlanMigration(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
@@ -251,12 +106,12 @@ func (m *SQLManager) CreateSchemas(dbName string) (int, error) {
 }
 
 func (m *SQLManager) GetConcreteClient(ctx context.Context, id string) (*Client, error) {
-	var d sqlData
+	var d Client
 	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client WHERE id=?"), id); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return d.ToClient()
+	return &d, nil
 }
 
 func (m *SQLManager) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -279,18 +134,17 @@ func (m *SQLManager) UpdateClient(ctx context.Context, c *Client) error {
 		c.Secret = string(h)
 	}
 
-	s, err := sqlDataFromClient(c)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
 	var query []string
 	for _, param := range sqlParams {
 		query = append(query, fmt.Sprintf("%s=:%s", param, param))
 	}
 
 	/* #nosec G201 - query is constructed using predefined variables only that are never modified */
-	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")), s); err != nil {
+	if _, err := m.DB.NamedExecContext(
+		ctx,
+		fmt.Sprintf(`UPDATE hydra_client SET %s WHERE id=:id`, strings.Join(query, ", ")),
+		setDefaults(c),
+	); err != nil {
 		return sqlcon.HandleError(err)
 	}
 	return nil
@@ -316,17 +170,15 @@ func (m *SQLManager) CreateClient(ctx context.Context, c *Client) error {
 	}
 	c.Secret = string(h)
 
-	data, err := sqlDataFromClient(c)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
 	/* #nosec G201 - sqlParams is a "constant" array */
-	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
-		"INSERT INTO hydra_client (%s) VALUES (%s)",
-		strings.Join(sqlParams, ", "),
-		":"+strings.Join(sqlParams, ", :"),
-	), data); err != nil {
+	if _, err := m.DB.NamedExecContext(ctx,
+		fmt.Sprintf(
+			"INSERT INTO hydra_client (%s) VALUES (%s)",
+			strings.Join(sqlParams, ", "),
+			":"+strings.Join(sqlParams, ", :"),
+		),
+		setDefaults(c),
+	); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -341,20 +193,10 @@ func (m *SQLManager) DeleteClient(ctx context.Context, id string) error {
 }
 
 func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients []Client, err error) {
-	d := make([]sqlData, 0)
+	clients = []Client{}
 
-	if err := m.DB.SelectContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
+	if err := m.DB.SelectContext(ctx, &clients, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
 		return nil, sqlcon.HandleError(err)
-	}
-
-	clients = make([]Client, len(d))
-	for i, k := range d {
-		c, err := k.ToClient()
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-
-		clients[i] = *c
 	}
 
 	return clients, nil
@@ -368,4 +210,24 @@ func (m *SQLManager) CountClients(ctx context.Context) (int, error) {
 	}
 
 	return n, nil
+}
+
+func setDefaults(c *Client) *Client {
+	if c.JSONWebKeys == nil {
+		c.JSONWebKeys = new(x.JoseJSONWebKeySet)
+	}
+
+	if c.Metadata == nil {
+		c.Metadata = []byte("{}")
+	}
+
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now().UTC()
+	}
+
+	if c.UpdatedAt.IsZero() {
+		c.UpdatedAt = time.Now().UTC()
+	}
+
+	return c
 }

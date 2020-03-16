@@ -34,9 +34,10 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
+
+	"github.com/ory/hydra/x"
 )
 
 type SQLManager struct {
@@ -219,17 +220,12 @@ func (m *SQLManager) GetForcedObfuscatedLoginSession(ctx context.Context, client
 }
 
 func (m *SQLManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest) error {
-	d, err := newSQLConsentRequest(c)
-	if err != nil {
-		return err
-	}
-
 	/* #nosec G201 - sqlParamsConsentRequest is "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_consent_request (%s) VALUES (%s)",
 		strings.Join(sqlParamsConsentRequest, ", "),
 		":"+strings.Join(sqlParamsConsentRequest, ", :"),
-	), d); err != nil {
+	), c.prepareSQL()); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -237,7 +233,7 @@ func (m *SQLManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest
 }
 
 func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error) {
-	var d sqlConsentRequest
+	var d ConsentRequest
 	err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_consent_request r "+
 		"LEFT JOIN hydra_oauth2_consent_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
 	if err != nil {
@@ -247,26 +243,22 @@ func (m *SQLManager) GetConsentRequest(ctx context.Context, challenge string) (*
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.ClientID)
 	if err != nil {
 		return nil, err
 	}
 
-	return d.toConsentRequest(c)
+	d.Client = c
+	return &d, nil
 }
 
 func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) error {
-	d, err := newSQLAuthenticationRequest(c)
-	if err != nil {
-		return err
-	}
-
 	/* #nosec G201 - sqlParamsAuthenticationRequest is "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_request (%s) VALUES (%s)",
 		strings.Join(sqlParamsAuthenticationRequest, ", "),
 		":"+strings.Join(sqlParamsAuthenticationRequest, ", :"),
-	), d); err != nil {
+	), c.prepareSQL()); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -274,7 +266,7 @@ func (m *SQLManager) CreateLoginRequest(ctx context.Context, c *LoginRequest) er
 }
 
 func (m *SQLManager) GetLoginRequest(ctx context.Context, challenge string) (*LoginRequest, error) {
-	var d sqlAuthenticationRequest
+	var d LoginRequest
 	err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT r.*, COALESCE(hr.was_used, false) as was_handled FROM hydra_oauth2_authentication_request r "+
 		"LEFT JOIN hydra_oauth2_authentication_request_handled hr ON r.challenge = hr.challenge WHERE r.challenge=?"), challenge)
 	if err != nil {
@@ -284,29 +276,27 @@ func (m *SQLManager) GetLoginRequest(ctx context.Context, challenge string) (*Lo
 		return nil, sqlcon.HandleError(err)
 	}
 
-	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client)
+	c, err := m.r.ClientManager().GetConcreteClient(ctx, d.ClientID)
 	if err != nil {
 		return nil, err
 	}
 
-	return d.toAuthenticationRequest(c)
+	d.Client = c
+	return &d, nil
 }
 
 func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
-	d, err := newSQLHandledConsentRequest(r)
-	if err != nil {
-		return nil, err
-	}
+	r.prepareSQL()
 
 	/* #nosec G201 - sqlParamsConsentRequestHandled is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_consent_request_handled (%s) VALUES (%s)",
 		strings.Join(sqlParamsConsentRequestHandled, ", "),
 		":"+strings.Join(sqlParamsConsentRequestHandled, ", :"),
-	), d); err != nil {
+	), r); err != nil {
 		err = sqlcon.HandleError(err)
 		if errors.Cause(err) == sqlcon.ErrUniqueViolation {
-			return m.replaceUnusedConsentRequest(ctx, challenge, d)
+			return m.replaceUnusedConsentRequest(ctx, challenge, r)
 		}
 		return nil, err
 	}
@@ -314,7 +304,7 @@ func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string,
 	return m.GetConsentRequest(ctx, challenge)
 }
 
-func (m *SQLManager) replaceUnusedConsentRequest(ctx context.Context, challenge string, d *sqlHandledConsentRequest) (*ConsentRequest, error) {
+func (m *SQLManager) replaceUnusedConsentRequest(ctx context.Context, challenge string, d *HandledConsentRequest) (*ConsentRequest, error) {
 	/* #nosec G201 - sqlParamsConsentRequestHandledUpdate is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"UPDATE hydra_oauth2_consent_request_handled SET %s WHERE challenge=:challenge AND was_used=false",
@@ -327,7 +317,7 @@ func (m *SQLManager) replaceUnusedConsentRequest(ctx context.Context, challenge 
 }
 
 func (m *SQLManager) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error) {
-	var d sqlHandledConsentRequest
+	var d HandledConsentRequest
 	var challenge string
 
 	// This can be solved more elegantly with a join statement, but it works for now
@@ -353,21 +343,16 @@ func (m *SQLManager) VerifyAndInvalidateConsentRequest(ctx context.Context, veri
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return d.toHandledConsentRequest(r)
+	return d.postSQL(r), nil
 }
 
 func (m *SQLManager) HandleLoginRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
-	d, err := newSQLHandledLoginRequest(r)
-	if err != nil {
-		return nil, err
-	}
-
 	/* #nosec G201 - sqlParamsAuthenticationRequestHandled is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_authentication_request_handled (%s) VALUES (%s)",
 		strings.Join(sqlParamsAuthenticationRequestHandled, ", "),
 		":"+strings.Join(sqlParamsAuthenticationRequestHandled, ", :"),
-	), d); err != nil {
+	), r.prepareSQL()); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -375,7 +360,7 @@ func (m *SQLManager) HandleLoginRequest(ctx context.Context, challenge string, r
 }
 
 func (m *SQLManager) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
-	var d sqlHandledLoginRequest
+	var d HandledLoginRequest
 	var challenge string
 
 	// This can be solved more elegantly with a join statement, but it works for now
@@ -401,7 +386,7 @@ func (m *SQLManager) VerifyAndInvalidateLoginRequest(ctx context.Context, verifi
 		return nil, err
 	}
 
-	return d.toHandledLoginRequest(r)
+	return d.postSQL(r), nil
 }
 
 func (m *SQLManager) GetRememberedLoginSession(ctx context.Context, id string) (*LoginSession, error) {
@@ -445,7 +430,7 @@ func (m *SQLManager) DeleteLoginSession(ctx context.Context, id string) error {
 }
 
 func (m *SQLManager) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]HandledConsentRequest, error) {
-	var a []sqlHandledConsentRequest
+	var a []HandledConsentRequest
 
 	if err := m.DB.SelectContext(ctx, &a, m.DB.Rebind(`SELECT h.* FROM
 	hydra_oauth2_consent_request_handled as h
@@ -467,7 +452,7 @@ LIMIT 1`), subject, client); err != nil {
 }
 
 func (m *SQLManager) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]HandledConsentRequest, error) {
-	var a []sqlHandledConsentRequest
+	var a []HandledConsentRequest
 
 	if err := m.DB.SelectContext(ctx, &a, m.DB.Rebind(`SELECT h.* FROM
 	hydra_oauth2_consent_request_handled as h
@@ -504,8 +489,8 @@ WHERE
 	return n, nil
 }
 
-func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests []sqlHandledConsentRequest) ([]HandledConsentRequest, error) {
-	var aa []HandledConsentRequest
+func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests []HandledConsentRequest) ([]HandledConsentRequest, error) {
+	var result []HandledConsentRequest
 	for _, v := range requests {
 		r, err := m.GetConsentRequest(ctx, v.Challenge)
 		if err != nil {
@@ -518,19 +503,15 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 			continue
 		}
 
-		va, err := v.toHandledConsentRequest(r)
-		if err != nil {
-			return nil, err
-		}
-
-		aa = append(aa, *va)
+		v.postSQL(r)
+		result = append(result, v)
 	}
 
-	if len(aa) == 0 {
+	if len(result) == 0 {
 		return nil, errors.WithStack(ErrNoPreviousConsentFound)
 	}
 
-	return aa, nil
+	return result, nil
 }
 
 func (m *SQLManager) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
@@ -564,13 +545,12 @@ func (m *SQLManager) listUserAuthenticatedClients(ctx context.Context, subject, 
 }
 
 func (m *SQLManager) CreateLogoutRequest(ctx context.Context, r *LogoutRequest) error {
-	d := newSQLLogoutRequest(r)
 	/* #nosec G201 - sqlParamsLogoutRequest is a "constant" array */
 	if _, err := m.DB.NamedExecContext(ctx, fmt.Sprintf(
 		"INSERT INTO hydra_oauth2_logout_request (%s) VALUES (%s)",
 		strings.Join(sqlParamsLogoutRequest, ", "),
 		":"+strings.Join(sqlParamsLogoutRequest, ", :"),
-	), d); err != nil {
+	), r.prepareSQL()); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -593,29 +573,28 @@ func (m *SQLManager) RejectLogoutRequest(ctx context.Context, challenge string) 
 }
 
 func (m *SQLManager) GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error) {
-	var d sqlLogoutRequest
-	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE challenge=? AND rejected=FALSE"), challenge); err != nil {
+	var lr LogoutRequest
+	if err := m.DB.GetContext(ctx, &lr, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE challenge=? AND rejected=FALSE"), challenge); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}
 		return nil, sqlcon.HandleError(err)
 	}
 
-	if d.Client.Valid {
-		c, err := m.r.ClientManager().GetConcreteClient(ctx, d.Client.String)
+	if lr.ClientID.Valid {
+		var err error
+		lr.Client, err = m.r.ClientManager().GetConcreteClient(ctx, lr.ClientID.String)
 		if err != nil {
 			return nil, err
 		}
-
-		return d.ToLogoutRequest(c), nil
 	}
 
-	return d.ToLogoutRequest(nil), nil
+	return &lr, nil
 }
 
 func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {
-	var d sqlLogoutRequest
-	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE"), verifier); err != nil {
+	var lr LogoutRequest
+	if err := m.DB.GetContext(ctx, &lr, m.DB.Rebind("SELECT * FROM hydra_oauth2_logout_request WHERE verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE"), verifier); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(x.ErrNotFound)
 		}
@@ -626,5 +605,5 @@ func (m *SQLManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verif
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return m.GetLogoutRequest(ctx, d.Challenge)
+	return m.GetLogoutRequest(ctx, lr.Challenge)
 }

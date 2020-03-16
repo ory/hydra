@@ -35,17 +35,20 @@ import (
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/x/httpx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/mapx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/x"
 )
 
 const (
@@ -258,9 +261,9 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			Subject:           subject,
 			Client:            sanitizeClientFromRequest(ar),
 			RequestURL:        iu.String(),
-			AuthenticatedAt:   authenticatedAt,
+			AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
 			RequestedAt:       time.Now().UTC(),
-			SessionID:         sessionID,
+			SessionID:         sqlxx.NullString(sessionID),
 			OpenIDConnectContext: &OpenIDConnectContext{
 				IDTokenHintClaims: idTokenHintClaims,
 				ACRValues:         stringsx.Splitx(ar.GetRequestForm().Get("acr_values"), " "),
@@ -337,7 +340,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	if session.Error != nil {
+	if session.HasError() {
+		session.Error.SetDefaults(loginRequestDeniedErrorName)
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
@@ -367,7 +371,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, err
 	}
 
-	sessionID := session.LoginRequest.SessionID
+	sessionID := session.LoginRequest.SessionID.String()
 
 	if err := s.r.OpenIDConnectRequestValidator().ValidatePrompt(ctx, &fosite.AuthorizeRequest{
 		ResponseTypes: req.GetResponseTypes(),
@@ -378,8 +382,8 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 			ID:                req.GetID(),
 			RequestedAt:       req.GetRequestedAt(),
 			Client:            req.GetClient(),
-			RequestedAudience: []string(req.GetRequestedAudience()),
-			GrantedAudience:   []string(req.GetGrantedAudience()),
+			RequestedAudience: req.GetRequestedAudience(),
+			GrantedAudience:   req.GetGrantedAudience(),
 			RequestedScope:    req.GetRequestedScopes(),
 			GrantedScope:      req.GetGrantedScopes(),
 			Form:              req.GetRequestForm(),
@@ -388,7 +392,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 					Subject:     subjectIdentifier,
 					IssuedAt:    time.Now().UTC(),                // doesn't matter
 					ExpiresAt:   time.Now().Add(time.Hour).UTC(), // doesn't matter
-					AuthTime:    session.AuthenticatedAt,
+					AuthTime:    time.Time(session.AuthenticatedAt),
 					RequestedAt: session.RequestedAt,
 				},
 				Headers: &jwt.Headers{},
@@ -542,7 +546,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
 			LoginSessionID:         as.LoginRequest.SessionID,
-			LoginChallenge:         as.LoginRequest.Challenge,
+			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
 			Context:                as.Context,
 		},
 	); err != nil {
@@ -575,11 +579,12 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The consent request has expired, please try again."))
 	}
 
-	if session.Error != nil {
+	if session.HasError() {
+		session.Error.SetDefaults(consentRequestDeniedErrorName)
 		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
-	if session.ConsentRequest.AuthenticatedAt.IsZero() {
+	if time.Time(session.ConsentRequest.AuthenticatedAt).IsZero() {
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The authenticatedAt value was not set."))
 	}
 

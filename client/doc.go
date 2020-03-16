@@ -66,11 +66,18 @@ type swaggerListClientsResult struct {
 	Body []Client
 }
 
-// swagger:parameters getOAuth2Client deleteOAuth2Client
-type swaggerQueryClientPayload struct {
+// swagger:parameters getOAuth2Client
+type swaggerGetOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.
 	//
-	// unique: true
+	// in: path
+	ID string `json:"id"`
+}
+
+// swagger:parameters deleteOAuth2Client
+type swaggerDeleteOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
 	// in: path
 	ID string `json:"id"`
 }

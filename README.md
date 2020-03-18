@@ -158,9 +158,9 @@ that your company deserves a spot here, reach out to
         </tr>
         <tr>
             <td>Sponsor</td>
-            <td>3 Rein</td>
-            <td align="center"><img height="32px" src="./docs/adopters/3R-horiz.svg" alt="3REIN"></td>
-            <td><a href="https://3rein.com/">3rein.com</a> <em>(avaiable soon)</em></td>
+            <td>3Rein</td>
+            <td align="center"><img height="32px" src="./docs/adopters/3R-horiz.svg" alt="3Rein"></td>
+            <td><a href="https://3rein.com/">3rein.com</a></td>
         </tr>
         <tr>
             <td>Contributor</td>
@@ -205,6 +205,7 @@ TheCrealm.
 <em>\* Uses one of ORY's major projects in production.</em>
 
 <!--END ADOPTERS-->
+
 
 
 ### OAuth2 and OpenID Connect: Open Standards!
@@ -311,6 +312,7 @@ set of access control policies, similar to AWS IAM Policies, in order to
 determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 <!--END ECOSYSTEM-->
+
 
 
 ## Security

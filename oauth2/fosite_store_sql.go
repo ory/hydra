@@ -447,7 +447,10 @@ func (s *FositeSQLStore) FlushInactiveAccessTokens(ctx context.Context, notAfter
 }
 
 func (s *FositeSQLStore) BeginTX(ctx context.Context) (context.Context, error) {
-	if tx, err := s.DB.BeginTxx(ctx, nil); err != nil {
+	if tx, err := s.DB.BeginTxx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelRepeatableRead,
+		ReadOnly:  false,
+	}); err != nil {
 		return ctx, err
 	} else {
 		return context.WithValue(ctx, txKey, tx), nil

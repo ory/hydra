@@ -7,22 +7,22 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// AcceptConsentRequest The request payload used to accept a consent request.
+// AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.
+//
 // swagger:model acceptConsentRequest
 type AcceptConsentRequest struct {
 
-	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	// grant access token audience
 	GrantAccessTokenAudience []string `json:"grant_access_token_audience,omitempty"`
 
-	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
+	// grant scope
 	GrantScope []string `json:"grant_scope,omitempty"`
 
-	// HandledAt contains the timestamp the consent request was handled.
-	// Format: date-time
+	// handled at
 	// Format: date-time
 	HandledAt NullTime `json:"handled_at,omitempty"`
 

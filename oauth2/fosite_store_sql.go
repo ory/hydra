@@ -31,6 +31,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
@@ -289,7 +290,14 @@ func (s *FositeSQLStore) createSession(ctx context.Context, signature string, re
 		":"+strings.Join(sqlParams, ", :"),
 	)
 	if _, err := db.NamedExecContext(ctx, query, data); err != nil {
-		return sqlcon.HandleError(err)
+		err = sqlcon.HandleError(err)
+		switch errCause := errors.Cause(err).(type) {
+		case *herodot.DefaultError:
+			if errCause == sqlcon.ErrConcurrentUpdate {
+				return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+			}
+		}
+		return err
 	}
 	return nil
 }
@@ -430,8 +438,14 @@ func (s *FositeSQLStore) revokeSession(ctx context.Context, id string, table tab
 	/* #nosec G201 - table is a const enum */
 	if _, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE request_id=?", table)), id); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
-	} else if err != nil {
-		return sqlcon.HandleError(err)
+	} else if err := sqlcon.HandleError(err); err != nil {
+		switch errCause := errors.Cause(err).(type) {
+		case *herodot.DefaultError:
+			if errCause == sqlcon.ErrConcurrentUpdate {
+				return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+			}
+		}
+		return err
 	}
 	return nil
 }

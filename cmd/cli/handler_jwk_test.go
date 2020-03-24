@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/ory/x/josex"
 	"testing"
+
+	"github.com/ory/x/josex"
 )
 
 func Test_toSDKFriendlyJSONWebKey(t *testing.T) {

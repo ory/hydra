@@ -13,8 +13,8 @@ import (
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/errorsx"
 	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -59,7 +59,8 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			"refresh_token",
 		},
 		Request: fosite.Request{
-			ID: uuid.New(),
+			RequestedAt: time.Now(),
+			ID:          uuid.New(),
 			Client: &hc.Client{
 				ClientID: testClient.ClientID,
 			},
@@ -74,9 +75,9 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 
 	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(10*time.Second))
 	require.NoError(t, postgresRegistry.OAuth2Storage().(clientCreator).CreateClient(ctx, &testClient))
-	assert.NoError(t, postgresRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))
+	require.NoError(t, postgresRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))
 	_, err = postgresRegistry.OAuth2Storage().GetRefreshTokenSession(ctx, tokenSignature, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	provider := postgresRegistry.OAuth2Provider()
 
 	var wg sync.WaitGroup
@@ -115,24 +116,28 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		var successCount int
 		for err := range errorsCh {
 			if err != nil {
-				switch err := errors.Cause(err).(type) {
+				switch cause := errorsx.Cause(err).(type) {
 				case *fosite.RFC6749Error:
-
-					// TODO: ok this is the tricky part, we need to add error handling logic somewhere such that we are
-					// able to catch the following transaction error(s):
-					//
-					//   • ERROR: could not serialize access due to concurrent update (SQLSTATE 40001)
-					//
-					// this logic likely belongs somewhere in fosite as the refresh flow is currently wrapping any error
-					// it gets back into a `fosite.ErrServerError`.
-
-					// TODO: add assertions that will deal with errors to ensure the returned 'fosite.RFC6749Error'
-					// error is hydrated as expected
-
-					// TODO: amir - remove debug prints
-					fmt.Printf("RFC6749 error debug: %s\n", err.Debug)
+					switch cause.Name {
+					case fosite.ErrInvalidRequest.Name:
+						assert.Equal(t, fosite.ErrInvalidRequest.Description, cause.Description)
+						assert.Contains(t, cause.Debug, "could not serialize access due to concurrent update (SQLSTATE 40001)")
+					default:
+						t.Errorf("an unexpected RFC6749 error with the name %q was returned.\n"+
+							"Hint: has the refresh token error handling changed in fosite? If so, you need to add further "+
+							"assertions here to cover the additional errors that are being returned by the handler.\n\n"+
+							"Error description: %s\n"+
+							"Error debug: %s\n"+
+							"Error hint: %s\n"+
+							"Raw error: %+v",
+							cause.Name,
+							cause.Description,
+							cause.Debug,
+							cause.Hint,
+							err)
+					}
 				default:
-					t.Errorf("expected underlying error type be '*fosite.RFC6749Error', but it was "+
+					t.Errorf("expected underlying error to be of type '*fosite.RFC6749Error', but it was "+
 						"actually of type %T: %+v", err, err)
 				}
 			} else {
@@ -140,13 +145,11 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			}
 		}
 
-		if successCount != 1 {
-			t.Errorf("CRITICAL: in test iteration %d, %d out of %d workers were able to use the refresh token "+
-				"to obtain a new access/refresh token where exactly ONE was expected to be have been successfull.",
-				run,
-				successCount,
-				workers)
-		}
+		assert.Equal(t, 1, successCount, "CRITICAL: in test iteration %d, %d out of %d workers "+
+			"were able to use the refresh token. Exactly ONE was expected to be have been successful.",
+			run,
+			successCount,
+			workers)
 
 		// reset state for the next test iteration
 		_ = postgresRegistry.OAuth2Storage().RevokeRefreshToken(ctx, request.ID)

@@ -6,11 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// Oauth2TokenResponse The Access Token Response
+// Oauth2TokenResponse Oauth2TokenResponse The Access Token Response
+//
 // swagger:model oauth2TokenResponse
 type Oauth2TokenResponse struct {
 

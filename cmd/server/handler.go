@@ -28,6 +28,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/segmentio/analytics-go"
 	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/driver"
@@ -267,6 +268,9 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 			BuildVersion: d.Registry().BuildVersion(),
 			BuildTime:    d.Registry().BuildDate(),
 			BuildHash:    d.Registry().BuildHash(),
+			Config: &analytics.Config{
+				Endpoint: "https://sqa.ory.sh",
+			},
 		},
 	)
 

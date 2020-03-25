@@ -2,17 +2,19 @@ package configuration
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/ory/viper"
+	"github.com/stretchr/testify/require"
+
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/logrusx"

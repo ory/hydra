@@ -4,13 +4,13 @@ orbs:
   sdk: ory/sdk@0.1.26
   changelog: ory/changelog@0.0.6
   goreleaser: ory/goreleaser@0.0.27
-  nancy: ory/nancy@0.0.8
-  golangci: ory/golangci@0.0.2
+  nancy: ory/nancy@0.0.9
+  golangci: ory/golangci@0.0.4
 
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable

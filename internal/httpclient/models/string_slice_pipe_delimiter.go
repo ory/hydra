@@ -6,10 +6,11 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 )
 
 // StringSlicePipeDelimiter StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.
+//
 // swagger:model StringSlicePipeDelimiter
 type StringSlicePipeDelimiter []string
 

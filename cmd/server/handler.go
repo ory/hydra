@@ -37,6 +37,7 @@ import (
 	"github.com/gobuffalo/packr/v2"
 
 	"github.com/ory/x/viperx"
+	"github.com/segmentio/analytics-go"
 
 	"github.com/sirupsen/logrus"
 
@@ -338,6 +339,9 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 			BuildVersion: d.Registry().BuildVersion(),
 			BuildTime:    d.Registry().BuildDate(),
 			BuildHash:    d.Registry().BuildHash(),
+			Config: &analytics.Config{
+				Endpoint: "https://sqa.ory.sh",
+			},
 		},
 	)
 

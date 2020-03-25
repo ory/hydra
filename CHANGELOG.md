@@ -203,6 +203,7 @@
 
 **Merged pull requests:**
 
+- chore: bump ory/x to v0.0.108 and integrate unit test fix from https://github.com/ory/hydra/pull/1733 [\#1770](https://github.com/ory/hydra/pull/1770) ([vancity-amir](https://github.com/vancity-amir))
 - chore: bump e2e image to Go 1.14 [\#1769](https://github.com/ory/hydra/pull/1769) ([aeneasr](https://github.com/aeneasr))
 - fix: move to ory sqa service [\#1768](https://github.com/ory/hydra/pull/1768) ([aeneasr](https://github.com/aeneasr))
 - docs: Updates issue and pull request templates [\#1764](https://github.com/ory/hydra/pull/1764) ([aeneasr](https://github.com/aeneasr))
@@ -1494,7 +1495,6 @@
 - all: All JSON output/input should be using `\_` instead of camelCase [\#777](https://github.com/ory/hydra/issues/777)
 - oauth2: Reject authorization requests for invalid scopes before redirecting to consent endpoint [\#776](https://github.com/ory/hydra/issues/776)
 - oauth2: Improving the consent flow design [\#772](https://github.com/ory/hydra/issues/772)
-- oauth2: Expire consent request on successful consent interaction [\#771](https://github.com/ory/hydra/issues/771)
 - health: Add ability to retrieve version \(protected endpoint\) [\#743](https://github.com/ory/hydra/issues/743)
 - Deprecate `hydra policies create -f` [\#708](https://github.com/ory/hydra/issues/708)
 - Disallow unknown JSON fields [\#707](https://github.com/ory/hydra/issues/707)
@@ -1696,6 +1696,7 @@
 
 **Implemented enhancements:**
 
+- oauth2: Expire consent request on successful consent interaction [\#771](https://github.com/ory/hydra/issues/771)
 - server: Add default policy for well-known/jwks.json [\#761](https://github.com/ory/hydra/issues/761)
 - cmd: Add newsletter info and sign up [\#755](https://github.com/ory/hydra/issues/755)
 - metrics: Improve metrics endpoint [\#742](https://github.com/ory/hydra/issues/742)
@@ -1760,10 +1761,6 @@
 - policies: change effect type from string to boolean [\#666](https://github.com/ory/hydra/issues/666)
 - cmd: `hydra connect --url` should work with and without trailing slash [\#650](https://github.com/ory/hydra/issues/650)
 
-**Merged pull requests:**
-
-- add a save way to get the ClusterURL and append to it [\#748](https://github.com/ory/hydra/pull/748) ([zepatrik](https://github.com/zepatrik))
-
 ## [v0.11.0](https://github.com/ory/hydra/tree/v0.11.0) (2018-01-08)
 
 [Full Changelog](https://github.com/ory/hydra/compare/v0.10.10...v0.11.0)
@@ -1792,6 +1789,7 @@
 
 **Merged pull requests:**
 
+- add a save way to get the ClusterURL and append to it [\#748](https://github.com/ory/hydra/pull/748) ([zepatrik](https://github.com/zepatrik))
 - docs: Adds documentation on third-party deps [\#728](https://github.com/ory/hydra/pull/728) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.10.10](https://github.com/ory/hydra/tree/v0.10.10) (2017-12-16)
@@ -2079,7 +2077,6 @@
 - docs: updated hydra version in the tutorial to v0.10.0-alpha.8 and consent app to v0.10.0-alpha.9 [\#625](https://github.com/ory/hydra/pull/625) ([abusaidm](https://github.com/abusaidm))
 - docs: fixed spelling and wording [\#624](https://github.com/ory/hydra/pull/624) ([abusaidm](https://github.com/abusaidm))
 - docs: fix bash command and version used in tutorial [\#622](https://github.com/ory/hydra/pull/622) ([abusaidm](https://github.com/abusaidm))
-- Support dep [\#606](https://github.com/ory/hydra/pull/606) ([joshuarubin](https://github.com/joshuarubin))
 
 ## [v0.9.16](https://github.com/ory/hydra/tree/v0.9.16) (2017-10-23)
 
@@ -2112,6 +2109,10 @@
 ## [v0.9.15](https://github.com/ory/hydra/tree/v0.9.15) (2017-10-11)
 
 [Full Changelog](https://github.com/ory/hydra/compare/v0.9.14...v0.9.15)
+
+**Merged pull requests:**
+
+- Support dep [\#606](https://github.com/ory/hydra/pull/606) ([joshuarubin](https://github.com/joshuarubin))
 
 ## [v0.9.14](https://github.com/ory/hydra/tree/v0.9.14) (2017-10-06)
 
@@ -2372,6 +2373,7 @@
 **Merged pull requests:**
 
 - cmd/server: print full error message on http startup [\#514](https://github.com/ory/hydra/pull/514) ([aeneasr](https://github.com/aeneasr))
+- metrics: improve metrics [\#508](https://github.com/ory/hydra/pull/508) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.9.1](https://github.com/ory/hydra/tree/v0.9.1) (2017-06-12)
 
@@ -2380,7 +2382,6 @@
 **Merged pull requests:**
 
 - client: export tests [\#510](https://github.com/ory/hydra/pull/510) ([aeneasr](https://github.com/aeneasr))
-- metrics: improve metrics [\#508](https://github.com/ory/hydra/pull/508) ([aeneasr](https://github.com/aeneasr))
 - cmd: add auto migration image [\#502](https://github.com/ory/hydra/pull/502) ([aeneasr](https://github.com/aeneasr))
 
 ## [v0.9.0](https://github.com/ory/hydra/tree/v0.9.0) (2017-06-07)
@@ -3139,7 +3140,6 @@
 
 **Implemented enhancements:**
 
-- all: move docs from gitbook to github [\#204](https://github.com/ory/hydra/issues/204)
 - 0.4.0 [\#203](https://github.com/ory/hydra/pull/203) ([aeneasr](https://github.com/aeneasr))
 
 **Fixed bugs:**
@@ -3160,6 +3160,7 @@
 **Implemented enhancements:**
 
 - oauth2: introspection should return custom session values [\#205](https://github.com/ory/hydra/issues/205)
+- all: move docs from gitbook to github [\#204](https://github.com/ory/hydra/issues/204)
 - warden: move IntrospectToken from warden sdk to oauth2 [\#201](https://github.com/ory/hydra/issues/201)
 - warden: rename InspectToken to IntrospectToken [\#200](https://github.com/ory/hydra/issues/200)
 

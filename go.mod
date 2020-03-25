@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3
 	github.com/go-openapi/runtime v0.19.11
@@ -14,6 +14,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0
+	github.com/gobuffalo/packr/v2 v2.2.0
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.3.1
 	github.com/google/uuid v1.1.1
@@ -23,7 +24,9 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
+	github.com/mattn/goveralls v0.0.5 // indirect
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103
+	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
@@ -31,10 +34,11 @@ require (
 	github.com/ory/fosite v0.30.2
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
-	github.com/ory/herodot v0.6.2
+	github.com/ory/herodot v0.7.0
+	github.com/ory/jsonschema/v3 v3.0.1
 	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
-	github.com/ory/viper v1.5.6
-	github.com/ory/x v0.0.102
+	github.com/ory/viper v1.7.3
+	github.com/ory/x v0.0.108
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -44,7 +48,7 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/segmentio/backo-go v0.0.0-20200129164019-23eae7c10bd3 // indirect
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v0.0.6
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.4.0
@@ -54,11 +58,10 @@ require (
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v0.2.1
-	golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
+	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
-	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
-	gopkg.in/ini.v1 v1.54.0 // indirect
+	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
+	golang.org/x/tools v0.0.0-20200324161117-bbbf714b4a18
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

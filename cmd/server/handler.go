@@ -23,15 +23,14 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/jsonschema/v3"
-	"github.com/ory/x/errorsx"
-	"github.com/ory/x/jsonschemax"
 	"net"
 	"net/http"
 	"strings"
 	"sync"
 
-	"github.com/fsnotify/fsnotify"
+	"github.com/ory/jsonschema/v3"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/jsonschemax"
 
 	"github.com/ory/viper"
 
@@ -132,41 +131,18 @@ func jsonschemaFormatError(e *jsonschema.ValidationError) (pointer, message stri
 	return
 }
 
-func validateAndWatchViper(l *logrus.Logger) {
+func watchAndValidateViper(l *logrus.Logger) {
 	schema, err := schemas.Find("config.schema.json")
 	if err != nil {
 		l.WithError(err).Fatal("Unable to open configuration JSON Schema.")
 	}
-
-	if err := viperx.Validate("config.schema.json", schema); err != nil {
-		l.Logf(logrus.InfoLevel, "all config: %+v", viper.AllSettings())
-		LoggerWithValidationErrorFields(l, err).
-			Fatal("The configuration is invalid and could not be loaded.")
-	}
-
-	viperx.AddWatcher(func(event fsnotify.Event) error {
-		if err := viperx.Validate("config.schema.json", schema); err != nil {
-			LoggerWithValidationErrorFields(l, err).
-				Error("The changed configuration is invalid and could not be loaded. Rolling back to the last working configuration revision. Please address the validation errors before restarting ORY Hydra.")
-			return viperx.ErrRollbackConfigurationChanges
-		}
-		return nil
-	})
-
-	viperx.WatchConfig(l, &viperx.WatchOptions{
-		Immutables: []string{"log", "serve", "dsn", "profiling"},
-		OnImmutableChange: func(key string) {
-			l.WithField("key", key).
-				WithField("reset_to", fmt.Sprintf("%v", viper.Get(key))).
-				Error("A configuration value marked as immutable has changed. Rolling back to the last working configuration revision. To reload the values please restart ORY Hydra.")
-		},
-	})
+	viperx.WatchAndValidateViper(l, schema, "ORY Hydra", []string{"log", "serve", "dsn", "profiling"})
 }
 
 func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		logger := logrusx.New()
-		validateAndWatchViper(logger)
+		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
 			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
@@ -194,7 +170,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 func RunServePublic(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		logger := logrusx.New()
-		validateAndWatchViper(logger)
+		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
 			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
@@ -222,7 +198,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		logger := logrusx.New()
-		validateAndWatchViper(logger)
+		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
 			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),

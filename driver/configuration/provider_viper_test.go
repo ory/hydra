@@ -2,58 +2,68 @@ package configuration
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/ory/viper"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	"github.com/ory/viper"
 
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/logrusx"
 )
 
-func setEnv(key, value string) func(t *testing.T) {
-	return func(t *testing.T) {
-		require.NoError(t, os.Setenv(key, value))
+func setupEnv(env map[string]string) func(t *testing.T) (func(), func()) {
+	return func(t *testing.T) (setup func(), clean func()) {
+		setup = func() {
+			for k, v := range env {
+				require.NoError(t, os.Setenv(k, v))
+			}
+		}
+
+		clean = func() {
+			for k := range env {
+				require.NoError(t, os.Unsetenv(k))
+			}
+		}
+		return
 	}
 }
 
 func TestSubjectTypesSupported(t *testing.T) {
-	p := NewViperProvider(logrus.New(), false, nil)
-	viper.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
 	for k, tc := range []struct {
-		d string
-		p func(t *testing.T)
-		e []string
-		c func(t *testing.T)
+		d   string
+		env func(t *testing.T) (func(), func())
+		e   []string
 	}{
 		{
 			d: "Load legacy environment variable in legacy format",
-			p: setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), "public,pairwise,foobar"),
-			c: setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), ""),
+			env: setupEnv(map[string]string{
+				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)): "public,pairwise,foobar",
+			}),
 			e: []string{"public", "pairwise"},
 		},
 		{
 			d: "Load legacy environment variable in legacy format",
-			p: func(t *testing.T) {
-				setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), "public,pairwise,foobar")(t)
-				setEnv(strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)), "jwt")(t)
-			},
-			c: setEnv(strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)), ""),
+			env: setupEnv(map[string]string{
+				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)): "public,pairwise,foobar",
+				strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)):   "jwt",
+			}),
 			e: []string{"public"},
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
-			tc.p(t)
+			setup, clean := tc.env(t)
+			setup()
+			p := NewViperProvider(logrus.New(), false, nil)
+			viper.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
 			assert.EqualValues(t, tc.e, p.SubjectTypesSupported())
-			tc.c(t)
+			clean()
 		})
 	}
 }
@@ -88,7 +98,7 @@ func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
 	value := p.AdminDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	os.Setenv("SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH", "true")
+	viper.Set(ViperKeyAdminDisableHealthAccessLog, "true")
 
 	value = p.AdminDisableHealthAccessLog()
 	assert.Equal(t, true, value)
@@ -103,7 +113,7 @@ func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
 	value := p.PublicDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	os.Setenv("SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH", "true")
+	viper.Set(ViperKeyPublicDisableHealthAccessLog, "true")
 
 	value = p.PublicDisableHealthAccessLog()
 	assert.Equal(t, true, value)
@@ -128,6 +138,6 @@ func TestViperProvider_CookieSameSiteMode(t *testing.T) {
 	p := NewViperProvider(l, false, nil)
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
 
-	os.Setenv("COOKIE_SAME_SITE_MODE", "none")
+	viper.Set(ViperKeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
 }

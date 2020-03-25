@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// LoginRequest Contains information on an ongoing login request.
+// LoginRequest LoginRequest Contains information on an ongoing login request.
 //
 // swagger:model loginRequest
 type LoginRequest struct {
@@ -31,10 +31,10 @@ type LoginRequest struct {
 	// might come in handy if you want to deal with additional request parameters.
 	RequestURL string `json:"request_url,omitempty"`
 
-	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	// requested access token audience
 	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
 
-	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	// requested scope
 	RequestedScope []string `json:"requested_scope,omitempty"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)

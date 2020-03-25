@@ -4,7 +4,6 @@ go 1.14
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3
 	github.com/go-openapi/runtime v0.19.11
@@ -57,7 +56,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

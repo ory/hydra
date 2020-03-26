@@ -12,7 +12,6 @@ require (
 	github.com/go-openapi/validate v0.19.6
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
-	github.com/gobuffalo/logger v0.0.0-20190315122211-86e12af44bc2
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobuffalo/packr/v2 v2.2.0
 	github.com/gobwas/glob v0.2.3
@@ -24,13 +23,11 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
-	github.com/mattn/goveralls v0.0.5 // indirect
-	github.com/mitchellh/mapstructure v1.2.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
-	github.com/ory/fosite v0.30.2
+	github.com/ory/fosite v0.30.5
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.7.0
@@ -61,7 +58,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200320181102-891825fb96df
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
-	golang.org/x/tools v0.0.0-20200325203130-f53864d0dba1
+	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

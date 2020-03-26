@@ -97,7 +97,7 @@ jobs:
       - image: oryd/e2e-env:latest
         environment:
           - GO111MODULE=on
-          - TEST_DATABASE_MYSQL=mysql://root:test@localhost:3306/mysql?parseTime=true
+          - TEST_DATABASE_MYSQL=mysql://(root:test)@localhost:3306/mysql?parseTime=true
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test

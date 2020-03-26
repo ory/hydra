@@ -475,7 +475,16 @@ func (s *FositeSQLStore) Commit(ctx context.Context) error {
 	if tx, ok := ctx.Value(txKey).(*sqlx.Tx); !ok {
 		return errors.Wrap(fosite.ErrServerError, "commit failed: no transaction stored in context")
 	} else {
-		return tx.Commit()
+		if err := sqlcon.HandleError(tx.Commit()); err != nil {
+			switch errCause := errors.Cause(err).(type) {
+			case *herodot.DefaultError:
+				if errCause == sqlcon.ErrConcurrentUpdate {
+					return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+				}
+			}
+			return err
+		}
+		return nil
 	}
 }
 

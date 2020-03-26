@@ -553,7 +553,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accessRequest.GetGrantTypes().Exact("client_credentials") {
+	if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy() == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
@@ -659,12 +659,12 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	authorizeRequest.SetID(session.Challenge)
 
 	claims := &jwt.IDTokenClaims{
-		Subject:                             session.ConsentRequest.SubjectIdentifier,
-		Issuer:                              strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
-		IssuedAt:                            time.Now().UTC(),
-		AuthTime:                            time.Time(session.AuthenticatedAt),
-		RequestedAt:                         session.RequestedAt,
-		Extra:                               session.Session.IDToken,
+		Subject:     session.ConsentRequest.SubjectIdentifier,
+		Issuer:      strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
+		IssuedAt:    time.Now().UTC(),
+		AuthTime:    time.Time(session.AuthenticatedAt),
+		RequestedAt: session.RequestedAt,
+		Extra:       session.Session.IDToken,
 		AuthenticationContextClassReference: session.ConsentRequest.ACR,
 
 		// We do not need to pass the audience because it's included directly by ORY Fosite

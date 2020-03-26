@@ -323,8 +323,7 @@
           "const": "memory"
         },
         {
-          "format": "uri",
-          "pattern": "^(postgres|mysql|cockroach)://"
+          "format": "uri"
         }
       ],
       "examples": [

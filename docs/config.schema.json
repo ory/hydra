@@ -76,7 +76,19 @@
             "DELETE"
           ],
           "items": {
-            "$ref": "#/definitions/http_method"
+            "type": "string",
+            "enum": [
+              "POST",
+              "GET",
+              "PUT",
+              "PATCH",
+              "DELETE",
+              "CONNECT",
+              "HEAD",
+              "OPTIONS",
+              "TRACE"
+            ],
+            "broken $ref FIXME": "#/definitions/http_method"
           }
         },
         "allowed_headers": {
@@ -399,49 +411,51 @@
         "subject_identifiers": {
           "type": "object",
           "description": "Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms",
-          "oneOf": [
-            {
-              "properties": {
-                "enabled": {
-                  "type": "array",
-                  "description": "A list of algorithms to enable.",
-                  "const": [
-                    "public"
-                  ]
-                }
+          "properties": {
+            "enabled": {
+              "type": "array",
+              "description": "A list of algorithms to enable.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "public",
+                  "pairwise"
+                ]
               }
             },
-            {
+            "pairwise": {
+              "type": "object",
+              "description": "Configures the pairwise algorithm.",
               "properties": {
-                "enabled": {
-                  "type": "array",
-                  "description": "A list of algorithms to enable.",
-                  "items": {
-                    "type": "string",
-                    "enum": [
-                      "public",
-                      "pairwise"
-                    ]
-                  },
-                  "contains": {
-                    "const": "pairwise"
-                  }
-                },
-                "pairwise": {
-                  "type": "object",
-                  "description": "Configures the pairwise algorithm.",
-                  "properties": {
-                    "salt": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "salt"
-                  ]
+                "salt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "salt"
+              ]
+            }
+          },
+          "if": {
+            "properties": {
+              "enabled": {
+                "contains": {
+                  "const": "pairwise"
                 }
               }
             }
-          ],
+          },
+          "then": {
+            "required": ["pairwise"]
+          },
+          "else": {
+            "properties": {
+              "pairwise": {
+                "$comment": "This enforces pairwise to not be set iff 'enabled' does not contain 'pairwise'",
+                "not": {}
+              }
+            }
+          },
           "examples": [
             {
               "enabled": [

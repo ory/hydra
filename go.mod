@@ -12,6 +12,7 @@ require (
 	github.com/go-openapi/validate v0.19.6
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
+	github.com/gobuffalo/logger v0.0.0-20190315122211-86e12af44bc2
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobuffalo/packr/v2 v2.2.0
 	github.com/gobwas/glob v0.2.3
@@ -35,8 +36,8 @@ require (
 	github.com/ory/herodot v0.7.0
 	github.com/ory/jsonschema/v3 v3.0.1
 	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
-	github.com/ory/viper v1.7.3
-	github.com/ory/x v0.0.108
+	github.com/ory/viper v1.7.4
+	github.com/ory/x v0.0.109
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -61,6 +62,6 @@ require (
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
-	golang.org/x/tools v0.0.0-20200325010219-a49f79bcc224
+	golang.org/x/tools v0.0.0-20200325203130-f53864d0dba1
 	gopkg.in/square/go-jose.v2 v2.4.1
 )

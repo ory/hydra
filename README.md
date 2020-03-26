@@ -1,8 +1,8 @@
 <h1 align="center"><img src="./docs/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">
-    <a href="https://discord.gg/PAMQWkr">Chat</a> |
-    <a href="https://community.ory.am/">Forums</a> |
+    <a href="https://www.ory.sh/chat">Chat</a> |
+    <a href="https://community.ory.sh/">Forums</a> |
     <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
     <a href="https://www.ory.sh/docs/next/hydra/">Guide</a> |
     <a href="https://www.ory.sh/docs/next/hydra/sdk/api">API Docs</a> |

@@ -30,8 +30,9 @@ import (
 
 	"github.com/gobuffalo/packr/v2"
 
-	"github.com/ory/x/viperx"
 	"github.com/segmentio/analytics-go"
+
+	"github.com/ory/x/viperx"
 
 	"github.com/sirupsen/logrus"
 

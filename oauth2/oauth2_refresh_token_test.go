@@ -11,6 +11,10 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/fosite"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
@@ -19,9 +23,6 @@ import (
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/pborman/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 // TestCreateRefreshTokenSessionStress is a sanity test to verify the fix for https://github.com/ory/hydra/issues/1719 &

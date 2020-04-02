@@ -8,13 +8,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ory/hydra/x"
-	"github.com/ory/viper"
-	"github.com/ory/x/logrusx"
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/x"
+	"github.com/ory/viper"
+	"github.com/ory/x/logrusx"
 )
 
 func setupEnv(env map[string]string) func(t *testing.T) (func(), func()) {

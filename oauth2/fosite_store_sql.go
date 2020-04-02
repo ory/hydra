@@ -31,18 +31,20 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/herodot"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/ory/herodot"
+
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
+
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/jwk"
 )
 
 type FositeSQLStore struct {
@@ -69,11 +71,12 @@ func NewFositeSQLStore(db *sqlx.DB, r InternalRegistry, c Configuration, kc *jwk
 type tableName string
 
 const (
-	sqlTableOpenID  tableName = "oidc"
-	sqlTableAccess  tableName = "access"
-	sqlTableRefresh tableName = "refresh"
-	sqlTableCode    tableName = "code"
-	sqlTablePKCE    tableName = "pkce"
+	sqlTableOpenID         tableName = "oidc"
+	sqlTableAccess         tableName = "access"
+	sqlTableRefresh        tableName = "refresh"
+	sqlTableCode           tableName = "code"
+	sqlTablePKCE           tableName = "pkce"
+	sqlTableBlacklistedJTI tableName = "jti_blacklist"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
@@ -226,6 +229,57 @@ func (s *FositeSQLStore) PlanMigration(dbName string) ([]*migrate.PlannedMigrati
 
 func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
 	return s.r.ClientManager().GetClient(ctx, id)
+}
+
+func (s *FositeSQLStore) ClientAssertionJWTValid(ctx context.Context, jti string) error {
+	d, err := s.getClientAssertionJWT(ctx, jti)
+	if errors.Is(err, sqlcon.ErrNoRows) {
+		// the jti is not known => valid
+		return nil
+	} else if err != nil {
+		return err
+	}
+	if d.Expiry.After(time.Now()) {
+		// the jti is not expired yet => invalid
+		return errors.WithStack(fosite.ErrJTIKnown)
+	}
+	// the jti is expired => valid
+	return nil
+}
+
+func (s *FositeSQLStore) SetClientAssertionJWT(ctx context.Context, j string, exp time.Time) error {
+	db := s.db(ctx)
+
+	// delete expired
+	if _, err := db.ExecContext(ctx, fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE expires_at < now()", sqlTableBlacklistedJTI)); err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	if err := s.setClientAssertionJWT(ctx, newBlacklistedJTI(j, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+		// found a jti
+		return errors.WithStack(fosite.ErrJTIKnown)
+	} else if err != nil {
+		return err
+	}
+	// setting worked without a problem
+	return nil
+}
+
+func (s *FositeSQLStore) getClientAssertionJWT(ctx context.Context, j string) (*blacklistedJTI, error) {
+	sig := signatureFromJTI(j)
+	jti := blacklistedJTI{
+		JTI: j,
+	}
+	db := s.db(ctx)
+
+	return &jti, sqlcon.HandleError(db.GetContext(ctx, &jti, db.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", sqlTableBlacklistedJTI)), sig))
+}
+
+func (s *FositeSQLStore) setClientAssertionJWT(ctx context.Context, jti *blacklistedJTI) error {
+	db := s.db(ctx)
+	_, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("INSERT INTO hydra_oauth2_%s (signature, expires_at) VALUES (?, ?)", sqlTableBlacklistedJTI)), jti.Signature, jti.Expiry)
+
+	return sqlcon.HandleError(err)
 }
 
 func (s *FositeSQLStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {

@@ -34,11 +34,12 @@ import (
 )
 
 type FositeMemoryStore struct {
-	AuthorizeCodes map[string]authorizeCode
-	IDSessions     map[string]fosite.Requester
-	AccessTokens   map[string]fosite.Requester
-	RefreshTokens  map[string]fosite.Requester
-	PKCES          map[string]fosite.Requester
+	AuthorizeCodes  map[string]authorizeCode
+	IDSessions      map[string]fosite.Requester
+	AccessTokens    map[string]fosite.Requester
+	RefreshTokens   map[string]fosite.Requester
+	PKCES           map[string]fosite.Requester
+	BlacklistedJTIs map[string]time.Time
 
 	c Configuration
 	r InternalRegistry
@@ -53,11 +54,12 @@ func NewFositeMemoryStore(
 	c Configuration,
 ) *FositeMemoryStore {
 	return &FositeMemoryStore{
-		AuthorizeCodes: make(map[string]authorizeCode),
-		IDSessions:     make(map[string]fosite.Requester),
-		AccessTokens:   make(map[string]fosite.Requester),
-		PKCES:          make(map[string]fosite.Requester),
-		RefreshTokens:  make(map[string]fosite.Requester),
+		AuthorizeCodes:  make(map[string]authorizeCode),
+		IDSessions:      make(map[string]fosite.Requester),
+		AccessTokens:    make(map[string]fosite.Requester),
+		PKCES:           make(map[string]fosite.Requester),
+		RefreshTokens:   make(map[string]fosite.Requester),
+		BlacklistedJTIs: make(map[string]time.Time),
 
 		c: c,
 		r: r,
@@ -71,6 +73,53 @@ type authorizeCode struct {
 
 func (s *FositeMemoryStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
 	return s.r.ClientManager().GetClient(ctx, id)
+}
+
+func (s *FositeMemoryStore) ClientAssertionJWTValid(_ context.Context, jti string) error {
+	s.RLock()
+	defer s.RUnlock()
+	if exp, exists := s.BlacklistedJTIs[jti]; exists && exp.After(time.Now()) {
+		return errors.WithStack(fosite.ErrJTIKnown)
+	}
+
+	return nil
+}
+
+func (s *FositeMemoryStore) SetClientAssertionJWT(_ context.Context, jti string, exp time.Time) error {
+	s.Lock()
+	defer s.Unlock()
+
+	for j, e := range s.BlacklistedJTIs {
+		if e.Before(time.Now()) {
+			delete(s.BlacklistedJTIs, j)
+		}
+	}
+
+	if _, exists := s.BlacklistedJTIs[jti]; exists {
+		return errors.WithStack(fosite.ErrJTIKnown)
+	}
+
+	s.BlacklistedJTIs[jti] = exp
+	return nil
+}
+
+func (s *FositeMemoryStore) getClientAssertionJWT(_ context.Context, jti string) (*blacklistedJTI, error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	if exp, exists := s.BlacklistedJTIs[jti]; exists {
+		return newBlacklistedJTI(jti, exp), nil
+	}
+
+	return nil, errors.WithStack(sqlcon.ErrNoRows)
+}
+
+func (s *FositeMemoryStore) setClientAssertionJWT(_ context.Context, jti *blacklistedJTI) error {
+	s.Lock()
+	defer s.Unlock()
+
+	s.BlacklistedJTIs[jti.JTI] = jti.Expiry
+	return nil
 }
 
 func (s *FositeMemoryStore) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {

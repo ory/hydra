@@ -598,6 +598,7 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			_, err := store.getClientAssertionJWT(context.Background(), expiredJTI.JTI)
 			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
 			cmp, err := store.getClientAssertionJWT(context.Background(), newJTI.JTI)
+			require.NoError(t, err)
 			assert.Equal(t, newJTI, cmp)
 		})
 

@@ -95,6 +95,10 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		}
 	}
 
+	// Make create schemas with:
+	// > check if table hydra_client_migration exists
+	// > if yes -> run migration to fizz 2019010000000 + id
+	// >  ..  INSERT INTO hydra_fizz_migrate VALUES CONCAT() (SELECT * FROM hydra_client_migration);
 	n, err := reg.CreateSchemas(scheme)
 	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
 	fmt.Printf("Successfully applied %d SQL migrations!\n", n)

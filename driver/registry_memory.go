@@ -3,6 +3,7 @@ package driver
 import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/persistence/memory"
 	"github.com/ory/hydra/x"
 
 	"github.com/ory/hydra/client"
@@ -44,6 +45,7 @@ func (m *RegistryMemory) WithConsentStrategy(c consent.Strategy) *RegistryMemory
 }
 
 func (m *RegistryMemory) Init() error {
+	m.persister = &memory.Persister{}
 	return nil
 }
 

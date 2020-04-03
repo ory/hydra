@@ -2,6 +2,9 @@ package driver
 
 import (
 	"fmt"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/hydra/persistence/sql"
+	"github.com/pkg/errors"
 	"os"
 	"strings"
 	"time"
@@ -57,6 +60,7 @@ func (m *RegistrySQL) Init() error {
 		return nil
 	}
 
+	// old db connection
 	options := append([]sqlcon.OptionModifier{}, m.dbalOptions...)
 	if m.Tracer().IsLoaded() {
 		options = append(options, sqlcon.WithDistributedTracing(), sqlcon.WithOmitArgsFromTraceSpans())
@@ -72,7 +76,21 @@ func (m *RegistrySQL) Init() error {
 		return err
 	}
 
-	return err
+	// new db connection
+	pool, idlePool, connMaxLifetime := sqlcon.ParseConnectionOptions(m.l, m.c.DSN())
+	c, err := pop.NewConnection(&pop.ConnectionDetails{
+		URL:             m.c.DSN(),
+		IdlePool:        idlePool,
+		ConnMaxLifetime: connMaxLifetime,
+		Pool:            pool,
+	})
+	p, err := sql.NewPersister(c)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+	m.persister = p
+
+	return nil
 }
 
 func (m *RegistrySQL) DB() *sqlx.DB {

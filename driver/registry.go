@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"github.com/ory/hydra/persistence"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -31,6 +32,7 @@ type Registry interface {
 	BuildDate() string
 	BuildHash() string
 
+	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
 	x.RegistryCookieStore

@@ -209,6 +209,7 @@ TheCrealm.
 
 
 
+
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -313,6 +314,7 @@ set of access control policies, similar to AWS IAM Policies, in order to
 determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 <!--END ECOSYSTEM-->
+
 
 
 

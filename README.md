@@ -129,61 +129,61 @@ that your company deserves a spot here, reach out to
         <tr>
             <td>Sponsor</td>
             <td>Raspberry PI Foundation</td>
-            <td align="center"><img height="32px" src="./docs/adopters/raspi.svg" alt="Raspberry PI Foundation"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/raspi.svg" alt="Raspberry PI Foundation"></td>
             <td><a href="https://www.raspberrypi.org/">raspberrypi.org</a></td>
         </tr>
         <tr>
             <td>Contributor</td>
             <td>Kyma Project</a>
-            <td align="center"><img height="32px" src="./docs/adopters/kyma.svg" alt="Kyma Project"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/kyma.svg" alt="Kyma Project"></td>
             <td><a href="https://kyma-project.io">kyma-project.io</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
             <td>ThoughtWorks</td>
-            <td align="center"><img height="32px" src="./docs/adopters/tw.svg" alt="ThoughtWorks"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/tw.svg" alt="ThoughtWorks"></td>
             <td><a href="https://www.thoughtworks.com/">thoughtworks.com</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
             <td>Tulip</td>
-            <td align="center"><img height="32px" src="./docs/adopters/tulip.svg" alt="Tulip Retail"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/tulip.svg" alt="Tulip Retail"></td>
             <td><a href="https://tulip.com/">tulip.com</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
             <td>Cashdeck / All My Funds</td>
-            <td align="center"><img height="32px" src="./docs/adopters/allmyfunds.svg" alt="All My Funds"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/allmyfunds.svg" alt="All My Funds"></td>
             <td><a href="https://cashdeck.com.au/">cashdeck.com.au</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
             <td>3Rein</td>
-            <td align="center"><img height="32px" src="./docs/adopters/3R-horiz.svg" alt="3Rein"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/3R-horiz.svg" alt="3Rein"></td>
             <td><a href="https://3rein.com/">3rein.com</a></td>
         </tr>
         <tr>
             <td>Contributor</td>
             <td>Hootsuite</td>
-            <td align="center"><img height="32px" src="./docs/adopters/hootsuite.svg" alt="Hootsuite"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/hootsuite.svg" alt="Hootsuite"></td>
             <td><a href="https://hootsuite.com/">hootsuite.com</a></td>
         </tr>
         <tr>
             <td>Adopter *</td>
             <td>Segment</td>
-            <td align="center"><img height="32px" src="./docs/adopters/segment.svg" alt="Segment"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/segment.svg" alt="Segment"></td>
             <td><a href="https://segment.com/">segment.com</a></td>
         </tr>
         <tr>
             <td>Adopter *</td>
             <td>Arduino</td>
-            <td align="center"><img height="32px" src="./docs/adopters/arduino.svg" alt="Arduino"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/arduino.svg" alt="Arduino"></td>
             <td><a href="https://www.arduino.cc/">arduino.cc</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
             <td>OrderMyGear</td>
-            <td align="center"><img height="32px" src="./docs/adopters/ordermygear.svg" alt="OrderMyGear"></td>
+            <td align="center"><img height="32px" src="./.github/adopters/ordermygear.svg" alt="OrderMyGear"></td>
             <td><a href="https://www.ordermygear.com/">ordermygear.com</a></td>
         </tr>
     </tdbody>
@@ -205,6 +205,8 @@ TheCrealm.
 <em>\* Uses one of ORY's major projects in production.</em>
 
 <!--END ADOPTERS-->
+
+
 
 
 
@@ -312,6 +314,8 @@ set of access control policies, similar to AWS IAM Policies, in order to
 determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 <!--END ECOSYSTEM-->
+
+
 
 
 

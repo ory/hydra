@@ -6,16 +6,18 @@ import (
 	"testing"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/dbal/migratest"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/dbal/migratest"
 )
 
 func TestXXMigrations(t *testing.T) {
@@ -52,6 +54,7 @@ func TestXXMigrations(t *testing.T) {
 					require.Error(t, err)
 					return
 				}
+
 				_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
 				require.NoError(t, err)
 				_, err = s.GetRefreshTokenSession(context.Background(), sig, oauth2.NewSession(""))
@@ -63,6 +66,10 @@ func TestXXMigrations(t *testing.T) {
 				if k > 2 {
 					_, err = s.GetPKCERequestSession(context.Background(), sig, oauth2.NewSession(""))
 					require.NoError(t, err)
+				}
+
+				if k >= 11 {
+					require.True(t, errors.Is(s.ClientAssertionJWTValid(context.Background(), sig), fosite.ErrJTIKnown), "%+v", err)
 				}
 			})
 		},

@@ -9,6 +9,7 @@ before finalizing the upgrade process.
 
 
 - [Hassle-free upgrades](#hassle-free-upgrades)
+- [1.4](#14)
 - [1.3.0](#130)
 - [1.2.0](#120)
 - [1.1.0](#110)
@@ -142,7 +143,13 @@ before finalizing the upgrade process.
 
 Do you want the latest features and patches without work and hassle? Are you looking for a reliable, scalable, and
 secure deployment with zero effort? We can run it for you! If you're interested,
-[contact us now](mailto:hi@ory.sh)!
+[contact us now](mailto:office@ory.sh)!
+
+## 1.4
+
+Please run `hydra migrate sql` when upgrading to this version. For more information, check https://github.com/ory/hydra/commit/700d17d3b7d507de1b1d459a7261d6fb2571ebe3.
+
+For a full list of changes please check: https://github.com/ory/hydra/compare/v1.3.2...v1.4.1
 
 ## 1.3.0
 

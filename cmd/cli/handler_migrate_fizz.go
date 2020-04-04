@@ -55,6 +55,8 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 	}
 
 	// print migration status
+	fmt.Println("The following migration is planned:")
+	fmt.Println("")
 	if err := p.MigrationStatus(context.Background(), os.Stdout); err != nil {
 		fmt.Printf("Could not get the migration status:\n%v\n", errors.WithStack(err))
 		os.Exit(1)

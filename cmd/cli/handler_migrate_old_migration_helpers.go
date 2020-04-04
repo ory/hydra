@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"github.com/gobuffalo/pop/v5"
 	"github.com/ory/x/sqlcon"
+	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -31,37 +34,44 @@ func getMigrationRecords(c *pop.Connection, tableName oldTableName) ([]migrate.M
 }
 
 func migrateOldMigrationTables(c *pop.Connection) error {
-	var migrations []migrate.MigrationRecord
-	err := c.Transaction(func(tx *pop.Connection) error {
-		// in this order the migrations only depend on already done ones
-		for _, table := range []oldTableName{clientMigrationTableName, jwkMigrationTableName, consentMigrationTableName, oauth2MigrationTableName} {
-			ms, err := getMigrationRecords(tx, table)
-			if err != nil {
+	if err := c.RawQuery(fmt.Sprintf("SELECT * FROM %s", clientMigrationTableName)); err != nil {
+		// assume there are no old migration tables => done
+		return nil
+	}
 
+	return sqlcon.HandleError(c.Transaction(func(tx *pop.Connection) error {
+		// in this order the migrations only depend on already done ones
+		for i, table := range []oldTableName{clientMigrationTableName, jwkMigrationTableName, consentMigrationTableName, oauth2MigrationTableName} {
+			// get old migrations
+			migrations, err := getMigrationRecords(tx, table)
+			if err != nil {
 				return err
 			}
-			migrations = append(migrations, ms...)
-		}
 
-		for i, m := range migrations {
-			if m.AppliedAt.Before(time.Now()) {
-				// the migration was run already -> set it as run for fizz
-				// fizz standard version pattern: YYYYMMDDhhmmss
-				err := tx.RawQuery(fmt.Sprintf("INSERT INTO %s (version) VALUES (2019%010d)", MigrationTableName, i+1)).Exec()
-				if err != nil {
-					return sqlcon.HandleError(err)
+			// translate migrations
+			for _, m := range migrations {
+				if m.AppliedAt.Before(time.Now()) {
+					// the migration was run already -> set it as run for fizz
+					// fizz standard version pattern: YYYYMMDDhhmmss
+					migrationNumber, err := strconv.ParseInt(strings.TrimSuffix(m.Id, ".sql"), 10, 0)
+					if err != nil {
+						return errors.WithStack(err)
+					}
+
+					if err := tx.RawQuery(
+						fmt.Sprintf("INSERT INTO %s (version) VALUES (2019%02d%08d)", MigrationTableName, i+1, migrationNumber)).
+						Exec(); err != nil {
+						return sqlcon.HandleError(err)
+					}
 				}
+			}
+
+			// delete old migration table
+			if err := tx.RawQuery(fmt.Sprintf("DROP TABLE %s", table)).Exec(); err != nil {
+				return sqlcon.HandleError(err)
 			}
 		}
 
 		return nil
-	})
-	if err != nil {
-		return sqlcon.HandleError(err)
-	}
-
-}
-
-func hasOldMigrationTables() {
-
+	}))
 }

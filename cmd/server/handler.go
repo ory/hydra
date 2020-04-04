@@ -27,9 +27,11 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
-	"github.com/segmentio/analytics-go"
 	"github.com/sirupsen/logrus"
+
+	analytics "github.com/ory/analytics-go/v4"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/x"
@@ -269,7 +271,11 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 			BuildTime:    d.Registry().BuildDate(),
 			BuildHash:    d.Registry().BuildHash(),
 			Config: &analytics.Config{
-				Endpoint: "https://sqa.ory.sh",
+				Endpoint:             "https://sqa.ory.sh",
+				GzipCompressionLevel: 6,
+				BatchMaxSize:         500 * 1000,
+				BatchSize:            250,
+				Interval:             time.Hour * 24,
 			},
 		},
 	)

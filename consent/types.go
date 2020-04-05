@@ -147,6 +147,8 @@ type HandledConsentRequest struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
+	Username        string              `json:"username" db:"username"`
+
 	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	Challenge       string              `json:"-" db:"challenge"`
@@ -205,6 +207,8 @@ type PreviousConsentSession struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
+	Username        string              `json:"username" db:"username"`
+
 	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	Challenge       string              `json:"-" db:"challenge"`
@@ -236,6 +240,8 @@ type HandledLoginRequest struct {
 	// Subject is the user ID of the end-user that authenticated.
 	// required: true
 	Subject string `json:"subject" db:"subject"`
+
+	Username string `json:"username" db:"username"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -503,6 +509,8 @@ type ConsentRequest struct {
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
 	Context sqlxx.JSONRawMessage `json:"context,omitempty" db:"context"`
+
+	Username               string         `json:"username" db:"username"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string         `json:"-" db:"forced_subject_identifier"`

@@ -684,6 +684,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 				"kid": openIDKeyID,
 			}},
 			Subject: session.ConsentRequest.Subject,
+			Username: session.ConsentRequest.Username,
 		},
 		Extra:            session.Session.AccessToken,
 		KID:              accessTokenKeyID,

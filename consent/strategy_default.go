@@ -397,6 +397,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 				},
 				Headers: &jwt.Headers{},
 				Subject: session.Subject,
+				Username: session.Username,
 			},
 		},
 	}); errors.Cause(err) == fosite.ErrLoginRequired {
@@ -548,6 +549,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			LoginSessionID:         as.LoginRequest.SessionID,
 			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
 			Context:                as.Context,
+			Username:               as.Username,
 		},
 	); err != nil {
 		return errors.WithStack(err)

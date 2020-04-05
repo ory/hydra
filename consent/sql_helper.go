@@ -54,6 +54,7 @@ var sqlParamsAuthenticationRequestHandled = []string{
 	"was_used",
 	"context",
 	"forced_subject_identifier",
+	"username",
 }
 
 var sqlParamsAuthenticationRequest = []string{
@@ -77,6 +78,7 @@ var sqlParamsConsentRequest = append(sqlParamsAuthenticationRequest,
 	"login_challenge",
 	"acr",
 	"context",
+	"username",
 )
 
 var sqlParamsConsentRequestHandled = []string{

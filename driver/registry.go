@@ -1,9 +1,10 @@
 package driver
 
 import (
-	"github.com/ory/hydra/persistence"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ory/hydra/persistence"
 
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/cmdx"

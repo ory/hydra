@@ -2,9 +2,11 @@ package memory
 
 import (
 	"context"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/hydra/persistence"
 	"io"
+
+	"github.com/gobuffalo/pop/v5"
+
+	"github.com/ory/hydra/persistence"
 )
 
 var _ persistence.Persister = new(Persister)

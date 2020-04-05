@@ -3,14 +3,16 @@ package cli
 import (
 	"context"
 	"fmt"
+	"os"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/viper"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/logrusx"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"os"
 )
 
 type MigrateHandlerFizz struct{}

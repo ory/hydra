@@ -2,12 +2,14 @@ package cli
 
 import (
 	"fmt"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/x/sqlcon"
-	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
 	"strconv"
 	"time"
+
+	"github.com/gobuffalo/pop/v5"
+	"github.com/pkg/errors"
+	migrate "github.com/rubenv/sql-migrate"
+
+	"github.com/ory/x/sqlcon"
 )
 
 type oldTableName string

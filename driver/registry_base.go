@@ -2,10 +2,11 @@ package driver
 
 import (
 	"context"
-	"github.com/ory/hydra/persistence"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/persistence"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 

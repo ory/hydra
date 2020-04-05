@@ -2,8 +2,9 @@ package persistence
 
 import (
 	"context"
-	"github.com/gobuffalo/pop/v5"
 	"io"
+
+	"github.com/gobuffalo/pop/v5"
 )
 
 type (

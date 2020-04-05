@@ -2,12 +2,14 @@ package driver
 
 import (
 	"fmt"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/hydra/persistence/sql"
-	"github.com/pkg/errors"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/gobuffalo/pop/v5"
+	"github.com/pkg/errors"
+
+	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"

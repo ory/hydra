@@ -2,11 +2,13 @@ package sql
 
 import (
 	"context"
+	"io"
+
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/hydra/persistence"
 	"github.com/pkg/errors"
-	"io"
+
+	"github.com/ory/hydra/persistence"
 )
 
 var _ persistence.Persister = new(Persister)

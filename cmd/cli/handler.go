@@ -36,7 +36,8 @@ type Handler struct {
 	Keys          *JWKHandler
 	Introspection *IntrospectionHandler
 	Token         *TokenHandler
-	Migration     *MigrateHandler
+	Migration     *MigrateHandlerFizz
+	MigrationOld  *MigrateHandler
 }
 
 func Remote(cmd *cobra.Command) string {
@@ -62,6 +63,7 @@ func NewHandler() *Handler {
 		Keys:          newJWKHandler(),
 		Introspection: newIntrospectionHandler(),
 		Token:         newTokenHandler(),
-		Migration:     newMigrateHandler(),
+		Migration:     newHandlerMigrateFizz(),
+		MigrationOld:  newMigrateHandler(),
 	}
 }

@@ -1,0 +1,3 @@
+ALTER TABLE hydra_jwk DROP PRIMARY KEY;
+CREATE UNIQUE INDEX hydra_jwk_idx_id_uq ON hydra_jwk (sid, kid);
+ALTER TABLE hydra_jwk ADD pk INT UNSIGNED AUTO_INCREMENT PRIMARY KEY;

@@ -1,0 +1,1 @@
+DROP INDEX hydra_oauth2_access_requested_at_idx;

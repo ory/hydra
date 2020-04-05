@@ -15,6 +15,10 @@ import (
 
 type MigrateHandlerFizz struct{}
 
+func newHandlerMigrateFizz() *MigrateHandlerFizz {
+	return &MigrateHandlerFizz{}
+}
+
 func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 	var d driver.Driver
 
@@ -47,9 +51,14 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	if err := conn.Open(); err != nil {
+		fmt.Printf("Could not open the database connection:\n%+v\n", err)
+		os.Exit(1)
+		return
+	}
 	// convert migration tables
 	if err := migrateOldMigrationTables(conn); err != nil {
-		fmt.Printf("Could not convert the migration table:\n%v\n", err)
+		fmt.Printf("Could not convert the migration table:\n%+v\n", err)
 		os.Exit(1)
 		return
 	}
@@ -58,7 +67,7 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 	fmt.Println("The following migration is planned:")
 	fmt.Println("")
 	if err := p.MigrationStatus(context.Background(), os.Stdout); err != nil {
-		fmt.Printf("Could not get the migration status:\n%v\n", errors.WithStack(err))
+		fmt.Printf("Could not get the migration status:\n%+v\n", errors.WithStack(err))
 		os.Exit(1)
 		return
 	}
@@ -74,7 +83,7 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 
 	// apply migrations
 	if err := p.MigrateUp(context.Background()); err != nil {
-		fmt.Printf("Could not apply migrations:\n%v\n", errors.WithStack(err))
+		fmt.Printf("Could not apply migrations:\n%+v\n", errors.WithStack(err))
 	}
 
 	fmt.Println("Successfully applied migrations!")

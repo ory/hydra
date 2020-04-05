@@ -1,0 +1,3 @@
+ALTER TABLE hydra_oauth2_consent_request DROP COLUMN requested_at_audience;
+ALTER TABLE hydra_oauth2_authentication_request DROP COLUMN requested_at_audience;
+ALTER TABLE hydra_oauth2_consent_request_handled DROP COLUMN granted_at_audience;

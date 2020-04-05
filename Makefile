@@ -1,5 +1,16 @@
 SHELL=/bin/bash -o pipefail
 
+.PHONY: dumpdbs
+dumpdbs:
+		docker rm -f database_migrations_old_postgres || true
+		docker rm -f database_migrations_new_postgres || true
+		docker run --rm --name database_migrations_old_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name database_migrations_new_postgres -p 3446:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		go run . migrate sqlold 'postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' --yes
+		go run . migrate sql 'postgres://postgres:secret@127.0.0.1:3446/hydra?sslmode=disable' --yes
+		docker exec -t database_migrations_old_postgres pg_dumpall -c -U postgres > dumpold.sql
+		docker exec -t database_migrations_new_postgres pg_dumpall -c -U postgres > dumpnew.sql
+
 .PHONY: tools
 tools:
 		npm i

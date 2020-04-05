@@ -1,0 +1,1 @@
+DROP TABLE hydra_oauth2_logout_request;

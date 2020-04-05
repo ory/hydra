@@ -1,0 +1,9 @@
+DROP INDEX hydra_oauth2_obfuscated_authentication_session_so_idx;
+
+DROP INDEX hydra_oauth2_consent_request_cid_idx;
+DROP INDEX hydra_oauth2_consent_request_sub_idx;
+DROP INDEX hydra_oauth2_consent_request_veri_idx;
+
+DROP INDEX hydra_oauth2_authentication_request_cid_idx;
+DROP INDEX hydra_oauth2_authentication_request_sub_idx;
+DROP INDEX hydra_oauth2_authentication_request_veri_idx;

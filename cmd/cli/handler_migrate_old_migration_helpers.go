@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -34,12 +33,16 @@ func getMigrationRecords(c *pop.Connection, tableName oldTableName) ([]migrate.M
 }
 
 func migrateOldMigrationTables(c *pop.Connection) error {
-	if err := c.RawQuery(fmt.Sprintf("SELECT * FROM %s", clientMigrationTableName)); err != nil {
+	if err := c.RawQuery(fmt.Sprintf("SELECT * FROM %s", clientMigrationTableName)).Exec(); err != nil {
 		// assume there are no old migration tables => done
 		return nil
 	}
 
 	return sqlcon.HandleError(c.Transaction(func(tx *pop.Connection) error {
+		if err := c.RawQuery("CREATE TABLE IF NOT EXISTS schema_migration (version varchar(14) NOT NULL)").Exec(); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
 		// in this order the migrations only depend on already done ones
 		for i, table := range []oldTableName{clientMigrationTableName, jwkMigrationTableName, consentMigrationTableName, oauth2MigrationTableName} {
 			// get old migrations
@@ -53,13 +56,13 @@ func migrateOldMigrationTables(c *pop.Connection) error {
 				if m.AppliedAt.Before(time.Now()) {
 					// the migration was run already -> set it as run for fizz
 					// fizz standard version pattern: YYYYMMDDhhmmss
-					migrationNumber, err := strconv.ParseInt(strings.TrimSuffix(m.Id, ".sql"), 10, 0)
+					migrationNumber, err := strconv.ParseInt(m.Id, 10, 0)
 					if err != nil {
 						return errors.WithStack(err)
 					}
 
 					if err := tx.RawQuery(
-						fmt.Sprintf("INSERT INTO %s (version) VALUES (2019%02d%08d)", MigrationTableName, i+1, migrationNumber)).
+						fmt.Sprintf("INSERT INTO schema_migration (version) VALUES (2019%02d%08d)", i+1, migrationNumber)).
 						Exec(); err != nil {
 						return sqlcon.HandleError(err)
 					}

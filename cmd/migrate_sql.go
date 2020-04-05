@@ -43,9 +43,17 @@ Before running this command on an existing database, create a back up!
 	Run: cmdHandler.Migration.MigrateSQL,
 }
 
+var migrateOldCmd = &cobra.Command{
+	Use: "sqlold <database-url>",
+	Run: cmdHandler.MigrationOld.MigrateSQL,
+}
+
 func init() {
 	migrateCmd.AddCommand(migrateSqlCmd)
+	migrateCmd.AddCommand(migrateOldCmd)
 
 	migrateSqlCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
+	migrateOldCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	migrateSqlCmd.Flags().BoolP("yes", "y", false, "If set all confirmation requests are accepted without user interaction.")
+	migrateOldCmd.Flags().BoolP("yes", "y", false, "If set all confirmation requests are accepted without user interaction.")
 }

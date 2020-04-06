@@ -1,9 +1,6 @@
 const config = require('./contrib/config.js')
 const fs = require('fs')
-
-let versions = [
-  'next'
-]
+const admonitions = require('remark-admonitions');
 
 const links = [
   {
@@ -71,6 +68,7 @@ module.exports = {
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
+        href: `https://www.ory.sh/${config.projectSlug}`
       },
       links: links
     },
@@ -105,10 +103,11 @@ module.exports = {
         path: config.projectSlug === 'docusaurus-template' ? 'contrib/docs' : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
         editUrl:
-          `https://github.com/docs/${config.projectSlug}/edit/master/docs`,
+          `https://github.com/ory/${config.projectSlug}/edit/master/docs`,
         routeBasePath: '',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
+        remarkPlugins: [admonitions],
       },
     ],
     [

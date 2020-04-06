@@ -13,6 +13,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0
+	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -31,6 +32,7 @@ require (
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.7.0
+	github.com/ory/jsonschema/v3 v3.0.1
 	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
 	github.com/ory/viper v1.7.4
 	github.com/ory/x v0.0.111

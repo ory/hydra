@@ -851,6 +851,8 @@ github.com/ory/jsonschema/v3 v3.0.1 h1:xzV7w2rt/Qn+jvh71joIXNKKOCqqNyTlaIxdxU0IQ
 github.com/ory/jsonschema/v3 v3.0.1/go.mod h1:jgLHekkFk0uiGdEWGleC+tOm6JSSP8cbf17PnBuGXlw=
 github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877 h1:nhBpj2EBDzv+qY4xjUOUMc4UvJam+rnKbIrpusYkliY=
 github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
+github.com/ory/sdk/swagutil v0.0.0-20200403154420-81a368933686 h1:U+74xA6gZn836eJEPyha/Yrix70ytZRrgJhwY0qjOZE=
+github.com/ory/sdk/swagutil v0.0.0-20200403154420-81a368933686/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
 github.com/ory/viper v1.5.6 h1:w4ceGgWwWLzAFYQ7bHaDZmwNsAto2JPVdyQjQnn7VWI=
 github.com/ory/viper v1.5.6/go.mod h1:TYmpFpKLxjQwvT4f0QPpkOn4sDXU1kDgAwJpgLYiQ28=
 github.com/ory/viper v1.7.4 h1:3RWBt7Pq9kSFNxLaRT0ljNdbtaWisCQG1cLPn2Yd4UY=

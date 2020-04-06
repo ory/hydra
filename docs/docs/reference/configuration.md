@@ -7,12 +7,12 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file `$HOME/.oathkeeper.yaml` exists, it will be used as a configuration file
+If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file
 which supports all configuration settings listed below.
 
 You can load the config file from another source using the
 `-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
-`oathkeeper --config path/to/config.yaml`.
+`hydra --config path/to/config.yaml`.
 
 Config files can be formatted as JSON, YAML and TOML. Some configuration values
 support reloading without server restart. All configuration values can be set
@@ -44,7 +44,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: warn
+  level: fatal
 
   ## format ##
   #
@@ -80,7 +80,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 62267
+    port: 54389
 
     ## host ##
     #
@@ -95,7 +95,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: localhost
+    host: ''
 
     ## cors ##
     #
@@ -134,9 +134,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -151,9 +149,8 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
+        - POST
         - HEAD
-        - PATCH
-        - TRACE
 
       ## allowed_headers ##
       #
@@ -168,8 +165,8 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - eiusmod commodo adipisicing cupidatat
-        - enim sunt eu culpa sint
+        - in minim
+        - nisi non
 
       ## exposed_headers ##
       #
@@ -184,8 +181,11 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - eiusmod
-        - ut in pariatur ex
+        - proident cupidatat
+        - Duis exercitation Lorem proident
+        - dolore sed incididunt aliqua
+        - aute
+        - cupidatat esse aute
 
       ## allow_credentials ##
       #
@@ -211,7 +211,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 81416384
+      max_age: 90691958
 
       ## debug ##
       #
@@ -225,7 +225,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
   ## admin ##
   #
@@ -238,7 +238,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 6721
+    port: 10836
 
     ## host ##
     #
@@ -283,11 +283,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - OPTIONS
-        - CONNECT
-        - OPTIONS
-        - GET
-        - POST
+        - DELETE
+        - TRACE
+        - TRACE
+        - DELETE
 
       ## allowed_headers ##
       #
@@ -298,11 +297,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - dolor
-        - magna cillum id sunt reprehenderit
-        - laboris labore exercitation velit
-        - dolore ea aliquip amet consectetur
-        - fugiat
+        - consequat amet sint nulla aliqua
+        - quis
 
       ## exposed_headers ##
       #
@@ -313,8 +309,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - ex in
-        - Ut ex
+        - esse in est irure
 
       ## allow_credentials ##
       #
@@ -324,7 +319,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## max_age ##
       #
@@ -334,7 +329,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 29553523
+      max_age: 50155493
 
       ## debug ##
       #
@@ -356,30 +351,30 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_BASE64=<value>
+      #    $ export SERVE_TLS_KEY_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_BASE64=<value>
+      #    > set SERVE_TLS_KEY_PATH=<value>
       #
-      base64: 0RY1SAWsmLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr...
+      path: /path/to/file.pem
 
     ## cert ##
     #
     # Configures the private key (pem encoded).
     #
     cert:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_PATH=<value>
+      #    $ export SERVE_TLS_CERT_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_PATH=<value>
+      #    > set SERVE_TLS_CERT_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: 0RY1SAWsmLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr...
 
     ## allow_termination_from ##
     #
@@ -392,9 +387,6 @@ serve:
     #    > set SERVE_TLS_ALLOW_TERMINATION_FROM=<value>
     #
     allow_termination_from:
-      - 127.0.0.1/32
-      - 127.0.0.1/32
-      - 127.0.0.1/32
       - 127.0.0.1/32
 
   ## cookies ##
@@ -424,7 +416,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: dolor ex
+dsn: Ut est sed sint
 
 ## webfinger ##
 #
@@ -451,8 +443,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
     #
-    broadcast_keys:
-      - hydra.openid.id-token
+    broadcast_keys: hydra.jwt.access-token
 
   ## oidc_discovery ##
   #
@@ -722,7 +713,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: wildcard
+  scope: exact
 
 ## ttl ##
 #
@@ -797,7 +788,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 10m
+  auth_code: 1h
 
 ## oauth2 ##
 #
@@ -841,7 +832,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 75604578
+      cost: 49126472
 
   ## pkce ##
   #

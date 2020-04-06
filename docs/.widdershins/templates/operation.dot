@@ -1,0 +1,194 @@
+
+{{? data.operation.operationId}}
+<a id="opId{{=data.operation.operationId}}"></a>
+{{?}}
+
+{{ data.methodUpper = data.method.verb.toUpperCase(); }}
+{{ data.url = data.utils.slashes(data.baseUrl + data.method.path); }}
+{{ data.parameters = data.operation.parameters; }}
+{{ data.enums = []; }}
+{{ data.utils.fakeProdCons(data); }}
+{{ data.utils.fakeBodyParameter(data); }}
+{{ data.utils.mergePathParameters(data); }}
+{{ data.utils.getParameters(data); }}
+
+### {{= data.operationUniqueName}}
+
+```
+{{=data.methodUpper}} {{=data.url}}{{=data.requiredQueryString}} HTTP/1.1{{? data.host}}
+Host: {{=data.host}}{{?}}{{?data.consumes.length}}
+Content-Type: {{=data.consumes[0]}}{{?}}{{?data.produces.length}}
+Accept: {{=data.produces[0]}}{{?}}
+{{?data.headerParameters.length}}{{~ data.headerParameters :p:index}}{{=p.name}}: {{=p.exampleValues.object}}
+{{~}}
+{{?}}
+```
+
+{{? data.operation.summary && !data.options.tocSummary}}*{{= data.operation.summary }}*{{?}}
+
+{{? data.operation.description}}{{= data.operation.description }}{{?}}
+
+{{? data.operation.requestBody}}
+#### Request body
+
+{{? data.bodyParameter.exampleValues.description }}
+##### {{= data.bodyParameter.exampleValues.description }}
+{{?}}
+
+{{= data.utils.getBodyParameterExamples(data) }}
+{{?}}
+
+{{? data.parameters && data.parameters.length }}
+{{#def.parameters}}
+{{?}}
+
+{{#def.responses}}
+
+{{#def.callbacks}}
+
+{{ data.security = data.operation.security ? data.operation.security : data.api.security; }}
+{{? data.security && data.security.length }}
+{{#def.authentication}}
+{{??}}
+{{#def.authentication_none}}
+{{?}}
+
+{{? data.options.codeSamples || data.operation["x-code-samples"] }}
+#### Code samples
+
+<div class="tabs" id="tab-{{=data.operation.operationId}}">
+<nav class="tabs-nav">
+<ul class="nav nav-tabs au-link-list au-link-list--inline">
+<li class="nav-item"><a class="nav-link active" role="tab" href="#tab-{{=data.operation.operationId}}-shell">Shell</a></li>
+<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-go">Go</a></li>
+<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-node">Node.js</a></li>
+<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-java">Java</a></li>
+<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-python">Python</a></li>
+<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-ruby">Ruby</a></li>
+</ul>
+</nav>
+<div class="tab-content">
+<div class="tab-pane active" role="tabpanel" id="tab-{{=data.operation.operationId}}-shell">
+
+```shell
+curl -X {{=data.methodUpper}} {{=data.url}}{{=data.requiredQueryString}}{{?data.allHeaders.length}} \{{?}}
+{{~data.allHeaders :p:index}}  -H '{{=p.name}}: {{=p.exampleValues.object}}'{{?index < data.allHeaders.length-1}} \{{?}}{{~}}
+```
+
+</div>
+<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-go">
+
+```go
+package main
+
+import (
+    "bytes"
+    "net/http"
+)
+
+func main() {{{?data.allHeaders.length}}
+    headers := map[string][]string{ {{~data.allHeaders :p:index}}
+        "{{=p.name}}": []string{"{{=p.exampleValues.object}}"},{{~}}
+    }{{?}}
+
+    var body []byte
+    // body = ...
+
+    req, err := http.NewRequest("{{=data.methodUpper}}", "{{=data.url}}", bytes.NewBuffer(body))
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+```
+
+</div>
+<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-node">
+
+```nodejs
+const fetch = require('node-fetch');
+{{?data.bodyParameter.present}}const input = '{{=data.bodyParameter.exampleValues.json}}';{{?}}
+{{?data.allHeaders.length}}const headers = {
+{{~data.allHeaders :p:index}}  '{{=p.name}}': {{=p.exampleValues.json}}{{?index < data.allHeaders.length-1}},{{?}}{{~}}
+}
+{{?}}
+fetch('{{=data.url}}{{=data.requiredQueryString}}', {
+  method: '{{=data.methodUpper}}'{{?data.bodyParameter.present || data.allHeaders.length}},{{?}}{{?data.bodyParameter.present}}
+  body: input{{?}}{{? data.bodyParameter.present && data.allHeaders.length}},{{?}}{{?data.allHeaders.length}}
+  headers{{?}}
+})
+.then(r => r.json())
+.then((body) => {
+    console.log(body)
+})
+```
+
+</div>
+<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-java">
+
+```java
+// This sample needs improvement.
+URL obj = new URL("{{=data.url}}{{=data.requiredQueryString}}");
+
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("{{=data.methodUpper}}");
+
+int responseCode = con.getResponseCode();
+
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream())
+);
+
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+
+System.out.println(response.toString());
+```
+
+</div>
+<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-python">
+
+```python
+import requests
+
+{{?data.allHeaders.length}}headers = {
+{{~data.allHeaders :p:index}}  '{{=p.name}}': {{=p.exampleValues.json}}{{?index < data.allHeaders.length-1}},{{?}}
+{{~}}}
+{{?}}
+r = requests.{{=data.method.verb}}(
+  '{{=data.url}}',
+  params={{{~ data.requiredParameters :p:index}}
+    '{{=p.name}}': {{=p.exampleValues.json}}{{? data.requiredParameters.length-1 != index }},{{?}}{{~}}{{?data.allHeaders.length}}},
+  headers = headers{{?}})
+
+print r.json()
+```
+
+</div>
+<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-ruby">
+
+```ruby
+require 'rest-client'
+require 'json'
+
+{{?data.allHeaders.length}}headers = {
+{{~data.allHeaders :p:index}}  '{{=p.name}}' => {{=p.exampleValues.json}}{{?index < data.allHeaders.length-1}},{{?}}
+{{~}}}{{?}}
+
+result = RestClient.{{=data.method.verb}} '{{=data.url}}',
+  params: {{{~ data.requiredParameters :p:index}}
+    '{{=p.name}}' => '{{=p.safeType}}'{{? data.requiredParameters.length-1 != index }},{{?}}{{~}}}{{? data.allHeaders.length}}, headers: headers
+{{?}}
+
+p JSON.parse(result)
+```
+
+</div>
+</div>
+</div>
+{{?}}

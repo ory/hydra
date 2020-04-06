@@ -1,0 +1,41 @@
+{
+  "name": "keto",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy",
+    "generate:api": "widdershins -u ../.widdershins/templates -e ../.widdershins/config.json ../api.swagger.json -o ../docs/oathkeeper/sdk/api.md",
+    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,json,js,css,html}' || true"
+  },
+  "dependencies": {
+    "@docusaurus/core": "2.0.0-alpha.50",
+    "@docusaurus/preset-classic": "2.0.0-alpha.50",
+    "classnames": "^2.2.6",
+    "node-fetch": "^2.6.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "json-schema-faker": "^0.5.0-rcv.24",
+    "json-schema-ref-parser": "^8.0.0",
+    "prettier": "^2.0.2",
+    "ramda": "^0.27.0",
+    "yaml": "^1.8.3"
+  }
+}

@@ -81,7 +81,7 @@ func isDSNAllowed(d driver.Driver) {
 	}
 }
 
-var schemas = packr.New("schemas", "../../docs")
+var schemas = packr.New("schemas", "../../.schema")
 
 func watchAndValidateViper(l *logrus.Logger) {
 	schema, err := schemas.Find("config.schema.json")

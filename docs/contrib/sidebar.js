@@ -16,7 +16,7 @@ const projects = [
     name: 'ORY Oathkeeper',
   },
   {
-    slug: 'Keto',
+    slug: 'keto',
     name: 'ORY Keto',
   },
 ].filter((item) => config.projectSlug !== item.slug);

@@ -73,3 +73,10 @@ module.exports = {
 
 Next, put your markdown files in `./docs/docs`. You may also want to add the CircleCI Orb `ory/docs` to your CI config,
 depending on the project type.
+
+## Update Documentation
+
+Check out [docusaurus-template](https://github.com/ory/docusaurus-template) using `git clone git@github.com:ory/docusaurus-template.git docusaurus-template`.
+It is important that the directory is named `docusaurus-template`!
+
+Then, make your changes, and run `./update.sh`.

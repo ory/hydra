@@ -1,4 +1,4 @@
-<h1 align="center"><img src="./docs/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
+<h1 align="center"><img src=".github/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">
     <a href="https://www.ory.sh/chat">Chat</a> |
@@ -235,7 +235,7 @@ and the OpenID Foundation:
 ORY Hydra is an OpenID Foundation [certified OpenID Provider (OP)](http://openid.net/certification/#OPs).
 
 <p align="center">
-    <img src="./docs/images/oidc-cert.png" alt="ORY Hydra is a certified OpenID Providier" width="256px">
+    <img src=".github/images/oidc-cert.png" alt="ORY Hydra is a certified OpenID Providier" width="256px">
 </p>
 
 The following OpenID profiles are certified:
@@ -262,7 +262,7 @@ The **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)** teaches you
 a Postgres instance and an exemplary identity provider written in React using docker-compose.
 It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)**.
 
-<img src="docs/images/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src=".github/images/oauth2-flow.gif" alt="OAuth2 Flow">
 
 <br clear="all">
 

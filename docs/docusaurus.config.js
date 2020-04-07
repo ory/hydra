@@ -66,7 +66,7 @@ module.exports = {
       apiKey: '8463c6ece843b377565726bb4ed325b0',
       indexName: 'ory',
       algoliaOptions: {
-        facetFilters: [`tags:${config.projectSlug}`, 'tags:ecosystem', `version:${version[0]}`],
+        facetFilters: [`tags:${config.projectSlug}`, `version:${version[0]}`],
       },
     },
     navbar: {

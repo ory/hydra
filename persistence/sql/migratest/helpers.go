@@ -1,27 +1,28 @@
 package migratest
 
 import (
-	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/x/stringslice"
 )
 
 type TestMigrator struct {
 	pop.Migrator
 }
 
-func NewTestMigrator(t *testing.T, c *pop.Connection, path string, steps int) *TestMigrator {
+func NewTestMigrator(t *testing.T, c *pop.Connection, migrationPath, testDataPath string) *TestMigrator {
 	tm := TestMigrator{
 		Migrator: pop.NewMigrator(c),
 	}
-	tm.SchemaPath = path
+	tm.SchemaPath = migrationPath
+	testDataPath = strings.TrimSuffix(testDataPath, "/")
 
 	runner := func(mf pop.Migration, tx *pop.Connection) error {
 		f, err := os.Open(mf.Path)
@@ -32,21 +33,49 @@ func NewTestMigrator(t *testing.T, c *pop.Connection, path string, steps int) *T
 		if content == "" {
 			return nil
 		}
-		fmt.Printf("%s:\n\n%s\n\n\n", mf.Path, content)
 		err = tx.RawQuery(content).Exec()
 		if err != nil {
 			return errors.Wrapf(err, "error executing %s, sql: %s", mf.Path, content)
 		}
-		return nil
+
+		if mf.Direction != "up" {
+			return nil
+		}
+
+		// exec testdata
+		var fileName string
+		if fi, err := os.Stat(filepath.Join(testDataPath, mf.Version+"_testdata."+mf.DBType+".sql")); err == nil && !fi.IsDir() {
+			// found specific test data
+			fileName = fi.Name()
+		} else if fi, err := os.Stat(filepath.Join(testDataPath, mf.Version+"_testdata.sql")); err == nil && !fi.IsDir() {
+			// found generic test data
+			fileName = fi.Name()
+		} else {
+			// found no test data
+			log.Printf("Found no test data for migration %s", mf.Version)
+			return nil
+		}
+
+		data, err := ioutil.ReadFile(filepath.Join(testDataPath, fileName))
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
+		return errors.WithStack(tx.RawQuery(string(data)).Exec())
 	}
 
-	if fi, err := os.Stat(path); err != nil || !fi.IsDir() {
+	if fi, err := os.Stat(migrationPath); err != nil || !fi.IsDir() {
 		// directory doesn't exist
+		t.FailNow()
+		return nil
+	}
+	if fi, err := os.Stat(testDataPath); err != nil || !fi.IsDir() {
+		// directory doesn't exist
+		t.FailNow()
 		return nil
 	}
 
-	uniqueVersions := map[string]int{}
-	require.NoError(t, filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
+	require.NoError(t, filepath.Walk(migrationPath, func(p string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			match, err := pop.ParseMigrationFilename(info.Name())
 			if err != nil {
@@ -65,18 +94,7 @@ func NewTestMigrator(t *testing.T, c *pop.Connection, path string, steps int) *T
 				Type:      match.Type,
 				Runner:    runner,
 			}
-			ms := append(tm.Migrations[mf.Direction], mf)
-
-			var versions []string
-			for _, m := range ms {
-				versions = append(versions, m.Version)
-			}
-			uniqueVersions[mf.Direction] = len(stringslice.Unique(versions))
-			// only add steps number of migrations
-			if i, ok := uniqueVersions[match.Direction]; ok && i <= steps {
-				tm.Migrations[mf.Direction] = ms
-			}
-			return nil
+			tm.Migrations[mf.Direction] = append(tm.Migrations[mf.Direction], mf)
 		}
 		return nil
 	}))

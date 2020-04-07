@@ -2,56 +2,87 @@ package migratest
 
 import (
 	"fmt"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/resilience"
+	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/sqlxx"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"log"
-	"sort"
 	"testing"
 	"time"
-
-	"github.com/bmizerany/assert"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
-
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/x/resilience"
-	"github.com/ory/x/sqlcon"
 )
 
-func ConnectToTestCockroachDB(t *testing.T) *pop.Connection {
-	pool, err := dockertest.NewPool("")
-	require.NoError(t, err)
+func assertEqualClients(t *testing.T, expected, actual *client.Client) {
+	now := time.Now()
+	expected.CreatedAt = now
+	expected.UpdatedAt = now
+	actual.CreatedAt = now
+	actual.UpdatedAt = now
 
-	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "cockroachdb/cockroach",
-		Tag:        "v19.2.0",
-		Cmd:        []string{"start", "--insecure"},
-	})
-	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+}
 
-	var c *pop.Connection
-	url := fmt.Sprintf("cockroach://root@localhost:%s/defaultdb?sslmode=disable", resource.GetPort("26257/tcp"))
-	maxCons, maxIdle, maxLife := sqlcon.ParseConnectionOptions(logrus.New(), url)
-
-	if err := resilience.Retry(logrus.New(), time.Second*5, time.Minute*5, func() error {
-		c, err = pop.NewConnection(&pop.ConnectionDetails{
-			URL:             url,
-			ConnMaxLifetime: maxLife,
-			Pool:            maxCons,
-			IdlePool:        maxIdle,
-		})
-		if err != nil {
-			return err
-		}
-
-		return c.Open()
-	}); err != nil {
-		if pErr := pool.Purge(resource); pErr != nil {
-			log.Fatalf("Could not connect to docker and unable to remove image: %s - %s", err, pErr)
-		}
-		log.Fatalf("Could not connect to docker: %s", err)
+func generateExpectedClient(migration int) *client.Client {
+	//return &client.Client{
+	//	PK:                                int64(migration),
+	//	ClientID:                          fmt.Sprintf("client-%04d", migration),
+	//	Name:                              fmt.Sprintf("Client %04d", migration),
+	//	Secret:                            fmt.Sprintf("secret-%04d", migration),
+	//	RedirectURIs:                      []string{fmt.Sprintf("http://redirect/%04d_1", migration)},
+	//	GrantTypes:                        []string{fmt.Sprintf("grant-%04d_1", migration)},
+	//	ResponseTypes:                     []string{fmt.Sprintf("response-%04d_1", migration)},
+	//	Scope:                             fmt.Sprintf("scope-%04d", migration),
+	//	Audience:                          []string{fmt.Sprintf("autdience-%04d_1", migration)},
+	//	Owner:                             fmt.Sprintf("owner-%04d", migration),
+	//	PolicyURI:                         fmt.Sprintf("http://policy/%04d", migration),
+	//	AllowedCORSOrigins:                []string{fmt.Sprintf("http://cors/%04d_1", migration)},
+	//	TermsOfServiceURI:                 fmt.Sprintf("http://tos/%04d", migration),
+	//	ClientURI:                         fmt.Sprintf("http://client/%04d", migration),
+	//	LogoURI:                           fmt.Sprintf("http://logo/%04d", migration),
+	//	Contacts:                          []string{fmt.Sprintf("contact-%04d_1", migration)},
+	//	SecretExpiresAt:                   0,
+	//	SubjectType:                       fmt.Sprintf("subject-%04d", migration),
+	//	SectorIdentifierURI:               fmt.Sprintf("http://sector_id/%04d", migration),
+	//	JSONWebKeysURI:                    fmt.Sprintf("http://jwks/%04d", migration),
+	//	JSONWebKeys:                       &x.JoseJSONWebKeySet{},
+	//	TokenEndpointAuthMethod:           fmt.Sprintf("token_auth-%04d", migration),
+	//	RequestURIs:                       []string{fmt.Sprintf("http://request/%04d_1", migration)},
+	//	RequestObjectSigningAlgorithm:     fmt.Sprintf("request_alg-%04d", migration),
+	//	UserinfoSignedResponseAlg:         fmt.Sprintf("userinfo_alg-%04d", migration),
+	//	FrontChannelLogoutURI:             fmt.Sprintf("http://front_logout/%04d", migration),
+	//	FrontChannelLogoutSessionRequired: false,
+	//	PostLogoutRedirectURIs:            []string{fmt.Sprintf("http://post_redirect/%04d_1", migration)},
+	//	BackChannelLogoutURI:              fmt.Sprintf("http://back_logout/%04d", migration),
+	//	BackChannelLogoutSessionRequired:  false,
+	//	Metadata:                          sqlxx.JSONRawMessage("{}"),
+	//}
+	return &client.Client{
+		PK:                      int64(migration),
+		ClientID:                fmt.Sprintf("%d-data", migration),
+		Name:                    "some-client",
+		Secret:                  "abcdef",
+		RedirectURIs:            sqlxx.StringSlicePipeDelimiter{"http://localhost", "http://google"},
+		GrantTypes:              sqlxx.StringSlicePipeDelimiter{"authorize_code", "implicit"},
+		ResponseTypes:           sqlxx.StringSlicePipeDelimiter{"token", "id_token"},
+		Scope:                   "foo|bar",
+		Owner:                   "aeneas",
+		PolicyURI:               "http://policy",
+		TermsOfServiceURI:       "http://tos",
+		ClientURI:               "http://client",
+		LogoURI:                 "http://logo",
+		Contacts:                sqlxx.StringSlicePipeDelimiter{"aeneas", "foo"},
+		JSONWebKeys:             &x.JoseJSONWebKeySet{},
+		TokenEndpointAuthMethod: "none",
+		Metadata:                sqlxx.JSONRawMessage("{}"),
+		Audience:                sqlxx.StringSlicePipeDelimiter{},
+		AllowedCORSOrigins:      sqlxx.StringSlicePipeDelimiter{},
+		RequestURIs:             sqlxx.StringSlicePipeDelimiter{},
+		PostLogoutRedirectURIs:  sqlxx.StringSlicePipeDelimiter{},
 	}
-
-	return c
 }
 
 func TestMigrations(t *testing.T) {
@@ -59,56 +90,35 @@ func TestMigrations(t *testing.T) {
 		t.SkipNow()
 		return
 	}
-
-	cr := ConnectToTestCockroachDB(t)
-
-	tm := NewTestMigrator(t, cr, "../migrations", 13)
-	require.NoError(t, tm.Up())
-	ms := tm.Migrations["up"]
-	sort.Sort(ms)
-	fmt.Printf("%+v\n", ms)
-
-	t.Run("case=up to migration 13", func(t *testing.T) {
-		client := &client13{
-			PK:                                13,
-			ClientID:                          "client-13",
-			Name:                              "Client-13",
-			Secret:                            "secret-13",
-			RedirectURIs:                      []string{"http://redirect/13-1"},
-			GrantTypes:                        []string{"grant-13_1"},
-			ResponseTypes:                     []string{"response-13_1"},
-			Scope:                             "scope-13",
-			Audience:                          []string{"audience-13_1"},
-			Owner:                             "owner-13",
-			PolicyURI:                         "http://policy/13",
-			AllowedCORSOrigins:                []string{"http://cors/13"},
-			TermsOfServiceURI:                 "http://tos/13",
-			ClientURI:                         "http://client/13",
-			LogoURI:                           "http://logo/13",
-			Contacts:                          []string{"contact-13_1"},
-			SecretExpiresAt:                   0,
-			SubjectType:                       "subject-13",
-			SectorIdentifierURI:               "sector-13",
-			JSONWebKeysURI:                    "http://jwk/13",
-			JSONWebKeys:                       nil,
-			TokenEndpointAuthMethod:           "token_auth_method-13",
-			RequestURIs:                       []string{"http://request/13"},
-			RequestObjectSigningAlgorithm:     "request_alg-13",
-			UserinfoSignedResponseAlg:         "response_alg-13",
-			CreatedAt:                         time.Now(),
-			UpdatedAt:                         time.Now(),
-			FrontChannelLogoutURI:             "http://logout/13",
-			FrontChannelLogoutSessionRequired: true,
-			PostLogoutRedirectURIs:            []string{"http://post_logout/13_1"},
-			BackChannelLogoutURI:              "http://back_logout/13",
-			BackChannelLogoutSessionRequired:  true,
-		}
-
-		require.NoError(t, cr.Create(client))
-
-		cmp := &client13{}
-		require.NoError(t, cr.Find(cmp, 13))
-
-		assert.Equal(t, client, cmp)
+	pgURI := dockertest.RunTestPostgreSQL(t)
+	pg, err := pop.NewConnection(&pop.ConnectionDetails{
+		URL: pgURI,
 	})
+	require.NoError(t, err)
+
+	require.NoError(t, resilience.Retry(logrus.New(), time.Second*5, time.Minute*5, func() error {
+		if err := pg.Open(); err != nil {
+			// an Open error probably means we have a problem with the connections config
+			log.Printf("could not open pop connection: %+v", err)
+			return err
+		}
+		return pg.RawQuery("select version()").Exec()
+	}))
+
+	x.CleanSQLPop(t, pg)
+
+	tm := NewTestMigrator(t, pg, "../migrations", "./testdata")
+	require.NoError(t, tm.Up())
+
+	for i := 1; i <= 2; i++ {
+		t.Run(fmt.Sprintf("case=migration %d", i), func(t *testing.T) {
+			expected := generateExpectedClient(i)
+			actual := &client.Client{}
+			require.NoError(t, pg.Find(actual, expected.ClientID))
+			assertEqualClients(t, expected, actual)
+		})
+	}
+
+	x.CleanSQLPop(t, pg)
+	require.NoError(t, pg.Close())
 }

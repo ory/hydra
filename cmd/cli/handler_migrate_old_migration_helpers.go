@@ -41,6 +41,7 @@ func migrateOldMigrationTables(c *pop.Connection) error {
 	}
 
 	return sqlcon.HandleError(c.Transaction(func(tx *pop.Connection) error {
+		// should be done by pop, depends on https://github.com/gobuffalo/pop/pull/531
 		if err := c.RawQuery("CREATE TABLE IF NOT EXISTS schema_migration (version varchar(14) NOT NULL)").Exec(); err != nil {
 			return sqlcon.HandleError(err)
 		}

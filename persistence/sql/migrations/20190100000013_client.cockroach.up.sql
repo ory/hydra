@@ -1,4 +1,3 @@
--- +migrate Up
 CREATE TABLE IF NOT EXISTS hydra_client (
 	id varchar(255) NOT NULL,
 	client_name text NOT NULL,
@@ -34,6 +33,3 @@ CREATE TABLE IF NOT EXISTS hydra_client (
 	backchannel_logout_session_required BOOL NOT NULL DEFAULT FALSE,
 	UNIQUE (id)
 );
-
--- +migrate Down
-DROP TABLE hydra_client;

@@ -3,6 +3,7 @@ module github.com/ory/hydra
 go 1.14
 
 require (
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3
@@ -29,6 +30,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/ory/analytics-go/v4 v4.0.1
+	github.com/ory/dockertest/v3 v3.5.4
 	github.com/ory/fosite v0.31.0
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1

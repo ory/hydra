@@ -1,15 +1,31 @@
 SHELL=/bin/bash -o pipefail
 
-.PHONY: dumpdbs
-dumpdbs:
+.PHONY: dump_db_migrations
+dump_db_migrations:
 		docker rm -f database_migrations_old_postgres || true
+		docker rm -f database_migrations_old_mysql || true
+		docker rm -f database_migrations_old_cockroach || true
 		docker rm -f database_migrations_new_postgres || true
-		docker run --rm --name database_migrations_old_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
-		docker run --rm --name database_migrations_new_postgres -p 3446:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
-		go run . migrate sqlold 'postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' --yes
-		go run . migrate sql 'postgres://postgres:secret@127.0.0.1:3446/hydra?sslmode=disable' --yes
-		docker exec -t database_migrations_old_postgres pg_dumpall -c -U postgres > dumpold.sql
-		docker exec -t database_migrations_new_postgres pg_dumpall -c -U postgres > dumpnew.sql
+		docker rm -f database_migrations_new_mysql || true
+		docker rm -f database_migrations_new_cockroach || true
+		docker run --rm --name database_migrations_old_postgres -p 3930:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name database_migrations_new_postgres -p 3931:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name database_migrations_old_mysql -p 3932:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
+		docker run --rm --name database_migrations_new_mysql -p 3933:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
+		docker run --rm --name database_migrations_old_cockroach -p 3934:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
+		docker run --rm --name database_migrations_new_cockroach -p 3935:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
+		go run . migrate sqlold 'postgres://postgres:secret@127.0.0.1:3930/hydra?sslmode=disable' --yes
+		go run . migrate sqlold 'mysql://root:secret@(127.0.0.1:3932)/mysql?parseTime=true&multiStatements=true' --yes
+		go run . migrate sqlold 'cockroach://root@127.0.0.1:3934/defaultdb?sslmode=disable' --yes
+		go run . migrate sql 'postgres://postgres:secret@127.0.0.1:3931/hydra?sslmode=disable' --yes
+		go run . migrate sql 'mysql://root:secret@(127.0.0.1:3933)/mysql?parseTime=true&multiStatements=true' --yes
+		go run . migrate sql 'cockroach://root@127.0.0.1:3935/defaultdb?sslmode=disable' --yes
+		docker exec -t database_migrations_old_postgres pg_dumpall -c -U postgres > dump_postgres_old.sql
+		docker exec -t database_migrations_new_postgres pg_dumpall -c -U postgres > dump_postgres_new.sql
+		docker exec database_migrations_old_mysql /usr/bin/mysqldump -u root --password=secret mysql > dump_mysql_old.sql
+		docker exec database_migrations_new_mysql /usr/bin/mysqldump -u root --password=secret mysql > dump_mysql_new.sql
+		docker exec database_migrations_old_cockroach ./cockroach dump defaultdb --insecure > dump_cockroach_old.sql
+		docker exec database_migrations_new_cockroach ./cockroach dump defaultdb --insecure > dump_cockroach_new.sql
 
 .PHONY: tools
 tools:

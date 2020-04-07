@@ -1,0 +1,7 @@
+DROP TABLE hydra_oauth2_consent_request_handled;
+DROP TABLE hydra_oauth2_consent_request;
+DROP TABLE hydra_oauth2_authentication_request_handled;
+DROP TABLE hydra_oauth2_authentication_request;
+DROP TABLE hydra_oauth2_authentication_session;
+DROP TABLE hydra_oauth2_obfuscated_authentication_session;
+DROP TABLE hydra_oauth2_logout_request;

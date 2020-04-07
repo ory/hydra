@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// HealthNotReadyStatus HealthNotReadyStatus health not ready status
+// HealthNotReadyStatus HealthNotReadyStatus HealthNotReadyStatus health not ready status
 //
 // swagger:model healthNotReadyStatus
 type HealthNotReadyStatus struct {

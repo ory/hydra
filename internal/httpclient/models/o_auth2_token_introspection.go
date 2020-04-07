@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
+// OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 //
 // https://tools.ietf.org/html/rfc7662
 //

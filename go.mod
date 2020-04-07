@@ -3,7 +3,6 @@ module github.com/ory/hydra
 go 1.14
 
 require (
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3
@@ -35,7 +34,8 @@ require (
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.7.0
-	github.com/ory/sdk/swagutil v0.0.0-20200219090358-f796db673877
+	github.com/ory/jsonschema/v3 v3.0.1
+	github.com/ory/sdk/swagutil v0.0.0-20200406162532-cbbf149e7384
 	github.com/ory/viper v1.7.4
 	github.com/ory/x v0.0.111
 	github.com/pborman/uuid v1.2.0

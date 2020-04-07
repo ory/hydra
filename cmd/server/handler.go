@@ -29,6 +29,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gobuffalo/packr/v2"
+
+	"github.com/ory/x/viperx"
+
 	"github.com/sirupsen/logrus"
 
 	analytics "github.com/ory/analytics-go/v4"
@@ -77,10 +81,22 @@ func isDSNAllowed(d driver.Driver) {
 	}
 }
 
+var schemas = packr.New("schemas", "../../.schema")
+
+func watchAndValidateViper(l *logrus.Logger) {
+	schema, err := schemas.Find("config.schema.json")
+	if err != nil {
+		l.WithError(err).Fatal("Unable to open configuration JSON Schema.")
+	}
+	viperx.WatchAndValidateViper(l, schema, "ORY Hydra", []string{"log", "serve", "dsn", "profiling"})
+}
+
 func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		logger := logrusx.New()
+		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
-			logrusx.New(),
+			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,
@@ -105,8 +121,10 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 
 func RunServePublic(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		logger := logrusx.New()
+		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
-			logrusx.New(),
+			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,
@@ -131,8 +149,10 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 
 func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
+		logger := logrusx.New()
+		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
-			logrusx.New(),
+			logger,
 			flagx.MustGetBool(cmd, "dangerous-force-http"),
 			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
 			version, build, date, true,

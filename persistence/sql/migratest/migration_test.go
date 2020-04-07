@@ -2,17 +2,19 @@ package migratest
 
 import (
 	"fmt"
-	"github.com/bmizerany/assert"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/x/resilience"
-	"github.com/ory/x/sqlcon"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
 	"log"
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/bmizerany/assert"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/x/resilience"
+	"github.com/ory/x/sqlcon"
 )
 
 func ConnectToTestCockroachDB(t *testing.T) *pop.Connection {

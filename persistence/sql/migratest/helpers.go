@@ -2,13 +2,15 @@ package migratest
 
 import (
 	"fmt"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/x/stringslice"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/gobuffalo/pop/v5"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/stringslice"
 )
 
 type TestMigrator struct {

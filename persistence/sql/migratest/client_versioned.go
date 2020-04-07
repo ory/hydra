@@ -1,9 +1,10 @@
 package migratest
 
 import (
+	"time"
+
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlxx"
-	"time"
 )
 
 type (

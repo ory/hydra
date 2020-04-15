@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "gen": "cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.md && node ./docs/scripts/config.js docs/config.js",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",

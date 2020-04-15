@@ -39,14 +39,18 @@ const replace = (path, replacer) =>
     });
   });
 
-config.updateTags.forEach(({ files, image }) => {
+config.updateTags.forEach(({ files, image, replacer }) => {
   files.forEach((loc) => {
-    replace(loc, (content) =>
-      content.replace(
+    replace(loc, (content) => {
+      if (replacer) {
+        return replacer({ content, next });
+      }
+
+      return content.replace(
         new RegExp(`${image}:v[0-9a-zA-Z\\.\\+\\_\\-]+`, 'g'),
         `${image}:${next}`
-      )
-    )
+      );
+    })
       .then(() => {
         console.log('Done!');
       })

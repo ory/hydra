@@ -4,8 +4,8 @@
     <a href="https://www.ory.sh/chat">Chat</a> |
     <a href="https://community.ory.sh/">Forums</a> |
     <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
-    <a href="https://www.ory.sh/docs/next/hydra/">Guide</a> |
-    <a href="https://www.ory.sh/docs/next/hydra/sdk/api">API Docs</a> |
+    <a href="https://www.ory.sh/hydra/docs/index">Guide</a> |
+    <a href="https://www.ory.sh/hydra/docs/reference/api">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
     <a href="https://opencollective.com/ory">Support this project!</a>
 </h4>
@@ -211,6 +211,7 @@ TheCrealm.
 
 
 
+
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -315,6 +316,7 @@ set of access control policies, similar to AWS IAM Policies, in order to
 determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 <!--END ECOSYSTEM-->
+
 
 
 

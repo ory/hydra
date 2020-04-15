@@ -36,7 +36,7 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.7.0
 	github.com/ory/jsonschema/v3 v3.0.1
-	github.com/ory/sdk/swagutil v0.0.0-20200406162532-cbbf149e7384
+	github.com/ory/sdk/swagutil v0.0.0-20200407150153-53df6d772608
 	github.com/ory/viper v1.7.4
 	github.com/ory/x v0.0.113
 	github.com/pborman/uuid v1.2.0

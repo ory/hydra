@@ -3,13 +3,15 @@ package migratest
 import (
 	"database/sql"
 	"fmt"
+
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlxx"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func expectedClient(i int) *client.Client {

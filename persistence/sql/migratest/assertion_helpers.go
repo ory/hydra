@@ -2,14 +2,16 @@ package migratest
 
 import (
 	"database/sql"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/sqlxx"
-	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func assertEqualClients(t *testing.T, expected, actual *client.Client) {

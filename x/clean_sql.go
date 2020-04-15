@@ -1,8 +1,9 @@
 package x
 
 import (
-	"github.com/gobuffalo/pop/v5"
 	"testing"
+
+	"github.com/gobuffalo/pop/v5"
 
 	"github.com/jmoiron/sqlx"
 )

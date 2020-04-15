@@ -1,13 +1,14 @@
 package migratest
 
 import (
-	"github.com/gobuffalo/pop/v5/logging"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/gobuffalo/pop/v5/logging"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"

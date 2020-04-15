@@ -3,8 +3,14 @@ package migratest
 import (
 	"context"
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
@@ -13,10 +19,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/require"
-	"os"
-	"testing"
 )
 
 func TestMigrations(t *testing.T) {

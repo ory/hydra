@@ -51,14 +51,14 @@ func signatureFromJTI(jti string) string {
 	return fmt.Sprintf("%x", sha256.Sum256([]byte(jti)))
 }
 
-type blacklistedJTI struct {
+type BlacklistedJTI struct {
 	JTI       string
 	Signature string    `db:"signature"`
 	Expiry    time.Time `db:"expires_at"`
 }
 
-func newBlacklistedJTI(jti string, exp time.Time) *blacklistedJTI {
-	return &blacklistedJTI{
+func newBlacklistedJTI(jti string, exp time.Time) *BlacklistedJTI {
+	return &BlacklistedJTI{
 		JTI:       jti,
 		Signature: signatureFromJTI(jti),
 		// because the database timestamp types are not as accurate as time.Time we truncate to seconds (which should always work)
@@ -69,9 +69,9 @@ func newBlacklistedJTI(jti string, exp time.Time) *blacklistedJTI {
 type assertionJWTReader interface {
 	x.FositeStorer
 
-	getClientAssertionJWT(ctx context.Context, jti string) (*blacklistedJTI, error)
+	getClientAssertionJWT(ctx context.Context, jti string) (*BlacklistedJTI, error)
 
-	setClientAssertionJWT(context.Context, *blacklistedJTI) error
+	setClientAssertionJWT(context.Context, *BlacklistedJTI) error
 }
 
 var defaultRequest = fosite.Request{

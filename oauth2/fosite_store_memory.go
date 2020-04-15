@@ -103,7 +103,7 @@ func (s *FositeMemoryStore) SetClientAssertionJWT(_ context.Context, jti string,
 	return nil
 }
 
-func (s *FositeMemoryStore) getClientAssertionJWT(_ context.Context, jti string) (*blacklistedJTI, error) {
+func (s *FositeMemoryStore) getClientAssertionJWT(_ context.Context, jti string) (*BlacklistedJTI, error) {
 	s.RLock()
 	defer s.RUnlock()
 
@@ -114,7 +114,7 @@ func (s *FositeMemoryStore) getClientAssertionJWT(_ context.Context, jti string)
 	return nil, errors.WithStack(sqlcon.ErrNoRows)
 }
 
-func (s *FositeMemoryStore) setClientAssertionJWT(_ context.Context, jti *blacklistedJTI) error {
+func (s *FositeMemoryStore) setClientAssertionJWT(_ context.Context, jti *BlacklistedJTI) error {
 	s.Lock()
 	defer s.Unlock()
 

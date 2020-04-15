@@ -57,4 +57,3 @@ ALTER TABLE hydra_oauth2_consent_request ADD CONSTRAINT hydra_oauth2_consent_req
 
 -- This caused #1209:
 -- SET session_replication_role = DEFAULT;
-

@@ -2,8 +2,6 @@ module github.com/ory/hydra
 
 go 1.14
 
-replace github.com/gobuffalo/pop/v5 => ../pop
-
 require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -17,7 +15,8 @@ require (
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0
 	github.com/gobuffalo/packr/v2 v2.7.1
-	github.com/gobuffalo/pop/v5 v5.0.9
+	github.com/gobuffalo/pop v4.13.1+incompatible
+	github.com/gobuffalo/pop/v5 v5.0.11
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -39,7 +38,7 @@ require (
 	github.com/ory/jsonschema/v3 v3.0.1
 	github.com/ory/sdk/swagutil v0.0.0-20200406162532-cbbf149e7384
 	github.com/ory/viper v1.7.4
-	github.com/ory/x v0.0.111
+	github.com/ory/x v0.0.113
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -56,11 +55,15 @@ require (
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
+	github.com/uber/jaeger-lib v2.2.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v0.2.1
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
+	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/square/go-jose.v2 v2.4.1
 )
+
+replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200409124423-bb3cb4c51f56

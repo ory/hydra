@@ -334,7 +334,7 @@ func migrationsSqlMysql7Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/mysql/7.sql", size: 6246, mode: os.FileMode(420), modTime: time.Unix(1557684956, 0)}
+	info := bindataFileInfo{name: "migrations/sql/mysql/7.sql", size: 6246, mode: os.FileMode(420), modTime: time.Unix(1586165799, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -514,7 +514,7 @@ func migrationsSqlPostgres7Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/postgres/7.sql", size: 6376, mode: os.FileMode(420), modTime: time.Unix(1557684956, 0)}
+	info := bindataFileInfo{name: "migrations/sql/postgres/7.sql", size: 6376, mode: os.FileMode(420), modTime: time.Unix(1586165799, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

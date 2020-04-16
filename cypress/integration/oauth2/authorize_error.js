@@ -2,6 +2,69 @@ import { createClient, prng } from '../../helpers';
 import qs from 'querystring';
 
 describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
+  describe('rejecting login and consent requests', () => {
+    const nc = () => ({
+      client_id: prng(),
+      client_secret: prng(),
+      scope: 'offline_access openid',
+      subject_type: 'public',
+      token_endpoint_auth_method: 'client_secret_basic',
+      redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
+      grant_types: ['authorization_code', 'refresh_token']
+    });
+
+    it('should return an error when rejecting login', function() {
+      const client = nc();
+      cy.authCodeFlow(client, {
+        login: { accept: false },
+        consent: { skip: true }
+      });
+
+      cy.get('body')
+        .invoke('text')
+        .then(content => {
+          const {
+            result,
+            error_description,
+            token: { access_token, id_token, refresh_token } = {}
+          } = JSON.parse(content);
+
+          expect(result).to.equal('error');
+          expect(error_description).to.equal(
+            'The resource owner denied the request'
+          );
+          expect(access_token).to.be.empty;
+          expect(id_token).to.be.empty;
+          expect(refresh_token).to.be.empty;
+        });
+    });
+
+    it('should return an error when rejecting consent', function() {
+      const client = nc();
+      cy.authCodeFlow(client, {
+        consent: { accept: false }
+      });
+
+      cy.get('body')
+        .invoke('text')
+        .then(content => {
+          const {
+            result,
+            error_description,
+            token: { access_token, id_token, refresh_token } = {}
+          } = JSON.parse(content);
+
+          expect(result).to.equal('error');
+          expect(error_description).to.equal(
+            'The resource owner denied the request'
+          );
+          expect(access_token).to.be.empty;
+          expect(id_token).to.be.empty;
+          expect(refresh_token).to.be.empty;
+        });
+    });
+  });
+
   it('should return an error when an OAuth 2.0 Client ID is used that does not exist', () => {
     cy.visit(
       `${Cypress.env(

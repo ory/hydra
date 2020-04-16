@@ -436,6 +436,12 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					compareConsentRequest(t, c, got2.ConsentRequest)
 					assert.Equal(t, c.Challenge, got2.Challenge)
 
+					if tc.hasError {
+						assert.True(t, got2.HasError())
+					}
+					assert.Equal(t, tc.remember, got2.Remember)
+					assert.Equal(t, tc.rememberFor, got2.RememberFor)
+
 					_, err = m.VerifyAndInvalidateConsentRequest(context.TODO(), "verifier"+tc.key)
 					require.Error(t, err)
 

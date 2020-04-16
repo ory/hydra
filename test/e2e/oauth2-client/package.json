@@ -14,7 +14,7 @@
     "express": "^4.16.4",
     "express-session": "^1.16.1",
     "express-winston": "^3.1.0",
-    "hydra-login-consent-logout": "0.0.3",
+    "hydra-login-consent-logout": "1.4.2",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.4.0",
     "node-fetch": "^2.3.0",

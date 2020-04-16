@@ -10,3 +10,4 @@ sdk/js
 sdk/php
 vendor/
 dist/
+.bin/

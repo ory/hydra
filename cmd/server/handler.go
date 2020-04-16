@@ -105,7 +105,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 		isDSNAllowed(d)
 
 		admin, _, adminmw, _ := setup(d, cmd)
-		cert := getOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
+		cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
 
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -133,7 +133,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 		isDSNAllowed(d)
 
 		_, public, _, publicmw := setup(d, cmd)
-		cert := getOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
+		cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
 
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -159,7 +159,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 		).CallRegistry()
 
 		admin, public, adminmw, publicmw := setup(d, cmd)
-		cert := getOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
+		cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
 
 		var wg sync.WaitGroup
 		wg.Add(2)

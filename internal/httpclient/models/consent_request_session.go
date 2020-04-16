@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ConsentRequestSession Used to pass session data to a consent request.
+// ConsentRequestSession ConsentRequestSession Used to pass session data to a consent request.
 //
 // swagger:model consentRequestSession
 type ConsentRequestSession struct {

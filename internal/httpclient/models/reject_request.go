@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// RejectRequest RejectRequest RejectRequest RejectRequest The request payload used to accept a login or consent request.
+// RejectRequest RejectRequest RejectRequest RejectRequest RejectRequest The request payload used to accept a login or consent request.
 //
 // swagger:model rejectRequest
 type RejectRequest struct {

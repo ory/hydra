@@ -12,7 +12,7 @@ require (
 	github.com/go-openapi/validate v0.19.6
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
-	github.com/gobuffalo/packr v1.24.0
+	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
@@ -46,7 +46,6 @@ require (
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v0.0.7
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
-	github.com/square/go-jose/v3 v3.0.0-20200415055503-21f2ca25ccce // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect

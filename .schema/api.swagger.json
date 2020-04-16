@@ -1821,10 +1821,10 @@
       "description": "It is important that this model object is named JSONWebKey for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKey.",
       "type": "object",
       "required": [
-        "alg",
-        "kid",
+        "use",
         "kty",
-        "use"
+        "kid",
+        "alg"
       ],
       "properties": {
         "alg": {
@@ -1905,7 +1905,7 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSONWebKeySet JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+      "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
       "type": "object",
       "properties": {
         "keys": {
@@ -1926,30 +1926,20 @@
       "title": "NullTime implements sql.NullTime functionality."
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
           "$ref": "#/definitions/consentRequest"
         },
         "grant_access_token_audience": {
-          "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "grant_scope": {
-          "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
-          "type": "string",
-          "format": "date-time"
+          "$ref": "#/definitions/NullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -1974,20 +1964,12 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "AcceptConsentRequest The request payload used to accept a consent request.",
+      "title": "The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "grant_scope": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
@@ -2042,7 +2024,7 @@
     },
     "completedRequest": {
       "type": "object",
-      "title": "CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -2084,19 +2066,9 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "description": "requested access token audience",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
-          "description": "requested scope",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "skip": {
@@ -2130,11 +2102,10 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
           "format": "date-time"
         }
@@ -2172,7 +2143,6 @@
       }
     },
     "healthNotReadyStatus": {
-      "description": "HealthNotReadyStatus HealthNotReadyStatus HealthNotReadyStatus health not ready status",
       "type": "object",
       "properties": {
         "errors": {
@@ -2185,7 +2155,6 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2195,7 +2164,6 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
@@ -2219,7 +2187,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "LoginRequest LoginRequest Contains information on an ongoing login request.",
+      "title": "Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2236,17 +2204,9 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "session_id": {
@@ -2416,7 +2376,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": [
         "active"
       ],
@@ -2485,32 +2445,26 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
+      "description": "The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
-          "description": "access token",
           "type": "string"
         },
         "expires_in": {
-          "description": "expires in",
           "type": "integer",
           "format": "int64"
         },
         "id_token": {
-          "description": "id token",
           "type": "string"
         },
         "refresh_token": {
-          "description": "refresh token",
           "type": "string"
         },
         "scope": {
-          "description": "scope",
           "type": "string"
         },
         "token_type": {
-          "description": "token type",
           "type": "string"
         }
       }
@@ -2555,30 +2509,25 @@
       "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
-          "description": "error",
           "type": "string"
         },
         "error_debug": {
-          "description": "error debug",
           "type": "string"
         },
         "error_description": {
-          "description": "error description",
           "type": "string"
         },
         "error_hint": {
-          "description": "error hint",
           "type": "string"
         },
         "status_code": {
-          "description": "status code",
           "type": "integer",
           "format": "int64"
         }
       }
     },
     "userinfoResponse": {
-      "description": "UserinfoResponse UserinfoResponse UserinfoResponse The userinfo response",
+      "description": "The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -2672,7 +2621,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

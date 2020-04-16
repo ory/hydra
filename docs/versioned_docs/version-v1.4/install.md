@@ -11,8 +11,8 @@ binaries, Docker Images and support various package managers.
 We recommend using Docker to run ORY Hydra:
 
 ```shell
-$ docker pull oryd/hydra:1.4.2
-$ docker run --rm -it oryd/hydra:1.4.2 help
+$ docker pull oryd/hydra:v1.4.3
+$ docker run --rm -it oryd/hydra:v1.4.3 help
 ```
 
 ## macOS

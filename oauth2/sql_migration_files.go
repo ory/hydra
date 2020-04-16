@@ -124,7 +124,7 @@ func migrationsSqlCockroach10Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/cockroach/10.sql", size: 173, mode: os.FileMode(420), modTime: time.Unix(1585815362, 0)}
+	info := bindataFileInfo{name: "migrations/sql/cockroach/10.sql", size: 173, mode: os.FileMode(420), modTime: time.Unix(1585837863, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -144,7 +144,7 @@ func migrationsSqlCockroach11Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/cockroach/11.sql", size: 289, mode: os.FileMode(420), modTime: time.Unix(1585817202, 0)}
+	info := bindataFileInfo{name: "migrations/sql/cockroach/11.sql", size: 289, mode: os.FileMode(420), modTime: time.Unix(1585837863, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -444,7 +444,7 @@ func migrationsSqlShared11Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/shared/11.sql", size: 363, mode: os.FileMode(420), modTime: time.Unix(1585817202, 0)}
+	info := bindataFileInfo{name: "migrations/sql/shared/11.sql", size: 363, mode: os.FileMode(420), modTime: time.Unix(1585837863, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -584,7 +584,7 @@ func migrationsSqlTests11_testSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "migrations/sql/tests/11_test.sql", size: 4491, mode: os.FileMode(420), modTime: time.Unix(1585818782, 0)}
+	info := bindataFileInfo{name: "migrations/sql/tests/11_test.sql", size: 4491, mode: os.FileMode(420), modTime: time.Unix(1585837863, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

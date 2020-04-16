@@ -46,6 +46,7 @@ require (
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/cobra v0.0.7
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
+	github.com/square/go-jose/v3 v3.0.0-20200415055503-21f2ca25ccce // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect

@@ -64,6 +64,7 @@ func migrateOldMigrationTables(c *pop.Connection) error {
 						return errors.WithStack(err)
 					}
 
+					/* #nosec G201 - i is static (0..3) and migrationNumber is from the database */
 					if err := tx.RawQuery(
 						fmt.Sprintf("INSERT INTO schema_migration (version) VALUES (2019%02d%08d)", i+1, migrationNumber)).
 						Exec(); err != nil {

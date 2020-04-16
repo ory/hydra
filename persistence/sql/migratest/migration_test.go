@@ -3,8 +3,11 @@ package migratest
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
+
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/viper"
+	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
@@ -18,7 +21,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
-	"github.com/ory/x/sqlcon/dockertest"
 )
 
 func TestMigrations(t *testing.T) {
@@ -33,14 +35,19 @@ func TestMigrations(t *testing.T) {
 		"cockroach": dockertest.ConnectToTestCockroachDBPop,
 	} {
 		t.Run(fmt.Sprintf("database=%s", db), func(t *testing.T) {
-			t.Parallel()
 			c := connect(t)
 			x.CleanSQLPop(t, c)
-			require.NoError(t, os.Setenv("DSN", c.URL()))
+			url := c.URL()
+
+			// workaround for https://github.com/gobuffalo/pop/issues/538
+			if db == "mysql" {
+				url = "mysql://" + url
+			}
+			viper.Set(configuration.ViperKeyDSN, url)
 			d := driver.NewDefaultDriver(logrus.New(), true, []string{}, "", "", "", false)
 			var dbx *sqlx.DB
 			require.NoError(t,
-				dbal.Connect(c.URL(), logrus.New(), func() error {
+				dbal.Connect(url, logrus.New(), func() error {
 					return nil
 				}, func(db *sqlx.DB) error {
 					dbx = db

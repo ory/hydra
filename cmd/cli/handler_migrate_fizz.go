@@ -89,6 +89,4 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println("Successfully applied migrations!")
-
-	return
 }

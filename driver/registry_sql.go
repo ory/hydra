@@ -86,6 +86,9 @@ func (m *RegistrySQL) Init() error {
 		ConnMaxLifetime: connMaxLifetime,
 		Pool:            pool,
 	})
+	if err != nil {
+		return errors.WithStack(err)
+	}
 	p, err := sql.NewPersister(c)
 	if err != nil {
 		return errors.WithStack(err)

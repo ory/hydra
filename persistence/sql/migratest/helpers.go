@@ -8,8 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gobuffalo/pop/v5/logging"
-
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
@@ -129,35 +127,4 @@ func NewTestMigrator(t *testing.T, c *pop.Connection, migrationPath, testDataPat
 	}))
 
 	return &tm
-}
-
-func addTestMigrationData(t *testing.T, c *pop.Connection, m *pop.FileMigrator, testDataPath string, version func(int) string) {
-	var ranAllMigrations bool
-	pop.SetLogger(func(_ logging.Level, s string, _ ...interface{}) {
-		if strings.Contains(s, "already up to date") {
-			ranAllMigrations = true
-		}
-	})
-	require.NoError(t, c.TX.Commit())
-	for i := 1; !ranAllMigrations; i++ {
-		require.NoError(t, m.UpTo(1))
-		// exec testdata
-		var fileName string
-		if fi, err := os.Stat(filepath.Join(testDataPath, version(i)+"_testdata."+c.Dialect.Name()+".sql")); err == nil && !fi.IsDir() {
-			// found specific test data
-			fileName = fi.Name()
-		} else if fi, err := os.Stat(filepath.Join(testDataPath, version(i)+"_testdata.sql")); err == nil && !fi.IsDir() {
-			// found generic test data
-			fileName = fi.Name()
-		} else {
-			// found no test data
-			t.Logf("Found no test data for migration %s", version(i))
-			continue
-		}
-
-		data, err := ioutil.ReadFile(filepath.Join(testDataPath, fileName))
-		require.NoError(t, err)
-
-		require.NoError(t, c.RawQuery(string(data)).Exec())
-	}
 }

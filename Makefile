@@ -37,7 +37,7 @@ tools:
 test:
 		make test-resetdb
 		make sqlbin
-		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
+		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true' \
 		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
 		TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
 		$$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m

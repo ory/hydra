@@ -15,7 +15,7 @@ jobs:
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
-          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
       - image: postgres:9.6
         environment:
@@ -98,7 +98,7 @@ jobs:
       - image: oryd/e2e-env:latest
         environment:
           - GO111MODULE=on
-          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test

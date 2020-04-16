@@ -38,6 +38,7 @@ Cypress.Commands.add(
         scope: acceptScope = []
       } = {},
       login: {
+        accept: acceptLogin = true,
         skip: skipLogin = false,
         remember: rememberLogin = false,
         username = 'foo@bar.com',
@@ -65,10 +66,16 @@ Cypress.Commands.add(
     if (!skipLogin) {
       cy.get('#email').type(username, { delay: 1 });
       cy.get('#password').type(password, { delay: 1 });
+
       if (rememberLogin) {
         cy.get('#remember').click();
       }
-      cy.get('#accept').click();
+
+      if (acceptLogin) {
+        cy.get('#accept').click();
+      } else {
+        cy.get('#reject').click();
+      }
     }
 
     if (!skipConsent) {

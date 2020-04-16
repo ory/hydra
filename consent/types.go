@@ -111,7 +111,13 @@ func (e *RequestDeniedError) Scan(value interface{}) error {
 	if len(v) == 0 || v == "{}" {
 		return nil
 	}
-	return errors.WithStack(json.Unmarshal([]byte(v), e))
+
+	if err := json.Unmarshal([]byte(v), e); err != nil {
+		return errors.WithStack(err)
+	}
+
+	e.valid = true
+	return nil
 }
 
 func (e *RequestDeniedError) Value() (driver.Value, error) {

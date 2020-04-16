@@ -9,22 +9,22 @@
     "consent": "hydra-login-consent-logout"
   },
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.19.0",
     "dotenv": "^7.0.0",
-    "express": "^4.16.4",
-    "express-session": "^1.16.1",
-    "express-winston": "^3.1.0",
-    "hydra-login-consent-logout": "0.0.3",
+    "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "express-winston": "^3.4.0",
+    "hydra-login-consent-logout": "1.4.3",
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.4.0",
-    "node-fetch": "^2.3.0",
+    "jwks-rsa": "^1.8.0",
+    "node-fetch": "^2.6.0",
     "node-uuid": "^1.4.8",
-    "openid-client": "^2.4.5",
-    "simple-oauth2": "^2.2.1",
+    "openid-client": "^2.5.0",
+    "simple-oauth2": "^2.5.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "cross-env": "^5.2.0",
-    "nodemon": "^1.18.11"
+    "cross-env": "^5.2.1",
+    "nodemon": "^1.19.4"
   }
 }

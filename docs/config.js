@@ -7,7 +7,16 @@ module.exports = {
       image: 'oryd/hydra',
       files: [
         'docs/docs/install.md',
-        'docs/docs/configure-deploy.mdx'
+        'docs/docs/configure-deploy.mdx',
+        'quickstart.yml',
+        'quickstart-cockroach.yml',
+        'quickstart-cors.yml',
+        'quickstart-debug.yml',
+        'quickstart-jwt.yml',
+        'quickstart-mysql.yml',
+        'quickstart-postgres.yml',
+        'quickstart-prometheus.yml',
+        'quickstart-tracing.yml',
       ]
     }
   ],

@@ -28,11 +28,10 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/fosite v0.31.0
+	github.com/ory/fosite v0.31.1
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.7.0
-	github.com/ory/jsonschema/v3 v3.0.1
 	github.com/ory/sdk/swagutil v0.0.0-20200407150153-53df6d772608
 	github.com/ory/viper v1.7.4
 	github.com/ory/x v0.0.111

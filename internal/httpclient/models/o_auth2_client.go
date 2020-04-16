@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.
+// OAuth2Client OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.
 //
 // swagger:model oAuth2Client
 type OAuth2Client struct {
@@ -61,6 +61,7 @@ type OAuth2Client struct {
 	Contacts StringSlicePipeDelimiter `json:"contacts,omitempty"`
 
 	// CreatedAt returns the timestamp of the client's creation.
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
@@ -147,6 +148,7 @@ type OAuth2Client struct {
 	TosURI string `json:"tos_uri,omitempty"`
 
 	// UpdatedAt returns the timestamp of the last update.
+	// Format: date-time
 	// Format: date-time
 	// Format: date-time
 	UpdatedAt strfmt.DateTime `json:"updated_at,omitempty"`

@@ -22,3 +22,5 @@ LICENSE.txt
 !./hydra/
 hydra-login-consent-node
 ./cypress/screenshots
+*.packr.go
+.packrd/

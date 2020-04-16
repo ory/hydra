@@ -22,7 +22,7 @@ package server
 
 import (
 	"context"
-	"crypto/sha1"
+	"crypto/sha1" // #nosec G505 - This is required for certificate chains alongside sha256
 	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
@@ -48,6 +48,7 @@ const (
 func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.Certificates = []*x509.Certificate{cert}
 	sig256 := sha256.Sum256(cert.Raw)
+	// #nosec G401 - This is required for certificate chains alongside sha256
 	sig1 := sha1.Sum(cert.Raw)
 	priv.CertificateThumbprintSHA256 = sig256[:]
 	priv.CertificateThumbprintSHA1 = sig1[:]

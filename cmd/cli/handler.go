@@ -21,6 +21,7 @@
 package cli
 
 import (
+	"github.com/ory/hydra/internal/fizzmigrate"
 	"net/url"
 	"os"
 	"strings"
@@ -37,7 +38,7 @@ type Handler struct {
 	Introspection *IntrospectionHandler
 	Token         *TokenHandler
 	Migration     *MigrateHandlerFizz
-	MigrationOld  *MigrateHandler
+	MigrationOld  *fizzmigrate.MigrateHandler
 }
 
 func Remote(cmd *cobra.Command) string {
@@ -64,6 +65,6 @@ func NewHandler() *Handler {
 		Introspection: newIntrospectionHandler(),
 		Token:         newTokenHandler(),
 		Migration:     newHandlerMigrateFizz(),
-		MigrationOld:  newMigrateHandler(),
+		MigrationOld:  fizzmigrate.NewMigrateHandler(),
 	}
 }

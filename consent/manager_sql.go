@@ -30,12 +30,9 @@ import (
 	"github.com/ory/hydra/client"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
-
 	"github.com/ory/fosite"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
+	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/x"
 )
@@ -50,21 +47,6 @@ func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 		DB: db,
 		r:  r,
 	}
-}
-
-func (m *SQLManager) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
-	migrate.SetTable("hydra_oauth2_authentication_consent_migration")
-	plan, _, err := migrate.PlanMigration(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
-	return plan, errors.WithStack(err)
-}
-
-func (m *SQLManager) CreateSchemas(dbName string) (int, error) {
-	migrate.SetTable("hydra_oauth2_authentication_consent_migration")
-	n, err := migrate.Exec(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
-	}
-	return n, nil
 }
 
 func (m *SQLManager) RevokeSubjectConsentSession(ctx context.Context, user string) error {
@@ -91,7 +73,7 @@ func (m *SQLManager) revokeConsentSession(ctx context.Context, user, client stri
 	var challenges = make([]string, 0)
 	/* #nosec G201 - see "part" */
 	if err := m.DB.SelectContext(ctx, &challenges, m.DB.Rebind(fmt.Sprintf(
-		`SELECT r.challenge FROM hydra_oauth2_consent_request_handled as h 
+		`SELECT r.challenge FROM hydra_oauth2_consent_request_handled as h
 JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 		part,
 	)), args...); err != nil {
@@ -119,14 +101,14 @@ JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 	case "mysql":
 		/* #nosec G201 - see "part" */
 		queries = append(queries,
-			fmt.Sprintf(`DELETE h, r FROM hydra_oauth2_consent_request_handled as h 
+			fmt.Sprintf(`DELETE h, r FROM hydra_oauth2_consent_request_handled as h
 JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge
 WHERE %s`, part),
 		)
 	default:
 		queries = append(queries,
 			/* #nosec G201 - see "part" */
-			fmt.Sprintf(`DELETE FROM hydra_oauth2_consent_request_handled 
+			fmt.Sprintf(`DELETE FROM hydra_oauth2_consent_request_handled
 WHERE challenge IN (SELECT r.challenge FROM hydra_oauth2_consent_request as r WHERE %s)`, part),
 			/* #nosec G201 - see "part" */
 			fmt.Sprintf(`DELETE FROM hydra_oauth2_consent_request as r WHERE %s`, part),

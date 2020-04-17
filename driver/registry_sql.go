@@ -1,8 +1,6 @@
 package driver
 
 import (
-	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -12,9 +10,6 @@ import (
 	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/olekukonko/tablewriter"
-	migrate "github.com/rubenv/sql-migrate"
-
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 
@@ -39,11 +34,6 @@ func init() {
 	})
 }
 
-type schemaCreator interface {
-	CreateSchemas(dbName string) (int, error)
-	PlanMigration(dbName string) ([]*migrate.PlannedMigration, error)
-}
-
 func NewRegistrySQL() *RegistrySQL {
 	r := &RegistrySQL{
 		RegistryBase: new(RegistryBase),
@@ -58,42 +48,41 @@ func (m *RegistrySQL) WithDB(db *sqlx.DB) Registry {
 }
 
 func (m *RegistrySQL) Init() error {
-	if m.db != nil {
-		return nil
+	if m.db == nil {
+		// old db connection
+		options := append([]sqlcon.OptionModifier{}, m.dbalOptions...)
+		if m.Tracer().IsLoaded() {
+			options = append(options, sqlcon.WithDistributedTracing(), sqlcon.WithOmitArgsFromTraceSpans())
+		}
+
+		connection, err := sqlcon.NewSQLConnection(m.c.DSN(), m.Logger(), options...)
+		if err != nil {
+			return err
+		}
+
+		m.db, err = connection.GetDatabaseRetry(time.Second*5, time.Minute*5)
+		if err != nil {
+			return err
+		}
 	}
 
-	// old db connection
-	options := append([]sqlcon.OptionModifier{}, m.dbalOptions...)
-	if m.Tracer().IsLoaded() {
-		options = append(options, sqlcon.WithDistributedTracing(), sqlcon.WithOmitArgsFromTraceSpans())
+	if m.persister == nil {
+		// new db connection
+		pool, idlePool, connMaxLifetime := sqlcon.ParseConnectionOptions(m.l, m.c.DSN())
+		c, err := pop.NewConnection(&pop.ConnectionDetails{
+			URL:             m.c.DSN(),
+			IdlePool:        idlePool,
+			ConnMaxLifetime: connMaxLifetime,
+			Pool:            pool,
+		})
+		if err != nil {
+			return errors.WithStack(err)
+		}
+		m.persister, err = sql.NewPersister(c)
+		if err != nil {
+			return err
+		}
 	}
-
-	connection, err := sqlcon.NewSQLConnection(m.c.DSN(), m.Logger(), options...)
-	if err != nil {
-		return err
-	}
-
-	m.db, err = connection.GetDatabaseRetry(time.Second*5, time.Minute*5)
-	if err != nil {
-		return err
-	}
-
-	// new db connection
-	pool, idlePool, connMaxLifetime := sqlcon.ParseConnectionOptions(m.l, m.c.DSN())
-	c, err := pop.NewConnection(&pop.ConnectionDetails{
-		URL:             m.c.DSN(),
-		IdlePool:        idlePool,
-		ConnMaxLifetime: connMaxLifetime,
-		Pool:            pool,
-	})
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	p, err := sql.NewPersister(c)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-	m.persister = p
 
 	return nil
 }
@@ -106,76 +95,6 @@ func (m *RegistrySQL) DB() *sqlx.DB {
 	}
 
 	return m.db
-}
-
-func (m *RegistrySQL) SchemaMigrationPlan(dbName string) (*tablewriter.Table, error) {
-	names := map[int]string{
-		0: "JSON Web Keys",
-		1: "OAuth 2.0 Clients",
-		2: "Login &Consent",
-		3: "OAuth 2.0",
-	}
-
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetCenterSeparator("|")
-	table.SetAutoMergeCells(true)
-	table.SetRowLine(true)
-	table.SetColMinWidth(4, 20)
-	table.SetHeader([]string{
-		"Driver",
-		"Module",
-		"ID",
-		"#",
-		"Query",
-	})
-
-	for component, s := range []schemaCreator{
-		m.KeyManager().(schemaCreator),
-		m.ClientManager().(schemaCreator),
-		m.ConsentManager().(schemaCreator),
-		m.OAuth2Storage().(schemaCreator),
-	} {
-		plans, err := s.PlanMigration(dbName)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, plan := range plans {
-			for k, up := range plan.Up {
-				up = strings.Replace(strings.TrimSpace(up), "\n", "", -1)
-				up = strings.Join(strings.Fields(up), " ")
-				if len(up) > 0 {
-					table.Append([]string{m.db.DriverName(), names[component], plan.Id + ".sql", fmt.Sprintf("%d", k), up})
-				}
-			}
-		}
-	}
-
-	return table, nil
-}
-
-func (m *RegistrySQL) CreateSchemas(dbName string) (int, error) {
-	var total int
-
-	m.Logger().Debugf("Applying %s SQL migrations...", dbName)
-	for k, s := range []schemaCreator{
-		m.KeyManager().(schemaCreator),
-		m.ClientManager().(schemaCreator),
-		m.ConsentManager().(schemaCreator),
-		m.OAuth2Storage().(schemaCreator),
-	} {
-		m.Logger().Debugf("Applying %s SQL migrations for manager: %T (%d)", dbName, s, k)
-		if c, err := s.CreateSchemas(dbName); err != nil {
-			return c, err
-		} else {
-			m.Logger().Debugf("Successfully applied %d %s SQL migrations from manager: %T (%d)", c, dbName, s, k)
-			total += c
-		}
-	}
-	m.Logger().Debugf("Applied %d %s SQL migrations", total, dbName)
-
-	return total, nil
 }
 
 func (m *RegistrySQL) CanHandle(dsn string) bool {

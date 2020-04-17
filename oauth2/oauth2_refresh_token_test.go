@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,11 +17,9 @@ import (
 	"github.com/ory/fosite"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/errorsx"
-	"github.com/ory/x/sqlcon/dockertest"
 )
 
 // TestCreateRefreshTokenSessionStress is a sanity test to verify the fix for https://github.com/ory/hydra/issues/1719 &
@@ -75,24 +72,9 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		},
 	}
 
-	config := internal.NewConfigurationWithDefaults()
-	registries := make(map[string]driver.Registry)
-	var pg, msql, cdb *sqlx.DB
-	dockertest.Parallel([]func(){
-		func() {
-			pg = connectToPG(t)
-		},
-		func() {
-			msql = connectToMySQL(t)
-		},
-		func() {
-			cdb = connectToCRDB(t)
-		},
-	})
-
-	registries[dbal.DriverPostgreSQL] = connectSQL(t, config, dbal.DriverPostgreSQL, pg)
-	registries[dbal.DriverCockroachDB] = connectSQL(t, config, dbal.DriverCockroachDB, cdb)
-	registries[dbal.DriverMySQL] = connectSQL(t, config, dbal.DriverMySQL, msql)
+	registries[dbal.DriverPostgreSQL] = connectToPG(t)
+	registries[dbal.DriverCockroachDB] = connectToCRDB(t)
+	registries[dbal.DriverMySQL] = connectToMySQL(t)
 
 	for dbName, dbRegistry := range registries {
 		ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))

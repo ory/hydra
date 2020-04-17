@@ -21,101 +21,75 @@
 package client_test
 
 import (
-	"flag"
+	"context"
 	"fmt"
-	"log"
-	"sync"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/x"
+	"github.com/ory/viper"
+	"github.com/stretchr/testify/require"
+	"strings"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/stretchr/testify/require"
-
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var clientManagers = map[string]Manager{}
-var m sync.Mutex
-
-func TestMain(m *testing.M) {
-	flag.Parse()
-	runner := dockertest.Register()
-	runner.Exit(m.Run())
+func getManager(t *testing.T, url string) Manager {
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyDSN, url)
+	reg, err := driver.NewRegistry(conf)
+	require.NoError(t, err)
+	require.NoError(t, reg.Init())
+	require.NoError(t, reg.Persister().MigrateUp(context.Background()))
+	return reg.ClientManager()
 }
 
-func connectToMySQL() {
-	db, err := dockertest.ConnectToTestMySQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
+func connectToMySQL(t *testing.T) Manager {
+	c := dockertest.ConnectToTestMySQLPop(t)
+	x.CleanSQLPop(t, c)
+	url := c.URL()
+	if !strings.HasPrefix(url, "mysql") {
+		url = "mysql://" + url
 	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-
-	m.Lock()
-	clientManagers["mysql"] = reg.ClientManager()
-	m.Unlock()
+	return getManager(t, url)
 }
 
-func connectToPG() {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-
-	m.Lock()
-	clientManagers["postgres"] = reg.ClientManager()
-	m.Unlock()
+func connectToPG(t *testing.T) Manager {
+	c := dockertest.ConnectToTestPostgreSQLPop(t)
+	x.CleanSQLPop(t, c)
+	return getManager(t, c.URL())
 }
 
-func connectToCRDB() {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
+func connectToCRDB(t *testing.T) Manager {
+	c := dockertest.ConnectToTestCockroachDBPop(t)
+	x.CleanSQLPop(t, c)
+	url := c.URL()
+	if !strings.HasPrefix(url, "cockroach") {
+		url = "cockroach://" + strings.Split(url, "://")[1]
 	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-
-	m.Lock()
-	clientManagers["cockroach"] = reg.ClientManager()
-	m.Unlock()
+	return getManager(t, url)
 }
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistry(conf)
 
-	clientManagers["memory"] = reg.ClientManager()
+	clientManagers := map[string]Manager{
+		"memory": reg.ClientManager(),
+	}
 
 	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			connectToPG,
-			connectToMySQL,
-			connectToCRDB,
-		})
+		clientManagers["postgres"] = connectToPG(t)
+		clientManagers["mysql"] = connectToMySQL(t)
+		clientManagers["cockroach"] = connectToCRDB(t)
 	}
 
 	t.Log("Creating schemas...")
 	for k, m := range clientManagers {
-		s, ok := m.(*SQLManager)
-		if ok {
-			x.CleanSQL(t, s.DB)
-			x, err := s.CreateSchemas(k)
-			if err != nil {
-				t.Fatal("Could not create schemas", err.Error())
-			} else {
-				t.Logf("Schemas created. Rows affected: %+v", x)
-			}
-			require.NoError(t, err)
-		}
-
 		t.Run("case=create-get-update-delete", func(t *testing.T) {
 			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m))
 		})
@@ -127,9 +101,5 @@ func TestManagers(t *testing.T) {
 		t.Run("case=auth-client", func(t *testing.T) {
 			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAuthenticate(k, m))
 		})
-
-		if ok {
-			x.CleanSQL(t, s.DB)
-		}
 	}
 }

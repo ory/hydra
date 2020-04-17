@@ -23,9 +23,8 @@ package client
 import (
 	"context"
 	"fmt"
-	"testing"
-
 	"github.com/ory/hydra/client"
+	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
@@ -42,12 +41,12 @@ func TestXXMigrations(t *testing.T) {
 		return
 	}
 
-	require.True(t, len(client.Migrations[dbal.DriverMySQL].Box.List()) == len(client.Migrations[dbal.DriverPostgreSQL].Box.List()))
+	require.True(t, len(Migrations[dbal.DriverMySQL].Box.List()) == len(Migrations[dbal.DriverPostgreSQL].Box.List()))
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{client.Migrations},
-		migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", client.Migrations, client.AssetNames(), client.Asset)},
+		migratest.MigrationSchemas{Migrations},
+		migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", Migrations, AssetNames(), Asset)},
 		x.CleanSQL, x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, _, step, steps int) {
 			if dbName == "cockroach" {

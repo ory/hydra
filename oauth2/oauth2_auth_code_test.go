@@ -36,7 +36,6 @@ import (
 	"time"
 
 	djwt "github.com/dgrijalva/jwt-go"
-	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -56,7 +55,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/viper"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/ory/x/urlx"
 )
 
@@ -154,32 +152,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 
 	if !testing.Short() {
-		var p, m, c *sqlx.DB
-		dockertest.Parallel([]func(){
-			func() {
-				p = connectToPG(t)
-			},
-			func() {
-				m = connectToMySQL(t)
-			},
-			func() {
-				c = connectToCRDB(t)
-			},
-		})
-		pr := internal.NewRegistrySQL(conf, p)
-		_, err := pr.CreateSchemas("postgres")
-		require.NoError(t, err)
-		regs["postgres"] = pr
-
-		mr := internal.NewRegistrySQL(conf, m)
-		_, err = mr.CreateSchemas("mysql")
-		require.NoError(t, err)
-		regs["mysql"] = mr
-
-		cr := internal.NewRegistrySQL(conf, c)
-		_, err = cr.CreateSchemas("cockroach")
-		require.NoError(t, err)
-		regs["cockroach"] = cr
+		regs["postgres"] = connectToPG(t)
+		regs["mysql"] = connectToMySQL(t)
+		regs["cockroach"] = connectToCRDB(t)
 	}
 
 	for km, reg := range regs {

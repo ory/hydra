@@ -18,68 +18,61 @@
  * @license 	Apache-2.0
  */
 
-package cli
+package fizzmigrate
 
 import (
 	"bufio"
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/ory/x/sqlcon"
 
-	"github.com/ory/viper"
-
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/logrusx"
 
-	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 )
 
 type MigrateHandler struct{}
 
-func newMigrateHandler() *MigrateHandler {
+func NewMigrateHandler() *MigrateHandler {
 	return &MigrateHandler{}
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	var d driver.Driver
+	l := logrusx.New()
+	c := configuration.NewViperProvider(l, false, nil)
+	scheme := sqlcon.GetDriverName(c.DSN())
 
-	if flagx.MustGetBool(cmd, "read-from-env") {
-		d = driver.NewDefaultDriver(logrusx.New(), false, nil, "", "", "", false)
-		if len(d.Configuration().DSN()) == 0 {
-			fmt.Println(cmd.UsageString())
-			fmt.Println("")
-			fmt.Println("When using flag -e, environment variable DSN must be set")
-			os.Exit(1)
-			return
-		}
-	} else {
-		if len(args) != 1 {
-			fmt.Println(cmd.UsageString())
-			os.Exit(1)
-			return
-		}
-		viper.Set(configuration.ViperKeyDSN, args[0])
-		d = driver.NewDefaultDriver(logrusx.New(), false, nil, "", "", "", false)
-	}
-
-	reg, ok := d.Registry().(*driver.RegistrySQL)
-	if !ok {
-		fmt.Println(cmd.UsageString())
+	connection, err := sqlcon.NewSQLConnection(c.DSN(), l)
+	if err != nil {
+		fmt.Println(cmd.Usage())
 		fmt.Println("")
-		fmt.Printf("Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.\n")
+		fmt.Printf("Could not create database connection: %s", err)
 		os.Exit(1)
 		return
 	}
 
-	scheme := sqlcon.GetDriverName(d.Configuration().DSN())
+	db, err := connection.GetDatabaseRetry(time.Second*5, time.Minute*5)
+	if err != nil {
+		fmt.Println(cmd.Usage())
+		fmt.Println("")
+		fmt.Printf("Could not connect to DSN \"%s\": %s", c.DSN(), err)
+		os.Exit(1)
+		return
+	}
 
-	plan, err := reg.SchemaMigrationPlan(scheme)
+	m := OldMigrationRunner{
+		l,
+		db,
+	}
+
+	plan, err := m.SchemaMigrationPlan(scheme)
 	cmdx.Must(err, "An error occurred planning migrations: %s", err)
 
 	fmt.Println("The following migration is planned:")
@@ -99,7 +92,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	// > check if table hydra_client_migration exists
 	// > if yes -> run migration to fizz 2019010000000 + id
 	// >  ..  INSERT INTO hydra_fizz_migrate VALUES CONCAT() (SELECT * FROM hydra_client_migration);
-	n, err := reg.CreateSchemas(scheme)
+	n, err := m.CreateSchemas(scheme)
 	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
 	fmt.Printf("Successfully applied %d SQL migrations!\n", n)
 }

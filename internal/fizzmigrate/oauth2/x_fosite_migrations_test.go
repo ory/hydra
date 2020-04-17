@@ -3,6 +3,9 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
+	"github.com/ory/hydra/internal/fizzmigrate/client"
+	"github.com/ory/hydra/internal/fizzmigrate/consent"
+	migrateOauth2 "github.com/ory/hydra/internal/fizzmigrate/oauth2"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
@@ -13,8 +16,6 @@ import (
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
@@ -28,8 +29,8 @@ func TestXXMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{client.Migrations, consent.Migrations, oauth2.Migrations},
-		migratest.MigrationSchemas{nil, nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", oauth2.Migrations, oauth2.AssetNames(), oauth2.Asset)},
+		migratest.MigrationSchemas{client.Migrations, consent.Migrations, migrateOauth2.Migrations},
+		migratest.MigrationSchemas{nil, nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", migrateOauth2.Migrations, migrateOauth2.AssetNames(), migrateOauth2.Asset)},
 		x.CleanSQL,
 		x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, m, k, steps int) {

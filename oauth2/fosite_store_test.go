@@ -22,12 +22,11 @@ package oauth2_test
 
 import (
 	"context"
-	"flag"
+	"strings"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/viper"
@@ -43,39 +42,40 @@ import (
 
 var registries = make(map[string]driver.Registry)
 
-func TestMain(m *testing.M) {
-	flag.Parse()
-	runner := dockertest.Register()
-	runner.Exit(m.Run())
-}
-
-func connectToPG(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestPostgreSQL()
+func getManager(t *testing.T, url string) driver.Registry {
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyDSN, url)
+	reg, err := driver.NewRegistry(conf)
 	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return db
-}
-
-func connectToMySQL(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestMySQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return db
-}
-
-func connectToCRDB(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return db
-}
-
-func connectSQL(t *testing.T, conf *configuration.ViperProvider, dbName string, db *sqlx.DB) driver.Registry {
-	x.CleanSQL(t, db)
-	reg := internal.NewRegistrySQL(conf, db)
-	_, err := reg.CreateSchemas(dbName)
-	require.NoError(t, err)
+	require.NoError(t, reg.Init())
+	require.NoError(t, reg.Persister().MigrateUp(context.Background()))
 	return reg
+}
+
+func connectToMySQL(t *testing.T) driver.Registry {
+	c := dockertest.ConnectToTestMySQLPop(t)
+	x.CleanSQLPop(t, c)
+	url := c.URL()
+	if !strings.HasPrefix(url, "mysql") {
+		url = "mysql://" + url
+	}
+	return getManager(t, url)
+}
+
+func connectToPG(t *testing.T) driver.Registry {
+	c := dockertest.ConnectToTestPostgreSQLPop(t)
+	x.CleanSQLPop(t, c)
+	return getManager(t, c.URL())
+}
+
+func connectToCRDB(t *testing.T) driver.Registry {
+	c := dockertest.ConnectToTestCockroachDBPop(t)
+	x.CleanSQLPop(t, c)
+	url := c.URL()
+	if !strings.HasPrefix(url, "cockroach") {
+		url = "cockroach://" + strings.Split(url, "://")[1]
+	}
+	return getManager(t, url)
 }
 
 func TestManagers(t *testing.T) {
@@ -103,21 +103,9 @@ func TestManagers(t *testing.T) {
 			registries["memory"] = reg
 
 			if !testing.Short() {
-				var p, m, c *sqlx.DB
-				dockertest.Parallel([]func(){
-					func() {
-						p = connectToPG(t)
-					},
-					func() {
-						m = connectToMySQL(t)
-					},
-					func() {
-						c = connectToCRDB(t)
-					},
-				})
-				registries["postgres"] = connectSQL(t, conf, "postgres", p)
-				registries["mysql"] = connectSQL(t, conf, "mysql", m)
-				registries["cockroach"] = connectSQL(t, conf, "cockroach", c)
+				registries["postgres"] = connectToPG(t)
+				registries["mysql"] = connectToMySQL(t)
+				registries["cockroach"] = connectToCRDB(t)
 			}
 
 			for k, store := range registries {

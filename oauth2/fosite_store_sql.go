@@ -32,14 +32,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/herodot"
 
 	"github.com/ory/fosite"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
 
@@ -78,20 +76,6 @@ const (
 	sqlTablePKCE           tableName = "pkce"
 	sqlTableBlacklistedJTI tableName = "jti_blacklist"
 )
-
-var Migrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/mysql",
-	}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/postgres",
-	}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/cockroach",
-	}, true),
-}
 
 type transactionKey int
 
@@ -219,12 +203,6 @@ func (s *SQLData) toRequest(session fosite.Session, cm client.Manager, conf Conf
 	}
 
 	return r, nil
-}
-
-func (s *FositeSQLStore) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
-	migrate.SetTable("hydra_oauth2_migration")
-	plan, _, err := migrate.PlanMigration(s.DB.DB, dbal.Canonicalize(s.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
-	return plan, errors.WithStack(err)
 }
 
 func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -396,15 +374,6 @@ func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, ta
 		return sqlcon.HandleError(err)
 	}
 	return nil
-}
-
-func (s *FositeSQLStore) CreateSchemas(dbName string) (int, error) {
-	migrate.SetTable("hydra_oauth2_migration")
-	n, err := migrate.Exec(s.DB.DB, dbal.Canonicalize(s.DB.DriverName()), Migrations[dbName], migrate.Up)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
-	}
-	return n, nil
 }
 
 func (s *FositeSQLStore) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) error {

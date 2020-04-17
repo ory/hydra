@@ -23,14 +23,15 @@ package jwk_test
 import (
 	"context"
 	"fmt"
+	"github.com/ory/hydra/internal/fizzmigrate/client"
+	migrateJWK "github.com/ory/hydra/internal/fizzmigrate/jwk"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
-	. "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
@@ -46,8 +47,8 @@ func TestXXMigrations(t *testing.T) {
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{Migrations},
-		migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", Migrations, AssetNames(), Asset)},
+		migratest.MigrationSchemas{migrateJWK.Migrations},
+		migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", migrateJWK.Migrations, migrateJWK.AssetNames(), migrateJWK.Asset)},
 		x.CleanSQL,
 		x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, k, m, steps int) {
@@ -59,7 +60,7 @@ func TestXXMigrations(t *testing.T) {
 				reg := internal.NewRegistrySQL(conf, db)
 
 				sid := fmt.Sprintf("%d-sid", k+1)
-				m := NewSQLManager(db, reg)
+				m := jwk.NewSQLManager(db, reg)
 				_, err := m.GetKeySet(context.TODO(), sid)
 				require.Error(t, err, "malformed ciphertext")
 			})

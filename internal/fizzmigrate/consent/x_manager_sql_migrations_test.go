@@ -3,6 +3,7 @@ package consent_test
 import (
 	"context"
 	"fmt"
+	migrateConsent "github.com/ory/hydra/internal/fizzmigrate/consent"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
@@ -14,6 +15,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal"
+	migrateClient "github.com/ory/hydra/internal/fizzmigrate/client"
 	"github.com/ory/hydra/x"
 )
 
@@ -23,17 +25,17 @@ func TestXXMigrations(t *testing.T) {
 		return
 	}
 
-	require.True(t, len(client.Migrations[dbal.DriverMySQL].Box.List()) == len(client.Migrations[dbal.DriverPostgreSQL].Box.List()))
+	require.True(t, len(migrateClient.Migrations[dbal.DriverMySQL].Box.List()) == len(migrateClient.Migrations[dbal.DriverPostgreSQL].Box.List()))
 
 	var clients []client.Client
-	for k := range client.Migrations[dbal.DriverMySQL].Box.List() {
+	for k := range migrateClient.Migrations[dbal.DriverMySQL].Box.List() {
 		clients = append(clients, client.Client{ClientID: fmt.Sprintf("%d-client", k+1)})
 	}
 
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
-		migratest.MigrationSchemas{nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", consent.Migrations, consent.AssetNames(), consent.Asset)},
+		migratest.MigrationSchemas{migrateClient.Migrations, migrateConsent.Migrations},
+		migratest.MigrationSchemas{nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", migrateConsent.Migrations, migrateConsent.AssetNames(), migrateConsent.Asset)},
 		x.CleanSQL, x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, sk, step, steps int) {
 			if sk == 0 {

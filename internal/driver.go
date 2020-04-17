@@ -73,7 +73,7 @@ func NewRegistry(c *configuration.ViperProvider) *driver.RegistryMemory {
 
 func NewRegistrySQL(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
 	viper.Set("LOG_LEVEL", "debug")
-	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
+	r := driver.NewRegistrySQL().WithLogger(logrusx.New()).WithConfig(c).(*driver.RegistrySQL).WithDB(db)
 	_ = r.Init()
 	return r.(*driver.RegistrySQL)
 }

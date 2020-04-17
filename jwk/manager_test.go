@@ -21,7 +21,12 @@
 package jwk_test
 
 import (
+	"context"
 	"fmt"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/viper"
+	"strings"
 	"sync"
 	"testing"
 
@@ -40,31 +45,40 @@ var managers = map[string]Manager{}
 var m sync.Mutex
 var testGenerator = &RS256Generator{}
 
-func TestMain(m *testing.M) {
-	runner := dockertest.Register()
-
-	runner.Exit(m.Run())
+func getManager(t *testing.T, url string) Manager {
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyDSN, url)
+	reg, err := driver.NewRegistry(conf)
+	require.NoError(t, err)
+	require.NoError(t, reg.Init())
+	require.NoError(t, reg.Persister().MigrateUp(context.Background()))
+	return reg.KeyManager()
 }
 
-func connectToPG(t *testing.T) *SQLManager {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
+func connectToMySQL(t *testing.T) Manager {
+	c := dockertest.ConnectToTestMySQLPop(t)
+	x.CleanSQLPop(t, c)
+	url := c.URL()
+	if !strings.HasPrefix(url, "mysql") {
+		url = "mysql://" + url
+	}
+	return getManager(t, url)
 }
 
-func connectToMySQL(t *testing.T) *SQLManager {
-	db, err := dockertest.ConnectToTestMySQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
+func connectToPG(t *testing.T) Manager {
+	c := dockertest.ConnectToTestPostgreSQLPop(t)
+	x.CleanSQLPop(t, c)
+	return getManager(t, c.URL())
 }
 
-func connectToCRDB(t *testing.T) *SQLManager {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
+func connectToCRDB(t *testing.T) Manager {
+	c := dockertest.ConnectToTestCockroachDBPop(t)
+	x.CleanSQLPop(t, c)
+	url := c.URL()
+	if !strings.HasPrefix(url, "cockroach") {
+		url = "cockroach://" + strings.Split(url, "://")[1]
+	}
+	return getManager(t, url)
 }
 
 func TestManager(t *testing.T) {
@@ -73,23 +87,9 @@ func TestManager(t *testing.T) {
 	managers["memory"] = reg.KeyManager()
 
 	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			func() {
-				m.Lock()
-				managers["postgres"] = connectToPG(t)
-				m.Unlock()
-			},
-			func() {
-				m.Lock()
-				managers["mysql"] = connectToMySQL(t)
-				m.Unlock()
-			},
-			func() {
-				m.Lock()
-				managers["cockroach"] = connectToCRDB(t)
-				m.Unlock()
-			},
-		})
+		managers["postgres"] = connectToPG(t)
+		managers["mysql"] = connectToMySQL(t)
+		managers["cockroach"] = connectToCRDB(t)
 	}
 
 	t.Run("TestManagerKey", func(t *testing.T) {
@@ -97,11 +97,6 @@ func TestManager(t *testing.T) {
 		require.NoError(t, err)
 
 		for name, m := range managers {
-			if m, ok := m.(*SQLManager); ok {
-				n, err := m.CreateSchemas(name)
-				require.NoError(t, err)
-				t.Logf("Applied %d migrations to %s", n, name)
-			}
 			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks, "TestManagerKey"))
 		}
 	})
@@ -112,11 +107,6 @@ func TestManager(t *testing.T) {
 		ks.Key("private")
 
 		for name, m := range managers {
-			if m, ok := m.(*SQLManager); ok {
-				n, err := m.CreateSchemas(name)
-				require.NoError(t, err)
-				t.Logf("Applied %d migrations to %s", n, name)
-			}
 			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
 		}
 	})

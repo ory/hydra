@@ -6,10 +6,8 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v5"
-	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
-
 	"github.com/ory/x/sqlcon"
+	"github.com/pkg/errors"
 )
 
 type oldTableName string
@@ -22,8 +20,14 @@ const (
 	oauth2MigrationTableName  oldTableName = "hydra_oauth2_migration"
 )
 
-func getMigrationRecords(c *pop.Connection, tableName oldTableName) ([]migrate.MigrationRecord, error) {
-	var records []migrate.MigrationRecord
+// this type is copied from sql-migrate to remove the dependency
+type OldMigrationRecord struct {
+	Id        string    `db:"id"`
+	AppliedAt time.Time `db:"applied_at"`
+}
+
+func getMigrationRecords(c *pop.Connection, tableName oldTableName) ([]OldMigrationRecord, error) {
+	var records []OldMigrationRecord
 
 	/* #nosec G201 TableName is static */
 	err := sqlcon.HandleError(
@@ -41,9 +45,8 @@ func migrateOldMigrationTables(c *pop.Connection) error {
 	}
 
 	return sqlcon.HandleError(c.Transaction(func(tx *pop.Connection) error {
-		// should be done by pop, depends on https://github.com/gobuffalo/pop/pull/531
-		if err := c.RawQuery("CREATE TABLE IF NOT EXISTS schema_migration (version varchar(14) NOT NULL)").Exec(); err != nil {
-			return sqlcon.HandleError(err)
+		if err := pop.CreateSchemaMigrations(c); err != nil {
+			return errors.WithStack(err)
 		}
 
 		// in this order the migrations only depend on already done ones

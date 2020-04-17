@@ -70,6 +70,7 @@ const (
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
 	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
+	ViperKeyLogLevel                       = "log.level"
 )
 
 func init() {

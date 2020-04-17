@@ -160,7 +160,7 @@ func TestViperProviderValidates(t *testing.T) {
 	c := NewViperProvider(l, false, nil)
 
 	// log
-	assert.Equal(t, "debug", viper.Get("log.level"))
+	assert.Equal(t, "debug", viper.Get(ViperKeyLogLevel))
 	assert.Equal(t, "json", viper.Get("log.format"))
 
 	// serve

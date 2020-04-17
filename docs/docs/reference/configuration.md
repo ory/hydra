@@ -44,7 +44,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: trace
+  level: debug
 
   ## format ##
   #
@@ -58,7 +58,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: json
+  format: text
 
 ## serve ##
 #
@@ -80,7 +80,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 37922
+    port: 65050
 
     ## host ##
     #
@@ -114,7 +114,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: false
+      enabled: true
 
       ## allowed_origins ##
       #
@@ -151,8 +151,6 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - POST
-        - GET
         - TRACE
 
       ## allowed_headers ##
@@ -168,10 +166,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - sunt magna cillum dolore voluptate
-        - adipisicing esse exercitation
-        - commodo qui nulla in id
-        - nostrud exercitation aute dolor in
+        - mollit
 
       ## exposed_headers ##
       #
@@ -186,9 +181,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - in quis voluptate culpa
-        - reprehenderit ex dolore
-        - eu ipsum officia ullamco
+        - Ut proident
+        - nostrud sit aliquip ullamco
+        - non reprehenderit
+        - nulla qui et exercitation
 
       ## allow_credentials ##
       #
@@ -204,6 +200,20 @@ serve:
       #
       allow_credentials: true
 
+      ## options_passthrough ##
+      #
+      # TODO
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
+      #
+      options_passthrough: true
+
       ## max_age ##
       #
       # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.
@@ -214,7 +224,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 64210505
+      max_age: 16579227
 
       ## debug ##
       #
@@ -228,12 +238,33 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
+
+    ## access_log ##
+    #
+    # Access Log configuration for public server.
+    #
+    access_log:
+      ## disable_for_health ##
+      #
+      # Disable access log for health endpoints.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
+      #
+      disable_for_health: false
 
   ## admin ##
   #
   admin:
     ## port ##
+    #
+    # Default value: 4445
     #
     # Set this value using environment variables on
     # - Linux/macOS:
@@ -241,9 +272,14 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 11452
+    port: 21012
 
     ## host ##
+    #
+    # The interface or unix socket ORY Hydra should listen and handle administrative API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+    #
+    # Examples:
+    # - localhost
     #
     # Set this value using environment variables on
     # - Linux/macOS:
@@ -255,8 +291,14 @@ serve:
 
     ## cors ##
     #
+    # Configures Cross Origin Resource Sharing for public endpoints.
+    #
     cors:
       ## enabled ##
+      #
+      # Sets whether CORS is enabled.
+      #
+      # Default value: false
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -267,6 +309,15 @@ serve:
       enabled: false
 
       ## allowed_origins ##
+      #
+      # A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.
+      #
+      # Default value: *
+      #
+      # Examples:
+      # - - https://example.com
+      #   - https://*.example.com
+      #   - https://*.foo.example.com
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -279,6 +330,10 @@ serve:
 
       ## allowed_methods ##
       #
+      # A list of HTTP methods the user agent is allowed to use with cross-domain requests.
+      #
+      # Default value: POST,GET,PUT,PATCH,DELETE
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
@@ -286,13 +341,13 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - POST
-        - CONNECT
-        - DELETE
-        - HEAD
-        - PATCH
+        - OPTIONS
 
       ## allowed_headers ##
+      #
+      # A list of non simple headers the client is allowed to use with cross-domain requests.
+      #
+      # Default value: Authorization,Content-Type
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -301,10 +356,13 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - do pariatur fugiat ipsum quis
-        - laborum
+        - ullamco amet voluptate nostrud
 
       ## exposed_headers ##
+      #
+      # Sets which headers are safe to expose to the API of a CORS API specification.
+      #
+      # Default value: Content-Type
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -313,9 +371,17 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - dolor ut id Ut
+        - anim aliqua
+        - laboris Duis laborum
+        - anim amet magna
+        - in eu dolor ullamco
+        - ullamco Ut non et commodo
 
       ## allow_credentials ##
+      #
+      # Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.
+      #
+      # Default value: true
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -323,9 +389,25 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
+
+      ## options_passthrough ##
+      #
+      # TODO
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_CORS_OPTIONS_PASSTHROUGH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_CORS_OPTIONS_PASSTHROUGH=<value>
+      #
+      options_passthrough: true
 
       ## max_age ##
+      #
+      # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -333,9 +415,13 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 39479969
+      max_age: 49548208
 
       ## debug ##
+      #
+      # Adds additional log output to debug server side CORS issues.
+      #
+      # Default value: false
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -344,6 +430,25 @@ serve:
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
       debug: false
+
+    ## access_log ##
+    #
+    # Access Log configuration for admin server.
+    #
+    access_log:
+      ## disable_for_health ##
+      #
+      # Disable access log for health endpoints.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
+      #
+      disable_for_health: false
 
   ## tls ##
   #
@@ -370,15 +475,15 @@ serve:
     # Configures the private key (pem encoded).
     #
     cert:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_PATH=<value>
+      #    $ export SERVE_TLS_CERT_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_PATH=<value>
+      #    > set SERVE_TLS_CERT_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## allow_termination_from ##
     #
@@ -391,9 +496,6 @@ serve:
     #    > set SERVE_TLS_ALLOW_TERMINATION_FROM=<value>
     #
     allow_termination_from:
-      - 127.0.0.1/32
-      - 127.0.0.1/32
-      - 127.0.0.1/32
       - 127.0.0.1/32
 
   ## cookies ##
@@ -423,7 +525,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: anim aliquip et enim
+dsn: reprehenderit in Excepteur
 
 ## webfinger ##
 #
@@ -450,8 +552,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
     #
-    broadcast_keys:
-      - hydra.openid.id-token
+    broadcast_keys: hydra.jwt.access-token
 
   ## oidc_discovery ##
   #
@@ -721,7 +822,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: wildcard
+  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
 
 ## ttl ##
 #
@@ -796,7 +897,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 10m
+  auth_code: 1h
 
 ## oauth2 ##
 #
@@ -840,7 +941,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 37717394
+      cost: 32565487
 
   ## pkce ##
   #
@@ -884,4 +985,150 @@ secrets:
     - this-is-the-primary-secret
     - this-is-an-old-secret
     - this-is-another-old-secret
+
+  ## cookie ##
+  #
+  # A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use a separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.
+  #
+  # Examples:
+  # - - this-is-the-primary-secret
+  #   - this-is-an-old-secret
+  #   - this-is-another-old-secret
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export SECRETS_COOKIE=<value>
+  # - Windows Command Line (CMD):
+  #    > set SECRETS_COOKIE=<value>
+  #
+  cookie:
+    - this-is-the-primary-secret
+    - this-is-an-old-secret
+    - this-is-another-old-secret
+
+## profiling ##
+#
+# Enables profiling if set. For more details on profiling, head over to: https://blog.golang.org/profiling-go-programs
+#
+# Examples:
+# - cpu
+#
+# Set this value using environment variables on
+# - Linux/macOS:
+#    $ export PROFILING=<value>
+# - Windows Command Line (CMD):
+#    > set PROFILING=<value>
+#
+profiling: cpu
+
+## tracing ##
+#
+# ORY Hydra supports distributed tracing.
+#
+tracing:
+  ## provider ##
+  #
+  # Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.
+  #
+  # Examples:
+  # - jaeger
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export TRACING_PROVIDER=<value>
+  # - Windows Command Line (CMD):
+  #    > set TRACING_PROVIDER=<value>
+  #
+  provider: jaeger
+
+  ## service_name ##
+  #
+  # Specifies the service name to use on the tracer.
+  #
+  # Examples:
+  # - ORY Hydra
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export TRACING_SERVICE_NAME=<value>
+  # - Windows Command Line (CMD):
+  #    > set TRACING_SERVICE_NAME=<value>
+  #
+  service_name: ORY Hydra
+
+  ## providers ##
+  #
+  providers:
+    ## jaeger ##
+    #
+    # Configures the jaeger tracing backend.
+    #
+    jaeger:
+      ## local_agent_address ##
+      #
+      # The address of the jaeger-agent where spans should be sent to.
+      #
+      # Examples:
+      # - 127.0.0.1:6831
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
+      # - Windows Command Line (CMD):
+      #    > set TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
+      #
+      local_agent_address: 127.0.0.1:6831
+
+      ## propagation ##
+      #
+      # The tracing header format
+      #
+      # Examples:
+      # - jaeger
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export TRACING_PROVIDERS_JAEGER_PROPAGATION=<value>
+      # - Windows Command Line (CMD):
+      #    > set TRACING_PROVIDERS_JAEGER_PROPAGATION=<value>
+      #
+      propagation: jaeger
+
+      ## sampling ##
+      #
+      # Examples:
+      # - type: const
+      #   value: 1
+      #   server_url: http://localhost:5778/sampling
+      #
+      sampling:
+        ## type ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export TRACING_PROVIDERS_JAEGER_SAMPLING_TYPE=<value>
+        # - Windows Command Line (CMD):
+        #    > set TRACING_PROVIDERS_JAEGER_SAMPLING_TYPE=<value>
+        #
+        type: const
+
+        ## value ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export TRACING_PROVIDERS_JAEGER_SAMPLING_VALUE=<value>
+        # - Windows Command Line (CMD):
+        #    > set TRACING_PROVIDERS_JAEGER_SAMPLING_VALUE=<value>
+        #
+        value: 1
+
+        ## server_url ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=<value>
+        # - Windows Command Line (CMD):
+        #    > set TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=<value>
+        #
+        server_url: http://localhost:5778/sampling
 ```

@@ -7,6 +7,11 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/ory/x/tracing"
+	"github.com/ory/x/urlx"
+	"github.com/ory/x/viperx"
 
 	"github.com/rs/cors"
 	"github.com/sirupsen/logrus"
@@ -140,4 +145,100 @@ func TestViperProvider_CookieSameSiteMode(t *testing.T) {
 
 	viper.Set(ViperKeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
+}
+
+func TestViperProviderValidates(t *testing.T) {
+	l := logrusx.New()
+	viper.Reset()
+	viperx.InitializeConfig(
+		"hydra",
+		"../../internal",
+		l,
+	)
+
+	require.NoError(t, viperx.ValidateFromURL("../../.schema/config.schema.json"))
+	c := NewViperProvider(l, false, nil)
+
+	// log
+	assert.Equal(t, "debug", viper.Get("log.level"))
+	assert.Equal(t, "json", viper.Get("log.format"))
+
+	// serve
+	assert.Equal(t, "localhost:1", c.PublicListenOn())
+	assert.Equal(t, "localhost:2", c.AdminListenOn())
+	assert.Equal(t, false, c.CORSEnabled("public"))
+	assert.Equal(t, false, c.CORSEnabled("admin"))
+	expectedCors := cors.Options{
+		AllowedOrigins:     []string{"https://example.com"},
+		AllowedMethods:     []string{"GET"},
+		AllowedHeaders:     []string{"Authorization"},
+		ExposedHeaders:     []string{"Content-Type"},
+		AllowCredentials:   true,
+		MaxAge:             1,
+		Debug:              false,
+		OptionsPassthrough: true,
+	}
+	assert.Equal(t, expectedCors, c.CORSOptions("public"))
+	assert.Equal(t, expectedCors, c.CORSOptions("admin"))
+	assert.Equal(t, []string{"127.0.0.1/32"}, c.AllowTLSTerminationFrom())
+	assert.Equal(t, "/path/to/file.pem", viper.Get("serve.tls.key.path"))
+	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", viper.Get("serve.tls.cert.base64"))
+	assert.Equal(t, http.SameSiteLaxMode, c.CookieSameSiteMode())
+
+	// dsn
+	assert.Equal(t, "memory", c.DSN())
+
+	// webfinger
+	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys())
+	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OAuth2ClientRegistrationURL())
+	assert.Equal(t, []string{"sub", "username"}, c.OIDCDiscoverySupportedClaims())
+	assert.Equal(t, []string{"offline", "openid", "whatever"}, c.OIDCDiscoverySupportedScope())
+	assert.Equal(t, "https://example.com", c.OIDCDiscoveryUserinfoEndpoint())
+
+	// oidc
+	assert.Equal(t, []string{"pairwise"}, c.SubjectTypesSupported())
+	assert.Equal(t, "random_salt", c.SubjectIdentifierAlgorithmSalt())
+	assert.Equal(t, []string{"whatever"}, c.DefaultClientScope())
+
+	// urls
+	assert.Equal(t, urlx.ParseOrPanic("https://issuer/"), c.IssuerURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://public/"), c.PublicURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://login/"), c.LoginURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://consent/"), c.ConsentURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://logout/"), c.LogoutURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://error/"), c.ErrorURL())
+	assert.Equal(t, urlx.ParseOrPanic("https://post_logout/"), c.LogoutRedirectURL())
+
+	// strategies
+	assert.Equal(t, "exact", c.ScopeStrategy())
+
+	// ttl
+	assert.Equal(t, 2*time.Hour, c.ConsentRequestMaxAge())
+	assert.Equal(t, 2*time.Hour, c.AccessTokenLifespan())
+	assert.Equal(t, 2*time.Hour, c.RefreshTokenLifespan())
+	assert.Equal(t, 2*time.Hour, c.IDTokenLifespan())
+	assert.Equal(t, 2*time.Hour, c.AuthCodeLifespan())
+
+	// oauth2
+	assert.Equal(t, true, c.ShareOAuth2Debug())
+	assert.Equal(t, 20, c.BCryptCost())
+	assert.Equal(t, true, c.PKCEEnforced())
+
+	// secrets
+	assert.Equal(t, []byte{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}, c.GetSystemSecret())
+	assert.Equal(t, [][]uint8{{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}}, c.GetCookieSecrets())
+
+	// profiling
+	assert.Equal(t, "cpu", viper.Get("profiling"))
+
+	// tracing
+	assert.Equal(t, "jaeger", c.TracingProvider())
+	assert.Equal(t, "hydra service", c.TracingServiceName())
+	assert.Equal(t, &tracing.JaegerConfig{
+		LocalAgentHostPort: "127.0.0.1:6831",
+		SamplerType:        "const",
+		SamplerValue:       1,
+		SamplerServerURL:   "http://sampling",
+		Propagation:        "jaeger",
+	}, c.TracingJaegerConfig())
 }

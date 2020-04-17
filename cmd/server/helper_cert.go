@@ -28,8 +28,9 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 
-	"github.com/ory/viper"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
 

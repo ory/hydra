@@ -78,7 +78,18 @@
             "DELETE"
           ],
           "items": {
-            "$ref": "#/definitions/http_method"
+            "type": "string",
+            "enum": [
+              "POST",
+              "GET",
+              "PUT",
+              "PATCH",
+              "DELETE",
+              "CONNECT",
+              "HEAD",
+              "OPTIONS",
+              "TRACE"
+            ]
           }
         },
         "allowed_headers": {

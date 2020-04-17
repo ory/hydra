@@ -187,17 +187,17 @@
         {
           "type": "link",
           "label": "Home",
-          "href": "https://www.ory.sh/Keto"
+          "href": "https://www.ory.sh/keto"
         },
         {
           "type": "link",
           "label": "Docs",
-          "href": "https://www.ory.sh/Keto/docs"
+          "href": "https://www.ory.sh/keto/docs"
         },
         {
           "type": "link",
           "label": "GitHub",
-          "href": "https://github.com/ory/Keto"
+          "href": "https://github.com/ory/keto"
         }
       ]
     }

@@ -1,4 +1,4 @@
-<h1 align="center"><img src=".github/images/banner_hydra.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
+<h1 align="center"><img src=".github/banner_hydra.svg" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">
     <a href="https://www.ory.sh/chat">Chat</a> |
@@ -213,6 +213,8 @@ TheCrealm.
 
 
 
+
+
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -322,6 +324,8 @@ determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 
 <!--END ECOSYSTEM-->
+
+
 
 
 

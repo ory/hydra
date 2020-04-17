@@ -7,31 +7,29 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file `$HOME/.oathkeeper.yaml` exists, it will be used as a configuration file
-which supports all configuration settings listed below.
+If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file which supports all
+configuration settings listed below.
 
-You can load the config file from another source using the
-`-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
-`oathkeeper --config path/to/config.yaml`.
+You can load the config file from another source using the `-c path/to/config.yaml` or `--config path/to/config.yaml`
+flag: `hydra --config path/to/config.yaml`.
 
-Config files can be formatted as JSON, YAML and TOML. Some configuration values
-support reloading without server restart. All configuration values can be set
-using environment variables, as documented below.
+Config files can be formatted as JSON, YAML and TOML. Some configuration values support reloading without server restart.
+All configuration values can be set using environment variables, as documented below.
 
-To find out more about edge cases like setting string array values through
-environmental variables head to the
-[Configuring ORY services](https://www.ory.sh/docs/ecosystem/configuring)
-section.
+To find out more about edge cases like setting string array values through environmental variables head to the
+[Configuring ORY services](https://www.ory.sh/docs/ecosystem/configuring) section.
 
 ```yaml
 ## ORY Hydra Configuration
 #
+
 
 ## log ##
 #
 # Configures the logger
 #
 log:
+  
   ## level ##
   #
   # Sets the log level.
@@ -44,7 +42,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: warn
+  level: error
 
   ## format ##
   #
@@ -65,11 +63,13 @@ log:
 # Controls the configuration for the http(s) daemon(s).
 #
 serve:
+  
   ## public ##
   #
   # Controls the public daemon serving public API endpoints like /oauth2/auth, /oauth2/token, /.well-known/jwks.json
   #
   public:
+    
     ## port ##
     #
     # Default value: 4444
@@ -80,7 +80,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 62267
+    port: 44500
 
     ## host ##
     #
@@ -88,7 +88,7 @@ serve:
     #
     # Examples:
     # - localhost
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export SERVE_PUBLIC_HOST=<value>
@@ -102,6 +102,7 @@ serve:
     # Configures Cross Origin Resource Sharing for public endpoints.
     #
     cors:
+      
       ## enabled ##
       #
       # Sets whether CORS is enabled.
@@ -114,7 +115,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -126,7 +127,7 @@ serve:
       # - - https://example.com
       #   - https://*.example.com
       #   - https://*.foo.example.com
-      #
+      # 
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
@@ -134,9 +135,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - "*"
 
       ## allowed_methods ##
       #
@@ -152,8 +151,9 @@ serve:
       #
       allowed_methods:
         - HEAD
-        - PATCH
+        - HEAD
         - TRACE
+        - PUT
 
       ## allowed_headers ##
       #
@@ -168,8 +168,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - eiusmod commodo adipisicing cupidatat
-        - enim sunt eu culpa sint
+        - veniam
 
       ## exposed_headers ##
       #
@@ -184,8 +183,11 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - eiusmod
-        - ut in pariatur ex
+        - consectetur do anim nostrud fugiat
+        - eiusmod labore cillum sit
+        - sunt nostrud nisi et ut
+        - est in esse Lorem
+        - exercitation ad eiusmod
 
       ## allow_credentials ##
       #
@@ -199,7 +201,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## max_age ##
       #
@@ -211,7 +213,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 81416384
+      max_age: 17678477
 
       ## debug ##
       #
@@ -225,11 +227,12 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
   ## admin ##
   #
   admin:
+    
     ## port ##
     #
     # Set this value using environment variables on
@@ -238,7 +241,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 6721
+    port: 35292
 
     ## host ##
     #
@@ -253,6 +256,7 @@ serve:
     ## cors ##
     #
     cors:
+      
       ## enabled ##
       #
       # Set this value using environment variables on
@@ -272,7 +276,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - "*"
 
       ## allowed_methods ##
       #
@@ -283,11 +287,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - OPTIONS
-        - CONNECT
-        - OPTIONS
+        - PUT
+        - HEAD
+        - HEAD
+        - PATCH
         - GET
-        - POST
 
       ## allowed_headers ##
       #
@@ -298,11 +302,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - dolor
-        - magna cillum id sunt reprehenderit
-        - laboris labore exercitation velit
-        - dolore ea aliquip amet consectetur
-        - fugiat
+        - exercitation in consectetur
 
       ## exposed_headers ##
       #
@@ -313,8 +313,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - ex in
-        - Ut ex
+        - consequat
+        - sint
+        - commodo consectetur ex veniam culpa
 
       ## allow_credentials ##
       #
@@ -334,7 +335,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 29553523
+      max_age: 52824174
 
       ## debug ##
       #
@@ -344,42 +345,45 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
   ## tls ##
   #
   # Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.
   #
   tls:
+    
     ## key ##
     #
     # Configures the private key (pem encoded).
     #
     key:
-      ## base64 ##
+      
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_BASE64=<value>
+      #    $ export SERVE_TLS_KEY_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_BASE64=<value>
+      #    > set SERVE_TLS_KEY_PATH=<value>
       #
-      base64: 0RY1SAWsmLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr...
+      path: /path/to/file.pem
 
     ## cert ##
     #
     # Configures the private key (pem encoded).
     #
     cert:
-      ## path ##
+      
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_PATH=<value>
+      #    $ export SERVE_TLS_CERT_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_PATH=<value>
+      #    > set SERVE_TLS_CERT_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: 0RY1SAWsmLS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tXG5NSUlEWlRDQ0FrMmdBd0lCQWdJRVY1eE90REFOQmdr...
 
     ## allow_termination_from ##
     #
@@ -396,10 +400,12 @@ serve:
       - 127.0.0.1/32
       - 127.0.0.1/32
       - 127.0.0.1/32
+      - 127.0.0.1/32
 
   ## cookies ##
   #
   cookies:
+    
     ## same_site_mode ##
     #
     # Specify the SameSite mode that cookies should be sent with.
@@ -412,7 +418,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: None
+    same_site_mode: Strict
 
 ## dsn ##
 #
@@ -424,18 +430,20 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: dolor ex
+dsn: eiusmod
 
 ## webfinger ##
 #
 # Configures ./well-known/ settings.
 #
 webfinger:
+  
   ## jwks ##
   #
   # Configures the /.well-known/jwks.json endpoint.
   #
   jwks:
+    
     ## broadcast_keys ##
     #
     # A list of JSON Web Keys that should be exposed at that endpoint. This is usually the public key for verifying OpenID Connect ID Tokens. However, you might want to add additional keys here as well.
@@ -444,7 +452,7 @@ webfinger:
     #
     # Examples:
     # - hydra.jwt.access-token
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_JWKS_BROADCAST_KEYS=<value>
@@ -459,11 +467,12 @@ webfinger:
   # Configures OpenID Connect Discovery (/.well-known/openid-configuration).
   #
   oidc_discovery:
+    
     ## client_registration_url ##
     #
     # Examples:
     # - https://my-service.com/clients
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_CLIENT_REGISTRATION_URL=<value>
@@ -479,7 +488,7 @@ webfinger:
     # Examples:
     # - - email
     #   - username
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_SUPPORTED_CLAIMS=<value>
@@ -498,7 +507,7 @@ webfinger:
     # - - email
     #   - whatever
     #   - read.photos
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_SUPPORTED_SCOPE=<value>
@@ -516,7 +525,7 @@ webfinger:
     #
     # Examples:
     # - https://example.org/my-custom-userinfo-endpoint
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_USERINFO_URL=<value>
@@ -530,6 +539,7 @@ webfinger:
 # Configures OpenID Connect features.
 #
 oidc:
+  
   ## subject_identifiers ##
   #
   # Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
@@ -540,8 +550,9 @@ oidc:
   #     - pairwise
   #   pairwise:
   #     salt: some-random-salt
-  #
+  # 
   subject_identifiers:
+    
     ## enabled ##
     #
     # A list of algorithms to enable.
@@ -561,6 +572,7 @@ oidc:
     # Configures the pairwise algorithm.
     #
     pairwise:
+      
       ## salt ##
       #
       # Set this value using environment variables on
@@ -576,6 +588,7 @@ oidc:
   # Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).
   #
   dynamic_client_registration:
+    
     ## default_scope ##
     #
     # The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the "scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
@@ -584,7 +597,7 @@ oidc:
     # - - openid
     #   - offline
     #   - offline_access
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=<value>
@@ -599,16 +612,18 @@ oidc:
 ## urls ##
 #
 urls:
+  
   ## self ##
   #
   self:
+    
     ## issuer ##
     #
     # This value will be used as the "issuer" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal to the public value.
     #
     # Examples:
     # - https://localhost:4444/
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export URLS_SELF_ISSUER=<value>
@@ -623,7 +638,7 @@ urls:
     #
     # Examples:
     # - https://localhost:4444/
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export URLS_SELF_PUBLIC=<value>
@@ -638,7 +653,7 @@ urls:
   #
   # Examples:
   # - https://my-login.app/login
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_LOGIN=<value>
@@ -653,7 +668,7 @@ urls:
   #
   # Examples:
   # - https://my-consent.app/consent
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_CONSENT=<value>
@@ -668,7 +683,7 @@ urls:
   #
   # Examples:
   # - https://my-logout.app/logout
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_LOGOUT=<value>
@@ -683,7 +698,7 @@ urls:
   #
   # Examples:
   # - https://my-error.app/error
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_ERROR=<value>
@@ -698,7 +713,7 @@ urls:
   #
   # Examples:
   # - https://my-example.app/logout-successful
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_POST_LOGOUT_REDIRECT=<value>
@@ -710,6 +725,7 @@ urls:
 ## strategies ##
 #
 strategies:
+  
   ## scope ##
   #
   # Defines how scopes are matched. For more details have a look at https://github.com/ory/fosite#scopes
@@ -722,13 +738,14 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: wildcard
+  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
 
 ## ttl ##
 #
 # Configures time to live.
 #
 ttl:
+  
   ## login_consent_request ##
   #
   # Configures how long a user login and consent flow may take.
@@ -769,7 +786,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 720h
+  refresh_token: 1h
 
   ## id_token ##
   #
@@ -802,6 +819,7 @@ ttl:
 ## oauth2 ##
 #
 oauth2:
+  
   ## expose_internal_errors ##
   #
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.
@@ -810,7 +828,7 @@ oauth2:
   #
   # Examples:
   # - true
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
@@ -824,11 +842,13 @@ oauth2:
   # Configures hashing algorithms. Supports only BCrypt at the moment.
   #
   hashers:
+    
     ## bcrypt ##
     #
     # Configures the BCrypt hashing algorithm used for hashing Client Secrets.
     #
     bcrypt:
+      
       ## cost ##
       #
       # Sets the BCrypt cost. The higher the value, the more CPU time is being used to generate hashes.
@@ -841,18 +861,19 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 75604578
+      cost: 17238859
 
   ## pkce ##
   #
   pkce:
+    
     ## enforced ##
     #
     # Sets whether PKCE should be enforced for all clients.
     #
     # Examples:
     # - true
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export OAUTH2_PKCE_ENFORCED=<value>
@@ -866,6 +887,7 @@ oauth2:
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys
 #
 secrets:
+  
   ## system ##
   #
   # The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.
@@ -874,7 +896,7 @@ secrets:
   # - - this-is-the-primary-secret
   #   - this-is-an-old-secret
   #   - this-is-another-old-secret
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export SECRETS_SYSTEM=<value>
@@ -885,4 +907,5 @@ secrets:
     - this-is-the-primary-secret
     - this-is-an-old-secret
     - this-is-another-old-secret
+
 ```

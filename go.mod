@@ -3,7 +3,6 @@ module github.com/ory/hydra
 go 1.14
 
 require (
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3
@@ -13,7 +12,7 @@ require (
 	github.com/go-openapi/validate v0.19.6
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
-	github.com/gobuffalo/packr v1.24.0
+	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gobuffalo/pop v4.13.1+incompatible
 	github.com/gobuffalo/pop/v5 v5.0.11
@@ -31,12 +30,11 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/fosite v0.31.0
+	github.com/ory/fosite v0.31.2
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.7.0
-	github.com/ory/jsonschema/v3 v3.0.1
-	github.com/ory/sdk/swagutil v0.0.0-20200407150153-53df6d772608
+	github.com/ory/sdk/swagutil v0.0.0-20200416175937-89e79eede081
 	github.com/ory/viper v1.7.4
 	github.com/ory/x v0.0.113
 	github.com/pborman/uuid v1.2.0
@@ -63,7 +61,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/gorp.v1 v1.7.2 // indirect
-	gopkg.in/square/go-jose.v2 v2.4.1
+	gopkg.in/square/go-jose.v2 v2.5.0
 )
 
 replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200409124423-bb3cb4c51f56

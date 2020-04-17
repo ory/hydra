@@ -22,26 +22,39 @@ package server
 
 import (
 	"context"
+	"crypto/sha1" // #nosec G505 - This is required for certificate chains alongside sha256
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 
 	"github.com/ory/viper"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/driver"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/tlsx"
+
+	"github.com/ory/hydra/jwk"
 )
 
 const (
 	tlsKeyName = "hydra.https-tls"
 )
 
-func getOrCreateTLSCertificate(cmd *cobra.Command, d driver.Driver) []tls.Certificate {
+func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
+	priv.Certificates = []*x509.Certificate{cert}
+	sig256 := sha256.Sum256(cert.Raw)
+	// #nosec G401 - This is required for certificate chains alongside sha256
+	sig1 := sha1.Sum(cert.Raw)
+	priv.CertificateThumbprintSHA256 = sig256[:]
+	priv.CertificateThumbprintSHA1 = sig1[:]
+}
+
+func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Driver) []tls.Certificate {
 	cert, err := tlsx.Certificate(
 		viper.GetString("serve.tls.cert.base64"),
 		viper.GetString("serve.tls.key.base64"),
@@ -66,13 +79,13 @@ func getOrCreateTLSCertificate(cmd *cobra.Command, d driver.Driver) []tls.Certif
 			d.Registry().Logger().WithError(err).Fatalf(`Could not generate a self signed TLS certificate`)
 		}
 
-		priv.Certificates = []*x509.Certificate{cert}
+		AttachCertificate(priv, cert)
 		if err := d.Registry().KeyManager().DeleteKey(context.TODO(), tlsKeyName, priv.KeyID); err != nil {
 			d.Registry().Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
 		}
 
 		if err := d.Registry().KeyManager().AddKey(context.TODO(), tlsKeyName, priv); err != nil {
-			d.Registry().Logger().WithError(err).Fatal(`Could not update (add) the self signed TLS certificate`)
+			d.Registry().Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
 		}
 	}
 

@@ -8,6 +8,8 @@ env:
 before:
   hooks:
     - go mod download
+    - go install github.com/gobuffalo/packr/v2/packr2
+    - packr2
 
 builds:
   -

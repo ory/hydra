@@ -23,12 +23,13 @@ package jwk_test
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/viper"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/viper"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"

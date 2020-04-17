@@ -27,10 +27,11 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
-	"github.com/pkg/errors"
 )
 
 func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {

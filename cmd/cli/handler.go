@@ -21,10 +21,11 @@
 package cli
 
 import (
-	"github.com/ory/hydra/internal/fizzmigrate"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/ory/hydra/internal/fizzmigrate"
 
 	"github.com/spf13/cobra"
 

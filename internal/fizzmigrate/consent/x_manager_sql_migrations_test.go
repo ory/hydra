@@ -3,8 +3,9 @@ package consent_test
 import (
 	"context"
 	"fmt"
-	migrateConsent "github.com/ory/hydra/internal/fizzmigrate/consent"
 	"testing"
+
+	migrateConsent "github.com/ory/hydra/internal/fizzmigrate/consent"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"

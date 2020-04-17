@@ -3,10 +3,11 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/ory/hydra/internal/fizzmigrate/client"
 	"github.com/ory/hydra/internal/fizzmigrate/consent"
 	migrateOauth2 "github.com/ory/hydra/internal/fizzmigrate/oauth2"
-	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"

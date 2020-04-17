@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/ory/x/cmdx"
 	"os"
 	"strings"
+
+	"github.com/ory/x/cmdx"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"

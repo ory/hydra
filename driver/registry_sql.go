@@ -10,6 +10,7 @@ import (
 	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/jmoiron/sqlx"
+
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 

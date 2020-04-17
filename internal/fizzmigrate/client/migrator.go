@@ -2,10 +2,11 @@ package client
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/x/dbal"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/dbal"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{

@@ -23,9 +23,10 @@ package jwk_test
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/ory/hydra/internal/fizzmigrate/client"
 	migrateJWK "github.com/ory/hydra/internal/fizzmigrate/jwk"
-	"testing"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"

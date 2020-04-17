@@ -23,16 +23,19 @@ package client_test
 import (
 	"context"
 	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
 	"github.com/ory/viper"
-	"github.com/stretchr/testify/require"
-	"strings"
-	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
+
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/x/sqlcon/dockertest"

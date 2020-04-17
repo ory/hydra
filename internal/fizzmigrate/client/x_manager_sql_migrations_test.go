@@ -23,8 +23,9 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/client"
 	"testing"
+
+	"github.com/ory/hydra/client"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"

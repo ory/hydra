@@ -30,9 +30,10 @@ import (
 	"github.com/ory/hydra/client"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/x/sqlcon"
-	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/x"
 )

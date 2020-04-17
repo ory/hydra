@@ -2,16 +2,18 @@ package fizzmigrate
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
+	migrate "github.com/rubenv/sql-migrate"
+	"github.com/sirupsen/logrus"
+
 	"github.com/ory/hydra/internal/fizzmigrate/client"
 	"github.com/ory/hydra/internal/fizzmigrate/consent"
 	"github.com/ory/hydra/internal/fizzmigrate/jwk"
 	"github.com/ory/hydra/internal/fizzmigrate/oauth2"
-	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
-	"os"
-	"strings"
 )
 
 type OldMigrationRunner struct {

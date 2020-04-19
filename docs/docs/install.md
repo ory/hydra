@@ -27,10 +27,10 @@ $ hydra help
 
 ## Linux
 
-On linux, you can use `curl | bash` to fetch the latest stable binary using:
+On linux, you can use `bash <(curl ...)` to fetch the latest stable binary using:
 
 ```shell
-$ curl https://raw.githubusercontent.com/ory/hydra/master/install.sh | bash -s -- -b .
+$ bash <(curl https://raw.githubusercontent.com/ory/hydra/master/install.sh) -b . v1.4.5
 $ ./hydra help
 ```
 

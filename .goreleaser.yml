@@ -17,7 +17,7 @@ builds:
     flags:
       - -a
     ldflags:
-      - -s -w -X github.com/ory/hydra/cmd.Version={{.Env.RELEASE_NAME}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
     binary: hydra
     env:
       - CGO_ENABLED=0
@@ -58,12 +58,13 @@ brews:
   - github:
       owner: ory
       name: homebrew-hydra
+    goarm: 6
     ids:
     - hydra-archive
     homepage:  https://www.ory.sh
     commit_author:
-      name: ory
-      email: hi@ory.sh
+      name: aeneasr
+      email: aeneas@ory.sh
 
 scoop:
   bucket:
@@ -71,8 +72,8 @@ scoop:
     name: scoop-hydra
   homepage:  https://www.ory.sh
   commit_author:
-    name: ory
-    email: hi@ory.sh
+    name: aeneasr
+    email: aeneas@ory.sh
 
 dockers:
   - dockerfile: Dockerfile
@@ -82,7 +83,6 @@ dockers:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-      - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}"
       - "oryd/hydra:latest"
   - dockerfile: Dockerfile-alpine
     binaries:
@@ -91,9 +91,7 @@ dockers:
       - "oryd/hydra:v{{ .Major }}-alpine"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-alpine"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
-      - "oryd/hydra:{{ .Env.DOCKER_SHORT_TAG }}-alpine"
       - "oryd/hydra:latest-alpine"
 
 release:
   prerelease: auto
-  name_template: "{{.Env.RELEASE_NAME}}"

@@ -81,7 +81,7 @@ dockers:
       - "oryd/hydra:v{{ .Major }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
-      - "oryd/hydra:v{{ .Tag }}"
+      - "oryd/hydra:{{ .Tag }}"
       - "oryd/hydra:latest"
   - dockerfile: Dockerfile-alpine
     binaries:
@@ -90,7 +90,7 @@ dockers:
       - "oryd/hydra:v{{ .Major }}-alpine"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-alpine"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
-      - "oryd/hydra:v{{ .Tag }}-alpine"
+      - "oryd/hydra:{{ .Tag }}-alpine"
       - "oryd/hydra:latest-alpine"
 
 release:

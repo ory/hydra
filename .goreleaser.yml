@@ -42,8 +42,6 @@ archives:
     id: hydra-archive
     replacements:
       darwin: macOS
-      linux: Linux
-      windows: Windows
       386: 32-bit
       amd64: 64-bit
     format_overrides:

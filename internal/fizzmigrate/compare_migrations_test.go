@@ -3,8 +3,16 @@ package fizzmigrate
 import (
 	"context"
 	"fmt"
+	"os/exec"
+	"strings"
+	"testing"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"modernc.org/mathutil"
+
 	"github.com/ory/hydra/internal/fizzmigrate/client"
 	"github.com/ory/hydra/internal/fizzmigrate/consent"
 	"github.com/ory/hydra/internal/fizzmigrate/jwk"
@@ -12,12 +20,6 @@ import (
 	"github.com/ory/hydra/persistence/sql"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"modernc.org/mathutil"
-	"os/exec"
-	"strings"
-	"testing"
 )
 
 func connectPostgres(t *testing.T) (*pop.Connection, *sqlx.DB) {
@@ -59,7 +61,7 @@ var dbConnections = map[string]func(*testing.T) (*pop.Connection, *sqlx.DB){
 }
 
 func migrateOldBySingleSteps(t *testing.T, m migrator, db string, stepsDone *int, maxSteps int, afterEach func(int)) {
-	for ; *stepsDone < maxSteps; {
+	for *stepsDone < maxSteps {
 		n, err := m.CreateMaxSchemas(db, 1)
 		require.NoError(t, err)
 		require.Equal(t, 1, n)

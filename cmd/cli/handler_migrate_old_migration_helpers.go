@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/x/sqlcon"
 	"github.com/pkg/errors"
+
+	"github.com/ory/x/sqlcon"
 )
 
 type oldTableName string

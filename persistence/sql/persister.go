@@ -3,10 +3,11 @@ package sql
 import (
 	"context"
 	"fmt"
-	"github.com/ory/x/sqlcon"
 	"io"
 	"strconv"
 	"time"
+
+	"github.com/ory/x/sqlcon"
 
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/pop/v5"
@@ -143,4 +144,3 @@ func (p *Persister) migrateOldMigrationTables() error {
 		return nil
 	}))
 }
-

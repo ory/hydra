@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// GenericError GenericError GenericError Error response
+// GenericError Error response
 //
 // Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
 //

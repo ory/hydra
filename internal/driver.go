@@ -51,7 +51,7 @@ func resetConfig() {
 	viper.Set(configuration.ViperKeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
 	viper.Set(configuration.ViperKeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
 
-	viper.Set("LOG_LEVEL", "debug")
+	viper.Set(configuration.ViperKeyLogLevel, "debug")
 }
 
 func NewConfigurationWithDefaults() *configuration.ViperProvider {
@@ -65,15 +65,15 @@ func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 }
 
 func NewRegistry(c *configuration.ViperProvider) *driver.RegistryMemory {
-	viper.Set("LOG_LEVEL", "debug")
+	viper.Set(configuration.ViperKeyLogLevel, "debug")
 	r := driver.NewRegistryMemory().WithConfig(c)
 	_ = r.Init()
 	return r.(*driver.RegistryMemory)
 }
 
 func NewRegistrySQL(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
-	viper.Set("LOG_LEVEL", "debug")
-	r := driver.NewRegistrySQL().WithLogger(logrusx.New()).WithConfig(c).(*driver.RegistrySQL).WithDB(db)
+	viper.Set(configuration.ViperKeyLogLevel, "debug")
+	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
 	_ = r.Init()
 	return r.(*driver.RegistrySQL)
 }

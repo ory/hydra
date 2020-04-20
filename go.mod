@@ -62,6 +62,7 @@ require (
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/square/go-jose.v2 v2.5.0
+	modernc.org/mathutil v1.0.0
 )
 
-replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200409124423-bb3cb4c51f56
+replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200418094557-850d559d8122

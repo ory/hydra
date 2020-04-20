@@ -12,6 +12,7 @@ type (
 		MigrationStatus(context.Context, io.Writer) error
 		MigrateDown(context.Context, int) error
 		MigrateUp(context.Context) error
+		PrepareMigration(context.Context) error
 		Connection(context.Context) *pop.Connection
 	}
 	Provider interface {

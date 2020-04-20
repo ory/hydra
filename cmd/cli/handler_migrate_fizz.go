@@ -63,7 +63,7 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 		return
 	}
 	// convert migration tables
-	if err := migrateOldMigrationTables(conn); err != nil {
+	if err := p.PrepareMigration(context.Background()); err != nil {
 		fmt.Printf("Could not convert the migration table:\n%+v\n", err)
 		os.Exit(1)
 		return

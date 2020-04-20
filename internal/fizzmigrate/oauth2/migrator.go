@@ -45,3 +45,9 @@ func (s *migrator) CreateSchemas(dbName string) (int, error) {
 	}
 	return n, nil
 }
+
+func (m *migrator) CreateMaxSchemas(dbName string, steps int) (int, error) {
+	migrate.SetTable("hydra_oauth2_migration")
+	n, err := migrate.ExecMax(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up, steps)
+	return n, errors.WithStack(err)
+}

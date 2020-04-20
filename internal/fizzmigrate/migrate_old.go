@@ -24,6 +24,7 @@ type OldMigrationRunner struct {
 type migrator interface {
 	CreateSchemas(dbName string) (int, error)
 	PlanMigration(dbName string) ([]*migrate.PlannedMigration, error)
+	CreateMaxSchemas(string, int) (int, error)
 }
 
 func (m *OldMigrationRunner) SchemaMigrationPlan(dbName string) (*tablewriter.Table, error) {

@@ -1,9 +1,10 @@
 version: 2.1
 
 orbs:
+  goreleaser: ory/goreleaser@0.1.7
+  slack: circleci/slack@3.4.2
   sdk: ory/sdk@0.1.33
   changelog: ory/changelog@0.0.9
-  goreleaser: ory/goreleaser@0.0.29
   nancy: ory/nancy@0.0.9
   docs: ory/docs@0.0.4
   golangci: ory/golangci@0.0.4
@@ -45,60 +46,24 @@ jobs:
       #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
-  test-e2e-memory:
-    docker:
-      - image: oryd/e2e-env:latest
-        environment:
-          - GO111MODULE=on
-    working_directory: /go/src/github.com/ory/hydra
-    steps:
-      - checkout
-      # core node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-            - v1-deps
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-
-      # oauth2_client node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-            - v1-deps
-      - run: cd test/e2e/oauth2-client; npm ci
-      - save_cache:
-          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-            - /test/e2e/oauth2-client/node_modules
-
-      # go modules cache
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go install .
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
-
-      - run: ./test/e2e/circle-ci.bash memory
-      - run: ./test/e2e/circle-ci.bash memory-jwt
-
-  test-e2e-mysql:
+  test-e2e:
+    parameters:
+      flavor:
+        type: string
     docker:
       - image: oryd/e2e-env:latest
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+          - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+      - image: postgres:9.6
+        environment:
+          - POSTGRES_USER=test
+          - POSTGRES_PASSWORD=test
+          - POSTGRES_DB=hydra
+      - image: cockroachdb/cockroach:v2.1.6
+        command: start --insecure
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
@@ -142,161 +107,8 @@ jobs:
           paths:
             - "/go/pkg/mod"
 
-      - run: ./test/e2e/circle-ci.bash mysql
-      - run: ./test/e2e/circle-ci.bash mysql-jwt
-
-  test-e2e-postgres:
-    docker:
-      - image: oryd/e2e-env:latest
-        environment:
-          - GO111MODULE=on
-          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
-      - image: postgres:9.6
-        environment:
-          - POSTGRES_USER=test
-          - POSTGRES_PASSWORD=test
-          - POSTGRES_DB=hydra
-    working_directory: /go/src/github.com/ory/hydra
-    steps:
-      - checkout
-      # core node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-            - v1-deps
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-
-      # oauth2_client node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-            - v1-deps
-      - run: cd test/e2e/oauth2-client; npm ci
-      - save_cache:
-          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-            - /test/e2e/oauth2-client/node_modules
-
-      # go modules cache
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go install .
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
-
-      - run: ./test/e2e/circle-ci.bash postgres
-      - run: ./test/e2e/circle-ci.bash postgres-jwt
-
-  test-e2e-cockroach:
-    docker:
-      - image: oryd/e2e-env:latest
-        environment:
-          - GO111MODULE=on
-          - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
-      - image: cockroachdb/cockroach:v2.1.6
-        command: start --insecure
-    working_directory: /go/src/github.com/ory/hydra
-    steps:
-      - checkout
-      # core node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-            - v1-deps
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-
-      # oauth2_client node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-            - v1-deps
-      - run: cd test/e2e/oauth2-client; npm ci
-      - save_cache:
-          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-            - /test/e2e/oauth2-client/node_modules
-
-      # go modules cache
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go install .
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
-
-      - run: ./test/e2e/circle-ci.bash cockroach
-      - run: ./test/e2e/circle-ci.bash cockroach-jwt
-
-  test-e2e-plugin:
-    docker:
-      - image: oryd/e2e-env:latest
-        environment:
-          - GO111MODULE=on
-    working_directory: /go/src/github.com/ory/hydra
-    steps:
-      - checkout
-      # core node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-            - v1-deps
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-
-      # oauth2_client node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-            - v1-deps
-      - run: cd test/e2e/oauth2-client; npm ci
-      - save_cache:
-          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-            - /test/e2e/oauth2-client/node_modules
-
-      # go modules cache
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go install .
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
-
-      - run: ./test/e2e/circle-ci.bash plugin
-      - run: ./test/e2e/circle-ci.bash plugin-jwt
+      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>
+      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>-jwt
 
 workflows:
   bdt:
@@ -315,23 +127,33 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e-memory:
+      - test-e2e:
+          name: test-e2e-memory
+          flavor: memory
           filters:
             tags:
               only: /.*/
-      - test-e2e-postgres:
+      - test-e2e:
+          name: test-e2e-postgres
+          flavor: postgres
           filters:
             tags:
               only: /.*/
-      - test-e2e-mysql:
+      - test-e2e:
+          name: test-e2e-mysql
+          flavor: mysql
           filters:
             tags:
               only: /.*/
-      - test-e2e-cockroach:
+      - test-e2e:
+          name: test-e2e-cockroach
+          flavor: cockroach
           filters:
             tags:
               only: /.*/
-      - test-e2e-plugin:
+      - test-e2e:
+          name: test-e2e-plugin
+          flavor: plugin
           filters:
             tags:
               only: /.*/
@@ -377,25 +199,6 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
-      - goreleaser/test:
-          filters:
-            tags:
-              only: /.*/
-      - goreleaser/release:
-          requires:
-            - goreleaser/test
-            - test
-            - golangci/lint
-            - test-e2e-memory
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
-            - test-e2e-plugin
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore: /.*/
       - docs/build:
           requires:
             - test
@@ -405,3 +208,61 @@ workflows:
               only: /.*/
             branches:
               only: master
+      ## goreleaser
+      -
+        goreleaser/test:
+          filters:
+            tags:
+              only: /.*/
+      -
+        goreleaser/release:
+          requires:
+            - goreleaser/test
+            - test
+            - golangci/lint
+            - test-e2e-memory
+            - test-e2e-postgres
+            - test-e2e-mysql
+            - test-e2e-cockroach
+            - test-e2e-plugin
+            - changelog/generate
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.*/
+      -
+        goreleaser/newsletter-draft:
+          chimp-list: f605a41b53
+          chimp-segment: 6478605
+          requires:
+            - goreleaser/release
+          filters:
+            tags:
+              only: /.*/
+      -
+        slack/approval-notification:
+          message: Pending approval
+          channel: release-automation
+          requires:
+            - goreleaser/newsletter-draft
+          filters:
+            tags:
+              only: /.*/
+      -
+        newsletter-approval:
+          type: approval
+          requires:
+            - goreleaser/newsletter-draft
+          filters:
+            tags:
+              only: /.*/
+      -
+        goreleaser/newsletter-send:
+          chimp-list: f605a41b53
+          requires:
+            - newsletter-approval
+          filters:
+            tags:
+              only: /.*/
+      ## end goreleaser

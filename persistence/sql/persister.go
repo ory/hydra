@@ -89,16 +89,17 @@ func (p *Persister) migrateOldMigrationTables() error {
 		return nil
 	}
 
-	return errors.WithStack(p.c.Transaction(func(tx *pop.Connection) error {
-		if err := pop.CreateSchemaMigrations(p.c); err != nil {
-			return errors.WithStack(err)
-		}
+	if err := pop.CreateSchemaMigrations(p.c); err != nil {
+		return errors.WithStack(err)
+	}
 
+	return errors.WithStack(p.c.Transaction(func(tx *pop.Connection) error {
 		// in this order the migrations only depend on already done ones
 		for i, table := range []oldTableName{clientMigrationTableName, jwkMigrationTableName, consentMigrationTableName, oauth2MigrationTableName} {
 			// in some cases the tables might not exist, so we just add empty ones
+			/* #nosec G201 table is static */
 			err := errors.WithStack(
-				tx.RawQuery(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s ();", table)).
+				tx.RawQuery(fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (id varchar(1));", table)).
 					Exec())
 			if err != nil {
 				return err
@@ -107,7 +108,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 			// get old migrations
 			var migrations []OldMigrationRecord
 
-			/* #nosec G201 TableName is static */
+			/* #nosec G201 table is static */
 			err = errors.WithStack(
 				tx.RawQuery(fmt.Sprintf("SELECT * FROM %s", table)).
 					Eager().
@@ -118,20 +119,18 @@ func (p *Persister) migrateOldMigrationTables() error {
 
 			// translate migrations
 			for _, m := range migrations {
-				if m.AppliedAt.Before(time.Now()) {
-					// the migration was run already -> set it as run for fizz
-					// fizz standard version pattern: YYYYMMDDhhmmss
-					migrationNumber, err := strconv.ParseInt(m.Id, 10, 0)
-					if err != nil {
-						return errors.WithStack(err)
-					}
+				// mark the migration as run for fizz
+				// fizz standard version pattern: YYYYMMDDhhmmss
+				migrationNumber, err := strconv.ParseInt(m.Id, 10, 0)
+				if err != nil {
+					return errors.WithStack(err)
+				}
 
-					/* #nosec G201 - i is static (0..3) and migrationNumber is from the database */
-					if err := tx.RawQuery(
-						fmt.Sprintf("INSERT INTO schema_migration (version) VALUES (2019%02d%08d)", i+1, migrationNumber)).
-						Exec(); err != nil {
-						return sqlcon.HandleError(err)
-					}
+				/* #nosec G201 - i is static (0..3) and migrationNumber is from the database */
+				if err := tx.RawQuery(
+					fmt.Sprintf("INSERT INTO schema_migration (version) VALUES ('2019%02d%08d')", i+1, migrationNumber)).
+					Exec(); err != nil {
+					return errors.WithStack(err)
 				}
 			}
 

@@ -13,18 +13,22 @@ var _ persistence.Persister = new(Persister)
 
 type Persister struct{}
 
-func (p *Persister) MigrationStatus(_ context.Context, w io.Writer) error {
+func (*Persister) MigrationStatus(_ context.Context, _ io.Writer) error {
 	return nil
 }
 
-func (p *Persister) MigrateDown(_ context.Context, steps int) error {
+func (*Persister) MigrateDown(_ context.Context, steps int) error {
 	return nil
 }
 
-func (p *Persister) MigrateUp(_ context.Context) error {
+func (*Persister) MigrateUp(_ context.Context) error {
 	return nil
 }
 
-func (p *Persister) Connection(_ context.Context) *pop.Connection {
+func (*Persister) PrepareMigration(context.Context) error {
+	return nil
+}
+
+func (*Persister) Connection(_ context.Context) *pop.Connection {
 	return nil
 }

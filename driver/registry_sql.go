@@ -79,6 +79,9 @@ func (m *RegistrySQL) Init() error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
+		if err := c.Open(); err != nil {
+			return errors.WithStack(err)
+		}
 		m.persister, err = sql.NewPersister(c)
 		if err != nil {
 			return err

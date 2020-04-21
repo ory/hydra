@@ -59,10 +59,12 @@ func stripDump(d string) string {
 	return strings.ReplaceAll(d, "\r\n", "")
 }
 
+// note: the makefile starts postgres with the database "hydra" but dockertest with the default "postgres"
+// we should probably use the default for testing everywhere
 func dumpArgs(t *testing.T, db string) []string {
 	switch db {
 	case "postgres":
-		return []string{"exec", "-t", getContainerID(t, "5432"), "pg_dump", "-U", "postgres", "-s"}
+		return []string{"exec", "-t", getContainerID(t, "5432"), "pg_dump", "-U", "postgres", "-s", "-T", "hydra_*_migration", "-T", "schema_migration"}
 	case "mysql":
 		return []string{"exec", "-t", getContainerID(t, "3306"), "/usr/bin/mysqldump", "-u", "root", "--password=secret", "mysql"}
 	case "cockroach":

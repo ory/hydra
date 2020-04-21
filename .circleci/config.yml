@@ -15,14 +15,14 @@ jobs:
       - image: circleci/golang:1.14
         environment:
           - GO111MODULE=on
-          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
           - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
       - image: postgres:9.6
         environment:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
-          - POSTGRES_DB=hydra
+          - POSTGRES_DB=postgres
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
@@ -56,12 +56,12 @@ jobs:
           - GO111MODULE=on
           - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
-          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
       - image: postgres:9.6
         environment:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
-          - POSTGRES_DB=hydra
+          - POSTGRES_DB=postgres
       - image: cockroachdb/cockroach:v2.1.6
         command: start --insecure
       - image: mysql:5.7

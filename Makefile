@@ -14,10 +14,10 @@ dump_db_migrations:
 		docker run --rm --name database_migrations_new_mysql -p 3933:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name database_migrations_old_cockroach -p 3934:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
 		docker run --rm --name database_migrations_new_cockroach -p 3935:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
-		go run . migrate sqlold 'postgres://postgres:secret@127.0.0.1:3930/hydra?sslmode=disable' --yes
+		go run . migrate sqlold 'postgres://postgres:secret@127.0.0.1:3930/postgres?sslmode=disable' --yes
 		go run . migrate sqlold 'mysql://root:secret@(127.0.0.1:3932)/mysql?parseTime=true&multiStatements=true' --yes
 		go run . migrate sqlold 'cockroach://root@127.0.0.1:3934/defaultdb?sslmode=disable' --yes
-		go run . migrate sql 'postgres://postgres:secret@127.0.0.1:3931/hydra?sslmode=disable' --yes
+		go run . migrate sql 'postgres://postgres:secret@127.0.0.1:3931/postgres?sslmode=disable' --yes
 		go run . migrate sql 'mysql://root:secret@(127.0.0.1:3933)/mysql?parseTime=true&multiStatements=true' --yes
 		go run . migrate sql 'cockroach://root@127.0.0.1:3935/defaultdb?sslmode=disable' --yes
 		docker exec -t database_migrations_old_postgres pg_dumpall -c -U postgres > dump_postgres_old.sql
@@ -38,7 +38,7 @@ test:
 		make test-resetdb
 		#make sqlbin
 		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true' \
-		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
+		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable' \
 		TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
 		$$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql

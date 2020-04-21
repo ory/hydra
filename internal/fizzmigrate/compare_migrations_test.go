@@ -83,15 +83,15 @@ func dump(t *testing.T, db string) string {
 var dbConnections = map[string]func(*testing.T) (*pop.Connection, *sqlx.DB){
 	"postgres":  connectPostgres,
 	"mysql":     connectMySQL,
-	//"cockroach": connectCockroach,
+	"cockroach": connectCockroach,
 }
 
 func migrateOldBySingleSteps(t *testing.T, m migrator, db string, stepsDone *int, maxSteps int, afterEach func(int)) {
 	startSteps := *stepsDone
 	for ; *stepsDone < startSteps+maxSteps; *stepsDone++ {
-		_, err := m.CreateMaxSchemas(db, 1)
+		n, err := m.CreateMaxSchemas(db, 1)
 		require.NoError(t, err)
-		//require.Equal(t, 1, n)
+		require.Equal(t, 1, n)
 		afterEach(*stepsDone)
 	}
 }
@@ -103,38 +103,17 @@ func min(a, b int) int {
 	return b
 }
 
-// returns how many migrations exist: client, jwk, consent, oauth2
-func migrationAmount(db string) (int, int, int, int) {
-	switch db {
-	case "cockroach":
-		return 2, 1, 3, 3
-	case "mysql", "postgres":
-		return 14, 4, 14, 11
-	}
-	return 0, 0, 0, 0
-}
-
-func totalMigrations(db string) (res int) {
-	amounts := make([]int, 4)
-	amounts[0], amounts[1], amounts[2], amounts[3] = migrationAmount(db)
-	for _, i := range amounts {
-		res += i
-	}
-	return
-}
-
 func migrateOldUpSteps(t *testing.T, dbx *sqlx.DB, db string, todo int, afterEach func(int)) {
-	numClient, numJWK, numConsent, numOauth2 := migrationAmount(db)
 	stepsDone := 0
-	migrateOldBySingleSteps(t, client.NewMigrator(dbx), db, &stepsDone, min(todo, numClient), afterEach)
+	migrateOldBySingleSteps(t, client.NewMigrator(dbx), db, &stepsDone, min(todo, 14), afterEach)
 	if todo > stepsDone {
-		migrateOldBySingleSteps(t, jwk.NewMigrator(dbx), db, &stepsDone, min(todo-stepsDone, numJWK), afterEach)
+		migrateOldBySingleSteps(t, jwk.NewMigrator(dbx), db, &stepsDone, min(todo-stepsDone, 4), afterEach)
 	}
 	if todo > stepsDone {
-		migrateOldBySingleSteps(t, consent.NewMigrator(dbx), db, &stepsDone, min(todo-stepsDone, numConsent), afterEach)
+		migrateOldBySingleSteps(t, consent.NewMigrator(dbx), db, &stepsDone, min(todo-stepsDone, 14), afterEach)
 	}
 	if todo > stepsDone {
-		migrateOldBySingleSteps(t, oauth2.NewMigrator(dbx), db, &stepsDone, min(todo-stepsDone, numOauth2), afterEach)
+		migrateOldBySingleSteps(t, oauth2.NewMigrator(dbx), db, &stepsDone, min(todo-stepsDone, 11), afterEach)
 	}
 }
 
@@ -149,15 +128,15 @@ func TestCompareMigrations(t *testing.T) {
 			persister, err := sql.NewPersister(c)
 			require.NoError(t, err)
 
-			schemasOld := make([]string, totalMigrations(db))
-			migrateOldUpSteps(t, dbx, db, totalMigrations(db), func(i int) {
+			schemasOld := make([]string, 43)
+			migrateOldUpSteps(t, dbx, db, 43, func(i int) {
 				schemasOld[i] = dump(t, db)
 			})
 
 			x.CleanSQLPop(t, c)
 
-			schemasNew := make([]string, totalMigrations(db))
-			for i := 0; i < totalMigrations(db); i++ {
+			schemasNew := make([]string, 43)
+			for i := 0; i < 43; i++ {
 				n, err := persister.MigrateUpTo(context.Background(), 1)
 				require.NoError(t, err)
 				require.Equal(t, 1, n)
@@ -180,8 +159,8 @@ func TestMixMigrations(t *testing.T) {
 			persister, err := sql.NewPersister(c)
 			require.NoError(t, err)
 
-			schemas := make([]string, totalMigrations(db))
-			for i := 0; i < totalMigrations(db); i++ {
+			schemas := make([]string, 43)
+			for i := 0; i < 43; i++ {
 				x.CleanSQLPop(t, c)
 				migrateOldUpSteps(t, dbx, db, i, func(_ int) {})
 				require.NoError(t, persister.MigrateUp(context.Background()))

@@ -13,8 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// for i in {01..03}; do echo "-- cockroach support added later" > $(printf "201902000000%s_testdata.cockroach.sql" $i); done
-
 type TestMigrator struct {
 	pop.Migrator
 }
@@ -77,13 +75,6 @@ func NewTestMigrator(t *testing.T, c *pop.Connection, migrationPath, testDataPat
 			return errors.WithStack(err)
 		}
 
-		//for _, q := range strings.Split(string(data), ";") {
-		//	if err := c.RawQuery(q).Exec(); err != nil {
-		//		log.Print(mf.Version)
-		//		return errors.WithStack(err)
-		//	}
-		//}
-		//return nil
 		if err := tx.RawQuery(string(data)).Exec(); err != nil {
 			log.Print(mf.Version)
 			return errors.WithStack(err)

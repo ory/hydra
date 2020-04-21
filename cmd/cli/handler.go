@@ -25,8 +25,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/hydra/internal/fizzmigrate"
-
 	"github.com/spf13/cobra"
 
 	"github.com/ory/x/cmdx"
@@ -38,8 +36,7 @@ type Handler struct {
 	Keys          *JWKHandler
 	Introspection *IntrospectionHandler
 	Token         *TokenHandler
-	Migration     *MigrateHandlerFizz
-	MigrationOld  *fizzmigrate.MigrateHandler
+	Migration     *MigrateHandler
 }
 
 func Remote(cmd *cobra.Command) string {
@@ -65,7 +62,6 @@ func NewHandler() *Handler {
 		Keys:          newJWKHandler(),
 		Introspection: newIntrospectionHandler(),
 		Token:         newTokenHandler(),
-		Migration:     newHandlerMigrateFizz(),
-		MigrationOld:  fizzmigrate.NewMigrateHandler(),
+		Migration:     newMigrateHandler(),
 	}
 }

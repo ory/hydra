@@ -19,13 +19,13 @@ import (
 	"github.com/ory/x/logrusx"
 )
 
-type MigrateHandlerFizz struct{}
+type MigrateHandler struct{}
 
-func newHandlerMigrateFizz() *MigrateHandlerFizz {
-	return &MigrateHandlerFizz{}
+func newMigrateHandler() *MigrateHandler {
+	return &MigrateHandler{}
 }
 
-func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
+func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	var d driver.Driver
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
@@ -62,6 +62,7 @@ func (h *MigrateHandlerFizz) MigrateSQL(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 		return
 	}
+
 	// convert migration tables
 	if err := p.PrepareMigration(context.Background()); err != nil {
 		fmt.Printf("Could not convert the migration table:\n%+v\n", err)

@@ -195,7 +195,7 @@ type Client struct {
 	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
 }
 
-func (c Client) TableName() string {
+func (Client) TableName() string {
 	return "hydra_client"
 }
 

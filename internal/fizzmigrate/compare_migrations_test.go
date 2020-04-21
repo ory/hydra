@@ -3,8 +3,16 @@ package fizzmigrate
 import (
 	"context"
 	"fmt"
+	"os/exec"
+	"regexp"
+	"strings"
+	"testing"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/internal/fizzmigrate/client"
 	"github.com/ory/hydra/internal/fizzmigrate/consent"
 	"github.com/ory/hydra/internal/fizzmigrate/jwk"
@@ -12,12 +20,6 @@ import (
 	"github.com/ory/hydra/persistence/sql"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"os/exec"
-	"regexp"
-	"strings"
-	"testing"
 )
 
 func connectPostgres(t *testing.T) (*pop.Connection, *sqlx.DB) {
@@ -59,8 +61,6 @@ func stripDump(d string) string {
 	return strings.ReplaceAll(d, "\r\n", "")
 }
 
-// note: the makefile starts postgres with the database "hydra" but dockertest with the default "postgres"
-// we should probably use the default for testing everywhere
 func dumpArgs(t *testing.T, db string) []string {
 	switch db {
 	case "postgres":

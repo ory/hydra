@@ -147,7 +147,7 @@ func TestMigrations(t *testing.T) {
 
 				if i >= 11 {
 					abjti := &oauth2.BlacklistedJTI{}
-					require.NoError(t, dbx.Get(abjti, dbx.Rebind("select * from hydra_oauth2_jti_blacklist where signature = ?"), ebjti.Signature))
+					require.NoError(t, c.Where("signature = ?", ebjti.Signature).First(abjti))
 					assertEqualOauth2BlacklistedJTIs(t, ebjti, abjti)
 				}
 			}

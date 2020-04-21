@@ -31,6 +31,7 @@ func CleanSQL(t *testing.T, db *sqlx.DB) {
 		"hydra_client_migration",
 		"hydra_oauth2_migration",
 		"hydra_jwk_migration",
+		"schema_migration",
 	} {
 		if _, err := db.Exec("DROP TABLE IF EXISTS " + tb); err != nil {
 			t.Logf(`Unable to clean up table "%s": %s`, tb, err)

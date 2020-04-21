@@ -91,7 +91,6 @@ func TestManagers(t *testing.T) {
 		clientManagers["cockroach"] = connectToCRDB(t)
 	}
 
-	t.Log("Creating schemas...")
 	for k, m := range clientManagers {
 		t.Run("case=create-get-update-delete", func(t *testing.T) {
 			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m))

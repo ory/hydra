@@ -52,9 +52,13 @@ func signatureFromJTI(jti string) string {
 }
 
 type BlacklistedJTI struct {
-	JTI       string
+	JTI       string    `db:"-"`
 	Signature string    `db:"signature"`
 	Expiry    time.Time `db:"expires_at"`
+}
+
+func (BlacklistedJTI) TableName() string {
+	return "hydra_oauth2_jti_blacklist"
 }
 
 func newBlacklistedJTI(jti string, exp time.Time) *BlacklistedJTI {

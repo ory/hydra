@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
@@ -168,10 +169,15 @@ func TestMixMigrations(t *testing.T) {
 
 			schemas := make([]string, 43)
 			for i := 0; i < 43; i++ {
+				start := time.Now()
 				x.CleanSQLPop(t, c)
 				migrateOldUpSteps(t, dbx, db, i, func(_ int) {})
 				require.NoError(t, persister.MigrateUp(context.Background()))
+				t.Logf("migrate took: %dms",time.Now().Sub(start).Milliseconds())
+
+				start = time.Now()
 				schemas[i] = dump(t, db)
+				t.Logf("dump took: %dms",time.Now().Sub(start).Milliseconds())
 			}
 			for _, s := range schemas {
 				assert.Equal(t, schemas[0], s)

@@ -3,6 +3,7 @@ package fizzmigrate
 import (
 	"context"
 	"fmt"
+	migrate "github.com/rubenv/sql-migrate"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -21,6 +22,12 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
+
+type migrator interface {
+	PlanMigration(string) ([]*migrate.PlannedMigration, error)
+	CreateSchemas(string) (int, error)
+	CreateMaxSchemas(string, int) (int, error)
+}
 
 func connectPostgres(t *testing.T) (*pop.Connection, *sqlx.DB) {
 	c := dockertest.ConnectToTestPostgreSQLPop(t)

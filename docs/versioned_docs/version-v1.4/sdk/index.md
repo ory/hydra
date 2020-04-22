@@ -31,8 +31,8 @@ repositories:
 
 We also provide more info for these SDKs:
 
-- [Golang](https://www.ory.sh/hydra/docs/sdk/go)
-- [JavaScript](https://www.ory.sh/hydra/docs/sdk/js)
+- [Golang](go.md)
+- [JavaScript](js.md)
 
 Missing your programming language?
 [Create an issue](https://github.com/ory/hydra/issues) and help us build, test

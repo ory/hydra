@@ -1,9 +1,9 @@
 ---
 id: debugging
-title: Debugging
+title: Common Problems & Debugging
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'; 
+import useBaseUrl from '@docusaurus/useBaseUrl'
 
 Spec-compliant OAuth 2.0 and OpenID Connect is hard. Let's take a look how to
 resolve certain issues.
@@ -31,6 +31,27 @@ There are three things you can do to quickly debug any issue:
    1. Stop all containers
    2. Remove them (unless you have something important running)
    3. Retry. **This can help a lot if you are new to this!**
+
+## I am running into CSRF issues
+
+We protect the Login and Consent flows using CSRF Cookies. This mitigates several attack vectors but
+can lead cause issues when misconfigured. The most common causes of CSRF issues are the following:
+
+- You are mixing domains with IP addresses in your request - for example using `127.0.0.1` and `localhost`
+in the same flow.
+- You are running ORY Hydra via HTTP but are missing the `--dangerous-force-http` CLI flag.
+- You are running the OAuth2 flow in separate browsers, or in a browser with incognito mode. The Brave browser
+is also known for notoriously discarding cookies when used in "No-Tracking" mode.
+- You are running ORY Hydra behind a Reverse Proxy (e.g. Load Balancer) that strips the Cookie header. If the
+reverse proxy supports path rewrites that might also cause issues!
+- You are trying to do two OAuth2 flows at the same time in the same Browser.
+- You have changed the Cookie SameSite behavior. If this is the default value (you did not change it), this should
+not be an issue.
+
+:::warn
+You cannot call `/oauth2/auth` using an AJAX request. It is not allowed and not possible with OAuth2.
+This endpoint can only be accessed using a normal browser request.
+:::
 
 ## Logout is not working as expected
 

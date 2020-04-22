@@ -1,3 +1,5 @@
+// +build legacy_migration_test
+
 package oauth2_test
 
 import (

@@ -6,13 +6,19 @@ tools:
 		go install github.com/ory/go-acc github.com/ory/x/tools/listx github.com/go-swagger/go-swagger/cmd/swagger github.com/go-bindata/go-bindata/go-bindata github.com/sqs/goreturns github.com/ory/sdk/swagutil
 
 # Runs full test suite including tests where databases are enabled
+.PHONY: test-legacy-migrations
+test-legacy-migrations:
+		make test-resetdb
+		source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m ./internal/fizzmigrate
+		docker rm -f hydra_test_database_mysql
+		docker rm -f hydra_test_database_postgres
+		docker rm -f hydra_test_database_cockroach
+
+# Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:
 		make test-resetdb
-		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true' \
-		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable' \
-		TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
-		$$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
+		source scripts/test-env.sh && $$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach

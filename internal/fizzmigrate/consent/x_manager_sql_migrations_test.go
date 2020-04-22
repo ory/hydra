@@ -1,3 +1,5 @@
+// +build legacy_migration_test
+
 package consent_test
 
 import (

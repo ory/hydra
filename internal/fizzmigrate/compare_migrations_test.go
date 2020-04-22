@@ -1,3 +1,5 @@
+// +build legacy_migration_test
+
 package fizzmigrate
 
 import (

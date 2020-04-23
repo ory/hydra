@@ -313,7 +313,7 @@ func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 
 func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), key); err != nil {
-		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. This can happen if you forget to run "hydra migrate sql", set the wrong "secrets.system" or forget to set "secrets.system" entirely.`, key)
+		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql"..`, key)
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {

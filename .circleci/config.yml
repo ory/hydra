@@ -15,7 +15,7 @@ jobs:
       image: ubuntu-1604:201903-01
     steps:
       - checkout
-      - run: circleci-install golang 1.14.2
+      - run: sudo circleci-install golang 1.14.2
       - run: make test-legacy-migrations
 
   test:

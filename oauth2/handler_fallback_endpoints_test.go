@@ -40,7 +40,7 @@ import (
 func TestHandlerConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(conf)
 
 	h := reg.OAuth2Handler()
 	r := x.NewRouterAdmin()

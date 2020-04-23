@@ -21,87 +21,40 @@
 package client_test
 
 import (
-	"context"
 	"fmt"
-	"strings"
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/x"
-	"github.com/ory/viper"
+	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/x/sqlcon/dockertest"
 )
-
-func getManager(t *testing.T, url string) Manager {
-	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyDSN, url)
-	reg, err := driver.NewRegistry(conf)
-	require.NoError(t, err)
-	require.NoError(t, reg.Init())
-	require.NoError(t, reg.Persister().MigrateUp(context.Background()))
-	return reg.ClientManager()
-}
-
-func connectToMySQL(t *testing.T) Manager {
-	c := dockertest.ConnectToTestMySQLPop(t)
-	x.CleanSQLPop(t, c)
-	url := c.URL()
-	if !strings.HasPrefix(url, "mysql") {
-		url = "mysql://" + url
-	}
-	return getManager(t, url)
-}
-
-func connectToPG(t *testing.T) Manager {
-	c := dockertest.ConnectToTestPostgreSQLPop(t)
-	x.CleanSQLPop(t, c)
-	return getManager(t, c.URL())
-}
-
-func connectToCRDB(t *testing.T) Manager {
-	c := dockertest.ConnectToTestCockroachDBPop(t)
-	x.CleanSQLPop(t, c)
-	url := c.URL()
-	if !strings.HasPrefix(url, "cockroach") {
-		url = "cockroach://" + strings.Split(url, "://")[1]
-	}
-	return getManager(t, url)
-}
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
 
-	clientManagers := map[string]Manager{
-		"memory": reg.ClientManager(),
+	registries := map[string]driver.Registry{
+		"memory": internal.NewRegistryMemory(conf),
 	}
 
 	if !testing.Short() {
-		clientManagers["postgres"] = connectToPG(t)
-		clientManagers["mysql"] = connectToMySQL(t)
-		clientManagers["cockroach"] = connectToCRDB(t)
+		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
+		t.Log("connected")
 	}
 
-	for k, m := range clientManagers {
+	for k, m := range registries {
 		t.Run("case=create-get-update-delete", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m))
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m.ClientManager()))
 		})
 
 		t.Run("case=autogenerate-key", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAutoGenerateKey(k, m))
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAutoGenerateKey(k, m.ClientManager()))
 		})
 
 		t.Run("case=auth-client", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAuthenticate(k, m))
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAuthenticate(k, m.ClientManager()))
 		})
 	}
 }

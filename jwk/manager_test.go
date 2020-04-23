@@ -21,84 +21,36 @@
 package jwk_test
 
 import (
-	"context"
 	"fmt"
-	"strings"
-	"sync"
 	"testing"
-
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/viper"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/ory/hydra/driver"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var managers = map[string]Manager{}
-
-var m sync.Mutex
 var testGenerator = &RS256Generator{}
-
-func getManager(t *testing.T, url string) Manager {
-	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyDSN, url)
-	reg, err := driver.NewRegistry(conf)
-	require.NoError(t, err)
-	require.NoError(t, reg.Init())
-	require.NoError(t, reg.Persister().MigrateUp(context.Background()))
-	return reg.KeyManager()
-}
-
-func connectToMySQL(t *testing.T) Manager {
-	c := dockertest.ConnectToTestMySQLPop(t)
-	x.CleanSQLPop(t, c)
-	url := c.URL()
-	if !strings.HasPrefix(url, "mysql") {
-		url = "mysql://" + url
-	}
-	return getManager(t, url)
-}
-
-func connectToPG(t *testing.T) Manager {
-	c := dockertest.ConnectToTestPostgreSQLPop(t)
-	x.CleanSQLPop(t, c)
-	return getManager(t, c.URL())
-}
-
-func connectToCRDB(t *testing.T) Manager {
-	c := dockertest.ConnectToTestCockroachDBPop(t)
-	x.CleanSQLPop(t, c)
-	url := c.URL()
-	if !strings.HasPrefix(url, "cockroach") {
-		url = "cockroach://" + strings.Split(url, "://")[1]
-	}
-	return getManager(t, url)
-}
 
 func TestManager(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
-	managers["memory"] = reg.KeyManager()
+	registries := map[string]driver.Registry{
+		"memory": internal.NewRegistryMemory(conf),
+	}
 
 	if !testing.Short() {
-		managers["postgres"] = connectToPG(t)
-		managers["mysql"] = connectToMySQL(t)
-		managers["cockroach"] = connectToCRDB(t)
+		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
 	}
 
 	t.Run("TestManagerKey", func(t *testing.T) {
 		ks, err := testGenerator.Generate("TestManagerKey", "sig")
 		require.NoError(t, err)
 
-		for name, m := range managers {
-			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks, "TestManagerKey"))
+		for name, r := range registries {
+			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(r.KeyManager(), ks, "TestManagerKey"))
 		}
 	})
 
@@ -107,8 +59,8 @@ func TestManager(t *testing.T) {
 		require.NoError(t, err)
 		ks.Key("private")
 
-		for name, m := range managers {
-			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
+		for name, r := range registries {
+			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(r.KeyManager(), ks, "TestManagerKeySet"))
 		}
 	})
 }

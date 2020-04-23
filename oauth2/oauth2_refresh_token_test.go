@@ -72,9 +72,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		},
 	}
 
-	registries[dbal.DriverPostgreSQL] = connectToPG(t)
-	registries[dbal.DriverCockroachDB] = connectToCRDB(t)
-	registries[dbal.DriverMySQL] = connectToMySQL(t)
+	setupRegistries(t)
 
 	for dbName, dbRegistry := range registries {
 		ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))

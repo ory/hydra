@@ -39,7 +39,7 @@ import (
 
 //func TestLogout(t *testing.T) {
 //	conf := internal.NewConfigurationWithDefaults()
-//	reg := internal.NewRegistry(conf)
+//	reg := internal.NewRegistryMemory(conf)
 //
 //	r := x.NewRouterPublic()
 //	h := NewHandler(reg, conf)
@@ -103,7 +103,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			challenge := "challenge" + key
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(conf)
 
 			if tc.exists {
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
@@ -142,7 +142,7 @@ func TestGetLoginRequest(t *testing.T) {
 			challenge := "challenge" + key
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(conf)
 
 			if tc.exists {
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.TODO(), &LoginRequest{
@@ -181,7 +181,7 @@ func TestGetConsentRequest(t *testing.T) {
 			challenge := "challenge" + key
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(conf)
 
 			if tc.exists {
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.TODO(), &ConsentRequest{

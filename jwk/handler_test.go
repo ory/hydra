@@ -40,7 +40,7 @@ import (
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(conf)
 
 	viper.Set(configuration.ViperKeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 

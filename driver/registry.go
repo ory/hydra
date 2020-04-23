@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -59,6 +60,7 @@ func MustNewRegistry(c configuration.Provider) Registry {
 }
 
 func NewRegistry(c configuration.Provider) (Registry, error) {
+	fmt.Printf("got dsn '%s'\n", c.DSN())
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errors.WithStack(err)

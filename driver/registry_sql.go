@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"github.com/ory/x/resilience"
 	"strings"
 	"time"
 
@@ -79,7 +80,7 @@ func (m *RegistrySQL) Init() error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		if err := c.Open(); err != nil {
+		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
 			return errors.WithStack(err)
 		}
 		m.persister, err = sql.NewPersister(c)

@@ -46,7 +46,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 	hydra "github.com/ory/hydra/internal/httpclient/client"
@@ -146,18 +145,9 @@ func acceptConsent(apiClient *hydra.OryHydra, scope []string, expectSkip bool, e
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	regs := map[string]driver.Registry{
-		"memory": internal.NewRegistry(conf),
-	}
+	setupRegistries(t)
 
-	if !testing.Short() {
-		regs["postgres"] = connectToPG(t)
-		regs["mysql"] = connectToMySQL(t)
-		regs["cockroach"] = connectToCRDB(t)
-	}
-
-	for km, reg := range regs {
+	for km, reg := range registries {
 		t.Run("manager="+km, func(t *testing.T) {
 			for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 				t.Run("strategy="+strat.d, func(t *testing.T) {
@@ -1142,7 +1132,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second*2)
 			viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(conf)
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 

@@ -18,7 +18,7 @@ test-legacy-migrations:
 .PHONY: test
 test:
 		make test-resetdb
-		source scripts/test-env.sh && $$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
+		source scripts/test-env.sh && $$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m -v
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach

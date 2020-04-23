@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestMigrator is a modified pop.FileMigrator
 type TestMigrator struct {
 	pop.Migrator
 }
@@ -76,20 +77,18 @@ func NewTestMigrator(t *testing.T, c *pop.Connection, migrationPath, testDataPat
 		}
 
 		if err := tx.RawQuery(string(data)).Exec(); err != nil {
-			log.Print(mf.Version)
+			t.Logf(mf.Version)
 			return errors.WithStack(err)
 		}
 		return nil
 	}
 
 	if fi, err := os.Stat(migrationPath); err != nil || !fi.IsDir() {
-		// directory doesn't exist
-		t.FailNow()
+		t.Fatalf("could not find directory %s", migrationPath)
 		return nil
 	}
 	if fi, err := os.Stat(testDataPath); err != nil || !fi.IsDir() {
-		// directory doesn't exist
-		t.FailNow()
+		t.Fatalf("could not find directory %s", testDataPath)
 		return nil
 	}
 

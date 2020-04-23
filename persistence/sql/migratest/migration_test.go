@@ -29,13 +29,21 @@ func TestMigrations(t *testing.T) {
 		return
 	}
 
-	for db, connect := range map[string]func(*testing.T) *pop.Connection{
-		"postgres":  dockertest.ConnectToTestPostgreSQLPop,
-		"mysql":     dockertest.ConnectToTestMySQLPop,
-		"cockroach": dockertest.ConnectToTestCockroachDBPop,
-	} {
+	connections := make(map[string]*pop.Connection, 3)
+	dockertest.Parallel([]func(){
+		func() {
+			connections["postgres"] = dockertest.ConnectToTestPostgreSQLPop(t)
+		},
+		func() {
+			connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
+		},
+		func() {
+			connections["cockroach"] = dockertest.ConnectToTestCockroachDBPop(t)
+		},
+	})
+
+	for db, c := range connections {
 		t.Run(fmt.Sprintf("database=%s", db), func(t *testing.T) {
-			c := connect(t)
 			x.CleanSQLPop(t, c)
 			url := c.URL()
 
@@ -127,7 +135,8 @@ func TestMigrations(t *testing.T) {
 				})
 			}
 
-			// TODO this is very stupid and should be replaced as soon the manager uses pop
+			// TODO https://github.com/ory/hydra/issues/1815
+			// this is very stupid and should be replaced as soon the manager uses pop
 			// necessary because the manager does not provide any way to access the data
 			for i := 1; i <= 11; i++ {
 				if db == "cockroach" && i < 9 {

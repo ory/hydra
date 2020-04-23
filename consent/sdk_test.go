@@ -50,7 +50,7 @@ func TestSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyIssuerURL, "https://www.ory.sh")
 	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(conf)
 
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)

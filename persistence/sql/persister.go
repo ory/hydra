@@ -78,7 +78,7 @@ const (
 
 // this type is copied from sql-migrate to remove the dependency
 type OldMigrationRecord struct {
-	Id        string    `db:"id"`
+	ID        string    `db:"id"`
 	AppliedAt time.Time `db:"applied_at"`
 }
 
@@ -121,7 +121,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 			for _, m := range migrations {
 				// mark the migration as run for fizz
 				// fizz standard version pattern: YYYYMMDDhhmmss
-				migrationNumber, err := strconv.ParseInt(m.Id, 10, 0)
+				migrationNumber, err := strconv.ParseInt(m.ID, 10, 0)
 				if err != nil {
 					return errors.WithStack(err)
 				}

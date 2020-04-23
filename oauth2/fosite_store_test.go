@@ -22,58 +22,50 @@ package oauth2_test
 
 import (
 	"context"
-	"strings"
+	"flag"
+	"fmt"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/viper"
+	"github.com/stretchr/testify/require"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
+func TestMain(m *testing.M) {
+	flag.Parse()
+
+	runner := dockertest.Register()
+	runner.Exit(m.Run())
+}
+
 var registries = make(map[string]driver.Registry)
-
-func getManager(t *testing.T, url string) driver.Registry {
-	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyDSN, url)
-	reg, err := driver.NewRegistry(conf)
-	require.NoError(t, err)
-	require.NoError(t, reg.Init())
-	require.NoError(t, reg.Persister().MigrateUp(context.Background()))
-	return reg
+var cleanRegistries = func(*testing.T) {
+	fmt.Printf("\n\nsetting memory reg\n\n\n")
+	registries["memory"] = internal.NewRegistryMemory(internal.NewConfigurationWithDefaults())
 }
 
-func connectToMySQL(t *testing.T) driver.Registry {
-	c := dockertest.ConnectToTestMySQLPop(t)
-	x.CleanSQLPop(t, c)
-	url := c.URL()
-	if !strings.HasPrefix(url, "mysql") {
-		url = "mysql://" + url
+// returns clean registries that can safely be used for one test
+// to reuse call cleanRegistries
+func setupRegistries(t *testing.T) {
+	if len(registries) == 0 && !testing.Short() {
+		// first time called and sql tests
+		var cleanSQL func(*testing.T)
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t)
+		cleanMem := cleanRegistries
+		cleanMem(t)
+		cleanRegistries = func(t *testing.T) {
+			cleanMem(t)
+			cleanSQL(t)
+		}
+	} else {
+		// reset all/init mem
+		cleanRegistries(t)
 	}
-	return getManager(t, url)
-}
-
-func connectToPG(t *testing.T) driver.Registry {
-	c := dockertest.ConnectToTestPostgreSQLPop(t)
-	x.CleanSQLPop(t, c)
-	return getManager(t, c.URL())
-}
-
-func connectToCRDB(t *testing.T) driver.Registry {
-	c := dockertest.ConnectToTestCockroachDBPop(t)
-	x.CleanSQLPop(t, c)
-	url := c.URL()
-	if !strings.HasPrefix(url, "cockroach") {
-		url = "cockroach://" + strings.Split(url, "://")[1]
-	}
-	return getManager(t, url)
 }
 
 func TestManagers(t *testing.T) {
@@ -90,30 +82,15 @@ func TestManagers(t *testing.T) {
 			enableSessionEncrypted: true,
 		},
 	}
-
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			conf := internal.NewConfigurationWithDefaults()
+			setupRegistries(t)
+			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
+
 			viper.Set(configuration.ViperKeyEncryptSessionData, tc.enableSessionEncrypted)
-			reg := internal.NewRegistry(conf)
-
-			require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
-			registries["memory"] = reg
-
-			if !testing.Short() {
-				registries["postgres"] = connectToPG(t)
-				registries["mysql"] = connectToMySQL(t)
-				registries["cockroach"] = connectToCRDB(t)
-			}
 
 			for k, store := range registries {
 				TestHelperRunner(t, store, k)
-			}
-
-			for _, m := range registries {
-				if mm, ok := m.(*driver.RegistrySQL); ok {
-					x.CleanSQL(t, mm.DB())
-				}
 			}
 		})
 

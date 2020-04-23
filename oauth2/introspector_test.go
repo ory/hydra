@@ -54,7 +54,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "wildcard")
 	viper.Set(configuration.ViperKeyIssuerURL, "foobariss")
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

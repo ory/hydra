@@ -150,7 +150,9 @@
             }
           },
           "additionalProperties": false,
-          "required": ["path"]
+          "required": [
+            "path"
+          ]
         },
         {
           "properties": {
@@ -165,7 +167,9 @@
             }
           },
           "additionalProperties": false,
-          "required": ["base64"]
+          "required": [
+            "base64"
+          ]
         }
       ]
     },
@@ -472,7 +476,9 @@
             }
           },
           "then": {
-            "required": ["pairwise"]
+            "required": [
+              "pairwise"
+            ]
           },
           "else": {
             "properties": {
@@ -627,9 +633,15 @@
         "refresh_token": {
           "description": "Configures how long refresh tokens are valid. Set to -1 for refresh tokens to never expire.",
           "default": "720h",
-          "allOf": [
+          "oneOf": [
             {
               "$ref": "#/definitions/duration"
+            },
+            {
+              "enum": [
+                "-1",
+                -1
+              ]
             }
           ]
         },

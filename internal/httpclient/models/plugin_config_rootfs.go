@@ -10,22 +10,25 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Version Version Version version
+// PluginConfigRootfs PluginConfigRootfs plugin config rootfs
 //
-// swagger:model version
-type Version struct {
+// swagger:model PluginConfigRootfs
+type PluginConfigRootfs struct {
 
-	// Version is the service's version.
-	Version string `json:"version,omitempty"`
+	// diff ids
+	DiffIds []string `json:"diff_ids"`
+
+	// type
+	Type string `json:"type,omitempty"`
 }
 
-// Validate validates this version
-func (m *Version) Validate(formats strfmt.Registry) error {
+// Validate validates this plugin config rootfs
+func (m *PluginConfigRootfs) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Version) MarshalBinary() ([]byte, error) {
+func (m *PluginConfigRootfs) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -33,8 +36,8 @@ func (m *Version) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Version) UnmarshalBinary(b []byte) error {
-	var res Version
+func (m *PluginConfigRootfs) UnmarshalBinary(b []byte) error {
+	var res PluginConfigRootfs
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

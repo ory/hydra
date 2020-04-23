@@ -10,22 +10,25 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Version Version Version version
+// PluginConfigUser PluginConfigUser plugin config user
 //
-// swagger:model version
-type Version struct {
+// swagger:model PluginConfigUser
+type PluginConfigUser struct {
 
-	// Version is the service's version.
-	Version string `json:"version,omitempty"`
+	// g ID
+	GID uint32 `json:"GID,omitempty"`
+
+	// UID
+	UID uint32 `json:"UID,omitempty"`
 }
 
-// Validate validates this version
-func (m *Version) Validate(formats strfmt.Registry) error {
+// Validate validates this plugin config user
+func (m *PluginConfigUser) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Version) MarshalBinary() ([]byte, error) {
+func (m *PluginConfigUser) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -33,8 +36,8 @@ func (m *Version) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Version) UnmarshalBinary(b []byte) error {
-	var res Version
+func (m *PluginConfigUser) UnmarshalBinary(b []byte) error {
+	var res PluginConfigUser
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

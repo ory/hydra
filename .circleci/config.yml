@@ -11,13 +11,17 @@ orbs:
 
 jobs:
   test-legacy-migrations:
+    parameters:
+      flavor:
+        type: string
     machine:
       image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run: sudo rm -rfd /usr/local/go
       - run: sudo circleci-install golang 1.14.2
-      - run: make test-legacy-migrations
+      - run: make test-resetdb
+      - run: source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m -run=Test*/db=<< parameters.flavor>> ./internal/fizzmigrate
 
   test:
     docker:
@@ -124,13 +128,24 @@ workflows:
     jobs:
 
       # Test legacy migrations
-      -
-        test-legacy-migrations-approval:
-          type: approval
-      -
-        test-legacy-migrations:
-          requires:
-            - test-legacy-migrations-approval
+      - test-legacy-migrations:
+          name: test-legacy-migrations-postgres
+          flavor: postgres
+          filters:
+            tags:
+              only: /.*/
+      - test-legacy-migrations:
+          name: test-legacy-migrations-mysql
+          flavor: mysql
+          filters:
+            tags:
+              only: /.*/
+      - test-legacy-migrations:
+          name: test-legacy-migrations-cockroach
+          flavor: cockroach
+          filters:
+            tags:
+              only: /.*/
       # END - Test legacy migrations
 
       - golangci/lint:

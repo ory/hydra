@@ -129,9 +129,7 @@ func migrateOldUpSteps(t *testing.T, dbx *sqlx.DB, db string, todo int, afterEac
 
 func TestCompareMigrations(t *testing.T) {
 	for db, connect := range dbConnections {
-		db, connect := db, connect
 		t.Run("db="+db, func(t *testing.T) {
-			t.Parallel()
 			c, dbx := connect(t)
 			x.CleanSQLPop(t, c)
 
@@ -162,9 +160,7 @@ func TestCompareMigrations(t *testing.T) {
 
 func TestMixMigrations(t *testing.T) {
 	for db, connect := range dbConnections {
-		db, connect := db, connect
 		t.Run("db="+db, func(t *testing.T) {
-			t.Parallel()
 			c, dbx := connect(t)
 			persister, err := sql.NewPersister(c)
 			require.NoError(t, err)

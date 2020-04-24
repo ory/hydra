@@ -23,7 +23,7 @@ $ SERVE_TLS_KEY_PATH=/path/to/key.pem
 $ SERVE_TLS_CERT_PATH=/path/to/cert.crt
 ```
 
-If you run Docker locally, you can then use:
+If you run Docker locally, you can then use
 
 ```
 $ docker run ... \
@@ -31,6 +31,8 @@ $ docker run ... \
     -e SERVE_TLS_KEY_BASE64=$(SERVE_TLS_KEY_BASE64) \
     ...
 ```
+
+or mount the files using `--mount` and linking to the files.
 
 ## Mobile & Browser (SPA) Authorization
 

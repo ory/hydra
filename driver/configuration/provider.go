@@ -46,6 +46,7 @@ type Provider interface {
 	PublicListenOn() string
 	PublicDisableHealthAccessLog() bool
 	CookieSameSiteMode() http.SameSite
+	CookieSameSiteLegacyWorkaround() bool
 	ConsentRequestMaxAge() time.Duration
 	AccessTokenLifespan() time.Duration
 	RefreshTokenLifespan() time.Duration

@@ -223,6 +223,11 @@ serve:
     # specify the SameSite mode that cookies should be sent with
     same_site_mode: Lax
 
+    # Some older browser versions don't work with SameSite=None. This option enables the workaround
+    # defined in https://web.dev/samesite-cookie-recipes/ which essentially stores a second cookie
+    # without SameSite as a fallback.
+    same_site_legacy_workaround: false
+
 # dsn sets the data source name. This configures the backend where ORY Hydra persists data.
 #
 ## In-memory database

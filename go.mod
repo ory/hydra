@@ -3,6 +3,7 @@ module github.com/ory/hydra
 go 1.14
 
 require (
+	github.com/davidrjonas/semver-cli v0.0.0-20200305203455-0b3cebbaa360 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3

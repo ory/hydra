@@ -201,7 +201,7 @@ func TestValidateCsrfSession(t *testing.T) {
 				{
 					name:      cookieAuthenticationCSRFName,
 					csrfValue: "CSRF-VALUE",
-					sameSite:  http.SameSiteDefaultMode,
+					sameSite:  http.SameSiteNoneMode,
 				},
 				{
 					name:      legacyCsrfSessionName(cookieAuthenticationCSRFName),
@@ -218,7 +218,7 @@ func TestValidateCsrfSession(t *testing.T) {
 				{
 					name:      cookieAuthenticationCSRFName,
 					csrfValue: "CSRF-VALUE",
-					sameSite:  http.SameSiteDefaultMode,
+					sameSite:  http.SameSiteNoneMode,
 				},
 				{
 					name:      legacyCsrfSessionName(cookieAuthenticationCSRFName),

@@ -867,6 +867,8 @@ github.com/ory/sdk/swagutil v0.0.0-20200416175937-89e79eede081 h1:b6Ua5v35KuRHKr
 github.com/ory/sdk/swagutil v0.0.0-20200416175937-89e79eede081/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
 github.com/ory/sdk/swagutil v0.0.0-20200417161747-f12e98ecfd2e h1:TvoA41hKo0Gr8ZQaq54Qcshyn6oGHDZ5i0vfSE5eVaU=
 github.com/ory/sdk/swagutil v0.0.0-20200417161747-f12e98ecfd2e/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
+github.com/ory/sdk/swagutil v0.0.0-20200423140806-4d849e59dffb h1:eokjOSqbJGUr5cAn9UZYj8cjilFF8E2qRc7GeJpGdlg=
+github.com/ory/sdk/swagutil v0.0.0-20200423140806-4d849e59dffb/go.mod h1:Ufg1eAyz+Zt3+oweSZVThG13ewewWCKwBmoNmK8Z0co=
 github.com/ory/viper v1.5.6 h1:w4ceGgWwWLzAFYQ7bHaDZmwNsAto2JPVdyQjQnn7VWI=
 github.com/ory/viper v1.5.6/go.mod h1:TYmpFpKLxjQwvT4f0QPpkOn4sDXU1kDgAwJpgLYiQ28=
 github.com/ory/viper v1.7.4 h1:3RWBt7Pq9kSFNxLaRT0ljNdbtaWisCQG1cLPn2Yd4UY=

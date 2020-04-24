@@ -61,7 +61,7 @@ func matchScopes(scopeStrategy fosite.ScopeStrategy, previousConsent []HandledCo
 	return nil
 }
 
-func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.Store, name, csrf string, secure bool, sameSiteMode http.SameSite) error {
+func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.Store, name, csrf string, secure bool, sameSiteMode http.SameSite, sameSiteLegacyWorkaround bool) error {
 	// Errors can be ignored here, because we always get a session session back. Error typically means that the
 	// session doesn't exist yet.
 	session, _ := store.Get(r, name)
@@ -72,12 +72,14 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.St
 	if err := session.Save(r, w); err != nil {
 		return errors.WithStack(err)
 	}
-
+	if sameSiteMode == http.SameSiteNoneMode && sameSiteLegacyWorkaround {
+		return createCsrfSession(w, r, store, legacyCsrfSessionName(name), csrf, secure, http.SameSiteDefaultMode, false)
+	}
 	return nil
 }
 
-func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCSRF string) error {
-	if cookie, err := store.Get(r, name); err != nil {
+func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCSRF string, sameSiteLegacyWorkaround bool) error {
+	if cookie, err := getCsrfSession(r, store, name, sameSiteLegacyWorkaround); err != nil {
 		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("CSRF session cookie could not be decoded"))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {
 		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("No CSRF value available in the session cookie"))
@@ -86,4 +88,16 @@ func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCS
 	}
 
 	return nil
+}
+
+func getCsrfSession(r *http.Request, store sessions.Store, name string, sameSiteLegacyWorkaround bool) (*sessions.Session, error) {
+	cookie, err := store.Get(r, name)
+	if sameSiteLegacyWorkaround && (err != nil || len(cookie.Values) == 0) {
+		return store.Get(r, legacyCsrfSessionName(name))
+	}
+	return cookie, err
+}
+
+func legacyCsrfSessionName(name string) string {
+	return name + "_legacy"
 }

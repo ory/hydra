@@ -346,6 +346,14 @@
                 "None"
               ],
               "default": "None"
+            },
+            "same_site_legacy_workaround": {
+              "type": "boolean",
+              "description": "Some older browser versions don’t work with SameSite=None. This option enables the workaround defined in https://web.dev/samesite-cookie-recipes/ which essentially stores a second cookie without SameSite as a fallback.",
+              "default": false,
+              "examples": [
+                true
+              ]
             }
           }
         }

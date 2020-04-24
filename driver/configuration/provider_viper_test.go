@@ -184,6 +184,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "/path/to/file.pem", viper.Get("serve.tls.key.path"))
 	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", viper.Get("serve.tls.cert.base64"))
 	assert.Equal(t, http.SameSiteLaxMode, c.CookieSameSiteMode())
+	assert.Equal(t, true, c.CookieSameSiteLegacyWorkaround())
 
 	// dsn
 	assert.Equal(t, "memory", c.DSN())

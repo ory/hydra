@@ -51,6 +51,7 @@ const (
 	ViperKeyPublicListenOnPort             = "serve.public.port"
 	ViperKeyPublicDisableHealthAccessLog   = "serve.public.access_log.disable_for_health"
 	ViperKeyCookieSameSiteMode             = "serve.cookies.same_site_mode"
+	ViperKeyCookieSameSiteLegacyWorkaround = "serve.cookies.same_site_legacy_workaround"
 	ViperKeyConsentRequestMaxAge           = "ttl.login_consent_request"
 	ViperKeyAccessTokenLifespan            = "ttl.access_token"  // #nosec G101
 	ViperKeyRefreshTokenLifespan           = "ttl.refresh_token" // #nosec G101
@@ -237,6 +238,10 @@ func (v *ViperProvider) CookieSameSiteMode() http.SameSite {
 	default:
 		return http.SameSiteDefaultMode
 	}
+}
+
+func (v *ViperProvider) CookieSameSiteLegacyWorkaround() bool {
+	return viperx.GetBool(v.l, ViperKeyCookieSameSiteLegacyWorkaround, false, "COOKIE_SAME_SITE_LEGACY_WORKAROUND")
 }
 
 func (v *ViperProvider) ConsentRequestMaxAge() time.Duration {

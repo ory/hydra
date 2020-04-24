@@ -50,6 +50,7 @@ serve:
       - 127.0.0.1/32
   cookies:
     same_site_mode: Lax
+    same_site_legacy_workaround: true
 
 dsn: memory
 

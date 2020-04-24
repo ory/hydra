@@ -1661,7 +1661,7 @@ Status Code **200**
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-16T17:30:00Z",
+    "created_at": "2020-04-24T09:00:46Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -1691,7 +1691,7 @@ Status Code **200**
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-16T17:30:00Z",
+    "updated_at": "2020-04-24T09:00:46Z",
     "userinfo_signed_response_alg": "string"
   }
 ]
@@ -1870,7 +1870,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1900,7 +1900,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1946,7 +1946,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1976,7 +1976,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2057,7 +2057,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2087,7 +2087,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2226,7 +2226,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2256,7 +2256,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2434,7 +2434,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2464,7 +2464,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2509,7 +2509,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2539,7 +2539,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2620,7 +2620,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2650,7 +2650,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -4823,7 +4823,7 @@ or rejected the request.
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-16T17:30:00Z",
+    "created_at": "2020-04-24T09:00:46Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -4853,7 +4853,7 @@ or rejected the request.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-16T17:30:00Z",
+    "updated_at": "2020-04-24T09:00:46Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -5063,7 +5063,7 @@ The response contains a redirect URL which the consent provider should redirect 
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-16T17:30:00Z",
+  "handled_at": "2020-04-24T09:00:46Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5174,7 +5174,7 @@ const input = '{
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-16T17:30:00Z",
+  "handled_at": "2020-04-24T09:00:46Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5552,7 +5552,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-16T17:30:00Z",
+    "created_at": "2020-04-24T09:00:46Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -5582,7 +5582,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-16T17:30:00Z",
+    "updated_at": "2020-04-24T09:00:46Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -6903,7 +6903,7 @@ Status Code **200**
         "contacts": [
           "string"
         ],
-        "created_at": "2020-04-16T17:30:00Z",
+        "created_at": "2020-04-24T09:00:46Z",
         "frontchannel_logout_session_required": true,
         "frontchannel_logout_uri": "string",
         "grant_types": [
@@ -6933,7 +6933,7 @@ Status Code **200**
         "subject_type": "string",
         "token_endpoint_auth_method": "string",
         "tos_uri": "string",
-        "updated_at": "2020-04-16T17:30:00Z",
+        "updated_at": "2020-04-24T09:00:46Z",
         "userinfo_signed_response_alg": "string"
       },
       "context": {},
@@ -6969,7 +6969,7 @@ Status Code **200**
     "grant_scope": [
       "string"
     ],
-    "handled_at": "2020-04-16T17:30:00Z",
+    "handled_at": "2020-04-24T09:00:46Z",
     "remember": true,
     "remember_for": 0,
     "session": {
@@ -7522,7 +7522,7 @@ automatically when performing the refresh flow.
 
 ```json
 {
-  "notAfter": "2020-04-16T17:30:00Z"
+  "notAfter": "2020-04-24T09:00:46Z"
 }
 ```
 
@@ -7618,7 +7618,7 @@ func main() {
 ```nodejs
 const fetch = require('node-fetch');
 const input = '{
-  "notAfter": "2020-04-16T17:30:00Z"
+  "notAfter": "2020-04-24T09:00:46Z"
 }';
 const headers = {
   'Content-Type': 'application/json',  'Accept': 'application/json'
@@ -8242,7 +8242,7 @@ effectively written in the swagger spec.*
 <a id="schemanulltime"></a>
 
 ```json
-"2020-04-16T17:30:00Z"
+"2020-04-24T09:00:46Z"
 
 ```
 
@@ -8281,7 +8281,7 @@ effectively written in the swagger spec.*
       "contacts": [
         "string"
       ],
-      "created_at": "2020-04-16T17:30:00Z",
+      "created_at": "2020-04-24T09:00:46Z",
       "frontchannel_logout_session_required": true,
       "frontchannel_logout_uri": "string",
       "grant_types": [
@@ -8311,7 +8311,7 @@ effectively written in the swagger spec.*
       "subject_type": "string",
       "token_endpoint_auth_method": "string",
       "tos_uri": "string",
-      "updated_at": "2020-04-16T17:30:00Z",
+      "updated_at": "2020-04-24T09:00:46Z",
       "userinfo_signed_response_alg": "string"
     },
     "context": {},
@@ -8347,7 +8347,7 @@ effectively written in the swagger spec.*
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-16T17:30:00Z",
+  "handled_at": "2020-04-24T09:00:46Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8412,7 +8412,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-16T17:30:00Z",
+  "handled_at": "2020-04-24T09:00:46Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8518,7 +8518,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-16T17:30:00Z",
+    "created_at": "2020-04-24T09:00:46Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -8548,7 +8548,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-16T17:30:00Z",
+    "updated_at": "2020-04-24T09:00:46Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -8637,7 +8637,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 
 ```json
 {
-  "notAfter": "2020-04-16T17:30:00Z"
+  "notAfter": "2020-04-24T09:00:46Z"
 }
 
 ```
@@ -8761,7 +8761,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-16T17:30:00Z",
+    "created_at": "2020-04-24T09:00:46Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -8791,7 +8791,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-16T17:30:00Z",
+    "updated_at": "2020-04-24T09:00:46Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -8887,7 +8887,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-16T17:30:00Z",
+  "created_at": "2020-04-24T09:00:46Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -8917,7 +8917,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-16T17:30:00Z",
+  "updated_at": "2020-04-24T09:00:46Z",
   "userinfo_signed_response_alg": "string"
 }
 

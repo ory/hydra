@@ -76,6 +76,11 @@ More details about the various OAuth2 flows can be found in these articles:
 
 ### OAuth 2.0 Scope != Permission
 
+:::info The OAuth2 Scope reflects a permission the user gave to the OAuth2
+Application, not a permission the system (e.g. API) gave to that OAuth2
+application. Also, the OAuth2 Scope can not be changed without revoking the
+token. :::
+
 A second important concept is the OAuth 2.0 Scope. Many people confuse OAuth 2.0
 Scope with internal Access Control like for example Role Based Access Control
 (RBAC) or Access Control Lists (ACL). Both concepts cover different aspects of

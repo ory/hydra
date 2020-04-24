@@ -81,3 +81,4 @@ $ cd $(go env GOPATH)/src/github.com/ory/hydra
 $ GO111MODULE=on make install-stable
 $ $(go env GOPATH)/bin/hydra help
 ```
+

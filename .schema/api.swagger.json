@@ -1814,7 +1814,7 @@
   },
   "definitions": {
     "ContainerWaitOKBodyError": {
-      "description": "ContainerWaitOKBodyError container waiting error, if any",
+      "description": "ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any",
       "type": "object",
       "properties": {
         "Message": {
@@ -1915,7 +1915,7 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSONWebKeySet JSONWebKeySet JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+      "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
       "type": "object",
       "properties": {
         "keys": {
@@ -1937,7 +1937,7 @@
     },
     "PluginConfig": {
       "type": "object",
-      "title": "PluginConfig PluginConfig PluginConfig The config of a plugin.",
+      "title": "PluginConfig The config of a plugin.",
       "required": [
         "Args",
         "Description",
@@ -2024,7 +2024,7 @@
       }
     },
     "PluginConfigArgs": {
-      "description": "PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args",
+      "description": "PluginConfigArgs plugin config args",
       "type": "object",
       "required": [
         "Description",
@@ -2058,7 +2058,7 @@
       }
     },
     "PluginConfigInterface": {
-      "description": "PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
+      "description": "PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
       "type": "object",
       "required": [
         "Socket",
@@ -2079,7 +2079,7 @@
       }
     },
     "PluginConfigLinux": {
-      "description": "PluginConfigLinux PluginConfigLinux plugin config linux",
+      "description": "PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux",
       "type": "object",
       "required": [
         "AllowAllDevices",
@@ -2108,7 +2108,7 @@
       }
     },
     "PluginConfigNetwork": {
-      "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
+      "description": "PluginConfigNetwork plugin config network",
       "type": "object",
       "required": [
         "Type"
@@ -2121,7 +2121,7 @@
       }
     },
     "PluginConfigRootfs": {
-      "description": "PluginConfigRootfs plugin config rootfs",
+      "description": "PluginConfigRootfs PluginConfigRootfs plugin config rootfs",
       "type": "object",
       "properties": {
         "diff_ids": {
@@ -2138,7 +2138,7 @@
       }
     },
     "PluginConfigUser": {
-      "description": "PluginConfigUser plugin config user",
+      "description": "PluginConfigUser PluginConfigUser plugin config user",
       "type": "object",
       "properties": {
         "GID": {
@@ -2154,7 +2154,7 @@
       }
     },
     "PluginDevice": {
-      "description": "PluginDevice PluginDevice PluginDevice plugin device",
+      "description": "PluginDevice plugin device",
       "type": "object",
       "required": [
         "Description",
@@ -2185,7 +2185,7 @@
       }
     },
     "PluginEnv": {
-      "description": "PluginEnv PluginEnv plugin env",
+      "description": "PluginEnv PluginEnv PluginEnv plugin env",
       "type": "object",
       "required": [
         "Description",
@@ -2216,7 +2216,7 @@
       }
     },
     "PluginInterfaceType": {
-      "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
+      "description": "PluginInterfaceType plugin interface type",
       "type": "object",
       "required": [
         "Capability",
@@ -2328,7 +2328,7 @@
       }
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -2349,7 +2349,7 @@
           }
         },
         "handled_at": {
-          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2466,7 +2466,7 @@
     },
     "completedRequest": {
       "type": "object",
-      "title": "The response payload sent when accepting or rejecting a login or consent request.",
+      "title": "CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -2476,7 +2476,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
+      "title": "Contains information on an ongoing consent request.",
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2508,6 +2508,7 @@
           "type": "string"
         },
         "requested_access_token_audience": {
+          "description": "requested access token audience",
           "type": "array",
           "items": {
             "type": "string"
@@ -2515,6 +2516,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
+          "description": "requested scope",
           "type": "array",
           "items": {
             "type": "string"
@@ -2533,7 +2535,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2552,11 +2554,11 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
+      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
@@ -2565,7 +2567,7 @@
     "genericError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "GenericError GenericError GenericError GenericError Error response",
+      "title": "Error response",
       "required": [
         "error"
       ],
@@ -2607,7 +2609,6 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2617,12 +2618,11 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
       "required": [
         "alg",
-        "use",
-        "kid"
+        "kid",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -2641,7 +2641,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing login request.",
+      "title": "LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2658,7 +2658,6 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "description": "requested access token audience",
           "type": "array",
           "items": {
             "type": "string"
@@ -2666,7 +2665,6 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
-          "description": "requested scope",
           "type": "array",
           "items": {
             "type": "string"
@@ -2689,7 +2687,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
+      "title": "Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2711,7 +2709,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
@@ -2752,7 +2750,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2827,7 +2825,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2909,7 +2907,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
+      "description": "Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2941,7 +2939,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "OpenIDConnectContext Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2976,7 +2974,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "RejectRequest The request payload used to accept a login or consent request.",
+      "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "error",

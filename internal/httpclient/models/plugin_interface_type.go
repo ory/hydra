@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type
+// PluginInterfaceType PluginInterfaceType plugin interface type
 //
 // swagger:model PluginInterfaceType
 type PluginInterfaceType struct {

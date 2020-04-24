@@ -5,7 +5,32 @@ title: Advanced Topics
 
 This guide aims to help setting up a production system with ORY Hydra.
 
-<!-- toc -->
+## Self-Signed SSL
+
+If you want to run ORY Hydra using self-signed TLS certificates, you can do the
+following:
+
+```
+$ openssl genrsa -out key.pem 4096
+$ openssl req -new -x509 -sha256 -key key.pem -out cert.crt -days 365
+
+$ SERVE_TLS_CERT_BASE64=$(base64 -i cert.crt)
+$ SERVE_TLS_KEY_BASE64=$(base64 -i key.pem)
+
+# or
+
+$ SERVE_TLS_KEY_PATH=/path/to/key.pem
+$ SERVE_TLS_CERT_PATH=/path/to/cert.crt
+```
+
+If you run Docker locally, you can then use:
+
+```
+$ docker run ... \
+    -e SERVE_TLS_CERT_BASE64=$(SERVE_TLS_CERT_BASE64) \
+    -e SERVE_TLS_KEY_BASE64=$(SERVE_TLS_KEY_BASE64) \
+    ...
+```
 
 ## Mobile & Browser (SPA) Authorization
 

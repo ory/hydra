@@ -15,7 +15,7 @@ jobs:
       flavor:
         type: string
     machine:
-      image: ubuntu-1604:201903-0
+      image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run: sudo rm -rfd /usr/local/go

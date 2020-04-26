@@ -15,7 +15,7 @@ jobs:
       flavor:
         type: string
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-1604:201903-0
     steps:
       - checkout
       - run: sudo rm -rfd /usr/local/go
@@ -203,6 +203,9 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
+            - test-legacy-migrations-postgres
+            - test-legacy-migrations-mysql
+            - test-legacy-migrations-cockroach
           filters:
             tags:
               only: /.*/
@@ -219,6 +222,9 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
+            - test-legacy-migrations-postgres
+            - test-legacy-migrations-mysql
+            - test-legacy-migrations-cockroach
           filters:
             tags:
               only: /.*/
@@ -263,6 +269,9 @@ workflows:
             - test-e2e-cockroach
             - test-e2e-plugin
             - changelog/generate
+            - test-legacy-migrations-postgres
+            - test-legacy-migrations-mysql
+            - test-legacy-migrations-cockroach
           filters:
             branches:
               ignore: /.*/

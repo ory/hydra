@@ -43,6 +43,7 @@ docker:
 		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
 		packr2 clean
 		docker build -t oryd/hydra:latest .
+		docker build -f Dockerfile-alpine -t oryd/hydra:latest-alpine .
 		rm hydra
 
 .PHONY: e2e

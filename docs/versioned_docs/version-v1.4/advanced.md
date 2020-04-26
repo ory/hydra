@@ -5,7 +5,34 @@ title: Advanced Topics
 
 This guide aims to help setting up a production system with ORY Hydra.
 
-<!-- toc -->
+## Self-Signed SSL
+
+If you want to run ORY Hydra using self-signed TLS certificates, you can do the
+following:
+
+```
+$ openssl genrsa -out key.pem 4096
+$ openssl req -new -x509 -sha256 -key key.pem -out cert.crt -days 365
+
+$ SERVE_TLS_CERT_BASE64=$(base64 -i cert.crt)
+$ SERVE_TLS_KEY_BASE64=$(base64 -i key.pem)
+
+# or
+
+$ SERVE_TLS_KEY_PATH=/path/to/key.pem
+$ SERVE_TLS_CERT_PATH=/path/to/cert.crt
+```
+
+If you run Docker locally, you can then use
+
+```
+$ docker run ... \
+    -e SERVE_TLS_CERT_BASE64=$(SERVE_TLS_CERT_BASE64) \
+    -e SERVE_TLS_KEY_BASE64=$(SERVE_TLS_KEY_BASE64) \
+    ...
+```
+
+or mount the files using `--mount` and linking to the files.
 
 ## Mobile & Browser (SPA) Authorization
 
@@ -448,3 +475,11 @@ values are `Strict`, `Lax` or `None`.
 If you wish to embed requests to hydra on a third party site (for example an
 iframe that periodically polls to check session status) you will need to set the
 mode to `None`.
+
+Some
+[browser versions](https://www.chromium.org/updates/same-site/incompatible-clients)
+reject cookies using the `Same-Site=None` attribute. Hydra implements a
+[workaround](https://web.dev/samesite-cookie-recipes/#handling-incompatible-clients)
+that can be enabled by setting `serve.cookies.same_site_legacy_workaround` to
+`true`. This workaround is disabled by default, and only takes effect when
+`serve.cookies.same_site_mode` is set to `None`.

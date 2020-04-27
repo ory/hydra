@@ -77,14 +77,14 @@ func NewRegistryMemory(c *configuration.ViperProvider) *driver.RegistryMemory {
 	return r.(*driver.RegistryMemory)
 }
 
-func NewRegistrySQL(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
+func NewRegistrySQLFromDB(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
 	viper.Set(configuration.ViperKeyLogLevel, "debug")
 	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
 	_ = r.Init()
 	return r.(*driver.RegistrySQL)
 }
 
-func NewRegistryPop(t *testing.T, url string) *driver.RegistrySQL {
+func NewRegistrySQLFromURL(t *testing.T, url string) *driver.RegistrySQL {
 	conf := NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyDSN, url)
 	reg, err := driver.NewRegistry(conf)
@@ -153,26 +153,21 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb *driver.RegistrySQL, clean 
 	wg.Wait()
 	t.Log("done waiting")
 
-	pg = NewRegistryPop(t, pgURL)
-	mysql = NewRegistryPop(t, mysqlURL)
-	crdb = NewRegistryPop(t, crdbURL)
+	pg = NewRegistrySQLFromURL(t, pgURL)
+	mysql = NewRegistrySQLFromURL(t, mysqlURL)
+	crdb = NewRegistrySQLFromURL(t, crdbURL)
+	dbs := []*driver.RegistrySQL{pg, mysql, crdb}
 
 	clean = func(t *testing.T) {
 		wg := sync.WaitGroup{}
 
-		wg.Add(3)
-		go func() {
-			CleanAndMigrate(pg)(t)
-			wg.Done()
-		}()
-		go func() {
-			CleanAndMigrate(mysql)(t)
-			wg.Done()
-		}()
-		go func() {
-			CleanAndMigrate(crdb)(t)
-			wg.Done()
-		}()
+		wg.Add(len(dbs))
+		for _, db := range dbs {
+			go func(db *driver.RegistrySQL) {
+				defer wg.Done()
+				CleanAndMigrate(db)(t)
+			}(db)
+		}
 		wg.Wait()
 	}
 	clean(t)

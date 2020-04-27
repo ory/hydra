@@ -40,7 +40,7 @@ func TestXXMigrations(t *testing.T) {
 					k += 3
 				}
 				conf := internal.NewConfigurationWithDefaults()
-				reg := internal.NewRegistrySQL(conf, db)
+				reg := internal.NewRegistrySQLFromDB(conf, db)
 
 				sid := fmt.Sprintf("%d-sid", k+1)
 				m := jwk.NewSQLManager(db, reg)

@@ -39,7 +39,7 @@ func TestXXMigrations(t *testing.T) {
 		func(t *testing.T, dbName string, db *sqlx.DB, m, k, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				conf := internal.NewConfigurationWithDefaults()
-				reg := internal.NewRegistrySQL(conf, db)
+				reg := internal.NewRegistrySQLFromDB(conf, db)
 
 				if m != 2 {
 					t.Skip("Skipping polling unless it's the last migration schema")

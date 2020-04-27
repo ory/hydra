@@ -48,7 +48,7 @@ func TestXXMigrations(t *testing.T) {
 
 			t.Run(fmt.Sprintf("poll=%d", step), func(t *testing.T) {
 				conf := internal.NewConfigurationWithDefaults()
-				reg := internal.NewRegistrySQL(conf, db)
+				reg := internal.NewRegistrySQLFromDB(conf, db)
 
 				kk := step + 1
 				if dbName == "cockroach" {

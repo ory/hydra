@@ -23,7 +23,6 @@ package oauth2_test
 import (
 	"context"
 	"flag"
-	"fmt"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/viper"
@@ -45,7 +44,6 @@ func TestMain(m *testing.M) {
 
 var registries = make(map[string]driver.Registry)
 var cleanRegistries = func(*testing.T) {
-	fmt.Printf("\n\nsetting memory reg\n\n\n")
 	registries["memory"] = internal.NewRegistryMemory(internal.NewConfigurationWithDefaults())
 }
 

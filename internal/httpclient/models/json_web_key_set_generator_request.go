@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request
+// JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request
 //
 // swagger:model jsonWebKeySetGeneratorRequest
 type JSONWebKeySetGeneratorRequest struct {

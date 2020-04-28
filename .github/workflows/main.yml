@@ -1,0 +1,10 @@
+on: [push]
+
+jobs:
+  find_closed_references:
+    runs-on: ubuntu-latest
+    name: Find closed references
+    steps:
+    - uses: ory/closed-reference-notifier@v0.0.1-alpha.1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}

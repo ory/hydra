@@ -619,8 +619,7 @@
           "enum": [
             "opaque",
             "jwt"
-          ],
-          "default": "opaque"
+          ]
         }
       }
     },

@@ -1831,10 +1831,10 @@
       "description": "It is important that this model object is named JSONWebKey for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKey.",
       "type": "object",
       "required": [
-        "use",
-        "kty",
+        "alg",
         "kid",
-        "alg"
+        "kty",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -1937,7 +1937,7 @@
     },
     "PluginConfig": {
       "type": "object",
-      "title": "PluginConfig The config of a plugin.",
+      "title": "PluginConfig PluginConfig PluginConfig The config of a plugin.",
       "required": [
         "Args",
         "Description",
@@ -2058,7 +2058,7 @@
       }
     },
     "PluginConfigInterface": {
-      "description": "PluginConfigInterface The interface between Docker and the plugin",
+      "description": "PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
       "type": "object",
       "required": [
         "Socket",
@@ -2108,7 +2108,7 @@
       }
     },
     "PluginConfigNetwork": {
-      "description": "PluginConfigNetwork plugin config network",
+      "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
       "type": "object",
       "required": [
         "Type"
@@ -2154,7 +2154,7 @@
       }
     },
     "PluginDevice": {
-      "description": "PluginDevice plugin device",
+      "description": "PluginDevice PluginDevice PluginDevice plugin device",
       "type": "object",
       "required": [
         "Description",
@@ -2328,20 +2328,30 @@
       }
     },
     "PreviousConsentSession": {
-      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
           "$ref": "#/definitions/consentRequest"
         },
         "grant_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "description": "GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "grant_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "description": "GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "description": "handled at\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+          "type": "string",
+          "format": "date-time"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2365,7 +2375,7 @@
       }
     },
     "VolumeUsageData": {
-      "description": "VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
+      "description": "VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
       "type": "object",
       "required": [
         "RefCount",
@@ -2386,12 +2396,20 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "grant_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
@@ -2488,9 +2506,19 @@
           "type": "string"
         },
         "requested_access_token_audience": {
+          "description": "requested access token audience",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
+          "description": "requested scope",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "skip": {
@@ -2577,6 +2605,7 @@
       }
     },
     "healthStatus": {
+      "description": "HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2589,8 +2618,8 @@
       "type": "object",
       "required": [
         "alg",
-        "use",
-        "kid"
+        "kid",
+        "use"
       ],
       "properties": {
         "alg": {
@@ -2609,7 +2638,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing login request.",
+      "title": "LoginRequest LoginRequest LoginRequest LoginRequest Contains information on an ongoing login request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2626,9 +2655,17 @@
           "type": "string"
         },
         "requested_access_token_audience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "requested_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "session_id": {
@@ -2647,7 +2684,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "Contains information about an ongoing logout request.",
+      "title": "LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2669,7 +2706,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "Client represents an OAuth 2.0 Client.",
+      "title": "OAuth2Client OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
@@ -2710,7 +2747,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.",
+          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2785,7 +2822,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.",
+          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
@@ -2867,26 +2904,32 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "The Access Token Response",
+      "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
+          "description": "access token",
           "type": "string"
         },
         "expires_in": {
+          "description": "expires in",
           "type": "integer",
           "format": "int64"
         },
         "id_token": {
+          "description": "id token",
           "type": "string"
         },
         "refresh_token": {
+          "description": "refresh token",
           "type": "string"
         },
         "scope": {
+          "description": "scope",
           "type": "string"
         },
         "token_type": {
+          "description": "token type",
           "type": "string"
         }
       }
@@ -2928,28 +2971,33 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "The request payload used to accept a login or consent request.",
+      "title": "RejectRequest RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
+          "description": "error",
           "type": "string"
         },
         "error_debug": {
+          "description": "error debug",
           "type": "string"
         },
         "error_description": {
+          "description": "error description",
           "type": "string"
         },
         "error_hint": {
+          "description": "error hint",
           "type": "string"
         },
         "status_code": {
+          "description": "status code",
           "type": "integer",
           "format": "int64"
         }
       }
     },
     "userinfoResponse": {
-      "description": "The userinfo response",
+      "description": "UserinfoResponse UserinfoResponse UserinfoResponse UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -3043,7 +3091,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

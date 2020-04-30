@@ -72,7 +72,7 @@ func (m *RegistrySQL) Init() error {
 		// new db connection
 		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.c.DSN())
 		c, err := pop.NewConnection(&pop.ConnectionDetails{
-			URL:             cleanedDSN,
+			URL:             sqlcon.FinalizeDSN(m.l, cleanedDSN),
 			IdlePool:        idlePool,
 			ConnMaxLifetime: connMaxLifetime,
 			Pool:            pool,

@@ -3,7 +3,6 @@ module github.com/ory/hydra
 go 1.14
 
 require (
-	github.com/davidrjonas/semver-cli v0.0.0-20200305203455-0b3cebbaa360 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.19.3
@@ -15,6 +14,7 @@ require (
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
+	github.com/gobuffalo/pop/v5 v5.0.11
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -36,7 +36,7 @@ require (
 	github.com/ory/herodot v0.7.0
 	github.com/ory/sdk/swagutil v0.0.0-20200423140806-4d849e59dffb
 	github.com/ory/viper v1.7.4
-	github.com/ory/x v0.0.111
+	github.com/ory/x v0.0.115
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -61,3 +61,5 @@ require (
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/square/go-jose.v2 v2.5.0
 )
+
+replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.0.12-0.20200420123908-2624c41ffa94

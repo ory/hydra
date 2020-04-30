@@ -10,19 +10,32 @@ orbs:
   golangci: ory/golangci@0.0.4
 
 jobs:
+  test-legacy-migrations:
+    parameters:
+      flavor:
+        type: string
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run: sudo rm -rfd /usr/local/go
+      - run: sudo circleci-install golang 1.14.2
+      - run: make test-resetdb
+      - run: source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m -run=Test*/db=<< parameters.flavor>> ./internal/fizzmigrate
+
   test:
     docker:
       - image: circleci/golang:1.14
         environment:
           - GO111MODULE=on
-          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
-          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
       - image: postgres:9.6
         environment:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
-          - POSTGRES_DB=hydra
+          - POSTGRES_DB=postgres
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
@@ -56,14 +69,14 @@ jobs:
       - image: oryd/e2e-env:latest
         environment:
           - GO111MODULE=on
-          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
-          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/hydra?sslmode=disable
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
       - image: postgres:9.6
         environment:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
-          - POSTGRES_DB=hydra
+          - POSTGRES_DB=postgres
       - image: cockroachdb/cockroach:v2.1.6
         command: start --insecure
       - image: mysql:5.7
@@ -115,6 +128,28 @@ jobs:
 workflows:
   bdt:
     jobs:
+
+      # Test legacy migrations
+      - test-legacy-migrations:
+          name: test-legacy-migrations-postgres
+          flavor: postgres
+          filters:
+            tags:
+              only: /.*/
+      - test-legacy-migrations:
+          name: test-legacy-migrations-mysql
+          flavor: mysql
+          filters:
+            tags:
+              only: /.*/
+      - test-legacy-migrations:
+          name: test-legacy-migrations-cockroach
+          flavor: cockroach
+          filters:
+            tags:
+              only: /.*/
+      # END - Test legacy migrations
+
       - golangci/lint:
           filters:
             tags:
@@ -168,6 +203,9 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
+            - test-legacy-migrations-postgres
+            - test-legacy-migrations-mysql
+            - test-legacy-migrations-cockroach
           filters:
             tags:
               only: /.*/
@@ -184,6 +222,9 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
+            - test-legacy-migrations-postgres
+            - test-legacy-migrations-mysql
+            - test-legacy-migrations-cockroach
           filters:
             tags:
               only: /.*/
@@ -228,6 +269,9 @@ workflows:
             - test-e2e-cockroach
             - test-e2e-plugin
             - changelog/generate
+            - test-legacy-migrations-postgres
+            - test-legacy-migrations-mysql
+            - test-legacy-migrations-cockroach
           filters:
             branches:
               ignore: /.*/

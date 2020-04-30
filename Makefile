@@ -6,14 +6,20 @@ tools:
 		go install github.com/ory/go-acc github.com/ory/x/tools/listx github.com/go-swagger/go-swagger/cmd/swagger github.com/go-bindata/go-bindata/go-bindata github.com/sqs/goreturns github.com/ory/sdk/swagutil
 
 # Runs full test suite including tests where databases are enabled
+.PHONY: test-legacy-migrations
+test-legacy-migrations:
+		make test-resetdb
+		make sqlbin
+		source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m ./internal/fizzmigrate
+		docker rm -f hydra_test_database_mysql
+		docker rm -f hydra_test_database_postgres
+		docker rm -f hydra_test_database_cockroach
+
+# Runs full test suite including tests where databases are enabled
 .PHONY: test
 test:
 		make test-resetdb
-		make sqlbin
-		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
-		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
-		TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
-		$$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
+		source scripts/test-env.sh && $$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
@@ -28,13 +34,12 @@ test-resetdb:
 		docker rm -f hydra_test_database_postgres || true
 		docker rm -f hydra_test_database_cockroach || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
+		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:9.6
 		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
-		make sqlbin
 		packr2
 		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
 		packr2 clean
@@ -76,10 +81,10 @@ mocks:
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin
 sqlbin:
-		cd client; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
-		cd consent; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
-		cd jwk; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
-		cd oauth2; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
+		cd internal/fizzmigrate/client; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
+		cd internal/fizzmigrate/consent; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
+		cd internal/fizzmigrate/jwk; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
+		cd internal/fizzmigrate/oauth2; $$(go env GOPATH)/bin/go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
 
 # Runs all code generators
 .PHONY: gen

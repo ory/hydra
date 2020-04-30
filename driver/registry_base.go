@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/persistence"
+
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/ory/hydra/metrics/prometheus"
@@ -72,6 +74,7 @@ type RegistryBase struct {
 	buildHash    string
 	buildDate    string
 	r            Registry
+	persister    persistence.Persister
 }
 
 func (m *RegistryBase) with(r Registry) *RegistryBase {
@@ -410,4 +413,8 @@ func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate)
 	}
 	return m.pmm
+}
+
+func (m *RegistryBase) Persister() persistence.Persister {
+	return m.persister
 }

@@ -2,6 +2,12 @@ package internal
 
 import (
 	"context"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/stretchr/testify/require"
+	"strings"
+	"sync"
+	"testing"
 
 	"github.com/jmoiron/sqlx"
 
@@ -64,18 +70,108 @@ func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 	return configuration.NewViperProvider(logrusx.New(), false, nil).(*configuration.ViperProvider)
 }
 
-func NewRegistry(c *configuration.ViperProvider) *driver.RegistryMemory {
+func NewRegistryMemory(c *configuration.ViperProvider) *driver.RegistryMemory {
 	viper.Set(configuration.ViperKeyLogLevel, "debug")
 	r := driver.NewRegistryMemory().WithConfig(c)
 	_ = r.Init()
 	return r.(*driver.RegistryMemory)
 }
 
-func NewRegistrySQL(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
+func NewRegistrySQLFromDB(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
 	viper.Set(configuration.ViperKeyLogLevel, "debug")
 	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
 	_ = r.Init()
 	return r.(*driver.RegistrySQL)
+}
+
+func NewRegistrySQLFromURL(t *testing.T, url string) *driver.RegistrySQL {
+	conf := NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyDSN, url)
+	reg, err := driver.NewRegistry(conf)
+	require.NoError(t, err)
+	r, ok := reg.(*driver.RegistrySQL)
+	require.True(t, ok)
+	require.NoError(t, r.Init())
+	return r
+}
+
+func CleanAndMigrate(reg *driver.RegistrySQL) func(*testing.T) {
+	return func(t *testing.T) {
+		x.CleanSQL(t, reg.DB())
+		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
+		t.Log("clean and migrate done")
+	}
+}
+
+func ConnectToMySQL(t *testing.T) string {
+	c := dockertest.ConnectToTestMySQLPop(t)
+	url := c.URL()
+	if !strings.HasPrefix(url, "mysql://") {
+		url = "mysql://" + url
+	}
+	require.NoError(t, c.Close())
+	return url
+}
+
+func ConnectToPG(t *testing.T) string {
+	c := dockertest.ConnectToTestPostgreSQLPop(t)
+	require.NoError(t, c.Close())
+	return c.URL()
+}
+
+func ConnectToCRDB(t *testing.T) string {
+	c := dockertest.ConnectToTestCockroachDBPop(t)
+	url := c.URL()
+	if !strings.HasPrefix(url, "cockroach") {
+		url = "cockroach://" + strings.Split(url, "://")[1]
+	}
+	require.NoError(t, c.Close())
+	return url
+}
+
+func ConnectDatabases(t *testing.T) (pg, mysql, crdb *driver.RegistrySQL, clean func(*testing.T)) {
+	var pgURL, mysqlURL, crdbURL string
+	wg := sync.WaitGroup{}
+
+	wg.Add(3)
+	go func() {
+		pgURL = ConnectToPG(t)
+		t.Log("Pg done")
+		wg.Done()
+	}()
+	go func() {
+		mysqlURL = ConnectToMySQL(t)
+		t.Log("myssql done")
+		wg.Done()
+	}()
+	go func() {
+		crdbURL = ConnectToCRDB(t)
+		t.Log("cddb done")
+		wg.Done()
+	}()
+	t.Log("beginning to wait")
+	wg.Wait()
+	t.Log("done waiting")
+
+	pg = NewRegistrySQLFromURL(t, pgURL)
+	mysql = NewRegistrySQLFromURL(t, mysqlURL)
+	crdb = NewRegistrySQLFromURL(t, crdbURL)
+	dbs := []*driver.RegistrySQL{pg, mysql, crdb}
+
+	clean = func(t *testing.T) {
+		wg := sync.WaitGroup{}
+
+		wg.Add(len(dbs))
+		for _, db := range dbs {
+			go func(db *driver.RegistrySQL) {
+				defer wg.Done()
+				CleanAndMigrate(db)(t)
+			}(db)
+		}
+		wg.Wait()
+	}
+	clean(t)
+	return
 }
 
 func MustEnsureRegistryKeys(r driver.Registry, key string) {

@@ -28,20 +28,11 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
-
-var Migrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/mysql"}, true),
-	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/cockroach"}, true),
-}
 
 func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 	return &SQLManager{
@@ -88,21 +79,6 @@ var sqlParams = []string{
 	"backchannel_logout_uri",
 	"backchannel_logout_session_required",
 	"metadata",
-}
-
-func (m *SQLManager) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
-	migrate.SetTable("hydra_client_migration")
-	plan, _, err := migrate.PlanMigration(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
-	return plan, errors.WithStack(err)
-}
-
-func (m *SQLManager) CreateSchemas(dbName string) (int, error) {
-	migrate.SetTable("hydra_client_migration")
-	n, err := migrate.Exec(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d Migrations", n)
-	}
-	return n, nil
 }
 
 func (m *SQLManager) GetConcreteClient(ctx context.Context, id string) (*Client, error) {

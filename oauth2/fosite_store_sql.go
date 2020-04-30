@@ -32,14 +32,12 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/herodot"
 
 	"github.com/ory/fosite"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
 
@@ -79,20 +77,6 @@ const (
 	sqlTableBlacklistedJTI tableName = "jti_blacklist"
 )
 
-var Migrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/mysql",
-	}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/postgres",
-	}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/cockroach",
-	}, true),
-}
-
 type transactionKey int
 
 const txKey transactionKey = iota
@@ -113,7 +97,7 @@ var sqlParams = []string{
 	"challenge_id",
 }
 
-type sqlData struct {
+type SQLData struct {
 	PK                int            `db:"pk"`
 	Signature         string         `db:"signature"`
 	Request           string         `db:"request_id"`
@@ -130,7 +114,7 @@ type sqlData struct {
 	Session           []byte         `db:"session_data"`
 }
 
-func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*sqlData, error) {
+func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*SQLData, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		logger.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -161,7 +145,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration,
 		}
 	}
 
-	return &sqlData{
+	return &SQLData{
 		Request:           r.GetID(),
 		ConsentChallenge:  challenge,
 		Signature:         signature,
@@ -178,7 +162,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration,
 	}, nil
 }
 
-func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, conf Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*fosite.Request, error) {
+func (s *SQLData) toRequest(session fosite.Session, cm client.Manager, conf Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*fosite.Request, error) {
 	sess := s.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
@@ -221,12 +205,6 @@ func (s *sqlData) toRequest(session fosite.Session, cm client.Manager, conf Conf
 	return r, nil
 }
 
-func (s *FositeSQLStore) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
-	migrate.SetTable("hydra_oauth2_migration")
-	plan, _, err := migrate.PlanMigration(s.DB.DB, dbal.Canonicalize(s.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
-	return plan, errors.WithStack(err)
-}
-
 func (s *FositeSQLStore) GetClient(ctx context.Context, id string) (fosite.Client, error) {
 	return s.r.ClientManager().GetClient(ctx, id)
 }
@@ -265,9 +243,9 @@ func (s *FositeSQLStore) SetClientAssertionJWT(ctx context.Context, j string, ex
 	return nil
 }
 
-func (s *FositeSQLStore) getClientAssertionJWT(ctx context.Context, j string) (*blacklistedJTI, error) {
+func (s *FositeSQLStore) getClientAssertionJWT(ctx context.Context, j string) (*BlacklistedJTI, error) {
 	sig := signatureFromJTI(j)
-	jti := blacklistedJTI{
+	jti := BlacklistedJTI{
 		JTI: j,
 	}
 	db := s.db(ctx)
@@ -275,7 +253,7 @@ func (s *FositeSQLStore) getClientAssertionJWT(ctx context.Context, j string) (*
 	return &jti, sqlcon.HandleError(db.GetContext(ctx, &jti, db.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", sqlTableBlacklistedJTI)), sig))
 }
 
-func (s *FositeSQLStore) setClientAssertionJWT(ctx context.Context, jti *blacklistedJTI) error {
+func (s *FositeSQLStore) setClientAssertionJWT(ctx context.Context, jti *BlacklistedJTI) error {
 	db := s.db(ctx)
 	_, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("INSERT INTO hydra_oauth2_%s (signature, expires_at) VALUES (?, ?)", sqlTableBlacklistedJTI)), jti.Signature, jti.Expiry)
 
@@ -368,7 +346,7 @@ func (s *FositeSQLStore) findSessionBySignature(ctx context.Context, signature s
 	db := s.db(ctx)
 	signature = s.hashSignature(signature, table)
 
-	var d sqlData
+	var d SQLData
 	/* #nosec G201 - table is a fixed enum */
 	if err := db.GetContext(ctx, &d, db.Rebind(fmt.Sprintf("SELECT * FROM hydra_oauth2_%s WHERE signature=?", table)), signature); err == sql.ErrNoRows {
 		return nil, errors.Wrap(fosite.ErrNotFound, "")
@@ -396,15 +374,6 @@ func (s *FositeSQLStore) deleteSession(ctx context.Context, signature string, ta
 		return sqlcon.HandleError(err)
 	}
 	return nil
-}
-
-func (s *FositeSQLStore) CreateSchemas(dbName string) (int, error) {
-	migrate.SetTable("hydra_oauth2_migration")
-	n, err := migrate.Exec(s.DB.DB, dbal.Canonicalize(s.DB.DriverName()), Migrations[dbName], migrate.Up)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
-	}
-	return n, nil
 }
 
 func (s *FositeSQLStore) CreateOpenIDConnectSession(ctx context.Context, signature string, requester fosite.Requester) error {

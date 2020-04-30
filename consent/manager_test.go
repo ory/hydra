@@ -21,93 +21,31 @@
 package consent_test
 
 import (
-	"flag"
-	"sync"
 	"testing"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
-	"github.com/stretchr/testify/require"
-
 	"github.com/ory/viper"
 
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
 )
-
-var m sync.Mutex
-var regs = make(map[string]driver.Registry)
-
-func connectToPostgres(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	require.NoError(t, err)
-	return db
-}
-
-func connectToMySQL(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestMySQL()
-	require.NoError(t, err)
-	return db
-}
-
-func connectToCockroach(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	require.NoError(t, err)
-	return db
-}
-
-func TestMain(m *testing.M) {
-	flag.Parse()
-	runner := dockertest.Register()
-	runner.Exit(m.Run())
-}
-
-func createSQL(t *testing.T, dbName string, db *sqlx.DB) driver.Registry {
-	x.CleanSQL(t, db)
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-	_, err := reg.CreateSchemas(dbName)
-	require.NoError(t, err, "db: %s", db.DriverName())
-
-	return reg
-}
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Hour)
-	regs["memory"] = internal.NewRegistry(conf)
+	registries := map[string]driver.Registry{
+		"memory": internal.NewRegistryMemory(conf),
+	}
 
 	if !testing.Short() {
-		var p, m, c *sqlx.DB
-		dockertest.Parallel([]func(){
-			func() {
-				p = connectToPostgres(t)
-			},
-			func() {
-				m = connectToMySQL(t)
-			},
-			func() {
-				c = connectToCockroach(t)
-			},
-		})
-		regs["postgres"] = createSQL(t, "postgres", p)
-		regs["mysql"] = createSQL(t, "mysql", m)
-		regs["cockroach"] = createSQL(t, "cockroach", c)
+		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
 	}
 
-	for k, m := range regs {
+	for k, m := range registries {
 		t.Run("manager="+k, ManagerTests(m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
-	}
-
-	for _, m := range regs {
-		if mm, ok := m.ConsentManager().(*SQLManager); ok {
-			x.CleanSQL(t, mm.DB)
-		}
 	}
 }

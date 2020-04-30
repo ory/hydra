@@ -4,6 +4,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/ory/hydra/persistence"
+
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
@@ -31,6 +33,7 @@ type Registry interface {
 	BuildDate() string
 	BuildHash() string
 
+	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
 	x.RegistryCookieStore

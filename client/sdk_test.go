@@ -76,7 +76,7 @@ func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"public"})
 	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"foo", "bar"})
-	r := internal.NewRegistry(conf)
+	r := internal.NewRegistryMemory(conf)
 
 	router := x.NewRouterAdmin()
 	handler := client.NewHandler(r)

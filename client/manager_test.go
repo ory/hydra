@@ -21,115 +21,40 @@
 package client_test
 
 import (
-	"flag"
 	"fmt"
-	"log"
-	"sync"
+	"github.com/ory/hydra/driver"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
 )
-
-var clientManagers = map[string]Manager{}
-var m sync.Mutex
-
-func TestMain(m *testing.M) {
-	flag.Parse()
-	runner := dockertest.Register()
-	runner.Exit(m.Run())
-}
-
-func connectToMySQL() {
-	db, err := dockertest.ConnectToTestMySQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-
-	m.Lock()
-	clientManagers["mysql"] = reg.ClientManager()
-	m.Unlock()
-}
-
-func connectToPG() {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-
-	m.Lock()
-	clientManagers["postgres"] = reg.ClientManager()
-	m.Unlock()
-}
-
-func connectToCRDB() {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	if err != nil {
-		log.Fatalf("Could not connect to database: %v", err)
-	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistrySQL(conf, db)
-
-	m.Lock()
-	clientManagers["cockroach"] = reg.ClientManager()
-	m.Unlock()
-}
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
 
-	clientManagers["memory"] = reg.ClientManager()
-
-	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			connectToPG,
-			connectToMySQL,
-			connectToCRDB,
-		})
+	registries := map[string]driver.Registry{
+		"memory": internal.NewRegistryMemory(conf),
 	}
 
-	t.Log("Creating schemas...")
-	for k, m := range clientManagers {
-		s, ok := m.(*SQLManager)
-		if ok {
-			x.CleanSQL(t, s.DB)
-			x, err := s.CreateSchemas(k)
-			if err != nil {
-				t.Fatal("Could not create schemas", err.Error())
-			} else {
-				t.Logf("Schemas created. Rows affected: %+v", x)
-			}
-			require.NoError(t, err)
-		}
+	if !testing.Short() {
+		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
+		t.Log("connected")
+	}
 
+	for k, m := range registries {
 		t.Run("case=create-get-update-delete", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m))
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperCreateGetUpdateDeleteClient(k, m.ClientManager()))
 		})
 
 		t.Run("case=autogenerate-key", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAutoGenerateKey(k, m))
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAutoGenerateKey(k, m.ClientManager()))
 		})
 
 		t.Run("case=auth-client", func(t *testing.T) {
-			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAuthenticate(k, m))
+			t.Run(fmt.Sprintf("db=%s", k), TestHelperClientAuthenticate(k, m.ClientManager()))
 		})
-
-		if ok {
-			x.CleanSQL(t, s.DB)
-		}
 	}
 }

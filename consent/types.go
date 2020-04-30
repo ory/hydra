@@ -57,6 +57,10 @@ type LoginSession struct {
 	Remember        bool      `db:"remember"`
 }
 
+func (s LoginSession) TableName() string {
+	return "hydra_oauth2_authentication_session"
+}
+
 // The request payload used to accept a login or consent request.
 //
 // swagger:model rejectRequest
@@ -162,6 +166,10 @@ type HandledConsentRequest struct {
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
+}
+
+func (r HandledConsentRequest) TableName() string {
+	return "hydra_oauth2_consent_request_handled"
 }
 
 func (r *HandledConsentRequest) HasError() bool {
@@ -273,6 +281,10 @@ type HandledLoginRequest struct {
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 	WasUsed         bool                `json:"-" db:"was_used"`
+}
+
+func (r HandledLoginRequest) TableName() string {
+	return "hydra_oauth2_authentication_request_handled"
 }
 
 func (r *HandledLoginRequest) HasError() bool {

@@ -43,7 +43,7 @@ import (
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
-	r := internal.NewRegistry(c)
+	r := internal.NewRegistryMemory(c)
 
 	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
 	for k, tc := range []struct {

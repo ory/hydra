@@ -22,25 +22,7 @@ package consent
 
 import (
 	"fmt"
-
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/x/dbal"
 )
-
-var Migrations = map[string]*dbal.PackrMigrationSource{
-	"mysql": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/mysql",
-	}, true),
-	"postgres": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/postgres",
-	}, true),
-	"cockroach": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/cockroach",
-	}, true),
-}
 
 var sqlParamsAuthenticationRequestHandled = []string{
 	"challenge",

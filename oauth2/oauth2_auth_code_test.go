@@ -36,7 +36,6 @@ import (
 	"time"
 
 	djwt "github.com/dgrijalva/jwt-go"
-	"github.com/jmoiron/sqlx"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -47,7 +46,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 	hydra "github.com/ory/hydra/internal/httpclient/client"
@@ -56,7 +54,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/viper"
 	"github.com/ory/x/pointerx"
-	"github.com/ory/x/sqlcon/dockertest"
 	"github.com/ory/x/urlx"
 )
 
@@ -148,41 +145,9 @@ func acceptConsent(apiClient *hydra.OryHydra, scope []string, expectSkip bool, e
 // - [x] If `id_token_hint` is handled properly
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	regs := map[string]driver.Registry{
-		"memory": internal.NewRegistry(conf),
-	}
+	setupRegistries(t)
 
-	if !testing.Short() {
-		var p, m, c *sqlx.DB
-		dockertest.Parallel([]func(){
-			func() {
-				p = connectToPG(t)
-			},
-			func() {
-				m = connectToMySQL(t)
-			},
-			func() {
-				c = connectToCRDB(t)
-			},
-		})
-		pr := internal.NewRegistrySQL(conf, p)
-		_, err := pr.CreateSchemas("postgres")
-		require.NoError(t, err)
-		regs["postgres"] = pr
-
-		mr := internal.NewRegistrySQL(conf, m)
-		_, err = mr.CreateSchemas("mysql")
-		require.NoError(t, err)
-		regs["mysql"] = mr
-
-		cr := internal.NewRegistrySQL(conf, c)
-		_, err = cr.CreateSchemas("cockroach")
-		require.NoError(t, err)
-		regs["cockroach"] = cr
-	}
-
-	for km, reg := range regs {
+	for km, reg := range registries {
 		t.Run("manager="+km, func(t *testing.T) {
 			for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 				t.Run("strategy="+strat.d, func(t *testing.T) {
@@ -1167,7 +1132,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second*2)
 			viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(conf)
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 

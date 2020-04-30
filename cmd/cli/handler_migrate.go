@@ -1,43 +1,22 @@
-/*
- * Copyright © 2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @author		Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @copyright 	2015-2018 Aeneas Rekkas <aeneas+oss@aeneas.io>
- * @license 	Apache-2.0
- */
-
 package cli
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/spf13/cobra"
-
-	"github.com/ory/x/sqlcon"
-
-	"github.com/ory/viper"
-
 	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx"
-	"github.com/ory/x/logrusx"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/viper"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/logrusx"
 )
 
 type MigrateHandler struct{}
@@ -68,8 +47,9 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		d = driver.NewDefaultDriver(logrusx.New(), false, nil, "", "", "", false)
 	}
 
-	reg, ok := d.Registry().(*driver.RegistrySQL)
-	if !ok {
+	p := d.Registry().Persister()
+	conn := p.Connection(context.Background())
+	if conn == nil {
 		fmt.Println(cmd.UsageString())
 		fmt.Println("")
 		fmt.Printf("Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.\n")
@@ -77,14 +57,27 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	scheme := sqlcon.GetDriverName(d.Configuration().DSN())
+	if err := conn.Open(); err != nil {
+		fmt.Printf("Could not open the database connection:\n%+v\n", err)
+		os.Exit(1)
+		return
+	}
 
-	plan, err := reg.SchemaMigrationPlan(scheme)
-	cmdx.Must(err, "An error occurred planning migrations: %s", err)
+	// convert migration tables
+	if err := p.PrepareMigration(context.Background()); err != nil {
+		fmt.Printf("Could not convert the migration table:\n%+v\n", err)
+		os.Exit(1)
+		return
+	}
 
+	// print migration status
 	fmt.Println("The following migration is planned:")
 	fmt.Println("")
-	plan.Render()
+	if err := p.MigrationStatus(context.Background(), os.Stdout); err != nil {
+		fmt.Printf("Could not get the migration status:\n%+v\n", errors.WithStack(err))
+		os.Exit(1)
+		return
+	}
 
 	if !flagx.MustGetBool(cmd, "yes") {
 		fmt.Println("")
@@ -95,9 +88,12 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	n, err := reg.CreateSchemas(scheme)
-	cmdx.Must(err, "An error occurred while connecting to SQL: %s", err)
-	fmt.Printf("Successfully applied %d SQL migrations!\n", n)
+	// apply migrations
+	if err := p.MigrateUp(context.Background()); err != nil {
+		fmt.Printf("Could not apply migrations:\n%+v\n", errors.WithStack(err))
+	}
+
+	fmt.Println("Successfully applied migrations!")
 }
 
 func askForConfirmation(s string) bool {

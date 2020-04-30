@@ -22,87 +22,35 @@ package jwk_test
 
 import (
 	"fmt"
-	"sync"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/ory/hydra/driver"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var managers = map[string]Manager{}
-
-var m sync.Mutex
 var testGenerator = &RS256Generator{}
-
-func TestMain(m *testing.M) {
-	runner := dockertest.Register()
-
-	runner.Exit(m.Run())
-}
-
-func connectToPG(t *testing.T) *SQLManager {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
-}
-
-func connectToMySQL(t *testing.T) *SQLManager {
-	db, err := dockertest.ConnectToTestMySQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
-}
-
-func connectToCRDB(t *testing.T) *SQLManager {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return internal.NewRegistrySQL(internal.NewConfigurationWithDefaults(), db).KeyManager().(*SQLManager)
-}
 
 func TestManager(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
-	managers["memory"] = reg.KeyManager()
+	registries := map[string]driver.Registry{
+		"memory": internal.NewRegistryMemory(conf),
+	}
 
 	if !testing.Short() {
-		dockertest.Parallel([]func(){
-			func() {
-				m.Lock()
-				managers["postgres"] = connectToPG(t)
-				m.Unlock()
-			},
-			func() {
-				m.Lock()
-				managers["mysql"] = connectToMySQL(t)
-				m.Unlock()
-			},
-			func() {
-				m.Lock()
-				managers["cockroach"] = connectToCRDB(t)
-				m.Unlock()
-			},
-		})
+		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
 	}
 
 	t.Run("TestManagerKey", func(t *testing.T) {
 		ks, err := testGenerator.Generate("TestManagerKey", "sig")
 		require.NoError(t, err)
 
-		for name, m := range managers {
-			if m, ok := m.(*SQLManager); ok {
-				n, err := m.CreateSchemas(name)
-				require.NoError(t, err)
-				t.Logf("Applied %d migrations to %s", n, name)
-			}
-			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(m, ks, "TestManagerKey"))
+		for name, r := range registries {
+			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKey(r.KeyManager(), ks, "TestManagerKey"))
 		}
 	})
 
@@ -111,13 +59,8 @@ func TestManager(t *testing.T) {
 		require.NoError(t, err)
 		ks.Key("private")
 
-		for name, m := range managers {
-			if m, ok := m.(*SQLManager); ok {
-				n, err := m.CreateSchemas(name)
-				require.NoError(t, err)
-				t.Logf("Applied %d migrations to %s", n, name)
-			}
-			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(m, ks, "TestManagerKeySet"))
+		for name, r := range registries {
+			t.Run(fmt.Sprintf("case=%s", name), TestHelperManagerKeySet(r.KeyManager(), ks, "TestManagerKeySet"))
 		}
 	})
 }

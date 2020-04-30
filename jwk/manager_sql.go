@@ -27,12 +27,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
-	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
 	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
 	"github.com/ory/x/sqlcon"
 )
 
@@ -45,21 +42,7 @@ func NewSQLManager(db *sqlx.DB, r InternalRegistry) *SQLManager {
 	return &SQLManager{DB: db, R: r}
 }
 
-var Migrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/mysql",
-	}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/shared",
-		"migrations/sql/postgres",
-	}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
-		"migrations/sql/cockroach",
-	}, true),
-}
-
-type sqlData struct {
+type SQLData struct {
 	PK        int       `db:"pk"`
 	Set       string    `db:"sid"`
 	KID       string    `db:"kid"`
@@ -68,19 +51,8 @@ type sqlData struct {
 	Key       string    `db:"keydata"`
 }
 
-func (m *SQLManager) PlanMigration(dbName string) ([]*migrate.PlannedMigration, error) {
-	migrate.SetTable("hydra_jwk_migration")
-	plan, _, err := migrate.PlanMigration(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up, 0)
-	return plan, errors.WithStack(err)
-}
-
-func (m *SQLManager) CreateSchemas(dbName string) (int, error) {
-	migrate.SetTable("hydra_jwk_migration")
-	n, err := migrate.Exec(m.DB.DB, dbal.Canonicalize(m.DB.DriverName()), Migrations[dbName], migrate.Up)
-	if err != nil {
-		return 0, errors.Wrapf(err, "Could not migrate sql schema, applied %d migrations", n)
-	}
-	return n, nil
+func (d SQLData) TableName() string {
+	return "hydra_jwk"
 }
 
 func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
@@ -94,7 +66,7 @@ func (m *SQLManager) AddKey(ctx context.Context, set string, key *jose.JSONWebKe
 		return errors.WithStack(err)
 	}
 
-	if _, err = m.DB.NamedExecContext(ctx, `INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
+	if _, err = m.DB.NamedExecContext(ctx, `INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &SQLData{
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,
@@ -139,7 +111,7 @@ func (m *SQLManager) addKeySet(ctx context.Context, tx *sqlx.Tx, cipher *AEAD, s
 			return errors.WithStack(err)
 		}
 
-		if _, err = tx.NamedExecContext(ctx, `INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &sqlData{
+		if _, err = tx.NamedExecContext(ctx, `INSERT INTO hydra_jwk (sid, kid, version, keydata) VALUES (:sid, :kid, :version, :keydata)`, &SQLData{
 			Set:     set,
 			KID:     key.KeyID,
 			Version: 0,
@@ -153,7 +125,7 @@ func (m *SQLManager) addKeySet(ctx context.Context, tx *sqlx.Tx, cipher *AEAD, s
 }
 
 func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
-	var d sqlData
+	var d SQLData
 	if err := m.DB.GetContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? AND kid=? ORDER BY created_at DESC"), set, kid); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -174,7 +146,7 @@ func (m *SQLManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWeb
 }
 
 func (m *SQLManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
-	var ds []sqlData
+	var ds []SQLData
 	if err := m.DB.SelectContext(ctx, &ds, m.DB.Rebind("SELECT * FROM hydra_jwk WHERE sid=? ORDER BY created_at DESC"), set); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}

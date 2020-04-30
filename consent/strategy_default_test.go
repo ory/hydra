@@ -174,7 +174,7 @@ func genIDToken(t *testing.T, reg *driver.RegistryMemory, c jwtgo.Claims) string
 
 func TestStrategyLogout(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	// jwts := reg.OpenIDJWTStrategy()
@@ -512,7 +512,7 @@ func TestStrategyLogout(t *testing.T) {
 
 func TestStrategyLoginConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(conf)
 
 	var lph, cph, aph func(w http.ResponseWriter, r *http.Request)
 	lp := mockProvider(&lph)

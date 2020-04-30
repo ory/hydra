@@ -5,38 +5,40 @@
 **Table of Contents**
 
 - [Unreleased (2020-04-30)](#unreleased-2020-04-30)
+    - [Bug Fixes](#bug-fixes)
+- [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
     - [Code Refactoring](#code-refactoring)
     - [BREAKING CHANGES](#breaking-changes)
   - [1.4.10 (2020-04-30)](#1410-2020-04-30)
-    - [Bug Fixes](#bug-fixes)
+    - [Bug Fixes](#bug-fixes-1)
     - [Documentation](#documentation)
     - [Unclassified](#unclassified)
   - [1.4.9 (2020-04-25)](#149-2020-04-25)
-    - [Bug Fixes](#bug-fixes-1)
-  - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-2)
+  - [1.4.8 (2020-04-24)](#148-2020-04-24)
+    - [Bug Fixes](#bug-fixes-3)
     - [Documentation](#documentation-1)
     - [Features](#features)
   - [1.4.7 (2020-04-24)](#147-2020-04-24)
-    - [Bug Fixes](#bug-fixes-3)
+    - [Bug Fixes](#bug-fixes-4)
     - [Documentation](#documentation-2)
   - [1.4.6 (2020-04-17)](#146-2020-04-17)
-    - [Bug Fixes](#bug-fixes-4)
+    - [Bug Fixes](#bug-fixes-5)
     - [Documentation](#documentation-3)
   - [1.4.5 (2020-04-16)](#145-2020-04-16)
-    - [Bug Fixes](#bug-fixes-5)
+    - [Bug Fixes](#bug-fixes-6)
     - [Documentation](#documentation-4)
   - [1.4.3 (2020-04-16)](#143-2020-04-16)
-    - [Bug Fixes](#bug-fixes-6)
+    - [Bug Fixes](#bug-fixes-7)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-5)
     - [Features](#features-1)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-6)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-7)
-- [1.4.0 (2020-04-02)](#140-2020-04-02)
     - [Bug Fixes](#bug-fixes-8)
+- [1.4.0 (2020-04-02)](#140-2020-04-02)
+    - [Bug Fixes](#bug-fixes-9)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-7)
     - [Features](#features-2)
@@ -50,11 +52,11 @@
     - [References](#references)
     - [Upstream](#upstream)
   - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-9)
+    - [Bug Fixes](#bug-fixes-10)
     - [Documentation](#documentation-8)
   - [1.3.1 (2020-02-16)](#131-2020-02-16)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-10)
+    - [Bug Fixes](#bug-fixes-11)
     - [Documentation](#documentation-9)
     - [Features](#features-3)
     - [Unclassified](#unclassified-2)
@@ -425,7 +427,16 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.4.10...94057d9400aeb6751ad00acd34e987e8a8866c42) (2020-04-30)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...849fe62e918cb459256806870feb646f977adbdb) (2020-04-30)
+
+
+### Bug Fixes
+
+* Automatically append multiStatements parameter to mySQL URI ([#1835](https://github.com/ory/hydra/issues/1835)) ([849fe62](https://github.com/ory/hydra/commit/849fe62e918cb459256806870feb646f977adbdb))
+
+
+
+# [1.5.0-beta.1](https://github.com/ory/hydra/compare/v1.4.10...v1.5.0-beta.1) (2020-04-30)
 
 
 ### Code Refactoring

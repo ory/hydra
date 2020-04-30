@@ -612,6 +612,14 @@
             "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY"
           ],
           "default": "wildcard"
+        },
+        "access_token": {
+          "type": "string",
+          "description": "Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens",
+          "enum": [
+            "opaque",
+            "jwt"
+          ]
         }
       }
     },

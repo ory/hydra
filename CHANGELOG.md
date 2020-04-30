@@ -4,44 +4,39 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-04-30)](#unreleased-2020-04-30)
-    - [Code Refactoring](#code-refactoring)
-    - [BREAKING CHANGES](#breaking-changes)
-  - [1.4.10 (2020-04-30)](#1410-2020-04-30)
+- [Unreleased (2020-04-27)](#unreleased-2020-04-27)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Unclassified](#unclassified)
   - [1.4.9 (2020-04-25)](#149-2020-04-25)
     - [Bug Fixes](#bug-fixes-1)
-  - [1.4.8 (2020-04-24)](#148-2020-04-24)
-    - [Bug Fixes](#bug-fixes-2)
     - [Documentation](#documentation-1)
     - [Features](#features)
   - [1.4.7 (2020-04-24)](#147-2020-04-24)
-    - [Bug Fixes](#bug-fixes-3)
+    - [Bug Fixes](#bug-fixes-2)
     - [Documentation](#documentation-2)
   - [1.4.6 (2020-04-17)](#146-2020-04-17)
-    - [Bug Fixes](#bug-fixes-4)
+    - [Bug Fixes](#bug-fixes-3)
     - [Documentation](#documentation-3)
   - [1.4.5 (2020-04-16)](#145-2020-04-16)
-    - [Bug Fixes](#bug-fixes-5)
+    - [Bug Fixes](#bug-fixes-4)
     - [Documentation](#documentation-4)
   - [1.4.3 (2020-04-16)](#143-2020-04-16)
-    - [Bug Fixes](#bug-fixes-6)
-    - [Code Refactoring](#code-refactoring-1)
+    - [Bug Fixes](#bug-fixes-5)
+    - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation-5)
     - [Features](#features-1)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-6)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-7)
+    - [Bug Fixes](#bug-fixes-6)
 - [1.4.0 (2020-04-02)](#140-2020-04-02)
-    - [Bug Fixes](#bug-fixes-8)
-    - [Code Refactoring](#code-refactoring-2)
+    - [Bug Fixes](#bug-fixes-7)
+    - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-7)
     - [Features](#features-2)
     - [Unclassified](#unclassified-1)
-    - [BREAKING CHANGES](#breaking-changes-1)
+    - [BREAKING CHANGES](#breaking-changes)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
     - [Impact](#impact)
     - [Severity](#severity)
@@ -50,11 +45,11 @@
     - [References](#references)
     - [Upstream](#upstream)
   - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-9)
+    - [Bug Fixes](#bug-fixes-8)
     - [Documentation](#documentation-8)
   - [1.3.1 (2020-02-16)](#131-2020-02-16)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-10)
+    - [Bug Fixes](#bug-fixes-9)
     - [Documentation](#documentation-9)
     - [Features](#features-3)
     - [Unclassified](#unclassified-2)
@@ -425,27 +420,11 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.4.10...94057d9400aeb6751ad00acd34e987e8a8866c42) (2020-04-30)
-
-
-### Code Refactoring
-
-* Move migrations to gobuffalo/fizz ([#1775](https://github.com/ory/hydra/issues/1775)) ([94057d9](https://github.com/ory/hydra/commit/94057d9400aeb6751ad00acd34e987e8a8866c42)):
-  > This patch deprecates the previous migration system (sql-migrate) in favor of gobuffalo/fizz. No functional changes have been made.
-
-
-### BREAKING CHANGES
-
-* Please run `hydra migrate sql` before applying this release.
-
-
-
-## [1.4.10](https://github.com/ory/hydra/compare/v1.4.9...v1.4.10) (2020-04-30)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.4.9...0e293fc1a651c510b8c10359abb381be21f302f8) (2020-04-27)
 
 
 ### Bug Fixes
 
-* Add strategies.access_token to configuration JSON schema ([#1830](https://github.com/ory/hydra/issues/1830)) ([f09d539](https://github.com/ory/hydra/commit/f09d539065f03b24e9914bc4a3ac53a491fc75c3))
 * **docs:** Prefix href to jaeger tracing ui with http:// ([#1829](https://github.com/ory/hydra/issues/1829)) ([0e293fc](https://github.com/ory/hydra/commit/0e293fc1a651c510b8c10359abb381be21f302f8)):
   > Before these links would lead relatively to `https://www.ory.sh/hydra/docs/127.0.0.1:16686/search`
   > 
@@ -463,20 +442,12 @@
 
 
 
-## [1.4.9](https://github.com/ory/hydra/compare/1.4.8...v1.4.9) (2020-04-25)
+## [1.4.9](https://github.com/ory/hydra/compare/v1.4.7...v1.4.9) (2020-04-25)
 
 
 ### Bug Fixes
 
 * Update install.sh script ([#1828](https://github.com/ory/hydra/issues/1828)) ([7d56902](https://github.com/ory/hydra/commit/7d569022be432c03a6974400ba4a4d20ce693979))
-
-
-
-## [1.4.8](https://github.com/ory/hydra/compare/v1.4.7...1.4.8) (2020-04-24)
-
-
-### Bug Fixes
-
 * **docker:** Resolve nsswitch issues ([#1824](https://github.com/ory/hydra/issues/1824)) ([96b8733](https://github.com/ory/hydra/commit/96b8733bfc683eaec976354077225512397b63bc))
 
 

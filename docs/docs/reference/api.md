@@ -1671,7 +1671,7 @@ Status Code **200**
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-04-25T11:08:35Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -1691,7 +1691,7 @@ Status Code **200**
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-04-25T11:08:35Z",
     "userinfo_signed_response_alg": "string"
   }
 ]
@@ -1871,7 +1871,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -1891,7 +1891,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1933,7 +1933,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -1953,7 +1953,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2034,7 +2034,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2064,7 +2064,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2203,7 +2203,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2223,7 +2223,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2401,7 +2401,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2421,7 +2421,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2462,7 +2462,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2482,7 +2482,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2563,7 +2563,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2593,7 +2593,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -4814,7 +4814,7 @@ the subject accepted or rejected the request.
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-04-25T11:08:35Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -4834,7 +4834,7 @@ the subject accepted or rejected the request.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-04-25T11:08:35Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -5039,7 +5039,7 @@ the user-agent to.
 {
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-04-25T11:08:35Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5152,7 +5152,7 @@ const input = '{
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-04-25T11:08:35Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5539,7 +5539,7 @@ the requested authentication process.
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-04-25T11:08:35Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -5559,7 +5559,7 @@ the requested authentication process.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-04-25T11:08:35Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -6895,7 +6895,7 @@ Status Code **200**
         "client_secret_expires_at": 0,
         "client_uri": "string",
         "contacts": ["string"],
-        "created_at": "2020-04-30T11:01:46Z",
+        "created_at": "2020-04-25T11:08:35Z",
         "frontchannel_logout_session_required": true,
         "frontchannel_logout_uri": "string",
         "grant_types": ["string"],
@@ -6915,7 +6915,7 @@ Status Code **200**
         "subject_type": "string",
         "token_endpoint_auth_method": "string",
         "tos_uri": "string",
-        "updated_at": "2020-04-30T11:01:46Z",
+        "updated_at": "2020-04-25T11:08:35Z",
         "userinfo_signed_response_alg": "string"
       },
       "context": {},
@@ -6939,7 +6939,7 @@ Status Code **200**
     },
     "grant_access_token_audience": ["string"],
     "grant_scope": ["string"],
-    "handled_at": "2020-04-30T11:01:46Z",
+    "handled_at": "2020-04-25T11:08:35Z",
     "remember": true,
     "remember_for": 0,
     "session": {
@@ -7499,7 +7499,7 @@ deleted automatically when performing the refresh flow.
 
 ```json
 {
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-04-25T11:08:35Z"
 }
 ```
 
@@ -7597,7 +7597,7 @@ func main() {
 ```nodejs
 const fetch = require('node-fetch');
 const input = '{
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-04-25T11:08:35Z"
 }';
 const headers = {
   'Content-Type': 'application/json',  'Accept': 'application/json'
@@ -8086,26 +8086,6 @@ p JSON.parse(result)
 
 ## Schemas
 
-<a id="tocScontainerwaitokbodyerror">ContainerWaitOKBodyError</a>
-
-#### ContainerWaitOKBodyError
-
-<a id="schemacontainerwaitokbodyerror"></a>
-
-```json
-{
-  "Message": "string"
-}
-```
-
-_ContainerWaitOKBodyError container waiting error, if any_
-
-#### Properties
-
-| Name    | Type   | Required | Restrictions | Description         |
-| ------- | ------ | -------- | ------------ | ------------------- |
-| Message | string | false    | none         | Details of an error |
-
 <a id="tocSjsonrawmessage">JSONRawMessage</a>
 
 #### JSONRawMessage
@@ -8240,7 +8220,7 @@ _None_
 <a id="schemanulltime"></a>
 
 ```json
-"2020-04-30T11:01:46Z"
+"2020-04-25T11:08:35Z"
 ```
 
 _NullTime implements sql.NullTime functionality._
@@ -8250,406 +8230,6 @@ _NullTime implements sql.NullTime functionality._
 | Name                                            | Type              | Required | Restrictions | Description |
 | ----------------------------------------------- | ----------------- | -------- | ------------ | ----------- |
 | NullTime implements sql.NullTime functionality. | string(date-time) | false    | none         | none        |
-
-<a id="tocSpluginconfig">PluginConfig</a>
-
-#### PluginConfig
-
-<a id="schemapluginconfig"></a>
-
-```json
-{
-  "Args": {
-    "Description": "string",
-    "Name": "string",
-    "Settable": ["string"],
-    "Value": ["string"]
-  },
-  "Description": "string",
-  "DockerVersion": "string",
-  "Documentation": "string",
-  "Entrypoint": ["string"],
-  "Env": [
-    {
-      "Description": "string",
-      "Name": "string",
-      "Settable": ["string"],
-      "Value": "string"
-    }
-  ],
-  "Interface": {
-    "Socket": "string",
-    "Types": [
-      {
-        "Capability": "string",
-        "Prefix": "string",
-        "Version": "string"
-      }
-    ]
-  },
-  "IpcHost": true,
-  "Linux": {
-    "AllowAllDevices": true,
-    "Capabilities": ["string"],
-    "Devices": [
-      {
-        "Description": "string",
-        "Name": "string",
-        "Path": "string",
-        "Settable": ["string"]
-      }
-    ]
-  },
-  "Mounts": [
-    {
-      "Description": "string",
-      "Destination": "string",
-      "Name": "string",
-      "Options": ["string"],
-      "Settable": ["string"],
-      "Source": "string",
-      "Type": "string"
-    }
-  ],
-  "Network": {
-    "Type": "string"
-  },
-  "PidHost": true,
-  "PropagatedMount": "string",
-  "User": {
-    "GID": 0,
-    "UID": 0
-  },
-  "WorkDir": "string",
-  "rootfs": {
-    "diff_ids": ["string"],
-    "type": "string"
-  }
-}
-```
-
-_PluginConfig The config of a plugin._
-
-#### Properties
-
-| Name            | Type                                                  | Required | Restrictions | Description                                                       |
-| --------------- | ----------------------------------------------------- | -------- | ------------ | ----------------------------------------------------------------- |
-| Args            | [PluginConfigArgs](#schemapluginconfigargs)           | true     | none         | PluginConfigArgs plugin config args                               |
-| Description     | string                                                | true     | none         | description                                                       |
-| DockerVersion   | string                                                | false    | none         | Docker Version used to create the plugin                          |
-| Documentation   | string                                                | true     | none         | documentation                                                     |
-| Entrypoint      | [string]                                              | true     | none         | entrypoint                                                        |
-| Env             | [[PluginEnv](#schemapluginenv)]                       | true     | none         | env                                                               |
-| Interface       | [PluginConfigInterface](#schemapluginconfiginterface) | true     | none         | PluginConfigInterface The interface between Docker and the plugin |
-| IpcHost         | boolean                                               | true     | none         | ipc host                                                          |
-| Linux           | [PluginConfigLinux](#schemapluginconfiglinux)         | true     | none         | PluginConfigLinux plugin config linux                             |
-| Mounts          | [[PluginMount](#schemapluginmount)]                   | true     | none         | mounts                                                            |
-| Network         | [PluginConfigNetwork](#schemapluginconfignetwork)     | true     | none         | PluginConfigNetwork plugin config network                         |
-| PidHost         | boolean                                               | true     | none         | pid host                                                          |
-| PropagatedMount | string                                                | true     | none         | propagated mount                                                  |
-| User            | [PluginConfigUser](#schemapluginconfiguser)           | false    | none         | PluginConfigUser plugin config user                               |
-| WorkDir         | string                                                | true     | none         | work dir                                                          |
-| rootfs          | [PluginConfigRootfs](#schemapluginconfigrootfs)       | false    | none         | PluginConfigRootfs plugin config rootfs                           |
-
-<a id="tocSpluginconfigargs">PluginConfigArgs</a>
-
-#### PluginConfigArgs
-
-<a id="schemapluginconfigargs"></a>
-
-```json
-{
-  "Description": "string",
-  "Name": "string",
-  "Settable": ["string"],
-  "Value": ["string"]
-}
-```
-
-_PluginConfigArgs plugin config args_
-
-#### Properties
-
-| Name        | Type     | Required | Restrictions | Description |
-| ----------- | -------- | -------- | ------------ | ----------- |
-| Description | string   | true     | none         | description |
-| Name        | string   | true     | none         | name        |
-| Settable    | [string] | true     | none         | settable    |
-| Value       | [string] | true     | none         | value       |
-
-<a id="tocSpluginconfiginterface">PluginConfigInterface</a>
-
-#### PluginConfigInterface
-
-<a id="schemapluginconfiginterface"></a>
-
-```json
-{
-  "Socket": "string",
-  "Types": [
-    {
-      "Capability": "string",
-      "Prefix": "string",
-      "Version": "string"
-    }
-  ]
-}
-```
-
-_PluginConfigInterface The interface between Docker and the plugin_
-
-#### Properties
-
-| Name   | Type                                                | Required | Restrictions | Description |
-| ------ | --------------------------------------------------- | -------- | ------------ | ----------- |
-| Socket | string                                              | true     | none         | socket      |
-| Types  | [[PluginInterfaceType](#schemaplugininterfacetype)] | true     | none         | types       |
-
-<a id="tocSpluginconfiglinux">PluginConfigLinux</a>
-
-#### PluginConfigLinux
-
-<a id="schemapluginconfiglinux"></a>
-
-```json
-{
-  "AllowAllDevices": true,
-  "Capabilities": ["string"],
-  "Devices": [
-    {
-      "Description": "string",
-      "Name": "string",
-      "Path": "string",
-      "Settable": ["string"]
-    }
-  ]
-}
-```
-
-_PluginConfigLinux plugin config linux_
-
-#### Properties
-
-| Name            | Type                                  | Required | Restrictions | Description       |
-| --------------- | ------------------------------------- | -------- | ------------ | ----------------- |
-| AllowAllDevices | boolean                               | true     | none         | allow all devices |
-| Capabilities    | [string]                              | true     | none         | capabilities      |
-| Devices         | [[PluginDevice](#schemaplugindevice)] | true     | none         | devices           |
-
-<a id="tocSpluginconfignetwork">PluginConfigNetwork</a>
-
-#### PluginConfigNetwork
-
-<a id="schemapluginconfignetwork"></a>
-
-```json
-{
-  "Type": "string"
-}
-```
-
-_PluginConfigNetwork plugin config network_
-
-#### Properties
-
-| Name | Type   | Required | Restrictions | Description |
-| ---- | ------ | -------- | ------------ | ----------- |
-| Type | string | true     | none         | type        |
-
-<a id="tocSpluginconfigrootfs">PluginConfigRootfs</a>
-
-#### PluginConfigRootfs
-
-<a id="schemapluginconfigrootfs"></a>
-
-```json
-{
-  "diff_ids": ["string"],
-  "type": "string"
-}
-```
-
-_PluginConfigRootfs plugin config rootfs_
-
-#### Properties
-
-| Name     | Type     | Required | Restrictions | Description |
-| -------- | -------- | -------- | ------------ | ----------- |
-| diff_ids | [string] | false    | none         | diff ids    |
-| type     | string   | false    | none         | type        |
-
-<a id="tocSpluginconfiguser">PluginConfigUser</a>
-
-#### PluginConfigUser
-
-<a id="schemapluginconfiguser"></a>
-
-```json
-{
-  "GID": 0,
-  "UID": 0
-}
-```
-
-_PluginConfigUser plugin config user_
-
-#### Properties
-
-| Name | Type            | Required | Restrictions | Description |
-| ---- | --------------- | -------- | ------------ | ----------- |
-| GID  | integer(uint32) | false    | none         | g ID        |
-| UID  | integer(uint32) | false    | none         | UID         |
-
-<a id="tocSplugindevice">PluginDevice</a>
-
-#### PluginDevice
-
-<a id="schemaplugindevice"></a>
-
-```json
-{
-  "Description": "string",
-  "Name": "string",
-  "Path": "string",
-  "Settable": ["string"]
-}
-```
-
-_PluginDevice plugin device_
-
-#### Properties
-
-| Name        | Type     | Required | Restrictions | Description |
-| ----------- | -------- | -------- | ------------ | ----------- |
-| Description | string   | true     | none         | description |
-| Name        | string   | true     | none         | name        |
-| Path        | string   | true     | none         | path        |
-| Settable    | [string] | true     | none         | settable    |
-
-<a id="tocSpluginenv">PluginEnv</a>
-
-#### PluginEnv
-
-<a id="schemapluginenv"></a>
-
-```json
-{
-  "Description": "string",
-  "Name": "string",
-  "Settable": ["string"],
-  "Value": "string"
-}
-```
-
-_PluginEnv plugin env_
-
-#### Properties
-
-| Name        | Type     | Required | Restrictions | Description |
-| ----------- | -------- | -------- | ------------ | ----------- |
-| Description | string   | true     | none         | description |
-| Name        | string   | true     | none         | name        |
-| Settable    | [string] | true     | none         | settable    |
-| Value       | string   | true     | none         | value       |
-
-<a id="tocSplugininterfacetype">PluginInterfaceType</a>
-
-#### PluginInterfaceType
-
-<a id="schemaplugininterfacetype"></a>
-
-```json
-{
-  "Capability": "string",
-  "Prefix": "string",
-  "Version": "string"
-}
-```
-
-_PluginInterfaceType plugin interface type_
-
-#### Properties
-
-| Name       | Type   | Required | Restrictions | Description |
-| ---------- | ------ | -------- | ------------ | ----------- |
-| Capability | string | true     | none         | capability  |
-| Prefix     | string | true     | none         | prefix      |
-| Version    | string | true     | none         | version     |
-
-<a id="tocSpluginmount">PluginMount</a>
-
-#### PluginMount
-
-<a id="schemapluginmount"></a>
-
-```json
-{
-  "Description": "string",
-  "Destination": "string",
-  "Name": "string",
-  "Options": ["string"],
-  "Settable": ["string"],
-  "Source": "string",
-  "Type": "string"
-}
-```
-
-_PluginMount plugin mount_
-
-#### Properties
-
-| Name        | Type     | Required | Restrictions | Description |
-| ----------- | -------- | -------- | ------------ | ----------- |
-| Description | string   | true     | none         | description |
-| Destination | string   | true     | none         | destination |
-| Name        | string   | true     | none         | name        |
-| Options     | [string] | true     | none         | options     |
-| Settable    | [string] | true     | none         | settable    |
-| Source      | string   | true     | none         | source      |
-| Type        | string   | true     | none         | type        |
-
-<a id="tocSpluginsettings">PluginSettings</a>
-
-#### PluginSettings
-
-<a id="schemapluginsettings"></a>
-
-```json
-{
-  "Args": ["string"],
-  "Devices": [
-    {
-      "Description": "string",
-      "Name": "string",
-      "Path": "string",
-      "Settable": ["string"]
-    }
-  ],
-  "Env": ["string"],
-  "Mounts": [
-    {
-      "Description": "string",
-      "Destination": "string",
-      "Name": "string",
-      "Options": ["string"],
-      "Settable": ["string"],
-      "Source": "string",
-      "Type": "string"
-    }
-  ]
-}
-```
-
-_PluginSettings Settings that can be modified by users._
-
-#### Properties
-
-| Name    | Type                                  | Required | Restrictions | Description |
-| ------- | ------------------------------------- | -------- | ------------ | ----------- |
-| Args    | [string]                              | true     | none         | args        |
-| Devices | [[PluginDevice](#schemaplugindevice)] | true     | none         | devices     |
-| Env     | [string]                              | true     | none         | env         |
-| Mounts  | [[PluginMount](#schemapluginmount)]   | true     | none         | mounts      |
 
 <a id="tocSpreviousconsentsession">PreviousConsentSession</a>
 
@@ -8673,7 +8253,7 @@ _PluginSettings Settings that can be modified by users._
       "client_secret_expires_at": 0,
       "client_uri": "string",
       "contacts": ["string"],
-      "created_at": "2020-04-30T11:01:46Z",
+      "created_at": "2020-04-25T11:08:35Z",
       "frontchannel_logout_session_required": true,
       "frontchannel_logout_uri": "string",
       "grant_types": ["string"],
@@ -8693,7 +8273,7 @@ _PluginSettings Settings that can be modified by users._
       "subject_type": "string",
       "token_endpoint_auth_method": "string",
       "tos_uri": "string",
-      "updated_at": "2020-04-30T11:01:46Z",
+      "updated_at": "2020-04-25T11:08:35Z",
       "userinfo_signed_response_alg": "string"
     },
     "context": {},
@@ -8717,7 +8297,7 @@ _PluginSettings Settings that can be modified by users._
   },
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-04-25T11:08:35Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8766,29 +8346,6 @@ _StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string._
 | -------------------------------------------------------------------------- | -------- | -------- | ------------ | ----------- |
 | StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string. | [string] | false    | none         | none        |
 
-<a id="tocSvolumeusagedata">VolumeUsageData</a>
-
-#### VolumeUsageData
-
-<a id="schemavolumeusagedata"></a>
-
-```json
-{
-  "RefCount": 0,
-  "Size": 0
-}
-```
-
-_VolumeUsageData Usage details about the volume. This information is used by the
-`GET /system/df` endpoint, and omitted in other endpoints._
-
-#### Properties
-
-| Name     | Type           | Required | Restrictions | Description                                                                                                                                                                                                                             |
-| -------- | -------------- | -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| RefCount | integer(int64) | true     | none         | The number of containers referencing this volume. This field is set to `-1` if the reference-count is not available.                                                                                                                    |
-| Size     | integer(int64) | true     | none         | Amount of disk space used by the volume (in bytes). This information is only available for volumes created with the `"local"` volume driver. For volumes created with other volume drivers, this field is set to `-1` ("not available") |
-
 <a id="tocSacceptconsentrequest">acceptConsentRequest</a>
 
 #### acceptConsentRequest
@@ -8799,7 +8356,7 @@ _VolumeUsageData Usage details about the volume. This information is used by the
 {
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-04-25T11:08:35Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8900,7 +8457,7 @@ request._
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-04-25T11:08:35Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -8920,7 +8477,7 @@ request._
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-04-25T11:08:35Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -9001,7 +8558,7 @@ _Used to pass session data to a consent request._
 
 ```json
 {
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-04-25T11:08:35Z"
 }
 ```
 
@@ -9119,7 +8676,7 @@ _Error response_
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-04-25T11:08:35Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -9139,7 +8696,7 @@ _Error response_
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-04-25T11:08:35Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -9221,7 +8778,7 @@ _Contains information about an ongoing logout request._
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-04-25T11:08:35Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -9241,7 +8798,7 @@ _Contains information about an ongoing logout request._
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-04-25T11:08:35Z",
   "userinfo_signed_response_alg": "string"
 }
 ```

@@ -330,9 +330,9 @@ A logout request may be initiated by the OpenID Provider (OP - **you**) or by
 the Relying Party (RP - the OAuth2 Client):
 
 - The OP-initiated flow does not need an `id_token_hint`, and it may neither
-  define a `state` nor a `post_logout_url`.
+  define a `state` nor a `post_logout_redirect_uri`.
 - The RP-initiated flow needs an `id_token_hint` and may optionally define
-  `state` and `post_logout_url`.
+  `state` and `post_logout_redirect_uri`.
 
 Both requests follow the same pattern as user login and user consent. Before the
 logout is completed, the user is redirected to the **Logout UI** (similar to
@@ -359,7 +359,7 @@ Legend:
   `localhost`, `google.com`).**
 - `****`: The `post_logout_redirect` defaults to the configuration value of
   `urls.post_logout_redirect`. If it's an RP-initiated flow and a
-  `post_logout_url` was set and that URL is in the array of the OAuth2 Client's
+  `post_logout_redirect_uri` was set and that URL is in the array of the OAuth2 Client's
   `urls.post_logout_redirect`, the browser will be redirected there instead.
 
 ### Logout Flow

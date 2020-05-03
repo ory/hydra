@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginConfigArgs PluginConfigArgs plugin config args
+// PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args
 //
 // swagger:model PluginConfigArgs
 type PluginConfigArgs struct {

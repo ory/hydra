@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.
+// AcceptLoginRequest AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.
 //
 // swagger:model acceptLoginRequest
 type AcceptLoginRequest struct {

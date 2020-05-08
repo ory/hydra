@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.
+// OpenIDConnectContext Contains optional information about the OpenID Connect request.
 //
 // swagger:model openIDConnectContext
 type OpenIDConnectContext struct {

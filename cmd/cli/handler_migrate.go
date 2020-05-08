@@ -3,8 +3,9 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/ory/x/cmdx"
 	"os"
+
+	"github.com/ory/x/cmdx"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"

@@ -36,7 +36,7 @@ require (
 	github.com/ory/herodot v0.7.0
 	github.com/ory/sdk/swagutil v0.0.0-20200430101046-db494fac5eb6
 	github.com/ory/viper v1.7.4
-	github.com/ory/x v0.0.116
+	github.com/ory/x v0.0.118
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1

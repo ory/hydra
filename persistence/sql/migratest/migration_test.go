@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/x/popx"
+
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/viper"
 	"github.com/ory/x/sqlcon/dockertest"
@@ -63,7 +65,7 @@ func TestMigrations(t *testing.T) {
 				}),
 			)
 
-			tm := NewTestMigrator(t, c, "../migrations", "./testdata")
+			tm := popx.NewTestMigrator(t, c, "../migrations", "./testdata")
 			require.NoError(t, tm.Up())
 
 			var lastClient *client.Client

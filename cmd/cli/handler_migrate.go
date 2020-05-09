@@ -1,11 +1,9 @@
 package cli
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/ory/x/cmdx"
 
@@ -82,7 +80,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	if !flagx.MustGetBool(cmd, "yes") {
 		fmt.Println("")
 		fmt.Println("To skip the next question use flag --yes (at your own risk).")
-		if !askForConfirmation("Do you wish to execute this migration plan?") {
+		if !cmdx.AskForConfirmation("Do you wish to execute this migration plan?", nil, nil) {
 			fmt.Println("Migration aborted.")
 			return
 		}
@@ -94,22 +92,4 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println("Successfully applied migrations!")
-}
-
-func askForConfirmation(s string) bool {
-	reader := bufio.NewReader(os.Stdin)
-
-	for {
-		fmt.Printf("%s [y/n]: ", s)
-
-		response, err := reader.ReadString('\n')
-		cmdx.Must(err, "%s", err)
-
-		response = strings.ToLower(strings.TrimSpace(response))
-		if response == "y" || response == "yes" {
-			return true
-		} else if response == "n" || response == "no" {
-			return false
-		}
-	}
 }

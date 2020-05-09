@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginSettings PluginSettings PluginSettings PluginSettings Settings that can be modified by users.
+// PluginSettings PluginSettings Settings that can be modified by users.
 //
 // swagger:model PluginSettings
 type PluginSettings struct {

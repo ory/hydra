@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ConsentRequest ConsentRequest ConsentRequest Contains information on an ongoing consent request.
+// ConsentRequest Contains information on an ongoing consent request.
 //
 // swagger:model consentRequest
 type ConsentRequest struct {
@@ -49,10 +49,10 @@ type ConsentRequest struct {
 	RequestURL string `json:"request_url,omitempty"`
 
 	// requested access token audience
-	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
+	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience,omitempty"`
 
 	// requested scope
-	RequestedScope []string `json:"requested_scope,omitempty"`
+	RequestedScope StringSlicePipeDelimiter `json:"requested_scope,omitempty"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
@@ -73,6 +73,14 @@ func (m *ConsentRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOidcContext(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRequestedAccessTokenAudience(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRequestedScope(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -113,6 +121,38 @@ func (m *ConsentRequest) validateOidcContext(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) validateRequestedAccessTokenAudience(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.RequestedAccessTokenAudience) { // not required
+		return nil
+	}
+
+	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) validateRequestedScope(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.RequestedScope) { // not required
+		return nil
+	}
+
+	if err := m.RequestedScope.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_scope")
+		}
+		return err
 	}
 
 	return nil

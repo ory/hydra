@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// WellKnown WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata
+// WellKnown WellKnown represents important OpenID Connect discovery metadata
 //
 // It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms
 // among others.

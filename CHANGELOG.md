@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-05-02)](#unreleased-2020-05-02)
+- [Unreleased (2020-05-08)](#unreleased-2020-05-08)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
@@ -428,7 +428,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...0092a1f9ead25291441b871bf036a9fe7a6d0089) (2020-05-02)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...697b0f5303c5744d88206bb35d85cc5e55f68b88) (2020-05-08)
 
 
 ### Bug Fixes
@@ -438,6 +438,11 @@
 
 ### Documentation
 
+* Adding a line about CSRF cookie problems ([#1843](https://github.com/ory/hydra/issues/1843)) ([697b0f5](https://github.com/ory/hydra/commit/697b0f5303c5744d88206bb35d85cc5e55f68b88)):
+  > Issue I experienced today, running Hydra 1.4.10 in dangerous HTTP mode, the CSRF cookie defaulted to SameSite=None, but the cookie was not marked as secure (which makes sense, as Hydra is running over HTTP), so the cookie gets ignored (and was getting CSRF value not present errors).
+  > 
+  > I was able to get around it by either overriding the SameSite setting, or by switching to TLS termination.
+* Correct version tags ([#1841](https://github.com/ory/hydra/issues/1841)) ([f200fd4](https://github.com/ory/hydra/commit/f200fd408a69d500f33f9acfd319f925eead4efe))
 * Update name for post_logout_redirect_url ([#1840](https://github.com/ory/hydra/issues/1840)) ([0092a1f](https://github.com/ory/hydra/commit/0092a1f9ead25291441b871bf036a9fe7a6d0089)), closes [#1832](https://github.com/ory/hydra/issues/1832)
 
 

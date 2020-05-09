@@ -280,7 +280,7 @@ workflows:
       -
         goreleaser/newsletter-draft:
           chimp-list: f605a41b53
-          chimp-segment: 6478605
+          chimp-segment: 6479481
           requires:
             - goreleaser/release
           filters:

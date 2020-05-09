@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// JSONWebKey JSONWebKey It is important that this model object is named JSONWebKey for
+// JSONWebKey It is important that this model object is named JSONWebKey for
 // "swagger generate spec" to generate only on definition of a
 // JSONWebKey.
 //

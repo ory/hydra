@@ -1937,7 +1937,7 @@
     },
     "PluginConfig": {
       "type": "object",
-      "title": "PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig The config of a plugin.",
+      "title": "PluginConfig The config of a plugin.",
       "required": [
         "Args",
         "Description",
@@ -2024,7 +2024,7 @@
       }
     },
     "PluginConfigArgs": {
-      "description": "PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args",
+      "description": "PluginConfigArgs plugin config args",
       "type": "object",
       "required": [
         "Description",
@@ -2108,7 +2108,7 @@
       }
     },
     "PluginConfigNetwork": {
-      "description": "PluginConfigNetwork plugin config network",
+      "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
       "type": "object",
       "required": [
         "Type"
@@ -2121,7 +2121,7 @@
       }
     },
     "PluginConfigRootfs": {
-      "description": "PluginConfigRootfs PluginConfigRootfs plugin config rootfs",
+      "description": "PluginConfigRootfs plugin config rootfs",
       "type": "object",
       "properties": {
         "diff_ids": {
@@ -2216,7 +2216,7 @@
       }
     },
     "PluginInterfaceType": {
-      "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
+      "description": "PluginInterfaceType plugin interface type",
       "type": "object",
       "required": [
         "Capability",
@@ -2431,7 +2431,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": [
         "subject"
       ],
@@ -2531,7 +2531,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2550,10 +2550,11 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
+      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
@@ -2683,7 +2684,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest LogoutRequest LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
+      "title": "Contains information about an ongoing logout request.",
       "properties": {
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
@@ -2705,7 +2706,7 @@
     },
     "oAuth2Client": {
       "type": "object",
-      "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
+      "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
@@ -2746,7 +2747,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "created_at": {
-          "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
+          "description": "CreatedAt returns the timestamp of the client's creation.",
           "type": "string",
           "format": "date-time"
         },
@@ -2821,7 +2822,7 @@
           "type": "string"
         },
         "updated_at": {
-          "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
+          "description": "UpdatedAt returns the timestamp of the last update.",
           "type": "string",
           "format": "date-time"
         },
@@ -2935,7 +2936,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+      "title": "Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2996,7 +2997,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "The userinfo response",
+      "description": "UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -3079,6 +3080,7 @@
       }
     },
     "version": {
+      "description": "Version Version version",
       "type": "object",
       "properties": {
         "version": {

@@ -213,7 +213,7 @@ workflows:
               only: master
       - sdk/generate:
           appname: Ory_Hydra
-          specignorepgks: internal/httpclient,gopkg.in/square/go-jose.v2
+          specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
             - test
             - golangci/lint
@@ -231,7 +231,7 @@ workflows:
             branches:
               ignore: /master/
       - sdk/release:
-          specignorepgks: internal/httpclient,gopkg.in/square/go-jose.v2
+          specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
             - test
             - golangci/lint
@@ -280,7 +280,7 @@ workflows:
       -
         goreleaser/newsletter-draft:
           chimp-list: f605a41b53
-          chimp-segment: 6478605
+          chimp-segment: 6479481
           requires:
             - goreleaser/release
           filters:

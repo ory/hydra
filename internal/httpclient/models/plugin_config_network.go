@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network
+// PluginConfigNetwork PluginConfigNetwork plugin config network
 //
 // swagger:model PluginConfigNetwork
 type PluginConfigNetwork struct {

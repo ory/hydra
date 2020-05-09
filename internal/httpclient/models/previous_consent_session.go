@@ -9,10 +9,9 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
-// PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
+// PreviousConsentSession The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 //
 // swagger:model PreviousConsentSession
@@ -21,42 +20,15 @@ type PreviousConsentSession struct {
 	// consent request
 	ConsentRequest *ConsentRequest `json:"consent_request,omitempty"`
 
-	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantAccessTokenAudience []string `json:"grant_access_token_audience"`
+	// grant access token audience
+	GrantAccessTokenAudience StringSlicePipeDelimiter `json:"grant_access_token_audience,omitempty"`
 
-	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`
-	GrantScope []string `json:"grant_scope"`
+	// grant scope
+	GrantScope StringSlicePipeDelimiter `json:"grant_scope,omitempty"`
 
 	// handled at
 	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	// Format: date-time
-	HandledAt strfmt.DateTime `json:"handled_at,omitempty"`
+	HandledAt NullTime `json:"handled_at,omitempty"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -75,6 +47,14 @@ func (m *PreviousConsentSession) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateConsentRequest(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateGrantAccessTokenAudience(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateGrantScope(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -110,13 +90,48 @@ func (m *PreviousConsentSession) validateConsentRequest(formats strfmt.Registry)
 	return nil
 }
 
+func (m *PreviousConsentSession) validateGrantAccessTokenAudience(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.GrantAccessTokenAudience) { // not required
+		return nil
+	}
+
+	if err := m.GrantAccessTokenAudience.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) validateGrantScope(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.GrantScope) { // not required
+		return nil
+	}
+
+	if err := m.GrantScope.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *PreviousConsentSession) validateHandledAt(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.HandledAt) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("handled_at", "body", "date-time", m.HandledAt.String(), formats); err != nil {
+	if err := m.HandledAt.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("handled_at")
+		}
 		return err
 	}
 

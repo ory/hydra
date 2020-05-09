@@ -11,7 +11,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// LoginRequest LoginRequest LoginRequest LoginRequest LoginRequest LoginRequest LoginRequest Contains information on an ongoing login request.
+// LoginRequest Contains information on an ongoing login request.
 //
 // swagger:model loginRequest
 type LoginRequest struct {
@@ -32,10 +32,10 @@ type LoginRequest struct {
 	RequestURL string `json:"request_url,omitempty"`
 
 	// requested access token audience
-	RequestedAccessTokenAudience []string `json:"requested_access_token_audience,omitempty"`
+	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience,omitempty"`
 
 	// requested scope
-	RequestedScope []string `json:"requested_scope,omitempty"`
+	RequestedScope StringSlicePipeDelimiter `json:"requested_scope,omitempty"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
@@ -64,6 +64,14 @@ func (m *LoginRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateOidcContext(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRequestedAccessTokenAudience(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRequestedScope(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -104,6 +112,38 @@ func (m *LoginRequest) validateOidcContext(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) validateRequestedAccessTokenAudience(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.RequestedAccessTokenAudience) { // not required
+		return nil
+	}
+
+	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) validateRequestedScope(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.RequestedScope) { // not required
+		return nil
+	}
+
+	if err := m.RequestedScope.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_scope")
+		}
+		return err
 	}
 
 	return nil

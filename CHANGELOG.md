@@ -4,11 +4,12 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-05-08)](#unreleased-2020-05-08)
+- [Unreleased (2020-05-09)](#unreleased-2020-05-09)
     - [Bug Fixes](#bug-fixes)
+    - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
-    - [Code Refactoring](#code-refactoring)
+    - [Code Refactoring](#code-refactoring-1)
     - [BREAKING CHANGES](#breaking-changes)
   - [1.4.10 (2020-04-30)](#1410-2020-04-30)
     - [Bug Fixes](#bug-fixes-1)
@@ -31,7 +32,7 @@
     - [Documentation](#documentation-5)
   - [1.4.3 (2020-04-16)](#143-2020-04-16)
     - [Bug Fixes](#bug-fixes-7)
-    - [Code Refactoring](#code-refactoring-1)
+    - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-6)
     - [Features](#features-1)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
@@ -40,7 +41,7 @@
     - [Bug Fixes](#bug-fixes-8)
 - [1.4.0 (2020-04-02)](#140-2020-04-02)
     - [Bug Fixes](#bug-fixes-9)
-    - [Code Refactoring](#code-refactoring-2)
+    - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-8)
     - [Features](#features-2)
     - [Unclassified](#unclassified-1)
@@ -428,12 +429,18 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...697b0f5303c5744d88206bb35d85cc5e55f68b88) (2020-05-08)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...a0919a5ead62ad4b02005547fa55da10481a5afa) (2020-05-09)
 
 
 ### Bug Fixes
 
 * Automatically append multiStatements parameter to mySQL URI ([#1835](https://github.com/ory/hydra/issues/1835)) ([849fe62](https://github.com/ory/hydra/commit/849fe62e918cb459256806870feb646f977adbdb))
+
+
+### Code Refactoring
+
+* Moved AskForConfirmation to ory/x/cmdx ([#1848](https://github.com/ory/hydra/issues/1848)) ([0bd0b0d](https://github.com/ory/hydra/commit/0bd0b0dd353935c2bb53dd4f58f9072d5702a89b))
+* Moved TestMigrator to ory/x/popx ([#1846](https://github.com/ory/hydra/issues/1846)) ([a0919a5](https://github.com/ory/hydra/commit/a0919a5ead62ad4b02005547fa55da10481a5afa))
 
 
 ### Documentation

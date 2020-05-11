@@ -58,7 +58,7 @@ or by setting in the HTTP API JSON body when POSTing to `/clients`:
 }
 ```
 
-Be aware that when making requests to `/oauth2/token` with a public OAuth 2.0
+Be aware that when making requests to `/oauth2/token` or `/oauth2/revoke` with a public OAuth 2.0
 Client, you can not authenticate with the HTTP Basic Authorization but must
 include the `client_id` in the POST body.
 

@@ -186,6 +186,12 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="./.github/adopters/ordermygear.svg" alt="OrderMyGear"></td>
             <td><a href="https://www.ordermygear.com/">ordermygear.com</a></td>
         </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>Spiri.Bo</td>
+            <td align="center"><img height="32px" src="./.github/adopters/spiribo.svg" alt="SpiriBo"></td>
+            <td><a href="https://spiri.bo/">spiri.bo</a></td>
+        </tr>
     </tdbody>
 </table>
 

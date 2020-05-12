@@ -186,6 +186,12 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="./.github/adopters/ordermygear.svg" alt="OrderMyGear"></td>
             <td><a href="https://www.ordermygear.com/">ordermygear.com</a></td>
         </tr>
+        <tr>
+            <td>Sponsor</td>
+            <td>Spiri.bo</td>
+            <td align="center"><img height="32px" src="./.github/adopters/spiribo.svg" alt="Spiri.bo"></td>
+            <td><a href="https://spiri.bo/">spiri.bo</a></td>
+        </tr>
     </tdbody>
 </table>
 
@@ -205,6 +211,7 @@ TheCrealm.
 <em>\* Uses one of ORY's major projects in production.</em>
 
 <!--END ADOPTERS-->
+
 
 
 
@@ -324,6 +331,7 @@ determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 
 <!--END ECOSYSTEM-->
+
 
 
 

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-05-09)](#unreleased-2020-05-09)
+- [Unreleased (2020-05-11)](#unreleased-2020-05-11)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
@@ -429,7 +429,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...a0919a5ead62ad4b02005547fa55da10481a5afa) (2020-05-09)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...4409e73600b6572e2d20a337c2e0a520f048f9eb) (2020-05-11)
 
 
 ### Bug Fixes
@@ -445,6 +445,7 @@
 
 ### Documentation
 
+* Add details about auth creds in body ([#1852](https://github.com/ory/hydra/issues/1852)) ([4409e73](https://github.com/ory/hydra/commit/4409e73600b6572e2d20a337c2e0a520f048f9eb))
 * Adding a line about CSRF cookie problems ([#1843](https://github.com/ory/hydra/issues/1843)) ([697b0f5](https://github.com/ory/hydra/commit/697b0f5303c5744d88206bb35d85cc5e55f68b88)):
   > Issue I experienced today, running Hydra 1.4.10 in dangerous HTTP mode, the CSRF cookie defaulted to SameSite=None, but the cookie was not marked as secure (which makes sense, as Hydra is running over HTTP), so the cookie gets ignored (and was getting CSRF value not present errors).
   > 

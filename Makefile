@@ -107,14 +107,18 @@ sdk:
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 		git checkout $$HYDRA_LATEST
+		packr2
 		GO111MODULE=on go install \
 				-ldflags "-X github.com/ory/hydra/cmd.Version=$$HYDRA_LATEST -X github.com/ory/hydra/cmd.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.Commit=`git rev-parse HEAD`" \
 				.
+		packr2 clean
 		git checkout master
 
 .PHONY: install
 install:
+		packr2
 		GO111MODULE=on go install .
+		packr2 clean
 
 .PHONY: init
 init:

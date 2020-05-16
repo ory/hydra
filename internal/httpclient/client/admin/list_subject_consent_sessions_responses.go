@@ -35,12 +35,6 @@ func (o *ListSubjectConsentSessionsReader) ReadResponse(response runtime.ClientR
 			return nil, err
 		}
 		return nil, result
-	case 404:
-		result := NewListSubjectConsentSessionsNotFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 500:
 		result := NewListSubjectConsentSessionsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -106,39 +100,6 @@ func (o *ListSubjectConsentSessionsBadRequest) GetPayload() *models.GenericError
 }
 
 func (o *ListSubjectConsentSessionsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.GenericError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewListSubjectConsentSessionsNotFound creates a ListSubjectConsentSessionsNotFound with default headers values
-func NewListSubjectConsentSessionsNotFound() *ListSubjectConsentSessionsNotFound {
-	return &ListSubjectConsentSessionsNotFound{}
-}
-
-/*ListSubjectConsentSessionsNotFound handles this case with default header values.
-
-genericError
-*/
-type ListSubjectConsentSessionsNotFound struct {
-	Payload *models.GenericError
-}
-
-func (o *ListSubjectConsentSessionsNotFound) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listSubjectConsentSessionsNotFound  %+v", 404, o.Payload)
-}
-
-func (o *ListSubjectConsentSessionsNotFound) GetPayload() *models.GenericError {
-	return o.Payload
-}
-
-func (o *ListSubjectConsentSessionsNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
 

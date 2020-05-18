@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-05-16)](#unreleased-2020-05-16)
+- [Unreleased (2020-05-18)](#unreleased-2020-05-18)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
@@ -429,7 +429,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...6dabd9bcd9b9c840d11f418fe5c77e2ac730c72e) (2020-05-16)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.1...21dcdbafbd1d743991ba99cb651f550ca3018d2c) (2020-05-18)
 
 
 ### Bug Fixes
@@ -443,6 +443,7 @@
     > order to generate the .go files that pack the static files into bytes
     > that can be bundled.
 * Automatically append multiStatements parameter to mySQL URI ([#1835](https://github.com/ory/hydra/issues/1835)) ([849fe62](https://github.com/ory/hydra/commit/849fe62e918cb459256806870feb646f977adbdb))
+* Use correct path for swagger sdk ([21dcdba](https://github.com/ory/hydra/commit/21dcdbafbd1d743991ba99cb651f550ca3018d2c))
 
 
 ### Code Refactoring

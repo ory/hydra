@@ -19,11 +19,11 @@ require (
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/securecookie v1.1.1
-	github.com/gorilla/sessions v1.1.4-0.20181208214519-12bd4761fc66
+	github.com/gorilla/sessions v1.2.0
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/jackc/pgx/v4 v4.4.1
 	github.com/jmoiron/sqlx v1.2.0
-	github.com/julienschmidt/httprouter v1.2.0
+	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
@@ -55,7 +55,7 @@ require (
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v0.2.1
-	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
+	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8

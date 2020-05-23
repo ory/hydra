@@ -11,8 +11,8 @@ binaries, Docker Images and support various package managers.
 We recommend using Docker to run ORY Hydra:
 
 ```shell
-$ docker pull oryd/hydra:v1.5.0-beta.1
-$ docker run --rm -it oryd/hydra:v1.5.0-beta.1 help
+$ docker pull oryd/hydra:v1.5.0-beta.2
+$ docker run --rm -it oryd/hydra:v1.5.0-beta.2 help
 ```
 
 ## macOS
@@ -77,6 +77,7 @@ note that this will only work in a Bash-like shell.
 
 ```shell
 $ go get -d -u github.com/ory/hydra
+$ go install github.com/gobuffalo/packr/v2/packr2
 $ cd $(go env GOPATH)/src/github.com/ory/hydra
 $ GO111MODULE=on make install-stable
 $ $(go env GOPATH)/bin/hydra help

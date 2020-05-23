@@ -1671,7 +1671,7 @@ Status Code **200**
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -1691,7 +1691,7 @@ Status Code **200**
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   }
 ]
@@ -1871,7 +1871,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -1891,7 +1891,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1933,7 +1933,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -1953,7 +1953,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2034,7 +2034,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2064,7 +2064,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2203,7 +2203,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2223,7 +2223,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2401,7 +2401,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2421,7 +2421,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2462,7 +2462,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2482,7 +2482,7 @@ and only callable by first-party components.
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2563,7 +2563,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2593,7 +2593,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -4814,7 +4814,7 @@ the subject accepted or rejected the request.
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -4834,7 +4834,7 @@ the subject accepted or rejected the request.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -4843,10 +4843,7 @@ the subject accepted or rejected the request.
   "oidc_context": {
     "acr_values": ["string"],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": ["string"]
   },
@@ -5039,18 +5036,12 @@ the user-agent to.
 {
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }
 ```
@@ -5152,18 +5143,12 @@ const input = '{
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }';
 const headers = {
@@ -5539,7 +5524,7 @@ the requested authentication process.
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -5559,16 +5544,13 @@ the requested authentication process.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
     "acr_values": ["string"],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": ["string"]
   },
@@ -6775,8 +6757,11 @@ Accept: application/json
 ```
 
 This endpoint lists all subject's granted consent sessions, including client and
-granted scope. The "Link" header is also included in successful responses, which
-contains one or more links for pagination, formatted like so:
+granted scope. If the subject is unknown or has not granted any consent sessions
+yet, the endpoint returns an empty JSON array with status code 200 OK.
+
+The "Link" header is also included in successful responses, which contains one
+or more links for pagination, formatted like so:
 '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>;
 rel="{page}"', where page is one of the following applicable pages: 'first',
 'next', 'last', and 'previous'. Multiple links can be included in this header,
@@ -6800,7 +6785,6 @@ and will be separated by a comma.
 | ------ | -------------------------------------------------------------------------- | -------------------------------- | ----------------------------------- |
 | 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | A list of used consent requests. | Inline                              |
 | 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                     | [genericError](#schemagenericerror) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                     | [genericError](#schemagenericerror) |
 | 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                     | [genericError](#schemagenericerror) |
 
 <a id="lists-all-consent-sessions-of-a-subject-responseschema"></a>
@@ -6855,7 +6839,6 @@ Status Code **200**
 | »»» acr_values                           | [string]                                                  | false    | none         | ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request. It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required. OpenID Connect defines it as follows: > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values that the Authorization Server is being requested to use for processing this Authentication Request, with the values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a Voluntary Claim by this parameter.                                                                                                                                                                                                                                                                                            |
 | »»» display                              | string                                                    | false    | none         | Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User. The defined values are: page: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode. popup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over. touch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface. wap: The Authorization Server SHOULD display the authentication and consent UI consistent with a "feature phone" type display. The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display. |
 | »»» id_token_hint_claims                 | object                                                    | false    | none         | IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| »»»» **additionalProperties**            | object                                                    | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | »»» login_hint                           | string                                                    | false    | none         | LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | »»» ui_locales                           | [string]                                                  | false    | none         | UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | »» request_url                           | string                                                    | false    | none         | RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -6870,9 +6853,7 @@ Status Code **200**
 | » remember_for                           | integer(int64)                                            | false    | none         | RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | » session                                | [consentRequestSession](#schemaconsentrequestsession)     | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | »» access_token                          | object                                                    | false    | none         | AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| »»» **additionalProperties**             | object                                                    | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | »» id_token                              | object                                                    | false    | none         | IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable by anyone that has access to the ID Challenge. Use with care!                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| »»» **additionalProperties**             | object                                                    | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ##### Examples
 
@@ -6895,7 +6876,7 @@ Status Code **200**
         "client_secret_expires_at": 0,
         "client_uri": "string",
         "contacts": ["string"],
-        "created_at": "2020-04-30T11:01:46Z",
+        "created_at": "2020-05-23T14:44:00Z",
         "frontchannel_logout_session_required": true,
         "frontchannel_logout_uri": "string",
         "grant_types": ["string"],
@@ -6915,7 +6896,7 @@ Status Code **200**
         "subject_type": "string",
         "token_endpoint_auth_method": "string",
         "tos_uri": "string",
-        "updated_at": "2020-04-30T11:01:46Z",
+        "updated_at": "2020-05-23T14:44:00Z",
         "userinfo_signed_response_alg": "string"
       },
       "context": {},
@@ -6924,10 +6905,7 @@ Status Code **200**
       "oidc_context": {
         "acr_values": ["string"],
         "display": "string",
-        "id_token_hint_claims": {
-          "property1": {},
-          "property2": {}
-        },
+        "id_token_hint_claims": {},
         "login_hint": "string",
         "ui_locales": ["string"]
       },
@@ -6939,18 +6917,12 @@ Status Code **200**
     },
     "grant_access_token_audience": ["string"],
     "grant_scope": ["string"],
-    "handled_at": "2020-04-30T11:01:46Z",
+    "handled_at": "2020-05-23T14:44:00Z",
     "remember": true,
     "remember_for": 0,
     "session": {
-      "access_token": {
-        "property1": {},
-        "property2": {}
-      },
-      "id_token": {
-        "property1": {},
-        "property2": {}
-      }
+      "access_token": {},
+      "id_token": {}
     }
   }
 ]
@@ -7499,7 +7471,7 @@ deleted automatically when performing the refresh flow.
 
 ```json
 {
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-05-23T14:44:00Z"
 }
 ```
 
@@ -7597,7 +7569,7 @@ func main() {
 ```nodejs
 const fetch = require('node-fetch');
 const input = '{
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-05-23T14:44:00Z"
 }';
 const headers = {
   'Content-Type': 'application/json',  'Accept': 'application/json'
@@ -7749,10 +7721,7 @@ token was not granted one of the scopes, the result of active will be false.
   "aud": ["string"],
   "client_id": "string",
   "exp": 0,
-  "ext": {
-    "property1": {},
-    "property2": {}
-  },
+  "ext": {},
   "iat": 0,
   "iss": "string",
   "nbf": 0,
@@ -8240,7 +8209,7 @@ _None_
 <a id="schemanulltime"></a>
 
 ```json
-"2020-04-30T11:01:46Z"
+"2020-05-23T14:44:00Z"
 ```
 
 _NullTime implements sql.NullTime functionality._
@@ -8673,7 +8642,7 @@ _PluginSettings Settings that can be modified by users._
       "client_secret_expires_at": 0,
       "client_uri": "string",
       "contacts": ["string"],
-      "created_at": "2020-04-30T11:01:46Z",
+      "created_at": "2020-05-23T14:44:00Z",
       "frontchannel_logout_session_required": true,
       "frontchannel_logout_uri": "string",
       "grant_types": ["string"],
@@ -8693,7 +8662,7 @@ _PluginSettings Settings that can be modified by users._
       "subject_type": "string",
       "token_endpoint_auth_method": "string",
       "tos_uri": "string",
-      "updated_at": "2020-04-30T11:01:46Z",
+      "updated_at": "2020-05-23T14:44:00Z",
       "userinfo_signed_response_alg": "string"
     },
     "context": {},
@@ -8702,10 +8671,7 @@ _PluginSettings Settings that can be modified by users._
     "oidc_context": {
       "acr_values": ["string"],
       "display": "string",
-      "id_token_hint_claims": {
-        "property1": {},
-        "property2": {}
-      },
+      "id_token_hint_claims": {},
       "login_hint": "string",
       "ui_locales": ["string"]
     },
@@ -8717,18 +8683,12 @@ _PluginSettings Settings that can be modified by users._
   },
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }
 ```
@@ -8799,18 +8759,12 @@ _VolumeUsageData Usage details about the volume. This information is used by the
 {
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }
 ```
@@ -8900,7 +8854,7 @@ request._
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -8920,7 +8874,7 @@ request._
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -8929,10 +8883,7 @@ request._
   "oidc_context": {
     "acr_values": ["string"],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": ["string"]
   },
@@ -8971,14 +8922,8 @@ _Contains information on an ongoing consent request._
 
 ```json
 {
-  "access_token": {
-    "property1": {},
-    "property2": {}
-  },
-  "id_token": {
-    "property1": {},
-    "property2": {}
-  }
+  "access_token": {},
+  "id_token": {}
 }
 ```
 
@@ -8986,12 +8931,10 @@ _Used to pass session data to a consent request._
 
 #### Properties
 
-| Name                       | Type   | Required | Restrictions | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| -------------------------- | ------ | -------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| access_token               | object | false    | none         | AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care! |
-| » **additionalProperties** | object | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| id_token                   | object | false    | none         | IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable by anyone that has access to the ID Challenge. Use with care!                                                                                                                                                                                                                                                                            |
-| » **additionalProperties** | object | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Name         | Type   | Required | Restrictions | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------ | ------ | -------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| access_token | object | false    | none         | AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care! |
+| id_token     | object | false    | none         | IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable by anyone that has access to the ID Challenge. Use with care!                                                                                                                                                                                                                                                                            |
 
 <a id="tocSflushinactiveoauth2tokensrequest">flushInactiveOAuth2TokensRequest</a>
 
@@ -9001,7 +8944,7 @@ _Used to pass session data to a consent request._
 
 ```json
 {
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-05-23T14:44:00Z"
 }
 ```
 
@@ -9119,7 +9062,7 @@ _Error response_
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -9139,16 +9082,13 @@ _Error response_
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
     "acr_values": ["string"],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": ["string"]
   },
@@ -9221,7 +9161,7 @@ _Contains information about an ongoing logout request._
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -9241,7 +9181,7 @@ _Contains information about an ongoing logout request._
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -9297,10 +9237,7 @@ _Client represents an OAuth 2.0 Client._
   "aud": ["string"],
   "client_id": "string",
   "exp": 0,
-  "ext": {
-    "property1": {},
-    "property2": {}
-  },
+  "ext": {},
   "iat": 0,
   "iss": "string",
   "nbf": 0,
@@ -9317,22 +9254,21 @@ _Introspection contains an access token's session data as specified by IETF RFC
 
 #### Properties
 
-| Name                       | Type           | Required | Restrictions | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| -------------------------- | -------------- | -------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| active                     | boolean        | true     | none         | Active is a boolean indicator of whether or not the presented token is currently active. The specifics of a token's "active" state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a "true" value return for the "active" property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time). |
-| aud                        | [string]       | false    | none         | Audience contains a list of the token's intended audiences.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| client_id                  | string         | false    | none         | ClientID is aclient identifier for the OAuth 2.0 client that requested this token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| exp                        | integer(int64) | false    | none         | Expires at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire.                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ext                        | object         | false    | none         | Extra is arbitrary data set by the session.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| » **additionalProperties** | object         | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| iat                        | integer(int64) | false    | none         | Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued.                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| iss                        | string         | false    | none         | IssuerURL is a string representing the issuer of this token                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| nbf                        | integer(int64) | false    | none         | NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before.                                                                                                                                                                                                                                                                                                                                                                                                              |
-| obfuscated_subject         | string         | false    | none         | ObfuscatedSubject is set when the subject identifier algorithm was set to "pairwise" during authorization. It is the `sub` value of the ID Token that was issued.                                                                                                                                                                                                                                                                                                                                                                                                |
-| scope                      | string         | false    | none         | Scope is a JSON string containing a space-separated list of scopes associated with this token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| sub                        | string         | false    | none         | Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token.                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| token_type                 | string         | false    | none         | TokenType is the introspected token's type, for example `access_token` or `refresh_token`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| username                   | string         | false    | none         | Username is a human-readable identifier for the resource owner who authorized this token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Name               | Type           | Required | Restrictions | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------ | -------------- | -------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| active             | boolean        | true     | none         | Active is a boolean indicator of whether or not the presented token is currently active. The specifics of a token's "active" state will vary depending on the implementation of the authorization server and the information it keeps about its tokens, but a "true" value return for the "active" property will generally indicate that a given token has been issued by this authorization server, has not been revoked by the resource owner, and is within its given time window of validity (e.g., after its issuance time and before its expiration time). |
+| aud                | [string]       | false    | none         | Audience contains a list of the token's intended audiences.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| client_id          | string         | false    | none         | ClientID is aclient identifier for the OAuth 2.0 client that requested this token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| exp                | integer(int64) | false    | none         | Expires at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ext                | object         | false    | none         | Extra is arbitrary data set by the session.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| iat                | integer(int64) | false    | none         | Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued.                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| iss                | string         | false    | none         | IssuerURL is a string representing the issuer of this token                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| nbf                | integer(int64) | false    | none         | NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before.                                                                                                                                                                                                                                                                                                                                                                                                              |
+| obfuscated_subject | string         | false    | none         | ObfuscatedSubject is set when the subject identifier algorithm was set to "pairwise" during authorization. It is the `sub` value of the ID Token that was issued.                                                                                                                                                                                                                                                                                                                                                                                                |
+| scope              | string         | false    | none         | Scope is a JSON string containing a space-separated list of scopes associated with this token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| sub                | string         | false    | none         | Subject of the token, as defined in JWT [RFC7519]. Usually a machine-readable identifier of the resource owner who authorized this token.                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| token_type         | string         | false    | none         | TokenType is the introspected token's type, for example `access_token` or `refresh_token`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| username           | string         | false    | none         | Username is a human-readable identifier for the resource owner who authorized this token.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 <a id="tocSoauth2tokenresponse">oauth2TokenResponse</a>
 
@@ -9374,10 +9310,7 @@ _The Access Token Response_
 {
   "acr_values": ["string"],
   "display": "string",
-  "id_token_hint_claims": {
-    "property1": {},
-    "property2": {}
-  },
+  "id_token_hint_claims": {},
   "login_hint": "string",
   "ui_locales": ["string"]
 }
@@ -9387,14 +9320,13 @@ _Contains optional information about the OpenID Connect request._
 
 #### Properties
 
-| Name                       | Type     | Required | Restrictions | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| -------------------------- | -------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| acr_values                 | [string] | false    | none         | ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request. It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required. OpenID Connect defines it as follows: > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values that the Authorization Server is being requested to use for processing this Authentication Request, with the values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a Voluntary Claim by this parameter.                                                                                                                                                                                                                                                                                            |
-| display                    | string   | false    | none         | Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User. The defined values are: page: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode. popup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over. touch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface. wap: The Authorization Server SHOULD display the authentication and consent UI consistent with a "feature phone" type display. The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display. |
-| id_token_hint_claims       | object   | false    | none         | IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| » **additionalProperties** | object   | false    | none         | none                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| login_hint                 | string   | false    | none         | LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ui_locales                 | [string] | false    | none         | UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Name                 | Type     | Required | Restrictions | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------- | -------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| acr_values           | [string] | false    | none         | ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request. It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required. OpenID Connect defines it as follows: > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values that the Authorization Server is being requested to use for processing this Authentication Request, with the values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a Voluntary Claim by this parameter.                                                                                                                                                                                                                                                                                            |
+| display              | string   | false    | none         | Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User. The defined values are: page: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode. popup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over. touch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface. wap: The Authorization Server SHOULD display the authentication and consent UI consistent with a "feature phone" type display. The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display. |
+| id_token_hint_claims | object   | false    | none         | IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| login_hint           | string   | false    | none         | LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ui_locales           | [string] | false    | none         | UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 <a id="tocSrejectrequest">rejectRequest</a>
 

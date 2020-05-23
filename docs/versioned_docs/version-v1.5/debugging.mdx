@@ -47,7 +47,6 @@ reverse proxy supports path rewrites that might also cause issues!
 - You are trying to do two OAuth2 flows at the same time in the same Browser.
 - You have changed the Cookie SameSite behavior. If this is the default value (you did not change it), this should
 not be an issue.
-- You are using the `--dangerous-force-http` CLI flag to run via HTTP, but have not changed the Cookie SameSite behaviour. The default value for SameSite setting is `None`, which also requires the cookie be marked as `Secure` which won't be set whilst running Hydra over HTTP.
 
 :::warn
 You cannot call `/oauth2/auth` using an AJAX request. It is not allowed and not possible with OAuth2.

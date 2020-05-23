@@ -359,8 +359,9 @@ Legend:
   `localhost`, `google.com`).**
 - `****`: The `post_logout_redirect` defaults to the configuration value of
   `urls.post_logout_redirect`. If it's an RP-initiated flow and a
-  `post_logout_redirect_uri` was set and that URL is in the array of the OAuth2 Client's
-  `urls.post_logout_redirect`, the browser will be redirected there instead.
+  `post_logout_redirect_uri` was set and that URL is in the array of the OAuth2
+  Client's `urls.post_logout_redirect`, the browser will be redirected there
+  instead.
 
 ### Logout Flow
 

@@ -1661,7 +1661,7 @@ Status Code **200**
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -1691,7 +1691,7 @@ Status Code **200**
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   }
 ]
@@ -1870,7 +1870,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1900,7 +1900,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1946,7 +1946,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1976,7 +1976,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2057,7 +2057,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2087,7 +2087,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2226,7 +2226,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2256,7 +2256,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2434,7 +2434,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2464,7 +2464,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2509,7 +2509,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2539,7 +2539,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2620,7 +2620,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2650,7 +2650,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -4823,7 +4823,7 @@ or rejected the request.
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -4853,7 +4853,7 @@ or rejected the request.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -4864,10 +4864,7 @@ or rejected the request.
       "string"
     ],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": [
       "string"
@@ -5063,18 +5060,12 @@ The response contains a redirect URL which the consent provider should redirect 
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }
 ```
@@ -5174,18 +5165,12 @@ const input = '{
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }';
 const headers = {
@@ -5552,7 +5537,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -5582,7 +5567,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -5590,10 +5575,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
       "string"
     ],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": [
       "string"
@@ -6784,6 +6766,9 @@ Accept: application/json
 ```
 
 This endpoint lists all subject's granted consent sessions, including client and granted scope.
+If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
+empty JSON array with status code 200 OK.
+
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 
@@ -6803,7 +6788,6 @@ Multiple links can be included in this header, and will be separated by a comma.
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|A list of used consent requests.|Inline|
 |400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|genericError|[genericError](#schemagenericerror)|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|genericError|[genericError](#schemagenericerror)|
 |500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|genericError|[genericError](#schemagenericerror)|
 
 <a id="lists-all-consent-sessions-of-a-subject-responseschema"></a>
@@ -6857,7 +6841,6 @@ Status Code **200**
 |»»» acr_values|[string]|false|none|ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request. It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.  OpenID Connect defines it as follows: > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values that the Authorization Server is being requested to use for processing this Authentication Request, with the values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a Voluntary Claim by this parameter.|
 |»»» display|string|false|none|Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User. The defined values are: page: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode. popup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over. touch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface. wap: The Authorization Server SHOULD display the authentication and consent UI consistent with a "feature phone" type display.  The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display.|
 |»»» id_token_hint_claims|object|false|none|IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.|
-|»»»» **additionalProperties**|object|false|none|none|
 |»»» login_hint|string|false|none|LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.|
 |»»» ui_locales|[string]|false|none|UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.|
 |»» request_url|string|false|none|RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.|
@@ -6872,9 +6855,7 @@ Status Code **200**
 |» remember_for|integer(int64)|false|none|RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the authorization will be remembered indefinitely.|
 |» session|[consentRequestSession](#schemaconsentrequestsession)|false|none|none|
 |»» access_token|object|false|none|AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!|
-|»»» **additionalProperties**|object|false|none|none|
 |»» id_token|object|false|none|IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable by anyone that has access to the ID Challenge. Use with care!|
-|»»» **additionalProperties**|object|false|none|none|
 
 ##### Examples
 
@@ -6903,7 +6884,7 @@ Status Code **200**
         "contacts": [
           "string"
         ],
-        "created_at": "2020-04-30T11:01:46Z",
+        "created_at": "2020-05-23T14:44:00Z",
         "frontchannel_logout_session_required": true,
         "frontchannel_logout_uri": "string",
         "grant_types": [
@@ -6933,7 +6914,7 @@ Status Code **200**
         "subject_type": "string",
         "token_endpoint_auth_method": "string",
         "tos_uri": "string",
-        "updated_at": "2020-04-30T11:01:46Z",
+        "updated_at": "2020-05-23T14:44:00Z",
         "userinfo_signed_response_alg": "string"
       },
       "context": {},
@@ -6944,10 +6925,7 @@ Status Code **200**
           "string"
         ],
         "display": "string",
-        "id_token_hint_claims": {
-          "property1": {},
-          "property2": {}
-        },
+        "id_token_hint_claims": {},
         "login_hint": "string",
         "ui_locales": [
           "string"
@@ -6969,18 +6947,12 @@ Status Code **200**
     "grant_scope": [
       "string"
     ],
-    "handled_at": "2020-04-30T11:01:46Z",
+    "handled_at": "2020-05-23T14:44:00Z",
     "remember": true,
     "remember_for": 0,
     "session": {
-      "access_token": {
-        "property1": {},
-        "property2": {}
-      },
-      "id_token": {
-        "property1": {},
-        "property2": {}
-      }
+      "access_token": {},
+      "id_token": {}
     }
   }
 ]
@@ -7522,7 +7494,7 @@ automatically when performing the refresh flow.
 
 ```json
 {
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-05-23T14:44:00Z"
 }
 ```
 
@@ -7618,7 +7590,7 @@ func main() {
 ```nodejs
 const fetch = require('node-fetch');
 const input = '{
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-05-23T14:44:00Z"
 }';
 const headers = {
   'Content-Type': 'application/json',  'Accept': 'application/json'
@@ -7769,10 +7741,7 @@ scopes, the result of active will be false.
   ],
   "client_id": "string",
   "exp": 0,
-  "ext": {
-    "property1": {},
-    "property2": {}
-  },
+  "ext": {},
   "iat": 0,
   "iss": "string",
   "nbf": 0,
@@ -8262,7 +8231,7 @@ effectively written in the swagger spec.*
 <a id="schemanulltime"></a>
 
 ```json
-"2020-04-30T11:01:46Z"
+"2020-05-23T14:44:00Z"
 
 ```
 
@@ -8747,7 +8716,7 @@ effectively written in the swagger spec.*
       "contacts": [
         "string"
       ],
-      "created_at": "2020-04-30T11:01:46Z",
+      "created_at": "2020-05-23T14:44:00Z",
       "frontchannel_logout_session_required": true,
       "frontchannel_logout_uri": "string",
       "grant_types": [
@@ -8777,7 +8746,7 @@ effectively written in the swagger spec.*
       "subject_type": "string",
       "token_endpoint_auth_method": "string",
       "tos_uri": "string",
-      "updated_at": "2020-04-30T11:01:46Z",
+      "updated_at": "2020-05-23T14:44:00Z",
       "userinfo_signed_response_alg": "string"
     },
     "context": {},
@@ -8788,10 +8757,7 @@ effectively written in the swagger spec.*
         "string"
       ],
       "display": "string",
-      "id_token_hint_claims": {
-        "property1": {},
-        "property2": {}
-      },
+      "id_token_hint_claims": {},
       "login_hint": "string",
       "ui_locales": [
         "string"
@@ -8813,18 +8779,12 @@ effectively written in the swagger spec.*
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }
 
@@ -8901,18 +8861,12 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-04-30T11:01:46Z",
+  "handled_at": "2020-05-23T14:44:00Z",
   "remember": true,
   "remember_for": 0,
   "session": {
-    "access_token": {
-      "property1": {},
-      "property2": {}
-    },
-    "id_token": {
-      "property1": {},
-      "property2": {}
-    }
+    "access_token": {},
+    "id_token": {}
   }
 }
 
@@ -9007,7 +8961,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -9037,7 +8991,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -9048,10 +9002,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
       "string"
     ],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": [
       "string"
@@ -9096,14 +9047,8 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 
 ```json
 {
-  "access_token": {
-    "property1": {},
-    "property2": {}
-  },
-  "id_token": {
-    "property1": {},
-    "property2": {}
-  }
+  "access_token": {},
+  "id_token": {}
 }
 
 ```
@@ -9115,9 +9060,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
 |access_token|object|false|none|AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!|
-|» **additionalProperties**|object|false|none|none|
 |id_token|object|false|none|IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable by anyone that has access to the ID Challenge. Use with care!|
-|» **additionalProperties**|object|false|none|none|
 
 <a id="tocSflushinactiveoauth2tokensrequest">flushInactiveOAuth2TokensRequest</a>
 #### flushInactiveOAuth2TokensRequest
@@ -9126,7 +9069,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 
 ```json
 {
-  "notAfter": "2020-04-30T11:01:46Z"
+  "notAfter": "2020-05-23T14:44:00Z"
 }
 
 ```
@@ -9250,7 +9193,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "contacts": [
       "string"
     ],
-    "created_at": "2020-04-30T11:01:46Z",
+    "created_at": "2020-05-23T14:44:00Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -9280,7 +9223,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-04-30T11:01:46Z",
+    "updated_at": "2020-05-23T14:44:00Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -9288,10 +9231,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
       "string"
     ],
     "display": "string",
-    "id_token_hint_claims": {
-      "property1": {},
-      "property2": {}
-    },
+    "id_token_hint_claims": {},
     "login_hint": "string",
     "ui_locales": [
       "string"
@@ -9376,7 +9316,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "contacts": [
     "string"
   ],
-  "created_at": "2020-04-30T11:01:46Z",
+  "created_at": "2020-05-23T14:44:00Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -9406,7 +9346,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-04-30T11:01:46Z",
+  "updated_at": "2020-05-23T14:44:00Z",
   "userinfo_signed_response_alg": "string"
 }
 
@@ -9464,10 +9404,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   ],
   "client_id": "string",
   "exp": 0,
-  "ext": {
-    "property1": {},
-    "property2": {}
-  },
+  "ext": {},
   "iat": 0,
   "iss": "string",
   "nbf": 0,
@@ -9491,7 +9428,6 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 |client_id|string|false|none|ClientID is aclient identifier for the OAuth 2.0 client that requested this token.|
 |exp|integer(int64)|false|none|Expires at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire.|
 |ext|object|false|none|Extra is arbitrary data set by the session.|
-|» **additionalProperties**|object|false|none|none|
 |iat|integer(int64)|false|none|Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued.|
 |iss|string|false|none|IssuerURL is a string representing the issuer of this token|
 |nbf|integer(int64)|false|none|NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before.|
@@ -9542,10 +9478,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "string"
   ],
   "display": "string",
-  "id_token_hint_claims": {
-    "property1": {},
-    "property2": {}
-  },
+  "id_token_hint_claims": {},
   "login_hint": "string",
   "ui_locales": [
     "string"
@@ -9563,7 +9496,6 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 |acr_values|[string]|false|none|ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request. It is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.  OpenID Connect defines it as follows: > Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values that the Authorization Server is being requested to use for processing this Authentication Request, with the values appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication performed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a Voluntary Claim by this parameter.|
 |display|string|false|none|Display is a string value that specifies how the Authorization Server displays the authentication and consent user interface pages to the End-User. The defined values are: page: The Authorization Server SHOULD display the authentication and consent UI consistent with a full User Agent page view. If the display parameter is not specified, this is the default display mode. popup: The Authorization Server SHOULD display the authentication and consent UI consistent with a popup User Agent window. The popup User Agent window should be of an appropriate size for a login-focused dialog and should not obscure the entire window that it is popping up over. touch: The Authorization Server SHOULD display the authentication and consent UI consistent with a device that leverages a touch interface. wap: The Authorization Server SHOULD display the authentication and consent UI consistent with a "feature phone" type display.  The Authorization Server MAY also attempt to detect the capabilities of the User Agent and present an appropriate display.|
 |id_token_hint_claims|object|false|none|IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the End-User's current or past authenticated session with the Client.|
-|» **additionalProperties**|object|false|none|none|
 |login_hint|string|false|none|LoginHint hints about the login identifier the End-User might use to log in (if necessary). This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier) and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a phone number in the format specified for the phone_number Claim. The use of this parameter is optional.|
 |ui_locales|[string]|false|none|UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value "fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation), followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested locales are not supported by the OpenID Provider.|
 

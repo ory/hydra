@@ -42,7 +42,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: error
+  level: debug
 
   ## format ##
   #
@@ -80,7 +80,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 61947
+    port: 15758
 
     ## host ##
     #
@@ -95,7 +95,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: localhost
+    host: ""
 
     ## cors ##
     #
@@ -135,7 +135,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - "*"
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -150,11 +152,11 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
+        - PUT
+        - CONNECT
+        - GET
+        - PUT
         - HEAD
-        - PUT
-        - PUT
-        - CONNECT
-        - CONNECT
 
       ## allowed_headers ##
       #
@@ -169,10 +171,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - ut aliqua
-        - labore aliqua minim
-        - ex cillum eiusmod esse
-        - veniam dolore ad eu
+        - sunt consequat exercitation mollit
 
       ## exposed_headers ##
       #
@@ -187,9 +186,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - proident commodo
-        - cillum laboris esse irure qui
-        - sunt
+        - elit in officia
+        - incididunt
+        - do reprehenderit esse
 
       ## allow_credentials ##
       #
@@ -203,7 +202,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -217,7 +216,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -229,7 +228,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 74943663
+      max_age: 80189112
 
       ## debug ##
       #
@@ -279,7 +278,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 12590
+    port: 11022
 
     ## host ##
     #
@@ -350,10 +349,6 @@ serve:
       #
       allowed_methods:
         - PUT
-        - DELETE
-        - GET
-        - GET
-        - TRACE
 
       ## allowed_headers ##
       #
@@ -368,8 +363,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - consequat elit in nostrud
-        - proident ullamco
+        - veniam laboris dolor aliquip
+        - dolore aute ex id elit
+        - in esse
+        - quis
+        - cillum eu irure ex
 
       ## exposed_headers ##
       #
@@ -384,11 +382,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - aliquip
-        - sed sint
-        - sunt deserunt Ut Duis nisi
-        - Duis eu dolore Ut
-        - ipsum non
+        - dolore cillum Lorem Excepteur
+        - dolor veniam consectetur
+        - Lorem laborum commodo quis in
+        - ipsum aliquip in Duis velit
+        - non sint quis irure
 
       ## allow_credentials ##
       #
@@ -416,7 +414,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -428,7 +426,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 77380855
+      max_age: 62790446
 
       ## debug ##
       #
@@ -442,7 +440,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
     ## access_log ##
     #
@@ -476,15 +474,15 @@ serve:
     #
     key:
       
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_PATH=<value>
+      #    $ export SERVE_TLS_KEY_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_PATH=<value>
+      #    > set SERVE_TLS_KEY_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## cert ##
     #
@@ -515,6 +513,7 @@ serve:
     allow_termination_from:
       - 127.0.0.1/32
       - 127.0.0.1/32
+      - 127.0.0.1/32
 
   ## cookies ##
   #
@@ -532,7 +531,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Lax
+    same_site_mode: None
 
     ## same_site_legacy_workaround ##
     #
@@ -561,7 +560,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: Duis sunt
+dsn: nostrud
 
 ## webfinger ##
 #
@@ -868,7 +867,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: exact
+  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
 
   ## access_token ##
   #
@@ -880,7 +879,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_ACCESS_TOKEN=<value>
   #
-  access_token: jwt
+  access_token: opaque
 
 ## ttl ##
 #
@@ -928,7 +927,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 720h
+  refresh_token: "-1"
 
   ## id_token ##
   #
@@ -977,7 +976,7 @@ oauth2:
   # - Windows Command Line (CMD):
   #    > set OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
   #
-  expose_internal_errors: false
+  expose_internal_errors: true
 
   ## hashers ##
   #
@@ -1003,7 +1002,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 30423313
+      cost: 13961120
 
   ## pkce ##
   #

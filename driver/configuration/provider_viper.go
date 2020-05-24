@@ -424,7 +424,7 @@ func (v *ViperProvider) OIDCDiscoverySupportedClaims() []string {
 func (v *ViperProvider) OIDCDiscoverySupportedScope() []string {
 	return stringslice.Unique(
 		append(
-			[]string{"offline", "openid"},
+			[]string{"offline_access", "offline", "openid"},
 			viperx.GetStringSlice(v.l, ViperKeyOIDCDiscoverySupportedScope, []string{}, "OIDC_DISCOVERY_SCOPES_SUPPORTED")...,
 		),
 	)

@@ -193,7 +193,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys())
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OAuth2ClientRegistrationURL())
 	assert.Equal(t, []string{"sub", "username"}, c.OIDCDiscoverySupportedClaims())
-	assert.Equal(t, []string{"offline", "openid", "whatever"}, c.OIDCDiscoverySupportedScope())
+	assert.Equal(t, []string{"offline_access", "offline", "openid", "whatever"}, c.OIDCDiscoverySupportedScope())
 	assert.Equal(t, "https://example.com", c.OIDCDiscoveryUserinfoEndpoint())
 
 	// oidc

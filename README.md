@@ -1,4 +1,4 @@
-<h1 align="center"><img src=".github/banner_hydra.svg" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/ory/meta/master/static/banners/hydra.svg" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">
     <a href="https://www.ory.sh/chat">Chat</a> |

@@ -78,10 +78,6 @@ answer:
 In the second example ("authentication server"), you must use OpenID Connect ID
 Tokens.
 
-## How to deal with mobile apps?
-
-Read [this article](https://www.ory.sh/oauth2-for-mobile-app-spa-browser).
-
 ## How should I run migrations?
 
 Since ORY Hydra 0.8.0, migrations are no longer run automatically on boot. This

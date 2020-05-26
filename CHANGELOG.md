@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-05-25)](#unreleased-2020-05-25)
+- [Unreleased (2020-05-26)](#unreleased-2020-05-26)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
@@ -433,7 +433,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.3...ff0b990c4c37c683a7905421c29684f1e7e36675) (2020-05-25)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.3...04b2c22d97ffa69f58c53ab64f48c75095f96624) (2020-05-26)
 
 
 ### Bug Fixes
@@ -443,6 +443,7 @@
 
 ### Documentation
 
+* Update repository templates ([04b2c22](https://github.com/ory/hydra/commit/04b2c22d97ffa69f58c53ab64f48c75095f96624))
 * Use central banner repo for README ([ff0b990](https://github.com/ory/hydra/commit/ff0b990c4c37c683a7905421c29684f1e7e36675))
 
 

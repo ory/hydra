@@ -71,6 +71,7 @@ const (
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
 	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
+	ViperKeyPKCEEnforcedPublicClients      = "oauth2.pkce.enforced_public_clients"
 	ViperKeyLogLevel                       = "log.level"
 )
 
@@ -440,4 +441,8 @@ func (v *ViperProvider) ShareOAuth2Debug() bool {
 
 func (v *ViperProvider) PKCEEnforced() bool {
 	return viperx.GetBool(v.l, ViperKeyPKCEEnforced, false, "OAUTH2_PKCE_ENFORCED")
+}
+
+func (v *ViperProvider) EnforcePKCEForPublicClients() bool {
+	return viperx.GetBool(v.l, ViperKeyPKCEEnforcedPublicClients, false, "OAUTH2_PKCE_ENFORCED_PUBLIC_CLIENTS")
 }

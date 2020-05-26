@@ -1,3 +1,14 @@
+<!--
+
+Thank you for contributing changes to this document! Because we use a central repository
+to synchronize this file across all our repositories, make sure to make your edits
+in the correct file, which you can find here:
+
+https://github.com/ory/meta/blob/master/templates/repository/CONTRIBUTING.md
+
+-->
+
+
 # Contributing to ORY Hydra
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->

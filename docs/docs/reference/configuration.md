@@ -994,6 +994,12 @@ oauth2:
     #    > set OAUTH2_PKCE_ENFORCED=<value>
     #
     enforced: true
+    # Sets whether PKCE should be enforced for public clients.
+    #
+    # Examples:
+    # - true
+    enforced_public_clients: true
+
 
 ## secrets ##
 #

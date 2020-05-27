@@ -23,7 +23,7 @@ module.exports = {
 
   ],
   "SDKs":[
-    "sdk/index",
+    "sdk",
     "sdk/go",
     "sdk/js",
     "sdk/php",

@@ -1,6 +1,7 @@
 ---
-id: index
-title: Overview
+id: sdk
+title: Software Development Kits (SDKs)
+sidebar_label: Overview
 ---
 
 All SDKs use automated code generation provided by
@@ -10,7 +11,7 @@ code when upgrading versions. Therefore, we do not make backwards compatibility
 promises with regards to the generated SDKs. We hope to improve this process in
 the future.
 
-Before you check out the SDKs, head over to the [REST API](../reference/api.md)
+Before you check out the SDKs, head over to the [REST API](reference/api.md)
 documentation which includes code samples for common programming languages for
 each REST endpoint.
 
@@ -31,8 +32,8 @@ repositories:
 
 We also provide more info for these SDKs:
 
-- [Golang](go.md)
-- [JavaScript](js.md)
+- [Golang](sdk/go.md)
+- [JavaScript](sdk/js.md)
 
 Missing your programming language?
 [Create an issue](https://github.com/ory/hydra/issues) and help us build, test

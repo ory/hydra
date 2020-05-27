@@ -1,9 +1,10 @@
 package driver
 
 import (
-	"github.com/ory/x/resilience"
 	"strings"
 	"time"
+
+	"github.com/ory/x/resilience"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"

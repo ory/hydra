@@ -2,12 +2,14 @@ package internal
 
 import (
 	"context"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/stretchr/testify/require"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/jmoiron/sqlx"
 

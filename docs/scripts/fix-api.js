@@ -1,18 +1,18 @@
-const fs = require('fs');
+const fs = require('fs')
 
 if (process.argv.length !== 3 || process.argv[1] === 'help') {
   console.error(`
   usage:
     node fix-api.js path/to/file.md
-`);
-  process.exit(1);
+`)
+  process.exit(1)
 }
 
-const file = process.argv[2];
+const file = process.argv[2]
 
 fs.readFile(file, (err, b) => {
   if (err) {
-    throw err;
+    throw err
   }
 
   const t = b
@@ -38,11 +38,11 @@ fs.readFile(file, (err, b) => {
     // .replace(/^<h3 id="[0-9a-zA-Z0-9\-_.]+-responses">Responses<\/h3>$/gim, '#### Summary',-1)
     // .replace(/^> Example responses/gim, '### Responses',-1)
     // .replace(/^> Body parameter/gim, '### Request body',-1)
-    .replace(/^> ([0-9]+) Response$/gim, '###### $1 response', -1);
+    .replace(/^> ([0-9]+) Response$/gim, '###### $1 response', -1)
 
   fs.writeFile(file, t, (err) => {
     if (err) {
-      throw err;
+      throw err
     }
-  });
-});
+  })
+})

@@ -1,74 +1,74 @@
-const RefParser = require('json-schema-ref-parser');
-const parser = new RefParser();
-const jsf = require('json-schema-faker');
-const YAML = require('yaml');
-const { pathOr } = require('ramda');
-const path = require('path');
-const fs = require('fs');
+const RefParser = require('json-schema-ref-parser')
+const parser = new RefParser()
+const jsf = require('json-schema-faker')
+const YAML = require('yaml')
+const { pathOr } = require('ramda')
+const path = require('path')
+const fs = require('fs')
 
 jsf.option({
   alwaysFakeOptionals: true,
   useExamplesValue: true,
   useDefaultValue: true,
-  minItems: 1,
-});
+  minItems: 1
+})
 
 if (process.argv.length !== 3 || process.argv[1] === 'help') {
   console.error(`
   usage:
     node config.js path/to/config.js
-`);
-  return;
+`)
+  return
 }
 
-const config = require(path.resolve(process.argv[2]));
+const config = require(path.resolve(process.argv[2]))
 
 const enhance = (schema, parents = []) => (item) => {
-  const key = item.key.value;
+  const key = item.key.value
 
   const path = [
     ...parents.map((parent) => ['properties', parent]),
-    ['properties', key],
-  ].flat();
+    ['properties', key]
+  ].flat()
 
   if (['title', 'description'].find((f) => path[path.length - 1] === f)) {
-    return;
+    return
   }
 
-  const comments = [`# ${pathOr(key, [...path, 'title'], schema)} ##`, ''];
+  const comments = [`# ${pathOr(key, [...path, 'title'], schema)} ##`, '']
 
-  const description = pathOr('', [...path, 'description'], schema);
+  const description = pathOr('', [...path, 'description'], schema)
   if (description) {
-    comments.push(' ' + description.split('\n').join('\n '), '');
+    comments.push(' ' + description.split('\n').join('\n '), '')
   }
 
-  const defaultValue = pathOr('', [...path, 'default'], schema);
+  const defaultValue = pathOr('', [...path, 'default'], schema)
   if (defaultValue || defaultValue === false) {
-    comments.push(' Default value: ' + defaultValue, '');
+    comments.push(' Default value: ' + defaultValue, '')
   }
 
-  const examples = pathOr('', [...path, 'examples'], schema);
+  const examples = pathOr('', [...path, 'examples'], schema)
   if (examples) {
     comments.push(
       ' Examples:',
       ...YAML.stringify(examples)
         .split('\n')
         .map((i) => ` ${i}`)
-    ); // split always returns one empty object so no need for newline
+    ) // split always returns one empty object so no need for newline
   }
 
-  let hasChildren;
+  let hasChildren
   if (item.value.items) {
     item.value.items.forEach((item) => {
       if (item.key) {
-        enhance(schema, [...parents, key])(item);
-        hasChildren = true;
+        enhance(schema, [...parents, key])(item)
+        hasChildren = true
       }
-    });
+    })
   }
 
   if (!hasChildren) {
-    const env = [...parents, key].map((i) => i.toUpperCase()).join('_');
+    const env = [...parents, key].map((i) => i.toUpperCase()).join('_')
     comments.push(
       ' Set this value using environment variables on',
       ' - Linux/macOS:',
@@ -76,77 +76,77 @@ const enhance = (schema, parents = []) => (item) => {
       ' - Windows Command Line (CMD):',
       `    > set ${env}=<value>`,
       ''
-    );
+    )
   }
 
-  item.commentBefore = comments.join('\n');
-  item.spaceBefore = true;
-};
+  item.commentBefore = comments.join('\n')
+  item.spaceBefore = true
+}
 
 new Promise((resolve, reject) => {
   parser.dereference(
     require(path.resolve(config.updateConfig.src)),
     (err, result) => (err ? reject(err) : resolve(result))
-  );
+  )
 })
   .then((schema) => {
     const removeAdditionalProperties = (o) => {
-      delete o['additionalProperties'];
+      delete o['additionalProperties']
       if (o.properties) {
         Object.keys(o.properties).forEach((key) =>
           removeAdditionalProperties(o.properties[key])
-        );
+        )
       }
-    };
+    }
 
     const enableAll = (o) => {
       if (o.properties) {
         Object.keys(o.properties).forEach((key) => {
           if (key === 'enable') {
-            o.properties[key] = true;
+            o.properties[key] = true
           }
-          enableAll(o.properties[key]);
-        });
+          enableAll(o.properties[key])
+        })
       }
-    };
+    }
 
-    removeAdditionalProperties(schema);
-    enableAll(schema);
+    removeAdditionalProperties(schema)
+    enableAll(schema)
     if (schema.definitions) {
       Object.keys(schema.definitions).forEach((key) => {
-        removeAdditionalProperties(schema.definitions[key]);
-        enableAll(schema.definitions[key]);
-      });
+        removeAdditionalProperties(schema.definitions[key])
+        enableAll(schema.definitions[key])
+      })
     }
 
     jsf.option({
       useExamplesValue: true,
       useDefaultValue: false, // do not change this!!
       fixedProbabilities: true,
-      alwaysFakeOptionals: true,
-    });
+      alwaysFakeOptionals: true
+    })
 
-    const values = jsf.generate(schema);
-    const doc = YAML.parseDocument(YAML.stringify(values));
+    const values = jsf.generate(schema)
+    const doc = YAML.parseDocument(YAML.stringify(values))
 
-    const comments = [`# ${pathOr(config.projectSlug, ['title'], schema)}`, ''];
+    const comments = [`# ${pathOr(config.projectSlug, ['title'], schema)}`, '']
 
-    const description = pathOr('', ['description'], schema);
+    const description = pathOr('', ['description'], schema)
     if (description) {
-      comments.push(' ' + description);
+      comments.push(' ' + description)
     }
 
-    doc.commentBefore = comments.join('\n');
-    doc.spaceAfter = false;
-    doc.spaceBefore = false;
+    doc.commentBefore = comments.join('\n')
+    doc.spaceAfter = false
+    doc.spaceBefore = false
 
-    doc.contents.items.forEach(enhance(schema, []));
+    doc.contents.items.forEach(enhance(schema, []))
 
     return Promise.resolve({
       // schema,
       // values,
-      yaml: doc.toString(),
-    });
+      yaml: doc.toString()
+    })
   })
   .then((out) => {
     const content = `---
@@ -172,7 +172,7 @@ To find out more about edge cases like setting string array values through envir
 
 \`\`\`yaml
 ${out.yaml}
-\`\`\``;
+\`\`\``
 
     return new Promise((resolve, reject) => {
       fs.writeFile(
@@ -181,18 +181,18 @@ ${out.yaml}
         'utf8',
         (err) => {
           if (err) {
-            reject(err);
-            return;
+            reject(err)
+            return
           }
-          resolve();
+          resolve()
         }
-      );
-    });
+      )
+    })
   })
   .then(() => {
-    console.log('Done!');
+    console.log('Done!')
   })
   .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+    console.error(err)
+    process.exit(1)
+  })

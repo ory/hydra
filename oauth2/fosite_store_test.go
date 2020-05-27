@@ -23,11 +23,13 @@ package oauth2_test
 import (
 	"context"
 	"flag"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/viper"
-	"github.com/stretchr/testify/require"
-	"testing"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/internal"

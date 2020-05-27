@@ -22,8 +22,9 @@ package client_test
 
 import (
 	"fmt"
-	"github.com/ory/hydra/driver"
 	"testing"
+
+	"github.com/ory/hydra/driver"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"

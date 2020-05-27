@@ -1,6 +1,6 @@
-// +build tools
+// +build go_mod_indirect_pins
 
-package cmd
+package main
 
 import (
 	_ "github.com/go-bindata/go-bindata/go-bindata"
@@ -10,6 +10,10 @@ import (
 	_ "github.com/sqs/goreturns"
 	_ "golang.org/x/tools/cmd/goimports"
 	_ "golang.org/x/tools/cmd/stringer"
+
+	// FIXME pins websocket to 1.4.2
+	// FIXME See https://github.com/gobuffalo/buffalo/pull/1999
+	_ "github.com/gorilla/websocket"
 
 	_ "github.com/ory/sdk/swagutil"
 

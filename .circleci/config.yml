@@ -159,8 +159,6 @@ workflows:
           tags:
             only: /.*/
       - test:
-          requires:
-            - nancy/test
           filters:
             tags:
               only: /.*/

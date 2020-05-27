@@ -998,7 +998,7 @@ oauth2:
     #
     # Examples:
     # - true
-    enforced_public_clients: true
+    enforced_for_public_clients: true
 
 
 ## secrets ##

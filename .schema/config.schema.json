@@ -724,7 +724,7 @@
                 true
               ]
             },
-            "enforced_public_clients": {
+            "enforced_for_public_clients": {
               "type": "boolean",
               "description": "Sets whether PKCE should be enforced for public clients.",
               "examples": [

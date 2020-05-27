@@ -377,7 +377,7 @@ oauth2:
     # Set this to true if you want PKCE to be enforced for all clients.
     enforced: false
     # Set this to true if you want PKCE to be enforced for public clients.
-    enforced_public_clients: false
+    enforced_for_public_clients: false
   session:
     # store encrypted data in database, default true
     encrypt_at_rest: true

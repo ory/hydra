@@ -9,12 +9,13 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,json,js,css,html}' || true"
+    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,json,js,css,html}' --no-semi --single-quote --trailing-comma none || true"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.50",
     "@docusaurus/preset-classic": "2.0.0-alpha.50",
     "classnames": "2.2.6",
+    "mermaid": "^8.5.1",
     "node-fetch": "2.6.0",
     "react": "16.8.4",
     "react-dom": "16.8.4"

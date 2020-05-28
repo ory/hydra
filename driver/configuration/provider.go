@@ -63,6 +63,7 @@ type Provider interface {
 	LoginURL() *url.URL
 	LogoutURL() *url.URL
 	PKCEEnforced() bool
+	EnforcePKCEForPublicClients() bool
 }
 
 func MustValidate(l logrus.FieldLogger, p Provider) {

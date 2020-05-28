@@ -5,10 +5,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/rs/cors"
-	"github.com/sirupsen/logrus"
-
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/tracing"
+	"github.com/rs/cors"
 )
 
 type Provider interface {
@@ -66,7 +65,7 @@ type Provider interface {
 	EnforcePKCEForPublicClients() bool
 }
 
-func MustValidate(l logrus.FieldLogger, p Provider) {
+func MustValidate(l *logrusx.Logger, p Provider) {
 	if p.ServesHTTPS() {
 		if p.IssuerURL().String() == "" {
 			l.Fatalf(`Configuration key "%s" must be set unless flag "--dangerous-force-http" is set. To find out more, use "hydra help serve".`, ViperKeyIssuerURL)

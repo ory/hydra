@@ -1692,7 +1692,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					rr := res.Payload
 					assert.False(t, rr.Skip)
 					assert.EqualValues(t, "", rr.Subject)
-					assert.EqualValues(t, "foouser", rr.OidcContext.IDTokenHintClaims["sub"])
+					assert.EqualValues(t, "foouser", rr.OidcContext.IDTokenHintClaims.(map[string]interface{})["sub"])
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).

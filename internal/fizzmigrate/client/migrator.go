@@ -2,17 +2,16 @@ package client
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/x/dbal"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/mysql"}, true),
-	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/cockroach"}, true),
+	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/mysql"}, true),
+	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{"migrations/sql/shared", "migrations/sql/postgres"}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{"migrations/sql/cockroach"}, true),
 }
 
 type migrator struct {

@@ -42,7 +42,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: info
+  level: panic
 
   ## format ##
   #
@@ -80,7 +80,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 37539
+    port: 6165
 
     ## host ##
     #
@@ -95,7 +95,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ""
+    host: localhost
 
     ## cors ##
     #
@@ -115,7 +115,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: false
+      enabled: true
 
       ## allowed_origins ##
       #
@@ -150,10 +150,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - TRACE
-        - GET
-        - HEAD
-        - GET
+        - CONNECT
+        - PUT
+        - PUT
         - HEAD
 
       ## allowed_headers ##
@@ -169,9 +168,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - ea
-        - exercitation consectetur
-        - exercitation
+        - anim qui magna
+        - quis magna
+        - ut magna pariatur tempor
+        - sint laboris ipsum laborum incididunt
 
       ## exposed_headers ##
       #
@@ -186,7 +186,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - Excepteur adipisicing
+        - et qui esse nisi in
+        - Ut esse dolor sit culpa
+        - ex in
 
       ## allow_credentials ##
       #
@@ -226,7 +228,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 77402945
+      max_age: 13756495
 
       ## debug ##
       #
@@ -240,7 +242,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
 
     ## access_log ##
     #
@@ -276,7 +278,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 58375
+    port: 40828
 
     ## host ##
     #
@@ -311,7 +313,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: false
+      enabled: true
 
       ## allowed_origins ##
       #
@@ -331,7 +333,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - "*"
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -346,11 +350,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - POST
-        - PUT
         - DELETE
-        - TRACE
-        - PUT
+        - GET
+        - POST
+        - HEAD
 
       ## allowed_headers ##
       #
@@ -365,8 +368,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - in ex mollit
-        - mollit velit ad
+        - occaecat nisi non consectetur
+        - Ut ut magna
 
       ## exposed_headers ##
       #
@@ -381,9 +384,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - consectetur sed commodo cupidatat
-        - consequat anim id
-        - aute dolor ipsum irure
+        - officia et incididunt exercitation
+        - ullamco dolor laboris ad
+        - ipsum
+        - velit ea sint cillum sed
+        - in
 
       ## allow_credentials ##
       #
@@ -397,7 +402,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: false
+      allow_credentials: true
 
       ## options_passthrough ##
       #
@@ -423,7 +428,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 6684720
+      max_age: 16833072
 
       ## debug ##
       #
@@ -457,7 +462,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: false
+      disable_for_health: true
 
   ## tls ##
   #
@@ -487,15 +492,15 @@ serve:
     #
     cert:
       
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_BASE64=<value>
+      #    $ export SERVE_TLS_CERT_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_BASE64=<value>
+      #    > set SERVE_TLS_CERT_PATH=<value>
       #
-      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+      path: /path/to/file.pem
 
     ## allow_termination_from ##
     #
@@ -557,7 +562,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: in voluptate
+dsn: sit culpa quis commodo
 
 ## webfinger ##
 #
@@ -586,7 +591,8 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
     #
-    broadcast_keys: hydra.jwt.access-token
+    broadcast_keys:
+      - hydra.openid.id-token
 
   ## oidc_discovery ##
   #
@@ -876,7 +882,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_ACCESS_TOKEN=<value>
   #
-  access_token: opaque
+  access_token: jwt
 
 ## ttl ##
 #
@@ -924,7 +930,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 1h
+  refresh_token: 720h
 
   ## id_token ##
   #
@@ -999,7 +1005,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 40935632
+      cost: 43208319
 
   ## pkce ##
   #
@@ -1019,6 +1025,21 @@ oauth2:
     #    > set OAUTH2_PKCE_ENFORCED=<value>
     #
     enforced: true
+
+    ## enforced_for_public_clients ##
+    #
+    # Sets whether PKCE should be enforced for public clients.
+    #
+    # Examples:
+    # - true
+    # 
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS=<value>
+    # - Windows Command Line (CMD):
+    #    > set OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS=<value>
+    #
+    enforced_for_public_clients: true
 
 ## secrets ##
 #

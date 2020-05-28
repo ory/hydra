@@ -7,6 +7,7 @@
 - [Unreleased (2020-05-28)](#unreleased-2020-05-28)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
+    - [Features](#features)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
     - [Bug Fixes](#bug-fixes-1)
@@ -24,7 +25,7 @@
   - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-4)
     - [Documentation](#documentation-3)
-    - [Features](#features)
+    - [Features](#features-1)
   - [1.4.7 (2020-04-24)](#147-2020-04-24)
     - [Bug Fixes](#bug-fixes-5)
     - [Documentation](#documentation-4)
@@ -38,7 +39,7 @@
     - [Bug Fixes](#bug-fixes-8)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-7)
-    - [Features](#features-1)
+    - [Features](#features-2)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-8)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
@@ -47,7 +48,7 @@
     - [Bug Fixes](#bug-fixes-10)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-9)
-    - [Features](#features-2)
+    - [Features](#features-3)
     - [Unclassified](#unclassified-1)
     - [BREAKING CHANGES](#breaking-changes-1)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
@@ -64,7 +65,7 @@
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
     - [Bug Fixes](#bug-fixes-12)
     - [Documentation](#documentation-11)
-    - [Features](#features-3)
+    - [Features](#features-4)
     - [Unclassified](#unclassified-2)
   - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-3)
@@ -433,7 +434,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.3...13ee97dc8ca225a334b054fa98c9d2f7367cb1cf) (2020-05-28)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.3...d1907d670f923bb7a2433b04c85b57077b747a59) (2020-05-28)
 
 
 ### Bug Fixes
@@ -446,6 +447,11 @@
 * Move sdk to top level directory ([#1876](https://github.com/ory/hydra/issues/1876)) ([13ee97d](https://github.com/ory/hydra/commit/13ee97dc8ca225a334b054fa98c9d2f7367cb1cf))
 * Update repository templates ([04b2c22](https://github.com/ory/hydra/commit/04b2c22d97ffa69f58c53ab64f48c75095f96624))
 * Use central banner repo for README ([ff0b990](https://github.com/ory/hydra/commit/ff0b990c4c37c683a7905421c29684f1e7e36675))
+
+
+### Features
+
+* Configure pkce enforcement for public clients ([#1874](https://github.com/ory/hydra/issues/1874)) ([d1907d6](https://github.com/ory/hydra/commit/d1907d670f923bb7a2433b04c85b57077b747a59))
 
 
 

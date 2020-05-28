@@ -25,6 +25,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -42,14 +43,13 @@ func (s *errStackTracer) Error() string {
 
 func TestLogError(t *testing.T) {
 	buf := bytes.NewBuffer([]byte{})
-	l := logrus.New()
-	l.Level = logrus.DebugLevel
-	l.Out = buf
+	l := logrusx.New("", "", logrusx.ForceLevel(logrus.TraceLevel))
+	l.Logger.Out = buf
 	LogError(errors.New("asdf"), l)
 
 	t.Logf("%s", string(buf.Bytes()))
 
-	assert.True(t, strings.Contains(string(buf.Bytes()), "Stack trace"))
+	assert.True(t, strings.Contains(string(buf.Bytes()), "trace"))
 
 	LogError(errors.Wrap(new(errStackTracer), ""), l)
 }

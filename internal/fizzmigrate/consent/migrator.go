@@ -2,23 +2,22 @@ package consent
 
 import (
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/x/dbal"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
-	"mysql": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+	"mysql": dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
 	}, true),
-	"postgres": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+	"postgres": dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
 	}, true),
-	"cockroach": dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{
+	"cockroach": dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{
 		"migrations/sql/cockroach",
 	}, true),
 }

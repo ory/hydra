@@ -1,14 +1,18 @@
 package driver
 
 import (
+	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 
 	"github.com/ory/hydra/persistence"
 
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
+
+	"github.com/ory/hydra/metrics/prometheus"
+
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/healthx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -16,8 +20,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/healthx"
 )
 
 type Registry interface {
@@ -26,7 +28,7 @@ type Registry interface {
 	Init() error
 
 	WithConfig(c configuration.Provider) Registry
-	WithLogger(l logrus.FieldLogger) Registry
+	WithLogger(l *logrusx.Logger) Registry
 
 	WithBuildInfo(version, hash, date string) Registry
 	BuildVersion() string

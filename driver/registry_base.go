@@ -10,28 +10,28 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/serverx"
 
-	"github.com/gorilla/sessions"
-	"github.com/sirupsen/logrus"
+	"github.com/ory/hydra/metrics/prometheus"
 
+	"github.com/gorilla/sessions"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
+	"github.com/ory/x/healthx"
+	"github.com/ory/x/resilience"
+	"github.com/ory/x/tracing"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/healthx"
-	"github.com/ory/x/resilience"
-	"github.com/ory/x/tracing"
-	"github.com/ory/x/urlx"
 )
 
 const (
@@ -39,7 +39,7 @@ const (
 )
 
 type RegistryBase struct {
-	l            logrus.FieldLogger
+	l            *logrusx.Logger
 	c            configuration.Provider
 	cm           client.Manager
 	ch           *client.Handler
@@ -129,21 +129,21 @@ func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
 
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
-		h := herodot.NewJSONWriter(m.Logger())
+		h := herodot.NewJSONWriter(m.Logger().Logger)
 		h.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
 		m.writer = h
 	}
 	return m.writer
 }
 
-func (m *RegistryBase) WithLogger(l logrus.FieldLogger) Registry {
+func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 	m.l = l
 	return m.r
 }
 
-func (m *RegistryBase) Logger() logrus.FieldLogger {
+func (m *RegistryBase) Logger() *logrusx.Logger {
 	if m.l == nil {
-		m.l = logrusx.New()
+		m.l = logrusx.New("ORY Hydra", m.BuildVersion())
 	}
 	return m.l
 }

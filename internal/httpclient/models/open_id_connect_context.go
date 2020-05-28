@@ -38,7 +38,7 @@ type OpenIDConnectContext struct {
 
 	// IDTokenHintClaims are the claims of the ID Token previously issued by the Authorization Server being passed as a hint about the
 	// End-User's current or past authenticated session with the Client.
-	IDTokenHintClaims map[string]interface{} `json:"id_token_hint_claims,omitempty"`
+	IDTokenHintClaims interface{} `json:"id_token_hint_claims,omitempty"`
 
 	// LoginHint hints about the login identifier the End-User might use to log in (if necessary).
 	// This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier)

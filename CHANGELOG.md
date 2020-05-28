@@ -434,12 +434,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.3...d1907d670f923bb7a2433b04c85b57077b747a59) (2020-05-28)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.3...fdb3231e19f1b20cffcdad7fa0eebc1c513e5960) (2020-05-28)
 
 
 ### Bug Fixes
 
 * Add offline_access to discovery supported scoped ([#1870](https://github.com/ory/hydra/issues/1870)) ([73464e1](https://github.com/ory/hydra/commit/73464e1c6293ed7ff41d33e06389824222306a2f)), closes [#1866](https://github.com/ory/hydra/issues/1866)
+* Resolve dependency issues and adopt logrusx logger ([fdb3231](https://github.com/ory/hydra/commit/fdb3231e19f1b20cffcdad7fa0eebc1c513e5960))
 
 
 ### Documentation

@@ -1,5 +1,6 @@
 <a id="{{=data.operationUniqueSlug}}-parameters"></a>
-##### Parameters
+
+#### Parameters
 
 |Parameter|In|Type|Required|Description|
 |---|---|---|---|---|
@@ -7,7 +8,9 @@
 {{~}}
 
 {{? data.longDescs }}
+
 ##### Detailed descriptions
+
 {{~ data.parameters :p}}{{? p.shortDesc !== p.description}}
 **{{=p.name}}**: {{=p.description}}{{?}}
 {{~}}

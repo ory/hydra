@@ -9,18 +9,37 @@
 //     cr([Create Request]) --> backoffice[Backoffice Server REST]
 // `}/>
 
-import React, { useEffect } from "react"
+import React, {useEffect} from "react"
 import mermaid from "mermaid"
+import styles from './mermaid.module.css';
+import cn from 'classnames'
 
 mermaid.initialize({
-  startOnLoad: true
+  startOnLoad: true,
+  logLevel: 'fatal',
+  securityLevel: 'strict',
+  arrowMarkerAbsolute: false,
+  theme: "neutral",
+  flowchart: {
+    useMaxWidth: true,
+    htmlLabels: true,
+    rankSpacing: 65,
+    nodeSpacing: 30,
+    curve: "basis"
+  },
+  sequence:{
+    useMaxWidth: true,
+  },
+  gantt:{
+    useMaxWidth: true,
+  }
 })
 
-const Mermaid = ({ chart }) => {
+const Mermaid = ({chart}) => {
   useEffect(() => {
     mermaid.contentLoaded()
   }, [])
-  return <div className="mermaid">{chart}</div>
+  return <div className={cn(styles.graph, "mermaid")}>{chart}</div>
 }
 
 export default Mermaid

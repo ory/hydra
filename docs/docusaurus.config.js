@@ -103,32 +103,33 @@ module.exports = {
   },
   plugins: [
     [
-      "@docusaurus/plugin-content-docs",
+      require.resolve("@docusaurus/plugin-content-docs"),
       {
         path: config.projectSlug === 'docusaurus-template' ? 'contrib/docs' : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
         editUrl:
           `https://github.com/ory/${config.projectSlug}/edit/master/docs`,
         routeBasePath: '',
+        homePageId: 'index',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
         remarkPlugins: [admonitions],
       },
     ],
     [
-      "@docusaurus/plugin-content-pages",
+      require.resolve("@docusaurus/plugin-content-pages"),
     ],
-    ["@docusaurus/plugin-google-analytics"],
-    ["@docusaurus/plugin-sitemap"]
+    [require.resolve("@docusaurus/plugin-google-analytics")],
+    [require.resolve("@docusaurus/plugin-sitemap")]
   ],
   themes: [
     [
-      "@docusaurus/theme-classic",
+     require.resolve("@docusaurus/theme-classic"),
       {
         customCss: config.projectSlug === 'docusaurus-template' ? require.resolve('./contrib/theme.css') : require.resolve('./src/css/theme.css'),
       }
     ], [
-      "@docusaurus/theme-search-algolia"
+     require.resolve("@docusaurus/theme-search-algolia")
     ]
   ],
 };

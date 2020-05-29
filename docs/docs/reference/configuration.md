@@ -44,7 +44,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: panic
+  level: info
 
   ## format ##
   #
@@ -80,7 +80,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 6165
+    port: 29013
 
     ## host ##
     #
@@ -134,7 +134,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -149,10 +151,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - CONNECT
+        - GET
+        - DELETE
+        - GET
         - PUT
-        - PUT
-        - HEAD
 
       ## allowed_headers ##
       #
@@ -167,10 +169,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - anim qui magna
-        - quis magna
-        - ut magna pariatur tempor
-        - sint laboris ipsum laborum incididunt
+        - culpa aute ut in Ut
+        - irure consectetur adipisicing et
+        - Excepteur fugiat
+        - cupidatat ipsum qui voluptate dolor
 
       ## exposed_headers ##
       #
@@ -185,9 +187,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - et qui esse nisi in
-        - Ut esse dolor sit culpa
-        - ex in
+        - mollit ad fugiat id
+        - enim ut pariatur sit sint
+        - elit
+        - et in
 
       ## allow_credentials ##
       #
@@ -201,7 +204,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: false
+      allow_credentials: true
 
       ## options_passthrough ##
       #
@@ -215,7 +218,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -227,7 +230,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 13756495
+      max_age: 9256318
 
       ## debug ##
       #
@@ -275,7 +278,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 40828
+    port: 17868
 
     ## host ##
     #
@@ -309,7 +312,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -329,9 +332,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -346,10 +347,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - DELETE
-        - GET
-        - POST
+        - PUT
         - HEAD
+        - TRACE
 
       ## allowed_headers ##
       #
@@ -364,8 +364,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - occaecat nisi non consectetur
-        - Ut ut magna
+        - occaecat dolor amet Ut
+        - fugiat ullamco Duis commodo in
+        - in cupidatat
 
       ## exposed_headers ##
       #
@@ -380,11 +381,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - officia et incididunt exercitation
-        - ullamco dolor laboris ad
-        - ipsum
-        - velit ea sint cillum sed
-        - in
+        - ullamco reprehenderit ut dolore in
+        - amet dolor incididunt nulla
+        - ipsum incididunt
+        - cupidatat ex voluptate eu sint
+        - adipisicing ullamco
 
       ## allow_credentials ##
       #
@@ -424,7 +425,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 16833072
+      max_age: 94356990
 
       ## debug ##
       #
@@ -506,8 +507,6 @@ serve:
     #
     allow_termination_from:
       - 127.0.0.1/32
-      - 127.0.0.1/32
-      - 127.0.0.1/32
 
   ## cookies ##
   #
@@ -524,7 +523,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: None
+    same_site_mode: Lax
 
     ## same_site_legacy_workaround ##
     #
@@ -553,7 +552,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: sit culpa quis commodo
+dsn: consectetur laborum ullamco
 
 ## webfinger ##
 #
@@ -851,7 +850,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: exact
+  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
 
   ## access_token ##
   #
@@ -863,7 +862,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_ACCESS_TOKEN=<value>
   #
-  access_token: jwt
+  access_token: opaque
 
 ## ttl ##
 #
@@ -910,7 +909,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 720h
+  refresh_token: -1
 
   ## id_token ##
   #
@@ -938,7 +937,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 1h
+  auth_code: 10m
 
 ## oauth2 ##
 #
@@ -982,7 +981,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 43208319
+      cost: 99266754
 
   ## pkce ##
   #

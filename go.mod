@@ -35,7 +35,7 @@ require (
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.8.3
-	github.com/ory/sdk/swagutil v0.0.0-20200528115101-117ee73d2749
+	github.com/ory/sdk/swagutil v0.0.0-20200528141631-666b43d19aa3
 	github.com/ory/viper v1.7.5
 	github.com/ory/x v0.0.126
 	github.com/pborman/uuid v1.2.0

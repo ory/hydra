@@ -5954,7 +5954,6 @@ challenge to fetch information on the OAuth2 request and then accept or reject
 the requested authentication process.
 
 This endpoint tells ORY Hydra that the subject has not authenticated and
-includes a reason why the authentication was be denied.
 
 The response contains a redirect URL which the login provider should redirect
 the user-agent to.

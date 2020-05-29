@@ -12,8 +12,12 @@
     "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,json,js,css,html}' --no-semi --single-quote --trailing-comma none || true"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.50",
-    "@docusaurus/preset-classic": "2.0.0-alpha.50",
+    "@docusaurus/core": "2.0.0-alpha.56",
+    "@docusaurus/plugin-content-docs": "2.0.0-alpha.56",
+    "@docusaurus/plugin-content-pages": "2.0.0-alpha.56",
+    "@docusaurus/plugin-google-analytics": "2.0.0-alpha.56",
+    "@docusaurus/theme-classic": "2.0.0-alpha.56",
+    "@docusaurus/theme-search-algolia": "^2.0.0-alpha.32",
     "classnames": "2.2.6",
     "mermaid": "^8.5.1",
     "node-fetch": "2.6.0",

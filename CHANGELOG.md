@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-05-29)](#unreleased-2020-05-29)
+- [Unreleased (2020-05-30)](#unreleased-2020-05-30)
     - [Documentation](#documentation)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
     - [Bug Fixes](#bug-fixes)
@@ -436,11 +436,14 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...570943932773b2de54b187526d5d3e0ade2c2756) (2020-05-29)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...8f7227cd94fedf88bd5a4fdbc75eb480bc3d3aa9) (2020-05-30)
 
 
 ### Documentation
 
+* Add hint for login different subject ([#1880](https://github.com/ory/hydra/issues/1880)) ([8f7227c](https://github.com/ory/hydra/commit/8f7227cd94fedf88bd5a4fdbc75eb480bc3d3aa9)):
+
+    > Add hint to allow login provider login different subject when there is already an authentication of another subject.
 * Delete old redirect homepage ([45595dc](https://github.com/ory/hydra/commit/45595dc1aed479cd224353355a7e66030de609b0))
 * Use mdx for api reference ([5709439](https://github.com/ory/hydra/commit/570943932773b2de54b187526d5d3e0ade2c2756))
 

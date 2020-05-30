@@ -583,18 +583,18 @@ logout provider fetches information about the logout request:
 ```node
 // This is node-js pseudo code and will not work if you copy it 1:1
 
-challenge = req.url.query.logout_challenge;
+challenge = req.url.query.logout_challenge
 
 fetch(
   'https://hydra/oauth2/auth/requests/logout?' +
     querystring.stringify({ logout_challenge: challenge })
 )
   .then(function (response) {
-    return response.json();
+    return response.json()
   })
   .then(function (response) {
     // ...
-  });
+  })
 ```
 
 The server response is a JSON object with the following keys:
@@ -627,16 +627,16 @@ fetch(
   'https://hydra/oauth2/auth/requests/logout/accept?' +
     querystring.stringify({ logout_challenge: challenge }),
   {
-    method: 'PUT',
+    method: 'PUT'
   }
 )
   .then(function (response) {
-    return response.json();
+    return response.json()
   })
   .then(function (response) {
     // The response will contain a `redirect_to` key which contains the URL where the user's user agent must be redirected to next.
-    res.redirect(response.redirect_to);
-  });
+    res.redirect(response.redirect_to)
+  })
 ```
 
 You can also reject a logout request (e.g. if the user chose to not log out):
@@ -646,11 +646,11 @@ fetch(
   'https://hydra/oauth2/auth/requests/logout/reject?' +
     querystring.stringify({ logout_challenge: challenge }),
   {
-    method: 'PUT',
+    method: 'PUT'
   }
 ).then(function (response) {
   // Now you can do whatever you want - redirect the user back to your home page or whatever comes to mind.
-});
+})
 ```
 
 If the logout request was granted and the user agent redirected back to ORY

@@ -7,6 +7,7 @@
 #### Responses
 
 <a id="{{=data.operationUniqueSlug}}-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|

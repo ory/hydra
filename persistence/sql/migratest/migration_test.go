@@ -5,16 +5,19 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
 
-	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/viper"
 	"github.com/ory/x/sqlcon/dockertest"
 
+	"github.com/ory/hydra/driver/configuration"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/dbal"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -22,7 +25,6 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
 )
 
 func TestMigrations(t *testing.T) {
@@ -54,10 +56,10 @@ func TestMigrations(t *testing.T) {
 				url = "mysql://" + url
 			}
 			viper.Set(configuration.ViperKeyDSN, url)
-			d := driver.NewDefaultDriver(logrus.New(), true, []string{}, "", "", "", false)
+			d := driver.NewDefaultDriver(logrusx.New("", ""), true, []string{}, "", "", "", false)
 			var dbx *sqlx.DB
 			require.NoError(t,
-				dbal.Connect(url, logrus.New(), func() error {
+				dbal.Connect(url, logrusx.New("", ""), func() error {
 					return nil
 				}, func(db *sqlx.DB) error {
 					dbx = db

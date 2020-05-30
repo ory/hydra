@@ -104,6 +104,7 @@ oauth2:
       cost: 20
   pkce:
     enforced: true
+    enforced_for_public_clients: true
 
 secrets:
   system:

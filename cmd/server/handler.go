@@ -33,15 +33,14 @@ import (
 
 	"github.com/ory/x/viperx"
 
-	"github.com/sirupsen/logrus"
-
 	analytics "github.com/ory/analytics-go/v4"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/reqlog"
+
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/x"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
@@ -50,12 +49,13 @@ import (
 	"go.opentelemetry.io/otel/plugin/httptrace"
 
 	"github.com/ory/graceful"
+	"github.com/ory/x/healthx"
+	"github.com/ory/x/metricsx"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/x/healthx"
-	"github.com/ory/x/metricsx"
 )
 
 var _ = &consent.Handler{}
@@ -83,7 +83,7 @@ func isDSNAllowed(d driver.Driver) {
 
 var schemas = packr.New("schemas", "../../.schema")
 
-func watchAndValidateViper(l *logrus.Logger) {
+func watchAndValidateViper(l *logrusx.Logger) {
 	schema, err := schemas.Find("config.schema.json")
 	if err != nil {
 		l.WithError(err).Fatal("Unable to open configuration JSON Schema.")
@@ -93,7 +93,7 @@ func watchAndValidateViper(l *logrus.Logger) {
 
 func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		logger := logrusx.New()
+		logger := logrusx.New("", "")
 		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
 			logger,
@@ -121,7 +121,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 
 func RunServePublic(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		logger := logrusx.New()
+		logger := logrusx.New("", "")
 		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
 			logger,
@@ -149,7 +149,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 
 func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		logger := logrusx.New()
+		logger := logrusx.New("", "")
 		watchAndValidateViper(logger)
 		d := driver.NewDefaultDriver(
 			logger,
@@ -181,7 +181,7 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 func setTracingLogger(logger *reqlog.Middleware) {
 	// To avoid cyclic execution
 	before := logger.Before
-	logger.Before = func(entry *logrus.Entry, r *http.Request, remoteAddr string) *logrus.Entry {
+	logger.Before = func(entry *logrusx.Logger, r *http.Request, remoteAddr string) *logrusx.Logger {
 		fields := before(entry, r, remoteAddr)
 
 		_, _, spanCtx := httptrace.Extract(r.Context(), r)
@@ -211,10 +211,9 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 		publicmw.Use(tracer)
 	}
 
-	adminLogger := reqlog.NewMiddlewareFromLogger(
-		d.Registry().Logger().(*logrus.Logger),
-		fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()),
-	)
+	adminLogger := reqlog.
+		NewMiddlewareFromLogger(d.Registry().Logger(),
+		fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()))
 	if d.Configuration().AdminDisableHealthAccessLog() {
 		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
@@ -224,7 +223,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	adminmw.Use(d.Registry().PrometheusManager())
 
 	publicLogger := reqlog.NewMiddlewareFromLogger(
-		d.Registry().Logger().(*logrus.Logger),
+		d.Registry().Logger(),
 		fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String()),
 	)
 	if d.Configuration().PublicDisableHealthAccessLog() {

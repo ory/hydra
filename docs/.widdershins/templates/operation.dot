@@ -56,27 +56,18 @@ Accept: {{=data.produces[0]}}{{?}}
 {{? data.options.codeSamples || data.operation["x-code-samples"] }}
 #### Code samples
 
-<div class="tabs" id="tab-{{=data.operation.operationId}}">
-<nav class="tabs-nav">
-<ul class="nav nav-tabs au-link-list au-link-list--inline">
-<li class="nav-item"><a class="nav-link active" role="tab" href="#tab-{{=data.operation.operationId}}-shell">Shell</a></li>
-<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-go">Go</a></li>
-<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-node">Node.js</a></li>
-<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-java">Java</a></li>
-<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-python">Python</a></li>
-<li class="nav-item"><a class="nav-link" role="tab" href="#tab-{{=data.operation.operationId}}-ruby">Ruby</a></li>
-</ul>
-</nav>
-<div class="tab-content">
-<div class="tab-pane active" role="tabpanel" id="tab-{{=data.operation.operationId}}-shell">
+<Tabs groupId="code-samples" defaultValue="shell"
+  values={[{label: 'Shell', value: 'shell'}, {label: 'Go', value: 'go'}, {label: 'Node', value: 'node'},
+    {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
+<TabItem value="shell">
 
 ```shell
 curl -X {{=data.methodUpper}} {{=data.url}}{{=data.requiredQueryString}}{{?data.allHeaders.length}} \{{?}}
 {{~data.allHeaders :p:index}}  -H '{{=p.name}}: {{=p.exampleValues.object}}'{{?index < data.allHeaders.length-1}} \{{?}}{{~}}
 ```
 
-</div>
-<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-go">
+</TabItem>
+<TabItem value="go">
 
 ```go
 package main
@@ -103,10 +94,10 @@ func main() {{{?data.allHeaders.length}}
 }
 ```
 
-</div>
-<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-node">
+</TabItem>
+<TabItem value="node">
 
-```nodejs
+```javascript
 const fetch = require('node-fetch');
 {{?data.bodyParameter.present}}const input = '{{=data.bodyParameter.exampleValues.json}}';{{?}}
 {{?data.allHeaders.length}}const headers = {
@@ -124,8 +115,8 @@ fetch('{{=data.url}}{{=data.requiredQueryString}}', {
 })
 ```
 
-</div>
-<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-java">
+</TabItem>
+<TabItem value="java">
 
 ```java
 // This sample needs improvement.
@@ -150,8 +141,8 @@ in.close();
 System.out.println(response.toString());
 ```
 
-</div>
-<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-python">
+</TabItem>
+<TabItem value="python">
 
 ```python
 import requests
@@ -169,8 +160,8 @@ r = requests.{{=data.method.verb}}(
 print r.json()
 ```
 
-</div>
-<div class="tab-pane" role="tabpanel"  id="tab-{{=data.operation.operationId}}-ruby">
+</TabItem>
+<TabItem value="ruby">
 
 ```ruby
 require 'rest-client'
@@ -188,7 +179,6 @@ result = RestClient.{{=data.method.verb}} '{{=data.url}}',
 p JSON.parse(result)
 ```
 
-</div>
-</div>
-</div>
+</TabItem>
+</Tabs>
 {{?}}

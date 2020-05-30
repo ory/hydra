@@ -19,11 +19,11 @@ type ConsentRequestSession struct {
 	// refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.
 	// If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties
 	// can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!
-	AccessToken map[string]interface{} `json:"access_token,omitempty"`
+	AccessToken interface{} `json:"access_token,omitempty"`
 
 	// IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
 	// by anyone that has access to the ID Challenge. Use with care!
-	IDToken map[string]interface{} `json:"id_token,omitempty"`
+	IDToken interface{} `json:"id_token,omitempty"`
 }
 
 // Validate validates this consent request session

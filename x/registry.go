@@ -2,13 +2,12 @@ package x
 
 import (
 	"github.com/gorilla/sessions"
-	"github.com/sirupsen/logrus"
-
 	"github.com/ory/herodot"
+	"github.com/ory/x/logrusx"
 )
 
 type RegistryLogger interface {
-	Logger() logrus.FieldLogger
+	Logger() *logrusx.Logger
 }
 
 type RegistryWriter interface {

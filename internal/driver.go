@@ -2,12 +2,14 @@ package internal
 
 import (
 	"context"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
-	"github.com/stretchr/testify/require"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/jmoiron/sqlx"
 
@@ -62,12 +64,12 @@ func resetConfig() {
 
 func NewConfigurationWithDefaults() *configuration.ViperProvider {
 	resetConfig()
-	return configuration.NewViperProvider(logrusx.New(), true, nil).(*configuration.ViperProvider)
+	return configuration.NewViperProvider(logrusx.New("",""), true, nil).(*configuration.ViperProvider)
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 	resetConfig()
-	return configuration.NewViperProvider(logrusx.New(), false, nil).(*configuration.ViperProvider)
+	return configuration.NewViperProvider(logrusx.New("",""), false, nil).(*configuration.ViperProvider)
 }
 
 func NewRegistryMemory(c *configuration.ViperProvider) *driver.RegistryMemory {

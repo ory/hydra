@@ -31,8 +31,8 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/herodot"
@@ -114,7 +114,7 @@ type SQLData struct {
 	Session           []byte         `db:"session_data"`
 }
 
-func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*SQLData, error) {
+func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration, kc *jwk.AEAD, logger *logrusx.Logger) (*SQLData, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		logger.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -162,7 +162,7 @@ func sqlSchemaFromRequest(signature string, r fosite.Requester, c Configuration,
 	}, nil
 }
 
-func (s *SQLData) toRequest(session fosite.Session, cm client.Manager, conf Configuration, kc *jwk.AEAD, logger logrus.FieldLogger) (*fosite.Request, error) {
+func (s *SQLData) toRequest(session fosite.Session, cm client.Manager, conf Configuration, kc *jwk.AEAD, logger *logrusx.Logger) (*fosite.Request, error) {
 	sess := s.Session
 	if !gjson.ValidBytes(sess) {
 		var err error

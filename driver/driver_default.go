@@ -1,7 +1,7 @@
 package driver
 
 import (
-	"github.com/sirupsen/logrus"
+	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/driver/configuration"
 )
@@ -11,7 +11,7 @@ type DefaultDriver struct {
 	r Registry
 }
 
-func NewDefaultDriver(l logrus.FieldLogger, forcedHTTP bool, insecureRedirects []string, version, build, date string, validate bool) Driver {
+func NewDefaultDriver(l *logrusx.Logger, forcedHTTP bool, insecureRedirects []string, version, build, date string, validate bool) Driver {
 	c := configuration.NewViperProvider(l, forcedHTTP, insecureRedirects)
 	if validate {
 		configuration.MustValidate(l, c)

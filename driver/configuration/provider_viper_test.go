@@ -14,13 +14,13 @@ import (
 	"github.com/ory/x/viperx"
 
 	"github.com/rs/cors"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/x"
 	"github.com/ory/viper"
 	"github.com/ory/x/logrusx"
+
+	"github.com/ory/hydra/x"
 )
 
 func setupEnv(env map[string]string) func(t *testing.T) (func(), func()) {
@@ -65,7 +65,7 @@ func TestSubjectTypesSupported(t *testing.T) {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			setup, clean := tc.env(t)
 			setup()
-			p := NewViperProvider(logrus.New(), false, nil)
+			p := NewViperProvider(logrusx.New("", ""), false, nil)
 			viper.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
 			assert.EqualValues(t, tc.e, p.SubjectTypesSupported())
 			clean()
@@ -74,12 +74,12 @@ func TestSubjectTypesSupported(t *testing.T) {
 }
 
 func TestWellKnownKeysUnique(t *testing.T) {
-	p := NewViperProvider(logrus.New(), false, nil)
+	p := NewViperProvider(logrusx.New("", ""), false, nil)
 	assert.EqualValues(t, []string{x.OAuth2JWTKeyName, x.OpenIDConnectKeyName}, p.WellKnownKeys(x.OAuth2JWTKeyName, x.OpenIDConnectKeyName, x.OpenIDConnectKeyName))
 }
 
 func TestCORSOptions(t *testing.T) {
-	p := NewViperProvider(logrus.New(), false, nil)
+	p := NewViperProvider(logrusx.New("", ""), false, nil)
 	viper.Set("serve.public.cors.enabled", true)
 
 	assert.EqualValues(t, cors.Options{
@@ -95,8 +95,8 @@ func TestCORSOptions(t *testing.T) {
 }
 
 func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
-	l := logrusx.New()
-	l.SetOutput(ioutil.Discard)
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
 
 	p := NewViperProvider(l, false, nil)
 
@@ -110,8 +110,8 @@ func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
 }
 
 func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
-	l := logrusx.New()
-	l.SetOutput(ioutil.Discard)
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
 
 	p := NewViperProvider(l, false, nil)
 
@@ -125,8 +125,8 @@ func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
 }
 
 func TestViperProvider_IssuerURL(t *testing.T) {
-	l := logrusx.New()
-	l.SetOutput(ioutil.Discard)
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
 	viper.Set(ViperKeyIssuerURL, "http://hydra.localhost")
 	p := NewViperProvider(l, false, nil)
 	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
@@ -137,8 +137,8 @@ func TestViperProvider_IssuerURL(t *testing.T) {
 }
 
 func TestViperProvider_CookieSameSiteMode(t *testing.T) {
-	l := logrusx.New()
-	l.SetOutput(ioutil.Discard)
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
 
 	p := NewViperProvider(l, false, nil)
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
@@ -148,7 +148,7 @@ func TestViperProvider_CookieSameSiteMode(t *testing.T) {
 }
 
 func TestViperProviderValidates(t *testing.T) {
-	l := logrusx.New()
+	l := logrusx.New("", "")
 	viper.Reset()
 	viperx.InitializeConfig(
 		"hydra",
@@ -225,6 +225,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, true, c.ShareOAuth2Debug())
 	assert.Equal(t, 20, c.BCryptCost())
 	assert.Equal(t, true, c.PKCEEnforced())
+	assert.Equal(t, true, c.EnforcePKCEForPublicClients())
 
 	// secrets
 	assert.Equal(t, []byte{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}, c.GetSystemSecret())

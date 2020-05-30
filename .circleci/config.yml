@@ -159,8 +159,6 @@ workflows:
           tags:
             only: /.*/
       - test:
-          requires:
-            - nancy/test
           filters:
             tags:
               only: /.*/
@@ -196,6 +194,7 @@ workflows:
               only: /.*/
       - changelog/generate:
           requires:
+            - nancy/test
             - test
             - golangci/lint
             - test-e2e-memory
@@ -215,6 +214,7 @@ workflows:
           appname: Ory_Hydra
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
+            - nancy/test
             - test
             - golangci/lint
             - test-e2e-memory
@@ -233,6 +233,7 @@ workflows:
       - sdk/release:
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
+            - nancy/test
             - test
             - golangci/lint
             - sdk/generate
@@ -244,6 +245,7 @@ workflows:
               ignore: /.*/
       - docs/build:
           requires:
+            - nancy/test
             - test
             - golangci/lint
           filters:
@@ -261,6 +263,7 @@ workflows:
         goreleaser/release:
           requires:
             - goreleaser/test
+            - nancy/test
             - test
             - golangci/lint
             - test-e2e-memory

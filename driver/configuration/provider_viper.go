@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/logrusx"
 	"github.com/rs/cors"
 
 	"github.com/ory/viper"
@@ -14,18 +15,17 @@ import (
 	"github.com/ory/x/corsx"
 	"github.com/ory/x/stringsx"
 
-	"github.com/sirupsen/logrus"
-
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
 	"github.com/ory/x/viperx"
+
+	"github.com/ory/hydra/x"
 )
 
 type ViperProvider struct {
-	l                 logrus.FieldLogger
+	l                 *logrusx.Logger
 	ss                [][]byte
 	generatedSecret   []byte
 	forcedHTTP        bool
@@ -71,6 +71,7 @@ const (
 	ViperKeyAccessTokenStrategy            = "strategies.access_token"
 	ViperKeySubjectIdentifierAlgorithmSalt = "oidc.subject_identifiers.pairwise.salt"
 	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
+	ViperKeyPKCEEnforcedForPublicClients   = "oauth2.pkce.enforced_for_public_clients"
 	ViperKeyLogLevel                       = "log.level"
 )
 
@@ -79,7 +80,7 @@ func init() {
 	viper.AutomaticEnv()
 }
 
-func NewViperProvider(l logrus.FieldLogger, forcedHTTP bool, insecureRedirects []string) Provider {
+func NewViperProvider(l *logrusx.Logger, forcedHTTP bool, insecureRedirects []string) Provider {
 	if insecureRedirects == nil {
 		insecureRedirects = []string{}
 	}
@@ -440,4 +441,8 @@ func (v *ViperProvider) ShareOAuth2Debug() bool {
 
 func (v *ViperProvider) PKCEEnforced() bool {
 	return viperx.GetBool(v.l, ViperKeyPKCEEnforced, false, "OAUTH2_PKCE_ENFORCED")
+}
+
+func (v *ViperProvider) EnforcePKCEForPublicClients() bool {
+	return viperx.GetBool(v.l, ViperKeyPKCEEnforcedForPublicClients, false, "OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS")
 }

@@ -43,7 +43,7 @@ type OAuth2TokenIntrospection struct {
 	Exp int64 `json:"exp,omitempty"`
 
 	// Extra is arbitrary data set by the session.
-	Ext map[string]interface{} `json:"ext,omitempty"`
+	Ext interface{} `json:"ext,omitempty"`
 
 	// Issued at is an integer timestamp, measured in the number of seconds
 	// since January 1 1970 UTC, indicating when this token was

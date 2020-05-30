@@ -207,8 +207,8 @@ func checkTokenResponse(token oauth2token) {
 		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
 	}
 
-	if intro.Ext["foo"] != expectedValue {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext["foo"])
+	if intro.Ext.(map[string]interface{})["foo"] != expectedValue {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext.(map[string]interface{})["foo"])
 	}
 
 	idt := token.IDToken

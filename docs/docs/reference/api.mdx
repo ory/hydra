@@ -1,9 +1,13 @@
 ---
-title: REST API
-id: api
+title: ORY Hydra
+language_tabs: []
+toc_footers: []
+includes: []
+search: false
+highlight_theme: darkula
+headingLevel: 2
+
 ---
-
-
 
 Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here.
 
@@ -18,7 +22,9 @@ share them in a [GitHub issue](https://github.com/ory/docs/issues/new) any time.
 
 ## Authentication
 
-- HTTP Authentication, scheme: basic - OAuth 2.0 Authorization.   - Flow: authorizationCode
+- HTTP Authentication, scheme: basic 
+- OAuth 2.0 Authorization. 
+  - Flow: authorizationCode
   - OAuth 2.0 Authorization URL = [/oauth2/auth](/oauth2/auth)
   - OAuth 2.0 Token URL = [/oauth2/token](/oauth2/token)
   - OAuth 2.0 Scope
@@ -28,6 +34,7 @@ share them in a [GitHub issue](https://github.com/ory/docs/issues/new) any time.
     |offline|A scope required when requesting refresh tokens (alias for `offline_access`)|
     |offline_access|A scope required when requesting refresh tokens|
     |openid|Request an OpenID Connect ID Token|
+    
 
 <a id="ory-hydra-public-endpoints"></a>
 ## Public Endpoints
@@ -49,6 +56,7 @@ if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client l
 #### Responses
 
 <a id="json-web-keys-discovery-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -58,7 +66,7 @@ if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client l
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -246,6 +254,7 @@ For a full list of clients go here: https://openid.net/developers/certified/
 #### Responses
 
 <a id="openid-connect-discovery-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -256,7 +265,7 @@ For a full list of clients go here: https://openid.net/developers/certified/
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -466,6 +475,7 @@ refer to the cluster state, only to a single instance.
 #### Responses
 
 <a id="check-readiness-status-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -475,7 +485,7 @@ refer to the cluster state, only to a single instance.
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -639,6 +649,7 @@ To learn more about this flow please refer to the specification: https://tools.i
 #### Responses
 
 <a id="the-oauth-2.0-authorize-endpoint-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -650,7 +661,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 401 response
+> 401 Response
 
 ```json
 {
@@ -833,6 +844,7 @@ token: string
 #### Responses
 
 <a id="revoke-oauth2-tokens-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -844,7 +856,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 401 response
+> 401 Response
 
 ```json
 {
@@ -1017,6 +1029,7 @@ https://openid.net/specs/openid-connect-backchannel-1_0.html
 #### Responses
 
 <a id="openid-connect-front-backchannel-enabled-logout-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -1191,6 +1204,7 @@ client_id: string
 #### Responses
 
 <a id="the-oauth-2.0-token-endpoint-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -1201,7 +1215,7 @@ client_id: string
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -1381,6 +1395,7 @@ For more information please [refer to the spec](http://openid.net/specs/openid-c
 #### Responses
 
 <a id="openid-connect-userinfo-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -1391,7 +1406,7 @@ For more information please [refer to the spec](http://openid.net/specs/openid-c
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -1589,6 +1604,7 @@ Multiple links can be included in this header, and will be separated by a comma.
 #### Responses
 
 <a id="list-oauth-2.0-clients-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -1640,7 +1656,7 @@ Status Code **200**
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 [
@@ -1661,7 +1677,7 @@ Status Code **200**
     "contacts": [
       "string"
     ],
-    "created_at": "2020-05-28T13:50:42Z",
+    "created_at": "2020-05-29T16:29:25Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -1691,7 +1707,7 @@ Status Code **200**
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-05-28T13:50:42Z",
+    "updated_at": "2020-05-29T16:29:25Z",
     "userinfo_signed_response_alg": "string"
   }
 ]
@@ -1870,7 +1886,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1900,7 +1916,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1915,6 +1931,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 #### Responses
 
 <a id="create-an-oauth-2.0-client-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -1926,7 +1943,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 
 ##### Examples
 
-###### 201 response
+> 201 Response
 
 ```json
 {
@@ -1946,7 +1963,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1976,7 +1993,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2057,7 +2074,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2087,7 +2104,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2196,6 +2213,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 #### Responses
 
 <a id="get-an-oauth-2.0-client.-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -2206,7 +2224,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -2226,7 +2244,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2256,7 +2274,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2434,7 +2452,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2464,7 +2482,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2480,6 +2498,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 #### Responses
 
 <a id="update-an-oauth-2.0-client-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -2489,7 +2508,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -2509,7 +2528,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2539,7 +2558,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2620,7 +2639,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2650,7 +2669,7 @@ const input = '{
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2759,6 +2778,7 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
 #### Responses
 
 <a id="deletes-an-oauth-2.0-client-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -2770,7 +2790,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 404 response
+> 404 Response
 
 ```json
 {
@@ -2941,6 +2961,7 @@ refer to the cluster state, only to a single instance.
 #### Responses
 
 <a id="check-alive-status-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -2950,7 +2971,7 @@ refer to the cluster state, only to a single instance.
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -3120,6 +3141,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 #### Responses
 
 <a id="retrieve-a-json-web-key-set-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -3131,7 +3153,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -3355,6 +3377,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 #### Responses
 
 <a id="update-a-json-web-key-set-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -3366,7 +3389,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -3598,6 +3621,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 #### Responses
 
 <a id="generate-a-new-json-web-key-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -3609,7 +3633,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 
 ##### Examples
 
-###### 201 response
+> 201 Response
 
 ```json
 {
@@ -3809,6 +3833,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 #### Responses
 
 <a id="delete-a-json-web-key-set-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -3821,7 +3846,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 401 response
+> 401 Response
 
 ```json
 {
@@ -3993,6 +4018,7 @@ This endpoint returns a singular JSON Web Key, identified by the set and the spe
 #### Responses
 
 <a id="fetch-a-json-web-key-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -4003,7 +4029,7 @@ This endpoint returns a singular JSON Web Key, identified by the set and the spe
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -4224,6 +4250,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 #### Responses
 
 <a id="update-a-json-web-key-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -4235,7 +4262,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -4448,6 +4475,7 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
 #### Responses
 
 <a id="delete-a-json-web-key-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -4460,7 +4488,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 401 response
+> 401 Response
 
 ```json
 {
@@ -4630,6 +4658,7 @@ prometheus.io/path: "/metrics/prometheus"
 
 <a id="get-snapshot-metrics-from-the-hydra-service.-if-you're-using-k8s,-you-can-then-add-annotations-to
 your-deployment-like-so:-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -4789,6 +4818,7 @@ or rejected the request.
 #### Responses
 
 <a id="get-consent-request-information-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -4800,7 +4830,7 @@ or rejected the request.
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -4823,7 +4853,7 @@ or rejected the request.
     "contacts": [
       "string"
     ],
-    "created_at": "2020-05-28T13:50:42Z",
+    "created_at": "2020-05-29T16:29:25Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -4853,7 +4883,7 @@ or rejected the request.
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-05-28T13:50:42Z",
+    "updated_at": "2020-05-29T16:29:25Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -5060,7 +5090,7 @@ The response contains a redirect URL which the consent provider should redirect 
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-05-28T13:50:42Z",
+  "handled_at": "2020-05-29T16:29:25Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5081,6 +5111,7 @@ The response contains a redirect URL which the consent provider should redirect 
 #### Responses
 
 <a id="accept-a-consent-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -5091,7 +5122,7 @@ The response contains a redirect URL which the consent provider should redirect 
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -5165,7 +5196,7 @@ const input = '{
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-05-28T13:50:42Z",
+  "handled_at": "2020-05-29T16:29:25Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5307,6 +5338,7 @@ The response contains a redirect URL which the consent provider should redirect 
 #### Responses
 
 <a id="reject-a-consent-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -5317,7 +5349,7 @@ The response contains a redirect URL which the consent provider should redirect 
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -5503,6 +5535,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
 #### Responses
 
 <a id="get-a-login-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -5515,7 +5548,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -5537,7 +5570,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     "contacts": [
       "string"
     ],
-    "created_at": "2020-05-28T13:50:42Z",
+    "created_at": "2020-05-29T16:29:25Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -5567,7 +5600,7 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-05-28T13:50:42Z",
+    "updated_at": "2020-05-29T16:29:25Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -5783,6 +5816,7 @@ The response contains a redirect URL which the login provider should redirect th
 #### Responses
 
 <a id="accept-a-login-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -5794,7 +5828,7 @@ The response contains a redirect URL which the login provider should redirect th
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -6000,6 +6034,7 @@ The response contains a redirect URL which the login provider should redirect th
 #### Responses
 
 <a id="reject-a-login-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -6011,7 +6046,7 @@ The response contains a redirect URL which the login provider should redirect th
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -6191,6 +6226,7 @@ Use this endpoint to fetch a logout request.
 #### Responses
 
 <a id="get-a-logout-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -6201,7 +6237,7 @@ Use this endpoint to fetch a logout request.
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -6377,6 +6413,7 @@ The response contains a redirect URL which the consent provider should redirect 
 #### Responses
 
 <a id="accept-a-logout-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -6387,7 +6424,7 @@ The response contains a redirect URL which the consent provider should redirect 
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -6583,6 +6620,7 @@ status_code: 0
 #### Responses
 
 <a id="reject-a-logout-request-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -6594,7 +6632,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 404 response
+> 404 Response
 
 ```json
 {
@@ -6782,6 +6820,7 @@ Multiple links can be included in this header, and will be separated by a comma.
 #### Responses
 
 <a id="lists-all-consent-sessions-of-a-subject-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -6859,7 +6898,7 @@ Status Code **200**
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 [
@@ -6884,7 +6923,7 @@ Status Code **200**
         "contacts": [
           "string"
         ],
-        "created_at": "2020-05-28T13:50:42Z",
+        "created_at": "2020-05-29T16:29:25Z",
         "frontchannel_logout_session_required": true,
         "frontchannel_logout_uri": "string",
         "grant_types": [
@@ -6914,7 +6953,7 @@ Status Code **200**
         "subject_type": "string",
         "token_endpoint_auth_method": "string",
         "tos_uri": "string",
-        "updated_at": "2020-05-28T13:50:42Z",
+        "updated_at": "2020-05-29T16:29:25Z",
         "userinfo_signed_response_alg": "string"
       },
       "context": {},
@@ -6947,7 +6986,7 @@ Status Code **200**
     "grant_scope": [
       "string"
     ],
-    "handled_at": "2020-05-28T13:50:42Z",
+    "handled_at": "2020-05-29T16:29:25Z",
     "remember": true,
     "remember_for": 0,
     "session": {
@@ -7122,6 +7161,7 @@ associated OAuth 2.0 Access Tokens.
 #### Responses
 
 <a id="revokes-consent-sessions-of-a-subject-for-a-specific-oauth-2.0-client-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -7134,7 +7174,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 400 response
+> 400 Response
 
 ```json
 {
@@ -7312,6 +7352,7 @@ invalidates-a-subject's-authentication-session-parameters"></a>
 
 <a id="invalidates-all-login-sessions-of-a-certain-user
 invalidates-a-subject's-authentication-session-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -7324,7 +7365,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 400 response
+> 400 Response
 
 ```json
 {
@@ -7494,7 +7535,7 @@ automatically when performing the refresh flow.
 
 ```json
 {
-  "notAfter": "2020-05-28T13:50:42Z"
+  "notAfter": "2020-05-29T16:29:25Z"
 }
 ```
 
@@ -7508,6 +7549,7 @@ automatically when performing the refresh flow.
 #### Responses
 
 <a id="flush-expired-oauth2-access-tokens-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -7519,7 +7561,7 @@ typically 201.|None|
 
 ##### Examples
 
-###### 401 response
+> 401 Response
 
 ```json
 {
@@ -7590,7 +7632,7 @@ func main() {
 ```nodejs
 const fetch = require('node-fetch');
 const input = '{
-  "notAfter": "2020-05-28T13:50:42Z"
+  "notAfter": "2020-05-29T16:29:25Z"
 }';
 const headers = {
   'Content-Type': 'application/json',  'Accept': 'application/json'
@@ -7721,6 +7763,7 @@ scopes, the result of active will be false.
 #### Responses
 
 <a id="introspect-oauth2-tokens-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -7731,7 +7774,7 @@ scopes, the result of active will be false.
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -7917,6 +7960,7 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 #### Responses
 
 <a id="get-service-version-responses"></a>
+
 ##### Overview
 
 |Status|Meaning|Description|Schema|
@@ -7925,7 +7969,7 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 
 ##### Examples
 
-###### 200 response
+> 200 Response
 
 ```json
 {
@@ -8231,7 +8275,7 @@ effectively written in the swagger spec.*
 <a id="schemanulltime"></a>
 
 ```json
-"2020-05-28T13:50:42Z"
+"2020-05-29T16:29:25Z"
 
 ```
 
@@ -8716,7 +8760,7 @@ effectively written in the swagger spec.*
       "contacts": [
         "string"
       ],
-      "created_at": "2020-05-28T13:50:42Z",
+      "created_at": "2020-05-29T16:29:25Z",
       "frontchannel_logout_session_required": true,
       "frontchannel_logout_uri": "string",
       "grant_types": [
@@ -8746,7 +8790,7 @@ effectively written in the swagger spec.*
       "subject_type": "string",
       "token_endpoint_auth_method": "string",
       "tos_uri": "string",
-      "updated_at": "2020-05-28T13:50:42Z",
+      "updated_at": "2020-05-29T16:29:25Z",
       "userinfo_signed_response_alg": "string"
     },
     "context": {},
@@ -8779,7 +8823,7 @@ effectively written in the swagger spec.*
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-05-28T13:50:42Z",
+  "handled_at": "2020-05-29T16:29:25Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8861,7 +8905,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-05-28T13:50:42Z",
+  "handled_at": "2020-05-29T16:29:25Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8961,7 +9005,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "contacts": [
       "string"
     ],
-    "created_at": "2020-05-28T13:50:42Z",
+    "created_at": "2020-05-29T16:29:25Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -8991,7 +9035,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-05-28T13:50:42Z",
+    "updated_at": "2020-05-29T16:29:25Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -9069,7 +9113,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
 
 ```json
 {
-  "notAfter": "2020-05-28T13:50:42Z"
+  "notAfter": "2020-05-29T16:29:25Z"
 }
 
 ```
@@ -9193,7 +9237,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "contacts": [
       "string"
     ],
-    "created_at": "2020-05-28T13:50:42Z",
+    "created_at": "2020-05-29T16:29:25Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": [
@@ -9223,7 +9267,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
     "tos_uri": "string",
-    "updated_at": "2020-05-28T13:50:42Z",
+    "updated_at": "2020-05-29T16:29:25Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -9316,7 +9360,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "contacts": [
     "string"
   ],
-  "created_at": "2020-05-28T13:50:42Z",
+  "created_at": "2020-05-29T16:29:25Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -9346,7 +9390,7 @@ same as HandledLoginRequest, just with consent_request exposed as json*
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
   "tos_uri": "string",
-  "updated_at": "2020-05-28T13:50:42Z",
+  "updated_at": "2020-05-29T16:29:25Z",
   "userinfo_signed_response_alg": "string"
 }
 

@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	jeagerConf "github.com/uber/jaeger-client-go/config"
 	"github.com/uber/jaeger-client-go/zipkin"
 )
@@ -14,7 +14,7 @@ import (
 type Tracer struct {
 	ServiceName  string
 	Provider     string
-	Logger       logrus.FieldLogger
+	Logger       *logrusx.Logger
 	JaegerConfig *JaegerConfig
 
 	tracer opentracing.Tracer

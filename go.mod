@@ -14,7 +14,7 @@ require (
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
-	github.com/gobuffalo/pop/v5 v5.0.11
+	github.com/gobuffalo/pop/v5 v5.1.3
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -33,10 +33,10 @@ require (
 	github.com/ory/fosite v0.32.0
 	github.com/ory/go-acc v0.2.1
 	github.com/ory/graceful v0.1.1
-	github.com/ory/herodot v0.7.0
-	github.com/ory/sdk/swagutil v0.0.0-20200523161155-efb49dc7bc74
-	github.com/ory/viper v1.7.4
-	github.com/ory/x v0.0.119
+	github.com/ory/herodot v0.8.3
+	github.com/ory/sdk/swagutil v0.0.0-20200528141631-666b43d19aa3
+	github.com/ory/viper v1.7.5
+	github.com/ory/x v0.0.126
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -45,8 +45,8 @@ require (
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
-	github.com/sirupsen/logrus v1.5.0
-	github.com/spf13/cobra v0.0.7
+	github.com/sirupsen/logrus v1.6.0
+	github.com/spf13/cobra v1.0.0
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0
@@ -58,8 +58,7 @@ require (
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
+	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/square/go-jose.v2 v2.5.0
 )
-
-replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.0.12-0.20200420123908-2624c41ffa94

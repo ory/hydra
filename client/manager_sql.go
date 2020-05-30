@@ -66,6 +66,7 @@ var sqlParams = []string{
 	"jwks",
 	"jwks_uri",
 	"token_endpoint_auth_method",
+	"token_endpoint_auth_signing_alg",
 	"request_uris",
 	"request_object_signing_alg",
 	"userinfo_signed_response_alg",

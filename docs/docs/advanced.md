@@ -404,6 +404,20 @@ this value with your own obfuscated `sub` value by setting
 `force_subject_identifier` when accepting the login challenge in your user login
 app.
 
+### Using login_hint with Different Subject
+
+When a user already logged in with a subject(e.g. user-A), and she would like to
+login as another user using login_hint(e.g. login_hint=user-B), directly
+accepting the latter login request in your login provider will make hydra reply:
+`Subject from payload does not match subject from previous authentication`
+
+The suggested flow is:
+
+Check the response from [GET login request](https://www.ory.sh/hydra/docs/reference/api#get-a-login-request), if both the `subject` and `login_hint` are NOT empty and also NOT the same user, redirect UserAgent to `request_url` which is appended with '?prompt=login'. 
+This will make hydra ignore the existing authentication, and allow your login provider to login a different subject.
+
+For more information on `prompt=login` and other options, please check [Authentication Request](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+
 ## CORS
 
 Both ORY Hydra's Admin and Public endpoints support CORS. For detailed

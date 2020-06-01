@@ -268,7 +268,7 @@ available there.
 ### OAuth 2.0 Client Authentication with private/public keypairs
 
 ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA private/public keypairs with currently supported signing algorithms:
-- RS256, RS384, RS512
+- RS256 (default), RS384, RS512
 - PS256, PS384, PS512
 - ES256, ES384, ES512
 
@@ -331,7 +331,8 @@ Here's what a client with a `jwks` containing one RSA public key looks like:
       }
     ]
   },
-  "token_endpoint_auth_method": "private_key_jwt"
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "RS256"
 }
 ```
 
@@ -352,7 +353,8 @@ And here is how it looks like for a `jwks` including an ECDSA public key:
 		  }
     ]
   },
-  "token_endpoint_auth_method": "private_key_jwt"
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "ES256"
 }
 ```
 
@@ -362,7 +364,8 @@ And with `jwks_uri`:
 {
   "client_id": "client-jwks-uri",
   "jwks_uri": "http://path-to-my-public/keys.json",
-  "token_endpoint_auth_method": "private_key_jwt"
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "RS256"
 }
 ```
 

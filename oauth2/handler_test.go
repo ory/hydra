@@ -171,9 +171,10 @@ func TestUserinfo(t *testing.T) {
 	defer ts.Close()
 
 	for k, tc := range []struct {
-		setup            func(t *testing.T)
-		check            func(t *testing.T, body []byte)
-		expectStatusCode int
+		setup                func(t *testing.T)
+		checkForSuccess      func(t *testing.T, body []byte)
+		checkForUnauthorized func(t *testing.T, body []byte, header http.Header)
+		expectStatusCode     int
 	}{
 		{
 			setup: func(t *testing.T) {
@@ -186,6 +187,20 @@ func TestUserinfo(t *testing.T) {
 				op.EXPECT().
 					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
 					Return(fosite.RefreshToken, nil, nil)
+			},
+			checkForUnauthorized: func(t *testing.T, body []byte, headers http.Header) {
+				assert.True(t, headers.Get("WWW-Authenticate") != "", "%s", headers)
+			},
+			expectStatusCode: http.StatusUnauthorized,
+		},
+		{
+			setup: func(t *testing.T) {
+				op.EXPECT().
+					IntrospectToken(gomock.Any(), gomock.Eq("access-token"), gomock.Eq(fosite.AccessToken), gomock.Any()).
+					Return(fosite.AccessToken, nil, fosite.ErrRequestUnauthorized)
+			},
+			checkForUnauthorized: func(t *testing.T, body []byte, headers http.Header) {
+				assert.True(t, headers.Get("WWW-Authenticate") != "", "%s", headers)
 			},
 			expectStatusCode: http.StatusUnauthorized,
 		},
@@ -214,7 +229,7 @@ func TestUserinfo(t *testing.T) {
 					})
 			},
 			expectStatusCode: http.StatusOK,
-			check: func(t *testing.T, body []byte) {
+			checkForSuccess: func(t *testing.T, body []byte) {
 				assert.True(t, strings.Contains(string(body), `"sub":"alice"`), "%s", body)
 			},
 		},
@@ -243,7 +258,7 @@ func TestUserinfo(t *testing.T) {
 					})
 			},
 			expectStatusCode: http.StatusOK,
-			check: func(t *testing.T, body []byte) {
+			checkForSuccess: func(t *testing.T, body []byte) {
 				assert.False(t, strings.Contains(string(body), `"sub":"alice"`), "%s", body)
 				assert.True(t, strings.Contains(string(body), `"sub":"another-alice"`), "%s", body)
 			},
@@ -275,7 +290,7 @@ func TestUserinfo(t *testing.T) {
 					})
 			},
 			expectStatusCode: http.StatusOK,
-			check: func(t *testing.T, body []byte) {
+			checkForSuccess: func(t *testing.T, body []byte) {
 				assert.True(t, strings.Contains(string(body), `"sub":"alice"`), "%s", body)
 			},
 		},
@@ -334,7 +349,7 @@ func TestUserinfo(t *testing.T) {
 					})
 			},
 			expectStatusCode: http.StatusOK,
-			check: func(t *testing.T, body []byte) {
+			checkForSuccess: func(t *testing.T, body []byte) {
 				claims, err := jwt2.Parse(string(body), func(token *jwt2.Token) (interface{}, error) {
 					keys, err := reg.KeyManager().GetKeySet(context.Background(), x.OpenIDConnectKeyName)
 					require.NoError(t, err)
@@ -360,7 +375,9 @@ func TestUserinfo(t *testing.T) {
 			body, err := ioutil.ReadAll(resp.Body)
 			require.NoError(t, err)
 			if tc.expectStatusCode == http.StatusOK {
-				tc.check(t, body)
+				tc.checkForSuccess(t, body)
+			} else if tc.expectStatusCode == http.StatusUnauthorized {
+				tc.checkForUnauthorized(t, body, resp.Header)
 			}
 		})
 	}

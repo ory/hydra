@@ -124,7 +124,7 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 	if errors.Cause(err) == consent.ErrAbortOAuth2Request {
 		return
 	} else if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.forwardError(w, r, err)
 		return
 	}
@@ -186,13 +186,13 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 </body>
 </html>`)
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.forwardError(w, r, err)
 		return
 	}
 
 	if err := t.Execute(w, handled); err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.forwardError(w, r, err)
 		return
 	}
@@ -364,7 +364,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 	}
 
 	h.r.OAuth2Provider().WriteRevocationResponse(w, err)
@@ -402,17 +402,17 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	if r.Method != "POST" {
 		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	} else if err := r.ParseMultipartForm(1 << 20); err != nil && err != http.ErrNotMultipart {
 		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	} else if len(r.PostForm) == 0 {
 		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	}
@@ -423,7 +423,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	tt, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
@@ -447,7 +447,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	session, ok := resp.GetAccessRequester().GetSession().(*Session)
 	if !ok {
 		err := errors.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	}
@@ -472,7 +472,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		ObfuscatedSubject: obfuscated,
 		TokenType:         string(resp.GetTokenType()),
 	}); err != nil {
-		x.LogError(errors.WithStack(err), h.r.Logger())
+		x.LogError(r, errors.WithStack(err), h.r.Logger())
 	}
 }
 
@@ -548,7 +548,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -558,7 +558,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		if h.c.AccessTokenStrategy() == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
 			if err != nil {
-				x.LogError(err, h.r.Logger())
+				x.LogError(r, err, h.r.Logger())
 				h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 				return
 			}
@@ -585,7 +585,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -616,7 +616,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	authorizeRequest, err := h.r.OAuth2Provider().NewAuthorizeRequest(ctx, r)
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
@@ -626,7 +626,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		// do nothing
 		return
 	} else if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
@@ -641,7 +641,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}
@@ -650,7 +650,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	if h.c.AccessTokenStrategy() == "jwt" {
 		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
 		if err != nil {
-			x.LogError(err, h.r.Logger())
+			x.LogError(r, err, h.r.Logger())
 			h.writeAuthorizeError(w, r, authorizeRequest, err)
 			return
 		}
@@ -691,7 +691,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		ConsentChallenge: session.Challenge,
 	})
 	if err != nil {
-		x.LogError(err, h.r.Logger())
+		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	}

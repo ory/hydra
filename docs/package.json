@@ -9,7 +9,7 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,json,js,css,html}' --no-semi --single-quote --trailing-comma none || true"
+    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}' --no-semi --single-quote --trailing-comma none || true"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.56",

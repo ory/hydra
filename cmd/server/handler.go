@@ -187,10 +187,10 @@ func setTracingLogger(logger *reqlog.Middleware) {
 		_, _, spanCtx := httptrace.Extract(r.Context(), r)
 
 		if spanCtx.HasTraceID() {
-			fields = fields.WithField("trace_id", spanCtx.TraceIDString())
+			fields = fields.WithField("trace_id", spanCtx.TraceID.String())
 		}
 		if spanCtx.HasSpanID() {
-			fields = fields.WithField("span_id", spanCtx.SpanIDString())
+			fields = fields.WithField("span_id", spanCtx.SpanID.String())
 		}
 
 		return fields

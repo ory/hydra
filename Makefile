@@ -2,6 +2,7 @@ SHELL=/bin/bash -o pipefail
 
 export PATH := $(pwd)/.bin:${PATH}
 
+.PHONY: deps
 deps:
 ifneq ("v0","$(shell cat .bin/.lock)")
 		npm ci

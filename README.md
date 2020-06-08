@@ -404,7 +404,7 @@ It is possible to develop ORY Hydra on Windows, but please be aware that all gui
 
 ##### Install Tools
 
-When cloning ORY Hydra, run `make tools`. It will download several required dependencies. If you haven't run the command
+When cloning ORY Hydra, run `make deps`. It will download several required dependencies. If you haven't run the command
 in a while it's probably a good idea to run it again.
 
 #### Formatting Code

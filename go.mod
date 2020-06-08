@@ -32,17 +32,17 @@ require (
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/fosite v0.31.3
-	github.com/ory/go-acc v0.2.1
+	github.com/ory/go-acc v0.2.2
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.8.3
-	github.com/ory/sdk/swagutil v0.0.0-20200528141631-666b43d19aa3
+	github.com/ory/meta/tools/ory-dev v0.0.0-20200608154018-9d325ca2087d
 	github.com/ory/viper v1.7.5
-	github.com/ory/x v0.0.126
+	github.com/ory/x v0.0.128
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
-	github.com/prometheus/client_golang v1.1.0
+	github.com/prometheus/client_golang v1.4.0
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
@@ -55,11 +55,10 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
-	go.opentelemetry.io/otel v0.2.1
+	go.opentelemetry.io/otel v0.6.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
 	gopkg.in/square/go-jose.v2 v2.5.0
 )

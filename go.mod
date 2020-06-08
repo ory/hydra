@@ -35,7 +35,7 @@ require (
 	github.com/ory/go-acc v0.2.2
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.8.3
-	github.com/ory/sdk/swagutil v0.0.0-20200528141631-666b43d19aa3
+	github.com/ory/meta/tools/ory-dev v0.0.0-20200608154018-9d325ca2087d
 	github.com/ory/viper v1.7.5
 	github.com/ory/x v0.0.128
 	github.com/pborman/uuid v1.2.0
@@ -48,7 +48,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
-	github.com/spf13/viper v1.7.0 // indirect
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0

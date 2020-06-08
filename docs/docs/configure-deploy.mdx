@@ -3,7 +3,7 @@ title: Installation and Setup
 id: configure-deploy
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import useBaseUrl from '@docusaurus/useBaseUrl'
 
 The goal of this chapter is to introduce you to a fully functional set up that
 includes ORY Hydra as well as our User Login & Consent Provider reference
@@ -303,7 +303,11 @@ If your browser does not open automatically, navigate to:
 open the link, as prompted, in your browser, and follow the steps shown there.
 You might encounter a screen like the following one:
 
-<img alt="Insecure connection" src={useBaseUrl('/images/docs/hydra/insecure-connection.png')} />;
+<img
+  alt="Insecure connection"
+  src={useBaseUrl('/images/docs/hydra/insecure-connection.png')}
+/>
+;
 
 This happens because we run ORY Hydra with a self-signed TLS certificate. In
 production deployments, you would probably use a certificate signed by a trusted
@@ -315,4 +319,8 @@ proceed.
 
 When completed, you should land at a screen that looks like this one:
 
-<img alt="OAuth 2.0 result" src={useBaseUrl('/images/docs/hydra/install-result.png')} />;
+<img
+  alt="OAuth 2.0 result"
+  src={useBaseUrl('/images/docs/hydra/install-result.png')}
+/>
+;

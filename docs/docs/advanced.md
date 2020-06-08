@@ -413,10 +413,15 @@ accepting the latter login request in your login provider will make hydra reply:
 
 The suggested flow is:
 
-Check the response from [GET login request](https://www.ory.sh/hydra/docs/reference/api#get-a-login-request), if both the `subject` and `login_hint` are NOT empty and also NOT the same user, redirect UserAgent to `request_url` which is appended with '?prompt=login'. 
-This will make hydra ignore the existing authentication, and allow your login provider to login a different subject.
+Check the response from
+[GET login request](https://www.ory.sh/hydra/docs/reference/api#get-a-login-request),
+if both the `subject` and `login_hint` are NOT empty and also NOT the same user,
+redirect UserAgent to `request_url` which is appended with '?prompt=login'. This
+will make hydra ignore the existing authentication, and allow your login
+provider to login a different subject.
 
-For more information on `prompt=login` and other options, please check [Authentication Request](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+For more information on `prompt=login` and other options, please check
+[Authentication Request](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
 
 ## CORS
 

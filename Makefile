@@ -1,10 +1,15 @@
 SHELL=/bin/bash -o pipefail
 
-export PATH := $(pwd)/.bin:${PATH}
+EXECUTABLES = docker-compose docker node npm go
+K := $(foreach exec,$(EXECUTABLES),\
+        $(if $(shell which $(exec)),some string,$(error "No $(exec) in PATH")))
+
+export GO111MODULE := on
+export PATH := .bin:${PATH}
 
 .PHONY: deps
 deps:
-ifneq ("$(shell cat Makefile | md5))","$(shell cat .bin/.lock)")
+ifneq ("$(shell base64 Makefile))","$(shell cat .bin/.lock)")
 		npm ci
 		go build -o .bin/go-acc github.com/ory/go-acc
 		go build -o .bin/goreturns github.com/sqs/goreturns
@@ -16,12 +21,12 @@ ifneq ("$(shell cat Makefile | md5))","$(shell cat .bin/.lock)")
 		go build -o .bin/packr2 github.com/gobuffalo/packr/v2/packr2
 		go build -o .bin/go-bindata github.com/go-bindata/go-bindata/go-bindata
 		echo "v0" > .bin/.lock
-		echo "$$(cat Makefile | md5)" > .bin/.lock
+		echo "$$(base64 Makefile)" > .bin/.lock
 endif
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test-legacy-migrations
-test-legacy-migrations:
+test-legacy-migrations: deps
 		make test-resetdb
 		make sqlbin
 		source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m ./internal/fizzmigrate
@@ -31,7 +36,7 @@ test-legacy-migrations:
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
-test:
+test: deps
 		make test-resetdb
 		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m
 		docker rm -f hydra_test_database_mysql
@@ -40,7 +45,7 @@ test:
 
 # Resets the test databases
 .PHONY: test-resetdb
-test-resetdb:
+test-resetdb: deps
 		docker kill hydra_test_database_mysql || true
 		docker kill hydra_test_database_postgres || true
 		docker kill hydra_test_database_cockroach || true
@@ -53,7 +58,7 @@ test-resetdb:
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
-docker:
+docker: deps
 		packr2
 		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
 		packr2 clean
@@ -62,8 +67,7 @@ docker:
 		rm hydra
 
 .PHONY: e2e
-e2e:
-		make test-resetdb
+e2e: deps test-resetdb
 		source ./scripts/test-env.sh
 		./test/e2e/circle-ci.bash memory
 		./test/e2e/circle-ci.bash memory-jwt
@@ -83,30 +87,30 @@ quicktest:
 
 # Formats the code
 .PHONY: format
-format:
+format: deps
 		goreturns -w -local github.com/ory $$(listx .)
 		npm run format
 
 # Generates mocks
 .PHONY: mocks
-mocks:
+mocks: deps
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
 
 # Adds sql files to the binary using go-bindata
 .PHONY: sqlbin
-sqlbin:
+sqlbin: deps
 		cd internal/fizzmigrate/client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
 		cd internal/fizzmigrate/consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
 		cd internal/fizzmigrate/jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
 		cd internal/fizzmigrate/oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
 
 # Runs all code generators
-.PHONY: gen
+.PHONY: gen deps
 gen: mocks sqlbin sdk
 
 # Generates the SDKs
 .PHONY: sdk
-sdk:
+sdk: deps
 		swagger generate spec -m -o ./.schema/api.swagger.json -x internal/httpclient,gopkg.in/square/go-jose.v2
 		swagutil sanitize ./.schema/api.swagger.json
 		swagger flatten --with-flatten=remove-unused -o ./.schema/api.swagger.json ./.schema/api.swagger.json
@@ -118,7 +122,7 @@ sdk:
 
 
 .PHONY: install-stable
-install-stable:
+install-stable: deps
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 		git checkout $$HYDRA_LATEST
 		packr2
@@ -129,12 +133,7 @@ install-stable:
 		git checkout master
 
 .PHONY: install
-install:
+install: deps
 		packr2
 		GO111MODULE=on go install .
 		packr2 clean
-
-.PHONY: init
-init:
-		GO111MODULE=on go get .
-		GO111MODULE=on go install github.com/ory/go-acc

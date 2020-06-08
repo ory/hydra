@@ -50,10 +50,10 @@ func LogError(r *http.Request, err error, logger *logrusx.Logger) {
 	_, _, spanCtx := httptrace.Extract(r.Context(), r)
 
 	if spanCtx.HasTraceID() {
-		logger = logger.WithField("trace_id", spanCtx.TraceIDString())
+		logger = logger.WithField("trace_id", spanCtx.TraceID.String())
 	}
 	if spanCtx.HasSpanID() {
-		logger = logger.WithField("span_id", spanCtx.SpanIDString())
+		logger = logger.WithField("span_id", spanCtx.SpanID.String())
 	}
 
 	logger.WithRequest(r).

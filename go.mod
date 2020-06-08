@@ -16,16 +16,22 @@ require (
 	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gobuffalo/pop/v5 v5.1.3
 	github.com/gobwas/glob v0.2.3
+	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/mock v1.4.3
+	github.com/golangci/gocyclo v0.0.0-20180528144436-0a533e8fa43d // indirect
+	github.com/golangci/golangci-lint v1.21.0 // indirect
+	github.com/golangci/revgrep v0.0.0-20180812185044-276a5c0a1039 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/gostaticanalysis/analysisutil v0.0.3 // indirect
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/jackc/pgx/v4 v4.4.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
+	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
@@ -37,8 +43,9 @@ require (
 	github.com/ory/herodot v0.8.3
 	github.com/ory/sdk/swagutil v0.0.0-20200528141631-666b43d19aa3
 	github.com/ory/viper v1.7.5
-	github.com/ory/x v0.0.126
+	github.com/ory/x v0.0.128
 	github.com/pborman/uuid v1.2.0
+	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
@@ -46,8 +53,10 @@ require (
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
+	github.com/securego/gosec v0.0.0-20191008095658-28c1128b7336 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
+	github.com/spf13/viper v1.7.0 // indirect
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0
@@ -55,11 +64,16 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
-	go.opentelemetry.io/otel v0.2.1
+	github.com/uudashr/gocognit v1.0.0 // indirect
+	go.opentelemetry.io/otel v0.6.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200523222454-059865788121 // indirect
+	golang.org/x/sys v0.0.0-20200602225109-6fdc65e7d980 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
+	google.golang.org/grpc v1.29.1 // indirect
+	gopkg.in/ini.v1 v1.57.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.5.0
+	mvdan.cc/unparam v0.0.0-20190917161559-b83a221c10a2 // indirect
+	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
 )

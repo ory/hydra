@@ -45,20 +45,20 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: GO111MODULE=off go get github.com/mattn/goveralls github.com/ory/go-acc
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+            - hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
       - run: go mod download
+      - run: make deps
       - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
+          key: hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
           paths:
             - "/go/pkg/mod"
-      - run: go-acc -o coverage.txt ./... -- -failfast -timeout=20m
+            - ".bin"
+      - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
       #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
-      - run: go install github.com/go-bindata/go-bindata/go-bindata github.com/gobuffalo/packr/v2/packr2
       - run: make docker
 
   test-e2e:

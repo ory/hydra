@@ -22,6 +22,7 @@ package x
 
 import (
 	"bytes"
+	"net/http"
 	"strings"
 	"testing"
 
@@ -42,18 +43,27 @@ func (s *errStackTracer) Error() string {
 }
 
 func TestLogError(t *testing.T) {
+	r, err := http.NewRequest(http.MethodGet, "https://hydra/some/endpoint", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 	buf := bytes.NewBuffer([]byte{})
 	l := logrusx.New("", "", logrusx.ForceLevel(logrus.TraceLevel))
 	l.Logger.Out = buf
-	LogError(errors.New("asdf"), l)
+	LogError(r, errors.New("asdf"), l)
 
 	t.Logf("%s", string(buf.Bytes()))
 
 	assert.True(t, strings.Contains(string(buf.Bytes()), "trace"))
 
-	LogError(errors.Wrap(new(errStackTracer), ""), l)
+	LogError(r, errors.Wrap(new(errStackTracer), ""), l)
 }
 
 func TestLogErrorDoesNotPanic(t *testing.T) {
-	LogError(errors.New("asdf"), nil)
+	r, err := http.NewRequest(http.MethodGet, "https://hydra/some/endpoint", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	LogError(r, errors.New("asdf"), nil)
 }

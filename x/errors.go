@@ -25,6 +25,8 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/logrusx"
+
+	"go.opentelemetry.io/otel/plugin/httptrace"
 )
 
 var (
@@ -40,10 +42,20 @@ var (
 	}
 )
 
-func LogError(err error, logger *logrusx.Logger) {
+func LogError(r *http.Request, err error, logger *logrusx.Logger) {
 	if logger == nil {
-		logger = logrusx.New("","")
+		logger = logrusx.New("", "")
 	}
 
-	logger.WithError(err).Errorln("An error occurred")
+	_, _, spanCtx := httptrace.Extract(r.Context(), r)
+
+	if spanCtx.HasTraceID() {
+		logger = logger.WithField("trace_id", spanCtx.TraceIDString())
+	}
+	if spanCtx.HasSpanID() {
+		logger = logger.WithField("span_id", spanCtx.SpanIDString())
+	}
+
+	logger.WithRequest(r).
+		WithError(err).Errorln("An error occurred")
 }

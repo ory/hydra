@@ -25,7 +25,7 @@ jobs:
 
   test:
     docker:
-      - image: circleci/golang:1.14
+      - image: circleci/golang:1.14-node
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable

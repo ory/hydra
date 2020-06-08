@@ -4,7 +4,7 @@ export PATH := $(pwd)/.bin:${PATH}
 
 .PHONY: deps
 deps:
-ifneq ("v0","$(shell cat .bin/.lock)")
+ifneq ("$(shell cat Makefile | md5))","$(shell cat .bin/.lock)")
 		npm ci
 		go build -o .bin/go-acc github.com/ory/go-acc
 		go build -o .bin/goreturns github.com/sqs/goreturns
@@ -16,6 +16,7 @@ ifneq ("v0","$(shell cat .bin/.lock)")
 		go build -o .bin/packr2 github.com/gobuffalo/packr/v2/packr2
 		go build -o .bin/go-bindata github.com/go-bindata/go-bindata/go-bindata
 		echo "v0" > .bin/.lock
+		echo "$$(cat Makefile | md5)" > .bin/.lock
 endif
 
 # Runs full test suite including tests where databases are enabled

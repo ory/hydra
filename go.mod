@@ -26,25 +26,23 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/mattn/go-runewidth v0.0.4 // indirect
-	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/opentracing/opentracing-go v1.1.1-0.20190913142402-a7454ce5950e
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/fosite v0.31.3
-	github.com/ory/go-acc v0.2.1
+	github.com/ory/go-acc v0.2.2
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.8.3
 	github.com/ory/sdk/swagutil v0.0.0-20200528141631-666b43d19aa3
 	github.com/ory/viper v1.7.5
 	github.com/ory/x v0.0.128
 	github.com/pborman/uuid v1.2.0
-	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
-	github.com/prometheus/client_golang v1.1.0
+	github.com/prometheus/client_golang v1.4.0
 	github.com/rs/cors v1.6.0
 	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
@@ -62,9 +60,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/sys v0.0.0-20200602225109-6fdc65e7d980 // indirect
 	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
-	google.golang.org/grpc v1.29.1 // indirect
-	gopkg.in/ini.v1 v1.57.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.5.0
 )

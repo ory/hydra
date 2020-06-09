@@ -1567,6 +1567,7 @@ Status Code **200**
 | »» sector_identifier_uri                 | string                                        | false    | none         | URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | »» subject_type                          | string                                        | false    | none         | SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | »» token_endpoint_auth_method            | string                                        | false    | none         | Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| »» token_endpoint_auth_signing_alg       | string                                        | false    | none         | Requested Client Authentication signing algorithm for the Token Endpoint.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | »» tos_uri                               | string                                        | false    | none         | TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | »» updated_at                            | string(date-time)                             | false    | none         | UpdatedAt returns the timestamp of the last update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | »» userinfo_signed_response_alg          | string                                        | false    | none         | JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -1588,7 +1589,7 @@ Status Code **200**
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-06-08T17:55:44Z",
+    "created_at": "2020-06-09T07:38:44Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -1607,8 +1608,9 @@ Status Code **200**
     "sector_identifier_uri": "string",
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
     "tos_uri": "string",
-    "updated_at": "2020-06-08T17:55:44Z",
+    "updated_at": "2020-06-09T07:38:44Z",
     "userinfo_signed_response_alg": "string"
   }
 ]
@@ -1776,7 +1778,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -1795,8 +1797,9 @@ and only callable by first-party components.
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1838,7 +1841,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -1857,8 +1860,9 @@ and only callable by first-party components.
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -1928,7 +1932,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -1957,8 +1961,9 @@ const input = '{
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -2096,7 +2101,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2115,8 +2120,9 @@ and only callable by first-party components.
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2282,7 +2288,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2301,8 +2307,9 @@ and only callable by first-party components.
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2343,7 +2350,7 @@ and only callable by first-party components.
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -2362,8 +2369,9 @@ and only callable by first-party components.
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -2433,7 +2441,7 @@ const input = '{
   "contacts": [
     "string"
   ],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": [
@@ -2462,8 +2470,9 @@ const input = '{
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }';
 const headers = {
@@ -4565,7 +4574,7 @@ the subject accepted or rejected the request.
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-06-08T17:55:44Z",
+    "created_at": "2020-06-09T07:38:44Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -4584,8 +4593,9 @@ the subject accepted or rejected the request.
     "sector_identifier_uri": "string",
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
     "tos_uri": "string",
-    "updated_at": "2020-06-08T17:55:44Z",
+    "updated_at": "2020-06-09T07:38:44Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -4775,7 +4785,7 @@ the user-agent to.
 {
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-06-08T17:55:44Z",
+  "handled_at": "2020-06-09T07:38:44Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -4871,7 +4881,7 @@ const input = '{
   "grant_scope": [
     "string"
   ],
-  "handled_at": "2020-06-08T17:55:44Z",
+  "handled_at": "2020-06-09T07:38:44Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -5239,7 +5249,7 @@ the requested authentication process.
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-06-08T17:55:44Z",
+    "created_at": "2020-06-09T07:38:44Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -5258,8 +5268,9 @@ the requested authentication process.
     "sector_identifier_uri": "string",
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
     "tos_uri": "string",
-    "updated_at": "2020-06-08T17:55:44Z",
+    "updated_at": "2020-06-09T07:38:44Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -6471,6 +6482,7 @@ Status Code **200**
 | »»» sector_identifier_uri                | string                                                    | false    | none         | URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | »»» subject_type                         | string                                                    | false    | none         | SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | »»» token_endpoint_auth_method           | string                                                    | false    | none         | Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| »»» token_endpoint_auth_signing_alg      | string                                                    | false    | none         | Requested Client Authentication signing algorithm for the Token Endpoint.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | »»» tos_uri                              | string                                                    | false    | none         | TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | »»» updated_at                           | string(date-time)                                         | false    | none         | UpdatedAt returns the timestamp of the last update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | »»» userinfo_signed_response_alg         | string                                                    | false    | none         | JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -6518,7 +6530,7 @@ Status Code **200**
         "client_secret_expires_at": 0,
         "client_uri": "string",
         "contacts": ["string"],
-        "created_at": "2020-06-08T17:55:44Z",
+        "created_at": "2020-06-09T07:38:44Z",
         "frontchannel_logout_session_required": true,
         "frontchannel_logout_uri": "string",
         "grant_types": ["string"],
@@ -6537,8 +6549,9 @@ Status Code **200**
         "sector_identifier_uri": "string",
         "subject_type": "string",
         "token_endpoint_auth_method": "string",
+        "token_endpoint_auth_signing_alg": "string",
         "tos_uri": "string",
-        "updated_at": "2020-06-08T17:55:44Z",
+        "updated_at": "2020-06-09T07:38:44Z",
         "userinfo_signed_response_alg": "string"
       },
       "context": {},
@@ -6559,7 +6572,7 @@ Status Code **200**
     },
     "grant_access_token_audience": ["string"],
     "grant_scope": ["string"],
-    "handled_at": "2020-06-08T17:55:44Z",
+    "handled_at": "2020-06-09T07:38:44Z",
     "remember": true,
     "remember_for": 0,
     "session": {
@@ -7081,7 +7094,7 @@ deleted automatically when performing the refresh flow.
 
 ```json
 {
-  "notAfter": "2020-06-08T17:55:44Z"
+  "notAfter": "2020-06-09T07:38:44Z"
 }
 ```
 
@@ -7168,7 +7181,7 @@ func main() {
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
-  "notAfter": "2020-06-08T17:55:44Z"
+  "notAfter": "2020-06-09T07:38:44Z"
 }';
 const headers = {
   'Content-Type': 'application/json',  'Accept': 'application/json'
@@ -7779,7 +7792,7 @@ _None_
 <a id="schemanulltime"></a>
 
 ```json
-"2020-06-08T17:55:44Z"
+"2020-06-09T07:38:44Z"
 ```
 
 _NullTime implements sql.NullTime functionality._
@@ -8199,7 +8212,7 @@ _PluginSettings Settings that can be modified by users._
       "client_secret_expires_at": 0,
       "client_uri": "string",
       "contacts": ["string"],
-      "created_at": "2020-06-08T17:55:44Z",
+      "created_at": "2020-06-09T07:38:44Z",
       "frontchannel_logout_session_required": true,
       "frontchannel_logout_uri": "string",
       "grant_types": ["string"],
@@ -8218,8 +8231,9 @@ _PluginSettings Settings that can be modified by users._
       "sector_identifier_uri": "string",
       "subject_type": "string",
       "token_endpoint_auth_method": "string",
+      "token_endpoint_auth_signing_alg": "string",
       "tos_uri": "string",
-      "updated_at": "2020-06-08T17:55:44Z",
+      "updated_at": "2020-06-09T07:38:44Z",
       "userinfo_signed_response_alg": "string"
     },
     "context": {},
@@ -8240,7 +8254,7 @@ _PluginSettings Settings that can be modified by users._
   },
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-06-08T17:55:44Z",
+  "handled_at": "2020-06-09T07:38:44Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8313,7 +8327,7 @@ _VolumeUsageData Usage details about the volume. This information is used by the
 {
   "grant_access_token_audience": ["string"],
   "grant_scope": ["string"],
-  "handled_at": "2020-06-08T17:55:44Z",
+  "handled_at": "2020-06-09T07:38:44Z",
   "remember": true,
   "remember_for": 0,
   "session": {
@@ -8405,7 +8419,7 @@ request._
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-06-08T17:55:44Z",
+    "created_at": "2020-06-09T07:38:44Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -8424,8 +8438,9 @@ request._
     "sector_identifier_uri": "string",
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
     "tos_uri": "string",
-    "updated_at": "2020-06-08T17:55:44Z",
+    "updated_at": "2020-06-09T07:38:44Z",
     "userinfo_signed_response_alg": "string"
   },
   "context": {},
@@ -8495,7 +8510,7 @@ _Used to pass session data to a consent request._
 
 ```json
 {
-  "notAfter": "2020-06-08T17:55:44Z"
+  "notAfter": "2020-06-09T07:38:44Z"
 }
 ```
 
@@ -8608,7 +8623,7 @@ _Error response_
     "client_secret_expires_at": 0,
     "client_uri": "string",
     "contacts": ["string"],
-    "created_at": "2020-06-08T17:55:44Z",
+    "created_at": "2020-06-09T07:38:44Z",
     "frontchannel_logout_session_required": true,
     "frontchannel_logout_uri": "string",
     "grant_types": ["string"],
@@ -8627,8 +8642,9 @@ _Error response_
     "sector_identifier_uri": "string",
     "subject_type": "string",
     "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
     "tos_uri": "string",
-    "updated_at": "2020-06-08T17:55:44Z",
+    "updated_at": "2020-06-09T07:38:44Z",
     "userinfo_signed_response_alg": "string"
   },
   "oidc_context": {
@@ -8705,7 +8721,7 @@ _Contains information about an ongoing logout request._
   "client_secret_expires_at": 0,
   "client_uri": "string",
   "contacts": ["string"],
-  "created_at": "2020-06-08T17:55:44Z",
+  "created_at": "2020-06-09T07:38:44Z",
   "frontchannel_logout_session_required": true,
   "frontchannel_logout_uri": "string",
   "grant_types": ["string"],
@@ -8724,8 +8740,9 @@ _Contains information about an ongoing logout request._
   "sector_identifier_uri": "string",
   "subject_type": "string",
   "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
   "tos_uri": "string",
-  "updated_at": "2020-06-08T17:55:44Z",
+  "updated_at": "2020-06-09T07:38:44Z",
   "userinfo_signed_response_alg": "string"
 }
 ```
@@ -8765,6 +8782,7 @@ _Client represents an OAuth 2.0 Client._
 | sector_identifier_uri                | string                                                      | false    | none         | URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a file with a single JSON array of redirect_uri values.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | subject_type                         | string                                                      | false    | none         | SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | token_endpoint_auth_method           | string                                                      | false    | none         | Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| token_endpoint_auth_signing_alg      | string                                                      | false    | none         | Requested Client Authentication signing algorithm for the Token Endpoint.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | tos_uri                              | string                                                      | false    | none         | TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | updated_at                           | string(date-time)                                           | false    | none         | UpdatedAt returns the timestamp of the last update.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | userinfo_signed_response_alg         | string                                                      | false    | none         | JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |

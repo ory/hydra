@@ -2770,6 +2770,10 @@
           "description": "Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,\nclient_secret_basic, private_key_jwt, and none.",
           "type": "string"
         },
+        "token_endpoint_auth_signing_alg": {
+          "description": "Requested Client Authentication signing algorithm for the Token Endpoint.",
+          "type": "string"
+        },
         "tos_uri": {
           "description": "TermsOfServiceURI is a URL string that points to a human-readable terms of service\ndocument for the client that describes a contractual relationship\nbetween the end-user and the client that the end-user accepts when\nauthorizing the client.",
           "type": "string"

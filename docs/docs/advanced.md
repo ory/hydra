@@ -267,19 +267,21 @@ available there.
 
 ### OAuth 2.0 Client Authentication with private/public keypairs
 
-ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA private/public keypairs with currently supported signing algorithms:
+ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA
+private/public keypairs with currently supported signing algorithms:
+
 - RS256 (default), RS384, RS512
 - PS256, PS384, PS512
 - ES256, ES384, ES512
 
-This authentication method replaces the classic HTTP Basic
-Authorization and HTTP POST Authorization schemes. Instead of sending the
-`client_id` and `client_secret`, you authenticate the client with a signed JSON
-Web Token.
+This authentication method replaces the classic HTTP Basic Authorization and
+HTTP POST Authorization schemes. Instead of sending the `client_id` and
+`client_secret`, you authenticate the client with a signed JSON Web Token.
 
 To enable this feature for a specific OAuth 2.0 Client, you must set
 `token_endpoint_auth_method` to `private_key_jwt` and register the public key of
-the RSA/ECDSA signing key either using the `jwks_uri` or `jwks` fields of the client.
+the RSA/ECDSA signing key either using the `jwks_uri` or `jwks` fields of the
+client.
 
 When authenticating the client at the token endpoint, you generate and sign
 (with the RSA/ECDSA private key) a JSON Web Token with the following claims:
@@ -350,7 +352,7 @@ And here is how it looks like for a `jwks` including an ECDSA public key:
         "kid": "ecdsa-jwk",
         "x": "nQjdhpecjZRlworpYk_TJAQBe4QbS8IwHY1DWkfR0w0",
         "y": "UQfLzHxhc4i3EETUeaAS1vDVFJ-Y01hIESiXqqS86Vc"
-		  }
+      }
     ]
   },
   "token_endpoint_auth_method": "private_key_jwt",

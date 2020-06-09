@@ -863,6 +863,8 @@ github.com/ory/meta/tools/ory-dev v0.0.0-20200608154018-9d325ca2087d h1:w/xnzM07
 github.com/ory/meta/tools/ory-dev v0.0.0-20200608154018-9d325ca2087d/go.mod h1:ABb2mUoD/u98uc1VzxceUQLa8Q3MSvN9YreDviThAvg=
 github.com/ory/meta/tools/ory-dev v0.0.0-20200608162220-fce2b7800d64 h1:GQiKHWWoOC88MaU4/5dgtGqLXfm6RjRAUE+nfIW10JQ=
 github.com/ory/meta/tools/ory-dev v0.0.0-20200608162220-fce2b7800d64/go.mod h1:cMCUNH48o8EmQh5OR+O6aVkFHJgM4q/2itnvbAGmVqQ=
+github.com/ory/meta/tools/ory-dev v0.0.0-20200608180500-21615c5ab3c1 h1:F6nHn09BKXsSs+gZMHNaFmSbJvsipjFZAf8pPJyvPUc=
+github.com/ory/meta/tools/ory-dev v0.0.0-20200608180500-21615c5ab3c1/go.mod h1:cMCUNH48o8EmQh5OR+O6aVkFHJgM4q/2itnvbAGmVqQ=
 github.com/ory/viper v1.5.6/go.mod h1:TYmpFpKLxjQwvT4f0QPpkOn4sDXU1kDgAwJpgLYiQ28=
 github.com/ory/viper v1.7.4 h1:3RWBt7Pq9kSFNxLaRT0ljNdbtaWisCQG1cLPn2Yd4UY=
 github.com/ory/viper v1.7.4/go.mod h1:T6sodNZKNGPpashUOk7EtXz2isovz8oCd57GNVkkNmE=

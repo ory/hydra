@@ -147,6 +147,9 @@ type Client struct {
 	// client_secret_basic, private_key_jwt, and none.
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty" db:"token_endpoint_auth_method"`
 
+	// Requested Client Authentication signing algorithm for the Token Endpoint.
+	TokenEndpointAuthSigningAlgorithm string `json:"token_endpoint_auth_signing_alg,omitempty" db:"token_endpoint_auth_signing_alg"`
+
 	// Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the
 	// contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
 	// OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
@@ -263,7 +266,10 @@ func (c *Client) GetJSONWebKeys() *jose.JSONWebKeySet {
 }
 
 func (c *Client) GetTokenEndpointAuthSigningAlgorithm() string {
-	return "RS256"
+	if c.TokenEndpointAuthSigningAlgorithm == "" {
+		return "RS256"
+	}
+	return c.TokenEndpointAuthSigningAlgorithm
 }
 
 func (c *Client) GetRequestObjectSigningAlgorithm() string {

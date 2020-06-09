@@ -83,6 +83,10 @@ func TestValidate(t *testing.T) {
 			expectErr: true,
 		},
 		{
+			in:        &Client{ClientID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, TokenEndpointAuthMethod: "private_key_jwt", TokenEndpointAuthSigningAlgorithm: "HS256"},
+			expectErr: true,
+		},
+		{
 			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},

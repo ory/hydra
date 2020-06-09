@@ -35,6 +35,20 @@ import (
 	"github.com/ory/x/stringsx"
 )
 
+var (
+	supportedAuthTokenSigningAlgs = []string{
+		"RS256",
+		"RS384",
+		"RS512",
+		"PS256",
+		"PS384",
+		"PS512",
+		"ES256",
+		"ES384",
+		"ES512",
+	}
+)
+
 type Validator struct {
 	c    *http.Client
 	conf Configuration
@@ -60,9 +74,12 @@ func (v *Validator) Validate(c *Client) error {
 
 	if c.TokenEndpointAuthMethod == "" {
 		c.TokenEndpointAuthMethod = "client_secret_basic"
-	} else {
-		if len(c.JSONWebKeysURI) == 0 && c.JSONWebKeys == nil && c.TokenEndpointAuthMethod == "private_key_jwt" {
+	} else if c.TokenEndpointAuthMethod == "private_key_jwt" {
+		if len(c.JSONWebKeysURI) == 0 && c.JSONWebKeys == nil {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("When token_endpoint_auth_method is \"private_key_jwt\", either jwks or jwks_uri must be set."))
+		}
+		if c.TokenEndpointAuthSigningAlgorithm != "" && !isSupportedAuthTokenSigningAlg(c.TokenEndpointAuthSigningAlgorithm) {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Only RS256, RS384, RS512, PS256, PS384, PS512, ES256, ES384 and ES512 are supported as algorithms for private key authentication."))
 		}
 	}
 
@@ -199,4 +216,13 @@ func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []
 	}
 
 	return nil
+}
+
+func isSupportedAuthTokenSigningAlg(alg string) bool {
+	for _, sAlg := range supportedAuthTokenSigningAlgs {
+		if alg == sAlg {
+			return true
+		}
+	}
+	return false
 }

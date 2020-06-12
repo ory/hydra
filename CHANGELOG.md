@@ -4,54 +4,56 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-06-05)](#unreleased-2020-06-05)
+- [Unreleased (2020-06-12)](#unreleased-2020-06-12)
+    - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
+    - [Features](#features)
     - [Unclassified](#unclassified)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
-    - [Bug Fixes](#bug-fixes)
+    - [Bug Fixes](#bug-fixes-1)
     - [Documentation](#documentation-1)
-    - [Features](#features)
+    - [Features](#features-1)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
-    - [Bug Fixes](#bug-fixes-1)
+    - [Bug Fixes](#bug-fixes-2)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation-2)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
     - [Code Refactoring](#code-refactoring-1)
     - [BREAKING CHANGES](#breaking-changes)
   - [1.4.10 (2020-04-30)](#1410-2020-04-30)
-    - [Bug Fixes](#bug-fixes-2)
+    - [Bug Fixes](#bug-fixes-3)
     - [Documentation](#documentation-3)
     - [Unclassified](#unclassified-1)
   - [1.4.9 (2020-04-25)](#149-2020-04-25)
-    - [Bug Fixes](#bug-fixes-3)
-  - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-4)
-    - [Documentation](#documentation-4)
-    - [Features](#features-1)
-  - [1.4.7 (2020-04-24)](#147-2020-04-24)
+  - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-5)
+    - [Documentation](#documentation-4)
+    - [Features](#features-2)
+  - [1.4.7 (2020-04-24)](#147-2020-04-24)
+    - [Bug Fixes](#bug-fixes-6)
     - [Documentation](#documentation-5)
   - [1.4.6 (2020-04-17)](#146-2020-04-17)
-    - [Bug Fixes](#bug-fixes-6)
+    - [Bug Fixes](#bug-fixes-7)
     - [Documentation](#documentation-6)
   - [1.4.5 (2020-04-16)](#145-2020-04-16)
-    - [Bug Fixes](#bug-fixes-7)
+    - [Bug Fixes](#bug-fixes-8)
     - [Documentation](#documentation-7)
   - [1.4.3 (2020-04-16)](#143-2020-04-16)
-    - [Bug Fixes](#bug-fixes-8)
+    - [Bug Fixes](#bug-fixes-9)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-8)
-    - [Features](#features-2)
+    - [Features](#features-3)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-9)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-9)
-- [1.4.0 (2020-04-02)](#140-2020-04-02)
     - [Bug Fixes](#bug-fixes-10)
+- [1.4.0 (2020-04-02)](#140-2020-04-02)
+    - [Bug Fixes](#bug-fixes-11)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-10)
-    - [Features](#features-3)
+    - [Features](#features-4)
     - [Unclassified](#unclassified-2)
     - [BREAKING CHANGES](#breaking-changes-1)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
@@ -62,13 +64,13 @@
     - [References](#references)
     - [Upstream](#upstream)
   - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-11)
+    - [Bug Fixes](#bug-fixes-12)
     - [Documentation](#documentation-11)
   - [1.3.1 (2020-02-16)](#131-2020-02-16)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-12)
+    - [Bug Fixes](#bug-fixes-13)
     - [Documentation](#documentation-12)
-    - [Features](#features-4)
+    - [Features](#features-5)
     - [Unclassified](#unclassified-3)
   - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-4)
@@ -437,7 +439,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...e785bc71cdfe7f7996dfbf1dd2152887f5b5f76d) (2020-06-05)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...48c2c6de27a7ec73c77cb29c86578b8ca78885e8) (2020-06-12)
+
+
+### Bug Fixes
+
+* Remove duplicated tracing logger ([#1900](https://github.com/ory/hydra/issues/1900)) ([48c2c6d](https://github.com/ory/hydra/commit/48c2c6de27a7ec73c77cb29c86578b8ca78885e8))
+* Use .bin in PATH and improve CI tasks ([#1897](https://github.com/ory/hydra/issues/1897)) ([9c6eba8](https://github.com/ory/hydra/commit/9c6eba8d0611fb4a79820a90c31f72eb578ca3d5))
 
 
 ### Documentation
@@ -447,6 +455,12 @@
     > Add hint to allow login provider login different subject when there is already an authentication of another subject.
 * Delete old redirect homepage ([45595dc](https://github.com/ory/hydra/commit/45595dc1aed479cd224353355a7e66030de609b0))
 * Use mdx for api reference ([5709439](https://github.com/ory/hydra/commit/570943932773b2de54b187526d5d3e0ade2c2756))
+
+
+### Features
+
+* Log errors with request information ([#1893](https://github.com/ory/hydra/issues/1893)) ([4bfbddb](https://github.com/ory/hydra/commit/4bfbddb5a4fcb55448b12f2d6ea7e050d9f47720))
+* Support jwt signing alg other than RS256 ([#1889](https://github.com/ory/hydra/issues/1889)) ([fe8d77f](https://github.com/ory/hydra/commit/fe8d77f4a4a4644dcb9a188bf33ae3dea9871480)), closes [#1817](https://github.com/ory/hydra/issues/1817)
 
 
 ### Unclassified

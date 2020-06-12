@@ -46,7 +46,6 @@ import (
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
-	"go.opentelemetry.io/otel/plugin/httptrace"
 
 	"github.com/ory/graceful"
 	"github.com/ory/x/healthx"
@@ -178,25 +177,6 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 	}
 }
 
-func setTracingLogger(logger *reqlog.Middleware) {
-	// To avoid cyclic execution
-	before := logger.Before
-	logger.Before = func(entry *logrusx.Logger, r *http.Request, remoteAddr string) *logrusx.Logger {
-		fields := before(entry, r, remoteAddr)
-
-		_, _, spanCtx := httptrace.Extract(r.Context(), r)
-
-		if spanCtx.HasTraceID() {
-			fields = fields.WithField("trace_id", spanCtx.TraceID.String())
-		}
-		if spanCtx.HasSpanID() {
-			fields = fields.WithField("span_id", spanCtx.SpanID.String())
-		}
-
-		return fields
-	}
-}
-
 func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(d.Registry().BuildVersion()))
 
@@ -213,11 +193,10 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 
 	adminLogger := reqlog.
 		NewMiddlewareFromLogger(d.Registry().Logger(),
-		fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()))
+			fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()))
 	if d.Configuration().AdminDisableHealthAccessLog() {
 		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
-	setTracingLogger(adminLogger)
 
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.Registry().PrometheusManager())
@@ -229,7 +208,6 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	if d.Configuration().PublicDisableHealthAccessLog() {
 		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
-	setTracingLogger(publicLogger)
 
 	publicmw.Use(publicLogger)
 	publicmw.Use(d.Registry().PrometheusManager())

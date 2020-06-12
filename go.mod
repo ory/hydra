@@ -56,7 +56,6 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/uber/jaeger-client-go v2.22.1+incompatible
 	github.com/urfave/negroni v1.0.0
-	go.opentelemetry.io/otel v0.6.0
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d

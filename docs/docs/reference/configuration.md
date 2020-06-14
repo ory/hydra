@@ -1087,7 +1087,7 @@ profiling: cpu
 tracing:
   ## provider ##
   #
-  # Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.
+  # Set this to the tracing backend you wish to use. Currently supports Jaeger and Zipkin. If omitted or empty, tracing will be disabled.
   #
   # Examples:
   # - jaeger
@@ -1190,4 +1190,18 @@ tracing:
         #    > set TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=<value>
         #
         server_url: http://localhost:5778/sampling
+    ## zipkin ##
+    #
+    # Configures the zipkin tracing backend.
+    #
+    zipkin:
+      ## server_url ##
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
+      # - Windows Command Line (CMD):
+      #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
+      #
+      server_url: http://localhost:9411/api/v2/spans
 ```

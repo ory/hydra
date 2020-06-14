@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/x/logrusx"
 	"github.com/rs/cors"
+
+	"github.com/ory/x/logrusx"
 
 	"github.com/ory/viper"
 
@@ -287,6 +288,12 @@ func (v *ViperProvider) TracingJaegerConfig() *tracing.JaegerConfig {
 			viper.GetString("JAEGER_PROPAGATION"), // Standard Jaeger client config
 			viperx.GetString(v.l, "tracing.providers.jaeger.propagation", "", "TRACING_PROVIDER_JAEGER_PROPAGATION"),
 		),
+	}
+}
+
+func (v *ViperProvider) TracingZipkinConfig() *tracing.ZipkinConfig {
+	return &tracing.ZipkinConfig{
+		ServerURL: viperx.GetString(v.l, "tracing.providers.zipkin.server_url", "", "TRACING_PROVIDER_ZIPKIN_SERVER_URL"),
 	}
 }
 

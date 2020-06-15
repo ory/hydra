@@ -73,7 +73,7 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.St
 		return errors.WithStack(err)
 	}
 	if sameSiteMode == http.SameSiteNoneMode && sameSiteLegacyWorkaround {
-		return createCsrfSession(w, r, store, legacyCsrfSessionName(name), csrf, secure, http.SameSiteDefaultMode, false)
+		return createCsrfSession(w, r, store, legacyCsrfSessionName(name), csrf, secure, 0, false)
 	}
 	return nil
 }

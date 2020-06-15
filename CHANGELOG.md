@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-06-12)](#unreleased-2020-06-12)
+- [Unreleased (2020-06-15)](#unreleased-2020-06-15)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -439,7 +439,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...48c2c6de27a7ec73c77cb29c86578b8ca78885e8) (2020-06-12)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...6999a82d0fed29ff857dc5df5da39cb796022482) (2020-06-15)
 
 
 ### Bug Fixes
@@ -459,6 +459,7 @@
 
 ### Features
 
+* Allow unix socket as --endpoint ([#1899](https://github.com/ory/hydra/issues/1899)) ([6999a82](https://github.com/ory/hydra/commit/6999a82d0fed29ff857dc5df5da39cb796022482))
 * Log errors with request information ([#1893](https://github.com/ory/hydra/issues/1893)) ([4bfbddb](https://github.com/ory/hydra/commit/4bfbddb5a4fcb55448b12f2d6ea7e050d9f47720))
 * Support jwt signing alg other than RS256 ([#1889](https://github.com/ory/hydra/issues/1889)) ([fe8d77f](https://github.com/ory/hydra/commit/fe8d77f4a4a4644dcb9a188bf33ae3dea9871480)), closes [#1817](https://github.com/ory/hydra/issues/1817)
 

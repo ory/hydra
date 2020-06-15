@@ -201,6 +201,11 @@
           ],
           "default": "info"
         },
+        "leak_sensitive_values": {
+          "type": "boolean",
+          "description": "Logs sensitive values such as cookie and URL parameter.",
+          "default": false
+        },
         "format": {
           "type": "string",
           "description": "Sets the log format.",

@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -84,14 +85,35 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 func configureClientBase(cmd *cobra.Command, withAuth bool) *hydra.OryHydra {
 	u := RemoteURI(cmd)
-	ht := httptransport.New(
-		u.Host,
-		u.Path,
-		[]string{u.Scheme},
-	)
 
-	ht.Transport = newTransport(cmd)
+	var ht *httptransport.Runtime
+	if u.Scheme == "unix" {
+		// Based on https://stackoverflow.com/a/26224019 .
+		// Here we implement the caveat that the url should be
+		// http://xxxx.xxx/path and not unix:// .
+		ht = httptransport.New(
+			"unix",
+			"",
+			[]string{"http"},
+		)
 
+		ht.Transport = &http.Transport{
+			Dial: func(proto, addr string) (conn net.Conn, err error) {
+				// RemoteURI splits unix:///var/run/hydra.sock into
+				// u.Host: ""
+				// u.Path: /run/hydra.sock
+				return net.Dial("unix", u.Path)
+			},
+		}
+	} else {
+		ht = httptransport.New(
+			u.Host,
+			u.Path,
+			[]string{u.Scheme},
+		)
+
+		ht.Transport = newTransport(cmd)
+	}
 	if withAuth {
 		if token := flagx.MustGetString(cmd, "access-token"); token != "" {
 			ht.DefaultAuthentication = httptransport.BearerToken(token)

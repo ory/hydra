@@ -439,7 +439,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...5b5451929196eaa09a2fa21b1fbb5797693bf897) (2020-06-16)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...05bf907eb5702616c454d7b4e9a1a44efb58f37a) (2020-06-16)
 
 
 ### Bug Fixes
@@ -464,6 +464,7 @@
 
 ### Features
 
+* Add Zipkin support ([#1904](https://github.com/ory/hydra/issues/1904)) ([05bf907](https://github.com/ory/hydra/commit/05bf907eb5702616c454d7b4e9a1a44efb58f37a))
 * Allow unix socket as --endpoint ([#1899](https://github.com/ory/hydra/issues/1899)) ([6999a82](https://github.com/ory/hydra/commit/6999a82d0fed29ff857dc5df5da39cb796022482))
 * Log errors with request information ([#1893](https://github.com/ory/hydra/issues/1893)) ([4bfbddb](https://github.com/ory/hydra/commit/4bfbddb5a4fcb55448b12f2d6ea7e050d9f47720))
 * Support jwt signing alg other than RS256 ([#1889](https://github.com/ory/hydra/issues/1889)) ([fe8d77f](https://github.com/ory/hydra/commit/fe8d77f4a4a4644dcb9a188bf33ae3dea9871480)), closes [#1817](https://github.com/ory/hydra/issues/1817)

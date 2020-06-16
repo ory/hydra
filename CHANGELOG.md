@@ -439,11 +439,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...128ad987d548e719b62e789264a82ef5e611ff59) (2020-06-16)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...5b5451929196eaa09a2fa21b1fbb5797693bf897) (2020-06-16)
 
 
 ### Bug Fixes
 
+* Add config schema for log.leak_sensitive_values ([#1905](https://github.com/ory/hydra/issues/1905)) ([d954649](https://github.com/ory/hydra/commit/d954649cd382728b7ec8b58b56e75d2f0913d75a))
+* Properly return when subject is empty ([#1909](https://github.com/ory/hydra/issues/1909)) ([5b54519](https://github.com/ory/hydra/commit/5b5451929196eaa09a2fa21b1fbb5797693bf897)), closes [#1842](https://github.com/ory/hydra/issues/1842)
 * Remove duplicated tracing logger ([#1900](https://github.com/ory/hydra/issues/1900)) ([48c2c6d](https://github.com/ory/hydra/commit/48c2c6de27a7ec73c77cb29c86578b8ca78885e8))
 * Same site legacy workaround on iOS 12 ([#1908](https://github.com/ory/hydra/issues/1908)) ([128ad98](https://github.com/ory/hydra/commit/128ad987d548e719b62e789264a82ef5e611ff59)), closes [#1810](https://github.com/ory/hydra/issues/1810) [/github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go#L221](https://github.com//github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go/issues/L221) [/tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-4](https://github.com//tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00/issues/section-4) [239226#L118](https://github.com/239226/issues/L118) [#1907](https://github.com/ory/hydra/issues/1907):
 

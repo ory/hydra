@@ -17,7 +17,7 @@ ifneq ("$(shell base64 Makefile))","$(shell cat .bin/.lock)")
 		go build -o .bin/mockgen github.com/golang/mock/mockgen
 		go build -o .bin/swagger github.com/go-swagger/go-swagger/cmd/swagger
 		go build -o .bin/goimports golang.org/x/tools/cmd/goimports
-		go build -o .bin/ory-dev github.com/ory/meta/tools/ory-dev
+		go build -o .bin/ory github.com/ory/cli
 		go build -o .bin/packr2 github.com/gobuffalo/packr/v2/packr2
 		go build -o .bin/go-bindata github.com/go-bindata/go-bindata/go-bindata
 		echo "v0" > .bin/.lock
@@ -112,7 +112,7 @@ gen: mocks sqlbin sdk
 .PHONY: sdk
 sdk: deps
 		swagger generate spec -m -o ./.schema/api.swagger.json -x internal/httpclient,gopkg.in/square/go-jose.v2
-		ory-dev swagger sanitize ./.schema/api.swagger.json
+		ory dev swagger sanitize ./.schema/api.swagger.json
 		swagger flatten --with-flatten=remove-unused -o ./.schema/api.swagger.json ./.schema/api.swagger.json
 		swagger validate ./.schema/api.swagger.json
 		rm -rf internal/httpclient

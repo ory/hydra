@@ -33,11 +33,11 @@ require (
 	github.com/openzipkin-contrib/zipkin-go-opentracing v0.4.5
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/ory/analytics-go/v4 v4.0.1
+	github.com/ory/cli v0.0.10
 	github.com/ory/fosite v0.31.3
 	github.com/ory/go-acc v0.2.2
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.8.3
-	github.com/ory/meta/tools/ory-dev v0.0.0-20200608180500-21615c5ab3c1
 	github.com/ory/viper v1.7.5
 	github.com/ory/x v0.0.130
 	github.com/pborman/uuid v1.2.0

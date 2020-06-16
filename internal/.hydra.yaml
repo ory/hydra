@@ -126,3 +126,5 @@ tracing:
         type: const
         value: 1
         server_url: http://sampling
+    zipkin:
+      server_url: http://zipkin/api/v2/spans

@@ -5,9 +5,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/rs/cors"
+
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/tracing"
-	"github.com/rs/cors"
 )
 
 type Provider interface {
@@ -55,6 +56,7 @@ type Provider interface {
 	TracingServiceName() string
 	TracingProvider() string
 	TracingJaegerConfig() *tracing.JaegerConfig
+	TracingZipkinConfig() *tracing.ZipkinConfig
 	GetCookieSecrets() [][]byte
 	GetRotatedSystemSecrets() [][]byte
 	GetSystemSecret() []byte

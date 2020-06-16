@@ -16,6 +16,7 @@ import (
 	"github.com/ory/hydra/metrics/prometheus"
 
 	"github.com/gorilla/sessions"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
@@ -397,6 +398,7 @@ func (m *RegistryBase) Tracer() *tracing.Tracer {
 		m.trc = &tracing.Tracer{
 			ServiceName:  m.c.TracingServiceName(),
 			JaegerConfig: m.c.TracingJaegerConfig(),
+			ZipkinConfig: m.c.TracingZipkinConfig(),
 			Provider:     m.c.TracingProvider(),
 			Logger:       m.Logger(),
 		}

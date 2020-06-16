@@ -244,4 +244,7 @@ func TestViperProviderValidates(t *testing.T) {
 		SamplerServerURL:   "http://sampling",
 		Propagation:        "jaeger",
 	}, c.TracingJaegerConfig())
+	assert.Equal(t, &tracing.ZipkinConfig{
+		ServerURL: "http://zipkin/api/v2/spans",
+	}, c.TracingZipkinConfig())
 }

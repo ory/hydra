@@ -797,7 +797,8 @@
           "type": "string",
           "description": "Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.",
           "enum": [
-            "jaeger"
+            "jaeger",
+            "zipkin"
           ],
           "examples": [
             "jaeger"
@@ -918,6 +919,18 @@
                       "server_url": "http://localhost:5778/sampling"
                     }
                   ]
+                }
+              }
+            },
+            "zipkin": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configures the zipkin tracing backend.",
+              "properties": {
+                "server_url": {
+                  "type": "string",
+                  "description": "The address of Zipkin server where spans should be sent to.",
+                  "format": "uri"
                 }
               }
             }

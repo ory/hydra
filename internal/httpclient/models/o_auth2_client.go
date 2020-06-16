@@ -139,6 +139,9 @@ type OAuth2Client struct {
 	// client_secret_basic, private_key_jwt, and none.
 	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
 
+	// Requested Client Authentication signing algorithm for the Token Endpoint.
+	TokenEndpointAuthSigningAlg string `json:"token_endpoint_auth_signing_alg,omitempty"`
+
 	// TermsOfServiceURI is a URL string that points to a human-readable terms of service
 	// document for the client that describes a contractual relationship
 	// between the end-user and the client that the end-user accepts when

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-06-15)](#unreleased-2020-06-15)
+- [Unreleased (2020-06-16)](#unreleased-2020-06-16)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -439,12 +439,15 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...6999a82d0fed29ff857dc5df5da39cb796022482) (2020-06-15)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...128ad987d548e719b62e789264a82ef5e611ff59) (2020-06-16)
 
 
 ### Bug Fixes
 
 * Remove duplicated tracing logger ([#1900](https://github.com/ory/hydra/issues/1900)) ([48c2c6d](https://github.com/ory/hydra/commit/48c2c6de27a7ec73c77cb29c86578b8ca78885e8))
+* Same site legacy workaround on iOS 12 ([#1908](https://github.com/ory/hydra/issues/1908)) ([128ad98](https://github.com/ory/hydra/commit/128ad987d548e719b62e789264a82ef5e611ff59)), closes [#1810](https://github.com/ory/hydra/issues/1810) [/github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go#L221](https://github.com//github.com/golang/go/blob/release-branch.go1.14/src/net/http/cookie.go/issues/L221) [/tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00#section-4](https://github.com//tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00/issues/section-4) [239226#L118](https://github.com/239226/issues/L118) [#1907](https://github.com/ory/hydra/issues/1907):
+
+    > Enables legacy compatibility on iOS version < 13 and macOS version < 10.15
 * Use .bin in PATH and improve CI tasks ([#1897](https://github.com/ory/hydra/issues/1897)) ([9c6eba8](https://github.com/ory/hydra/commit/9c6eba8d0611fb4a79820a90c31f72eb578ca3d5))
 
 

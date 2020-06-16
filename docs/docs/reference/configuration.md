@@ -44,7 +44,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: fatal
+  level: trace
 
   ## leak_sensitive_values ##
   #
@@ -72,7 +72,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: text
+  format: json
 
 ## serve ##
 #
@@ -94,7 +94,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 52720
+    port: 47201
 
     ## host ##
     #
@@ -109,7 +109,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ''
+    host: localhost
 
     ## cors ##
     #
@@ -128,7 +128,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: false
+      enabled: true
 
       ## allowed_origins ##
       #
@@ -163,8 +163,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - GET
         - PUT
+        - POST
+        - OPTIONS
 
       ## allowed_headers ##
       #
@@ -179,11 +180,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - est minim Excepteur adipisicing irure
-        - ad
-        - in minim aute
-        - tempor eiusmod commodo
-        - amet veniam quis consequat exercitation
+        - do
+        - aliquip eu sed deserunt nulla
+        - nostrud
 
       ## exposed_headers ##
       #
@@ -198,7 +197,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - enim et
+        - ut nisi Lorem ea
+        - officia nostrud eu nisi commodo
+        - sit aliqua pariatur qui proident
 
       ## allow_credentials ##
       #
@@ -212,7 +213,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -238,7 +239,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 72752432
+      max_age: 36154120
 
       ## debug ##
       #
@@ -252,7 +253,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
     ## access_log ##
     #
@@ -286,7 +287,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 45540
+    port: 19334
 
     ## host ##
     #
@@ -301,7 +302,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_HOST=<value>
     #
-    host: localhost
+    host: ''
 
     ## cors ##
     #
@@ -320,7 +321,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -340,9 +341,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -357,11 +356,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - TRACE
         - CONNECT
-        - GET
-        - TRACE
-        - HEAD
 
       ## allowed_headers ##
       #
@@ -376,8 +371,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - in
-        - velit fugiat
+        - in ullamco Duis tempor dolore
+        - in aliquip officia dolore tempor
 
       ## exposed_headers ##
       #
@@ -392,11 +387,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - magna laboris laborum veniam aliqua
-        - irure
-        - non dolor minim ad laborum
-        - do dolor Duis Excepteur dolor
-        - enim dolor exercitation in
+        - pariatur
+        - do sint Excepteur esse
 
       ## allow_credentials ##
       #
@@ -424,7 +416,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -436,7 +428,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 70826157
+      max_age: 42316193
 
       ## debug ##
       #
@@ -481,30 +473,30 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_PATH=<value>
+      #    $ export SERVE_TLS_KEY_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_PATH=<value>
+      #    > set SERVE_TLS_KEY_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## cert ##
     #
     # Configures the private key (pem encoded).
     #
     cert:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_PATH=<value>
+      #    $ export SERVE_TLS_CERT_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_PATH=<value>
+      #    > set SERVE_TLS_CERT_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## allow_termination_from ##
     #
@@ -517,7 +509,6 @@ serve:
     #    > set SERVE_TLS_ALLOW_TERMINATION_FROM=<value>
     #
     allow_termination_from:
-      - 127.0.0.1/32
       - 127.0.0.1/32
       - 127.0.0.1/32
       - 127.0.0.1/32
@@ -537,7 +528,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: None
 
     ## same_site_legacy_workaround ##
     #
@@ -566,7 +557,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: laborum ut adipisicing
+dsn: laboris
 
 ## webfinger ##
 #
@@ -864,7 +855,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: wildcard
+  scope: exact
 
   ## access_token ##
   #
@@ -923,7 +914,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: -1
+  refresh_token: '-1'
 
   ## id_token ##
   #
@@ -951,7 +942,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 1h
+  auth_code: 10m
 
 ## oauth2 ##
 #
@@ -995,7 +986,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 54804355
+      cost: 7695807
 
   ## pkce ##
   #
@@ -1097,7 +1088,7 @@ profiling: cpu
 tracing:
   ## provider ##
   #
-  # Set this to the tracing backend you wish to use. Currently supports Jaeger and Zipkin. If omitted or empty, tracing will be disabled.
+  # Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.
   #
   # Examples:
   # - jaeger
@@ -1200,6 +1191,7 @@ tracing:
         #    > set TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=<value>
         #
         server_url: http://localhost:5778/sampling
+
     ## zipkin ##
     #
     # Configures the zipkin tracing backend.
@@ -1207,11 +1199,13 @@ tracing:
     zipkin:
       ## server_url ##
       #
+      # The address of Zipkin server where spans should be sent to.
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       # - Windows Command Line (CMD):
       #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       #
-      server_url: http://localhost:9411/api/v2/spans
+      server_url: https://IsCRiSgWdHSJqPsOBzhuPgKaVunJH.uagBxaRBF.fFMXcVtawv-GBX
 ```

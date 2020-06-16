@@ -265,20 +265,26 @@ library (e.g. [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa)) to
 `http://ory-hydra-public-api/.well-known/jwks.json`. All necessary keys are
 available there.
 
-### OAuth 2.0 Client Authentication with RSA private/public keypairs
+### OAuth 2.0 Client Authentication with private/public keypairs
 
-ORY Hydra supports OAuth 2.0 Client Authentication with RSA private/public
-keypairs. This authentication method replaces the classic HTTP Basic
-Authorization and HTTP POST Authorization schemes. Instead of sending the
-`client_id` and `client_secret`, you authenticate the client with a signed JSON
-Web Token.
+ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA
+private/public keypairs with currently supported signing algorithms:
+
+- RS256 (default), RS384, RS512
+- PS256, PS384, PS512
+- ES256, ES384, ES512
+
+This authentication method replaces the classic HTTP Basic Authorization and
+HTTP POST Authorization schemes. Instead of sending the `client_id` and
+`client_secret`, you authenticate the client with a signed JSON Web Token.
 
 To enable this feature for a specific OAuth 2.0 Client, you must set
 `token_endpoint_auth_method` to `private_key_jwt` and register the public key of
-the RSA signing key either using the `jwks_uri` or `jwks` fields of the client.
+the RSA/ECDSA signing key either using the `jwks_uri` or `jwks` fields of the
+client.
 
 When authenticating the client at the token endpoint, you generate and sign
-(with the RSA private key) a JSON Web Token with the following claims:
+(with the RSA/ECDSA private key) a JSON Web Token with the following claims:
 
 - `iss`: REQUIRED. Issuer. This MUST contain the client_id of the OAuth Client.
 - `sub`: REQUIRED. Subject. This MUST contain the client_id of the OAuth Client.
@@ -311,21 +317,46 @@ urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&
 client_assertion=PHNhbWxwOl ... ZT
 ```
 
-Here's what a client with a `jwks` looks like:
+Here's what a client with a `jwks` containing one RSA public key looks like:
 
 ```json
 {
-  "client_id": "client-jwks",
+  "client_id": "rsa-client-jwks",
   "jwks": {
     "keys": [
       {
         "kty": "RSA",
         "n": "jL7h5wc-yeMUsHGJHc0xe9SbTdaLKXMHvcIHQck20Ji7SvrHPdTDQTvZtTDS_wJYbeShcCrliHvbJRSZhtEe0mPJpyWg3O_HkKy6_SyHepLK-_BR7HfcXYB6pVJCG3BW-lVMY7gl5sULFA74kNZH50h8hdmyWC9JgOHn0n3YLdaxSWlhctuwNPSwqwzY4qtN7_CZub81SXWpKiwj4UpyB10b8rM8qn35FS1hfsaFCVi0gQpd4vFDgFyqqpmiwq8oMr8RZ2mf0NMKCP3RXnMhy9Yq8O7lgG2t6g1g9noWbzZDUZNc54tv4WGFJ_rJZRz0jE_GR6v5sdqsDTdjFquPlQ",
-        "e": "AQAB"
+        "e": "AQAB",
+        "use": "sig",
+        "kid": "rsa-jwk"
       }
     ]
   },
-  "token_endpoint_auth_method": "private_key_jwt"
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "RS256"
+}
+```
+
+And here is how it looks like for a `jwks` including an ECDSA public key:
+
+```json
+{
+  "client_id": "ecdsa-client-jwks",
+  "jwks": {
+    "keys": [
+      {
+        "kty": "EC",
+        "use": "sig",
+        "crv": "P-256",
+        "kid": "ecdsa-jwk",
+        "x": "nQjdhpecjZRlworpYk_TJAQBe4QbS8IwHY1DWkfR0w0",
+        "y": "UQfLzHxhc4i3EETUeaAS1vDVFJ-Y01hIESiXqqS86Vc"
+      }
+    ]
+  },
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "ES256"
 }
 ```
 
@@ -335,7 +366,8 @@ And with `jwks_uri`:
 {
   "client_id": "client-jwks-uri",
   "jwks_uri": "http://path-to-my-public/keys.json",
-  "token_endpoint_auth_method": "private_key_jwt"
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "RS256"
 }
 ```
 
@@ -348,7 +380,9 @@ with the OAuth 2.0 Client:
     {
       "kty": "RSA",
       "n": "jL7h5wc-yeMUsHGJHc0xe9SbTdaLKXMHvcIHQck20Ji7SvrHPdTDQTvZtTDS_wJYbeShcCrliHvbJRSZhtEe0mPJpyWg3O_HkKy6_SyHepLK-_BR7HfcXYB6pVJCG3BW-lVMY7gl5sULFA74kNZH50h8hdmyWC9JgOHn0n3YLdaxSWlhctuwNPSwqwzY4qtN7_CZub81SXWpKiwj4UpyB10b8rM8qn35FS1hfsaFCVi0gQpd4vFDgFyqqpmiwq8oMr8RZ2mf0NMKCP3RXnMhy9Yq8O7lgG2t6g1g9noWbzZDUZNc54tv4WGFJ_rJZRz0jE_GR6v5sdqsDTdjFquPlQ",
-      "e": "AQAB"
+      "e": "AQAB",
+      "use": "sig",
+      "kid": "rsa-jwk"
     }
   ]
 }
@@ -403,6 +437,25 @@ While ORY Hydra handles `sub` obfuscation out of the box, you may also override
 this value with your own obfuscated `sub` value by setting
 `force_subject_identifier` when accepting the login challenge in your user login
 app.
+
+### Using login_hint with Different Subject
+
+When a user already logged in with a subject(e.g. user-A), and she would like to
+login as another user using login_hint(e.g. login_hint=user-B), directly
+accepting the latter login request in your login provider will make hydra reply:
+`Subject from payload does not match subject from previous authentication`
+
+The suggested flow is:
+
+Check the response from
+[GET login request](https://www.ory.sh/hydra/docs/reference/api#get-a-login-request),
+if both the `subject` and `login_hint` are NOT empty and also NOT the same user,
+redirect UserAgent to `request_url` which is appended with '?prompt=login'. This
+will make hydra ignore the existing authentication, and allow your login
+provider to login a different subject.
+
+For more information on `prompt=login` and other options, please check
+[Authentication Request](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
 
 ## CORS
 

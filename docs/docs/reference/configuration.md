@@ -44,7 +44,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: error
+  level: warn
 
   ## leak_sensitive_values ##
   #
@@ -72,7 +72,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: json
+  format: text
 
 ## serve ##
 #
@@ -94,7 +94,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 34006
+    port: 24282
 
     ## host ##
     #
@@ -163,8 +163,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - PUT
-        - HEAD
+        - POST
 
       ## allowed_headers ##
       #
@@ -179,10 +178,11 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - dolor do minim eiusmod aute
-        - culpa ullamco dolore ex
-        - dolor consequat sed
-        - nostrud irure voluptate
+        - eu
+        - velit est nostrud
+        - Duis
+        - culpa aute sunt id
+        - anim deserunt
 
       ## exposed_headers ##
       #
@@ -197,10 +197,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - laboris aliqua sed reprehenderit sunt
-        - eu
-        - tempor aliquip
-        - sit ut eiusmod commodo
+        - minim consequat exercitation sunt in
+        - officia mollit
+        - anim eiusmod voluptate sunt do
 
       ## allow_credentials ##
       #
@@ -228,7 +227,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: true
+      options_passthrough: false
 
       ## max_age ##
       #
@@ -240,7 +239,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 884950
+      max_age: 25720902
 
       ## debug ##
       #
@@ -288,7 +287,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 61554
+    port: 10912
 
     ## host ##
     #
@@ -342,7 +341,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -357,11 +358,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - DELETE
+        - OPTIONS
         - TRACE
-        - DELETE
-        - HEAD
-        - TRACE
+        - PATCH
 
       ## allowed_headers ##
       #
@@ -376,8 +375,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - est dolor in dolor
-        - ipsum
+        - Ut laboris
+        - fugiat ad reprehenderit eiusmod
+        - nisi ea ut eu ullamco
 
       ## exposed_headers ##
       #
@@ -392,9 +392,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - officia ex consequat ad in
-        - eu culpa irure
-        - adipisicing eu nulla mollit
+        - cillum esse aliqua
+        - fugiat quis aute ut
+        - magna
+        - nostrud nisi est velit sed
 
       ## allow_credentials ##
       #
@@ -422,7 +423,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: true
+      options_passthrough: false
 
       ## max_age ##
       #
@@ -434,7 +435,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 21906086
+      max_age: 87705766
 
       ## debug ##
       #
@@ -448,7 +449,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
 
     ## access_log ##
     #
@@ -467,7 +468,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: false
+      disable_for_health: true
 
   ## tls ##
   #
@@ -479,15 +480,15 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_PATH=<value>
+      #    $ export SERVE_TLS_KEY_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_PATH=<value>
+      #    > set SERVE_TLS_KEY_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## cert ##
     #
@@ -515,6 +516,8 @@ serve:
     #    > set SERVE_TLS_ALLOW_TERMINATION_FROM=<value>
     #
     allow_termination_from:
+      - 127.0.0.1/32
+      - 127.0.0.1/32
       - 127.0.0.1/32
       - 127.0.0.1/32
       - 127.0.0.1/32
@@ -551,7 +554,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
     #
-    same_site_legacy_workaround: true
+    same_site_legacy_workaround: false
 
 ## dsn ##
 #
@@ -563,7 +566,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: reprehenderit consequat ad qui
+dsn: aliquip proident nisi
 
 ## webfinger ##
 #
@@ -590,7 +593,8 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
     #
-    broadcast_keys: hydra.jwt.access-token
+    broadcast_keys:
+      - hydra.openid.id-token
 
   ## oidc_discovery ##
   #
@@ -919,7 +923,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: '-1'
+  refresh_token: 1h
 
   ## id_token ##
   #
@@ -991,7 +995,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 47844132
+      cost: 75418380
 
   ## pkce ##
   #
@@ -1212,5 +1216,5 @@ tracing:
       # - Windows Command Line (CMD):
       #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       #
-      server_url: http://bpaPbvpQlijnMIKYRANrsDtMkoJ.rjd-FEuy,1
+      server_url: http://ruKAfLfbudkiksXIHCdJPstWw.qujdXp4Y,HDk33zL+IW1A.XBW,LIB7E3z,0Zp8
 ```

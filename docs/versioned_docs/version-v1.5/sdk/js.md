@@ -18,33 +18,33 @@ npm install --save @oryd/hydra-client
 #### Basic configuration
 
 ```js
-const Hydra = require('@oryd/hydra-client');
+const Hydra = require('@oryd/hydra-client')
 
 // Set this to Hydra's URL
-Hydra.ApiClient.instance.basePath = 'http://localhost:4445';
+Hydra.ApiClient.instance.basePath = 'http://localhost:4445'
 ```
 
 ### API Usage
 
 ```js
-const hydra = new Hydra.AdminAPI();
+const hydra = new Hydra.AdminAPI()
 
 // for example, let's fetch all OAuth2 clients
 hydra.listOAuth2Clients((error, data, response) => {
   if (error) {
     // a network error occurred.
-    throw error;
+    throw error
   } else if (response.statusCode < 200 || response.statusCode >= 400) {
     // an application error occurred.
     throw new Error(
       'Consent endpoint gave status code ' +
         response.statusCode +
         ', but status code 200 was expected.'
-    );
+    )
   }
 
-  console.log(response); // a list of OAuth2 clients.
-});
+  console.log(response) // a list of OAuth2 clients.
+})
 ```
 
 ### API Docs

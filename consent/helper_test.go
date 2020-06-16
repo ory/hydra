@@ -322,7 +322,7 @@ func TestCreateCsrfSession(t *testing.T) {
 				"csrf_none_fallback_legacy": {
 					httpOnly: true,
 					secure:   true,
-					sameSite: http.SameSiteDefaultMode,
+					sameSite: 0,
 				},
 			},
 		},

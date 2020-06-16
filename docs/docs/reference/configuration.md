@@ -46,6 +46,20 @@ log:
   #
   level: fatal
 
+  ## leak_sensitive_values ##
+  #
+  # Logs sensitive values such as cookie and URL parameter.
+  #
+  # Default value: false
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export LOG_LEAK_SENSITIVE_VALUES=<value>
+  # - Windows Command Line (CMD):
+  #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
+  #
+  leak_sensitive_values: false
+
   ## format ##
   #
   # Sets the log format.

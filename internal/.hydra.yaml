@@ -1,5 +1,6 @@
 log:
   level: debug
+  leak_sensitive_values: false
   format: json
 
 serve:

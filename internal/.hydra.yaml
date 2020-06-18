@@ -7,6 +7,10 @@ serve:
   public:
     port: 1
     host: localhost
+    socket:
+      owner: hydra
+      group: hydra-public-api
+      mode: 0775
     cors:
       enabled: false
       allowed_origins:
@@ -26,6 +30,11 @@ serve:
   admin:
     port: 2
     host: localhost
+    socket:
+      owner: hydra
+      group: hydra-admin-api
+      mode: 0770
+
     cors:
       enabled: false
       allowed_origins:

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -47,9 +48,15 @@ const (
 	ViperKeyEncryptSessionData             = "oauth2.session.encrypt_at_rest"
 	ViperKeyAdminListenOnHost              = "serve.admin.host"
 	ViperKeyAdminListenOnPort              = "serve.admin.port"
+	ViperKeyAdminSocketOwner               = "serve.admin.socket.owner"
+	ViperKeyAdminSocketGroup               = "serve.admin.socket.group"
+	ViperKeyAdminSocketMode                = "serve.admin.socket.mode"
 	ViperKeyAdminDisableHealthAccessLog    = "serve.admin.access_log.disable_for_health"
 	ViperKeyPublicListenOnHost             = "serve.public.host"
 	ViperKeyPublicListenOnPort             = "serve.public.port"
+	ViperKeyPublicSocketOwner              = "serve.public.socket.owner"
+	ViperKeyPublicSocketGroup              = "serve.public.socket.group"
+	ViperKeyPublicSocketMode               = "serve.public.socket.mode"
 	ViperKeyPublicDisableHealthAccessLog   = "serve.public.access_log.disable_for_health"
 	ViperKeyCookieSameSiteMode             = "serve.cookies.same_site_mode"
 	ViperKeyCookieSameSiteLegacyWorkaround = "serve.cookies.same_site_legacy_workaround"
@@ -220,12 +227,28 @@ func (v *ViperProvider) publicPort() int {
 	return viperx.GetInt(v.l, ViperKeyPublicListenOnPort, 4444, "PUBLIC_PORT")
 }
 
+func (v *ViperProvider) PublicSocketPermission() *UnixPermission {
+	return &UnixPermission{
+		Owner: viperx.GetString(v.l, ViperKeyPublicSocketOwner, ""),
+		Group: viperx.GetString(v.l, ViperKeyPublicSocketGroup, ""),
+		Mode:  os.FileMode(viperx.GetInt(v.l, ViperKeyPublicSocketMode, 0755)),
+	}
+}
+
 func (v *ViperProvider) adminHost() string {
 	return viperx.GetString(v.l, ViperKeyAdminListenOnHost, "", "ADMIN_HOST")
 }
 
 func (v *ViperProvider) adminPort() int {
 	return viperx.GetInt(v.l, ViperKeyAdminListenOnPort, 4445, "ADMIN_PORT")
+}
+
+func (v *ViperProvider) AdminSocketPermission() *UnixPermission {
+	return &UnixPermission{
+		Owner: viperx.GetString(v.l, ViperKeyAdminSocketOwner, ""),
+		Group: viperx.GetString(v.l, ViperKeyAdminSocketGroup, ""),
+		Mode:  os.FileMode(viperx.GetInt(v.l, ViperKeyAdminSocketMode, 0755)),
+	}
 }
 
 func (v *ViperProvider) CookieSameSiteMode() http.SameSite {

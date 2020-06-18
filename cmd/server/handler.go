@@ -40,6 +40,7 @@ import (
 	"github.com/ory/x/reqlog"
 
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
 
 	"github.com/julienschmidt/httprouter"
@@ -111,7 +112,7 @@ func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []
 
 		go serve(d, cmd, &wg,
 			EnhanceMiddleware(d, adminmw, d.Configuration().AdminListenOn(), admin.Router, d.Configuration().CORSEnabled("admin"), "admin"),
-			d.Configuration().AdminListenOn(), cert,
+			d.Configuration().AdminListenOn(), d.Configuration().AdminSocketPermission(), cert,
 		)
 
 		wg.Wait()
@@ -139,7 +140,7 @@ func RunServePublic(version, build, date string) func(cmd *cobra.Command, args [
 
 		go serve(d, cmd, &wg,
 			EnhanceMiddleware(d, publicmw, d.Configuration().PublicListenOn(), public.Router, false, "public"),
-			d.Configuration().PublicListenOn(), cert,
+			d.Configuration().PublicListenOn(), d.Configuration().PublicSocketPermission(), cert,
 		)
 
 		wg.Wait()
@@ -165,12 +166,12 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 
 		go serve(d, cmd, &wg,
 			EnhanceMiddleware(d, publicmw, d.Configuration().PublicListenOn(), public.Router, false, "public"),
-			d.Configuration().PublicListenOn(), cert,
+			d.Configuration().PublicListenOn(), d.Configuration().PublicSocketPermission(), cert,
 		)
 
 		go serve(d, cmd, &wg,
 			EnhanceMiddleware(d, adminmw, d.Configuration().AdminListenOn(), admin.Router, d.Configuration().CORSEnabled("admin"), "admin"),
-			d.Configuration().AdminListenOn(), cert,
+			d.Configuration().AdminListenOn(), d.Configuration().AdminSocketPermission(), cert,
 		)
 
 		wg.Wait()
@@ -285,7 +286,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	return
 }
 
-func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http.Handler, address string, cert []tls.Certificate) {
+func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http.Handler, address string, permission *configuration.UnixPermission, cert []tls.Certificate) {
 	defer wg.Done()
 
 	var srv = graceful.WithDefaults(&http.Server{
@@ -306,6 +307,10 @@ func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http
 		if x.AddressIsUnixSocket(address) {
 			addr := strings.TrimPrefix(address, "unix:")
 			unixListener, e := net.Listen("unix", addr)
+			if e != nil {
+				return e
+			}
+			e = permission.SetPermission(addr)
 			if e != nil {
 				return e
 			}

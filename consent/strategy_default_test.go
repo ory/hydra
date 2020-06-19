@@ -634,7 +634,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 				}
 			},
 			expectFinalStatusCode: http.StatusBadRequest,
-			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request},
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrInteractionRequired},
 			expectErr:             []bool{true, true},
 		},
 		{
@@ -714,7 +714,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 				}
 			},
 			expectFinalStatusCode: http.StatusBadRequest,
-			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, ErrAbortOAuth2Request},
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, fosite.ErrInteractionRequired},
 			expectErr:             []bool{true, true, true},
 		},
 		{

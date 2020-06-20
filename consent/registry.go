@@ -17,7 +17,6 @@ type InternalRegistry interface {
 	client.Registry
 
 	OAuth2Storage() x.FositeStorer
-	OAuth2Provider() fosite.OAuth2Provider
 	OpenIDJWTStrategy() jwk.JWTStrategy
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
 	ScopeStrategy() fosite.ScopeStrategy

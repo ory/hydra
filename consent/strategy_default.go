@@ -342,9 +342,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 
 	if session.HasError() {
 		session.Error.SetDefaults(loginRequestDeniedErrorName)
-		err = errors.WithStack(session.Error.toRFCError())
-		s.r.OAuth2Provider().WriteAuthorizeError(w, req, err)
-		return nil, err
+		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
 	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
@@ -583,9 +581,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 
 	if session.HasError() {
 		session.Error.SetDefaults(consentRequestDeniedErrorName)
-		err = errors.WithStack(session.Error.toRFCError())
-		s.r.OAuth2Provider().WriteAuthorizeError(w, req, err)
-		return nil, err
+		return nil, errors.WithStack(session.Error.toRFCError())
 	}
 
 	if time.Time(session.ConsentRequest.AuthenticatedAt).IsZero() {

@@ -138,12 +138,16 @@ workflows:
               only: /.*/
       - test-legacy-migrations:
           name: test-legacy-migrations-mysql
+          requires:
+            - test-legacy-migrations-postgres
           flavor: mysql
           filters:
             tags:
               only: /.*/
       - test-legacy-migrations:
           name: test-legacy-migrations-cockroach
+          requires:
+            - test-legacy-migrations-postgres
           flavor: cockroach
           filters:
             tags:
@@ -170,24 +174,32 @@ workflows:
               only: /.*/
       - test-e2e:
           name: test-e2e-postgres
+          requires:
+            - test-e2e-memory
           flavor: postgres
           filters:
             tags:
               only: /.*/
       - test-e2e:
           name: test-e2e-mysql
+          requires:
+            - test-e2e-memory
           flavor: mysql
           filters:
             tags:
               only: /.*/
       - test-e2e:
           name: test-e2e-cockroach
+          requires:
+            - test-e2e-memory
           flavor: cockroach
           filters:
             tags:
               only: /.*/
       - test-e2e:
           name: test-e2e-plugin
+          requires:
+            - test-e2e-memory
           flavor: plugin
           filters:
             tags:
@@ -197,12 +209,10 @@ workflows:
             - nancy/test
             - test
             - golangci/lint
-            - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
-            - test-legacy-migrations-postgres
             - test-legacy-migrations-mysql
             - test-legacy-migrations-cockroach
           filters:
@@ -217,12 +227,10 @@ workflows:
             - nancy/test
             - test
             - golangci/lint
-            - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
-            - test-legacy-migrations-postgres
             - test-legacy-migrations-mysql
             - test-legacy-migrations-cockroach
           filters:
@@ -266,13 +274,11 @@ workflows:
             - nancy/test
             - test
             - golangci/lint
-            - test-e2e-memory
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
             - changelog/generate
-            - test-legacy-migrations-postgres
             - test-legacy-migrations-mysql
             - test-legacy-migrations-cockroach
             - docs/build

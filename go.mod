@@ -2,8 +2,6 @@ module github.com/ory/hydra
 
 go 1.14
 
-replace github.com/gobuffalo/pop/v5 => ../../gobuffalo/pop
-
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible

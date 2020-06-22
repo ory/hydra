@@ -91,6 +91,10 @@ serve:
     # Leave empty to listen on all interfaces.
     host: localhost # leave this out or empty to listen on all devices which is the default
     # host: unix:/path/to/socket
+    # socket:
+    #   owner: hydra
+    #   group: hydra
+    #   mode: 0775
 
     # cors configures Cross Origin Resource Sharing for public endpoints.
     cors:
@@ -147,6 +151,10 @@ serve:
     # Leave empty to listen on all interfaces.
     host: localhost # leave this out or empty to listen on all devices which is the default
     # host: unix:/path/to/socket
+    # socket:
+    #   owner: hydra
+    #   group: hydra
+    #   mode: 0775
 
     # cors configures Cross Origin Resource Sharing for admin endpoints.
     cors:

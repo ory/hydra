@@ -42,8 +42,10 @@ type Provider interface {
 	DataSourcePlugin() string
 	DefaultClientScope() []string
 	AdminListenOn() string
+	AdminSocketPermission() *UnixPermission
 	AdminDisableHealthAccessLog() bool
 	PublicListenOn() string
+	PublicSocketPermission() *UnixPermission
 	PublicDisableHealthAccessLog() bool
 	CookieSameSiteMode() http.SameSite
 	CookieSameSiteLegacyWorkaround() bool

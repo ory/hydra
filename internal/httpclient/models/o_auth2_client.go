@@ -31,7 +31,7 @@ type OAuth2Client struct {
 	// RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
 	BackchannelLogoutURI string `json:"backchannel_logout_uri,omitempty"`
 
-	// ClientID  is the id for this client.
+	// ID  is the id for this client.
 	ClientID string `json:"client_id,omitempty"`
 
 	// Name is the human-readable string name of the client to be presented to the

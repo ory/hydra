@@ -27,7 +27,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	var d driver.Driver
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
-		d = driver.NewDefaultDriver(logrusx.New("",""), false, nil, "", "", "", false)
+		d = driver.NewDefaultDriver(logrusx.New("", ""), false, nil, "", "", "", false)
 		if len(d.Configuration().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
@@ -42,7 +42,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			return
 		}
 		viper.Set(configuration.ViperKeyDSN, args[0])
-		d = driver.NewDefaultDriver(logrusx.New("",""), false, nil, "", "", "", false)
+		d = driver.NewDefaultDriver(logrusx.New("", ""), false, nil, "", "", "", false)
 	}
 
 	p := d.Registry().Persister()

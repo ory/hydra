@@ -2,22 +2,23 @@ package jwk
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
 	migrate "github.com/rubenv/sql-migrate"
+
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/logrusx"
 )
 
 var Migrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrusx.New("",""), AssetNames(), Asset, []string{
+	dbal.DriverMySQL: dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/mysql",
 	}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrusx.New("",""), AssetNames(), Asset, []string{
+	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{
 		"migrations/sql/shared",
 		"migrations/sql/postgres",
 	}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrusx.New("",""), AssetNames(), Asset, []string{
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrusx.New("", ""), AssetNames(), Asset, []string{
 		"migrations/sql/cockroach",
 	}, true),
 }

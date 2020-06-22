@@ -41,7 +41,7 @@ type Introspection struct {
 	// scopes associated with this token.
 	Scope string `json:"scope,omitempty"`
 
-	// ClientID is aclient identifier for the OAuth 2.0 client that
+	// ID is aclient identifier for the OAuth 2.0 client that
 	// requested this token.
 	ClientID string `json:"client_id,omitempty"`
 

@@ -392,7 +392,7 @@ func (r *LogoutRequest) prepareSQL() *LogoutRequest {
 	if r.Client != nil {
 		r.ClientID = sql.NullString{
 			Valid:  true,
-			String: r.Client.ClientID,
+			String: r.Client.ID,
 		}
 	}
 	return r
@@ -465,7 +465,7 @@ func (r *LoginRequest) prepareSQL() *LoginRequest {
 	if r.Client == nil {
 		return r
 	}
-	r.ClientID = r.Client.ClientID
+	r.ClientID = r.Client.ID
 	return r
 }
 
@@ -536,7 +536,7 @@ func (r *ConsentRequest) prepareSQL() *ConsentRequest {
 	if r.Client == nil {
 		return r
 	}
-	r.ClientID = r.Client.ClientID
+	r.ClientID = r.Client.ID
 	return r
 }
 

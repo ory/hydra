@@ -181,7 +181,7 @@ func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string)
 	}
 	m.m["handledConsentRequests"].RUnlock()
 
-	c.Client.ClientID = c.Client.GetID()
+	c.Client.ID = c.Client.GetID()
 	return &c, nil
 }
 
@@ -210,7 +210,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 						return nil, err
 					}
 
-					c.Client.ClientID = c.Client.GetID()
+					c.Client.ID = c.Client.GetID()
 					h.ConsentRequest = &c
 					return &h, nil
 				}
@@ -260,7 +260,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 			continue
 		}
 
-		cr.Client.ClientID = cr.Client.GetID()
+		cr.Client.ID = cr.Client.GetID()
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
@@ -301,7 +301,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 			continue
 		}
 
-		cr.Client.ClientID = cr.Client.GetID()
+		cr.Client.ID = cr.Client.GetID()
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
@@ -343,7 +343,7 @@ func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context,
 			continue
 		}
 
-		cr.Client.ClientID = cr.Client.GetID()
+		cr.Client.ID = cr.Client.GetID()
 		c.ConsentRequest = cr
 		rs = append(rs, c)
 	}
@@ -420,7 +420,7 @@ func (m *MemoryManager) GetLoginRequest(ctx context.Context, challenge string) (
 	}
 	m.m["handledAuthRequests"].Unlock()
 
-	c.Client.ClientID = c.Client.GetID()
+	c.Client.ID = c.Client.GetID()
 	return &c, nil
 }
 
@@ -450,7 +450,7 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 						return nil, err
 					}
 
-					c.Client.ClientID = c.Client.GetID()
+					c.Client.ID = c.Client.GetID()
 					h.LoginRequest = &c
 					return &h, nil
 				}

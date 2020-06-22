@@ -107,7 +107,7 @@ func TestGetLogoutRequest(t *testing.T) {
 
 			if tc.exists {
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
-					Client:    &client.Client{ClientID: "client" + key},
+					Client:    &client.Client{ID: "client" + key},
 					Challenge: challenge,
 					WasUsed:   tc.used,
 				}))
@@ -146,7 +146,7 @@ func TestGetLoginRequest(t *testing.T) {
 
 			if tc.exists {
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.TODO(), &LoginRequest{
-					Client:     &client.Client{ClientID: "client" + key},
+					Client:     &client.Client{ID: "client" + key},
 					Challenge:  challenge,
 					WasHandled: tc.handled,
 				}))
@@ -185,7 +185,7 @@ func TestGetConsentRequest(t *testing.T) {
 
 			if tc.exists {
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.TODO(), &ConsentRequest{
-					Client:     &client.Client{ClientID: "client" + key},
+					Client:     &client.Client{ID: "client" + key},
 					Challenge:  challenge,
 					WasHandled: tc.handled,
 				}))

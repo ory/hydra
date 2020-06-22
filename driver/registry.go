@@ -1,8 +1,9 @@
 package driver
 
 import (
-	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
+
+	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/persistence"
 

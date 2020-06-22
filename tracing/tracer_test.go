@@ -2,15 +2,17 @@ package tracing_test
 
 import (
 	"encoding/json"
-	"github.com/opentracing/opentracing-go"
-	"github.com/ory/x/logrusx"
-	"github.com/ory/x/tracing"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/x/logrusx"
+	"github.com/ory/x/tracing"
 )
 
 type zipkinSpanRequest struct {

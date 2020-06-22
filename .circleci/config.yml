@@ -49,7 +49,7 @@ jobs:
           keys:
             - hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
       - run: go mod download
-      - run: make deps
+      - run: make .bin/go-acc
       - save_cache:
           key: hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
           paths:

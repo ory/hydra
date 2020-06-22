@@ -41,6 +41,7 @@ const (
 
 type RegistryBase struct {
 	l            *logrusx.Logger
+	al           *logrusx.Logger
 	c            configuration.Provider
 	cm           client.Manager
 	ch           *client.Handler
@@ -147,6 +148,13 @@ func (m *RegistryBase) Logger() *logrusx.Logger {
 		m.l = logrusx.New("ORY Hydra", m.BuildVersion())
 	}
 	return m.l
+}
+
+func (m *RegistryBase) AuditLogger() *logrusx.Logger {
+	if m.al == nil {
+		m.al = logrusx.NewAudit("ORY Hydra", m.BuildVersion())
+	}
+	return m.al
 }
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {

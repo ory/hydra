@@ -629,7 +629,12 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(w, r, authorizeRequest)
 	if errors.Cause(err) == consent.ErrAbortOAuth2Request {
+		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
+		return
+	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
+		x.LogAudit(r, err, h.r.AuditLogger())
+		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())

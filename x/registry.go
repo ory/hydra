@@ -8,6 +8,7 @@ import (
 
 type RegistryLogger interface {
 	Logger() *logrusx.Logger
+	AuditLogger() *logrusx.Logger
 }
 
 type RegistryWriter interface {

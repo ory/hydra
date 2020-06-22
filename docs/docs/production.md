@@ -116,6 +116,7 @@ like:
 ORY Hydra will try to create the socket file during startup and the socket will
 be writeable by the user running ORY Hydra. The owner, group and mode of the
 socket can be modified:
+
 ```yaml
 serve:
   admin:

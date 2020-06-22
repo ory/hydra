@@ -2676,7 +2676,7 @@
           "type": "string"
         },
         "client_id": {
-          "description": "ClientID  is the id for this client.",
+          "description": "ID  is the id for this client.",
           "type": "string"
         },
         "client_name": {
@@ -2809,7 +2809,7 @@
           }
         },
         "client_id": {
-          "description": "ClientID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
+          "description": "ID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
           "type": "string"
         },
         "exp": {

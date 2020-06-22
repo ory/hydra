@@ -74,7 +74,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should reject when basic auth client exists but origin not allowed",
 			prep: func() {
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-2", Secret: "bar", AllowedCORSOrigins: []string{"http://not-foobar.com"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-2", Secret: "bar", AllowedCORSOrigins: []string{"http://not-foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Basic Zm9vLTI6YmFy"}},
@@ -83,7 +83,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin allowed",
 			prep: func() {
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Basic Zm9vLTM6YmFy"}},
@@ -92,7 +92,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed per client",
 			prep: func() {
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*.foobar.com"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*.foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vLTQ6YmFy"}},
@@ -102,7 +102,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			d: "should accept when basic auth client exists and origin (with full wildcard) is allowed globally",
 			prep: func() {
 				viper.Set("serve.public.cors.allowed_origins", []string{"*"})
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-5", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-5", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"*"}, "Authorization": {"Basic Zm9vLTU6YmFy"}},
@@ -112,7 +112,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed globally",
 			prep: func() {
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://*.foobar.com"})
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-6", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-6", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vLTY6YmFy"}},
@@ -122,7 +122,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			d: "should accept when basic auth client exists and origin (with full wildcard) allowed per client",
 			prep: func() {
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-7", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-7", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Basic Zm9vLTc6YmFy"}},
@@ -144,7 +144,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				sess := oauth2.NewSession("foo-9")
 				sess.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour))
 				ar := fosite.NewAccessRequest(sess)
-				cl := &client.Client{ClientID: "foo-9", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}}
+				cl := &client.Client{ID: "foo-9", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}}
 				ar.Client = cl
 				if err := r.OAuth2Storage().CreateAccessTokenSession(nil, signature, ar); err != nil {
 					panic(err)
@@ -160,7 +160,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept any allowed specified origin protocol",
 			prep: func() {
-				r.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
 				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://*", "https://*"})
 			},

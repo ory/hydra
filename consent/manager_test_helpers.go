@@ -50,7 +50,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
-		Client:                 &client.Client{ClientID: "fk-client-" + key},
+		Client:                 &client.Client{ID: "fk-client-" + key},
 		RequestURL:             "https://request-url/path" + key,
 		LoginChallenge:         sqlxx.NullString("fk-login-challenge-" + key),
 		LoginSessionID:         sqlxx.NullString("fk-login-session-" + key),
@@ -102,7 +102,7 @@ func MockLogoutRequest(key string, withClient bool) (c *LogoutRequest) {
 	var cl *client.Client
 	if withClient {
 		cl = &client.Client{
-			ClientID: "fk-client-" + key,
+			ID: "fk-client-" + key,
 		}
 	}
 	return &LogoutRequest{
@@ -127,7 +127,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 			Display:   "popup" + key,
 		},
 		RequestedAt:    time.Now().UTC().Add(-time.Hour),
-		Client:         &client.Client{ClientID: "fk-client-" + key},
+		Client:         &client.Client{ID: "fk-client-" + key},
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
 		Skip:           true,
@@ -261,7 +261,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 	return func(t *testing.T) {
 		t.Run("case=init-fks", func(t *testing.T) {
 			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
-				require.NoError(t, clientManager.CreateClient(context.TODO(), &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)}))
+				require.NoError(t, clientManager.CreateClient(context.TODO(), &client.Client{ID: fmt.Sprintf("fk-client-%s", k)}))
 
 				require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
 					ID:              fmt.Sprintf("fk-login-session-%s", k),
@@ -272,7 +272,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				require.NoError(t, m.CreateLoginRequest(context.TODO(), &LoginRequest{
 					Challenge:       fmt.Sprintf("fk-login-challenge-%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
-					Client:          &client.Client{ClientID: fmt.Sprintf("fk-client-%s", k)},
+					Client:          &client.Client{ID: fmt.Sprintf("fk-client-%s", k)},
 					AuthenticatedAt: sqlxx.NullTime(time.Now()),
 					RequestedAt:     time.Now(),
 				}))
@@ -635,7 +635,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 						require.NoError(t, err)
 						for _, consent := range consents {
 							assert.Contains(t, tc.challenges, consent.Challenge)
-							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.ClientID)
+							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.ID)
 						}
 					}
 
@@ -699,7 +699,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 						}
 						require.NoError(t, m.CreateLoginSession(context.Background(), ls))
 
-						cl := &client.Client{ClientID: uuid.New().String()}
+						cl := &client.Client{ID: uuid.New().String()}
 						switch k % 4 {
 						case 0:
 							cl.FrontChannelLogoutURI = "http://some-url.com/"
@@ -735,10 +735,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 						for _, e := range es {
 							var found bool
 							for _, a := range actual {
-								if e.ClientID == a.ClientID {
+								if e.ID == a.ID {
 									found = true
 								}
-								assert.Equal(t, e.ClientID, a.ClientID)
+								assert.Equal(t, e.ID, a.ID)
 								assert.Equal(t, e.FrontChannelLogoutURI, a.FrontChannelLogoutURI)
 								assert.Equal(t, e.BackChannelLogoutURI, a.BackChannelLogoutURI)
 							}

@@ -2,6 +2,7 @@ package x
 
 import (
 	"github.com/gorilla/sessions"
+
 	"github.com/ory/herodot"
 	"github.com/ory/x/logrusx"
 )

@@ -5,7 +5,6 @@ package fizzmigrate
 import (
 	"context"
 	"fmt"
-	migrate "github.com/rubenv/sql-migrate"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -13,9 +12,13 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v5/logging"
 	"github.com/jmoiron/sqlx"
+	migrate "github.com/rubenv/sql-migrate"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/hydra/internal/fizzmigrate/client"
 	"github.com/ory/hydra/internal/fizzmigrate/consent"
@@ -23,7 +26,6 @@ import (
 	"github.com/ory/hydra/internal/fizzmigrate/oauth2"
 	"github.com/ory/hydra/persistence/sql"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
 )
 
 type migrator interface {
@@ -161,6 +163,10 @@ func TestCompareMigrations(t *testing.T) {
 func TestMixMigrations(t *testing.T) {
 	for db, connect := range dbConnections {
 		t.Run("db="+db, func(t *testing.T) {
+			pop.SetLogger(func(lvl logging.Level, s string, args ...interface{}) {
+				t.Logf("Running SQL Query: %s", fmt.Sprintf(s,args...))
+			})
+
 			c, dbx := connect(t)
 			persister, err := sql.NewPersister(c)
 			require.NoError(t, err)

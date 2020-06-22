@@ -37,8 +37,8 @@ import (
 type Client struct {
 	PK int64 `json:"-" db:"pk"`
 
-	// ClientID  is the id for this client.
-	ClientID string `json:"client_id" db:"id"`
+	// ID  is the id for this client.
+	ID string `json:"client_id" db:"id"`
 
 	// Name is the human-readable string name of the client to be presented to the
 	// end-user during authorization.
@@ -203,7 +203,7 @@ func (Client) TableName() string {
 }
 
 func (c *Client) GetID() string {
-	return c.ClientID
+	return c.ID
 }
 
 func (c *Client) GetRedirectURIs() []string {

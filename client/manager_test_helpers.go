@@ -39,7 +39,7 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		c := &Client{
-			ClientID:          "foo",
+			ID:                "foo",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
@@ -54,7 +54,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		require.NoError(t, m.CreateClient(ctx, &Client{
-			ClientID:     "1234321",
+			ID:           "1234321",
 			Secret:       "secret",
 			RedirectURIs: []string{"http://redirect"},
 		}))
@@ -75,7 +75,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		assert.NotNil(t, err)
 
 		c := &Client{
-			ClientID:                          "1234",
+			ID:                                "1234",
 			Name:                              "name",
 			Secret:                            "secret",
 			RedirectURIs:                      []string{"http://redirect", "http://redirect1"},
@@ -114,7 +114,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		}
 
 		assert.NoError(t, m.CreateClient(ctx, &Client{
-			ClientID:          "2-1234",
+			ID:                "2-1234",
 			Name:              "name",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
@@ -130,8 +130,8 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		ds, err := m.GetClients(ctx, 100, 0)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
-		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
+		assert.NotEqual(t, ds[0].ID, ds[1].ID)
+		assert.NotEqual(t, ds[0].ID, ds[1].ID)
 		// test if SecretExpiresAt was set properly
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
@@ -144,7 +144,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		assert.NoError(t, err)
 
 		err = m.UpdateClient(ctx, &Client{
-			ClientID:          "2-1234",
+			ID:                "2-1234",
 			Name:              "name-new",
 			Secret:            "secret-new",
 			RedirectURIs:      []string{"http://redirect/new"},

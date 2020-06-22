@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/x/logrusx"
 )
 
 func TestLogAudit(t *testing.T) {

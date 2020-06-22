@@ -31,9 +31,10 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/x/logrusx"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
+
+	"github.com/ory/x/logrusx"
 
 	"github.com/ory/herodot"
 

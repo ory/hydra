@@ -4,53 +4,56 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-06-16)](#unreleased-2020-06-16)
+- [Unreleased (2020-06-22)](#unreleased-2020-06-22)
     - [Bug Fixes](#bug-fixes)
+  - [1.5.1 (2020-06-16)](#151-2020-06-16)
+- [1.5.0 (2020-06-16)](#150-2020-06-16)
+    - [Bug Fixes](#bug-fixes-1)
     - [Documentation](#documentation)
     - [Features](#features)
     - [Unclassified](#unclassified)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
-    - [Bug Fixes](#bug-fixes-1)
+    - [Bug Fixes](#bug-fixes-2)
     - [Documentation](#documentation-1)
     - [Features](#features-1)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
-    - [Bug Fixes](#bug-fixes-2)
+    - [Bug Fixes](#bug-fixes-3)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation-2)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
     - [Code Refactoring](#code-refactoring-1)
     - [BREAKING CHANGES](#breaking-changes)
   - [1.4.10 (2020-04-30)](#1410-2020-04-30)
-    - [Bug Fixes](#bug-fixes-3)
+    - [Bug Fixes](#bug-fixes-4)
     - [Documentation](#documentation-3)
     - [Unclassified](#unclassified-1)
   - [1.4.9 (2020-04-25)](#149-2020-04-25)
-    - [Bug Fixes](#bug-fixes-4)
-  - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-5)
+  - [1.4.8 (2020-04-24)](#148-2020-04-24)
+    - [Bug Fixes](#bug-fixes-6)
     - [Documentation](#documentation-4)
     - [Features](#features-2)
   - [1.4.7 (2020-04-24)](#147-2020-04-24)
-    - [Bug Fixes](#bug-fixes-6)
+    - [Bug Fixes](#bug-fixes-7)
     - [Documentation](#documentation-5)
   - [1.4.6 (2020-04-17)](#146-2020-04-17)
-    - [Bug Fixes](#bug-fixes-7)
+    - [Bug Fixes](#bug-fixes-8)
     - [Documentation](#documentation-6)
   - [1.4.5 (2020-04-16)](#145-2020-04-16)
-    - [Bug Fixes](#bug-fixes-8)
+    - [Bug Fixes](#bug-fixes-9)
     - [Documentation](#documentation-7)
   - [1.4.3 (2020-04-16)](#143-2020-04-16)
-    - [Bug Fixes](#bug-fixes-9)
+    - [Bug Fixes](#bug-fixes-10)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-8)
     - [Features](#features-3)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-9)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-10)
-- [1.4.0 (2020-04-02)](#140-2020-04-02)
     - [Bug Fixes](#bug-fixes-11)
+- [1.4.0 (2020-04-02)](#140-2020-04-02)
+    - [Bug Fixes](#bug-fixes-12)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-10)
     - [Features](#features-4)
@@ -64,11 +67,11 @@
     - [References](#references)
     - [Upstream](#upstream)
   - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-12)
+    - [Bug Fixes](#bug-fixes-13)
     - [Documentation](#documentation-11)
   - [1.3.1 (2020-02-16)](#131-2020-02-16)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-13)
+    - [Bug Fixes](#bug-fixes-14)
     - [Documentation](#documentation-12)
     - [Features](#features-5)
     - [Unclassified](#unclassified-3)
@@ -439,7 +442,28 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.0-beta.5...05bf907eb5702616c454d7b4e9a1a44efb58f37a) (2020-06-16)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.5.1...5359276ac96a27cfe07c39647b4dee8a581d2dae) (2020-06-22)
+
+
+### Bug Fixes
+
+* Do not log error at login/consent cancelation ([#1914](https://github.com/ory/hydra/issues/1914)) ([379eed3](https://github.com/ory/hydra/commit/379eed3db3b3e4b8f13f12145f7f48048ab0cf8e)), closes [#1912](https://github.com/ory/hydra/issues/1912)
+* Improve Makefile dependency management ([#1918](https://github.com/ory/hydra/issues/1918)) ([5359276](https://github.com/ory/hydra/commit/5359276ac96a27cfe07c39647b4dee8a581d2dae)), closes [#1916](https://github.com/ory/hydra/issues/1916):
+
+    > This install dependencies only when you make a target that needs it.
+    > 
+    > This also removes the check that certain system dependencies (e.g. go)
+    > are installed. Instead, we simply let the target fail. This ensures we
+    > only test for the desired dependencies.
+
+
+
+## [1.5.1](https://github.com/ory/hydra/compare/v1.5.0...v1.5.1) (2020-06-16)
+
+No significant changes have been made for this release.
+
+
+# [1.5.0](https://github.com/ory/hydra/compare/v1.5.0-beta.5...v1.5.0) (2020-06-16)
 
 
 ### Bug Fixes

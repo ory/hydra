@@ -4,18 +4,20 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-06-22)](#unreleased-2020-06-22)
+- [Unreleased (2020-06-23)](#unreleased-2020-06-23)
+  - [1.5.2 (2020-06-23)](#152-2020-06-23)
     - [Bug Fixes](#bug-fixes)
+    - [Features](#features)
   - [1.5.1 (2020-06-16)](#151-2020-06-16)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
     - [Bug Fixes](#bug-fixes-1)
     - [Documentation](#documentation)
-    - [Features](#features)
+    - [Features](#features-1)
     - [Unclassified](#unclassified)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
     - [Bug Fixes](#bug-fixes-2)
     - [Documentation](#documentation-1)
-    - [Features](#features-1)
+    - [Features](#features-2)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
     - [Bug Fixes](#bug-fixes-3)
@@ -33,7 +35,7 @@
   - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-6)
     - [Documentation](#documentation-4)
-    - [Features](#features-2)
+    - [Features](#features-3)
   - [1.4.7 (2020-04-24)](#147-2020-04-24)
     - [Bug Fixes](#bug-fixes-7)
     - [Documentation](#documentation-5)
@@ -47,7 +49,7 @@
     - [Bug Fixes](#bug-fixes-10)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-8)
-    - [Features](#features-3)
+    - [Features](#features-4)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-9)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
@@ -56,7 +58,7 @@
     - [Bug Fixes](#bug-fixes-12)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-10)
-    - [Features](#features-4)
+    - [Features](#features-5)
     - [Unclassified](#unclassified-2)
     - [BREAKING CHANGES](#breaking-changes-1)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
@@ -73,7 +75,7 @@
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
     - [Bug Fixes](#bug-fixes-14)
     - [Documentation](#documentation-12)
-    - [Features](#features-5)
+    - [Features](#features-6)
     - [Unclassified](#unclassified-3)
   - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-4)
@@ -442,11 +444,17 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.5.1...5359276ac96a27cfe07c39647b4dee8a581d2dae) (2020-06-22)
+# Unreleased (2020-06-23)
+
+No significant changes have been made for this release.
+
+
+## [1.5.2](https://github.com/ory/hydra/compare/v1.5.1...v1.5.2) (2020-06-23)
 
 
 ### Bug Fixes
 
+* Bump pop to v5.2 ([#1922](https://github.com/ory/hydra/issues/1922)) ([5097805](https://github.com/ory/hydra/commit/50978054737e7ae7c54adf5ec9ee478e9feb174f)), closes [#1892](https://github.com/ory/hydra/issues/1892)
 * Do not log error at login/consent cancelation ([#1914](https://github.com/ory/hydra/issues/1914)) ([379eed3](https://github.com/ory/hydra/commit/379eed3db3b3e4b8f13f12145f7f48048ab0cf8e)), closes [#1912](https://github.com/ory/hydra/issues/1912)
 * Improve Makefile dependency management ([#1918](https://github.com/ory/hydra/issues/1918)) ([5359276](https://github.com/ory/hydra/commit/5359276ac96a27cfe07c39647b4dee8a581d2dae)), closes [#1916](https://github.com/ory/hydra/issues/1916):
 
@@ -455,6 +463,20 @@
     > This also removes the check that certain system dependencies (e.g. go)
     > are installed. Instead, we simply let the target fail. This ensures we
     > only test for the desired dependencies.
+
+
+### Features
+
+* Allow modifying unix socket permissions ([#1915](https://github.com/ory/hydra/issues/1915)) ([b19b7cf](https://github.com/ory/hydra/commit/b19b7cfd2eadf3dc7a1ef904756b435f5205a273)):
+
+    > This allows the reverse proxy to actually read the unix socket, since
+    > 
+    >  - The default permissions are 0755
+    >  - Hydra is usually run as a user different than the reverse proxy
+    >  - One needs read and write permissions to connect to the socket
+    > 
+    > With the commit, one can set the group to be a group that contains the
+    > reverse proxy user and permissions to 0770
 
 
 

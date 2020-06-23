@@ -114,4 +114,15 @@ like:
 - `ADMIN_HOST="unix:/var/run/hydra/admin_socket"`
 
 ORY Hydra will try to create the socket file during startup and the socket will
-be writeable by the user running ORY Hydra.
+be writeable by the user running ORY Hydra. The owner, group and mode of the
+socket can be modified:
+
+```yaml
+serve:
+  admin:
+    host: unix:/var/run/hydra/admin_socket
+    socket:
+      owner: hydra
+      group: hydra-admin-api
+      mode: 770
+```

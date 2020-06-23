@@ -70,7 +70,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: text
+  format: json
 
 ## serve ##
 #
@@ -94,7 +94,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 24282
+    port: 37162
 
     ## host ##
     #
@@ -109,7 +109,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ""
+    host: localhost
 
     ## cors ##
     #
@@ -164,7 +164,11 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
+        - TRACE
+        - PATCH
+        - TRACE
         - POST
+        - TRACE
 
       ## allowed_headers ##
       #
@@ -179,11 +183,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - eu
-        - velit est nostrud
-        - Duis
-        - culpa aute sunt id
-        - anim deserunt
+        - aute et nulla
 
       ## exposed_headers ##
       #
@@ -198,9 +198,8 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - minim consequat exercitation sunt in
-        - officia mollit
-        - anim eiusmod voluptate sunt do
+        - aute velit in dolor
+        - et
 
       ## allow_credentials ##
       #
@@ -214,7 +213,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -228,7 +227,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -240,7 +239,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 25720902
+      max_age: 80959111
 
       ## debug ##
       #
@@ -254,7 +253,51 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
+
+    ## socket ##
+    #
+    # Sets the permissions of the unix socket
+    #
+    socket:
+      
+      ## owner ##
+      #
+      # Owner of unix socket. If empty, the owner will be the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_SOCKET_OWNER=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
+      #
+      owner: voluptate ex Ut ad
+
+      ## group ##
+      #
+      # Group of unix socket. If empty, the group will be the primary group of the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_SOCKET_GROUP=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
+      #
+      group: fugiat laboris pariatur aliquip adipisicing
+
+      ## mode ##
+      #
+      # Mode of unix socket in numeric form
+      #
+      # Default value: 493
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_SOCKET_MODE=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
+      #
+      mode: 207
 
     ## access_log ##
     #
@@ -290,7 +333,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 10912
+    port: 15345
 
     ## host ##
     #
@@ -325,7 +368,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -345,9 +388,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - "*"
 
       ## allowed_methods ##
       #
@@ -362,9 +403,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - OPTIONS
-        - TRACE
-        - PATCH
+        - POST
+        - GET
 
       ## allowed_headers ##
       #
@@ -379,9 +419,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - Ut laboris
-        - fugiat ad reprehenderit eiusmod
-        - nisi ea ut eu ullamco
+        - Lorem est
+        - voluptate labore
+        - adipisicing est commodo deserunt
+        - anim exercitation ex
 
       ## exposed_headers ##
       #
@@ -396,10 +437,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - cillum esse aliqua
-        - fugiat quis aute ut
-        - magna
-        - nostrud nisi est velit sed
+        - Ut in sint laborum
+        - officia
+        - qui
+        - sed in dolore Excepteur Ut
+        - dolore irure nisi
 
       ## allow_credentials ##
       #
@@ -427,7 +469,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -439,7 +481,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 87705766
+      max_age: 73698706
 
       ## debug ##
       #
@@ -453,7 +495,51 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
+
+    ## socket ##
+    #
+    # Sets the permissions of the unix socket
+    #
+    socket:
+      
+      ## owner ##
+      #
+      # Owner of unix socket. If empty, the owner will be the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_SOCKET_OWNER=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
+      #
+      owner: voluptate
+
+      ## group ##
+      #
+      # Group of unix socket. If empty, the group will be the primary group of the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_SOCKET_GROUP=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
+      #
+      group: voluptate nulla id dolore ut
+
+      ## mode ##
+      #
+      # Mode of unix socket in numeric form
+      #
+      # Default value: 493
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_SOCKET_MODE=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_SOCKET_MODE=<value>
+      #
+      mode: 16
 
     ## access_log ##
     #
@@ -503,15 +589,15 @@ serve:
     #
     cert:
       
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_PATH=<value>
+      #    $ export SERVE_TLS_CERT_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_PATH=<value>
+      #    > set SERVE_TLS_CERT_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## allow_termination_from ##
     #
@@ -546,7 +632,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: None
 
     ## same_site_legacy_workaround ##
     #
@@ -563,7 +649,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
     #
-    same_site_legacy_workaround: false
+    same_site_legacy_workaround: true
 
 ## dsn ##
 #
@@ -575,7 +661,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: aliquip proident nisi
+dsn: Excepteur aute exercitation
 
 ## webfinger ##
 #
@@ -604,8 +690,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
     #
-    broadcast_keys:
-      - hydra.openid.id-token
+    broadcast_keys: hydra.jwt.access-token
 
   ## oidc_discovery ##
   #
@@ -895,7 +980,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_ACCESS_TOKEN=<value>
   #
-  access_token: jwt
+  access_token: opaque
 
 ## ttl ##
 #
@@ -943,7 +1028,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 1h
+  refresh_token: "-1"
 
   ## id_token ##
   #
@@ -971,7 +1056,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 10m
+  auth_code: 1h
 
 ## oauth2 ##
 #
@@ -992,7 +1077,7 @@ oauth2:
   # - Windows Command Line (CMD):
   #    > set OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
   #
-  expose_internal_errors: false
+  expose_internal_errors: true
 
   ## hashers ##
   #
@@ -1018,7 +1103,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 75418380
+      cost: 83455078
 
   ## pkce ##
   #
@@ -1246,6 +1331,6 @@ tracing:
       # - Windows Command Line (CMD):
       #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       #
-      server_url: http://ruKAfLfbudkiksXIHCdJPstWw.qujdXp4Y,HDk33zL+IW1A.XBW,LIB7E3z,0Zp8
+      server_url: https://eAzqrYxacZoALeDS.hgxwIAgmr5UzduB4kurZBiRKl
 
 ```

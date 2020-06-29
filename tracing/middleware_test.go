@@ -94,3 +94,35 @@ func TestShouldContinueTraceIfAlreadyPresent(t *testing.T) {
 
 	assert.Equal(t, parentSpan.SpanContext.SpanID, span.ParentID)
 }
+
+func TestShouldNotTraceHealthEndpoint(t *testing.T) {
+	testCases := []struct {
+		path            string
+		testDescription string
+	}{
+		{
+			path:            "health/ready",
+			testDescription: "ready",
+		},
+		{
+			path:            "health/alive",
+			testDescription: "alive",
+		},
+	}
+	for _, test := range testCases {
+		t.Run(test.testDescription, func(t *testing.T) {
+			defer mockedTracer.Reset()
+			request := httptest.NewRequest(http.MethodGet, "https://apis.somecompany.com/"+test.path, nil)
+
+			next := func(rw http.ResponseWriter, _ *http.Request) {
+				rw.WriteHeader(http.StatusOK)
+			}
+
+			tracer.ServeHTTP(negroni.NewResponseWriter(httptest.NewRecorder()), request, next)
+
+			spans := mockedTracer.FinishedSpans()
+			assert.Len(t, spans, 0)
+
+		})
+	}
+}

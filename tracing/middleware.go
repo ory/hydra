@@ -2,6 +2,7 @@ package tracing
 
 import (
 	"net/http"
+	"strings"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -11,6 +12,12 @@ import (
 func (t *Tracer) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	var span opentracing.Span
 	opName := r.URL.Path
+
+	// Omit health endpoints
+	if strings.HasPrefix(opName, "/health/") {
+		next(rw, r)
+		return
+	}
 
 	// It's very possible that Hydra is fronted by a proxy which could have initiated a trace.
 	// If so, we should attempt to join it.

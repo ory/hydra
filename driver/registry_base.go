@@ -131,7 +131,7 @@ func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
 
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
-		h := herodot.NewJSONWriter(m.Logger().Logger)
+		h := herodot.NewJSONWriter(m.Logger())
 		h.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
 		m.writer = h
 	}

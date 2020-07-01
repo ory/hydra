@@ -57,25 +57,25 @@ func RejectInsecureRequests(reg tlsRegistry, c tlsConfig) negroni.HandlerFunc {
 		}
 
 		if len(c.AllowTLSTerminationFrom()) == 0 {
-			reg.Logger().WithError(errors.New("TLS termination is not enabled")).Warnln("Could not serve http connection")
+			reg.Logger().WithRequest(r).WithError(errors.New("TLS termination is not enabled")).Error("Could not serve http connection")
 			reg.Writer().WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("can not serve request over insecure http"))
 			return
 		}
 
 		ranges := c.AllowTLSTerminationFrom()
 		if err := MatchesRange(r, ranges); err != nil {
-			reg.Logger().WithError(err).Warnln("Could not serve http connection")
+			reg.Logger().WithRequest(r).WithError(err).Warnln("Could not serve http connection")
 			reg.Writer().WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("can not serve request over insecure http"))
 			return
 		}
 
 		proto := r.Header.Get("X-Forwarded-Proto")
 		if proto == "" {
-			reg.Logger().WithError(errors.New("X-Forwarded-Proto header is missing")).Warnln("Could not serve http connection")
+			reg.Logger().WithRequest(r).WithError(errors.New("X-Forwarded-Proto header is missing")).Error("Could not serve http connection")
 			reg.Writer().WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("can not serve request over insecure http"))
 			return
 		} else if proto != "https" {
-			reg.Logger().WithError(errors.New("X-Forwarded-Proto header is missing")).Warnln("Could not serve http connection")
+			reg.Logger().WithRequest(r).WithError(errors.New("X-Forwarded-Proto header is missing")).Error("Could not serve http connection")
 			reg.Writer().WriteErrorCode(rw, r, http.StatusBadGateway, errors.Errorf("expected X-Forwarded-Proto header to be https but got: %s", proto))
 			return
 		}

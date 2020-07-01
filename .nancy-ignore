@@ -1,0 +1,4 @@
+# HashiCorp Consul issues - can be ignored because consul is not used.
+CVE-2020-7219
+CVE-2018-19653
+# End HashiCorp Consul

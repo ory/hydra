@@ -1,3 +1,8 @@
 :root {
   --ifm-color-primary: #6274f3;
 }
+
+.markdown figure {
+  padding: 8px;
+  margin: 32px;
+}

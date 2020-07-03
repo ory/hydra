@@ -44,7 +44,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: trace
+  level: debug
 
   ## leak_sensitive_values ##
   #
@@ -58,7 +58,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
   #
-  leak_sensitive_values: true
+  leak_sensitive_values: false
 
   ## format ##
   #
@@ -72,7 +72,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: text
+  format: json
 
 ## serve ##
 #
@@ -94,7 +94,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 27021
+    port: 20674
 
     ## host ##
     #
@@ -109,7 +109,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: localhost
+    host: ''
 
     ## cors ##
     #
@@ -128,7 +128,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: false
+      enabled: true
 
       ## allowed_origins ##
       #
@@ -148,9 +148,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -165,10 +163,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - TRACE
-        - POST
+        - PATCH
         - HEAD
-        - OPTIONS
+        - GET
 
       ## allowed_headers ##
       #
@@ -183,8 +180,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - reprehenderit cupidatat consequat
-        - enim veniam officia culpa amet
+        - in
+        - aliqua ipsum ea nulla
+        - sed quis ex veniam
+        - tempor
 
       ## exposed_headers ##
       #
@@ -199,10 +198,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - pariatur dolore voluptate proident est
-        - Excepteur Lorem
-        - dolore
-        - non dolore Duis sunt ipsum
+        - cupidatat
+        - cupidatat esse ullamco ex velit
+        - aliquip exercitation reprehenderit Duis
 
       ## allow_credentials ##
       #
@@ -242,7 +240,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 94292311
+      max_age: 49986263
 
       ## debug ##
       #
@@ -273,7 +271,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
       #
-      owner: ex do proident
+      owner: nostrud sint veniam aliqua
 
       ## group ##
       #
@@ -285,7 +283,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
       #
-      group: sint minim veniam esse
+      group: mollit culpa
 
       ## mode ##
       #
@@ -299,7 +297,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
       #
-      mode: 443
+      mode: 489
 
     ## access_log ##
     #
@@ -318,7 +316,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: false
+      disable_for_health: true
 
   ## admin ##
   #
@@ -333,7 +331,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 35757
+    port: 57236
 
     ## host ##
     #
@@ -387,9 +385,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -404,7 +400,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - DELETE
+        - PUT
+        - PATCH
+        - GET
 
       ## allowed_headers ##
       #
@@ -419,7 +417,11 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - sunt eu pariatur veniam et
+        - non laborum
+        - ea nulla
+        - incididunt Ut sed
+        - qui
+        - dolor esse
 
       ## exposed_headers ##
       #
@@ -434,8 +436,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - sunt do
-        - ipsum ut ex cillum
+        - Excepteur eiusmod nostrud magna
+        - incididunt enim Duis
+        - quis proident ad sunt nisi
+        - in laborum
 
       ## allow_credentials ##
       #
@@ -475,7 +479,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 87096341
+      max_age: 89000566
 
       ## debug ##
       #
@@ -506,7 +510,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
       #
-      owner: Ut
+      owner: eiusmod commodo
 
       ## group ##
       #
@@ -518,7 +522,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
       #
-      group: est Ut do
+      group: anim ea
 
       ## mode ##
       #
@@ -532,7 +536,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_MODE=<value>
       #
-      mode: 165
+      mode: 14
 
     ## access_log ##
     #
@@ -600,8 +604,6 @@ serve:
     #
     allow_termination_from:
       - 127.0.0.1/32
-      - 127.0.0.1/32
-      - 127.0.0.1/32
 
   ## cookies ##
   #
@@ -618,7 +620,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: None
 
     ## same_site_legacy_workaround ##
     #
@@ -647,7 +649,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: ad
+dsn: id sint
 
 ## webfinger ##
 #
@@ -944,7 +946,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: exact
+  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
 
   ## access_token ##
   #
@@ -956,7 +958,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_ACCESS_TOKEN=<value>
   #
-  access_token: jwt
+  access_token: opaque
 
 ## ttl ##
 #
@@ -1003,7 +1005,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 1h
+  refresh_token: '-1'
 
   ## id_token ##
   #
@@ -1075,7 +1077,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 62013399
+      cost: 31027833
 
   ## pkce ##
   #
@@ -1296,5 +1298,5 @@ tracing:
       # - Windows Command Line (CMD):
       #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       #
-      server_url: https://lUCuhZzMAnMFfUjdoROJSnmOVKIr.lvjUnbWlN
+      server_url: http://TcWkdDBLd.ioKPDAHsuUzdu1rNhPr-qS.EF1ePd-i0F9Pxxq7-xAjZo0GkTevD
 ```

@@ -9,7 +9,7 @@
 //     cr([Create Request]) --> backoffice[Backoffice Server REST]
 // `}/>
 
-import React, {useEffect} from "react"
+import React, {useEffect, useState} from "react"
 import mermaid from "mermaid"
 import styles from './mermaid.module.css';
 import cn from 'classnames'
@@ -27,19 +27,37 @@ mermaid.initialize({
     nodeSpacing: 30,
     curve: "basis"
   },
-  sequence:{
+  sequence: {
     useMaxWidth: true,
   },
-  gantt:{
+  gantt: {
     useMaxWidth: true,
   }
 })
 
 const Mermaid = ({chart}) => {
+  const [zoomed, setZoomed] = useState(false);
+  const [svg, setSvg] = useState(undefined)
+  const [id] = useState(`mermaid-${Math.random().toString(36).substr(2, -1)}`)
+  const toggle = () => setZoomed(!zoomed)
+
   useEffect(() => {
-    mermaid.contentLoaded()
+    mermaid.render(id, chart, (svg => {
+      setSvg(svg)
+    }))
   }, [])
-  return <div className={cn(styles.graph, "mermaid")}>{chart}</div>
+
+  return (
+    <>
+      <div onClick={toggle} className={cn(styles.graph, styles.pointer)} dangerouslySetInnerHTML={{__html: svg}}/>
+      <div onClick={toggle}
+           className={cn(styles.overlay, styles.pointer, styles.graph, {[styles.visible]: zoomed})}>
+        <div onClick={(e) => e.stopPropagation()}
+             className={cn(styles.backdrop, styles.graph)}
+             dangerouslySetInnerHTML={{__html: svg}}/>
+      </div>
+    </>
+  )
 }
 
 export default Mermaid

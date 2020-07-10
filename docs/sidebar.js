@@ -1,37 +1,75 @@
 module.exports = {
   "Introduction": [
     "index",
+    "5min-tutorial",
     "install",
   ],
-  Concepts: ["oauth2", "login-consent-flow"],
-  "Integrating Hydra into your stack":[
-    "5min-tutorial",
-    "implementing-consent",
-    "case-study"
+  Concepts: [
+    "concepts/oauth2",
+    "concepts/openid-connect-oidc",
+    "concepts/login",
+    "concepts/consent",
+    "concepts/logout",
+    "jwks",
+    "limitations",
   ],
   "Guides": [
-    "configure-deploy",
-    "dependencies-environment",
-    "production",
-    "debugging",
-    "advanced",
-    "integration"
+    {
+      type: "category",
+      label: "Implementing the User Interface",
+      items: [
+        "guides/login",
+        "guides/consent",
+        "guides/logout",
+      ]
+    },
+    {
+      type: "category",
+      label: "Operations",
+      items: [
+        "configure-deploy",
+        "dependencies-environment",
+        "production",
+        "guides/tracing",
+        "guides/secrets-key-rotation",
+        "guides/ssl-https-tls",
+        "guides/cookies",
+        "guides/cors",
+      ]
+    },
+    {
+      type: "category",
+      label: "OAuth2 & OpenID Connect",
+      items: [
+        "advanced",
+        "guides/oauth2-clients",
+        "guides/common-oauth2-openid-connect-flows",
+        "guides/using-oauth2",
+        "guides/oauth2-token-introspection",
+        "guides/oauth2-public-spa-mobile"
+      ]
+    },
   ],
-  "Reference":[
+  "Reference": [
     "reference/configuration",
     "reference/api",
-
   ],
-  "SDKs":[
+  "Debug & Help": [
+    "debug",
+    "debug/csrf",
+    "debug/token-endpoint-auth-method",
+    "debug/logout",
+  ],
+  "SDKs": [
     "sdk",
     "sdk/go",
     "sdk/js",
     "sdk/php",
   ],
-  "Further Reading":[
-    "limitations",
-    "jwks",
+  "Further Reading": [
+    "case-study",
     "benchmark",
     "security-architecture",
-    "faq"],
+    "faq"
+  ],
 };

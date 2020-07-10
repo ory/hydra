@@ -45,7 +45,7 @@ if (fs.existsSync('./versions.json')) {
     });
   }
   if (version.length === 0) {
-    version = ['latest']
+    version = ['master']
   }
 }
 

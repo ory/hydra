@@ -46,6 +46,8 @@ const (
 // swagger:model completedRequest
 type RequestHandlerResponse struct {
 	// RedirectURL is the URL which you should redirect the user to once the authentication process is completed.
+	//
+	// required: true
 	RedirectTo string `json:"redirect_to"`
 }
 
@@ -65,11 +67,25 @@ func (s LoginSession) TableName() string {
 //
 // swagger:model rejectRequest
 type RequestDeniedError struct {
-	Name        string `json:"error"`
+	// The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).
+	//
+	// Defaults to `request_denied`.
+	Name string `json:"error"`
+
+	// Description of the error in a human readable format.
 	Description string `json:"error_description"`
-	Hint        string `json:"error_hint,omitempty"`
-	Code        int    `json:"status_code,omitempty"`
-	Debug       string `json:"error_debug,omitempty"`
+
+	// Hint to help resolve the error.
+	Hint string `json:"error_hint"`
+
+	// Represents the HTTP status code of the error (e.g. 401 or 403)
+	//
+	// Defaults to 400
+	Code int `json:"status_code"`
+
+	// Debug contains information to help resolve the problem as a developer. Usually not exposed
+	// to the public but only in the server logs.
+	Debug string `json:"error_debug"`
 
 	valid bool
 }
@@ -90,7 +106,7 @@ func (e *RequestDeniedError) SetDefaults(name string) {
 
 func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	if e.Name == "" {
-		e.Name = "request was denied"
+		e.Name = "request_denied"
 	}
 
 	if e.Code == 0 {
@@ -248,6 +264,7 @@ type HandledLoginRequest struct {
 	ACR string `json:"acr" db:"acr"`
 
 	// Subject is the user ID of the end-user that authenticated.
+	//
 	// required: true
 	Subject string `json:"subject" db:"subject"`
 
@@ -412,23 +429,33 @@ type LogoutResult struct {
 type LoginRequest struct {
 	// Challenge is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
+	//
+	// required: true
 	Challenge string `json:"challenge" db:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
+	//
+	// required: true
 	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
 
 	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	//
+	// required: true
 	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
 	//
 	// This feature allows you to update / set session information.
+	//
+	// required: true
 	Skip bool `json:"skip" db:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
 	// when accepting the login request, or the request will fail.
+	//
+	// required: true
 	Subject string `json:"subject" db:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
@@ -436,6 +463,8 @@ type LoginRequest struct {
 	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
+	//
+	// required: true
 	Client *client.Client `json:"client"`
 
 	ClientID string `json:"-" db:"client_id"`
@@ -443,6 +472,8 @@ type LoginRequest struct {
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
+	//
+	// required: true
 	RequestURL string `json:"request_url" db:"request_url"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
@@ -475,6 +506,8 @@ func (r *LoginRequest) prepareSQL() *LoginRequest {
 type ConsentRequest struct {
 	// Challenge is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
+	//
+	// required: true
 	Challenge string `json:"challenge" db:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.

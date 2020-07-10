@@ -40,14 +40,17 @@ The same can be achieved by setting
 To initiate the flow, redirect the user's browser to the OAuth2 Auth Code URL:
 
 ```html
-<a href="https://ory-hydra:4444/oauth2/auth/?client_id=client-id&scope=offline_access&redirect_uri=http://my-app.com/callback">
+<a
+  href="https://ory-hydra:4444/oauth2/auth/?client_id=client-id&scope=offline_access&redirect_uri=http://my-app.com/callback"
+>
   Connect with ...
 </a>
 ```
 
 ## Client Credentials Flow
 
-To create a client only capable of performing the OAuth 2.0 Client Credentials flow, use:
+To create a client only capable of performing the OAuth 2.0 Client Credentials
+flow, use:
 
 ```shell script
 hydra clients create \

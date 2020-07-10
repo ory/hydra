@@ -2441,6 +2441,9 @@
     "completedRequest": {
       "type": "object",
       "title": "The response payload sent when accepting or rejecting a login or consent request.",
+      "required": [
+        "redirect_to"
+      ],
       "properties": {
         "redirect_to": {
           "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
@@ -2451,6 +2454,9 @@
     "consentRequest": {
       "type": "object",
       "title": "Contains information on an ongoing consent request.",
+      "required": [
+        "challenge"
+      ],
       "properties": {
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
@@ -2600,6 +2606,15 @@
     "loginRequest": {
       "type": "object",
       "title": "Contains information on an ongoing login request.",
+      "required": [
+        "challenge",
+        "requested_scope",
+        "requested_access_token_audience",
+        "skip",
+        "subject",
+        "client",
+        "request_url"
+      ],
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
@@ -2921,18 +2936,23 @@
       "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
+          "description": "The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).\n\nDefaults to `request_denied`.",
           "type": "string"
         },
         "error_debug": {
+          "description": "Debug contains information to help resolve the problem as a developer. Usually not exposed\nto the public but only in the server logs.",
           "type": "string"
         },
         "error_description": {
+          "description": "Description of the error in a human readable format.",
           "type": "string"
         },
         "error_hint": {
+          "description": "Hint to help resolve the error.",
           "type": "string"
         },
         "status_code": {
+          "description": "Represents the HTTP status code of the error (e.g. 401 or 403)\n\nDefaults to 400",
           "type": "integer",
           "format": "int64"
         }

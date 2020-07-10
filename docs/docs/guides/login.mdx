@@ -15,16 +15,18 @@ Please read the [Login Flow Documentation](../concepts/login) first!
 
 :::
 
-In this document, you will learn how to implement the Login Endpoint using our ORY Hydra SDKs.
-The goal for this document is to have document this for multiple programming languages. If you are
-an expert in one of these languages, your help is highly appreciated in improving these docs!
+In this document, you will learn how to implement the Login Endpoint using our
+ORY Hydra SDKs. The goal for this document is to have document this for multiple
+programming languages. If you are an expert in one of these languages, your help
+is highly appreciated in improving these docs!
 
 ## Implementing the Login HTML Form
 
 :::note
 
-The Login HTML Form cannot be a Signle Page App (Client-side browser application) or a Mobile App! It has to be
-a server-side application with access to ORY Hydra's Admin Endpoint!
+The Login HTML Form cannot be a Signle Page App (Client-side browser
+application) or a Mobile App! It has to be a server-side application with access
+to ORY Hydra's Admin Endpoint!
 
 :::
 
@@ -42,7 +44,9 @@ a server-side application with access to ORY Hydra's Admin Endpoint!
 
 :::note
 
-Check out our [reference implementation](https://github.com/ory/hydra-login-consent-node) of this endpoint!
+Check out our
+[reference implementation](https://github.com/ory/hydra-login-consent-node) of
+this endpoint!
 
 :::
 
@@ -51,22 +55,22 @@ Check out our [reference implementation](https://github.com/ory/hydra-login-cons
 import express from 'express'
 import url from 'url'
 import csrf from 'csurf'
-import {AdminApi} from '@oryd/hydra-client'
+import { AdminApi } from '@oryd/hydra-client'
 
 const hydraAdmin = new AdminApi(process.env.HYDRA_ADMIN_URL)
 
 // Sets up csrf protection. Always do this when handling HTML forms!
-const csrfProtection = csrf({cookie: true});
-const router = express.Router();
+const csrfProtection = csrf({ cookie: true })
+const router = express.Router()
 
 router.get('/login', csrfProtection, (req, res, next) => {
   // Parses the URL query
-  const query = url.parse(req.url, true).query;
+  const query = url.parse(req.url, true).query
 
   // The challenge is used to fetch information about the login request from ORY Hydra.
-  const challenge = String(query.login_challenge);
+  const challenge = String(query.login_challenge)
 
-  hydraAdmin.getLoginRequest(challenge).then(({body}) => {
+  hydraAdmin.getLoginRequest(challenge).then(({ body }) => {
     // If hydra was already able to authenticate the user, skip will be true and we do not need to re-authenticate
     // the user.
     if (body.skip) {
@@ -75,20 +79,22 @@ router.get('/login', csrfProtection, (req, res, next) => {
 
       // Now it's time to grant the login request. You could also deny the request if something went terribly wrong
       // (e.g. your arch-enemy logging in...)
-      return hydraAdmin.acceptLoginRequest(challenge, {
-        // All we need to do is to confirm that we indeed want to log in the user.
-        subject: String(body.subject)
-      }).then(({body}) => {
-        // All we need to do now is to redirect the user back to hydra!
-        res.redirect(String(body.redirectTo));
-      });
+      return hydraAdmin
+        .acceptLoginRequest(challenge, {
+          // All we need to do is to confirm that we indeed want to log in the user.
+          subject: String(body.subject)
+        })
+        .then(({ body }) => {
+          // All we need to do now is to redirect the user back to hydra!
+          res.redirect(String(body.redirectTo))
+        })
     }
 
     // If authentication can't be skipped we MUST show the login UI.
     res.render('login', {
       csrfToken: req.csrfToken(),
-      challenge: challenge,
-    });
+      challenge: challenge
+    })
   })
 })
 ```
@@ -98,15 +104,15 @@ router.get('/login', csrfProtection, (req, res, next) => {
 
 ```html
 <form action="/login" method="POST">
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-    <input type="hidden" name="challenge" value="{{ challenge }}">
-    <input type="email" id="email" name="email" placeholder="email@foobar.com">
-    <input type="password" id="password" name="password">
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+  <input type="hidden" name="challenge" value="{{ challenge }}" />
+  <input type="email" id="email" name="email" placeholder="email@foobar.com" />
+  <input type="password" id="password" name="password" />
 
-    <input type="checkbox" id="remember" name="remember" value="1">
-    <label for="remember">Remember me</label>
+  <input type="checkbox" id="remember" name="remember" value="1" />
+  <label for="remember">Remember me</label>
 
-    <input type="submit" id="accept" name="submit" value="Log in">
+  <input type="submit" id="accept" name="submit" value="Log in" />
 </form>
 ```
 
@@ -124,7 +130,9 @@ router.get('/login', csrfProtection, (req, res, next) => {
 
 :::note
 
-Check out our [reference implementation](https://github.com/ory/hydra-login-consent-node) of this endpoint!
+Check out our
+[reference implementation](https://github.com/ory/hydra-login-consent-node) of
+this endpoint!
 
 :::
 
@@ -132,7 +140,7 @@ Check out our [reference implementation](https://github.com/ory/hydra-login-cons
 // This is the endpoint the user ends up at once she/he inserts their password and username and hits "Log in".
 router.post('/login', csrfProtection, (req, res, next) => {
   // The challenge is now a hidden input field, so let's take it from the request body instead
-  const challenge = req.body.challenge;
+  const challenge = req.body.challenge
 
   // Let's check if the user provided valid credentials. Of course, you'd use a database or some third-party service
   // for this! Alternatively, you can also use ORY Kratos:
@@ -145,33 +153,34 @@ router.post('/login', csrfProtection, (req, res, next) => {
       csrfToken: req.csrfToken(),
       challenge: challenge,
       error: 'The username / password combination is not correct'
-    });
+    })
     return
   }
 
   // Seems like the user authenticated! Let's tell hydra...
-  hydraAdmin.acceptLoginRequest(challenge, {
-    // Subject is an alias for user ID. A subject can be a random string, a UUID, an email address, ....
-    subject: 'foo@bar.com',
+  hydraAdmin
+    .acceptLoginRequest(challenge, {
+      // Subject is an alias for user ID. A subject can be a random string, a UUID, an email address, ....
+      subject: 'foo@bar.com',
 
-    // This tells hydra to remember the browser and automatically authenticate the user in future requests. This will
-    // set the "skip" parameter in the other route to true on subsequent requests!
-    remember: Boolean(req.body.remember),
+      // This tells hydra to remember the browser and automatically authenticate the user in future requests. This will
+      // set the "skip" parameter in the other route to true on subsequent requests!
+      remember: Boolean(req.body.remember),
 
-    // When the session expires, in seconds. Set this to 0 so it will never expire.
-    rememberFor: 3600,
+      // When the session expires, in seconds. Set this to 0 so it will never expire.
+      rememberFor: 3600
 
-    // Sets which "level" (e.g. 2-factor authentication) of authentication the user has. The value is really arbitrary
-    // and optional. In the context of OpenID Connect, a value of 0 indicates the lowest authorization level.
-    // acr: '0',
-  })
-    .then(({body}) => {
+      // Sets which "level" (e.g. 2-factor authentication) of authentication the user has. The value is really arbitrary
+      // and optional. In the context of OpenID Connect, a value of 0 indicates the lowest authorization level.
+      // acr: '0',
+    })
+    .then(({ body }) => {
       // All we need to do now is to redirect the user back to hydra!
-      res.redirect(String(body.redirectTo));
+      res.redirect(String(body.redirectTo))
     })
     // This will handle any error that happens when making HTTP calls to hydra
-    .catch(next);
-});
+    .catch(next)
+})
 ```
 
 </TabItem>
@@ -189,13 +198,14 @@ router.post('/login', csrfProtection, (req, res, next) => {
 ```typescript
 // You can deny the login request at any point - for example if the system is currently undergoing maintenance
 // or the user has been banned, is not allowed to use OAuth2 flows, and so on:
-hydraAdmin.rejectLoginRequest(challenge, {
-  error: 'user_banned',
-  errorDescription: 'You are not allowed to log in!'
-})
-  .then(({body}) => {
+hydraAdmin
+  .rejectLoginRequest(challenge, {
+    error: 'user_banned',
+    errorDescription: 'You are not allowed to log in!'
+  })
+  .then(({ body }) => {
     // All we need to do now is to redirect the browser back to hydra!
-    res.redirect(String(body.redirectTo));
+    res.redirect(String(body.redirectTo))
   })
 ```
 

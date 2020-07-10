@@ -8,21 +8,33 @@ import Mermaid from '@theme/Mermaid'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
-OAuth2 and OpenID Connect require an authenticated End-User session for all OAuth2 / OpenID Connect flows except
-the `client_credentials` flow which does not involve End-Users.
+OAuth2 and OpenID Connect require an authenticated End-User session for all
+OAuth2 / OpenID Connect flows except the `client_credentials` flow which does
+not involve End-Users.
 
-ORY Hydra does not contain a database with End-Users but instead uses HTTP Redirection to "delegate" the login and consent
-flow to another app - we call this the Login & Consent App.
+ORY Hydra does not contain a database with End-Users but instead uses HTTP
+Redirection to "delegate" the login and consent flow to another app - we call
+this the Login & Consent App.
 
-The following short video shows the flow from an End-User's perspective - it includes both login and consent.
+The following short video shows the flow from an End-User's perspective - it
+includes both login and consent.
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/txUmfORzu8Y" frameborder="0" allowfullscreen></iframe>
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/txUmfORzu8Y"
+  frameborder="0"
+  allowfullscreen
+></iframe>
 
-Please read [Login Flow](./login) first, as the Login Flow happens before the consent flow.
+Please read [Login Flow](./login) first, as the Login Flow happens before the
+consent flow.
 
-The following sequence diagram describes the different API calls and HTTP Redirects when performing the OAuth2 flow:
+The following sequence diagram describes the different API calls and HTTP
+Redirects when performing the OAuth2 flow:
 
-<Mermaid chart={`sequenceDiagram
+<Mermaid
+  chart={`sequenceDiagram
     OAuth2 Client->>ORY Hydra: Initiates OAuth2 Authorize Code or Implicit Flow
     ORY Hydra-->>ORY Hydra: No end user session available (not authenticated)
     ORY Hydra->>Login Provider: Redirects end user with login challenge
@@ -37,15 +49,20 @@ The following sequence diagram describes the different API calls and HTTP Redire
     Consent Provider-->ORY Hydra: Transmits consent result and receives redirect url with consent verifier
     Consent Provider->>ORY Hydra: Redirects to redirect url with consent verifier
     ORY Hydra-->>ORY Hydra: Verifies grant
-    ORY Hydra->>OAuth2 Client: Transmits authorization code/token`} />
+    ORY Hydra->>OAuth2 Client: Transmits authorization code/token`}
+/>
 
 ## Redirection to the Consent Endpoint
 
 Once the login challenge is accepted, ORY Hydra will ask the user for consent:
 
-<img src={useBaseUrl('/img/docs/google-consent-playground.png')} alt="Exemplary Consent Screen"/>
+<img
+  src={useBaseUrl('/img/docs/google-consent-playground.png')}
+  alt="Exemplary Consent Screen"
+/>
 
-The UI is fully under your control, because ORY Hydra redirects the End-User's browser to the c
+The UI is fully under your control, because ORY Hydra redirects the End-User's
+browser to the c
 
 ```yaml title="hydra serve all -c path/to/hydra/config.yml
 # Can also be set using the environment variable:
@@ -56,13 +73,15 @@ urls:
 
 :::note
 
-The Consent and Login endpoint can obviously be implemented in the same code base / application. Check out our
+The Consent and Login endpoint can obviously be implemented in the same code
+base / application. Check out our
 [Login, Consent & Logout NodeJS Reference implementation](https://github.com/ory/hydra-login-consent-node)!
 
 :::
 
-ORY Hydra appends a `consent_challenge` query parameter to the url. The value is a ID which should later be used
-by the Consent Endpoint to fetch important information about the request.
+ORY Hydra appends a `consent_challenge` query parameter to the url. The value is
+a ID which should later be used by the Consent Endpoint to fetch important
+information about the request.
 
 ```
 https://consent-app/consent?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2
@@ -72,47 +91,56 @@ https://consent-app/consent?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2
 
 A consent has four distinctive attributes:
 
-- The requested scope (`/oauth2/auth?...&...&scope=email+profile+offline_access`);
+- The requested scope
+  (`/oauth2/auth?...&...&scope=email+profile+offline_access`);
 - The OAuth2 Client (`/oauth2/auth?client_id=abcd`);
 - The End-User (this is the `subject` set in the [Login Flow](./login));
-- Whether or not a previous consent exists, the previous consent has `remember: true`, and the scope
-granted by the user (did the user accept all of `email`, `profile`, `offline_access`?)
+- Whether or not a previous consent exists, the previous consent has
+  `remember: true`, and the scope granted by the user (did the user accept all
+  of `email`, `profile`, `offline_access`?)
 
 There are three possible states:
 
 - The user has never before authorized ("consent") the OAuth2 Client before.
-- The user has authorized ("consent") the OAuth2 Client before and chose to remember the "consent".
-- The user has authorized ("consent") the OAuth2 Client before, and chose to remember the "consent", but the OAuth2 Client
-now also wants additional permissions ("has changed the token scope" in `/oauth2/auth?scope=...`).
+- The user has authorized ("consent") the OAuth2 Client before and chose to
+  remember the "consent".
+- The user has authorized ("consent") the OAuth2 Client before, and chose to
+  remember the "consent", but the OAuth2 Client now also wants additional
+  permissions ("has changed the token scope" in `/oauth2/auth?scope=...`).
 
-Regardless of which of these three states we are in, the End-User's browser is always redirected to the consent endpoint.
-What changes is the `skip` value, as explained a bit later.
+Regardless of which of these three states we are in, the End-User's browser is
+always redirected to the consent endpoint. What changes is the `skip` value, as
+explained a bit later.
 
 :::note
 
-In certain scenarios (e.g. a special OAuth2 Client) you might not want to show the consent screen at all.
-In those cases you can choose to skip showing the UI and just accept the consent. Please keep in mind that
-OAuth2 is a delegation protocol and that it makes most sense for third-party access. Not showing the consent
-screen will break OpenID Connect Certification.
+In certain scenarios (e.g. a special OAuth2 Client) you might not want to show
+the consent screen at all. In those cases you can choose to skip showing the UI
+and just accept the consent. Please keep in mind that OAuth2 is a delegation
+protocol and that it makes most sense for third-party access. Not showing the
+consent screen will break OpenID Connect Certification.
 
 :::
 
 ## The Consent Endpoint
 
-The Consent Endpoint (set by `urls.consent`) is an application written by you. You can find an exemplary
+The Consent Endpoint (set by `urls.consent`) is an application written by you.
+You can find an exemplary
 [NodeJS reference implementation on our GitHub](https://github.com/ory/hydra-login-consent-node).
 
-The Consent Endpoint uses the `consent_challenge` value in the URL to fetch information about the consent request
-by making a HTTP GET request to:
+The Consent Endpoint uses the `consent_challenge` value in the URL to fetch
+information about the consent request by making a HTTP GET request to:
 
 ```
 http(s)://<HYDRA_ADMIN_URL>/oauth2/auth/requests/consent?consent_challenge=<challenge>
 ```
 
-The response (see below in "Consent Challenge Response" tab) contains information about the consent request.
-The body contains a `skip` value. If the value is `false`, the user interface must
-be shown. If `skip` is true, you should not show the user interface but instead just accept or reject
-the consent request! For more details about the implementation check the ["Implementing the Consent Endpoint" Guide](../guides/login).
+The response (see below in "Consent Challenge Response" tab) contains
+information about the consent request. The body contains a `skip` value. If the
+value is `false`, the user interface must be shown. If `skip` is true, you
+should not show the user interface but instead just accept or reject the consent
+request! For more details about the implementation check the
+["Implementing the Consent Endpoint" Guide](../guides/login).
 
 <Tabs
   defaultValue="ui"
@@ -130,86 +158,78 @@ the consent request! For more details about the implementation check the ["Imple
 curl "http://127.0.0.1:4445/oauth2/auth/requests/consent?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2"
 ```
 
-Check the ["Implementing the Consent Endpoint" Guide](../guides/consent) for examples using the ORY Hydra SDK in different
-languages.
+Check the ["Implementing the Consent Endpoint" Guide](../guides/consent) for
+examples using the ORY Hydra SDK in different languages.
 
 </TabItem>
 <TabItem value="json">
 
 ```json
 {
-    "challenge": "f633e49d56bc40e0a876ac8242eb9891",
-    "requested_scope": [
-        "openid",
-        "offline"
-    ],
-    "requested_access_token_audience": [],
-    "skip": false,
-    "subject": "foo@bar.com",
-    "oidc_context": {
-      "acr_values": [],
-      "display": "",
-      "id_token_hint_claims": {},
-      "login_hint": "",
-      "ui_locales": []
-    },
-    "client": {
-        "client_id": "auth-code-client",
-        "client_name": "",
-        "redirect_uris": [
-            "http://127.0.0.1:5555/callback"
-        ],
-        "grant_types": [
-            "authorization_code",
-            "refresh_token"
-        ],
-        "response_types": [
-            "code",
-            "id_token"
-        ],
-        "scope": "openid offline",
-        "audience": null,
-        "owner": "",
-        "policy_uri": "",
-        "allowed_cors_origins": null,
-        "tos_uri": "",
-        "client_uri": "",
-        "logo_uri": "",
-        "contacts": null,
-        "client_secret_expires_at": 0,
-        "subject_type": "public",
-        "token_endpoint_auth_method": "client_secret_basic",
-        "userinfo_signed_response_alg": "none",
-        "created_at": "2020-07-09T10:07:01Z",
-        "updated_at": "2020-07-09T10:07:01Z"
-    },
-    "request_url": "http://127.0.0.1:4444/oauth2/auth?audience=&client_id=auth-code-client&max_age=0&nonce=shfxjszihgvbptswjbqsrdbg&prompt=&redirect_uri=http%3A%2F%2F127.0.0.1%3A5555%2Fcallback&response_type=code&scope=openid+offline&state=pmkekezifwwpgmzpckiqxzbt",
-    "login_challenge": "de814daf9bbb4b788b505b3c2dd5ce20",
-    "login_session_id": "c829da46-2041-400c-b72d-08324f878d0a",
-    "acr": ""
+  "challenge": "f633e49d56bc40e0a876ac8242eb9891",
+  "requested_scope": ["openid", "offline"],
+  "requested_access_token_audience": [],
+  "skip": false,
+  "subject": "foo@bar.com",
+  "oidc_context": {
+    "acr_values": [],
+    "display": "",
+    "id_token_hint_claims": {},
+    "login_hint": "",
+    "ui_locales": []
+  },
+  "client": {
+    "client_id": "auth-code-client",
+    "client_name": "",
+    "redirect_uris": ["http://127.0.0.1:5555/callback"],
+    "grant_types": ["authorization_code", "refresh_token"],
+    "response_types": ["code", "id_token"],
+    "scope": "openid offline",
+    "audience": null,
+    "owner": "",
+    "policy_uri": "",
+    "allowed_cors_origins": null,
+    "tos_uri": "",
+    "client_uri": "",
+    "logo_uri": "",
+    "contacts": null,
+    "client_secret_expires_at": 0,
+    "subject_type": "public",
+    "token_endpoint_auth_method": "client_secret_basic",
+    "userinfo_signed_response_alg": "none",
+    "created_at": "2020-07-09T10:07:01Z",
+    "updated_at": "2020-07-09T10:07:01Z"
+  },
+  "request_url": "http://127.0.0.1:4444/oauth2/auth?audience=&client_id=auth-code-client&max_age=0&nonce=shfxjszihgvbptswjbqsrdbg&prompt=&redirect_uri=http%3A%2F%2F127.0.0.1%3A5555%2Fcallback&response_type=code&scope=openid+offline&state=pmkekezifwwpgmzpckiqxzbt",
+  "login_challenge": "de814daf9bbb4b788b505b3c2dd5ce20",
+  "login_session_id": "c829da46-2041-400c-b72d-08324f878d0a",
+  "acr": ""
 }
 ```
 
 </TabItem>
 </Tabs>
 
-The way you collect the consent information from the End-User is up to you. In most cases, you will show an
-HTML form similar to:
+The way you collect the consent information from the End-User is up to you. In
+most cases, you will show an HTML form similar to:
 
 ```html
 <form action="/consent" method="post">
-  <input type="hidden" name="csrf_token" value="...."/> <!-- Use CSRF tokens in your HTML forms! -->
+  <input type="hidden" name="csrf_token" value="...." />
+  <!-- Use CSRF tokens in your HTML forms! -->
   <input type="checkbox" name="scope" />
 </form>
 ```
 
-Once the End-User authenticated successfully, you either **accept** the login challenge, or you **reject**
-(e.g. the user is not allowed to perform OAuth2 flows) the login challenge.
+Once the End-User authenticated successfully, you either **accept** the login
+challenge, or you **reject** (e.g. the user is not allowed to perform OAuth2
+flows) the login challenge.
 
 ### Accepting the Consent Flow
 
-To accept the Consent Challenge, make a HTTP PUT request with `Content-Type: application/json` and a JSON payload
-(see [Accept Consent Request HTTP API Reference](../reference/api#schemaacceptconsentrequest))
+To accept the Consent Challenge, make a HTTP PUT request with
+`Content-Type: application/json` and a JSON payload (see
+[Accept Consent Request HTTP API Reference](../reference/api#schemaacceptconsentrequest))
 
 ```json
 {
@@ -261,13 +281,14 @@ The server responds with JSON
 
 which is the URL your application must the End-User's browser to.
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for examples using the ORY Hydra SDK in different
-languages.
+Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+examples using the ORY Hydra SDK in different languages.
 
 ### Rejecting the Consent Flow
 
-To reject the Login Challenge, make a HTTP PUT request with `Content-Type: application/json` and a JSON payload
-(see [Reject Consent Request HTTP API Reference](../reference/api#schemarejectrequest))
+To reject the Login Challenge, make a HTTP PUT request with
+`Content-Type: application/json` and a JSON payload (see
+[Reject Consent Request HTTP API Reference](../reference/api#schemarejectrequest))
 
 ```json
 {
@@ -315,21 +336,22 @@ The server responds with JSON
 
 which is the URL your application must the End-User's browser to.
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for examples using the ORY Hydra SDK in different
-languages.
+Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+examples using the ORY Hydra SDK in different languages.
 
 ## Revoking Consent
 
 You can revoke a user's consent either on a per application basis or for all
 applications.
 
-Revoking the consent will automatically revoke all related access
-and refresh tokens.
+Revoking the consent will automatically revoke all related access and refresh
+tokens.
 
 :::warning
 
-Do not use this endpoint to "invalidate" user sessions. Please revise your approach to and
-usage of OAuth2 if you use access / refresh tokens as user sessions (i.e. instead of browser cookies).
+Do not use this endpoint to "invalidate" user sessions. Please revise your
+approach to and usage of OAuth2 if you use access / refresh tokens as user
+sessions (i.e. instead of browser cookies).
 
 :::
 

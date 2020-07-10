@@ -14,7 +14,7 @@ npm install --save @oryd/hydra-client
 #### Basic configuration
 
 ```js
-import {AdminApi} from '@oryd/hydra-client'
+import { AdminApi } from '@oryd/hydra-client'
 
 // Set this to Hydra's URL
 const hydraAdmin = new AdminApi('http://localhost:4445')
@@ -23,7 +23,7 @@ const hydraAdmin = new AdminApi('http://localhost:4445')
 ### API Usage
 
 ```js
-hydraAdmin.listOAuth2Clients(10,0).then(({body}) => {
+hydraAdmin.listOAuth2Clients(10, 0).then(({ body }) => {
   body.forEach((client) => {
     console.log(client)
   })

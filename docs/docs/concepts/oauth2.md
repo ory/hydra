@@ -82,18 +82,18 @@ A typical OAuth 2.0 flow looks as follows:
 
 The OAuth 2.0 Scope **is not an internal RBAC/ACL permission**:
 
-- A permission allows an actor to perform a certain action in a system: _Bob
-  is allowed to delete his own photos_.
+- A permission allows an actor to perform a certain action in a system: _Bob is
+  allowed to delete his own photos_.
 - OAuth 2.0 Scope implies that an end-user granted certain privileges to a
   client: _Bob allowed the OAuth 2.0 Client to delete all users_. But Bob might
   not be allowed to delete all users because Bob is not an admin.
 
 The OAuth 2.0 Scope can be granted without the end-user actually having the
 right permissions. In the examples above, Bob granted an OAuth 2.0 Client the
-permission ("scope") to delete all users in his name. However, since Bob is
-not an administrator, that permission ("access control") is not actually
-granted to Bob. Therefore any request by the OAuth 2.0 Client that tries to
-delete users on behalf of Bob should fail.
+permission ("scope") to delete all users in his name. However, since Bob is not
+an administrator, that permission ("access control") is not actually granted to
+Bob. Therefore any request by the OAuth 2.0 Client that tries to delete users on
+behalf of Bob should fail.
 
 :::
 
@@ -192,8 +192,8 @@ https://authorization-server.com/auth
  &state=...
 ```
 
-When [accepting the consent request](concepts/consent), `offline_access` must be in the list of
-`grant_scope`:
+When [accepting the consent request](concepts/consent), `offline_access` must be
+in the list of `grant_scope`:
 
 ```js
 fetch('https://hydra/oauth2/auth/requests/consent/accept?challenge=' + encodeURIComponent(challenge), {

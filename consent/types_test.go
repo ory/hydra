@@ -34,7 +34,7 @@ func TestToRFCError(t *testing.T) {
 				valid:       true,
 			},
 			expect: &fosite.RFC6749Error{
-				Name:        "request was denied",
+				Name:        "request_denied",
 				Description: "not empty",
 				Code:        fosite.ErrInvalidRequest.Code,
 				Debug:       "",
@@ -43,7 +43,7 @@ func TestToRFCError(t *testing.T) {
 		{
 			input: &RequestDeniedError{valid: true},
 			expect: &fosite.RFC6749Error{
-				Name:        "request was denied",
+				Name:        "request_denied",
 				Description: "",
 				Hint:        "",
 				Code:        fosite.ErrInvalidRequest.Code,

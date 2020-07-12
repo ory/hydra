@@ -738,7 +738,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 		if len(state) > 0 {
 			// state can only be set if it's an RP-initiated logout flow. If not, we should throw an error.
-			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing"))
+			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter state is set but id_token_hint is missing"))
 		}
 
 		if len(requestedRedir) > 0 {

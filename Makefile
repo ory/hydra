@@ -1,5 +1,4 @@
-GLIDE = $(GOPATH)/bin/glide
-GO_VERSION = 1.13.5
+BUILDER_IMAGE = 899991151204.dkr.ecr.us-east-1.amazonaws.com/goboring:1.13-alpine3.10
 
 SRCROOT ?= $(realpath .)
 BUILD_ROOT ?= $(SRCROOT)
@@ -16,8 +15,9 @@ LD_FLAGS ?= -ldflags "-X github.com/ory/hydra/cmd.GitHash=$(REVISION) -X github.
 default: build
 
 build:
-	CGO_ENABLED=0 go build $(LD_FLAGS) \
-		-o $(BUILD_ROOT)/sand
+	echo "building with: `go version`"; \
+  	GO111MODULE=on CGO_ENABLED=1 go build $(LD_FLAGS) -o $(BUILD_ROOT)/sand \
+	&& echo "build successful. now checking goboring symbols exists..." && go tool nm $(BUILD_ROOT)/sand | grep _Cfunc__goboringcrypto_ > /dev/null
 
 build-osx:
 	CGO_ENABLED=0 GOOS=darwin go build $(LD_FLAGS) \
@@ -25,19 +25,20 @@ build-osx:
 	tar cvzf $(BUILD_ROOT)/sand-$(VERSION)-osx.tgz $(BUILD_ROOT)/sand-osx
 
 build-linux:
-	CGO_ENABLED=0 GOOS=linux go build $(LD_FLAGS) \
-		-o $(BUILD_ROOT)/sand-linux
+	echo "building with: `go version`"; \
+	GO111MODULE=on CGO_ENABLED=1 GOOS=linux go build $(LD_FLAGS) -o $(BUILD_ROOT)/sand-linux \
+	&& echo "build successful. now checking goboring symbols exists..." && go tool nm $(BUILD_ROOT)/sand-linux | grep _Cfunc__goboringcrypto_ > /dev/null
 	tar cvzf $(BUILD_ROOT)/sand-$(VERSION)-linux.tgz $(BUILD_ROOT)/sand-linux
 
 dist:
-	docker pull golang:$(GO_VERSION)
+	docker pull $(BUILDER_IMAGE)
 	docker run --rm \
 	           -v $(SRCROOT):$(SRCROOT_D) \
 	           -w $(SRCROOT_D) \
 	           -e BUILD_ROOT=$(BUILD_ROOT_D) \
 	           -e UID=`id -u` \
 	           -e GID=`id -g` \
-	           golang:$(GO_VERSION) \
+	           $(BUILDER_IMAGE) \
 	           make distbuild
 
 distbuild: clean build build-osx build-linux

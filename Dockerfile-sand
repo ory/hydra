@@ -1,4 +1,5 @@
-FROM alpine:3.10
+#- sand image --------------------------------------------------------------
+FROM 899991151204.dkr.ecr.us-east-1.amazonaws.com/alpine:3.10-fips
 RUN apk add --update ca-certificates
 ADD tmp/dist/sand /bin/sand
 ADD entrypoint.sh /

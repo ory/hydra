@@ -253,7 +253,7 @@ func TestStrategyLogout(t *testing.T) {
 			d:                "should fail if non-rp initiated logout is initiated with state (indicating rp-flow)",
 			params:           url.Values{"state": {"foobar"}},
 			lph:              noopHandler,
-			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter state is set but id_token_hint is missing","status_code":400,"request_id":""}`,
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{

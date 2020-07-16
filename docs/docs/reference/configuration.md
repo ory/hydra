@@ -38,13 +38,22 @@ log:
   #
   # Default value: info
   #
+  # One of:
+  # - panic
+  # - fatal
+  # - error
+  # - warn
+  # - info
+  # - debug
+  # - trace
+  #
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export LOG_LEVEL=<value>
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: fatal
+  level: panic
 
   ## leak_sensitive_values ##
   #
@@ -65,6 +74,10 @@ log:
   # Sets the log format.
   #
   # Default value: text
+  #
+  # One of:
+  # - json
+  # - text
   #
   # Set this value using environment variables on
   # - Linux/macOS:
@@ -94,7 +107,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 55371
+    port: 28171
 
     ## host ##
     #
@@ -109,7 +122,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ''
+    host: localhost
 
     ## cors ##
     #
@@ -128,7 +141,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -165,7 +178,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - CONNECT
+        - POST
+        - OPTIONS
+        - TRACE
 
       ## allowed_headers ##
       #
@@ -180,8 +195,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - elit do non ullamco amet
-        - sint
+        - eiusmod ea dolor est
 
       ## exposed_headers ##
       #
@@ -196,10 +210,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - ullamco amet
-        - non ea
-        - veniam do mollit cupidatat ut
-        - veniam irure
+        - minim et
+        - ad aliqua pariatur
+        - non incididunt nostrud
+        - magna esse proident
 
       ## allow_credentials ##
       #
@@ -233,13 +247,15 @@ serve:
       #
       # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.
       #
+      # Minimum value: 0
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_PUBLIC_CORS_MAX_AGE=<value>
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 66037927
+      max_age: 45522322
 
       ## debug ##
       #
@@ -270,7 +286,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
       #
-      owner: consequat Duis laborum Lorem
+      owner: sunt sint in
 
       ## group ##
       #
@@ -282,7 +298,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
       #
-      group: consectetur enim labore
+      group: qui Ut quis nisi
 
       ## mode ##
       #
@@ -290,13 +306,17 @@ serve:
       #
       # Default value: 493
       #
+      # Minimum value: 0
+      #
+      # Maximum value: 511
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_PUBLIC_SOCKET_MODE=<value>
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
       #
-      mode: 415
+      mode: 343
 
     ## access_log ##
     #
@@ -315,7 +335,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: false
+      disable_for_health: true
 
   ## admin ##
   #
@@ -330,7 +350,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 63271
+    port: 62818
 
     ## host ##
     #
@@ -401,7 +421,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - DELETE
+        - PATCH
+        - PUT
+        - OPTIONS
 
       ## allowed_headers ##
       #
@@ -416,9 +438,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - nostrud quis
-        - do proident aute non anim
-        - minim Duis esse consequat
+        - magna occaecat commodo in ad
+        - aliqua ipsum fugiat labore culpa
+        - elit Duis velit
 
       ## exposed_headers ##
       #
@@ -433,10 +455,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - proident
-        - pariatur
-        - Excepteur consequat
-        - cupidatat
+        - Duis
+        - consequat proident ipsum in
+        - enim veniam non ex
+        - id est
 
       ## allow_credentials ##
       #
@@ -470,13 +492,15 @@ serve:
       #
       # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.
       #
+      # Minimum value: 0
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_ADMIN_CORS_MAX_AGE=<value>
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 15490537
+      max_age: 26635639
 
       ## debug ##
       #
@@ -490,7 +514,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
 
     ## socket ##
     #
@@ -507,7 +531,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
       #
-      owner: Lorem anim ut id
+      owner: culpa consectetur
 
       ## group ##
       #
@@ -519,7 +543,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
       #
-      group: elit Ut
+      group: commodo
 
       ## mode ##
       #
@@ -527,13 +551,17 @@ serve:
       #
       # Default value: 493
       #
+      # Minimum value: 0
+      #
+      # Maximum value: 511
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_ADMIN_SOCKET_MODE=<value>
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_MODE=<value>
       #
-      mode: 385
+      mode: 217
 
     ## access_log ##
     #
@@ -552,7 +580,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: false
+      disable_for_health: true
 
   ## tls ##
   #
@@ -564,30 +592,30 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_PATH=<value>
+      #    $ export SERVE_TLS_KEY_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_PATH=<value>
+      #    > set SERVE_TLS_KEY_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## cert ##
     #
     # Configures the private key (pem encoded).
     #
     cert:
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_BASE64=<value>
+      #    $ export SERVE_TLS_CERT_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_BASE64=<value>
+      #    > set SERVE_TLS_CERT_PATH=<value>
       #
-      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+      path: /path/to/file.pem
 
     ## allow_termination_from ##
     #
@@ -601,9 +629,6 @@ serve:
     #
     allow_termination_from:
       - 127.0.0.1/32
-      - 127.0.0.1/32
-      - 127.0.0.1/32
-      - 127.0.0.1/32
 
   ## cookies ##
   #
@@ -614,13 +639,18 @@ serve:
     #
     # Default value: None
     #
+    # One of:
+    # - Strict
+    # - Lax
+    # - None
+    #
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export SERVE_COOKIES_SAME_SITE_MODE=<value>
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: Lax
 
     ## same_site_legacy_workaround ##
     #
@@ -637,7 +667,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
     #
-    same_site_legacy_workaround: true
+    same_site_legacy_workaround: false
 
 ## dsn ##
 #
@@ -649,7 +679,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: in
+dsn: et in dolor
 
 ## webfinger ##
 #
@@ -941,17 +971,26 @@ strategies:
   #
   # Default value: wildcard
   #
+  # One of:
+  # - exact
+  # - wildcard
+  # - DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
+  #
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export STRATEGIES_SCOPE=<value>
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: exact
+  scope: wildcard
 
   ## access_token ##
   #
   # Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens
+  #
+  # One of:
+  # - opaque
+  # - jwt
   #
   # Set this value using environment variables on
   # - Linux/macOS:
@@ -1006,7 +1045,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 1h
+  refresh_token: 720h
 
   ## id_token ##
   #
@@ -1034,7 +1073,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 10m
+  auth_code: 1h
 
 ## oauth2 ##
 #
@@ -1072,13 +1111,15 @@ oauth2:
       #
       # Default value: 10
       #
+      # Minimum value: 8
+      #
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export OAUTH2_HASHERS_BCRYPT_COST=<value>
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 46052094
+      cost: 74799897
 
   ## pkce ##
   #
@@ -1162,6 +1203,10 @@ secrets:
 #
 # Enables profiling if set. For more details on profiling, head over to: https://blog.golang.org/profiling-go-programs
 #
+# One of:
+# - cpu
+# - mem
+#
 # Examples:
 # - cpu
 #
@@ -1181,6 +1226,10 @@ tracing:
   ## provider ##
   #
   # Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.
+  #
+  # One of:
+  # - jaeger
+  # - zipkin
   #
   # Examples:
   # - jaeger
@@ -1299,5 +1348,5 @@ tracing:
       # - Windows Command Line (CMD):
       #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       #
-      server_url: https://wKunFsyDyTOvNGnadospbLk.dfgLZotIXgSNPfAvKMGUvHK,b5PaZsHXwIAoMOtgCcnPt5V.iQ09baxA0jwns3XCmaMzRGhY6hlIDu3
+      server_url: https://ojkgtdIf.pqq6bM+CpCfogq0v
 ```

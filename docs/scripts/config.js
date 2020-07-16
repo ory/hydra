@@ -47,6 +47,26 @@ const enhance = (schema, parents = []) => (item) => {
     comments.push(' Default value: ' + defaultValue, '')
   }
 
+  const enums = pathOr('', [...path, 'enum'], schema)
+  if (enums && Array.isArray(enums)) {
+    comments.push(
+      ' One of:',
+      ...YAML.stringify(enums)
+        .split('\n')
+        .map((i) => ` ${i}`)
+    ) // split always returns one empty object so no need for newline
+  }
+
+  const min = pathOr('', [...path, 'minimum'], schema)
+  if (min || min === 0) {
+    comments.push(` Minimum value: ${min}`, '')
+  }
+
+  const max = pathOr('', [...path, 'maximum'], schema)
+  if (max || max === 0) {
+    comments.push(` Maximum value: ${max}`, '')
+  }
+
   const examples = pathOr('', [...path, 'examples'], schema)
   if (examples) {
     comments.push(

@@ -108,13 +108,18 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	if len(client) > 0 {
-		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil {
+	if client == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "client" is not defined but should have been.`)))
+		return
+	}
+
+	if client == "all" {
+		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 	} else {
-		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil {
+		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}

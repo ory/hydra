@@ -111,6 +111,9 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1"))
+	require.Error(t, err)
+
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithClient("client1"))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))

@@ -160,7 +160,7 @@ func acceptLogoutChallenge(api *hydra.OryHydra, key string) func(t *testing.T) f
 			redir, err := api.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge(c))
 			require.NoError(t, err)
 
-			assert.Contains(t, redir.Payload.RedirectTo, "?logout_verifier")
+			assert.Contains(t, *redir.Payload.RedirectTo, "?logout_verifier")
 			http.Redirect(w, r, *redir.Payload.RedirectTo, http.StatusFound)
 		}
 	}
@@ -598,12 +598,12 @@ func TestStrategyLoginConsent(t *testing.T) {
 					lr := res.Payload
 
 					assert.NotEmpty(t, lr.Challenge)
-					assert.EqualValues(t, r.URL.Query().Get("login_challenge"), lr.Challenge)
+					assert.EqualValues(t, r.URL.Query().Get("login_challenge"), *lr.Challenge)
 					assert.EqualValues(t, "client-id", lr.Client.ClientID)
 					assert.EqualValues(t, []string{"scope-a"}, lr.RequestedScope)
-					assert.Contains(t, lr.RequestURL, "/oauth2/auth?login_verifier=&consent_verifier=&")
+					assert.Contains(t, *lr.RequestURL, "/oauth2/auth?login_verifier=&consent_verifier=&")
 					assert.EqualValues(t, false, *lr.Skip)
-					assert.EqualValues(t, "", lr.Subject)
+					assert.EqualValues(t, "", *lr.Subject)
 					assert.EqualValues(t, &models.OpenIDConnectContext{AcrValues: nil, Display: "page", UILocales: []string{"de", "en"}}, lr.OidcContext, "%s", res.Payload)
 					w.WriteHeader(http.StatusNoContent)
 				}
@@ -663,8 +663,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					lr := rrr.Payload
 
-					assert.NotEmpty(t, lr.Challenge)
-					assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), lr.Challenge)
+					assert.NotEmpty(t, *lr.Challenge)
+					assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), *lr.Challenge)
 					assert.EqualValues(t, "client-id", lr.Client.ClientID)
 					assert.EqualValues(t, []string{"scope-a"}, lr.RequestedScope)
 					assert.Contains(t, lr.RequestURL, "/oauth2/auth?login_verifier=&consent_verifier=&")
@@ -1017,7 +1017,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					lr := res.Payload
 
 					assert.True(t, *lr.Skip)
-					assert.Equal(t, "user", lr.Subject)
+					assert.Equal(t, "user", *lr.Subject)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1047,7 +1047,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					rr := res.Payload
 
 					assert.True(t, *rr.Skip)
-					assert.Equal(t, "user", rr.Subject)
+					assert.Equal(t, "user", *rr.Subject)
 					assert.Empty(t, rr.Client.ClientSecret)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -1242,7 +1242,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					rr := res.Payload
 					assert.True(t, *rr.Skip)
-					assert.Equal(t, "user", rr.Subject)
+					assert.Equal(t, "user", *rr.Subject)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1691,7 +1691,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					rr := res.Payload
 					assert.False(t, *rr.Skip)
-					assert.EqualValues(t, "", rr.Subject)
+					assert.EqualValues(t, "", *rr.Subject)
 					assert.EqualValues(t, "foouser", rr.OidcContext.IDTokenHintClaims.(map[string]interface{})["sub"])
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().

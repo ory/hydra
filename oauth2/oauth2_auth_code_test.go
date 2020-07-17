@@ -90,8 +90,8 @@ func acceptLogin(apiClient *hydra.OryHydra, subject string, expectSkip bool, exp
 			require.NoError(t, err)
 
 			rr := rrr.Payload
-			assert.Equal(t, expectSkip, rr.Skip)
-			assert.EqualValues(t, expectSubject, rr.Subject)
+			assert.Equal(t, expectSkip, *rr.Skip)
+			assert.EqualValues(t, expectSubject, *rr.Subject)
 
 			vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -496,9 +496,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
 									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
-									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
+									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), *rr.Challenge)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
-									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestURL)
+									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), *rr.RequestURL)
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -525,7 +525,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
 									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAccessTokenAudience)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
-									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
+									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), *rr.Challenge)
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")), rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
@@ -612,9 +612,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
 									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
-									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), rr.Challenge)
+									assert.EqualValues(t, r.URL.Query().Get("login_challenge"), *rr.Challenge)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
-									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", rr.RequestURL)
+									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", *rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -641,7 +641,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									assert.EqualValues(t, client.LogoURI, rr.Client.LogoURI)
 									assert.EqualValues(t, client.RedirectURIs, rr.Client.RedirectUris)
 									assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.RequestedScope)
-									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), rr.Challenge)
+									assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), *rr.Challenge)
 									assert.EqualValues(t, oauthConfig.AuthCodeURL("some-hardcoded-state")+"&prompt=login+consent&max_age=1", rr.RequestURL)
 
 									vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
@@ -830,7 +830,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									rr := rrr.Payload
 									assert.False(t, *rr.Skip)
-									assert.EqualValues(t, "", rr.Subject)
+									assert.EqualValues(t, "", *rr.Subject)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -892,7 +892,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 									rr := rrr.Payload
 									assert.False(t, *rr.Skip)
-									assert.EqualValues(t, "", rr.Subject)
+									assert.EqualValues(t, "", *rr.Subject)
 									assert.Empty(t, rr.Client.ClientSecret)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().

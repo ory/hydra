@@ -117,6 +117,7 @@ sdk: .bin/cli
 		rm -rf internal/httpclient
 		mkdir -p internal/httpclient
 		swagger generate client -f ./.schema/api.swagger.json -t internal/httpclient -A Ory_Hydra
+		make format
 
 
 .PHONY: install-stable

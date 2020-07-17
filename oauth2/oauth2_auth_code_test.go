@@ -99,8 +99,8 @@ func acceptLogin(apiClient *hydra.OryHydra, subject string, expectSkip bool, exp
 			require.NoError(t, err)
 
 			v := vr.Payload
-			require.NotEmpty(t, v.RedirectTo)
-			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, *v.RedirectTo)
+			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 		}
 	}
 }
@@ -127,8 +127,8 @@ func acceptConsent(apiClient *hydra.OryHydra, scope []string, expectSkip bool, e
 			require.NoError(t, err)
 			v := vr.Payload
 
-			require.NotEmpty(t, v.RedirectTo)
-			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			require.NotEmpty(t, *v.RedirectTo)
+			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 		}
 	}
 }
@@ -266,7 +266,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
-									assert.False(t, rr.Payload.Skip)
+									assert.False(t, *rr.Payload.Skip)
 									assert.Empty(t, rr.Payload.Subject)
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -275,8 +275,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 											Context: map[string]interface{}{"context": "bar"},
 										}))
 									require.NoError(t, err)
-									require.NotEmpty(t, v.Payload.RedirectTo)
-									http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.Payload.RedirectTo)
+									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -296,8 +296,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 											},
 										}))
 									require.NoError(t, err)
-									require.NotEmpty(t, v.Payload.RedirectTo)
-									http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.Payload.RedirectTo)
+									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -340,8 +340,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 											Subject: pointerx.String("user-a"), Remember: true, RememberFor: 0, Acr: "1",
 										}))
 									require.NoError(t, err)
-									require.NotEmpty(t, v.Payload.RedirectTo)
-									http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.Payload.RedirectTo)
+									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -360,8 +360,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -389,7 +389,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									challenge, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
-									assert.False(t, challenge.Payload.Skip)
+									assert.False(t, *challenge.Payload.Skip)
 
 									v, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 										WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -397,8 +397,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 											Subject: pointerx.String(""), Remember: false, RememberFor: 0, Acr: "1",
 										}))
 									require.Error(t, err)
-									require.NotEmpty(t, v.Payload.RedirectTo)
-									http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.Payload.RedirectTo)
+									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -435,8 +435,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 										}))
 									require.NoError(t, err)
 
-									require.NotEmpty(t, v.Payload.RedirectTo)
-									http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.Payload.RedirectTo)
+									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -455,8 +455,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -489,7 +489,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									rr := rrr.Payload
 
 									require.NoError(t, err)
-									assert.False(t, rr.Skip)
+									assert.False(t, *rr.Skip)
 									assert.Empty(t, rr.Subject)
 									assert.EqualValues(t, []string{"https://api.ory.sh/"}, rr.RequestedAccessTokenAudience)
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
@@ -507,8 +507,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 										}))
 
 									require.NoError(t, err)
-									require.NotEmpty(t, v.Payload.RedirectTo)
-									http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.Payload.RedirectTo)
+									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -541,8 +541,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -606,7 +606,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									rr := rrr.Payload
 
-									assert.False(t, rr.Skip)
+									assert.False(t, *rr.Skip)
 									assert.Empty(t, rr.Subject)
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
@@ -624,8 +624,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -656,8 +656,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -829,7 +829,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 
 									rr := rrr.Payload
-									assert.False(t, rr.Skip)
+									assert.False(t, *rr.Skip)
 									assert.EqualValues(t, "", rr.Subject)
 
 									vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -840,8 +840,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -865,8 +865,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -891,7 +891,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 
 									rr := rrr.Payload
-									assert.False(t, rr.Skip)
+									assert.False(t, *rr.Skip)
 									assert.EqualValues(t, "", rr.Subject)
 									assert.Empty(t, rr.Client.ClientSecret)
 
@@ -903,8 +903,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -928,8 +928,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {
@@ -986,8 +986,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1007,8 +1007,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									require.NoError(t, err)
 									v := vr.Payload
 
-									require.NotEmpty(t, v.RedirectTo)
-									http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+									require.NotEmpty(t, *v.RedirectTo)
+									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
 							cb: func(t *testing.T) httprouter.Handle {

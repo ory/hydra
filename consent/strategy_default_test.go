@@ -109,7 +109,7 @@ func acceptRequest(apiClient *hydra.OryHydra, consent *models.AcceptConsentReque
 				WithBody(consent))
 			require.NoError(t, err)
 			v := vr.Payload
-			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 		}
 	}
 }
@@ -161,7 +161,7 @@ func acceptLogoutChallenge(api *hydra.OryHydra, key string) func(t *testing.T) f
 			require.NoError(t, err)
 
 			assert.Contains(t, redir.Payload.RedirectTo, "?logout_verifier")
-			http.Redirect(w, r, redir.Payload.RedirectTo, http.StatusFound)
+			http.Redirect(w, r, *redir.Payload.RedirectTo, http.StatusFound)
 		}
 	}
 }
@@ -602,7 +602,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					assert.EqualValues(t, "client-id", lr.Client.ClientID)
 					assert.EqualValues(t, []string{"scope-a"}, lr.RequestedScope)
 					assert.Contains(t, lr.RequestURL, "/oauth2/auth?login_verifier=&consent_verifier=&")
-					assert.EqualValues(t, false, lr.Skip)
+					assert.EqualValues(t, false, *lr.Skip)
 					assert.EqualValues(t, "", lr.Subject)
 					assert.EqualValues(t, &models.OpenIDConnectContext{AcrValues: nil, Display: "page", UILocales: []string{"de", "en"}}, lr.OidcContext, "%s", res.Payload)
 					w.WriteHeader(http.StatusNoContent)
@@ -629,8 +629,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					lr := vr.Payload
 
-					assert.NotEmpty(t, lr.RedirectTo)
-					http.Redirect(w, r, lr.RedirectTo, http.StatusFound)
+					assert.NotEmpty(t, *lr.RedirectTo)
+					http.Redirect(w, r, *lr.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: http.StatusBadRequest,
@@ -709,8 +709,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					)
 					require.NoError(t, err)
 					v := vr.Payload
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: http.StatusBadRequest,
@@ -785,7 +785,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
-					require.True(t, res.Payload.Skip)
+					require.True(t, *res.Payload.Skip)
 					passAuthentication(apiClient, true)(t)(w, r)
 				}
 			},
@@ -819,7 +819,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
-					require.True(t, res.Payload.Skip)
+					require.True(t, *res.Payload.Skip)
 					passAuthentication(apiClient, true)(t)(w, r)
 				}
 			},
@@ -855,7 +855,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					lr := res.Payload
 
-					assert.True(t, lr.Skip)
+					assert.True(t, *lr.Skip)
 					assert.NotEmpty(t, lr.SessionID)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -870,8 +870,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -953,7 +953,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// 			rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
 		// 			require.NoError(t, err)
 		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			assert.True(t, rr.Skip)
+		// 			assert.True(t, *rr.Skip)
 		// 			assert.Equal(t, "user", rr.Subject)
 		//
 		// 			v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
@@ -964,8 +964,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// 			})
 		// 			require.NoError(t, err)
 		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			require.NotEmpty(t, v.RedirectTo)
-		// 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+		// 			require.NotEmpty(t, *v.RedirectTo)
+		// 			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 		// 		}
 		// 	},
 		// 	cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -973,7 +973,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// 			rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
 		// 			require.NoError(t, err)
 		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			assert.False(t, rr.Skip)
+		// 			assert.False(t, *rr.Skip)
 		// 			assert.Equal(t, "client-id", rr.Client.ID)
 		// 			assert.Equal(t, "user", rr.Subject)
 		//
@@ -988,8 +988,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// 			})
 		// 			require.NoError(t, err)
 		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			require.NotEmpty(t, v.RedirectTo)
-		// 			http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+		// 			require.NotEmpty(t, *v.RedirectTo)
+		// 			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 		// 		}
 		// 	},
 		// 	expectFinalStatusCode: http.StatusOK,
@@ -1016,7 +1016,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					lr := res.Payload
 
-					assert.True(t, lr.Skip)
+					assert.True(t, *lr.Skip)
 					assert.Equal(t, "user", lr.Subject)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -1046,7 +1046,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					rr := res.Payload
 
-					assert.True(t, rr.Skip)
+					assert.True(t, *rr.Skip)
 					assert.Equal(t, "user", rr.Subject)
 					assert.Empty(t, rr.Client.ClientSecret)
 
@@ -1061,8 +1061,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1103,7 +1103,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					rr := res.Payload
 
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1116,8 +1116,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1140,8 +1140,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					var v models.CompletedRequest
 					require.NoError(t, json.NewDecoder(hres.Body).Decode(&v))
 					require.EqualValues(t, http.StatusOK, hres.StatusCode)
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: http.StatusOK,
@@ -1168,7 +1168,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1181,8 +1181,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1241,7 +1241,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.True(t, rr.Skip)
+					assert.True(t, *rr.Skip)
 					assert.Equal(t, "user", rr.Subject)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -1255,8 +1255,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: http.StatusBadRequest,
@@ -1273,7 +1273,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1286,8 +1286,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1324,7 +1324,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1337,8 +1337,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: fosite.ErrLoginRequired.StatusCode(),
@@ -1355,7 +1355,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -1368,8 +1368,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1393,8 +1393,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: http.StatusOK,
@@ -1443,7 +1443,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1481,8 +1481,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					require.NotEmpty(t, v.RedirectTo)
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1516,7 +1516,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1555,7 +1555,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1590,7 +1590,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1614,7 +1614,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1631,7 +1631,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 					assert.Empty(t, "", rr.Subject)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -1643,7 +1643,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1660,7 +1660,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 					assert.Empty(t, "", rr.Subject)
 
 					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
@@ -1672,7 +1672,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			cph:                   acceptRequest(apiClient, nil),
@@ -1690,7 +1690,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 					require.NoError(t, err)
 					rr := res.Payload
-					assert.False(t, rr.Skip)
+					assert.False(t, *rr.Skip)
 					assert.EqualValues(t, "", rr.Subject)
 					assert.EqualValues(t, "foouser", rr.OidcContext.IDTokenHintClaims.(map[string]interface{})["sub"])
 
@@ -1703,7 +1703,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					require.NoError(t, err)
 					v := vr.Payload
 
-					http.Redirect(w, r, v.RedirectTo, http.StatusFound)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 				}
 			},
 			expectFinalStatusCode: http.StatusBadRequest,

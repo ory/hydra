@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ConsentRequest Contains information on an ongoing consent request.
@@ -22,7 +23,8 @@ type ConsentRequest struct {
 
 	// Challenge is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
-	Challenge string `json:"challenge,omitempty"`
+	// Required: true
+	Challenge *string `json:"challenge"`
 
 	// client
 	Client *OAuth2Client `json:"client,omitempty"`
@@ -68,6 +70,10 @@ type ConsentRequest struct {
 func (m *ConsentRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateChallenge(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateClient(formats); err != nil {
 		res = append(res, err)
 	}
@@ -87,6 +93,15 @@ func (m *ConsentRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *ConsentRequest) validateChallenge(formats strfmt.Registry) error {
+
+	if err := validate.Required("challenge", "body", m.Challenge); err != nil {
+		return err
+	}
+
 	return nil
 }
 

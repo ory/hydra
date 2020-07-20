@@ -130,7 +130,7 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot.Payload))
 	cs := csGot.Payload[0]
-	assert.Equal(t, "challenge3", cs.ConsentRequest.Challenge)
+	assert.Equal(t, "challenge3", *cs.ConsentRequest.Challenge)
 
 	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject2"))
 	require.NoError(t, err)
@@ -142,7 +142,7 @@ func TestSDK(t *testing.T) {
 
 	luaGot, err := sdk.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
 	require.NoError(t, err)
-	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
+	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier=verifiertestsdk-1", *luaGot.Payload.RedirectTo)
 
 	_, err = sdk.Admin.RejectLogoutRequest(admin.NewRejectLogoutRequestParams().WithLogoutChallenge("challengetestsdk-2"))
 	require.NoError(t, err)
@@ -152,14 +152,14 @@ func TestSDK(t *testing.T) {
 }
 
 func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
-	assert.EqualValues(t, expected.Challenge, got.Challenge)
-	assert.EqualValues(t, expected.Subject, got.Subject)
-	assert.EqualValues(t, expected.Skip, got.Skip)
+	assert.EqualValues(t, expected.Challenge, *got.Challenge)
+	assert.EqualValues(t, expected.Subject, *got.Subject)
+	assert.EqualValues(t, expected.Skip, *got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
 }
 
 func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models.ConsentRequest) {
-	assert.EqualValues(t, expected.Challenge, got.Challenge)
+	assert.EqualValues(t, expected.Challenge, *got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)

@@ -9,6 +9,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // LoginRequest Contains information on an ongoing login request.
@@ -18,10 +19,12 @@ type LoginRequest struct {
 
 	// Challenge is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
-	Challenge string `json:"challenge,omitempty"`
+	// Required: true
+	Challenge *string `json:"challenge"`
 
 	// client
-	Client *OAuth2Client `json:"client,omitempty"`
+	// Required: true
+	Client *OAuth2Client `json:"client"`
 
 	// oidc context
 	OidcContext *OpenIDConnectContext `json:"oidc_context,omitempty"`
@@ -29,13 +32,16 @@ type LoginRequest struct {
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
-	RequestURL string `json:"request_url,omitempty"`
+	// Required: true
+	RequestURL *string `json:"request_url"`
 
 	// requested access token audience
-	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience,omitempty"`
+	// Required: true
+	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience"`
 
 	// requested scope
-	RequestedScope StringSlicePipeDelimiter `json:"requested_scope,omitempty"`
+	// Required: true
+	RequestedScope StringSlicePipeDelimiter `json:"requested_scope"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
@@ -47,23 +53,33 @@ type LoginRequest struct {
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
 	//
 	// This feature allows you to update / set session information.
-	Skip bool `json:"skip,omitempty"`
+	// Required: true
+	Skip *bool `json:"skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
 	// when accepting the login request, or the request will fail.
-	Subject string `json:"subject,omitempty"`
+	// Required: true
+	Subject *string `json:"subject"`
 }
 
 // Validate validates this login request
 func (m *LoginRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateChallenge(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateClient(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateOidcContext(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateRequestURL(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -75,16 +91,33 @@ func (m *LoginRequest) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateSkip(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateSubject(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
 }
 
+func (m *LoginRequest) validateChallenge(formats strfmt.Registry) error {
+
+	if err := validate.Required("challenge", "body", m.Challenge); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *LoginRequest) validateClient(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Client) { // not required
-		return nil
+	if err := validate.Required("client", "body", m.Client); err != nil {
+		return err
 	}
 
 	if m.Client != nil {
@@ -117,10 +150,19 @@ func (m *LoginRequest) validateOidcContext(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *LoginRequest) validateRequestURL(formats strfmt.Registry) error {
+
+	if err := validate.Required("request_url", "body", m.RequestURL); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *LoginRequest) validateRequestedAccessTokenAudience(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.RequestedAccessTokenAudience) { // not required
-		return nil
+	if err := validate.Required("requested_access_token_audience", "body", m.RequestedAccessTokenAudience); err != nil {
+		return err
 	}
 
 	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
@@ -135,14 +177,32 @@ func (m *LoginRequest) validateRequestedAccessTokenAudience(formats strfmt.Regis
 
 func (m *LoginRequest) validateRequestedScope(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.RequestedScope) { // not required
-		return nil
+	if err := validate.Required("requested_scope", "body", m.RequestedScope); err != nil {
+		return err
 	}
 
 	if err := m.RequestedScope.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
 		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) validateSkip(formats strfmt.Registry) error {
+
+	if err := validate.Required("skip", "body", m.Skip); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) validateSubject(formats strfmt.Registry) error {
+
+	if err := validate.Required("subject", "body", m.Subject); err != nil {
 		return err
 	}
 

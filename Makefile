@@ -110,7 +110,7 @@ gen: mocks sqlbin sdk
 # Generates the SDKs
 .PHONY: sdk
 sdk: .bin/cli
-		swagger generate spec -m -o ./.schema/api.swagger.json -x internal/httpclient,gopkg.in/square/go-jose.v2
+		swagger generate spec -m -o ./.schema/api.swagger.json -x internal/httpclient -x gopkg.in/square/go-jose.v2
 		cli dev swagger sanitize ./.schema/api.swagger.json
 		swagger flatten --with-flatten=remove-unused -o ./.schema/api.swagger.json ./.schema/api.swagger.json
 		swagger validate ./.schema/api.swagger.json

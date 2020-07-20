@@ -15,19 +15,24 @@ import (
 // swagger:model rejectRequest
 type RejectRequest struct {
 
-	// error
+	// The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).
+	//
+	// Defaults to `request_denied`.
 	Error string `json:"error,omitempty"`
 
-	// error debug
+	// Debug contains information to help resolve the problem as a developer. Usually not exposed
+	// to the public but only in the server logs.
 	ErrorDebug string `json:"error_debug,omitempty"`
 
-	// error description
+	// Description of the error in a human readable format.
 	ErrorDescription string `json:"error_description,omitempty"`
 
-	// error hint
+	// Hint to help resolve the error.
 	ErrorHint string `json:"error_hint,omitempty"`
 
-	// status code
+	// Represents the HTTP status code of the error (e.g. 401 or 403)
+	//
+	// Defaults to 400
 	StatusCode int64 `json:"status_code,omitempty"`
 }
 

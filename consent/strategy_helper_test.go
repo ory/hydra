@@ -44,7 +44,7 @@ var passAuthentication = func(apiClient *client.OryHydra, remember bool) func(t 
 			}))
 			require.NoError(t, err)
 			require.NotEmpty(t, v.Payload.RedirectTo)
-			http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 		}
 	}
 }
@@ -63,7 +63,7 @@ var passAuthorization = func(apiClient *client.OryHydra, remember bool) func(t *
 			}))
 			require.NoError(t, err)
 			require.NotEmpty(t, v.Payload.RedirectTo)
-			http.Redirect(w, r, v.Payload.RedirectTo, http.StatusFound)
+			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 		}
 	}
 }

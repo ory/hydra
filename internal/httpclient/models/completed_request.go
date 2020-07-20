@@ -6,8 +6,10 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
@@ -16,11 +18,30 @@ import (
 type CompletedRequest struct {
 
 	// RedirectURL is the URL which you should redirect the user to once the authentication process is completed.
-	RedirectTo string `json:"redirect_to,omitempty"`
+	// Required: true
+	RedirectTo *string `json:"redirect_to"`
 }
 
 // Validate validates this completed request
 func (m *CompletedRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateRedirectTo(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CompletedRequest) validateRedirectTo(formats strfmt.Registry) error {
+
+	if err := validate.Required("redirect_to", "body", m.RedirectTo); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -46,9 +46,9 @@ func login(rw http.ResponseWriter, r *http.Request) {
 	lr := res.Payload
 
 	var v *models.CompletedRequest
-	if strings.Contains(lr.RequestURL, "mockLogin=accept") {
+	if strings.Contains(*lr.RequestURL, "mockLogin=accept") {
 		remember := false
-		if strings.Contains(lr.RequestURL, "rememberLogin=yes") {
+		if strings.Contains(*lr.RequestURL, "rememberLogin=yes") {
 			remember = true
 		}
 
@@ -76,7 +76,7 @@ func login(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Unable to accept/reject login request: %s", err)
 	}
-	http.Redirect(rw, r, v.RedirectTo, http.StatusFound)
+	http.Redirect(rw, r, *v.RedirectTo, http.StatusFound)
 }
 
 func consent(rw http.ResponseWriter, r *http.Request) {
@@ -129,7 +129,7 @@ func consent(rw http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Unable to accept/reject consent request: %s", err)
 	}
-	http.Redirect(rw, r, v.RedirectTo, http.StatusFound)
+	http.Redirect(rw, r, *v.RedirectTo, http.StatusFound)
 }
 
 func errh(rw http.ResponseWriter, r *http.Request) {

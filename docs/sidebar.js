@@ -35,6 +35,7 @@ module.exports = {
         "guides/kubernetes-helm-chart",
         "guides/ssl-https-tls",
         "guides/cookies",
+        "guides/scaling-hydra",
         "guides/cors",
       ]
     },

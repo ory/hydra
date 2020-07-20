@@ -24,7 +24,7 @@ the Hydra source code is easy:
 Change into the directory with the Hydra source code and run the following
 command to start the needed containers:
 
-```
+```shell script
 $ docker-compose -f quickstart.yml \
     -f quickstart-postgres.yml \
     up --build
@@ -35,7 +35,7 @@ Starting hydra_hydra_1
 
 If you prefer to use MySQL as the database backend, run this command instead:
 
-```
+```shell script
 $ docker-compose -f quickstart.yml \
     -f quickstart-mysql.yml \
     up --build
@@ -48,7 +48,7 @@ please examine the `scripts/5-min-tutorial.sh` and `docker-compose*.yml` files.
 You may also extend the command above to enable distributed tracing. The tracing
 UI is exposed at [http://127.0.0.1:16686/search](http://127.0.0.1:16686/search):
 
-```
+```shell script
 $ docker-compose -f quickstart.yml \
     -f quickstart-postgres.yml \
     -f quickstart-tracing.yml \
@@ -60,7 +60,7 @@ following command to start the needed containers, and status of Hydra is exposed
 at targets page in Prometheus
 [http://localhost:9090/targets](http://localhost:9090/targets):
 
-```
+```shell script
 docker-compose -f quickstart.yml \
   -f quickstart-prometheus.yml \
   up --build
@@ -79,7 +79,7 @@ head over to
 
 Let's create the OAuth 2.0 Client:
 
-```
+```shell script
 $ docker-compose -f quickstart.yml exec hydra \
     hydra clients create \
     --endpoint http://127.0.0.1:4445/ \
@@ -91,14 +91,14 @@ $ docker-compose -f quickstart.yml exec hydra \
 If you get an error message about a config file not being found, you can ignore
 it for now:
 
-```
+```shell script
 Config file not found because "Config File ".hydra" Not Found in "[/]""
 OAuth2 client my-client
 ```
 
 Let's perform the client credentials grant:
 
-```
+```shell script
 $ docker-compose -f quickstart.yml exec hydra \
     hydra token client \
     --endpoint http://127.0.0.1:4444/ \
@@ -111,7 +111,7 @@ UDYMha9TwsMBejEvKfnDOXkhgkLsnmUNYVQDklT5bD8.ZNpuNRC85erbIYDjPqhMwTinlvQmNTk_Uvtt
 Let's perform token introspection on that token. Make sure to copy the token you
 just got and not the dummy value.
 
-```
+```shell script
 $ docker-compose -f quickstart.yml exec hydra \
     hydra token introspect \
     --endpoint http://127.0.0.1:4445/ \
@@ -134,7 +134,7 @@ UDYMha9TwsMBejEvKfnDOXkhgkLsnmUNYVQDklT5bD8.ZNpuNRC85erbIYDjPqhMwTinlvQmNTk_Uvtt
 Next, we will perform the OAuth 2.0 Authorization Code Grant. For that, we must
 first create a client that is capable of performing that grant:
 
-```
+```shell script
 $ docker-compose -f quickstart.yml exec hydra \
     hydra clients create \
     --endpoint http://127.0.0.1:4445 \
@@ -154,7 +154,7 @@ The following command starts a server that serves an example web application.
 The application will perform the OAuth 2.0 Authorization Code Flow using ORY
 Hydra. The web server runs on [http://127.0.0.1:5555](http://127.0.0.1:5555).
 
-```
+```shell script
 $ docker-compose -f quickstart.yml exec hydra \
     hydra token user \
     --client-id auth-code-client \
@@ -180,7 +180,7 @@ Great! You installed Ory Hydra, connected the CLI, created a client and
 completed two authentication flows! Before you continue, clean up this set up in
 order to avoid conflicts with other tutorials from this guide:
 
-```
-$ docker-compose kill
-$ docker-compose rm -f
+```shell script
+$ docker-compose -f quickstart.yml kill
+$ docker-compose -f quickstart.yml rm -f -v
 ```

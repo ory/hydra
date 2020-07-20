@@ -423,8 +423,7 @@ If you log out of GitHub, you will not be logged out of CircleCI/TravisCI.
 :::
 
 Revoking the login sessions of a user is as easy as sending `DELETE` to
-`/oauth2/auth/sessions/login?subject={subject}` (see
-[full API documentation](../reference/api#opIdrevokeAuthenticationSession)).
+`/oauth2/auth/sessions/login?subject={subject}` (see [full API documentation](../reference/api#opIdrevokeAuthenticationSession)).
 
 This endpoint is not compatible with OpenID Connect Front-/Backchannel logout
 and does not revoke any tokens.

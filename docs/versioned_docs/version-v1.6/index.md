@@ -26,11 +26,10 @@ technology stack.
 
 ## OpenID Certified
 
-ORY Hydra is a
-[Certified OpenID Provider Server](https://openid.net/developers/certified/) and
-implements all the requirements stated by the OpenID Foundation. In particular,
-it correctly implements the various OAuth 2.0 and OpenID Connect flows specified
-by the IETF and OpenID Foundation.
+ORY Hydra is a [Certified OpenID Provider Server](https://openid.net/developers/certified/)
+and implements all the requirements stated by the OpenID Foundation. In particular, it correctly
+implements the various OAuth 2.0 and OpenID Connect flows specified by the IETF
+and OpenID Foundation.
 
 ## Cryptographic Key Storage
 
@@ -63,11 +62,11 @@ Hydra also provides a developer-friendly CLI.
 
 Hydra has a few limitations too:
 
-1. ORY Hydra does not manage user accounts, i.e. user registration, password
-   reset, user login, sending confirmation emails, etc. In Hydra's architecture,
-   the _Identity Provider_ is responsible for this.
-2. ORY Hydra doesn't support the OAuth 2.0 Resource Owner Password Credentials
-   flow because it is legacy, discouraged, and insecure.
+1. ORY Hydra does not manage user accounts, i.e. user registration, password reset,
+   user login, sending confirmation emails, etc. In Hydra's architecture, the
+   _Identity Provider_ is responsible for this.
+2. ORY Hydra doesn't support the OAuth 2.0 Resource Owner Password Credentials flow
+   because it is legacy, discouraged, and insecure.
 
 ## Is ORY Hydra the right fit for you?
 

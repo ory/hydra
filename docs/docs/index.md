@@ -24,18 +24,18 @@ technology stack, with authentication mechanisms required by your use case
 and OpenID Connect while being minimally invasive to your business logic and
 technology stack.
 
+## OpenID Certified
+
+ORY Hydra is a [Certified OpenID Provider Server](https://openid.net/developers/certified/)
+and implements all the requirements stated by the OpenID Foundation. In particular, it correctly
+implements the various OAuth 2.0 and OpenID Connect flows specified by the IETF
+and OpenID Foundation.
+
 ## Cryptographic Key Storage
 
 In addition to the OAuth 2.0 functionality, ORY Hydra offers a safe storage for
 cryptographic keys (used for example to sign JSON Web Tokens) and can manage
 OAuth 2.0 Clients.
-
-## Certified
-
-ORY Hydra is OpenID Connect certified (pending) and implements all the
-requirements stated by the OpenID Foundation. In particular, it correctly
-implements the various OAuth 2.0 and OpenID Connect flows specified by the IETF
-and OpenID Foundation.
 
 ## Security First
 
@@ -62,13 +62,13 @@ Hydra also provides a developer-friendly CLI.
 
 Hydra has a few limitations too:
 
-1. Hydra does not manage user accounts, i.e. user registration, password reset,
+1. ORY Hydra does not manage user accounts, i.e. user registration, password reset,
    user login, sending confirmation emails, etc. In Hydra's architecture, the
    _Identity Provider_ is responsible for this.
-2. Hydra doesn't support the OAuth 2.0 Resource Owner Password Credentials flow
+2. ORY Hydra doesn't support the OAuth 2.0 Resource Owner Password Credentials flow
    because it is legacy, discouraged, and insecure.
 
-## Is Hydra the right fit for you?
+## Is ORY Hydra the right fit for you?
 
 OAuth 2.0 can be used in many environments for various purposes. This list might
 help you decide if OAuth 2.0 and Hydra are the right fit for a use case:

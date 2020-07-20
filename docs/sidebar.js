@@ -32,6 +32,7 @@ module.exports = {
         "production",
         "guides/tracing",
         "guides/secrets-key-rotation",
+        "guides/kubernetes-helm-chart",
         "guides/ssl-https-tls",
         "guides/cookies",
         "guides/cors",

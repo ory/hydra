@@ -52,6 +52,10 @@ You can install ORY Hydra using [scoop](https://scoop.sh) on Windows:
 > hydra help
 ```
 
+## Kubernetes
+
+Please head over to the [Kubernetes Helm Chart](guides/kubernetes-helm-chart) documentation.
+
 ## Download Binaries
 
 You can download the client and server binaries on our

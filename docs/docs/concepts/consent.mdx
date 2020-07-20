@@ -27,8 +27,12 @@ includes both login and consent.
   allowfullscreen
 ></iframe>
 
+:::info
+
 Please read [Login Flow](./login) first, as the Login Flow happens before the
 consent flow.
+
+:::
 
 The following sequence diagram describes the different API calls and HTTP
 Redirects when performing the OAuth2 flow:
@@ -37,17 +41,17 @@ Redirects when performing the OAuth2 flow:
   chart={`sequenceDiagram
     OAuth2 Client->>ORY Hydra: Initiates OAuth2 Authorize Code or Implicit Flow
     ORY Hydra-->>ORY Hydra: No end user session available (not authenticated)
-    ORY Hydra->>Login Provider: Redirects end user with login challenge
-    Login Provider-->ORY Hydra: Fetches login info
-    Login Provider-->>Login Provider: Authenticates user with credentials
-    Login Provider-->ORY Hydra: Transmits login info and receives redirect url with login verifier
-    Login Provider->>ORY Hydra: Redirects end user to redirect url with login verifier
+    ORY Hydra->>Login Endpoint: Redirects end user with login challenge
+    Login Endpoint-->ORY Hydra: Fetches login info
+    Login Endpoint-->>Login Endpoint: Authenticates user with credentials
+    Login Endpoint-->ORY Hydra: Transmits login info and receives redirect url with login verifier
+    Login Endpoint->>ORY Hydra: Redirects end user to redirect url with login verifier
     ORY Hydra-->>ORY Hydra: First time that client asks user for permissions
-    ORY Hydra->>Consent Provider: Redirects end user with consent challenge
-    Consent Provider-->ORY Hydra: Fetches consent info (which user, what app, what scopes)
-    Consent Provider-->>Consent Provider: Asks for end user's permission to grant application access
-    Consent Provider-->ORY Hydra: Transmits consent result and receives redirect url with consent verifier
-    Consent Provider->>ORY Hydra: Redirects to redirect url with consent verifier
+    ORY Hydra->>Consent Endpoint: Redirects end user with consent challenge
+    Consent Endpoint-->ORY Hydra: Fetches consent info (which user, what app, what scopes)
+    Consent Endpoint-->>Consent Endpoint: Asks for end user's permission to grant application access
+    Consent Endpoint-->ORY Hydra: Transmits consent result and receives redirect url with consent verifier
+    Consent Endpoint->>ORY Hydra: Redirects to redirect url with consent verifier
     ORY Hydra-->>ORY Hydra: Verifies grant
     ORY Hydra->>OAuth2 Client: Transmits authorization code/token`}
 />
@@ -64,7 +68,7 @@ Once the login challenge is accepted, ORY Hydra will ask the user for consent:
 The UI is fully under your control, because ORY Hydra redirects the End-User's
 browser to the c
 
-```yaml title="hydra serve all -c path/to/hydra/config.yml
+```yaml title="hydra serve all -c path/to/hydra/config.yml"
 # Can also be set using the environment variable:
 #   URLS_CONSENT=https://consent-app/consent
 urls:
@@ -73,7 +77,7 @@ urls:
 
 :::note
 
-The Consent and Login endpoint can obviously be implemented in the same code
+You can implement the Login and Consent endpoints in the same code
 base / application. Check out our
 [Login, Consent & Logout NodeJS Reference implementation](https://github.com/ory/hydra-login-consent-node)!
 
@@ -154,8 +158,9 @@ request! For more details about the implementation check the
 </TabItem>
 <TabItem value="curl">
 
-```
-curl "http://127.0.0.1:4445/oauth2/auth/requests/consent?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2"
+```shell script
+$ curl \
+  "http://127.0.0.1:4445/oauth2/auth/requests/consent?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2"
 ```
 
 Check the ["Implementing the Consent Endpoint" Guide](../guides/consent) for
@@ -263,8 +268,8 @@ To accept the Consent Challenge, make a HTTP PUT request with
 
 With `curl` this might look like the following request:
 
-```
-curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/consent/accept?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
+```shell script
+$ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/consent/accept?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "grant_scope": ["openid", "offline_access"]
@@ -273,7 +278,7 @@ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/consen
 
 The server responds with JSON
 
-```
+```json
 {
   "redirect_to": "http://127.0.0.1:4445/oauth2/auth..."
 }
@@ -314,8 +319,8 @@ To reject the Login Challenge, make a HTTP PUT request with
 
 With `curl` this might look like the following request:
 
-```
-curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/consent/reject?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
+```shell script
+$ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/consent/reject?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "error": "user_banned",
@@ -328,7 +333,7 @@ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/consen
 
 The server responds with JSON
 
-```
+```json
 {
   "redirect_to": "http://127.0.0.1:4445/oauth2/auth..."
 }
@@ -356,8 +361,8 @@ sessions (i.e. instead of browser cookies).
 :::
 
 Revoking all consent sessions of a user is as easy as sending `DELETE`
-to`/oauth2/auth/sessions/consent?subject={subject}`.
+to `/oauth2/auth/sessions/consent?subject={subject}`.
 
 Revoking the consent sessions of a user for a specific client is as easy as
 sending `DELETE`
-to`/oauth2/auth/sessions/consent?subject={subject}&client={client}`.
+to `/oauth2/auth/sessions/consent?subject={subject}&client={client}`.

@@ -34,17 +34,17 @@ Redirects when performing the OAuth2 flow:
   chart={`sequenceDiagram
     OAuth2 Client->>ORY Hydra: Initiates OAuth2 Authorize Code or Implicit Flow
     ORY Hydra-->>ORY Hydra: No end user session available (not authenticated)
-    ORY Hydra->>Login Provider: Redirects end user with login challenge
-    Login Provider-->ORY Hydra: Fetches login info
-    Login Provider-->>Login Provider: Authenticates user with credentials
-    Login Provider-->ORY Hydra: Transmits login info and receives redirect url with login verifier
-    Login Provider->>ORY Hydra: Redirects end user to redirect url with login verifier
+    ORY Hydra->>Login Endpoint: Redirects end user with login challenge
+    Login Endpoint-->ORY Hydra: Fetches login info
+    Login Endpoint-->>Login Endpoint: Authenticates user with credentials
+    Login Endpoint-->ORY Hydra: Transmits login info and receives redirect url with login verifier
+    Login Endpoint->>ORY Hydra: Redirects end user to redirect url with login verifier
     ORY Hydra-->>ORY Hydra: First time that client asks user for permissions
-    ORY Hydra->>Consent Provider: Redirects end user with consent challenge
-    Consent Provider-->ORY Hydra: Fetches consent info (which user, what app, what scopes)
-    Consent Provider-->>Consent Provider: Asks for end user's permission to grant application access
-    Consent Provider-->ORY Hydra: Transmits consent result and receives redirect url with consent verifier
-    Consent Provider->>ORY Hydra: Redirects to redirect url with consent verifier
+    ORY Hydra->>Consent Endpoint: Redirects end user with consent challenge
+    Consent Endpoint-->ORY Hydra: Fetches consent info (which user, what app, what scopes)
+    Consent Endpoint-->>Consent Endpoint: Asks for end user's permission to grant application access
+    Consent Endpoint-->ORY Hydra: Transmits consent result and receives redirect url with consent verifier
+    Consent Endpoint->>ORY Hydra: Redirects to redirect url with consent verifier
     ORY Hydra-->>ORY Hydra: Verifies grant
     ORY Hydra->>OAuth2 Client: Transmits authorization code/token`}
 />
@@ -326,8 +326,8 @@ username, or something else that may change over time.
 
 With `curl` this might look like the following request:
 
-```
-curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/login/accept?login_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
+```shell script
+$ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/login/accept?login_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "subject": "the-user-id-that-just-logged-in",
@@ -379,8 +379,8 @@ To reject the Login Challenge, make a HTTP PUT request with
 
 With `curl` this might look like the following request:
 
-```
-curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/login/reject?login_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
+```shell script
+$ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/login/reject?login_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "error": "user_banned",
@@ -393,7 +393,7 @@ curl --location --request PUT 'http://127.0.0.1:4445/oauth2/auth/requests/login/
 
 The server responds with JSON
 
-```
+```json
 {
   "redirect_to": "http://127.0.0.1:4445/oauth2/auth..."
 }
@@ -423,7 +423,7 @@ If you log out of GitHub, you will not be logged out of CircleCI/TravisCI.
 :::
 
 Revoking the login sessions of a user is as easy as sending `DELETE` to
-`/oauth2/auth/sessions/login?subject={subject}`.
+`/oauth2/auth/sessions/login?subject={subject}` (see [full API documentation](../reference/api#opIdrevokeAuthenticationSession)).
 
 This endpoint is not compatible with OpenID Connect Front-/Backchannel logout
 and does not revoke any tokens.

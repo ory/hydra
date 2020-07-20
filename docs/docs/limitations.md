@@ -3,12 +3,8 @@ id: limitations
 title: Limitations
 ---
 
-# Limitations
-
 ORY Hydra tries to solve all of OAuth 2.0 and OpenID Connect uses. There are,
 however, some limitations.
-
-<!-- toc -->
 
 ## MySQL <= 5.6 / MariaDB
 

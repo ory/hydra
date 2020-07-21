@@ -74,6 +74,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should reject when basic auth client exists but origin not allowed",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
+				viper.Set("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-2", Secret: "bar", AllowedCORSOrigins: []string{"http://not-foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
@@ -83,6 +85,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin allowed",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
@@ -92,6 +95,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed per client",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*.foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
@@ -101,6 +105,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) is allowed globally",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"*"})
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-5", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
 			},
@@ -111,6 +116,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with partial wildcard) is allowed globally",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://*.foobar.com"})
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-6", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
 			},
@@ -121,6 +127,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept when basic auth client exists and origin (with full wildcard) allowed per client",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-7", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
 			},
@@ -131,6 +138,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should fail when token introspection fails",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 			},
 			code:         http.StatusNotImplemented,
@@ -140,6 +148,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should work when token introspection returns a session",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 				sess := oauth2.NewSession("foo-9")
 				sess.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour))
@@ -160,6 +169,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should accept any allowed specified origin protocol",
 			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
 				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
 				viper.Set("serve.public.cors.enabled", true)
 				viper.Set("serve.public.cors.allowed_origins", []string{"http://*", "https://*"})
@@ -168,9 +178,21 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {"Basic Zm9vLTQ6YmFy"}},
 			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://foo.foobar.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
 		},
+		{
+			d: "should accept when basic auth client exists and origin is set at the client as well as the server",
+			prep: func() {
+				viper.Set("serve.public.cors.enabled", true)
+				viper.Set("serve.public.cors.allowed_origins", []string{"http://**.example.com"})
+				r.ClientManager().CreateClient(context.Background(), &client.Client{ID: "foo8", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
+			},
+			code:         http.StatusNotImplemented,
+			header:       http.Header{"Origin": {"http://client-app.example.com"}, "Authorization": {"Basic Zm9vLTU6YmFy"}},
+			expectHeader: http.Header{"Access-Control-Allow-Credentials": []string{"true"}, "Access-Control-Allow-Origin": []string{"http://client-app.example.com"}, "Access-Control-Expose-Headers": []string{"Content-Type"}, "Vary": []string{"Origin"}},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			if tc.prep != nil {
+				viper.Reset()
 				tc.prep()
 			}
 

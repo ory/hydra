@@ -71,7 +71,6 @@ var tokenUserError = template.Must(template.New("").Parse(`<html>
 </html>`))
 
 var tokenUserResult = template.Must(template.New("").Parse(`<html>
-<html>
 <head></head>
 <body>
 <ul>

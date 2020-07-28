@@ -1410,10 +1410,15 @@
           },
           {
             "type": "string",
-            "description": "Deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID. If set `all`, delete all consent sessions of the Subject",
+            "description": "Deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID.",
             "name": "client",
-            "in": "query",
-            "required": true
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "Deletes all consent sessions by the Subject that have been granted.",
+            "name": "all",
+            "in": "query"
           }
         ],
         "responses": {

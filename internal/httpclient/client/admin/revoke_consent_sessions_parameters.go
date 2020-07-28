@@ -62,12 +62,12 @@ for the revoke consent sessions operation typically these are written to a http.
 type RevokeConsentSessionsParams struct {
 
 	/*All
-	  Deletes all consent sessions by the Subject that have been granted.
+	  If set, deletes all consent sessions by the Subject that have been granted
 
 	*/
 	All *bool
 	/*Client
-	  Deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID.
+	  If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 
 	*/
 	Client *string

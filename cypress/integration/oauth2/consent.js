@@ -48,7 +48,7 @@ describe('OAuth 2.0 End-User Authorization', () => {
     cy.request(
       'DELETE',
       Cypress.env('admin_url') +
-        '/oauth2/auth/sessions/consent?subject=foo@bar.com'
+        '/oauth2/auth/sessions/consent?subject=foo@bar.com&all=true'
     );
 
     cy.request(

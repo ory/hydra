@@ -49,11 +49,17 @@ type swaggerRevokeConsentSessions struct {
 	// required: true
 	Subject string `json:"subject"`
 
-	// Deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID. If set `all`, delete all consent sessions of the Subject
+	// Deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID.
 	//
 	// in: query
-	// required: true
+	// required: false
 	Client string `json:"client"`
+
+	// Deletes all consent sessions by the Subject that have been granted.
+	//
+	// in: query
+	// required: false
+	All bool `json:"all"`
 }
 
 // swagger:parameters listSubjectConsentSessions

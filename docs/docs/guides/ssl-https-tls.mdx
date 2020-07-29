@@ -25,8 +25,8 @@ If you run Docker locally, you can then use
 
 ```
 $ docker run ... \
-    -e SERVE_TLS_CERT_BASE64=$(SERVE_TLS_CERT_BASE64) \
-    -e SERVE_TLS_KEY_BASE64=$(SERVE_TLS_KEY_BASE64) \
+    -e SERVE_TLS_CERT_BASE64="$SERVE_TLS_CERT_BASE64" \
+    -e SERVE_TLS_KEY_BASE64="$SERVE_TLS_KEY_BASE64" \
     ...
 ```
 

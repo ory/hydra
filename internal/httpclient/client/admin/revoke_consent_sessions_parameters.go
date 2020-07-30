@@ -62,7 +62,7 @@ for the revoke consent sessions operation typically these are written to a http.
 type RevokeConsentSessionsParams struct {
 
 	/*All
-	  If set, deletes all consent sessions by the Subject that have been granted
+	  If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
 
 	*/
 	All *bool

@@ -1416,7 +1416,7 @@
           },
           {
             "type": "boolean",
-            "description": "If set, deletes all consent sessions by the Subject that have been granted",
+            "description": "If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.",
             "name": "all",
             "in": "query"
           }

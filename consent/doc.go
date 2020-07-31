@@ -53,6 +53,11 @@ type swaggerRevokeConsentSessions struct {
 	//
 	// in: query
 	Client string `json:"client"`
+
+	// If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
+	//
+	// in: query
+	All bool `json:"all"`
 }
 
 // swagger:parameters listSubjectConsentSessions

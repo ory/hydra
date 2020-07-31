@@ -103,21 +103,26 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
+	allClients := r.URL.Query().Get("all") == "true"
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "subject" is not defined but should have been.`)))
 		return
 	}
 
-	if len(client) > 0 {
+	switch {
+	case len(client) > 0:
 		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
-	} else {
+	case allClients:
 		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
+	default:
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter both "client" and "all" is not defined but one of them should have been.`)))
+		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)

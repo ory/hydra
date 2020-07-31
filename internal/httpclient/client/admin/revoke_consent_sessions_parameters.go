@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewRevokeConsentSessionsParams creates a new RevokeConsentSessionsParams object
@@ -60,6 +61,11 @@ for the revoke consent sessions operation typically these are written to a http.
 */
 type RevokeConsentSessionsParams struct {
 
+	/*All
+	  If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
+
+	*/
+	All *bool
 	/*Client
 	  If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 
@@ -109,6 +115,17 @@ func (o *RevokeConsentSessionsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithAll adds the all to the revoke consent sessions params
+func (o *RevokeConsentSessionsParams) WithAll(all *bool) *RevokeConsentSessionsParams {
+	o.SetAll(all)
+	return o
+}
+
+// SetAll adds the all to the revoke consent sessions params
+func (o *RevokeConsentSessionsParams) SetAll(all *bool) {
+	o.All = all
+}
+
 // WithClient adds the client to the revoke consent sessions params
 func (o *RevokeConsentSessionsParams) WithClient(client *string) *RevokeConsentSessionsParams {
 	o.SetClient(client)
@@ -138,6 +155,22 @@ func (o *RevokeConsentSessionsParams) WriteToRequest(r runtime.ClientRequest, re
 		return err
 	}
 	var res []error
+
+	if o.All != nil {
+
+		// query param all
+		var qrAll bool
+		if o.All != nil {
+			qrAll = *o.All
+		}
+		qAll := swag.FormatBool(qrAll)
+		if qAll != "" {
+			if err := r.SetQueryParam("all", qAll); err != nil {
+				return err
+			}
+		}
+
+	}
 
 	if o.Client != nil {
 

@@ -1413,6 +1413,12 @@
             "description": "If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID",
             "name": "client",
             "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.",
+            "name": "all",
+            "in": "query"
           }
         ],
         "responses": {

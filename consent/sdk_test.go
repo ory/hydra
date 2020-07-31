@@ -75,14 +75,18 @@ func TestSDK(t *testing.T) {
 	cr1, hcr1 := MockConsentRequest("1", false, 0, false, false, false)
 	cr2, hcr2 := MockConsentRequest("2", false, 0, false, false, false)
 	cr3, hcr3 := MockConsentRequest("3", true, 3600, false, false, false)
+	cr4, hcr4 := MockConsentRequest("4", true, 3600, false, false, false)
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
 	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr3))
+	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr4))
 	_, err := m.HandleConsentRequest(context.TODO(), "challenge1", hcr1)
 	require.NoError(t, err)
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge2", hcr2)
 	require.NoError(t, err)
 	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
+	require.NoError(t, err)
+	_, err = m.HandleConsentRequest(context.TODO(), "challenge4", hcr4)
 	require.NoError(t, err)
 
 	lur1 := MockLogoutRequest("testsdk-1", true)
@@ -111,6 +115,12 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1"))
+	require.Error(t, err)
+
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject(cr4.Subject).WithClient(&cr4.Client.ID))
+	require.NoError(t, err)
+
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithAll(pointerx.Bool(true)))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))

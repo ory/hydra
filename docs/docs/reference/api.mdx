@@ -6728,10 +6728,11 @@ This endpoint revokes a subject's granted consent sessions for a specific OAuth
 
 #### Parameters
 
-| Parameter | In    | Type   | Required | Description                                                                                                            |
-| --------- | ----- | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------- |
-| subject   | query | string | true     | The subject (Subject) who's consent sessions should be deleted.                                                        |
-| client    | query | string | false    | If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID |
+| Parameter | In    | Type    | Required | Description                                                                                                            |
+| --------- | ----- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| subject   | query | string  | true     | The subject (Subject) who's consent sessions should be deleted.                                                        |
+| client    | query | string  | false    | If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID |
+| all       | query | boolean | false    | If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.                             |
 
 #### Responses
 

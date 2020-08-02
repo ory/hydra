@@ -41,10 +41,14 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 			return h
 		}
 	}
-
 	corsOptions := conf.CORSOptions(iface)
+
+	var alwaysAllow bool = len(corsOptions.AllowedOrigins) == 0
 	var patterns []glob.Glob
 	for _, o := range corsOptions.AllowedOrigins {
+		if o == "*" {
+			alwaysAllow = true
+		}
 		// if the protocol (http or https) is specified, but the url is wildcard, use special ** glob, which ignore the '.' separator.
 		// This way g := glob.Compile("http://**") g.Match("http://google.com") returns true.
 		if splittedO := strings.Split(o, "://"); len(splittedO) != 1 && splittedO[1] == "*" {
@@ -54,20 +58,10 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 		if err != nil {
 			reg.Logger().WithError(err).Fatalf("Unable to parse cors origin: %s", o)
 		}
+
 		patterns = append(patterns, g)
 	}
 
-	var alwaysAllow bool
-	for _, o := range corsOptions.AllowedOrigins {
-		if o == "*" {
-			alwaysAllow = true
-			break
-		}
-	}
-
-	if len(corsOptions.AllowedOrigins) == 0 {
-		alwaysAllow = true
-	}
 
 	options := cors.Options{
 		AllowedOrigins:     corsOptions.AllowedOrigins,
@@ -111,27 +105,15 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 				return false
 			}
 
-			if alwaysAllow {
-				return true
-			}
-
-			for _, p := range cl.AllowedCORSOrigins {
-				if p == "*" {
+			for _, o := range cl.AllowedCORSOrigins {
+				if o == "*" {
 					return true
 				}
-			}
-
-			var clientPatterns []glob.Glob
-			for _, o := range cl.AllowedCORSOrigins {
 				g, err := glob.Compile(strings.ToLower(o), '.')
 				if err != nil {
 					return false
 				}
-				clientPatterns = append(patterns, g)
-			}
-
-			for _, p := range clientPatterns {
-				if p.Match(origin) {
+				if(g.Match(origin)){
 					return true
 				}
 			}

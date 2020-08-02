@@ -5,6 +5,7 @@ module.exports = {
     "install",
   ],
   Concepts: [
+    "concepts/before-oauth2",
     "concepts/oauth2",
     "concepts/openid-connect-oidc",
     "concepts/login",

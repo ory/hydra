@@ -108,24 +108,10 @@ A typical OAuth 2.0 flow looks as follows:
 
 ### OAuth 2.0 Scope
 
-:::info
+:::note
 
-The OAuth 2.0 Scope **is not an internal RBAC/ACL permission**:
-
-- A permission allows an actor to perform a certain action in a system: _Bob is
-  allowed to delete his own photos_.
-- OAuth 2.0 Scope implies that an end-user granted certain privileges to a
-  client: _Bob allowed the OAuth 2.0 Client to delete all users_. But Bob might
-  not be allowed to delete all users because Bob is not an admin.
-
-The OAuth 2.0 Scope can be granted without the end-user actually having the
-right permissions. In the examples above, Bob granted an OAuth 2.0 Client the
-permission ("scope") to delete all users in his name. However, since Bob is not
-an administrator, that permission ("access control") is not actually granted to
-Bob. Therefore any request by the OAuth 2.0 Client that tries to delete users on
-behalf of Bob should fail.
-
-:::
+Please read the section about OAuth2 Scope in
+[Read this before learning OAuth2 / OpenID Connect](./before-oauth2.mdx).
 
 A second important concept is the OAuth 2.0 Scope. Many people confuse OAuth 2.0
 Scope with internal Access Control like for example Role Based Access Control
@@ -146,16 +132,6 @@ scopes that he himself doesn't have permission to ("read all classified
 documents"). The OAuth Access Token with those scopes wouldn't help the external
 application read those documents because it can only act in the name of the
 user, and that user doesn't have these access privileges.
-
-To recap, ORY Hydra's primary feature is implementing the OAuth 2.0 and OpenID
-Connect spec, as well as related specs by the IETF and OpenID Foundation.
-
-The next sections explain how to connect your existing user management (user
-login, registration, logout, ...) with ORY Hydra in order to become an OAuth 2.0
-and OpenID Connect provider like Google, Dropbox, or Facebook.
-
-Again, please be aware that you must know how OAuth 2.0 and OpenID Connect work.
-This documentation will not teach you how these protocols work.
 
 The scope of an OAuth 2.0 scope defines the permission the token was granted by
 the end-user. For example, a specific token might be allowed to access public

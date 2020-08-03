@@ -72,14 +72,14 @@ you will make two observations:
 1. CircleCI still has access to your repositories;
 2. You are still logged into CircleCI.
 
-If you instead sing out of CircleCI:
+If you instead sign out of CircleCI:
 
 1. CircleCI still has access to your repositories;
 2. You are still logged into GitHub.
 
 That is because both applications are built by different people and different
 companies, and the user behavior on one site does not reflect user intent on
-another. It would be crazy if some app acould just log you out of GitHub, or if
+another. It would be crazy if some app could just log you out of GitHub, or if
 signing out of Google would invalidate your sessions on all the websites where
 you used "Sign in with Google".
 
@@ -113,7 +113,7 @@ Have you ever wondered why, when signing into Google/Facebook/Twitter/...
 - your browser doesn't perform tons of redirects?
 
 The answer is quite simple - they do not use OAuth2 or OpenID Connect for login
-and session management in first-party scenarios. It goes even farther than
+and session management in first-party scenarios. It goes even further than
 that - for example YouTube, which runs on a separate domain - does not use
 OAuth2 to sign into your Google account. They use a proprietary flow that
 includes HTTP Cookies.

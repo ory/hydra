@@ -1,6 +1,6 @@
 ---
 id: before-oauth2
-title: Read This Before Learning OAuth2 or OpenID Connect!
+title: Read This Before Becoming an OAuth2 or OpenID Connect Provider!
 ---
 
 OAuth2 and OpenID Connect is all the rage with big platforms (Google, Facebook,
@@ -20,6 +20,9 @@ is the right tool for you.
 If you want apps and websites you don't own to use your application as a
 potential sign in (e.g. be listed alongside "Sign in with Google", "Sign in with
 Apple"), ORY Hydra is the right tool for you.
+
+If you use an API that works with OAuth2 or OpenID Connect, then of course you need
+to use that API - but then you are on the OAuth2 / OpenID Connect client side!
 
 If you do not have user registration, password recovery, login form, session
 management, or user settings system in place then OAuth2 is most likely not the
@@ -162,6 +165,21 @@ On top of that, you need to refresh tokens when they expire which may become
 very complex in scenarios where you have more than one HTTP request using the
 access token. This is especially true for systems that have refresh tokens which
 are valid for one use only (e.g. ORY Hydra, Auth0, ...).
+
+**Cookies are great** and a common misconception is that cookies are less secure
+than tokens or less usable. For 95% of web applications it is enough to work
+with cookies, especially if they only run in the browser and not in a native
+mobile app. And that's great, because the browser takes care of:
+
+- Bound to one top-level-domain only;
+- Anti-XSS with `httpOnly`
+- TLS enforcment with `secure`;
+- Smaller CSRF attack surface with the new `SameSite` directive;
+- The domain model (cookies are isolated per domain);
+
+[ORY Kratos](https://www.ory.sh/kratos/) works both with tokens and cookies.
+Implementing login does not involve any manual token handling - just log
+in and you're done!
 
 ## Access Token Scope is not an Access Control Permission
 

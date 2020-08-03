@@ -10,18 +10,18 @@ orbs:
   golangci: ory/golangci@0.0.4
 
 jobs:
-  test-legacy-migrations:
-    parameters:
-      flavor:
-        type: string
-    machine:
-      image: ubuntu-1604:201903-01
-    steps:
-      - checkout
-      - run: sudo rm -rfd /usr/local/go
-      - run: sudo circleci-install golang 1.14.2
-      - run: make test-resetdb
-      - run: source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m -run=Test*/db=<< parameters.flavor>> ./internal/fizzmigrate
+#  test-legacy-migrations:
+#    parameters:
+#      flavor:
+#        type: string
+#    machine:
+#      image: ubuntu-1604:201903-01
+#    steps:
+#      - checkout
+#      - run: sudo rm -rfd /usr/local/go
+#      - run: sudo circleci-install golang 1.14.2
+#      - run: make test-resetdb
+#      - run: source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m -run=Test*/db=<< parameters.flavor>> ./internal/fizzmigrate
 
   test:
     docker:
@@ -130,28 +130,28 @@ workflows:
     jobs:
 
       # Test legacy migrations
-      - test-legacy-migrations:
-          name: test-legacy-migrations-postgres
-          flavor: postgres
-          filters:
-            tags:
-              only: /.*/
-      - test-legacy-migrations:
-          name: test-legacy-migrations-mysql
-          requires:
-            - test-legacy-migrations-postgres
-          flavor: mysql
-          filters:
-            tags:
-              only: /.*/
-      - test-legacy-migrations:
-          name: test-legacy-migrations-cockroach
-          requires:
-            - test-legacy-migrations-postgres
-          flavor: cockroach
-          filters:
-            tags:
-              only: /.*/
+#      - test-legacy-migrations:
+#          name: test-legacy-migrations-postgres
+#          flavor: postgres
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-legacy-migrations:
+#          name: test-legacy-migrations-mysql
+#          requires:
+#            - test-legacy-migrations-postgres
+#          flavor: mysql
+#          filters:
+#            tags:
+#              only: /.*/
+#      - test-legacy-migrations:
+#          name: test-legacy-migrations-cockroach
+#          requires:
+#            - test-legacy-migrations-postgres
+#          flavor: cockroach
+#          filters:
+#            tags:
+#              only: /.*/
       # END - Test legacy migrations
 
       - golangci/lint:
@@ -213,8 +213,8 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
-            - test-legacy-migrations-mysql
-            - test-legacy-migrations-cockroach
+#            - test-legacy-migrations-mysql
+#            - test-legacy-migrations-cockroach
           filters:
             tags:
               only: /.*/
@@ -231,8 +231,8 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
-            - test-legacy-migrations-mysql
-            - test-legacy-migrations-cockroach
+#            - test-legacy-migrations-mysql
+#            - test-legacy-migrations-cockroach
           filters:
             tags:
               only: /.*/
@@ -279,8 +279,8 @@ workflows:
             - test-e2e-cockroach
             - test-e2e-plugin
             - changelog/generate
-            - test-legacy-migrations-mysql
-            - test-legacy-migrations-cockroach
+#            - test-legacy-migrations-mysql
+#            - test-legacy-migrations-cockroach
             - docs/build
           filters:
             branches:

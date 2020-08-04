@@ -48,6 +48,7 @@ module.exports = {
         "guides/oauth2-clients",
         "guides/common-oauth2-openid-connect-flows",
         "guides/using-oauth2",
+        "guides/token-expiration",
         "guides/oauth2-token-introspection",
         "guides/oauth2-public-spa-mobile"
       ]

@@ -3,11 +3,14 @@ id: token-expiration
 title: Configuring Expiration
 ---
 
-In the Hydra config.yaml - located in your Hydra directory - you can set times for how long a login/consent flow may take, expiration times for access tokens, refresh tokens, id tokens and auth codes. 
+In the Hydra config.yaml - located in your Hydra directory - you can set times
+for how long a login/consent flow may take, expiration times for access tokens,
+refresh tokens, id tokens and auth codes.
 
 ## Login and Consent Request Expiration
 
-Key `ttl.login_consent_request` configures how long a user login and consent flow may take.
+Key `ttl.login_consent_request` configures how long a user login and consent
+flow may take.
 
 ```json title="path/to/hydra/config.yaml"
 #....
@@ -51,7 +54,8 @@ Key `ttl.access_token` configures how long access tokens are valid.
 
 ## Refresh Token Expiration
 
-Key `ttl.refresh_token` configures how long refresh tokens are valid. Set to -1 for refresh tokens to never expire.
+Key `ttl.refresh_token` configures how long refresh tokens are valid. Set to -1
+for refresh tokens to never expire.
 
 ```json title="path/to/hydra/config.yaml"
 #....
@@ -69,14 +73,14 @@ Key `ttl.refresh_token` configures how long refresh tokens are valid. Set to -1 
   #
   refresh_token: "-1"
     #....
-``` 
+```
 
 ## ID Token Expiration
 
 Key `ttl.id_token` configures how long id tokens are valid.
 
 ```json title="path/to/hydra/config.yaml"
-#.... 
+#....
   ## id_token ##
   #
   # Configures how long id tokens are valid.
@@ -99,7 +103,7 @@ Key `ttl.auth_code` configures how long auth codes are valid.
 
 ```json title="path/to/hydra/config.yaml"
 #....
-  
+
     ## auth_code ##
   #
   # Configures how long auth codes are valid.

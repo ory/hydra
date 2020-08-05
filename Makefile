@@ -15,8 +15,7 @@ GO_DEPENDENCIES = github.com/ory/go-acc \
 
 define make-go-dependency
   # go install is responsible for not re-building when the code hasn't changed
-  .PHONY: .bin/$(notdir $1)
-  .bin/$(notdir $1):
+  .bin/$(notdir $1): go.sum go.mod
 		GOBIN=$(PWD)/.bin/ go install $1
 endef
 
@@ -24,6 +23,12 @@ $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
 node_modules: package.json
 		npm ci
+
+.bin/clidoc:
+		go build -o .bin/clidoc ./cmd/clidoc/.
+
+docs/cli: .bin/clidoc
+		clidoc .
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test-legacy-migrations

@@ -118,3 +118,67 @@ func main() {
     )
 }
 ```
+
+### TLS Termination
+
+```
+
+import "github.com/ory/hydra-client-go/client"
+import httptransport "github.com/go-openapi/runtime/client"
+import "net/http"
+
+func main() {
+
+  tlsTermClient := new(http.Client)
+  rt := WithHeader(tlsTermClient.Transport)
+  rt.Set("X-Forwarded-Proto", "https")
+  tlsTermClient.Transport = rt
+
+	transport := httptransport.NewWithClient("host:port", "/", []string{"https"}, tlsTermClient)
+	hydra := client.New(transport, nil)
+  
+  // ...
+}
+
+type withHeader struct {
+        http.Header
+        rt http.RoundTripper
+}
+
+func WithHeader(rt http.RoundTripper) withHeader {
+        if rt == nil {
+                rt = http.DefaultTransport
+        }
+
+        return withHeader{Header: make(http.Header), rt: rt}
+}
+
+func (h withHeader) RoundTrip(req *http.Request) (*http.Response, error) {
+        for k, v := range h.Header {
+                req.Header[k] = v
+        }
+
+        return h.rt.RoundTrip(req)
+}
+```
+
+### Skip TLS Verification
+
+```go
+import "github.com/ory/hydra-client-go/client"
+import httptransport "github.com/go-openapi/runtime/client"#
+import "net/http"
+
+func main() {
+	skipTlsClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+		Timeout: 10,
+	}
+	transport := httptransport.NewWithClient("host:port", "/", []string{"https"}, skipTlsClient)
+	hydra := client.New(transport, nil)
+  
+  // ...
+}
+```

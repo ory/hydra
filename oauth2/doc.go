@@ -126,6 +126,9 @@ type WellKnown struct {
 	// URL of the authorization server's OAuth 2.0 revocation endpoint.
 	RevocationEndpoint string `json:"revocation_endpoint"`
 
+	// URL of the authorization server's OAuth 2.0 introspection endpoint.
+	IntrospectionEndpoint string `json:"introspection_endpoint"`
+
 	// Boolean value specifying whether the OP supports back-channel logout, with true indicating support.
 	BackChannelLogoutSupported bool `json:"backchannel_logout_supported"`
 

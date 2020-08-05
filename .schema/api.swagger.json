@@ -3120,6 +3120,10 @@
             "type": "string"
           }
         },
+        "introspection_endpoint": {
+          "description": "URL of the authorization server's OAuth 2.0 introspection endpoint.",
+          "type": "string"
+        },
         "issuer": {
           "description": "URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.\nIf IssuerURL discovery is supported , this value MUST be identical to the issuer value returned\nby WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.",
           "type": "string",

@@ -47,17 +47,12 @@ var (
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "hydra",
-	Short: "Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	Short: "Run and manage ORY Hydra",
 }
 
 var cmdHandler = cli.NewHandler()
 
 // Execute adds all child commands to the root command sets flags appropriately.
-// Execute adds all child commands to the root command sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -68,16 +63,8 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
-
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is $HOME/.hydra.yaml)")
 	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unkown certificate authorities")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.

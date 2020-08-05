@@ -136,7 +136,7 @@ func main() {
 
 	transport := httptransport.NewWithClient("host:port", "/", []string{"https"}, tlsTermClient)
 	hydra := client.New(transport, nil)
-  
+
   // ...
 }
 
@@ -178,7 +178,7 @@ func main() {
 	}
 	transport := httptransport.NewWithClient("host:port", "/", []string{"https"}, skipTlsClient)
 	hydra := client.New(transport, nil)
-  
+
   // ...
 }
 ```

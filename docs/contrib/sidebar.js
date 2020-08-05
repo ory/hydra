@@ -25,7 +25,7 @@ let sidebar = {
   Welcome: ['index']
 }
 
-const cn = path.join(__dirname, '..', 'sidebar.js')
+const cn = path.join(__dirname, '..', 'sidebar.json')
 if (fs.existsSync(cn)) {
   sidebar = require(cn)
 }

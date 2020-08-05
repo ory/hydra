@@ -12,18 +12,18 @@
     "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}' --no-semi --single-quote --trailing-comma none || true"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.58",
-    "@docusaurus/plugin-content-docs": "2.0.0-alpha.58",
-    "@docusaurus/plugin-content-pages": "2.0.0-alpha.58",
-    "@docusaurus/plugin-google-analytics": "2.0.0-alpha.58",
-    "@docusaurus/plugin-sitemap": "2.0.0-alpha.58",
-    "@docusaurus/theme-classic": "2.0.0-alpha.58",
-    "@docusaurus/theme-search-algolia": "2.0.0-alpha.58",
+    "@docusaurus/core": "2.0.0-alpha.61",
+    "@docusaurus/plugin-content-docs": "2.0.0-alpha.61",
+    "@docusaurus/plugin-content-pages": "2.0.0-alpha.61",
+    "@docusaurus/plugin-google-analytics": "2.0.0-alpha.61",
+    "@docusaurus/plugin-sitemap": "2.0.0-alpha.61",
+    "@docusaurus/theme-classic": "2.0.0-alpha.61",
+    "@docusaurus/theme-search-algolia": "2.0.0-alpha.61",
     "classnames": "2.2.6",
-    "mermaid": "8.5.2",
+    "mermaid": "8.6.4",
     "node-fetch": "2.6.0",
-    "react": "16.8.4",
-    "react-dom": "16.8.4"
+    "react": "16.13.1",
+    "react-dom": "16.13.1"
   },
   "browserslist": {
     "production": [

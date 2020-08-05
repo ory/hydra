@@ -6,7 +6,7 @@ orbs:
   sdk: ory/sdk@0.1.37
   changelog: ory/changelog@0.1.3
   nancy: ory/nancy@0.0.12
-  docs: ory/docs@0.0.4
+  docs: ory/docs@0.0.5
   golangci: ory/golangci@0.0.4
 
 jobs:
@@ -251,6 +251,11 @@ workflows:
               only: /.*/
             branches:
               ignore: /.*/
+      - docs/cli:
+          requires:
+            - nancy/test
+            - test
+            - golangci/lint
       - docs/build:
           requires:
             - nancy/test

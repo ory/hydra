@@ -30,13 +30,14 @@ import (
 
 	"github.com/ory/viper"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/fosite"
 	. "github.com/ory/hydra/driver"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
 )

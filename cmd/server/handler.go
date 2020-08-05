@@ -88,7 +88,7 @@ func watchAndValidateViper(l *logrusx.Logger) {
 	if err != nil {
 		l.WithError(err).Fatal("Unable to open configuration JSON Schema.")
 	}
-	viperx.WatchAndValidateViper(l, schema, "ORY Hydra", []string{"log", "serve", "dsn", "profiling"})
+	viperx.WatchAndValidateViper(l, schema, "ORY Hydra", []string{"log", "serve", "dsn", "profiling"}, "")
 }
 
 func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []string) {

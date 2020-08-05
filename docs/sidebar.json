@@ -1,10 +1,6 @@
-module.exports = {
-  "Introduction": [
-    "index",
-    "5min-tutorial",
-    "install",
-  ],
-  Concepts: [
+{
+  "Introduction": ["index", "5min-tutorial", "install"],
+  "Concepts": [
     "concepts/before-oauth2",
     "concepts/oauth2",
     "concepts/openid-connect-oidc",
@@ -12,22 +8,18 @@ module.exports = {
     "concepts/consent",
     "concepts/logout",
     "jwks",
-    "limitations",
+    "limitations"
   ],
   "Guides": [
     {
-      type: "category",
-      label: "Implementing the User Interface",
-      items: [
-        "guides/login",
-        "guides/consent",
-        "guides/logout",
-      ]
+      "type": "category",
+      "label": "Implementing the User Interface",
+      "items": ["guides/login", "guides/consent", "guides/logout"]
     },
     {
-      type: "category",
-      label: "Operations",
-      items: [
+      "type": "category",
+      "label": "Operations",
+      "items": [
         "configure-deploy",
         "dependencies-environment",
         "production",
@@ -37,13 +29,13 @@ module.exports = {
         "guides/ssl-https-tls",
         "guides/cookies",
         "guides/scaling-hydra",
-        "guides/cors",
+        "guides/cors"
       ]
     },
     {
-      type: "category",
-      label: "OAuth2 & OpenID Connect",
-      items: [
+      "type": "category",
+      "label": "OAuth2 & OpenID Connect",
+      "items": [
         "advanced",
         "guides/oauth2-clients",
         "guides/common-oauth2-openid-connect-flows",
@@ -52,28 +44,29 @@ module.exports = {
         "guides/oauth2-token-introspection",
         "guides/oauth2-public-spa-mobile"
       ]
-    },
+    }
   ],
   "Reference": [
     "reference/configuration",
     "reference/api",
+    {
+      "type": "category",
+      "label": "Command Line Interface (CLI)",
+      "items": [
+      ]
+    }
   ],
   "Debug & Help": [
     "debug",
     "debug/csrf",
     "debug/token-endpoint-auth-method",
-    "debug/logout",
+    "debug/logout"
   ],
-  "SDKs": [
-    "sdk",
-    "sdk/go",
-    "sdk/js",
-    "sdk/php",
-  ],
+  "SDKs": ["sdk", "sdk/go", "sdk/js", "sdk/php"],
   "Further Reading": [
     "case-study",
     "benchmark",
     "security-architecture",
     "faq"
-  ],
-};
+  ]
+}

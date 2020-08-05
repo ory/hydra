@@ -62,7 +62,6 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 		patterns = append(patterns, g)
 	}
 
-
 	options := cors.Options{
 		AllowedOrigins:     corsOptions.AllowedOrigins,
 		AllowedMethods:     corsOptions.AllowedMethods,
@@ -113,7 +112,7 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 				if err != nil {
 					return false
 				}
-				if(g.Match(origin)){
+				if g.Match(origin) {
 					return true
 				}
 			}

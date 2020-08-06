@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-08-05)](#unreleased-2020-08-05)
+- [Unreleased (2020-08-06)](#unreleased-2020-08-06)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
@@ -453,11 +453,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.6.0...ba1f14b3b7bc81b58e86300e2c04bbce8c5be13a) (2020-08-05)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.6.0...3838cdc580ad0a684b4120fb9dc057aa328a11b3) (2020-08-06)
 
 
 ### Bug Fixes
 
+* Bump clidoc ([7800049](https://github.com/ory/hydra/commit/7800049e94441436e5fea851505f259beb7b8e4a))
 * Remove duplicate html tags ([#1960](https://github.com/ory/hydra/issues/1960)) ([819fe6c](https://github.com/ory/hydra/commit/819fe6cd68178ed2ce434dc15e2ea4135f82e2b5))
 
 
@@ -478,7 +479,9 @@
     > Adds token-expiration to sidebar.
 * Add sdk samples for tls termination and tls verify skip ([#1968](https://github.com/ory/hydra/issues/1968)) ([6619e59](https://github.com/ory/hydra/commit/6619e59dcbdac604162c70df3df11afe2b5ae796))
 * Add section on oauth2 limitations at beginning ([4254363](https://github.com/ory/hydra/commit/425436303af59c3d78dff15f1232d84733db7ca0))
+* Adopt new sidebar.json ([8faf070](https://github.com/ory/hydra/commit/8faf070adac29551c50f4d0b5ce8ecde6d659b7e))
 * Clarify when to use oauth2 ([4c58601](https://github.com/ory/hydra/commit/4c586012bff2d23d60bd58fe2815017f9e56ad63))
+* Fix invalid links ([3838cdc](https://github.com/ory/hydra/commit/3838cdc580ad0a684b4120fb9dc057aa328a11b3))
 * Fix typos ([#1964](https://github.com/ory/hydra/issues/1964)) ([83ce657](https://github.com/ory/hydra/commit/83ce6578110f89ebd7e6a9eb7d76c4f9bd7cfbcd))
 * Fixed link ([#1969](https://github.com/ory/hydra/issues/1969)) ([ba1f14b](https://github.com/ory/hydra/commit/ba1f14b3b7bc81b58e86300e2c04bbce8c5be13a))
 * Update oauth2 limitation section ([62e6fdf](https://github.com/ory/hydra/commit/62e6fdfcc6e8cccb06ed50da96e7298f579207e8))
@@ -487,6 +490,7 @@
 
 ### Features
 
+* Add clidoc task and program ([e44d256](https://github.com/ory/hydra/commit/e44d25627714372843f8a73a73fb915363b21728))
 * Revoke consent sessions of a subject only if explicitly requested ([#1952](https://github.com/ory/hydra/issues/1952)) ([fb925cf](https://github.com/ory/hydra/commit/fb925cf8c3e738efab018cbf659e288d76eb4cd2)), closes [#1951](https://github.com/ory/hydra/issues/1951):
 
     > This patch adds query parameter `all` to `/oauth2/auth/sessions/consent`. If `all=true`, then all consent sessions of a certain subject will be revoked.

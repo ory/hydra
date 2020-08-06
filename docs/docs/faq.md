@@ -206,12 +206,12 @@ Check the logs using `docker logs <container-id>`.
 > request used a security parameter (e.g., anti-replay, anti-csrf) with
 > insufficient entropy (minimum of 8 characters)"
 
-> Kareem Diaa @kimooz Jun 07 16:41  
+> Kareem Diaa @kimooz Jun 07 16:41
 > Hey there , I am getting this error when I try request an access token "The
 > request used a security parameter (e.g., anti-replay, anti-csrf) with
 > insufficient entropy (minimum of 8 characters)"
 
-> Aeneas @arekkas Jun 07 16:41  
+> Aeneas @arekkas Jun 07 16:41
 > @kimooz make sure state and nonce are set in your auth code url
 > (http://hydra/oauth2/auth?client_id=...&nonce=THIS_NEEDS_TO_BE_SET&state=THIS_ALSO_NEEDS_TO_BE_SET
 
@@ -225,12 +225,12 @@ Check the logs using `docker logs <container-id>`.
 
 ## Refreshing tokens
 
-> Kareem Diaa @kimooz 15:48  
+> Kareem Diaa @kimooz 15:48
 > One last question if you don't mind from your experience do you think that
 > saving the user access token in a session and validating it from the client on
 > ever refresh does that make sense or not? using the introspect endpoint
 
-> Aeneas @arekkas 15:51  
+> Aeneas @arekkas 15:51
 > nah, simply write your http calls in a way that if a 401 or 403 occurs, the
 > token is refreshed that's the easiest and cleanest
 
@@ -242,17 +242,16 @@ you to show the login UI.
 
 ## Where can I get documentation on running multiple instances of Hydra?
 
-> @killa#7335 20190103 01:06  
+> @killa#7335 20190103 01:06
 > My company is thinking about adopting Hydra. There is a performance benchmark
 > including data at https://www.ory.sh/docs/next/performance/hydra and some
 > information on how to scale hydra. Where can I get documentation on running
-> multiple instances of Hydra?  
+> multiple instances of Hydra?
 > Source: Discord/ory/general
 
 Hydra scales according to 12 factor principles. Just add another instance with
-the same config.  
+the same config.
 Please check the documentation section for 12 factor principles for more
 information: https://www.ory.sh/docs/ecosystem/cloud-native. There is also some
 information on collecting statistics in the section on
-[prometheus](https://github.com/prometheus) in the five minute tutorial:
-https://www.ory.sh/docs/hydra/5min-tutorial
+[prometheus](https://github.com/prometheus) in the [five minute tutorial](./5min-tutorial).

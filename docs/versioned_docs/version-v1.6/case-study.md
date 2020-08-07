@@ -33,7 +33,7 @@ So you decide to implement OAuth2 and use ORY Hydra to do the job. You run Hydra
 by adding its Docker image to your cluster. Next, you set up some exemplary
 OAuth2 clients. These clients need to access a user's todo lists. To do so, the
 client initiates an OAuth2 request. This is where Hydra's
-[user login & consent flow](hydra/oauth2.md) comes into play. Before Hydra can
+[user login & consent flow](concepts/oauth2) comes into play. Before Hydra can
 issue an access token, we need to know which user is giving consent. To
 determine this, Hydra redirects the user agent (browser, mobile device) to
 ToDo24's login endpoint alongside with a challenge that contains important

@@ -32,7 +32,7 @@ repositories:
 
 We also provide more info for these SDKs:
 
-- [Golang](sdk/g)
+- [Golang](sdk/go)
 - [JavaScript](sdk/js)
 
 Missing your programming language?

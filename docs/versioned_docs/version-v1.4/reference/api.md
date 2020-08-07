@@ -19,8 +19,8 @@ share them in a [GitHub issue](https://github.com/ory/docs/issues/new) any time.
 ## Authentication
 
 - HTTP Authentication, scheme: basic - OAuth 2.0 Authorization.   - Flow: authorizationCode
-  - OAuth 2.0 Authorization URL = [/oauth2/auth](/oauth2/auth)
-  - OAuth 2.0 Token URL = [/oauth2/token](/oauth2/token)
+  - OAuth 2.0 Authorization URL = [ https://hydra.demo.ory.sh/oauth2/auth](https://hydra.demo.ory.sh/oauth2/auth)
+  - OAuth 2.0 Token URL = [ https://hydra.demo.ory.sh/oauth2/token](https://hydra.demo.ory.sh/oauth2/token)
   - OAuth 2.0 Scope
 
     |Scope|Scope Description|
@@ -125,7 +125,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -343,7 +343,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -520,7 +520,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -698,7 +698,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -893,7 +893,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/x-www-form-urlencoded"},
         "Accept": []string{"application/json"},
     }
@@ -1252,7 +1252,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/x-www-form-urlencoded"},
         "Accept": []string{"application/json"},
     }
@@ -1455,7 +1455,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
         "Authorization": []string{"Bearer {access-token}"},
     }
@@ -1734,7 +1734,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -2018,7 +2018,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -2298,7 +2298,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -2581,7 +2581,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -2818,7 +2818,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -2995,7 +2995,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -3198,7 +3198,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -3433,7 +3433,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -3676,7 +3676,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -3869,7 +3869,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -4070,7 +4070,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -4298,7 +4298,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -4508,7 +4508,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -4922,7 +4922,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -5145,7 +5145,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -5377,7 +5377,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -5649,7 +5649,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -5857,7 +5857,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -6074,7 +6074,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -6267,7 +6267,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -6450,7 +6450,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -6660,7 +6660,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -7023,7 +7023,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -7210,7 +7210,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -7400,7 +7400,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 
@@ -7595,7 +7595,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/json"},
         "Accept": []string{"application/json"},
     }
@@ -7822,7 +7822,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Content-Type": []string{"application/x-www-form-urlencoded"},
         "Accept": []string{"application/json"},
     }
@@ -8001,7 +8001,7 @@ import (
 )
 
 func main() {
-    headers := map[string][]string{ 
+    headers := map[string][]string{
         "Accept": []string{"application/json"},
     }
 

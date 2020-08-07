@@ -8,7 +8,7 @@ const githubRepoName = config.projectSlug === 'ecosystem'
 
 const links = [
   {
-    to: '/',
+    to: "/",
     activeBasePath: `${config.projectSlug}/docs`,
     label: `Docs`,
     position: 'left'

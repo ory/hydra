@@ -198,8 +198,8 @@ https://authorization-server.com/auth
  &state=...
 ```
 
-When [accepting the consent request](consent), `offline_access` must be
-in the list of `grant_scope`:
+When [accepting the consent request](consent), `offline_access` must be in the
+list of `grant_scope`:
 
 ```js
 fetch('https://hydra/oauth2/auth/requests/consent/accept?challenge=' + encodeURIComponent(challenge), {

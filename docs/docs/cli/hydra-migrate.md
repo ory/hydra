@@ -9,7 +9,6 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
-
 ## hydra migrate
 
 Various migration helpers
@@ -33,6 +32,6 @@ Various migration helpers
 
 ### SEE ALSO
 
-- [hydra](hydra) - Run and manage ORY Hydra
-- [hydra migrate sql](hydra-migrate-sql) - Create SQL schemas and apply
-  migration plans
+* [hydra](hydra)	 - Run and manage ORY Hydra
+* [hydra migrate sql](hydra-migrate-sql)	 - Create SQL schemas and apply migration plans
+

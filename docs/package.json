@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "gen": "cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",
+    "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",
     "docusaurus": "docusaurus",
+    "widdershins": "widdershins -u .widdershins/templates -e .widdershins/config.json ../.schema/api.swagger.json -o ./docs/reference/api.mdx",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
@@ -43,6 +44,7 @@
     "prettier": "2.0.2",
     "ramda": "0.27.0",
     "remark-admonitions": "1.2.1",
-    "yaml": "1.8.3"
+    "yaml": "1.8.3",
+    "widdershins": "3.6.7"
   }
 }

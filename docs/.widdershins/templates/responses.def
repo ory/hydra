@@ -21,6 +21,7 @@
 {{~}}
 {{? data.responseSchemas }}
 <a id="{{=data.operationUniqueSlug}}-responseschema"></a>
+
 ##### Response Schema
 {{~ data.responses :response}}
 {{? response.content && !response.$ref && !data.utils.isPrimitive(response.type)}}

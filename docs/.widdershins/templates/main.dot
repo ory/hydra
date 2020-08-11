@@ -50,7 +50,8 @@ share them in a [GitHub issue](https://github.com/ory/docs/issues/new) any time.
 {{ var origSchema = data.components.schemas[s]; }}
 {{ var schema = data.api.components.schemas[s]; }}
 
-<a id="tocS{{=s.toLowerCase()}}">{{=s}}</a>
+<a id="tocS{{=s.toLowerCase()}}"></a>
+
 #### {{=s}}
 
 <a id="schema{{=s.toLowerCase()}}"></a>

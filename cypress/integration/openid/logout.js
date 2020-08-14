@@ -18,6 +18,7 @@ describe('OpenID Connect Logout', () => {
     beforeEach(() => {
       Cypress.Cookies.preserveOnce(
         'oauth2_authentication_session',
+        'oauth2_authentication_session_insecure',
         'connect.sid'
       );
     });
@@ -84,6 +85,7 @@ describe('OpenID Connect Logout', () => {
     beforeEach(() => {
       Cypress.Cookies.preserveOnce(
         'oauth2_authentication_session',
+        'oauth2_authentication_session_insecure',
         'connect.sid'
       );
     });
@@ -143,6 +145,7 @@ describe('OpenID Connect Logout', () => {
     beforeEach(() => {
       Cypress.Cookies.preserveOnce(
         'oauth2_authentication_session',
+        'oauth2_authentication_session_insecure',
         'connect.sid'
       );
     });

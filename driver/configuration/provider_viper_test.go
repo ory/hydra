@@ -145,6 +145,12 @@ func TestViperProvider_CookieSameSiteMode(t *testing.T) {
 
 	viper.Set(ViperKeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
+
+	p = NewViperProvider(l, true, nil)
+	viper.Reset()
+	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
+	viper.Set(ViperKeyCookieSameSiteMode, "none")
+	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
 }
 
 func TestViperProviderValidates(t *testing.T) {

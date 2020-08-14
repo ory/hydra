@@ -246,7 +246,7 @@ func TestValidateCsrfSession(t *testing.T) {
 				assert.NoError(t, err, "failed to save cookie %s", c.name)
 			}
 
-			err := validateCsrfSession(r, store, cookieAuthenticationCSRFName, tc.csrfValue, tc.sameSiteLegacyWorkaround)
+			err := validateCsrfSession(r, store, cookieAuthenticationCSRFName, tc.csrfValue, tc.sameSiteLegacyWorkaround, true)
 			if tc.expectError {
 				assert.Error(t, err)
 			} else {
@@ -288,7 +288,7 @@ func TestCreateCsrfSession(t *testing.T) {
 			sameSite:                 http.SameSiteLaxMode,
 			sameSiteLegacyWorkaround: false,
 			expectedCookies: map[string]cookie{
-				"csrf_lax_insecure": {
+				"csrf_lax_insecure_insecure": {
 					httpOnly: true,
 					secure:   false,
 					sameSite: http.SameSiteLaxMode,

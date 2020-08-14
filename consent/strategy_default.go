@@ -103,7 +103,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 
 func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.Request) (*LoginSession, error) {
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
-	cookie, err := s.r.CookieStore().Get(r, CookieAuthenticationName)
+	cookie, err := s.r.CookieStore().Get(r, CookieName(s.c.ServesHTTPS(), CookieAuthenticationName))
 	if err != nil {
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
@@ -287,7 +287,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 }
 
 func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *http.Request) error {
-	sid, err := revokeAuthenticationCookie(w, r, s.r.CookieStore())
+	sid, err := s.revokeAuthenticationCookie(w, r, s.r.CookieStore())
 	if err != nil {
 		return err
 	}
@@ -299,8 +299,8 @@ func (s *DefaultStrategy) revokeAuthenticationSession(w http.ResponseWriter, r *
 	return s.r.ConsentManager().DeleteLoginSession(r.Context(), sid)
 }
 
-func revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, s sessions.Store) (string, error) {
-	cookie, _ := s.Get(r, CookieAuthenticationName)
+func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, ss sessions.Store) (string, error) {
+	cookie, _ := ss.Get(r, CookieName(s.c.ServesHTTPS(), CookieAuthenticationName))
 	sid, _ := mapx.GetString(cookie.Values, CookieAuthenticationSIDName)
 
 	cookie.Options.MaxAge = -1
@@ -349,7 +349,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The login request has expired, please try again."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround()); err != nil {
+	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.ServesHTTPS()); err != nil {
 		return nil, err
 	}
 
@@ -442,7 +442,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	// Not a skipped login and the user asked to remember its session, store a cookie
-	cookie, _ := s.r.CookieStore().Get(r, CookieAuthenticationName)
+	cookie, _ := s.r.CookieStore().Get(r, CookieName(s.c.ServesHTTPS(), CookieAuthenticationName))
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
@@ -588,7 +588,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 		return nil, errors.WithStack(fosite.ErrServerError.WithDebug("The authenticatedAt value was not set."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround()); err != nil {
+	if err := validateCsrfSession(r, s.r.CookieStore(), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.ServesHTTPS()); err != nil {
 		return nil, err
 	}
 

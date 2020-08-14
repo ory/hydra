@@ -73,7 +73,7 @@ func (m *RegistryMemory) ConsentManager() consent.Manager {
 
 func (m *RegistryMemory) OAuth2Storage() x.FositeStorer {
 	if m.fs == nil {
-		m.fs = oauth2.NewFositeMemoryStore(m.r, m.c)
+		m.fs = oauth2.NewFositeMemoryStore(m.r, m.C)
 	}
 	return m.fs
 }

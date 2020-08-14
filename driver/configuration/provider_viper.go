@@ -252,15 +252,21 @@ func (v *ViperProvider) AdminSocketPermission() *UnixPermission {
 }
 
 func (v *ViperProvider) CookieSameSiteMode() http.SameSite {
-	sameSiteModeStr := viperx.GetString(v.l, ViperKeyCookieSameSiteMode, "default", "COOKIE_SAME_SITE_MODE")
+	sameSiteModeStr := viperx.GetString(v.l, ViperKeyCookieSameSiteMode, "", "COOKIE_SAME_SITE_MODE")
 	switch strings.ToLower(sameSiteModeStr) {
 	case "lax":
 		return http.SameSiteLaxMode
 	case "strict":
 		return http.SameSiteStrictMode
 	case "none":
+		if v.forcedHTTP {
+			return http.SameSiteLaxMode
+		}
 		return http.SameSiteNoneMode
 	default:
+		if v.forcedHTTP {
+			return http.SameSiteLaxMode
+		}
 		return http.SameSiteDefaultMode
 	}
 }

@@ -42,7 +42,7 @@ const (
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
-	c            configuration.Provider
+	C            configuration.Provider
 	cm           client.Manager
 	ch           *client.Handler
 	fh           fosite.Hasher
@@ -93,7 +93,7 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 
 func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = OAuth2AwareCORSMiddleware("public", m.r, m.c)
+		m.oa2mw = OAuth2AwareCORSMiddleware("public", m.r, m.C)
 	}
 	return m.oa2mw
 }
@@ -125,7 +125,7 @@ func (m *RegistryBase) BuildHash() string {
 }
 
 func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
-	m.c = c
+	m.C = c
 	return m.r
 }
 
@@ -160,9 +160,9 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
 		if m.Tracer().IsLoaded() {
-			m.fh = &tracing.TracedBCrypt{WorkFactor: m.c.BCryptCost()}
+			m.fh = &tracing.TracedBCrypt{WorkFactor: m.C.BCryptCost()}
 		} else {
-			m.fh = x.NewBCrypt(m.c)
+			m.fh = x.NewBCrypt(m.C)
 		}
 	}
 	return m.fh
@@ -177,14 +177,14 @@ func (m *RegistryBase) ClientHandler() *client.Handler {
 
 func (m *RegistryBase) ClientValidator() *client.Validator {
 	if m.cv == nil {
-		m.cv = client.NewValidator(m.c)
+		m.cv = client.NewValidator(m.C)
 	}
 	return m.cv
 }
 
 func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	if m.kh == nil {
-		m.kh = jwk.NewHandler(m.r, m.c)
+		m.kh = jwk.NewHandler(m.r, m.C)
 	}
 	return m.kh
 }
@@ -200,7 +200,7 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 
 func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	if m.cos == nil {
-		m.cos = consent.NewStrategy(m.r, m.c)
+		m.cos = consent.NewStrategy(m.r, m.C)
 	}
 	return m.cos
 }
@@ -219,40 +219,40 @@ func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
 
 func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	if m.kc == nil {
-		m.kc = jwk.NewAEAD(m.c)
+		m.kc = jwk.NewAEAD(m.C)
 	}
 	return m.kc
 }
 
 func (m *RegistryBase) CookieStore() sessions.Store {
 	if m.cs == nil {
-		m.cs = sessions.NewCookieStore(m.c.GetCookieSecrets()...)
-		m.csPrev = m.c.GetCookieSecrets()
+		m.cs = sessions.NewCookieStore(m.C.GetCookieSecrets()...)
+		m.csPrev = m.C.GetCookieSecrets()
 	}
 	return m.cs
 }
 
 func (m *RegistryBase) oAuth2Config() *compose.Config {
 	return &compose.Config{
-		AccessTokenLifespan:            m.c.AccessTokenLifespan(),
-		RefreshTokenLifespan:           m.c.RefreshTokenLifespan(),
-		AuthorizeCodeLifespan:          m.c.AuthCodeLifespan(),
-		IDTokenLifespan:                m.c.IDTokenLifespan(),
-		IDTokenIssuer:                  m.c.IssuerURL().String(),
-		HashCost:                       m.c.BCryptCost(),
+		AccessTokenLifespan:            m.C.AccessTokenLifespan(),
+		RefreshTokenLifespan:           m.C.RefreshTokenLifespan(),
+		AuthorizeCodeLifespan:          m.C.AuthCodeLifespan(),
+		IDTokenLifespan:                m.C.IDTokenLifespan(),
+		IDTokenIssuer:                  m.C.IssuerURL().String(),
+		HashCost:                       m.C.BCryptCost(),
 		ScopeStrategy:                  m.ScopeStrategy(),
-		SendDebugMessagesToClients:     m.c.ShareOAuth2Debug(),
-		EnforcePKCE:                    m.c.PKCEEnforced(),
-		EnforcePKCEForPublicClients:    m.c.EnforcePKCEForPublicClients(),
+		SendDebugMessagesToClients:     m.C.ShareOAuth2Debug(),
+		EnforcePKCE:                    m.C.PKCEEnforced(),
+		EnforcePKCEForPublicClients:    m.C.EnforcePKCEForPublicClients(),
 		EnablePKCEPlainChallengeMethod: false,
-		TokenURL:                       urlx.AppendPaths(m.c.PublicURL(), oauth2.TokenPath).String(),
-		RedirectSecureChecker:          x.IsRedirectURISecure(m.c),
+		TokenURL:                       urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
+		RedirectSecureChecker:          x.IsRedirectURISecure(m.C),
 	}
 }
 
 func (m *RegistryBase) OAuth2HMACStrategy() *foauth2.HMACSHAStrategy {
 	if m.o2mc == nil {
-		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.c.GetSystemSecret(), m.c.GetRotatedSystemSecrets())
+		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.C.GetSystemSecret(), m.C.GetRotatedSystemSecrets())
 	}
 	return m.o2mc
 }
@@ -262,14 +262,14 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 		fc := m.oAuth2Config()
 		oidcStrategy := &openid.DefaultStrategy{
 			JWTStrategy: m.OpenIDJWTStrategy(),
-			Expiry:      m.c.IDTokenLifespan(),
-			Issuer:      m.c.IssuerURL().String(),
+			Expiry:      m.C.IDTokenLifespan(),
+			Issuer:      m.C.IssuerURL().String(),
 		}
 
 		var coreStrategy foauth2.CoreStrategy
 		hmacStrategy := m.OAuth2HMACStrategy()
 
-		switch ats := strings.ToLower(m.c.AccessTokenStrategy()); ats {
+		switch ats := strings.ToLower(m.C.AccessTokenStrategy()); ats {
 		case "jwt":
 			coreStrategy = &foauth2.DefaultJWTStrategy{
 				JWTStrategy:     m.AccessTokenJWTStrategy(),
@@ -308,15 +308,15 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 
 func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 	if m.fsc == nil {
-		if m.c.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
+		if m.C.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
 			m.Logger().Warn(`Using deprecated hierarchical scope strategy, consider upgrading to "wildcard"" or "exact"".`)
 			m.fsc = fosite.HierarchicScopeStrategy
-		} else if strings.ToLower(m.c.ScopeStrategy()) == "exact" {
+		} else if strings.ToLower(m.C.ScopeStrategy()) == "exact" {
 			m.fsc = fosite.ExactScopeStrategy
 		} else {
 			m.fsc = fosite.WildcardScopeStrategy
 		}
-		m.fscPrev = m.c.ScopeStrategy()
+		m.fscPrev = m.C.ScopeStrategy()
 	}
 	return m.fsc
 }
@@ -374,14 +374,14 @@ func (m *RegistryBase) AudienceStrategy() fosite.AudienceMatchingStrategy {
 
 func (m *RegistryBase) ConsentHandler() *consent.Handler {
 	if m.coh == nil {
-		m.coh = consent.NewHandler(m.r, m.c)
+		m.coh = consent.NewHandler(m.r, m.C)
 	}
 	return m.coh
 }
 
 func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 	if m.oah == nil {
-		m.oah = oauth2.NewHandler(m.r, m.c)
+		m.oah = oauth2.NewHandler(m.r, m.C)
 	}
 	return m.oah
 }
@@ -389,12 +389,12 @@ func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectIdentifierAlgorithm {
 	if m.sia == nil {
 		m.sia = map[string]consent.SubjectIdentifierAlgorithm{}
-		for _, t := range m.c.SubjectTypesSupported() {
+		for _, t := range m.C.SubjectTypesSupported() {
 			switch t {
 			case "public":
 				m.sia["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
 			case "pairwise":
-				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.c.SubjectIdentifierAlgorithmSalt()))
+				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.C.SubjectIdentifierAlgorithmSalt()))
 			}
 		}
 	}
@@ -404,10 +404,10 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectId
 func (m *RegistryBase) Tracer() *tracing.Tracer {
 	if m.trc == nil {
 		m.trc = &tracing.Tracer{
-			ServiceName:  m.c.TracingServiceName(),
-			JaegerConfig: m.c.TracingJaegerConfig(),
-			ZipkinConfig: m.c.TracingZipkinConfig(),
-			Provider:     m.c.TracingProvider(),
+			ServiceName:  m.C.TracingServiceName(),
+			JaegerConfig: m.C.TracingJaegerConfig(),
+			ZipkinConfig: m.C.TracingZipkinConfig(),
+			Provider:     m.C.TracingProvider(),
 			Logger:       m.Logger(),
 		}
 

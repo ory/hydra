@@ -58,7 +58,7 @@ func (m *RegistrySQL) Init() error {
 			options = append(options, sqlcon.WithDistributedTracing(), sqlcon.WithOmitArgsFromTraceSpans())
 		}
 
-		connection, err := sqlcon.NewSQLConnection(m.c.DSN(), m.Logger(), options...)
+		connection, err := sqlcon.NewSQLConnection(m.C.DSN(), m.Logger(), options...)
 		if err != nil {
 			return err
 		}
@@ -71,7 +71,7 @@ func (m *RegistrySQL) Init() error {
 
 	if m.persister == nil {
 		// new db connection
-		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.c.DSN())
+		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())
 		c, err := pop.NewConnection(&pop.ConnectionDetails{
 			URL:             sqlcon.FinalizeDSN(m.l, cleanedDSN),
 			IdlePool:        idlePool,
@@ -129,7 +129,7 @@ func (m *RegistrySQL) ConsentManager() consent.Manager {
 
 func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 	if m.fs == nil {
-		m.fs = oauth2.NewFositeSQLStore(m.DB(), m.r, m.c, m.KeyCipher())
+		m.fs = oauth2.NewFositeSQLStore(m.DB(), m.r, m.C, m.KeyCipher())
 	}
 	return m.fs
 }

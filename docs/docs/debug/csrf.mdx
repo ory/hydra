@@ -51,7 +51,11 @@ If you run a version of ORY Hydra 1.6 and below and experience this issue:
 
 - Make sure to not use the `--dangerous-force-http` flag
 - Set configuration value `serve.cookies.same_site_mode` or environment variable `SERVE_COOKIES_SAME_SITE_MODE` to
-`Lax` - this happens automatically for ORY Hydra 1.7+ when running in HTTP mode.
+`Lax` - this happens automatically for ORY Hydra v1.7.0 when running in HTTP mode.
+
+Chrome rejects cookies without the `secure` flag if a cookie with the same name for the same scope (domain, path)
+is set that has the `secure` flag. ORY Hydra 1.7.0+ uses different names for cookies with and without `secure` flag.
+For versions prior to that, you need to delete the cookies for the domain in order to get them working again.
 
 ### ORY Hydra Running Over HTTP Without dev-mode Enabled
 

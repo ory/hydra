@@ -9,7 +9,6 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
-
 ## hydra keys delete
 
 Delete a new JSON Web Key Set
@@ -41,4 +40,5 @@ hydra keys delete <set> [flags]
 
 ### SEE ALSO
 
-- [hydra keys](hydra-keys) - Manage JSON Web Keys
+* [hydra keys](hydra-keys)	 - Manage JSON Web Keys
+

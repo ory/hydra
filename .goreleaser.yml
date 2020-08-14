@@ -53,7 +53,7 @@ snapshot:
 changelog:
   sort: asc
 brews:
-  - github:
+  - tap:
       owner: ory
       name: homebrew-hydra
     goarm: 6

@@ -34,6 +34,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ory/x/sqlxx"
 
@@ -105,16 +106,25 @@ func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.R
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
 	cookie, err := s.r.CookieStore().Get(r, CookieName(s.c.ServesHTTPS(), CookieAuthenticationName))
 	if err != nil {
+		s.r.Logger().
+			WithRequest(r).
+			WithError(err).Debug("User logout skipped because cookie store returned an error.")
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
 	sessionID := mapx.GetStringDefault(cookie.Values, CookieAuthenticationSIDName, "")
 	if sessionID == "" {
+		s.r.Logger().
+			WithRequest(r).
+			Debug("User logout skipped because cookie exists but session value is empty.")
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	}
 
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionID)
 	if errors.Cause(err) == x.ErrNotFound {
+		s.r.Logger().
+			WithRequest(r).
+			WithError(err).Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
 		return nil, errors.WithStack(ErrNoAuthenticationSessionFound)
 	} else if err != nil {
 		return nil, err
@@ -303,8 +313,11 @@ func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *h
 	cookie, _ := ss.Get(r, CookieName(s.c.ServesHTTPS(), CookieAuthenticationName))
 	sid, _ := mapx.GetString(cookie.Values, CookieAuthenticationSIDName)
 
-	cookie.Options.MaxAge = -1
 	cookie.Values[CookieAuthenticationSIDName] = ""
+	cookie.Options.HttpOnly = true
+	cookie.Options.SameSite = s.c.CookieSameSiteMode()
+	cookie.Options.Secure = s.c.ServesHTTPS()
+	cookie.Options.MaxAge = -1
 
 	if err := cookie.Save(r, w); err != nil {
 		return "", errors.WithStack(err)
@@ -449,14 +462,18 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 	cookie.Options.HttpOnly = true
 	cookie.Options.SameSite = s.c.CookieSameSiteMode()
-
-	if s.c.ServesHTTPS() {
-		cookie.Options.Secure = true
-	}
-
+	cookie.Options.Secure = s.c.ServesHTTPS()
 	if err := cookie.Save(r, w); err != nil {
 		return nil, errors.WithStack(err)
 	}
+
+	s.r.Logger().WithRequest(r).
+		WithFields(logrus.Fields{
+			"cookie_name":      CookieName(s.c.ServesHTTPS(), CookieAuthenticationName),
+			"cookie_http_only": true,
+			"cookie_same_site": s.c.CookieSameSiteMode(),
+			"cookie_secure":    s.c.ServesHTTPS(),
+		}).Debug("Authentication session cookie was set.")
 	return session, nil
 }
 
@@ -750,6 +767,9 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		if errors.Cause(err) == ErrNoAuthenticationSessionFound {
 			// OP initiated log out but no session was found. Since we can not identify the user we can not call
 			// any RPs.
+			s.r.AuditLogger().
+				WithRequest(r).
+				Info("User logout skipped because no authentication session exists.")
 			http.Redirect(w, r, redir, http.StatusFound)
 			return nil, errors.WithStack(ErrAbortOAuth2Request)
 		} else if err != nil {
@@ -771,6 +791,9 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 			return nil, err
 		}
 
+		s.r.AuditLogger().
+			WithRequest(r).
+			Info("User logout requires user confirmation, redirecting to Logout UI.")
 		http.Redirect(w, r, urlx.SetQuery(s.c.LogoutURL(), url.Values{"logout_challenge": {challenge}}).String(), http.StatusFound)
 		return nil, errors.WithStack(ErrAbortOAuth2Request)
 	}
@@ -946,6 +969,10 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		return nil, err
 	}
 
+	s.r.AuditLogger().
+		WithRequest(r).
+		WithField("subject", lr.Subject).
+		Info("User logout completed!")
 	return &LogoutResult{
 		RedirectTo:             lr.PostLogoutRedirectURI,
 		FrontChannelLogoutURLs: urls,

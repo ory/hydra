@@ -42,6 +42,17 @@ as well as the network tab - look for `Cookie` and `Set-Cookie` HTTP Headers:
   src={useBaseUrl('img/docs/csrf_network_tab.png')}
 />
 
+### Same-Site in Chrome
+
+Google Chrome changed the behavior of `SameSite=None` so that it is not possible to use
+this SameSite mode without the HTTP Cookie `secure` flag.
+
+If you run a version of ORY Hydra 1.6 and below and experience this issue:
+
+- Make sure to not use the `--dangerous-force-http` flag
+- Set configuration value `serve.cookies.same_site_mode` or environment variable `SERVE_COOKIES_SAME_SITE_MODE` to
+`Lax` - this happens automatically for ORY Hydra 1.7+ when running in HTTP mode.
+
 ### ORY Hydra Running Over HTTP Without dev-mode Enabled
 
 You are running ORY Hydra via HTTP but are missing the `--dangerous-force-http`

@@ -265,6 +265,12 @@ Pull requests that update Java code
 
 #### Pull Requests
 
+### [Label Cloud/M2](https://github.com/ory/hydra/labels/cloud%2FM2)
+
+#### Issues
+
+#### Pull Requests
+
 ## [v1.8.0](https://github.com/ory/hydra/milestone/39)
 
 ### [Label Bug](https://github.com/ory/hydra/labels/bug)
@@ -573,6 +579,12 @@ Pull requests that update Java code
 #### Pull Requests
 
 ### [Label Good first issue](https://github.com/ory/hydra/labels/good%20first%20issue)
+
+#### Issues
+
+#### Pull Requests
+
+### [Label Cloud/M2](https://github.com/ory/hydra/labels/cloud%2FM2)
 
 #### Issues
 
@@ -1011,6 +1023,12 @@ Pull requests that update Java code
 #### Pull Requests
 
 ### [Label Good first issue](https://github.com/ory/hydra/labels/good%20first%20issue)
+
+#### Issues
+
+#### Pull Requests
+
+### [Label Cloud/M2](https://github.com/ory/hydra/labels/cloud%2FM2)
 
 #### Issues
 

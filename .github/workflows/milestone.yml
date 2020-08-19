@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Milestone Documentation Generator
-        uses: ory/milestone-action@v0.0.10
+        uses: ory/milestone-action@v0
         with:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           outputFile: docs/docs/milestones.md

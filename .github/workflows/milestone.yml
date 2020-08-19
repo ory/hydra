@@ -24,7 +24,7 @@ jobs:
       - name: Commit Milestone Documentation
         uses: EndBug/add-and-commit@v4.4.0
         with:
-          message: "autogen(docs): update milestone"
+          message: "autogen(docs): update milestone document"
           author_name: aeneasr
           author_email: "3372410+aeneasr@users.noreply.github.com"
         env:

@@ -9,7 +9,6 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
-
 ## hydra keys
 
 Manage JSON Web Keys
@@ -37,9 +36,9 @@ Manage JSON Web Keys
 
 ### SEE ALSO
 
-- [hydra](hydra) - Run and manage ORY Hydra
-- [hydra keys create](hydra-keys-create) - Create a new JSON Web Key Set
-- [hydra keys delete](hydra-keys-delete) - Delete a new JSON Web Key Set
-- [hydra keys get](hydra-keys-get) - Get a new JSON Web Key Set
-- [hydra keys import](hydra-keys-import) - Imports cryptographic keys of any
-  format to the JSON Web Key Store
+* [hydra](hydra)	 - Run and manage ORY Hydra
+* [hydra keys create](hydra-keys-create)	 - Create a new JSON Web Key Set
+* [hydra keys delete](hydra-keys-delete)	 - Delete a new JSON Web Key Set
+* [hydra keys get](hydra-keys-get)	 - Get a new JSON Web Key Set
+* [hydra keys import](hydra-keys-import)	 - Imports cryptographic keys of any format to the JSON Web Key Store
+

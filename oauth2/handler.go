@@ -394,10 +394,6 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Schemes: http, https
 //
-//     Security:
-//       basic:
-//       oauth2:
-//
 //     Responses:
 //       200: oAuth2TokenIntrospection
 //       401: genericError

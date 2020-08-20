@@ -88,6 +88,9 @@
     "debug/logout"
   ],
   "SDKs": ["sdk", "sdk/go", "sdk/js", "sdk/php"],
+  "Development": [
+    "milestones"
+  ],
   "Further Reading": [
     "case-study", 
     "benchmark", 

@@ -116,9 +116,4 @@ Authorization.
 
 ## How does Access Control work with Hydra?
 
-Hydra supports two concepts of authorization. One is called Token Introspection
-which is a standard by the IETF (
-[https://tools.ietf.org/html/rfc7662](https://tools.ietf.org/html/rfc7662) ). It
-is primarily targeted at third-party services and is usually used by a
-programmatic API. It can be used by first-party services too. The sole purpose
-of this endpoint is to check whether an access token is valid or not.
+See [OAuth 2.0 Token Introspection](guides/oauth2-token-introspection).

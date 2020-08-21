@@ -100,6 +100,7 @@ We are looking for help on this one.
 * [ ] Move to go-jose key generation ([hydra#1825](https://github.com/ory/hydra/issues/1825))
 * [ ] Introspection Response: `access_token` and `refresh_token` are not valid `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 * [ ] Split HTTPS handling for public/admin ([hydra#1962](https://github.com/ory/hydra/issues/1962))
+* [ ] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

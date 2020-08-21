@@ -27,6 +27,10 @@ New feature or request.
 
 Affects documentation.
 
+#### Issues
+
+* [x] docs: Hydra supports two concepts of authorization ([hydra#1992](https://github.com/ory/hydra/issues/1992)) - [@hackerman](https://github.com/aeneasr)
+
 #### Pull Requests
 
 * [x] docs: remove introspect security spec ([hydra#2002](https://github.com/ory/hydra/pull/2002))

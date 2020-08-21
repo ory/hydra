@@ -1542,14 +1542,6 @@
     },
     "/oauth2/introspect": {
       "post": {
-        "security": [
-          {
-            "basic": []
-          },
-          {
-            "oauth2": []
-          }
-        ],
         "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\nFor more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).",
         "consumes": [
           "application/x-www-form-urlencoded"

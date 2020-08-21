@@ -53,7 +53,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: fatal
+  level: info
 
   ## leak_sensitive_values ##
   #
@@ -67,7 +67,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
   #
-  leak_sensitive_values: true
+  leak_sensitive_values: false
 
   ## format ##
   #
@@ -108,7 +108,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 5089
+    port: 29866
 
     ## host ##
     #
@@ -123,7 +123,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ''
+    host: localhost
 
     ## cors ##
     #
@@ -162,9 +162,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -179,8 +177,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - POST
-        - CONNECT
+        - HEAD
+        - OPTIONS
+        - DELETE
+        - GET
 
       ## allowed_headers ##
       #
@@ -195,11 +195,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - aute cupidatat sed officia in
-        - do sunt laboris voluptate cupidatat
-        - Lorem
-        - cupidatat ut
-        - nostrud
+        - laborum laboris veniam sint
 
       ## exposed_headers ##
       #
@@ -214,9 +210,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - officia
-        - non amet ipsum
-        - laborum id cillum dolor ut
+        - occaecat pariatur
 
       ## allow_credentials ##
       #
@@ -230,7 +224,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -244,7 +238,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -258,7 +252,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 42351281
+      max_age: 30985675
 
       ## debug ##
       #
@@ -272,7 +266,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
 
     ## socket ##
     #
@@ -289,7 +283,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
       #
-      owner: ex
+      owner: nostrud Excepteur culpa cupidatat nulla
 
       ## group ##
       #
@@ -301,7 +295,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
       #
-      group: tempor sunt nostrud ad adipisicing
+      group: veniam voluptate et mollit
 
       ## mode ##
       #
@@ -319,7 +313,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
       #
-      mode: 402
+      mode: 466
 
     ## access_log ##
     #
@@ -338,7 +332,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: true
+      disable_for_health: false
 
   ## admin ##
   #
@@ -353,7 +347,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 49861
+    port: 64410
 
     ## host ##
     #
@@ -387,7 +381,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -407,9 +401,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -424,10 +416,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - CONNECT
-        - OPTIONS
-        - PATCH
-        - PUT
+        - DELETE
 
       ## allowed_headers ##
       #
@@ -442,9 +431,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - nulla quis
-        - pariatur
-        - aliquip consequat
+        - laborum
+        - ad qui reprehenderit
+        - amet
+        - nulla occaecat ut in sed
 
       ## exposed_headers ##
       #
@@ -459,11 +449,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - ad
-        - fugiat occaecat exercitation
-        - ipsum velit tempor
-        - eu sunt cupidatat
-        - eu adipisicing ut
+        - dolor sit in
+        - laboris
 
       ## allow_credentials ##
       #
@@ -477,7 +464,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -505,7 +492,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 57448325
+      max_age: 62287523
 
       ## debug ##
       #
@@ -519,7 +506,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
 
     ## socket ##
     #
@@ -536,7 +523,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
       #
-      owner: aute Ut elit in
+      owner: cupidatat officia
 
       ## group ##
       #
@@ -548,7 +535,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
       #
-      group: non amet ipsum Ut
+      group: nisi fugiat
 
       ## mode ##
       #
@@ -566,7 +553,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_MODE=<value>
       #
-      mode: 300
+      mode: 361
 
     ## access_log ##
     #
@@ -585,7 +572,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: true
+      disable_for_health: false
 
   ## tls ##
   #
@@ -597,30 +584,30 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_BASE64=<value>
+      #    $ export SERVE_TLS_KEY_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_BASE64=<value>
+      #    > set SERVE_TLS_KEY_PATH=<value>
       #
-      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+      path: /path/to/file.pem
 
     ## cert ##
     #
     # Configures the private key (pem encoded).
     #
     cert:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_PATH=<value>
+      #    $ export SERVE_TLS_CERT_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_PATH=<value>
+      #    > set SERVE_TLS_CERT_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## allow_termination_from ##
     #
@@ -633,6 +620,9 @@ serve:
     #    > set SERVE_TLS_ALLOW_TERMINATION_FROM=<value>
     #
     allow_termination_from:
+      - 127.0.0.1/32
+      - 127.0.0.1/32
+      - 127.0.0.1/32
       - 127.0.0.1/32
 
   ## cookies ##
@@ -655,7 +645,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: None
 
     ## same_site_legacy_workaround ##
     #
@@ -684,7 +674,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: dolor do consectetur esse velit
+dsn: in pariatur aliqua
 
 ## webfinger ##
 #
@@ -894,7 +884,7 @@ urls:
 
   ## login ##
   #
-  # Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
+  # Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.
   #
   # Examples:
   # - https://my-login.app/login
@@ -909,7 +899,7 @@ urls:
 
   ## consent ##
   #
-  # Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.
+  # Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.
   #
   # Examples:
   # - https://my-consent.app/consent
@@ -924,7 +914,7 @@ urls:
 
   ## logout ##
   #
-  # Sets the logout endpoint. Defaults to an internal fallback URL.
+  # Sets the logout endpoint. Defaults to an internal fallback URL showing an error.
   #
   # Examples:
   # - https://my-logout.app/logout
@@ -939,7 +929,7 @@ urls:
 
   ## error ##
   #
-  # Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL.
+  # Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.
   #
   # Examples:
   # - https://my-error.app/error
@@ -1050,7 +1040,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: -1
+  refresh_token: '-1'
 
   ## id_token ##
   #
@@ -1124,7 +1114,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 45400706
+      cost: 7985690
 
   ## pkce ##
   #
@@ -1353,5 +1343,5 @@ tracing:
       # - Windows Command Line (CMD):
       #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
       #
-      server_url: http://xQkDYKEvRCqZKJKHNdxVgPJPFBvSE.ilxd03w,MyHbYQ-T1Q3RU5ccO.ZMrB
+      server_url: https://qqhFProkPMAXVwcTbjDjVWLlgAYE.wwnfJVFZUFjhcn6TusUe5SZDfSlPCWRXFaiOGwM+urPvOpdoyfscffsIun+
 ```

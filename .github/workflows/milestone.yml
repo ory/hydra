@@ -2,10 +2,8 @@ name: Generate and Publish Milestone Document
 
 on:
   workflow_dispatch:
-  issues:
-    types: [opened, closed, edited, demilestoned, milestoned, reopened, assigned, unassigned, labeled, unlabeled]
-  pull_request:
-    types: [opened, closed, edited, demilestoned, milestoned, reopened, assigned, unassigned, labeled, unlabeled]
+  schedule:
+  - cron: "0 0 * * *"
 
 jobs:
   milestone:

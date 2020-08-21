@@ -82,6 +82,7 @@ New feature or request.
 * [ ] Make cookies with SameSite=None secure by default or using the configuration flag ([hydra#1844](https://github.com/ory/hydra/issues/1844))
 * [ ] Split HTTPS handling for public/admin ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 * [ ] Token claims customization with Jsonnet ([hydra#1748](https://github.com/ory/hydra/issues/1748)) - [@hackerman](https://github.com/aeneasr)
+* [ ] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 * [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 * [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 

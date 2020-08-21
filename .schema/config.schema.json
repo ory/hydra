@@ -595,7 +595,7 @@
         },
         "login": {
           "type": "string",
-          "description": "Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.",
+          "description": "Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
           "format": "uri",
           "examples": [
             "https://my-login.app/login"
@@ -603,7 +603,7 @@
         },
         "consent": {
           "type": "string",
-          "description": "Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL.",
+          "description": "Sets the consent endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.",
           "format": "uri",
           "examples": [
             "https://my-consent.app/consent"
@@ -611,7 +611,7 @@
         },
         "logout": {
           "type": "string",
-          "description": "Sets the logout endpoint. Defaults to an internal fallback URL.",
+          "description": "Sets the logout endpoint. Defaults to an internal fallback URL showing an error.",
           "format": "uri",
           "examples": [
             "https://my-logout.app/logout"
@@ -619,7 +619,7 @@
         },
         "error": {
           "type": "string",
-          "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL.",
+          "description": "Sets the error endpoint. The error ui will be shown when an OAuth2 error occurs that which can not be sent back to the client. Defaults to an internal fallback URL showing an error.",
           "format": "uri",
           "examples": [
             "https://my-error.app/error"

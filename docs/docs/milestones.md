@@ -13,7 +13,7 @@ Something is not working.
 
 #### Issues
 
-* [ ] Slow consent revocation request ([hydra#1997](https://github.com/ory/hydra/issues/1997))
+* [x] Slow consent revocation request ([hydra#1997](https://github.com/ory/hydra/issues/1997))
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -21,7 +21,7 @@ New feature or request.
 
 #### Pull Requests
 
-* [ ] perf: add (client_id, subject) index to access and refresh tables to improve revocation performance ([hydra#2001](https://github.com/ory/hydra/pull/2001)) - [@hackerman](https://github.com/aeneasr)
+* [x] perf: add (client_id, subject) index to access and refresh tables to improve revocation performance ([hydra#2001](https://github.com/ory/hydra/pull/2001)) - [@hackerman](https://github.com/aeneasr)
 
 ### [Docs](https://github.com/ory/hydra/labels/docs)
 

@@ -25,7 +25,7 @@ them, don't hesitate to ask. We're here to help! This is simply a reminder of wh
 -->
 
 - [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md).
-- [ ] I have read the [security policy](../security/policy).
+- [ ] I have read the [security policy](../SECURITY.md).
 - [ ] I confirm that this pull request does not address a security
       vulnerability. If this pull request addresses a security. vulnerability, I
       confirm that I got green light (please contact

@@ -1,0 +1,435 @@
+---
+id: gitlab
+title: Gitlab Hydra integration
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl'
+
+Gitlab has several OAuth2 related features. The relevant here is the possibility
+to sign into GitLab with (almost) any OAuth2 provider, in this case hydra. The documentation for this
+is quite generic and also not very detailed. So, in this guide, we'll connect
+gitlab's omniauth-connector to ORY Hydra. We'll do that in a docker-based
+lab-environment in order to investigate the details before you do something like
+this in production.
+
+## Preparation
+
+Even though we're mostly using hydra in a docker-container, having the
+command-line-client available is quite useful. So let's install hydra as
+explained in the [installation-guide](../install).
+You'll also need [docker](https://docs.docker.com/get-docker/) and
+[docker-compose](https://docs.docker.com/compose/install/).
+
+The [hydra-5-min-tutorial](../5min-tutorial) might
+be worth checking out upfront. It'll a give a nice quick overview how OAuth2 is
+working within hydra with a minimal example. We assume basic knowledge, here.
+
+If you have not yet the source-code of hydra, which we'll need for the docker-compose
+yaml-files, clone this repository:
+
+```shell
+git clone git@github.com:ory/hydra-gitlab-example.git
+```
+
+## Spin up the instances
+
+Gitlab has some [documentation](https://docs.gitlab.com/omnibus/docker/) about
+how to use their docker-images. It has also an example for docker-compose. So change into the directory with the Hydra 
+source code and create a new file quickstart-gitlab.yml with this content:
+
+```yaml
+version: '3'
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    restart: always
+    hostname: gitlab.example.com
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.example.com:8000/'
+    ports:
+      - "443:443" # https
+      - "8000:8000" # http
+      - "2222:22" # ssh
+    volumes:
+    - '$GITLAB_HOME/config:/etc/gitlab'
+    - '$GITLAB_HOME/logs:/var/log/gitlab'
+    - '$GITLAB_HOME/data:/var/opt/gitlab'
+```
+
+Now we can spinup the instances.
+
+```shell
+export GITLAB_HOME=$(pwd)/gitlab
+docker-compose -f quickstart.yml \
+    -f quickstart-postgres.yml -f quickstart-gitlab.yml \
+    up --build
+```
+
+Gitlab will take some time until it's up. You'll see the logs in the output. So you need to open a new terminal for the next steps. 
+
+Make sure to have the Domain-Name
+`gitlab.example.com` assigned to `127.0.0.1` before accessing the
+[gitlab-frontend](http://gitlab.example.com:8000). On an unixoid system, this is done by adding
+a line like this to your `/etc/host/file`:
+```
+127.0.0.1 gitlab.example.com
+```
+
+With the initial login, you will have to change the root-password.
+
+## Modify the gitlab configuration for OAuth2
+
+The gitlab-configuration can be modified in the container like such:
+
+```shell
+docker-compose -f quickstart.yml  -f quickstart-postgres.yml -f quickstart-gitlab.yml exec gitlab vim /etc/gitlab/gitlab.rb
+```
+
+Using vim might not be your first choice and if you never used it, it's quite
+unintuitive and confusing but it's worth learning the basics to do simple changes like this. Check the basics
+[here](https://www.youtube.com/watch?v=ggSyF1SVFr4).
+
+The first configuration is already done by overriding the
+[external_url](https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab)
+via an environment-variable within the quickstart.yaml. Now, at around line 433,
+add this:
+
+```ruby
+gitlab_rails['omniauth_enabled'] = true
+gitlab_rails['omniauth_block_auto_created_users'] = false
+gitlab_rails['omniauth_providers'] = [
+  {
+    'name' => 'oauth2_generic',
+    'app_id' => 'gitlab',
+    'app_secret' => 'theSecret',
+    'args' => {
+      client_options: {
+        'site' => 'http://127.0.0.1:4444', # including port if necessary
+        'user_info_url' => 'http://hydra:4444/userinfo',
+        'authorize_url' => 'http://127.0.0.1:4444/oauth2/auth',
+        'token_url' => 'http://hydra:4444/oauth2/token'
+      },
+      user_response_structure: {
+      },
+      # optionally, you can add the following two lines to "white label" the display name
+      # of this strategy (appears in urls and Gitlab login buttons)
+      # If you do this, you must also replace oauth2_generic, everywhere it appears above, with the new name.
+      name: 'ORY_Hydra', # display name for this strategy
+      #strategy_class: "OmniAuth::Strategies::OAuth2Generic" # Devise-specific config option Gitlab uses to find renamed strategy
+    }
+  }
+]
+```
+
+After you did these changes, restart the container:
+
+```shell
+docker-compose -f quickstart.yml  -f quickstart-postgres.yml -f quickstart-gitlab.yml up -d --force-recreate
+```
+
+While gitlab is restarting, let's look at the changes in detail here, as this is
+the main-change on the gitlab-side. First of all, the documentation for this is
+quite scattered in gitlab:
+
+- A specific
+  [step-by-step guide](https://docs.gitlab.com/ee/integration/oauth2_generic.html)
+  but not very detailed
+- [OmniAuth reference documenation in gitlab](https://docs.gitlab.com/ee/integration/omniauth.html#initial-omniauth-configuration)
+- [OmniAuth Generic reference documenation in gitlab](https://docs.gitlab.com/ee/integration/oauth2_generic.html)
+- [OmniAuth Gem-documentation from Satorix](https://gitlab.com/satorix/omniauth-oauth2-generic#gitlab-config-example)
+
+The biggest-source for errors is the clients-options-section. Here we'll specify
+the details for the OAuth2 flow and where hydra is located. Two things are
+extremely important to keep in your mind when looking at configurations which
+are specifying some flow one way or another:
+
+- Where is the DNS-name resolved? Sometimes it's on the users browser, sometimes
+  on gitlab or on the hydra-side. Especially in our docker-based POC, it makes a
+  huge difference!
+- Cookies can only be written/read, if they are from the same domain. In that
+  case "127.0.0.1". That would be a different domain than "localhost". Pay
+  attention to that.
+
+These two points in our mind, let's look at the three configurations:
+
+- `'site' => 'http://127.0.0.1:4444'` This is the default for the three URLs
+  later if not specified otherwise.
+- `'authorize_url' => 'http://127.0.0.1:4444/oauth2/auth'` this url will be a
+  redirect-target and therefore resolved on the browser of the user. Probably we
+  could omit the scheme, host and port as this is already defined in `site`.
+- `'token_url' => 'http://hydra:4444/oauth2/token'` the `token_url` will get used
+  on the gitlab-server to get a token after gitlab received the grant. As
+  it's resolved on the gitlab-side, we're using docker-name of the
+  hydra-container which is by default resolvable on the gitlab-container.
+- `'user_info_url' => 'http://hydra:4444/userinfo',` same thing for the
+  `user_info_url`. It's called on the gitlab-container and needs to be resolvable
+  there.
+
+The paths here are by default the same paths which are specified by OpenID
+connect. The configuration would be simpler if we used OpenID-Connect (more
+about that later in the appendix) but in our case we're simply manually specifying the values.
+So it's not an accident that these pathes here are the very same then what you
+get from hydra:
+
+```shell script
+$ curl http://127.0.0.1:4444/.well-known/openid-configuration | jq .
+[...]
+{
+  "issuer": "http://127.0.0.1:4444/",
+  "authorization_endpoint": "http://127.0.0.1:4444/oauth2/auth",
+  "token_endpoint": "http://127.0.0.1:4444/oauth2/token",
+  "jwks_uri": "http://127.0.0.1:4444/.well-known/jwks.json",
+[...]
+  "userinfo_endpoint": "http://127.0.0.1:4444/userinfo",
+  "scopes_supported": [
+    "offline_access",
+    "offline",
+    "openid"
+  ],
+  "token_endpoint_auth_methods_supported": [
+    "client_secret_post",
+    "client_secret_basic",
+    "private_key_jwt",
+    "none"
+  ],
+  [...]
+}
+```
+
+Also worth noting here is the supported `token_endpoint_auth_methods`: How does
+gitlab authenticate against hydra? So gitlab is using `client_secret_post` which
+we'll need to specify when we're creating the gitlab-client in hydra, which we'll do later in this guide.
+
+You should now see a "Ory Hydra" Login-button on the
+[sign-in-page](http://localhost:8000/users/sign_in) but if you click it, you'll
+get a:
+
+> Error: invalid_client Description: Client authentication failed (e.g., unknown
+> client, no client authentication included, or unsupported authentication
+> method) Hint: The requested OAuth 2.0 Client does not exist.
+
+## Creating the GitLab OAuth2 Client in hydra
+
+So depending on whether you've the hydra-binary available, you can use it
+directly
+
+```shell
+$ hydra clients create \
+    --endpoint http://127.0.0.1:4445 \
+    --id gitlab \
+    --secret theSecret \
+    --grant-types authorization_code,refresh_token \
+    --response-types code,id_token, email \
+    --scope openid,offline_access,profile,email \
+    --callbacks http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback \
+    --token-endpoint-auth-method client_secret_post
+```
+
+or you can use the binary within the docker-container:
+
+```shell script
+$ docker-compose -f quickstart.yml exec hydra \
+    hydra clients create \
+    --endpoint http://127.0.0.1:4445 \
+    --id gitlab \
+    --secret theSecret \
+    --grant-types authorization_code,refresh_token \
+    --response-types code,id_token,email \
+    --scope openid,offline_access,profile,email \
+    --callbacks http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback \
+    --token-endpoint-auth-method client_secret_post
+```
+
+Some remarks:
+
+- The endpoint is not part of the configuration but it's a command-line-switch telling the
+  hydra-binary to which hydra-instance to talk to
+- `id` and `secret` has been specified before in the gitlab-config
+- the token-endpoint-auth-method is by default `client_secret_basic` but gitlab
+  is using `client_secret_post` (couldn't find that anywhere in the
+  gitlab-documentation, though)
+- The callback needs to be resolvable on the users-browser. However, orginilly,
+  the callback-url is created on the gitlab-side. In order to make that
+  resolvable on the client, we set the `external_url` in the
+  gitlab-configuration. Here that value is just there to cross-check with the
+  generated one. It needs to match exactly.
+
+So after this, clicking the login-button on the
+[sign-in-page](http://localhost:8000/users/sign_in) will forward to Ory Hydra,
+which will redirect to the consent-app on port 3000. After the login, you'd get
+to the granting-page of the consent-app and after you've "allowed access",
+you'll get redirected back to gitlab which will unfortunately mention:
+
+> Could not authenticate you from ORYHydra because "The request is missing 
+> a required parameter, includes an invalid parameter value, includes a 
+> parameter more than once, or is otherwise malformed".
+
+So the message in quotes is from hydra and not very expressive. Note that
+it's a bit difficult to expose very meaningful error-messages as this could be
+used for security-attacks. Check the hydra-logs what's wrong and you'll find:
+
+```
+hydra_1          | time=2020-08-24T12:42:36Z level=error msg=An error occurred 
+audience=application error=map[message:invalid_request reason:Redirect URL is 
+using an insecure protocol, http is only allowed for hosts with suffix `localhost`, 
+for example: http://myapp.localhost/. status:Bad Request status_code:400] 
+http_request=map[headers:map[accept:text/html,application/xhtml+xml,application/xml;
+q=0.9,image/webp,*/*;q=0.8 accept-encoding:gzip, deflate accept-language:en-US,en;
+q=0.5 cookie:Value is sensitive and has been redacted. To see the value set config 
+key "log.leak_sensitive_values = true" or environment variable 
+"LOG_LEAK_SENSITIVE_VALUES=true". referer:http://127.0.0.1:3000/consent?consent_challenge=b695307490fa4732a80d3324f45f5a93 
+user-agent:Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0]
+host:127.0.0.1:4444 method:GET path:/oauth2/auth query:Value is sensitive and has 
+been redacted. To see the value set config key "log.leak_sensitive_values = true" 
+or environment variable "LOG_LEAK_SENSITIVE_VALUES=true". 
+remote:172.19.0.1:47684 scheme:http] service_name= service_version=
+```
+
+Ok, using http-callback-URLs doesn't make much sense in production however, 
+in a POC like this, http makes sense. 
+So therefore there is a switch in the hydra-binary which "whitelists"
+urls to be used without https. So please add the following switch to the 
+services.hydra.command-section in the quickstart.yml:
+`--dangerous-allow-insecure-redirect-urls http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback`
+
+Restart the hydra-container:
+```shell
+docker-compose -f quickstart.yml \
+    -f quickstart-postgres.yml -f quickstart-gitlab.yml \
+    restart hydra
+```
+
+Retrying now the login results in:
+
+> Signing in using your Ory Hydra account without a pre-existing GitLab account
+> is not allowed. Create a GitLab account first, and then connect it to your Ory
+> Hydra account.
+
+## Proper gitlab user-creation
+
+So gitlab is assuming that the user is already existing but it's not. A common solution to this issue
+is to create the users on the fly with the first login.
+So in order to do that you need to specify this in the `/etc/gitlab/gitlab.rb`:
+
+```ruby
+gitlab_rails['omniauth_allow_single_sign_on'] = ['ORY_Hydra']
+```
+
+So the creation of the user needs to call to hydra's
+[userinfo-endpoint](../reference/api#openid-connect-userinfo).
+The most important attribute is the sub-attribute which provides, according to
+the [specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken),
+the ID of a user which is (in this case) the email-address. However, the email-address
+of this one hardcoded user (foo@bar.com) is empty.
+As a result, we're still getting an errormessage:
+
+> Sign-in failed because Email can't be blank and Notification email can't be
+> blank.
+
+So now let's modify the mapping of fields a bit, in order to fill the
+email-field with the content of the sub-field:
+
+```ruby
+      user_response_structure: {
+        root_path: [],
+        id_path: 'sub',
+        attributes: {
+                email: 'sub'
+        }
+      },
+```
+
+Whether the attribute "email" is there or not is quite critical here. The Login-ID has the form of an email.
+So in order to satisfy Gitlab's requirement, we're mapping here the email-attribute to the Login-ID
+which is represented by "sub". This shouldn't be necessary in a real-world-implementation.
+
+But assuming that it's not doing that mapping, then gitlab would need to ask hydra on that endpoint 
+the email-address. But is gitlab even allowed to read it? We need consent from the user for that and
+fortunately we configured the client above to be able to ask for that scope.
+However, we also need to configure gitlab to ask for that scope:
+
+```
+     authorize_params: {
+           scope: 'email'
+      },
+```
+
+This is the last change and now, the integration should work properly.
+
+## Conclusion
+
+We've successfully integrated GitLab with hydra. Everything was done as configuration.
+No code has been created nor has any application been monkey-patched while following this guide (so far).
+However, GitLab is supporting OpenID-Connect and hydra does that as well. Why
+hasn't that been used in this guide?
+
+
+## Appendix: Some notes about OpenID connect
+
+OpenID might be the better choice then plain OAuth2. When we tried that, we ran
+into the issue that the used OpenID-connect-implemenation does not allow
+http-connection but "only" https. That's in general a good thing but stupid for
+POCs like this. Whereas hydra has a switch to whitelist URLs in such cases, the
+used
+[openid-connect-implementation](https://github.com/nov/openid_connect/issues/47)
+doesn't seem to have that. So, here is a reasonable openID-Connect
+configuration:
+
+```ruby
+gitlab_rails['omniauth_providers'] = [
+  { 'name' => 'openid_connect',
+    'label' => 'ORY Hydra',
+    # 'icon' => '<custom_provider_icon>',
+    'args' => {
+      'name' => 'openid_connect',
+      'scope' => ['openid'],
+      'response_type' => 'code',
+      'issuer' => 'http://127.0.0.1:4444/',
+      'discovery' => true,
+      'client_auth_method' => 'basic',
+      'send_scope_to_token_endpoint' => 'false',
+      'client_options' => {
+        'identifier' => 'gitlab',
+        'secret' => 'theSecret',
+        'redirect_uri' => 'http://gitlab.example.com:8000/users/auth/openid_connect/callback'
+      }
+    }
+  }
+]
+```
+
+In order to make that work which is not ssl, we need to patch the openid_connect
+gem. Checkout the details
+[here](https://github.com/nov/openid_connect/issues/47).
+
+```shell
+docker-compose -f quickstart.yml  -f quickstart-postgres.yml -f quickstart-gitlab.yml exec gitlab /opt/gitlab/embedded/lib/ruby/gems/2.6.0/gems/openid_connect-1.1.8/lib/openid_connect/discovery/provider/config.rb
+```
+
+```
+          def initialize(uri)
+            @host = uri.host
+            @port = uri.port unless [80, 443].include?(uri.port)
+            @path = File.join uri.path, '.well-known/openid-configuration'
+            @scheme = uri.scheme
+            attr_missing!
+          end
+
+          def endpoint
+            case scheme
+            when "http"
+              SWD.url_builder = URI::HTTP
+            else
+              SWD.url_builder = URI::HTTPS
+            end
+            SWD.url_builder.build [nil, host, port, path, nil, nil]
+          rescue URI::Error => e
+            raise SWD::Exception.new(e.message)
+          end
+```
+
+In order to avoid that scenario, this guide avoids OpenID-Connect. There might also be other [issues](https://gitlab.com/gitlab-org/gitlab-foss/-/issues/62208) with OpenID-Connect on GitLab.
+
+

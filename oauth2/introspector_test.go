@@ -178,9 +178,7 @@ func TestIntrospectorSDK(t *testing.T) {
 
 				ctx, err := client.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().
 					WithToken(c.token).
-					WithScope(pointerx.String(strings.Join(c.scopes, " "))),
-					nil,
-				)
+					WithScope(pointerx.String(strings.Join(c.scopes, " "))))
 				require.NoError(t, err)
 
 				if c.expectInactive {

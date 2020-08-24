@@ -293,6 +293,13 @@ workflows:
             tags:
               only: /.*/
       -
+        goreleaser/render-version-schema:
+          requires:
+            - goreleaser/release
+          filters:
+            tags:
+              only: /.*/
+      -
         goreleaser/newsletter-draft:
           chimp-list: f605a41b53
           chimp-segment: 6479481

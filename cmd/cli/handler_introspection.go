@@ -46,7 +46,7 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	c := configureClient(cmd)
 
 	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID != "" || clientSecret != "" {
-		_, _ = fmt.Fprintf(os.Stderr, "Flags client-id and client-secret are deprecated and ignored.")
+		_, _ = fmt.Fprintf(os.Stderr, "Flags --client-id and --client-secret and environment variables OAUTH2_CLIENT_SECRET and OAUTH2_ACCESS_TOKEN are deprecated and have no longer any effect.")
 	}
 
 	result, err := c.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().

@@ -59,7 +59,7 @@ type ClientService interface {
 
 	GetVersion(params *GetVersionParams) (*GetVersionOK, error)
 
-	IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*IntrospectOAuth2TokenOK, error)
+	IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams) (*IntrospectOAuth2TokenOK, error)
 
 	IsInstanceAlive(params *IsInstanceAliveParams) (*IsInstanceAliveOK, error)
 
@@ -737,7 +737,7 @@ set additional data for a token by setting `accessTokenExtra` during the consent
 
 For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 */
-func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*IntrospectOAuth2TokenOK, error) {
+func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams) (*IntrospectOAuth2TokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewIntrospectOAuth2TokenParams()
@@ -752,7 +752,6 @@ func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, auth
 		Schemes:            []string{"http", "https"},
 		Params:             params,
 		Reader:             &IntrospectOAuth2TokenReader{formats: a.formats},
-		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})

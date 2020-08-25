@@ -3,8 +3,6 @@ id: gitlab
 title: Gitlab Hydra integration
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
-
 Gitlab has several OAuth2 related features. The relevant here is the possibility
 to sign into GitLab with (almost) any OAuth2 provider, in this case ORY Hydra. The documentation for this
 is kept generic on purpose. So, in this guide, we'll connect
@@ -84,12 +82,8 @@ With the initial login, you will have to change the root-password.
 The gitlab-configuration can be modified in the container like such:
 
 ```shell
-docker-compose -f quickstart.yml  -f quickstart-postgres.yml -f quickstart-gitlab.yml exec gitlab vim /etc/gitlab/gitlab.rb
+docker-compose -f quickstart.yml  -f quickstart-postgres.yml -f quickstart-gitlab.yml exec gitlab nano /etc/gitlab/gitlab.rb
 ```
-
-Using vim might not be your first choice and if you never used it, it's quite
-unintuitive and confusing but it's worth learning the basics to do simple changes like this. Check the basics
-[here](https://www.youtube.com/watch?v=ggSyF1SVFr4).
 
 The first configuration is already done by overriding the
 [external_url](https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab)

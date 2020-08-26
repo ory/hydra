@@ -81,7 +81,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
 //
-// Revokes Consent Sessions of a Subject for a Specific Oauth 2.0 Client
+// Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.

@@ -60,7 +60,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 
 // swagger:route POST /clients admin createOAuth2Client
 //
-// Create an OAuth 2.0 client
+// Create an OAuth 2.0 Client
 //
 // Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
 //

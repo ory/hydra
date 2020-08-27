@@ -81,7 +81,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
 //
-// Revokes consent sessions of a subject for a specific OAuth 2.0 Client
+// Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
@@ -130,7 +130,7 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 
 // swagger:route GET /oauth2/auth/sessions/consent admin listSubjectConsentSessions
 //
-// Lists all consent sessions of a subject
+// Lists All Consent Sessions of a Subject
 //
 // This endpoint lists all subject's granted consent sessions, including client and granted scope.
 // If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
@@ -192,8 +192,8 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route DELETE /oauth2/auth/sessions/login admin revokeAuthenticationSession
 //
-// Invalidates all login sessions of a certain user
-// Invalidates a subject's authentication session
+// Invalidates All Login Sessions of a Certain User
+// Invalidates a Subject's Authentication Session
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
@@ -230,7 +230,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route GET /oauth2/auth/requests/login admin getLoginRequest
 //
-// Get a login request
+// Get a Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -283,7 +283,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 
 // swagger:route PUT /oauth2/auth/requests/login/accept admin acceptLoginRequest
 //
-// Accept a login request
+// Accept a Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -372,7 +372,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route PUT /oauth2/auth/requests/login/reject admin rejectLoginRequest
 //
-// Reject a login request
+// Reject a Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -449,7 +449,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route GET /oauth2/auth/requests/consent admin getConsentRequest
 //
-// Get consent request information
+// Get Consent Request Information
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -509,7 +509,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 
 // swagger:route PUT /oauth2/auth/requests/consent/accept admin acceptConsentRequest
 //
-// Accept a consent request
+// Accept a Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -589,7 +589,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 // swagger:route PUT /oauth2/auth/requests/consent/reject admin rejectConsentRequest
 //
-// Reject a consent request
+// Reject a Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -669,7 +669,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 // swagger:route PUT /oauth2/auth/requests/logout/accept admin acceptLogoutRequest
 //
-// Accept a logout request
+// Accept a Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
 // No body is required.
@@ -704,7 +704,7 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 
 // swagger:route PUT /oauth2/auth/requests/logout/reject admin rejectLogoutRequest
 //
-// Reject a logout request
+// Reject a Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
 // No body is required.
@@ -736,7 +736,7 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 
 // swagger:route GET /oauth2/auth/requests/logout admin getLogoutRequest
 //
-// Get a logout request
+// Get a Logout Request
 //
 // Use this endpoint to fetch a logout request.
 //

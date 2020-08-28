@@ -107,7 +107,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 // swagger:route GET /oauth2/sessions/logout public disconnectUser
 //
-// OpenID Connect Front-Backchannel enabled Logout
+// OpenID Connect Front-Backchannel Enabled Logout
 //
 // This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:
 //
@@ -345,7 +345,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 
 // swagger:route POST /oauth2/revoke public revokeOAuth2Token
 //
-// Revoke OAuth2 tokens
+// Revoke OAuth2 Tokens
 //
 // Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 // longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
@@ -378,7 +378,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 
 // swagger:route POST /oauth2/introspect admin introspectOAuth2Token
 //
-// Introspect OAuth2 tokens
+// Introspect OAuth2 Tokens
 //
 // The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
@@ -516,7 +516,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 
 // swagger:route POST /oauth2/token public oauth2Token
 //
-// The OAuth 2.0 token endpoint
+// The OAuth 2.0 Token Endpoint
 //
 // The client makes a request to the token endpoint by sending the
 // following parameters using the "application/x-www-form-urlencoded" HTTP
@@ -597,7 +597,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 // swagger:route GET /oauth2/auth public oauthAuth
 //
-// The OAuth 2.0 authorize endpoint
+// The OAuth 2.0 Authorize Endpoint
 //
 // This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
 // OAuth2 is a very popular protocol and a library for your programming language will exists.

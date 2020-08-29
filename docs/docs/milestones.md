@@ -3,6 +3,36 @@ id: milestones
 title: Milestones and Roadmap
 ---
 
+## [next](https://github.com/ory/hydra/milestone/41)
+
+*This milestone does not have a description.*
+
+### [Feat](https://github.com/ory/hydra/labels/feat)
+
+New feature or request.
+
+#### Issues
+
+* [ ] Reuse Detection in Refresh Token Rotation ([hydra#2022](https://github.com/ory/hydra/issues/2022))
+* [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
+
+### [Help wanted](https://github.com/ory/hydra/labels/help%20wanted)
+
+We are looking for help on this one.
+
+#### Issues
+
+* [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
+
+### [Rfc](https://github.com/ory/hydra/labels/rfc)
+
+A request for comments to discuss and share ideas.
+
+#### Issues
+
+* [ ] Multi-region deployment support ([hydra#2018](https://github.com/ory/hydra/issues/2018))
+* [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
+
 ## [v1.7.1](https://github.com/ory/hydra/milestone/40)
 
 *This milestone does not have a description.*
@@ -22,6 +52,10 @@ Something is not working.
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
 New feature or request.
+
+#### Issues
+
+* [ ] Publish a generated csharp SDK ([hydra#2017](https://github.com/ory/hydra/issues/2017))
 
 #### Pull Requests
 
@@ -96,6 +130,7 @@ New feature or request.
 * [ ] Split HTTPS handling for public/admin ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 * [ ] Token claims customization with Jsonnet ([hydra#1748](https://github.com/ory/hydra/issues/1748)) - [@hackerman](https://github.com/aeneasr)
 * [ ] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
+* [ ] Update clients from cli ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 * [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 * [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 
@@ -105,7 +140,6 @@ We are looking for help on this one.
 
 #### Issues
 
-* [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 * [ ] client_id case sensitivity is not properly enforced when using MySQL ([hydra#1644](https://github.com/ory/hydra/issues/1644)) - [@Patrik](https://github.com/zepatrik)
 * [ ] Add endpoint to Admin API to revoke access tokens ([hydra#1728](https://github.com/ory/hydra/issues/1728))
 * [ ] Migrate to gobuffalo/pop ([hydra#1730](https://github.com/ory/hydra/issues/1730)) - [@Patrik](https://github.com/zepatrik)
@@ -114,6 +148,7 @@ We are looking for help on this one.
 * [ ] Introspection Response: `access_token` and `refresh_token` are not valid `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 * [ ] Split HTTPS handling for public/admin ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 * [ ] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
+* [ ] Update clients from cli ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

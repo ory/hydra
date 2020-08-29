@@ -1,3 +1,8 @@
+---
+id: contributing
+title: Contribution Guidelines
+---
+
 <!--
 
 Thank you for contributing changes to this document! Because we use a central repository

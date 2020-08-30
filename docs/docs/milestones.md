@@ -22,6 +22,7 @@ We are looking for help on this one.
 
 #### Issues
 
+* [ ] Reuse Detection in Refresh Token Rotation ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 * [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)

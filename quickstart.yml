@@ -15,7 +15,7 @@ version: '3'
 services:
 
   hydra:
-    image: oryd/hydra:v1.7.3
+    image: oryd/hydra:v1.7.4
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port

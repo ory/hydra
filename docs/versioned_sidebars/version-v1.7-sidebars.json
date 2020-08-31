@@ -337,6 +337,17 @@
     {
       "collapsed": true,
       "type": "category",
+      "label": "Development",
+      "items": [
+        {
+          "type": "doc",
+          "id": "version-v1.7/milestones"
+        }
+      ]
+    },
+    {
+      "collapsed": true,
+      "type": "category",
       "label": "Further Reading",
       "items": [
         {

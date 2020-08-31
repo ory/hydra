@@ -86,10 +86,41 @@ Please follow these guidelines when formatting source code:
 ## Documentation
 
 Please provide documentation when changing, removing, or adding features.
-Documentation resides in the project's [docs](docs) folder. Generate API and
-configuration reference documentation using `cd docs; npm run gen`.
+Documentation resides in the project's `docs` folder.
 
-For further instructions please head over to [docs/README.md](docs/README.md).
+In cases where a project does not have a `docs` folder check the README for instructions.
+
+The commands listed below work exclusively for projects with a `docs` folder
+
+### Develop
+
+To change the documentation locally, you need NodeJS installed and the project
+checked out locally. Next, `cd` into `docs` and install the dependencies:
+
+```shell script
+$ cd docs
+$ npm install
+```
+
+#### Start
+
+To start a local development server with hot reloading, run:
+
+```shell script
+$ npm start
+```
+
+This command opens up a browser window. Please note that changes to the sidebar are not hot-reloaded
+and require a restart of the command.
+
+#### Build
+
+The `npm build` generates static content into the `build` directory and can be
+served using any static contents hosting service.
+
+```shell script
+$ npm build
+```
 
 ## Pull request procedure
 
@@ -114,6 +145,30 @@ feedback on the style and substance of the patch.
 Normally, all pull requests must include tests that test your change.
 Occasionally, a change will be very difficult to test for. In those cases,
 please include a note in your commit message explaining why.
+
+## How We Organize Our Work
+
+All repositories in the [ORY organization](https://github.com/ory) have their issues and pull requests 
+monitored in the [ORY Monitoring Board](https://github.com/orgs/ory/projects/9). This allows
+for a transparent backlog of unanswered issues and pull requests across the ecosystem from those
+who are allowed to merge pull requests to the main branch.
+
+The process is as follows:
+
+1. *Cards* represent open issues and pull requests and are automatically assigned to the **Triage** column if
+the author is not one of the maintainers and no maintainer has answered yet.
+2. A maintainer assigns the issue or pull request to someone or adds the label *help wanted*
+which moves the card to **Requires Action**.
+3. If a maintainer leaves a comment or review, the card moves to **Pending Reply**, implying that
+the original author needs to do something (e.g. implement a change, explain something in more detail, ...).
+4. If a non-maintainer pushes changes to the pull request or leaves a comment, the card moves
+back to **Requires Action**.
+5. If a card stays inactive for 60 days or more days, we assume that public interest in the issue
+or change has waned, **archiving** the card.
+6. If the issue is closed or the pull request merged or closed, the card is **archived** as well.
+
+We try our best to answer all issues and review all pull requests and hope that this transparent way
+of keeping a backlog helps you better understand how heavy the workload is.
 
 ## Communication
 

@@ -2,7 +2,7 @@ version: '3'
 
 services:
   gitlab:
-    image: gitlab/gitlab-ce:latest
+    image: gitlab/gitlab-ce:13.3.2-ce.0
     restart: always
     hostname: gitlab.example.com
     environment:

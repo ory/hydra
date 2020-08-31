@@ -5,6 +5,7 @@
 **Table of Contents**
 
 - [Unreleased (2020-08-31)](#unreleased-2020-08-31)
+  - [1.7.3 (2020-08-31)](#173-2020-08-31)
   - [1.7.1 (2020-08-31)](#171-2020-08-31)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
@@ -463,6 +464,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Unreleased (2020-08-31)
+
+No significant changes have been made for this release.
+
+
+## [1.7.3](https://github.com/ory/hydra/compare/v1.7.1...v1.7.3) (2020-08-31)
 
 No significant changes have been made for this release.
 

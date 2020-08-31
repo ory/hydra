@@ -977,6 +977,28 @@
       "title": "The Hydra version this config is written for.",
       "description": "SemVer according to https://semver.org/ prefixed with `v` as in our releases.",
       "pattern": "^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "cgroups": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "ORY Hydra can respect Linux container CPU quota",
+      "properties": {
+        "v1": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Configures parameters using cgroups v1 hierarchy",
+          "properties": {
+            "auto_max_procs_enabled": {
+              "type": "boolean",
+              "description": "Set GOMAXPROCS automatically according to cgroups limits",
+              "default": false,
+              "examples": [
+                true
+              ]
+            }
+          }
+        }
+      }
     }
   }
 }

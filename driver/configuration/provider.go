@@ -67,6 +67,8 @@ type Provider interface {
 	LogoutURL() *url.URL
 	PKCEEnforced() bool
 	EnforcePKCEForPublicClients() bool
+
+	CGroupsV1AutoMaxProcsEnabled() bool
 }
 
 func MustValidate(l *logrusx.Logger, p Provider) {

@@ -56,6 +56,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	"go.uber.org/automaxprocs/maxprocs"
 )
 
 var _ = &consent.Handler{}
@@ -180,6 +181,14 @@ func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []st
 
 func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(d.Registry().BuildVersion()))
+
+	if d.Configuration().CGroupsV1AutoMaxProcsEnabled() {
+		_, err := maxprocs.Set(maxprocs.Logger(d.Registry().Logger().Infof))
+
+		if err != nil {
+			d.Registry().Logger().WithError(err).Fatal("Couldn't set GOMAXPROCS")
+		}
+	}
 
 	adminmw = negroni.New()
 	publicmw = negroni.New()

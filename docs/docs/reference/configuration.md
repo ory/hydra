@@ -1358,4 +1358,34 @@ tracing:
 #    > set VERSION=<value>
 #
 version: v427341.68337.3967595104-81504i.60060150.298752588gmt.34JoRsuy8Mv.597907805pwU.92I.118542239
+
+## cgroups ##
+#
+# ORY Hydra can respect Linux container CPU quota
+#
+cgroups:
+
+  ## v1 ##
+  #
+  # Configures parameters using cgroups v1 hierarchy
+  #
+  v1:
+
+    ## auto_max_procs_enabled ##
+    #
+    # Set GOMAXPROCS automatically according to cgroups limits
+    #
+    # Default value: false
+    #
+    # Examples:
+    # - true
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export CGROUPS_V1_AUTO_MAX_PROCS_ENABLED=<value>
+    # - Windows Command Line (CMD):
+    #    > set CGROUPS_V1_AUTO_MAX_PROCS_ENABLED=<value>
+    #
+    auto_max_procs_enabled: true
+
 ```

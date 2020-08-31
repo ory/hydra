@@ -81,6 +81,7 @@ const (
 	ViperKeyPKCEEnforced                   = "oauth2.pkce.enforced"
 	ViperKeyPKCEEnforcedForPublicClients   = "oauth2.pkce.enforced_for_public_clients"
 	ViperKeyLogLevel                       = "log.level"
+	ViperKeyCGroupsV1AutoMaxProcsEnabled   = "cgroups.v1.auto_max_procs_enabled"
 )
 
 func init() {
@@ -481,4 +482,8 @@ func (v *ViperProvider) PKCEEnforced() bool {
 
 func (v *ViperProvider) EnforcePKCEForPublicClients() bool {
 	return viperx.GetBool(v.l, ViperKeyPKCEEnforcedForPublicClients, false, "OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS")
+}
+
+func (v *ViperProvider) CGroupsV1AutoMaxProcsEnabled() bool {
+	return viperx.GetBool(v.l, ViperKeyCGroupsV1AutoMaxProcsEnabled, false)
 }

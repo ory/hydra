@@ -4,7 +4,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-08-28)](#unreleased-2020-08-28)
+- [Unreleased (2020-08-31)](#unreleased-2020-08-31)
+  - [1.7.1 (2020-08-31)](#171-2020-08-31)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
@@ -461,7 +462,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.7.0...595e3b0edabf2fa51d2977923f5070dab35717b2) (2020-08-28)
+# Unreleased (2020-08-31)
+
+No significant changes have been made for this release.
+
+
+## [1.7.1](https://github.com/ory/hydra/compare/v1.7.0...v1.7.1) (2020-08-31)
 
 
 ### Bug Fixes
@@ -488,11 +494,13 @@
 * Fix access control section ([152ccf0](https://github.com/ory/hydra/commit/152ccf0b1f898270759a4d120873666c781a8dd7)), closes [#1992](https://github.com/ory/hydra/issues/1992)
 * Fix typos and correct legend ([94c9872](https://github.com/ory/hydra/commit/94c98725dba57f782a292d5cbf38819c2f472d02)), closes [#1930](https://github.com/ory/hydra/issues/1930)
 * Improve deprecation notice ([dedcafe](https://github.com/ory/hydra/commit/dedcafe0ca9a5504ff8b670170db455c7811dc46))
+* Remove duplicate tempalte ([3e32aa5](https://github.com/ory/hydra/commit/3e32aa57e37fdbf86e53e719a198532568341968))
 * Remove introspect security spec ([#2002](https://github.com/ory/hydra/issues/2002)) ([973d57b](https://github.com/ory/hydra/commit/973d57b8307e7986097ca3018f5753ca4ede2299)), closes [#1520](https://github.com/ory/hydra/issues/1520)
 * Spelling fix ([d9b00e3](https://github.com/ory/hydra/commit/d9b00e38cba9a743be4c449e534263d42f0e29b7))
 * Update 5 minute tutorial ([17f893f](https://github.com/ory/hydra/commit/17f893fdac9fbed064da69d5480abd63d61d8eae))
 * Update repository templates ([08cafb1](https://github.com/ory/hydra/commit/08cafb1794ae64507b977b77ddec0535d9496f1b))
 * Update repository templates ([aebc122](https://github.com/ory/hydra/commit/aebc122aed5ee96f12f7c52d6786187b4ba70211))
+* Update repository templates ([#2028](https://github.com/ory/hydra/issues/2028)) ([d61fd57](https://github.com/ory/hydra/commit/d61fd57fb608a9a9fae2d8771e19898df1263934))
 * Use NYT style capitalization for swagger ([#2019](https://github.com/ory/hydra/issues/2019)) ([066a6cd](https://github.com/ory/hydra/commit/066a6cd5fb4a194696ede66d8cf1fde1dbccf740))
 
 

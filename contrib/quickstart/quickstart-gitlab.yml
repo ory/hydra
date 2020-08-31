@@ -13,6 +13,6 @@ services:
       - "8000:8000" # http
       - "2222:22" # ssh
     volumes:
-    - '$GITLAB_HOME/config:/etc/gitlab'
-    - '$GITLAB_HOME/logs:/var/log/gitlab'
-    - '$GITLAB_HOME/data:/var/opt/gitlab'
+    - './contrib/quickstart/gitlab/config:/etc/gitlab'
+    - './contrib/quickstart/gitlab/logs:/var/log/gitlab'
+    - './contrib/quickstart/gitlab/data:/var/opt/gitlab'

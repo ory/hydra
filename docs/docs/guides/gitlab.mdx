@@ -45,7 +45,6 @@ So add the following switch to the services.hydra.command-section in the quickst
 
 Use this command to spinup the instances. This will show the logs on the terminal and it will take some time.
 ```shell
-export GITLAB_HOME=$(pwd)/contrib/quickstart/gitlab
 docker-compose -f quickstart.yml \
     -f quickstart-postgres.yml -f ./contrib/quickstart/quickstart-gitlab.yml \
     up --build
@@ -114,9 +113,9 @@ services:
     ports:
       - "8000:8000" # http
     volumes:
-    - '$GITLAB_HOME/config:/etc/gitlab'
-    - '$GITLAB_HOME/logs:/var/log/gitlab'
-    - '$GITLAB_HOME/data:/var/opt/gitlab'
+    - './contrib/quickstart/gitlab/config:/etc/gitlab'
+    - './contrib/quickstart/gitlab/logs:/var/log/gitlab'
+    - './contrib/quickstart/gitlab/data:/var/opt/gitlab'
 ```
 
 Other then `logs` and `data`, the config directory is already prepopulated and the single most important configuration-file is the `gitlab.rb` file. GitLab

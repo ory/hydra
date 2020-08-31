@@ -421,7 +421,7 @@ p JSON.parse(result)
 
 <a id="opIdisInstanceReady"></a>
 
-### Check readiness status
+### Check Readiness Status
 
 ```
 GET /health/ready HTTP/1.1
@@ -587,7 +587,7 @@ p JSON.parse(result)
 
 <a id="opIdoauthAuth"></a>
 
-### The OAuth 2.0 authorize endpoint
+### The OAuth 2.0 Authorize Endpoint
 
 ```
 GET /oauth2/auth HTTP/1.1
@@ -756,7 +756,7 @@ p JSON.parse(result)
 
 <a id="opIdrevokeOAuth2Token"></a>
 
-### Revoke OAuth2 tokens
+### Revoke OAuth2 Tokens
 
 ```
 POST /oauth2/revoke HTTP/1.1
@@ -949,7 +949,7 @@ p JSON.parse(result)
 
 <a id="opIddisconnectUser"></a>
 
-### OpenID Connect Front-Backchannel enabled Logout
+### OpenID Connect Front-Backchannel Enabled Logout
 
 ```
 GET /oauth2/sessions/logout HTTP/1.1
@@ -1084,7 +1084,7 @@ p JSON.parse(result)
 
 <a id="opIdoauth2Token"></a>
 
-### The OAuth 2.0 token endpoint
+### The OAuth 2.0 Token Endpoint
 
 ```
 POST /oauth2/token HTTP/1.1
@@ -1747,7 +1747,7 @@ p JSON.parse(result)
 
 <a id="opIdcreateOAuth2Client"></a>
 
-### Create an OAuth 2.0 client
+### Create an OAuth 2.0 Client
 
 ```
 POST /clients HTTP/1.1
@@ -2739,7 +2739,7 @@ p JSON.parse(result)
 
 <a id="opIdisInstanceAlive"></a>
 
-### Check alive status
+### Check Alive Status
 
 ```
 GET /health/alive HTTP/1.1
@@ -3357,7 +3357,7 @@ p JSON.parse(result)
 
 <a id="opIdcreateJsonWebKeySet"></a>
 
-### Generate a new JSON Web Key
+### Generate a New JSON Web Key
 
 ```
 POST /keys/{set} HTTP/1.1
@@ -4513,7 +4513,7 @@ p JSON.parse(result)
 
 <a id="opIdgetConsentRequest"></a>
 
-### Get consent request information
+### Get Consent Request Information
 
 ```
 GET /oauth2/auth/requests/consent?consent_challenge=string HTTP/1.1
@@ -4749,7 +4749,7 @@ p JSON.parse(result)
 
 <a id="opIdacceptConsentRequest"></a>
 
-### Accept a consent request
+### Accept a Consent Request
 
 ```
 PUT /oauth2/auth/requests/consent/accept?consent_challenge=string HTTP/1.1
@@ -4977,7 +4977,7 @@ p JSON.parse(result)
 
 <a id="opIdrejectConsentRequest"></a>
 
-### Reject a consent request
+### Reject a Consent Request
 
 ```
 PUT /oauth2/auth/requests/consent/reject?consent_challenge=string HTTP/1.1
@@ -5192,7 +5192,7 @@ p JSON.parse(result)
 
 <a id="opIdgetLoginRequest"></a>
 
-### Get a login request
+### Get a Login Request
 
 ```
 GET /oauth2/auth/requests/login?login_challenge=string HTTP/1.1
@@ -5422,7 +5422,7 @@ p JSON.parse(result)
 
 <a id="opIdacceptLoginRequest"></a>
 
-### Accept a login request
+### Accept a Login Request
 
 ```
 PUT /oauth2/auth/requests/login/accept?login_challenge=string HTTP/1.1
@@ -5637,7 +5637,7 @@ p JSON.parse(result)
 
 <a id="opIdrejectLoginRequest"></a>
 
-### Reject a login request
+### Reject a Login Request
 
 ```
 PUT /oauth2/auth/requests/login/reject?login_challenge=string HTTP/1.1
@@ -5848,7 +5848,7 @@ p JSON.parse(result)
 
 <a id="opIdgetLogoutRequest"></a>
 
-### Get a logout request
+### Get a Logout Request
 
 ```
 GET /oauth2/auth/requests/logout?logout_challenge=string HTTP/1.1
@@ -6021,7 +6021,7 @@ p JSON.parse(result)
 
 <a id="opIdacceptLogoutRequest"></a>
 
-### Accept a logout request
+### Accept a Logout Request
 
 ```
 PUT /oauth2/auth/requests/logout/accept?logout_challenge=string HTTP/1.1
@@ -6195,7 +6195,7 @@ p JSON.parse(result)
 
 <a id="opIdrejectLogoutRequest"></a>
 
-### Reject a logout request
+### Reject a Logout Request
 
 ```
 PUT /oauth2/auth/requests/logout/reject?logout_challenge=string HTTP/1.1
@@ -6405,7 +6405,7 @@ p JSON.parse(result)
 
 <a id="opIdlistSubjectConsentSessions"></a>
 
-### Lists all consent sessions of a subject
+### Lists All Consent Sessions of a Subject
 
 ```
 GET /oauth2/auth/sessions/consent?subject=string HTTP/1.1
@@ -6717,7 +6717,7 @@ p JSON.parse(result)
 
 <a id="opIdrevokeConsentSessions"></a>
 
-### Revokes consent sessions of a subject for a specific OAuth 2.0 Client
+### Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 
 ```
 DELETE /oauth2/auth/sessions/consent?subject=string HTTP/1.1
@@ -6895,9 +6895,9 @@ p JSON.parse(result)
 
 <a id="opIdrevokeAuthenticationSession"></a>
 
-### Invalidates all login sessions of a certain user
+### Invalidates All Login Sessions of a Certain User
 
-Invalidates a subject's authentication session
+Invalidates a Subject's Authentication Session
 
 ```
 DELETE /oauth2/auth/sessions/login?subject=string HTTP/1.1
@@ -7271,7 +7271,7 @@ p JSON.parse(result)
 
 <a id="opIdintrospectOAuth2Token"></a>
 
-### Introspect OAuth2 tokens
+### Introspect OAuth2 Tokens
 
 ```
 POST /oauth2/introspect HTTP/1.1
@@ -7484,7 +7484,7 @@ p JSON.parse(result)
 
 <a id="opIdgetVersion"></a>
 
-### Get service version
+### Get Service Version
 
 ```
 GET /version HTTP/1.1

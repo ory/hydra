@@ -156,7 +156,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Create an OAuth 2.0 client",
+        "summary": "Create an OAuth 2.0 Client",
         "operationId": "createOAuth2Client",
         "parameters": [
           {
@@ -346,7 +346,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Check alive status",
+        "summary": "Check Alive Status",
         "operationId": "isInstanceAlive",
         "responses": {
           "200": {
@@ -373,7 +373,7 @@
         "tags": [
           "public"
         ],
-        "summary": "Check readiness status",
+        "summary": "Check Readiness Status",
         "operationId": "isInstanceReady",
         "responses": {
           "200": {
@@ -520,7 +520,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Generate a new JSON Web Key",
+        "summary": "Generate a New JSON Web Key",
         "operationId": "createJsonWebKeySet",
         "parameters": [
           {
@@ -827,7 +827,7 @@
         "tags": [
           "public"
         ],
-        "summary": "The OAuth 2.0 authorize endpoint",
+        "summary": "The OAuth 2.0 Authorize Endpoint",
         "operationId": "oauthAuth",
         "responses": {
           "302": {
@@ -864,7 +864,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get consent request information",
+        "summary": "Get Consent Request Information",
         "operationId": "getConsentRequest",
         "parameters": [
           {
@@ -918,7 +918,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept a consent request",
+        "summary": "Accept a Consent Request",
         "operationId": "acceptConsentRequest",
         "parameters": [
           {
@@ -973,7 +973,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject a consent request",
+        "summary": "Reject a Consent Request",
         "operationId": "rejectConsentRequest",
         "parameters": [
           {
@@ -1028,7 +1028,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get a login request",
+        "summary": "Get a Login Request",
         "operationId": "getLoginRequest",
         "parameters": [
           {
@@ -1088,7 +1088,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept a login request",
+        "summary": "Accept a Login Request",
         "operationId": "acceptLoginRequest",
         "parameters": [
           {
@@ -1149,7 +1149,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject a login request",
+        "summary": "Reject a Login Request",
         "operationId": "rejectLoginRequest",
         "parameters": [
           {
@@ -1207,7 +1207,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get a logout request",
+        "summary": "Get a Logout Request",
         "operationId": "getLogoutRequest",
         "parameters": [
           {
@@ -1252,7 +1252,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Accept a logout request",
+        "summary": "Accept a Logout Request",
         "operationId": "acceptLogoutRequest",
         "parameters": [
           {
@@ -1297,7 +1297,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Reject a logout request",
+        "summary": "Reject a Logout Request",
         "operationId": "rejectLogoutRequest",
         "parameters": [
           {
@@ -1349,7 +1349,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Lists all consent sessions of a subject",
+        "summary": "Lists All Consent Sessions of a Subject",
         "operationId": "listSubjectConsentSessions",
         "parameters": [
           {
@@ -1398,7 +1398,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Revokes consent sessions of a subject for a specific OAuth 2.0 Client",
+        "summary": "Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
         "operationId": "revokeConsentSessions",
         "parameters": [
           {
@@ -1462,7 +1462,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Invalidates all login sessions of a certain user\nInvalidates a subject's authentication session",
+        "summary": "Invalidates All Login Sessions of a Certain User\nInvalidates a Subject's Authentication Session",
         "operationId": "revokeAuthenticationSession",
         "parameters": [
           {
@@ -1556,7 +1556,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Introspect OAuth2 tokens",
+        "summary": "Introspect OAuth2 Tokens",
         "operationId": "introspectOAuth2Token",
         "parameters": [
           {
@@ -1616,7 +1616,7 @@
         "tags": [
           "public"
         ],
-        "summary": "Revoke OAuth2 tokens",
+        "summary": "Revoke OAuth2 Tokens",
         "operationId": "revokeOAuth2Token",
         "parameters": [
           {
@@ -1655,7 +1655,7 @@
         "tags": [
           "public"
         ],
-        "summary": "OpenID Connect Front-Backchannel enabled Logout",
+        "summary": "OpenID Connect Front-Backchannel Enabled Logout",
         "operationId": "disconnectUser",
         "responses": {
           "302": {
@@ -1688,7 +1688,7 @@
         "tags": [
           "public"
         ],
-        "summary": "The OAuth 2.0 token endpoint",
+        "summary": "The OAuth 2.0 Token Endpoint",
         "operationId": "oauth2Token",
         "parameters": [
           {
@@ -1791,7 +1791,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get service version",
+        "summary": "Get Service Version",
         "operationId": "getVersion",
         "responses": {
           "200": {

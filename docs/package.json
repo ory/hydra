@@ -2,6 +2,10 @@
   "name": "docusaurus-template",
   "version": "0.0.0",
   "private": true,
+  "consts": {
+    "prettierTarget": "{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}",
+    "prettierArgs": "--no-semi --single-quote --trailing-comma none"
+  },
   "scripts": {
     "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",
     "docusaurus": "docusaurus",
@@ -10,7 +14,8 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}' --no-semi --single-quote --trailing-comma none || true"
+    "format": "prettier --write ${npm_package_consts_prettierTarget} ${npm_package_consts_prettierArgs} || true",
+    "format:check": "prettier --check ${npm_package_consts_prettierTarget} ${npm_package_consts_prettierArgs}"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.61",

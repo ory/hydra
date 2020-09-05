@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:13.3.2-ce.0
+    restart: always
+    hostname: gitlab.example.com
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.example.com:8000/'
+    ports:
+      - "443:443" # https
+      - "8000:8000" # http
+      - "2222:22" # ssh
+    volumes:
+    - './contrib/quickstart/gitlab/config:/etc/gitlab'
+    - './contrib/quickstart/gitlab/logs:/var/log/gitlab'
+    - './contrib/quickstart/gitlab/data:/var/opt/gitlab'

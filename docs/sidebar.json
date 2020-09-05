@@ -29,7 +29,7 @@
         "guides/ssl-https-tls", 
         "guides/cookies", 
         "guides/scaling-hydra", 
-        "guides/cors",
+        "guides/cors", 
         "guides/gitlab"
       ]
     }, 

@@ -105,6 +105,7 @@ Something is not working.
 * [ ] Introspection Response: `access_token` and `refresh_token` are not valid `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 * [ ] Make cookies with SameSite=None secure by default or using the configuration flag ([hydra#1844](https://github.com/ory/hydra/issues/1844))
 * [ ] RSA key generation is slow on ARM ([hydra#1989](https://github.com/ory/hydra/issues/1989))
+* [ ] `loginRequest.requested_access_token_audience` should not be `null` ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -153,6 +154,7 @@ We are looking for help on this one.
 * [ ] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 * [ ] Update clients from cli ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 * [ ] Expired token is considered an error ([hydra#2031](https://github.com/ory/hydra/issues/2031))
+* [ ] `loginRequest.requested_access_token_audience` should not be `null` ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 * [x] Automatically set GOMAXPROCS according to linux container cpu quota ([hydra#2033](https://github.com/ory/hydra/issues/2033))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)

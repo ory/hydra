@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-09-03)](#unreleased-2020-09-03)
+- [Unreleased (2020-09-07)](#unreleased-2020-09-07)
     - [Documentation](#documentation)
     - [Features](#features)
   - [1.7.4 (2020-08-31)](#174-2020-08-31)
@@ -467,12 +467,14 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.7.4...8bcb8c9d25c9e7b16383e7e4392da36ea385c5eb) (2020-09-03)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.7.4...d8d4f1e581504b5111e9051a46636140c31a3a86) (2020-09-07)
 
 
 ### Documentation
 
+* Gitlab hydra integration ([#2014](https://github.com/ory/hydra/issues/2014)) ([e2bc127](https://github.com/ory/hydra/commit/e2bc12701d3f61f549ac1cd8d92c5f00dc9e551c))
 * Improve before-oauth2 ([8bcb8c9](https://github.com/ory/hydra/commit/8bcb8c9d25c9e7b16383e7e4392da36ea385c5eb))
+* Update logout flow docs based on new spec ([#2044](https://github.com/ory/hydra/issues/2044)) ([d8d4f1e](https://github.com/ory/hydra/commit/d8d4f1e581504b5111e9051a46636140c31a3a86)), closes [#1994](https://github.com/ory/hydra/issues/1994)
 
 
 ### Features

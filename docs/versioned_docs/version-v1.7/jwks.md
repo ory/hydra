@@ -49,7 +49,7 @@ JWKs are well supported amongst all languages. This endpoint helps you managing
 certificates, private, public and symmetric keys. It is important to never
 transport keys over insecure channels such as http.
 
-The [REST API Documentation](https://www.ory.sh/hydra/docs/reference/api/) will give you
+The [REST API Documentation](./reference/api) will give you
 details on the various endpoints.
 
 ## Auto-generated JWKs

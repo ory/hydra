@@ -42,4 +42,5 @@ Manage OAuth 2.0 Clients
 * [hydra clients get](hydra-clients-get)	 - Get an OAuth 2.0 Client
 * [hydra clients import](hydra-clients-import)	 - Import OAuth 2.0 Clients from one or more JSON files
 * [hydra clients list](hydra-clients-list)	 - List OAuth 2.0 Clients
+* [hydra clients update](hydra-clients-update)	 - Update an OAuth 2.0 Client
 

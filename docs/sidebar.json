@@ -61,6 +61,7 @@
         "cli/hydra-clients-get", 
         "cli/hydra-clients-import", 
         "cli/hydra-clients-list", 
+        "cli/hydra-clients-update", 
         "cli/hydra-keys", 
         "cli/hydra-keys-create", 
         "cli/hydra-keys-delete", 

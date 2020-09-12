@@ -22,7 +22,7 @@
     "@docusaurus/theme-search-algolia": "2.0.0-alpha.61",
     "classnames": "2.2.6",
     "mermaid": "8.6.4",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.1",
     "react": "16.13.1",
     "react-dom": "16.13.1"
   },

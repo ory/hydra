@@ -280,7 +280,7 @@ The **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)** teaches you
 a Postgres instance and an exemplary identity provider written in React using docker-compose.
 It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)**.
 
-<img src=".github/images/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src="docs/static/img/docs/oauth2-flow.gif" alt="OAuth2 Flow">
 
 <br clear="all">
 

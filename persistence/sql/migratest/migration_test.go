@@ -105,11 +105,11 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=consent migration %d", i), func(t *testing.T) {
 					ecr, elr, els, ehcr, ehlr, efols, elor := expectedConsent(i)
 
-					acr, err := d.Registry().ConsentManager().GetConsentRequest(context.Background(), ecr.Challenge)
+					acr, err := d.Registry().ConsentManager().GetConsentRequest(context.Background(), ecr.ID)
 					require.NoError(t, err)
 					assertEqualConsentRequests(t, ecr, acr)
 
-					alr, err := d.Registry().ConsentManager().GetLoginRequest(context.Background(), elr.Challenge)
+					alr, err := d.Registry().ConsentManager().GetLoginRequest(context.Background(), elr.ID)
 					require.NoError(t, err)
 					assertEqualLoginRequests(t, elr, alr)
 
@@ -118,11 +118,11 @@ func TestMigrations(t *testing.T) {
 					assertEqualLoginSessions(t, els, als)
 
 					ahcr := &consent.HandledConsentRequest{}
-					require.NoError(t, c.Q().Where("challenge = ?", ehcr.Challenge).First(ahcr))
+					require.NoError(t, c.Q().Where("challenge = ?", ehcr.ID).First(ahcr))
 					assertEqualHandledConsentRequests(t, ehcr, ahcr)
 
 					ahlr := &consent.HandledLoginRequest{}
-					require.NoError(t, c.Q().Where("challenge = ?", ehlr.Challenge).First(ahlr))
+					require.NoError(t, c.Q().Where("challenge = ?", ehlr.ID).First(ahlr))
 					assertEqualHandledLoginRequests(t, ehlr, ahlr)
 
 					if efols != nil {
@@ -160,7 +160,7 @@ func TestMigrations(t *testing.T) {
 
 				if i >= 11 {
 					abjti := &oauth2.BlacklistedJTI{}
-					require.NoError(t, c.Where("signature = ?", ebjti.Signature).First(abjti))
+					require.NoError(t, c.Where("signature = ?", ebjti.ID).First(abjti))
 					assertEqualOauth2BlacklistedJTIs(t, ebjti, abjti)
 				}
 			}

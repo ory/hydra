@@ -72,11 +72,18 @@ func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 	return configuration.NewViperProvider(logrusx.New("", ""), false, nil).(*configuration.ViperProvider)
 }
 
-func NewRegistryMemory(c *configuration.ViperProvider) *driver.RegistryMemory {
+func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Registry {
 	viper.Set(configuration.ViperKeyLogLevel, "debug")
-	r := driver.NewRegistryMemory().WithConfig(c)
-	_ = r.Init()
-	return r.(*driver.RegistryMemory)
+
+	// TODO using CRDB until sqlite is supported
+	viper.Set(configuration.ViperKeyDSN, ConnectToCRDB(t))
+	// viper.Set(configuration.ViperKeyDSN, "memory")
+
+	r, err := driver.NewRegistry(c, logrusx.New("test_hydra", "master"))
+	require.NoError(t, err)
+	require.NoError(t, r.Init())
+	require.NoError(t, r.Persister().MigrateUp(context.Background()))
+	return r
 }
 
 func NewRegistrySQLFromDB(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
@@ -89,7 +96,7 @@ func NewRegistrySQLFromDB(c *configuration.ViperProvider, db *sqlx.DB) *driver.R
 func NewRegistrySQLFromURL(t *testing.T, url string) *driver.RegistrySQL {
 	conf := NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyDSN, url)
-	reg, err := driver.NewRegistry(conf)
+	reg, err := driver.NewRegistry(conf, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)
 	r, ok := reg.(*driver.RegistrySQL)
 	require.True(t, ok)
@@ -99,7 +106,7 @@ func NewRegistrySQLFromURL(t *testing.T, url string) *driver.RegistrySQL {
 
 func CleanAndMigrate(reg *driver.RegistrySQL) func(*testing.T) {
 	return func(t *testing.T) {
-		x.CleanSQL(t, reg.DB())
+		x.CleanSQLPop(t, reg.Persister().Connection(context.Background()))
 		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
 		t.Log("clean and migrate done")
 	}
@@ -148,7 +155,7 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb *driver.RegistrySQL, clean 
 	}()
 	go func() {
 		crdbURL = ConnectToCRDB(t)
-		t.Log("cddb done")
+		t.Log("crdb done")
 		wg.Done()
 	}()
 	t.Log("beginning to wait")

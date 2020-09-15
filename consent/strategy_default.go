@@ -262,7 +262,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	if err := s.r.ConsentManager().CreateLoginRequest(
 		r.Context(),
 		&LoginRequest{
-			Challenge:         challenge,
+			ID:                challenge,
 			Verifier:          verifier,
 			CSRF:              csrf,
 			Skip:              skip,
@@ -548,7 +548,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	if err := s.r.ConsentManager().CreateConsentRequest(
 		r.Context(),
 		&ConsentRequest{
-			Challenge:              challenge,
+			ID:                     challenge,
 			ACR:                    as.ACR,
 			Verifier:               verifier,
 			CSRF:                   csrf,
@@ -563,7 +563,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
 			LoginSessionID:         as.LoginRequest.SessionID,
-			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
+			LoginChallenge:         sqlxx.NullString(as.LoginRequest.ID),
 			Context:                as.Context,
 		},
 	); err != nil {

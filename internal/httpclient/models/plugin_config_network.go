@@ -7,13 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // PluginConfigNetwork PluginConfigNetwork plugin config network
-//
 // swagger:model PluginConfigNetwork
 type PluginConfigNetwork struct {
 

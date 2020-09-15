@@ -100,7 +100,7 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 	m.m["handledConsentRequests"].RLock()
 	for k, c := range m.handledConsentRequests {
 		m.m["handledConsentRequests"].RUnlock()
-		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		cr, err := m.GetConsentRequest(ctx, c.ID)
 		if err != nil {
 			return err
 		}
@@ -115,12 +115,12 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 			delete(m.consentRequests, k)
 			m.m["consentRequests"].Unlock()
 
-			if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+			if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, c.ID); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
-			if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, c.Challenge); errors.Cause(err) == fosite.ErrNotFound {
+			if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, c.ID); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
 				return err
@@ -157,10 +157,10 @@ func (m *MemoryManager) RevokeSubjectLoginSession(ctx context.Context, user stri
 func (m *MemoryManager) CreateConsentRequest(ctx context.Context, c *ConsentRequest) error {
 	m.m["consentRequests"].Lock()
 	defer m.m["consentRequests"].Unlock()
-	if _, ok := m.consentRequests[c.Challenge]; ok {
+	if _, ok := m.consentRequests[c.ID]; ok {
 		return errors.New("Key already exists")
 	}
-	m.consentRequests[c.Challenge] = *c
+	m.consentRequests[c.ID] = *c
 	return nil
 }
 
@@ -175,7 +175,7 @@ func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string)
 
 	m.m["handledConsentRequests"].RLock()
 	for _, h := range m.handledConsentRequests {
-		if h.Challenge == c.Challenge {
+		if h.ID == c.ID {
 			c.WasHandled = h.WasUsed
 		}
 	}
@@ -187,7 +187,7 @@ func (m *MemoryManager) GetConsentRequest(ctx context.Context, challenge string)
 
 func (m *MemoryManager) HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error) {
 	m.m["handledConsentRequests"].Lock()
-	m.handledConsentRequests[r.Challenge] = *r
+	m.handledConsentRequests[r.ID] = *r
 	m.m["handledConsentRequests"].Unlock()
 	return m.GetConsentRequest(ctx, challenge)
 }
@@ -198,7 +198,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 		if c.Verifier == verifier {
 			m.m["handledConsentRequests"].RLock()
 			for _, h := range m.handledConsentRequests {
-				if h.Challenge == c.Challenge {
+				if h.ID == c.ID {
 					m.m["consentRequests"].RUnlock()
 					m.m["handledConsentRequests"].RUnlock()
 					if h.WasUsed {
@@ -206,7 +206,7 @@ func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, v
 					}
 
 					h.WasUsed = true
-					if _, err := m.HandleConsentRequest(ctx, h.Challenge, &h); err != nil {
+					if _, err := m.HandleConsentRequest(ctx, h.ID, &h); err != nil {
 						return nil, err
 					}
 
@@ -228,7 +228,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 	m.m["handledConsentRequests"].RLock()
 	for _, c := range m.handledConsentRequests {
 		m.m["handledConsentRequests"].RUnlock()
-		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		cr, err := m.GetConsentRequest(ctx, c.ID)
 		if errors.Cause(err) == x.ErrNotFound {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		} else if err != nil {
@@ -279,7 +279,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 	m.m["handledConsentRequests"].RLock()
 	for _, c := range m.handledConsentRequests {
 		m.m["handledConsentRequests"].RUnlock()
-		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		cr, err := m.GetConsentRequest(ctx, c.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -322,7 +322,7 @@ func (m *MemoryManager) FindSubjectsGrantedConsentRequests(ctx context.Context, 
 func (m *MemoryManager) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
 	var rs []HandledConsentRequest
 	for _, c := range m.handledConsentRequests {
-		cr, err := m.GetConsentRequest(ctx, c.Challenge)
+		cr, err := m.GetConsentRequest(ctx, c.ID)
 		if err != nil {
 			return 0, err
 		}
@@ -396,10 +396,10 @@ func (m *MemoryManager) DeleteLoginSession(ctx context.Context, id string) error
 func (m *MemoryManager) CreateLoginRequest(ctx context.Context, a *LoginRequest) error {
 	m.m["authRequests"].Lock()
 	defer m.m["authRequests"].Unlock()
-	if _, ok := m.authRequests[a.Challenge]; ok {
+	if _, ok := m.authRequests[a.ID]; ok {
 		return errors.New("Key already exists")
 	}
-	m.authRequests[a.Challenge] = *a
+	m.authRequests[a.ID] = *a
 	return nil
 }
 
@@ -414,7 +414,7 @@ func (m *MemoryManager) GetLoginRequest(ctx context.Context, challenge string) (
 
 	m.m["handledAuthRequests"].Lock()
 	for _, h := range m.handledAuthRequests {
-		if h.Challenge == c.Challenge {
+		if h.ID == c.ID {
 			c.WasHandled = h.WasUsed
 		}
 	}
@@ -426,7 +426,7 @@ func (m *MemoryManager) GetLoginRequest(ctx context.Context, challenge string) (
 
 func (m *MemoryManager) HandleLoginRequest(ctx context.Context, challenge string, r *HandledLoginRequest) (*LoginRequest, error) {
 	m.m["handledAuthRequests"].Lock()
-	m.handledAuthRequests[r.Challenge] = *r
+	m.handledAuthRequests[r.ID] = *r
 	m.m["handledAuthRequests"].Unlock()
 	return m.GetLoginRequest(ctx, challenge)
 }
@@ -437,7 +437,7 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 		if c.Verifier == verifier {
 			m.m["handledAuthRequests"].RLock()
 			for _, h := range m.handledAuthRequests {
-				if h.Challenge == c.Challenge {
+				if h.ID == c.ID {
 					m.m["handledAuthRequests"].RUnlock()
 					m.m["authRequests"].RUnlock()
 
@@ -446,7 +446,7 @@ func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, ver
 					}
 
 					h.WasUsed = true
-					if _, err := m.HandleLoginRequest(ctx, h.Challenge, &h); err != nil {
+					if _, err := m.HandleLoginRequest(ctx, h.ID, &h); err != nil {
 						return nil, err
 					}
 

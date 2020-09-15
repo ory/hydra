@@ -40,7 +40,7 @@ import (
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
 	c = &ConsentRequest{
-		Challenge:         "challenge" + key,
+		ID:                "challenge" + key,
 		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
 		RequestedAudience: []string{"auda" + key, "audb" + key},
 		Skip:              skip,
@@ -85,7 +85,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		ConsentRequest:  c,
 		RememberFor:     rememberFor,
 		Remember:        remember,
-		Challenge:       "challenge" + key,
+		ID:              "challenge" + key,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt: authenticatedAt,
 		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
@@ -131,7 +131,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
 		Skip:           true,
-		Challenge:      "challenge" + key,
+		ID:             "challenge" + key,
 		Verifier:       "verifier" + key,
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		CSRF:           "csrf" + key,
@@ -156,7 +156,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		LoginRequest:           c,
 		RememberFor:            120,
 		Remember:               true,
-		Challenge:              "challenge" + key,
+		ID:                     "challenge" + key,
 		RequestedAt:            time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt:        sqlxx.NullTime(authenticatedAt),
 		Error:                  err,
@@ -186,7 +186,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		ConsentRequest:  c,
 		RememberFor:     rememberFor,
 		Remember:        remember,
-		Challenge:       c.Challenge,
+		ID:              c.ID,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt: sqlxx.NullTime(authAt),
 		GrantedScope:    []string{"scopea", "scopeb"},
@@ -196,7 +196,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		HandledAt:       sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
-	_, err := m.HandleConsentRequest(context.Background(), c.Challenge, h)
+	_, err := m.HandleConsentRequest(context.Background(), c.ID, h)
 	require.NoError(t, err)
 	return h
 }
@@ -215,7 +215,7 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 		},
 		Client:                 ar.Client,
 		RequestURL:             "https://request-url/path",
-		LoginChallenge:         sqlxx.NullString(ar.Challenge),
+		LoginChallenge:         sqlxx.NullString(ar.ID),
 		LoginSessionID:         ar.SessionID,
 		ForceSubjectIdentifier: "forced-subject",
 		SubjectIdentifier:      "forced-subject",
@@ -224,9 +224,9 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 		Context:                sqlxx.JSONRawMessage(`{"foo": "bar"}`),
 
-		Challenge: uuid.New().String(),
-		Verifier:  uuid.New().String(),
-		CSRF:      uuid.New().String(),
+		ID:       uuid.New().String(),
+		Verifier: uuid.New().String(),
+		CSRF:     uuid.New().String(),
 	}
 
 	require.NoError(t, m.CreateConsentRequest(context.Background(), c))
@@ -249,9 +249,9 @@ func SaneMockAuthRequest(t *testing.T, m Manager, ls *LoginSession, cl *client.C
 		RequestedScope: []string{"scopea", "scopeb"},
 		SessionID:      sqlxx.NullString(ls.ID),
 
-		CSRF:      uuid.New().String(),
-		Challenge: uuid.New().String(),
-		Verifier:  uuid.New().String(),
+		CSRF:     uuid.New().String(),
+		ID:       uuid.New().String(),
+		Verifier: uuid.New().String(),
 	}
 	require.NoError(t, m.CreateLoginRequest(context.Background(), c))
 	return c
@@ -270,7 +270,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				}))
 
 				require.NoError(t, m.CreateLoginRequest(context.TODO(), &LoginRequest{
-					Challenge:       fmt.Sprintf("fk-login-challenge-%s", k),
+					ID:              fmt.Sprintf("fk-login-challenge-%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{ID: fmt.Sprintf("fk-client-%s", k)},
 					AuthenticatedAt: sqlxx.NullTime(time.Now()),
@@ -380,7 +380,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					got2, err := m.VerifyAndInvalidateLoginRequest(context.TODO(), "verifier"+tc.key)
 					require.NoError(t, err)
 					compareAuthenticationRequest(t, c, got2.LoginRequest)
-					assert.Equal(t, c.Challenge, got2.Challenge)
+					assert.Equal(t, c.ID, got2.ID)
 
 					_, err = m.VerifyAndInvalidateLoginRequest(context.TODO(), "verifier"+tc.key)
 					require.Error(t, err)
@@ -434,7 +434,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					got2, err := m.VerifyAndInvalidateConsentRequest(context.TODO(), "verifier"+tc.key)
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got2.ConsentRequest)
-					assert.Equal(t, c.Challenge, got2.Challenge)
+					assert.Equal(t, c.ID, got2.ID)
 
 					if tc.hasError {
 						assert.True(t, got2.HasError())
@@ -634,7 +634,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					} else {
 						require.NoError(t, err)
 						for _, consent := range consents {
-							assert.Contains(t, tc.challenges, consent.Challenge)
+							assert.Contains(t, tc.challenges, consent.ID)
 							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.ID)
 						}
 					}
@@ -838,7 +838,7 @@ func compareLogoutRequest(t *testing.T, a, b *LogoutRequest) {
 
 func compareAuthenticationRequest(t *testing.T, a, b *LoginRequest) {
 	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
-	assert.EqualValues(t, a.Challenge, b.Challenge)
+	assert.EqualValues(t, a.ID, b.ID)
 	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)
 	assert.EqualValues(t, a.Subject, b.Subject)
 	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)
@@ -851,7 +851,7 @@ func compareAuthenticationRequest(t *testing.T, a, b *LoginRequest) {
 
 func compareConsentRequest(t *testing.T, a, b *ConsentRequest) {
 	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
-	assert.EqualValues(t, a.Challenge, b.Challenge)
+	assert.EqualValues(t, a.ID, b.ID)
 	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)
 	assert.EqualValues(t, a.Subject, b.Subject)
 	assert.EqualValues(t, a.RequestedScope, b.RequestedScope)

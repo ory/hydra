@@ -207,7 +207,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, true, c.CookieSameSiteLegacyWorkaround())
 
 	// dsn
-	assert.Equal(t, "memory", c.DSN())
+	assert.Equal(t, DefaultSQLiteMemoryDSN, c.DSN())
 
 	// webfinger
 	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys())

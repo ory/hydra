@@ -28,6 +28,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gobuffalo/pop/v5"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -59,7 +61,7 @@ type LoginSession struct {
 	Remember        bool      `db:"remember"`
 }
 
-func (s LoginSession) TableName() string {
+func (_ LoginSession) TableName() string {
 	return "hydra_oauth2_authentication_session"
 }
 
@@ -153,6 +155,9 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 //
 // swagger:model acceptConsentRequest
 type HandledConsentRequest struct {
+	// ID instead of Challenge because of pop
+	ID string `json:"-" db:"challenge"`
+
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
 
@@ -175,7 +180,6 @@ type HandledConsentRequest struct {
 
 	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
-	Challenge       string              `json:"-" db:"challenge"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 	WasUsed         bool                `json:"-" db:"was_used"`
@@ -184,7 +188,7 @@ type HandledConsentRequest struct {
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
 }
 
-func (r HandledConsentRequest) TableName() string {
+func (_ HandledConsentRequest) TableName() string {
 	return "hydra_oauth2_consent_request_handled"
 }
 
@@ -192,16 +196,20 @@ func (r *HandledConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-func (r *HandledConsentRequest) prepareSQL() *HandledConsentRequest {
+func (r *HandledConsentRequest) BeforeSave(_ *pop.Connection) error {
 	if r.Session != nil {
 		r.SessionAccessToken = r.Session.AccessToken
 		r.SessionIDToken = r.Session.IDToken
 	}
-	return r
+	return nil
 }
 
-func (r *HandledConsentRequest) postSQL(cr *ConsentRequest) *HandledConsentRequest {
-	r.ConsentRequest = cr
+func (r *HandledConsentRequest) AfterSave(c *pop.Connection) error {
+	r.ConsentRequest = &ConsentRequest{}
+	if err := c.Find(r.ConsentRequest, r.ID); err != nil {
+		return errors.WithStack(err)
+	}
+
 	if r.SessionAccessToken == nil {
 		r.SessionAccessToken = make(map[string]interface{})
 	}
@@ -209,12 +217,15 @@ func (r *HandledConsentRequest) postSQL(cr *ConsentRequest) *HandledConsentReque
 		r.SessionIDToken = make(map[string]interface{})
 	}
 	r.Session = &ConsentRequestSessionData{AccessToken: r.SessionAccessToken, IDToken: r.SessionIDToken}
-	return r
+	return nil
 }
 
 // The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 type PreviousConsentSession struct {
+	// Named ID because of pop
+	ID string `json:"-" db:"challenge"`
+
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
 
@@ -237,7 +248,6 @@ type PreviousConsentSession struct {
 
 	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
-	Challenge       string              `json:"-" db:"challenge"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 	WasUsed         bool                `json:"-" db:"was_used"`
@@ -250,6 +260,9 @@ type PreviousConsentSession struct {
 //
 // swagger:model acceptLoginRequest
 type HandledLoginRequest struct {
+	// ID instead of challenge for pop
+	ID string `json:"-" db:"challenge"`
+
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
@@ -294,13 +307,12 @@ type HandledLoginRequest struct {
 
 	LoginRequest    *LoginRequest       `json:"-" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
-	Challenge       string              `json:"-" db:"challenge"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
 	WasUsed         bool                `json:"-" db:"was_used"`
 }
 
-func (r HandledLoginRequest) TableName() string {
+func (_ HandledLoginRequest) TableName() string {
 	return "hydra_oauth2_authentication_request_handled"
 }
 
@@ -308,16 +320,16 @@ func (r *HandledLoginRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
-func (r *HandledLoginRequest) postSQL(lr *LoginRequest) *HandledLoginRequest {
-	r.LoginRequest = lr
-	return r
+func (r *HandledLoginRequest) AfterUpdate(c *pop.Connection) error {
+	r.LoginRequest = &LoginRequest{}
+	return errors.WithStack(c.Find(r.LoginRequest, r.ID))
 }
 
-func (r *HandledLoginRequest) prepareSQL() *HandledLoginRequest {
+func (r *HandledLoginRequest) BeforeSave(_ *pop.Connection) error {
 	if string(r.Context) == "" {
 		r.Context = sqlxx.JSONRawMessage("{}")
 	}
-	return r
+	return nil
 }
 
 // Contains optional information about the OpenID Connect request.
@@ -405,6 +417,10 @@ type LogoutRequest struct {
 	Client                *client.Client `json:"-" db:"-"`
 }
 
+func (_ LogoutRequest) TableName() string {
+	return "hydra_oauth2_logout_request"
+}
+
 func (r *LogoutRequest) prepareSQL() *LogoutRequest {
 	if r.Client != nil {
 		r.ClientID = sql.NullString{
@@ -427,11 +443,11 @@ type LogoutResult struct {
 //
 // swagger:model loginRequest
 type LoginRequest struct {
-	// Challenge is the identifier ("login challenge") of the login request. It is used to
+	// ID is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
 	//
 	// required: true
-	Challenge string `json:"challenge" db:"challenge"`
+	ID string `json:"challenge" db:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
@@ -465,7 +481,7 @@ type LoginRequest struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client *client.Client `json:"client"`
+	Client *client.Client `json:"client" db:"-"`
 
 	ClientID string `json:"-" db:"client_id"`
 
@@ -492,6 +508,10 @@ type LoginRequest struct {
 	Context         string         `json:"-" db:"context"`
 }
 
+func (_ LoginRequest) TableName() string {
+	return "hydra_oauth2_authentication_request"
+}
+
 func (r *LoginRequest) prepareSQL() *LoginRequest {
 	if r.Client == nil {
 		return r
@@ -504,11 +524,11 @@ func (r *LoginRequest) prepareSQL() *LoginRequest {
 //
 // swagger:model consentRequest
 type ConsentRequest struct {
-	// Challenge is the identifier ("authorization challenge") of the consent authorization request. It is used to
+	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
 	//
 	// required: true
-	Challenge string `json:"challenge" db:"challenge"`
+	ID string `json:"challenge" db:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
@@ -565,12 +585,15 @@ type ConsentRequest struct {
 	WasHandled             bool           `json:"-" db:"was_handled"`
 }
 
-func (r *ConsentRequest) prepareSQL() *ConsentRequest {
-	if r.Client == nil {
-		return r
+func (_ ConsentRequest) TableName() string {
+	return "hydra_oauth2_consent_request"
+}
+
+func (r *ConsentRequest) BeforeSave(_ *pop.Connection) error {
+	if r.Client != nil {
+		r.ClientID = r.Client.ID
 	}
-	r.ClientID = r.Client.ID
-	return r
+	return nil
 }
 
 // Used to pass session data to a consent request.

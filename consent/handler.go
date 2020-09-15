@@ -335,7 +335,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	p.Challenge = challenge
+	p.ID = challenge
 	ar, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -428,7 +428,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 
 	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &HandledLoginRequest{
 		Error:       &p,
-		Challenge:   challenge,
+		ID:          challenge,
 		RequestedAt: ar.RequestedAt,
 	})
 	if err != nil {
@@ -564,7 +564,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	p.Challenge = challenge
+	p.ID = challenge
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
@@ -647,7 +647,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 
 	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &HandledConsentRequest{
 		Error:       &p,
-		Challenge:   challenge,
+		ID:          challenge,
 		RequestedAt: hr.RequestedAt,
 		HandledAt:   sqlxx.NullTime(time.Now().UTC()),
 	})

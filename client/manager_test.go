@@ -24,24 +24,25 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/ory/hydra/driver"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/internal"
 )
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 
 	registries := map[string]driver.Registry{
-		"memory": internal.NewRegistryMemory(conf),
+		"memory": internal.NewRegistryMemory(t, conf),
 	}
 
 	if !testing.Short() {
-		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
+		// registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
 		t.Log("connected")
 	}
 

@@ -21,6 +21,7 @@
 package client_test
 
 import (
+	"context"
 	"fmt"
 	"net/http/httptest"
 	"strings"
@@ -76,7 +77,7 @@ func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"public"})
 	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"foo", "bar"})
-	r := internal.NewRegistryMemory(conf)
+	r := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterAdmin()
 	handler := client.NewHandler(r)
@@ -109,18 +110,18 @@ func TestClientSDK(t *testing.T) {
 		result.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, result.Payload.CreatedAt)
 		result.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, result.Payload)
+		assert.EqualValues(t, compareClient, result.Payload, "%#v %#v", compareClient.AllowedCorsOrigins, result.Payload.AllowedCorsOrigins)
 		assert.EqualValues(t, "bar", result.Payload.Metadata.(map[string]interface{})["foo"])
 
 		// secret is not returned on GetOAuth2Client
 		compareClient.ClientSecret = ""
-		gresult, err := c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(createClient.ClientID))
+		gresult, err := c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(createClient.ClientID).WithContext(context.Background()))
 		require.NoError(t, err)
 		assert.NotEmpty(t, gresult.Payload.UpdatedAt)
 		gresult.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, gresult.Payload.CreatedAt)
 		gresult.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, gresult.Payload)
+		assert.EqualValues(t, compareClient, gresult.Payload, "%#v %#v", compareClient.Jwks, gresult.Payload.Jwks)
 
 		// get client will return The request could not be authorized
 		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID("unknown"))

@@ -1132,7 +1132,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second*2)
 			viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			viper.Set(configuration.ViperKeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistryMemory(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 

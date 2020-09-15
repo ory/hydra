@@ -97,7 +97,7 @@ func expectedJWK(i int) *jwk.SQLData {
 
 func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *consent.LoginSession, *consent.HandledConsentRequest, *consent.HandledLoginRequest, *consent.ForcedObfuscatedLoginSession, *consent.LogoutRequest) {
 	cr := &consent.ConsentRequest{
-		Challenge:              fmt.Sprintf("challenge-%04d", i),
+		ID:                     fmt.Sprintf("challenge-%04d", i),
 		RequestedScope:         sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_scope-%04d_1", i)},
 		RequestedAudience:      sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_audience-%04d_1", i)},
 		Skip:                   true,
@@ -114,7 +114,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		WasHandled:             true,
 	}
 	lr := &consent.LoginRequest{
-		Challenge:            fmt.Sprintf("challenge-%04d", i),
+		ID:                   fmt.Sprintf("challenge-%04d", i),
 		RequestedScope:       sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_scope-%04d_1", i)},
 		RequestedAudience:    sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_audience-%04d_1", i)},
 		Skip:                 true,
@@ -136,7 +136,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		GrantedAudience: sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("granted_audience-%04d_1", i)},
 		Remember:        true,
 		RememberFor:     i,
-		Challenge:       fmt.Sprintf("challenge-%04d", i),
+		ID:              fmt.Sprintf("challenge-%04d", i),
 		WasUsed:         true,
 		Error:           &consent.RequestDeniedError{},
 		SessionIDToken: map[string]interface{}{
@@ -154,7 +154,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		ForceSubjectIdentifier: fmt.Sprintf("force_subject_id-%04d", i),
 		Context:                sqlxx.JSONRawMessage(fmt.Sprintf("{\"context\": \"%04d\"}", i)),
 		Error:                  &consent.RequestDeniedError{},
-		Challenge:              fmt.Sprintf("challenge-%04d", i),
+		ID:                     fmt.Sprintf("challenge-%04d", i),
 		WasUsed:                true,
 	}
 	fols := &consent.ForcedObfuscatedLoginSession{
@@ -228,7 +228,7 @@ func expectedOauth2(i int) (*oauth2.SQLData, *oauth2.BlacklistedJTI) {
 		Session:           []byte(fmt.Sprintf("session-%04d", i)),
 	}
 	j := &oauth2.BlacklistedJTI{
-		Signature: fmt.Sprintf("sig-%04d", i),
+		ID: fmt.Sprintf("sig-%04d", i),
 	}
 	switch i {
 	case 1:

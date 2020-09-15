@@ -68,7 +68,7 @@ func createAccessTokenSessionPairwise(subject, client string, token string, expi
 
 func TestRevoke(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

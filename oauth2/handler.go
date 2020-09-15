@@ -663,7 +663,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		}
 	}
 
-	authorizeRequest.SetID(session.Challenge)
+	authorizeRequest.SetID(session.ID)
 
 	claims := &jwt.IDTokenClaims{
 		Subject:                             session.ConsentRequest.SubjectIdentifier,
@@ -695,7 +695,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		Extra:            session.Session.AccessToken,
 		KID:              accessTokenKeyID,
 		ClientID:         authorizeRequest.GetClient().GetID(),
-		ConsentChallenge: session.Challenge,
+		ConsentChallenge: session.ID,
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())

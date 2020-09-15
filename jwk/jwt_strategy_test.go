@@ -36,7 +36,7 @@ import (
 
 func TestRS256JWTStrategy(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	testGenerator := &RS256Generator{}
 

@@ -234,7 +234,7 @@ func (s *FositeSQLStore) SetClientAssertionJWT(ctx context.Context, j string, ex
 		return sqlcon.HandleError(err)
 	}
 
-	if err := s.setClientAssertionJWT(ctx, newBlacklistedJTI(j, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+	if err := s.setClientAssertionJWT(ctx, NewBlacklistedJTI(j, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
 		// found a jti
 		return errors.WithStack(fosite.ErrJTIKnown)
 	} else if err != nil {
@@ -256,7 +256,7 @@ func (s *FositeSQLStore) getClientAssertionJWT(ctx context.Context, j string) (*
 
 func (s *FositeSQLStore) setClientAssertionJWT(ctx context.Context, jti *BlacklistedJTI) error {
 	db := s.db(ctx)
-	_, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("INSERT INTO hydra_oauth2_%s (signature, expires_at) VALUES (?, ?)", sqlTableBlacklistedJTI)), jti.Signature, jti.Expiry)
+	_, err := db.ExecContext(ctx, db.Rebind(fmt.Sprintf("INSERT INTO hydra_oauth2_%s (signature, expires_at) VALUES (?, ?)", sqlTableBlacklistedJTI)), jti.ID, jti.Expiry)
 
 	return sqlcon.HandleError(err)
 }

@@ -114,7 +114,7 @@ func acceptRequest(apiClient *hydra.OryHydra, consent *models.AcceptConsentReque
 	}
 }
 
-func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID string) http.CookieJar {
+func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) http.CookieJar {
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
 	secrets := viper.GetStringSlice(configuration.ViperKeyGetCookieSecrets)
@@ -124,7 +124,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID str
 	}
 
 	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.C.ServesHTTPS(), CookieAuthenticationName))
+	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.Config().ServesHTTPS(), CookieAuthenticationName))
 
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	cookie.Options.HttpOnly = true
@@ -136,7 +136,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID str
 	return cj
 }
 
-func newValidAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID, subject string) http.CookieJar {
+func newValidAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID, subject string) http.CookieJar {
 	cj := newAuthCookieJar(t, reg, u, sessionID)
 	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &LoginSession{
 		ID:              sessionID,
@@ -166,7 +166,7 @@ func acceptLogoutChallenge(api *hydra.OryHydra, key string) func(t *testing.T) f
 	}
 }
 
-func genIDToken(t *testing.T, reg *driver.RegistryMemory, c jwtgo.Claims) string {
+func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.Claims) string {
 	r, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r
@@ -174,7 +174,7 @@ func genIDToken(t *testing.T, reg *driver.RegistryMemory, c jwtgo.Claims) string
 
 func TestStrategyLogout(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	// jwts := reg.OpenIDJWTStrategy()
@@ -482,7 +482,7 @@ func TestStrategyLogout(t *testing.T) {
 				c.Client.BackChannelLogoutURI = servers[k].URL
 				c.Subject = tc.subject
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), c))
-				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.Challenge, hc)
+				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.ID, hc)
 				require.NoError(t, err)
 				require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c.Client))
 			}
@@ -512,7 +512,7 @@ func TestStrategyLogout(t *testing.T) {
 
 func TestStrategyLoginConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	var lph, cph, aph func(w http.ResponseWriter, r *http.Request)
 	lp := mockProvider(&lph)

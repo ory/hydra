@@ -7,17 +7,16 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // LoginRequest Contains information on an ongoing login request.
-//
 // swagger:model loginRequest
 type LoginRequest struct {
 
-	// Challenge is the identifier ("login challenge") of the login request. It is used to
+	// ID is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
 	// Required: true
 	Challenge *string `json:"challenge"`

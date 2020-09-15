@@ -108,7 +108,7 @@ func (s *FositeMemoryStore) getClientAssertionJWT(_ context.Context, jti string)
 	defer s.RUnlock()
 
 	if exp, exists := s.BlacklistedJTIs[jti]; exists {
-		return newBlacklistedJTI(jti, exp), nil
+		return NewBlacklistedJTI(jti, exp), nil
 	}
 
 	return nil, errors.WithStack(sqlcon.ErrNoRows)

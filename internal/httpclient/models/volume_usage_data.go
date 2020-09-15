@@ -7,14 +7,13 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
 // `GET /system/df` endpoint, and omitted in other endpoints.
-//
 // swagger:model VolumeUsageData
 type VolumeUsageData struct {
 

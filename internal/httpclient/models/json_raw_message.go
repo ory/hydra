@@ -6,6 +6,5 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 // JSONRawMessage JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger.
-//
 // swagger:model JSONRawMessage
 type JSONRawMessage interface{}

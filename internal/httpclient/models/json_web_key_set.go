@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
@@ -18,7 +18,6 @@ import (
 // JSONWebKeySet. Since one with the same name is previously defined as
 // client.Client.JSONWebKeys and this one is last, this one will be
 // effectively written in the swagger spec.
-//
 // swagger:model JSONWebKeySet
 type JSONWebKeySet struct {
 

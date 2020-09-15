@@ -50,7 +50,7 @@ func TestSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyIssuerURL, "https://www.ory.sh")
 	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)
@@ -162,14 +162,14 @@ func TestSDK(t *testing.T) {
 }
 
 func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
-	assert.EqualValues(t, expected.Challenge, *got.Challenge)
+	assert.EqualValues(t, expected.ID, *got.Challenge)
 	assert.EqualValues(t, expected.Subject, *got.Subject)
 	assert.EqualValues(t, expected.Skip, *got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
 }
 
 func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models.ConsentRequest) {
-	assert.EqualValues(t, expected.Challenge, *got.Challenge)
+	assert.EqualValues(t, expected.ID, *got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)

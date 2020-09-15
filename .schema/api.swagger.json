@@ -2461,7 +2461,7 @@
           "type": "string"
         },
         "challenge": {
-          "description": "Challenge is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
+          "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
           "type": "string"
         },
         "client": {
@@ -2615,7 +2615,7 @@
       ],
       "properties": {
         "challenge": {
-          "description": "Challenge is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
+          "description": "ID is the identifier (\"login challenge\") of the login request. It is used to\nidentify the session.",
           "type": "string"
         },
         "client": {

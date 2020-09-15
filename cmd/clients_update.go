@@ -7,14 +7,17 @@ import (
 // updateCmd represents the update command
 var clientsUpdateCmd = &cobra.Command{
 	Use:   "update <id>",
-	Short: "Update an OAuth 2.0 Client",
-	Long: `This command updates an OAuth 2.0 Client by its ID.
+	Short: "Update an entire OAuth 2.0 Client",
+	Long: `This command replaces an OAuth 2.0 Client by its ID.
 
-Example:
-  hydra clients update client-1 -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
+Please be aware that this command replaces the entire client.
+To update only the name, a full client should be provided, for example:
+  hydra clients update client-1 -n "my updated app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
+
+If only the name flag (-n "my updated app") is provided, the all other fields are updated to their default values.
 
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
-  hydra clients update client-1 -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
+  hydra clients update client-1 -n "my updated app" -g client_credentials -r token -a core,foobar --keybase keybase_username
 `,
 	Run: cmdHandler.Clients.UpdateClient,
 }

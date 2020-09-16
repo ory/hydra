@@ -17,21 +17,37 @@ services:
   hydra:
     depends_on:
       - jaeger
+#      - zipkin
+#      - datadog
     environment:
       - TRACING_PROVIDER=jaeger
-      - TRACING_PROVIDER_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
-      - TRACING_PROVIDER_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
-      - TRACING_PROVIDER_JAEGER_SAMPLING_TYPE=const
-      - TRACING_PROVIDER_JAEGER_SAMPLING_VALUE=1
+#      - TRACING_PROVIDER=zipkin
+#      - TRACING_PROVIDER=datadog
+      # Jaeger
+      - TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
+      - TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
+      - TRACING_PROVIDERS_JAEGER_SAMPLING_TYPE=const
+      - TRACING_PROVIDERS_JAEGER_SAMPLING_VALUE=1
+      # Zipkin
+      - TRACING_PROVIDERS_ZIPKIN_SERVER_URL=http://zipkin:9411/api/v2/spans
+      # DataDog (see env vars here: https://docs.datadoghq.com/tracing/setup/go/#configuration)
+      - DD_SERVICE=Hydra
 
   jaeger:
-    image: jaegertracing/all-in-one:1.7.0
+    image: jaegertracing/all-in-one:1.19.2
     ports:
       - "16686:16686" # The UI port
-#      These are ports for collecting, sampling, agents, ...
-#      - "5775:5775/udp"
-#      - "6831:6831/udp"
-#      - "6832:6832/udp"
-#      - "5778:5778"
-#      - "14268:14268"
-#      - "9411:9411"
+
+#  zipkin:
+#    image: openzipkin/zipkin:2
+#    environment:
+#      - STORAGE_TYPE=mem
+#    ports:
+#      - "9411:9411" # The UI/API port
+
+#  datadog:
+#    image: datadog/agent:7
+#    environment:
+#      - DD_API_KEY=<YOUR_API_KEY> # Replace it with your DataDog API key
+#      - DD_APM_ENABLED=true
+#      - DD_APM_NON_LOCAL_TRAFFIC=true

@@ -44,11 +44,11 @@ type (
 )
 
 const (
-	sqlTableOpenID         tableName = "oidc"
-	sqlTableAccess         tableName = "access"
-	sqlTableRefresh        tableName = "refresh"
-	sqlTableCode           tableName = "code"
-	sqlTablePKCE           tableName = "pkce"
+	sqlTableOpenID  tableName = "oidc"
+	sqlTableAccess  tableName = "access"
+	sqlTableRefresh tableName = "refresh"
+	sqlTableCode    tableName = "code"
+	sqlTablePKCE    tableName = "pkce"
 )
 
 func (r RequestSQL) TableName() string {

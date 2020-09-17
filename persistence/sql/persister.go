@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+
 	"github.com/ory/fosite/storage"
 
 	"github.com/gobuffalo/packr/v2"
@@ -23,7 +24,7 @@ const transactionContextKey = "transactionConnection"
 var (
 	migrations = packr.New("migrations", "migrations")
 
-	ErrTransactionOpen = errors.New("There is already a transaction in this context.")
+	ErrTransactionOpen   = errors.New("There is already a transaction in this context.")
 	ErrNoTransactionOpen = errors.New("There is no transaction in this context.")
 )
 

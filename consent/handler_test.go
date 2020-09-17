@@ -150,8 +150,8 @@ func TestGetLoginRequest(t *testing.T) {
 				cl := &client.Client{ID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
-					Client:     cl,
-					ID:         challenge,
+					Client: cl,
+					ID:     challenge,
 				}))
 			}
 

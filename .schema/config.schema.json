@@ -826,10 +826,11 @@
       "properties": {
         "provider": {
           "type": "string",
-          "description": "Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will be disabled.",
+          "description": "Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).",
           "enum": [
             "jaeger",
-            "zipkin"
+            "zipkin",
+            "datadog"
           ],
           "examples": [
             "jaeger"
@@ -966,7 +967,12 @@
                   "description": "The address of Zipkin server where spans should be sent to.",
                   "format": "uri"
                 }
-              }
+              },
+              "examples": [
+                {
+                  "server_url": "http://localhost:9411/api/v2/spans"
+                }
+              ]
             }
           }
         }

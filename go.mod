@@ -3,15 +3,13 @@ module github.com/ory/hydra
 go 1.14
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
-	github.com/go-openapi/errors v0.19.7
-	github.com/go-openapi/runtime v0.19.21
-	github.com/go-openapi/spec v0.19.9 // indirect
-	github.com/go-openapi/strfmt v0.19.5
-	github.com/go-openapi/swag v0.19.9
-	github.com/go-openapi/validate v0.19.11
+	github.com/go-openapi/errors v0.19.3
+	github.com/go-openapi/runtime v0.19.11
+	github.com/go-openapi/strfmt v0.19.4
+	github.com/go-openapi/swag v0.19.7
+	github.com/go-openapi/validate v0.19.6
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0 // indirect
@@ -27,9 +25,7 @@ require (
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
-	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
-	github.com/mitchellh/mapstructure v1.3.3 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
@@ -40,7 +36,7 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.1
 	github.com/ory/viper v1.7.5
-	github.com/ory/x v0.0.149
+	github.com/ory/x v0.0.150
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -58,7 +54,6 @@ require (
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
-	go.mongodb.org/mongo-driver v1.4.1 // indirect
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect

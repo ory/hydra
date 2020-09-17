@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-09-03)](#unreleased-2020-09-03)
+- [Unreleased (2020-09-12)](#unreleased-2020-09-12)
     - [Documentation](#documentation)
     - [Features](#features)
   - [1.7.4 (2020-08-31)](#174-2020-08-31)
@@ -467,12 +467,22 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.7.4...8bcb8c9d25c9e7b16383e7e4392da36ea385c5eb) (2020-09-03)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.7.4...5107e58778f44319f7148cc3794f5ca3ec799b9a) (2020-09-12)
 
 
 ### Documentation
 
+* Corrected documentation links ([#2045](https://github.com/ory/hydra/issues/2045)) ([#2047](https://github.com/ory/hydra/issues/2047)) ([9e8c2e3](https://github.com/ory/hydra/commit/9e8c2e3556a920c9670896640dede5ce80cb2de8))
+* Fix typo ([#2052](https://github.com/ory/hydra/issues/2052)) ([d1f5ecc](https://github.com/ory/hydra/commit/d1f5ecc9bb85d418737826b8cce8efb0d9c4562c)):
+
+    > s̶i̶g̶n̶l̶e̶ ̶p̶a̶g̶e̶ ̶a̶p̶p̶  ➡️  single page app
+* Gitlab hydra integration ([#2014](https://github.com/ory/hydra/issues/2014)) ([e2bc127](https://github.com/ory/hydra/commit/e2bc12701d3f61f549ac1cd8d92c5f00dc9e551c))
 * Improve before-oauth2 ([8bcb8c9](https://github.com/ory/hydra/commit/8bcb8c9d25c9e7b16383e7e4392da36ea385c5eb))
+* Minor typo in limitations.md ([#2048](https://github.com/ory/hydra/issues/2048)) ([42d85ee](https://github.com/ory/hydra/commit/42d85eebbb0540f1698d1fe0b05378d11dc30a44)):
+
+    > It said "an maximum" but I believe it should be "a maximum".
+* Update logout flow docs based on new spec ([#2044](https://github.com/ory/hydra/issues/2044)) ([d8d4f1e](https://github.com/ory/hydra/commit/d8d4f1e581504b5111e9051a46636140c31a3a86)), closes [#1994](https://github.com/ory/hydra/issues/1994)
+* Use relative paths ([5107e58](https://github.com/ory/hydra/commit/5107e58778f44319f7148cc3794f5ca3ec799b9a))
 
 
 ### Features

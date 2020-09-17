@@ -253,7 +253,7 @@ and the OpenID Foundation:
 ORY Hydra is an OpenID Foundation [certified OpenID Provider (OP)](http://openid.net/certification/#OPs).
 
 <p align="center">
-    <img src=".github/images/oidc-cert.png" alt="ORY Hydra is a certified OpenID Providier" width="256px">
+    <img src="docs/static/img/docs/oidc-cert.png" alt="ORY Hydra is a certified OpenID Providier" width="256px">
 </p>
 
 The following OpenID profiles are certified:
@@ -280,7 +280,7 @@ The **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)** teaches you
 a Postgres instance and an exemplary identity provider written in React using docker-compose.
 It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)**.
 
-<img src=".github/images/oauth2-flow.gif" alt="OAuth2 Flow">
+<img src="docs/static/img/docs/oauth2-flow.gif" alt="OAuth2 Flow">
 
 <br clear="all">
 

@@ -1738,6 +1738,46 @@
             }
           }
         }
+      },
+      "delete": {
+        "description": "This endpoint deletes OAuth2 access tokens issued for a client from the database",
+        "consumes": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete OAuth2 Access Tokens from a client",
+        "operationId": "deleteOAuth2Token",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "client_id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+          },
+          "401": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
       }
     },
     "/userinfo": {

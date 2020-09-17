@@ -519,3 +519,13 @@ func (s *FositeSQLStore) Rollback(ctx context.Context) error {
 		return tx.Rollback()
 	}
 }
+
+func (s *FositeSQLStore) DeleteAccessTokens(ctx context.Context, clientID string) error {
+	if _, err := s.DB.ExecContext(ctx, s.DB.Rebind(fmt.Sprintf("DELETE FROM hydra_oauth2_%s WHERE client_id=?", sqlTableAccess)), clientID); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	} else if err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	return nil
+}

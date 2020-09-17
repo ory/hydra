@@ -103,6 +103,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)
+	admin.DELETE(TokenPath, h.DeleteHandler)
 }
 
 // swagger:route GET /oauth2/sessions/logout public disconnectUser
@@ -724,6 +725,37 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 	}
 
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
+}
+
+// swagger:route DELETE /oauth2/token admin deleteOAuth2Token
+//
+// Delete OAuth2 Access Tokens from a client
+//
+// This endpoint deletes OAuth2 access tokens issued for a client from the database
+//
+//     Consumes:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       500: genericError
+func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	client := r.URL.Query().Get("client")
+
+	if client == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "client" is not defined but it should have been.`)))
+		return
+	}
+
+	if err := h.r.OAuth2Storage().DeleteAccessTokens(r.Context(), client); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // This function will not be called, OPTIONS request will be handled by cors

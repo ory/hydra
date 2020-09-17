@@ -779,7 +779,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		challenge := uuid.New()
 		if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &LogoutRequest{
 			RequestURL:  r.URL.String(),
-			Challenge:   challenge,
+			ID:          challenge,
 			Subject:     session.Subject,
 			SessionID:   session.ID,
 			Verifier:    uuid.New(),
@@ -902,7 +902,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	challenge := uuid.New()
 	if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &LogoutRequest{
 		RequestURL:  r.URL.String(),
-		Challenge:   challenge,
+		ID:          challenge,
 		SessionID:   hintSid,
 		Subject:     session.Subject,
 		Verifier:    uuid.New(),

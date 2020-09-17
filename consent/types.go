@@ -206,7 +206,7 @@ func (r *HandledConsentRequest) BeforeSave(_ *pop.Connection) error {
 
 func (r *HandledConsentRequest) AfterSave(c *pop.Connection) error {
 	r.ConsentRequest = &ConsentRequest{}
-	if err := c.Find(r.ConsentRequest, r.ID); err != nil {
+	if err := c.Select("*").Where(fmt.Sprintf("%s = ?", (&pop.Model{Value: r.ConsentRequest}).IDField()), r.ID).First(r.ConsentRequest); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -322,7 +322,7 @@ func (r *HandledLoginRequest) HasError() bool {
 
 func (r *HandledLoginRequest) AfterUpdate(c *pop.Connection) error {
 	r.LoginRequest = &LoginRequest{}
-	return errors.WithStack(c.Find(r.LoginRequest, r.ID))
+	return r.LoginRequest.FindInDB(c, r.ID)
 }
 
 func (r *HandledLoginRequest) BeforeSave(_ *pop.Connection) error {
@@ -394,7 +394,7 @@ func (n *OpenIDConnectContext) Value() (driver.Value, error) {
 type LogoutRequest struct {
 	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
 	// identify the session.
-	Challenge string `json:"-" db:"challenge"`
+	ID string `json:"-" db:"challenge"`
 
 	// Subject is the user for whom the logout was request.
 	Subject string `json:"subject" db:"subject"`
@@ -421,14 +421,14 @@ func (_ LogoutRequest) TableName() string {
 	return "hydra_oauth2_logout_request"
 }
 
-func (r *LogoutRequest) prepareSQL() *LogoutRequest {
+func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
 	if r.Client != nil {
 		r.ClientID = sql.NullString{
 			Valid:  true,
 			String: r.Client.ID,
 		}
 	}
-	return r
+	return nil
 }
 
 // Returned when the log out request was used.
@@ -504,20 +504,24 @@ type LoginRequest struct {
 
 	AuthenticatedAt sqlxx.NullTime `json:"-" db:"authenticated_at"`
 	RequestedAt     time.Time      `json:"-" db:"requested_at"`
-	WasHandled      bool           `json:"-" db:"was_handled"`
-	Context         string         `json:"-" db:"context"`
+	WasHandled      bool           `json:"-" db:"was_handled,r"`
 }
 
 func (_ LoginRequest) TableName() string {
 	return "hydra_oauth2_authentication_request"
 }
 
-func (r *LoginRequest) prepareSQL() *LoginRequest {
-	if r.Client == nil {
-		return r
+func (r *LoginRequest) BeforeSave(_ *pop.Connection) error {
+	if r.Client != nil {
+		r.ClientID = r.Client.ID
 	}
-	r.ClientID = r.Client.ID
-	return r
+	return nil
+}
+
+func (r *LoginRequest) FindInDB(c *pop.Connection, id string) error {
+	return c.Select("hydra_oauth2_authentication_request.*", "COALESCE(hr.was_used, 0) as was_handled").
+		LeftJoin("hydra_oauth2_authentication_request_handled as hr", "hydra_oauth2_authentication_request.challenge = hr.challenge").
+		Find(r, id)
 }
 
 // Contains information on an ongoing consent request.
@@ -582,7 +586,7 @@ type ConsentRequest struct {
 	CSRF                   string         `json:"-" db:"csrf"`
 	AuthenticatedAt        sqlxx.NullTime `json:"-" db:"authenticated_at"`
 	RequestedAt            time.Time      `json:"-" db:"requested_at"`
-	WasHandled             bool           `json:"-" db:"was_handled"`
+	WasHandled             bool           `json:"-" db:"was_handled,r"`
 }
 
 func (_ ConsentRequest) TableName() string {
@@ -594,6 +598,18 @@ func (r *ConsentRequest) BeforeSave(_ *pop.Connection) error {
 		r.ClientID = r.Client.ID
 	}
 	return nil
+}
+
+func (r *ConsentRequest) AfterFind(c *pop.Connection) error {
+	r.Client = &client.Client{}
+	return c.Find(r.Client, r.ClientID)
+}
+
+func (r *ConsentRequest) FindInDB(c *pop.Connection, id string) error {
+	return c.Select("COALESCE(hr.was_used, false) as was_handled", "hydra_oauth2_consent_request.*").
+		Where("hydra_oauth2_consent_request.challenge = ?", id).
+		LeftJoin("hydra_oauth2_consent_request_handled hr", "hr.challenge = hydra_oauth2_consent_request.challenge").
+		First(r)
 }
 
 // Used to pass session data to a consent request.

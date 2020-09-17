@@ -69,6 +69,10 @@ func createTestClient(prefix string) *models.OAuth2Client {
 		UserinfoSignedResponseAlg: "none",
 		SubjectType:               "public",
 		Metadata:                  map[string]interface{}{"foo": "bar"},
+		// because these values are not nullable in the SQL schema, we have to set them not nil
+		AllowedCorsOrigins:        models.StringSlicePipeDelimiter{},
+		Audience:                  models.StringSlicePipeDelimiter{},
+		Jwks:                      models.JoseJSONWebKeySet(map[string]interface{}{}),
 		// SectorIdentifierUri:   "https://sector.com/foo",
 	}
 }
@@ -110,7 +114,7 @@ func TestClientSDK(t *testing.T) {
 		result.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, result.Payload.CreatedAt)
 		result.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, result.Payload, "%#v %#v", compareClient.AllowedCorsOrigins, result.Payload.AllowedCorsOrigins)
+		assert.EqualValues(t, compareClient, result.Payload)
 		assert.EqualValues(t, "bar", result.Payload.Metadata.(map[string]interface{})["foo"])
 
 		// secret is not returned on GetOAuth2Client
@@ -121,7 +125,7 @@ func TestClientSDK(t *testing.T) {
 		gresult.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, gresult.Payload.CreatedAt)
 		gresult.Payload.CreatedAt = strfmt.DateTime{}
-		assert.EqualValues(t, compareClient, gresult.Payload, "%#v %#v", compareClient.Jwks, gresult.Payload.Jwks)
+		assert.EqualValues(t, compareClient, gresult.Payload)
 
 		// get client will return The request could not be authorized
 		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID("unknown"))
@@ -145,6 +149,8 @@ func TestClientSDK(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, uresult.Payload.UpdatedAt)
 		uresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, uresult.Payload.CreatedAt)
+		uresult.Payload.CreatedAt = strfmt.DateTime{}
 		assert.EqualValues(t, compareClient, uresult.Payload)
 
 		// create another client
@@ -153,6 +159,8 @@ func TestClientSDK(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, uresult.Payload.UpdatedAt)
 		uresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, uresult.Payload.CreatedAt)
+		uresult.Payload.CreatedAt = strfmt.DateTime{}
 		assert.EqualValues(t, updateClient, uresult.Payload)
 
 		// again, test if secret is not returned on Get
@@ -162,6 +170,8 @@ func TestClientSDK(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, gresult.Payload.UpdatedAt)
 		gresult.Payload.UpdatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, gresult.Payload.CreatedAt)
+		gresult.Payload.CreatedAt = strfmt.DateTime{}
 		assert.EqualValues(t, compareClient, gresult.Payload)
 
 		// client can not be found after being deleted

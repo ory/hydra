@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"github.com/ory/fosite/storage"
 
 	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/pop/v5"
@@ -15,9 +16,16 @@ import (
 )
 
 var _ persistence.Persister = new(Persister)
-var migrations = packr.New("migrations", "migrations")
+var _ storage.Transactional = new(Persister)
 
 const transactionContextKey = "transactionConnection"
+
+var (
+	migrations = packr.New("migrations", "migrations")
+
+	ErrTransactionOpen = errors.New("There is already a transaction in this context.")
+	ErrNoTransactionOpen = errors.New("There is no transaction in this context.")
+)
 
 type (
 	Persister struct {
@@ -32,10 +40,38 @@ type (
 		KeyCipher() *jwk.AEAD
 	}
 	popableStringSlice struct {
-		values []string `db:"values"`
+		Values []string `db:"values"`
 		from   string   `db:"-"`
 	}
 )
+
+func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
+	_, ok := ctx.Value(transactionContextKey).(*pop.Connection)
+	if ok {
+		return ctx, errors.WithStack(ErrTransactionOpen)
+	}
+
+	c, err := p.conn.NewTransaction()
+	return context.WithValue(ctx, transactionContextKey, c), err
+}
+
+func (p *Persister) Commit(ctx context.Context) error {
+	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
+	if !ok || c.TX == nil {
+		return errors.WithStack(ErrNoTransactionOpen)
+	}
+
+	return c.TX.Commit()
+}
+
+func (p *Persister) Rollback(ctx context.Context) error {
+	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
+	if !ok || c.TX == nil {
+		return errors.WithStack(ErrNoTransactionOpen)
+	}
+
+	return c.TX.Rollback()
+}
 
 func NewPersister(c *pop.Connection, r Dependencies, config configuration.Provider, l *logrusx.Logger) (*Persister, error) {
 	mb, err := pop.NewMigrationBox(migrations, c)

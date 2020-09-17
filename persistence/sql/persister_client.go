@@ -2,8 +2,6 @@ package sql
 
 import (
 	"context"
-	"fmt"
-
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 
@@ -67,10 +65,7 @@ func (p *Persister) CountClients(ctx context.Context) (int, error) {
 
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
 	var cl client.Client
-	fmt.Printf("\n\n%#v\n\n", cl.JSONWebKeys)
-	err := sqlcon.HandleError(p.Connection(ctx).Find(&cl, id))
-	fmt.Printf("\n\n%#v\n\n", cl.JSONWebKeys)
-	return &cl, err
+	return &cl, sqlcon.HandleError(p.Connection(ctx).Find(&cl, id))
 }
 
 func (p *Persister) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {

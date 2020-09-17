@@ -42,7 +42,7 @@ func TestManagers(t *testing.T) {
 	}
 
 	if !testing.Short() {
-		// registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
+		registries["postgres"], registries["mysql"], registries["cockroach"], _ = internal.ConnectDatabases(t)
 		t.Log("connected")
 	}
 

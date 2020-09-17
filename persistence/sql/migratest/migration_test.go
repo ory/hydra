@@ -133,7 +133,7 @@ func TestMigrations(t *testing.T) {
 
 					if elor != nil {
 						alor := &consent.LogoutRequest{}
-						require.NoError(t, dbx.Get(alor, dbx.Rebind("select * from hydra_oauth2_logout_request where challenge = ?"), elor.Challenge))
+						require.NoError(t, dbx.Get(alor, dbx.Rebind("select * from hydra_oauth2_logout_request where challenge = ?"), elor.ID))
 						assertEqualLogoutRequests(t, elor, alor)
 					}
 				})

@@ -102,8 +102,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 
 	h := oauth2.NewHandler(reg, conf)
 	for _, r := range flushRequests {
-		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
-		_ = cl.CreateClient(nil, r.Client.(*client.Client))
+		_ = cl.CreateClient(context.Background(), r.Client.(*client.Client))
+		require.NoError(t, store.CreateAccessTokenSession(context.Background(), r.ID, r))
 	}
 
 	r := x.NewRouterAdmin()

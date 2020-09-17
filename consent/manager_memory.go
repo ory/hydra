@@ -504,7 +504,7 @@ func (m *MemoryManager) ListUserAuthenticatedClientsWithBackChannelLogout(ctx co
 
 func (m *MemoryManager) CreateLogoutRequest(ctx context.Context, r *LogoutRequest) error {
 	m.m["logoutRequests"].Lock()
-	m.logoutRequests[r.Challenge] = *r
+	m.logoutRequests[r.ID] = *r
 	m.m["logoutRequests"].Unlock()
 	return nil
 }

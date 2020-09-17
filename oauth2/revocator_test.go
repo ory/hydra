@@ -21,6 +21,7 @@
 package oauth2_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -61,7 +62,7 @@ func createAccessTokenSessionPairwise(subject, client string, token string, expi
 		ar.Session.(*oauth2.Session).Claims.Subject = obfuscated
 	}
 
-	if err := fs.CreateAccessTokenSession(nil, token, ar); err != nil {
+	if err := fs.CreateAccessTokenSession(context.Background(), token, ar); err != nil {
 		panic(err)
 	}
 }

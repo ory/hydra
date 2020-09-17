@@ -76,8 +76,8 @@ func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Regi
 	viper.Set(configuration.ViperKeyLogLevel, "debug")
 
 	// TODO using CRDB until sqlite is supported
-	viper.Set(configuration.ViperKeyDSN, ConnectToCRDB(t))
-	// viper.Set(configuration.ViperKeyDSN, "memory")
+	//viper.Set(configuration.ViperKeyDSN, ConnectToCRDB(t))
+	viper.Set(configuration.ViperKeyDSN, "memory")
 
 	r, err := driver.NewRegistry(c, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)

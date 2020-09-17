@@ -23,23 +23,16 @@ func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.Conse
 }
 
 func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*consent.ConsentRequest, error) {
-	var r consent.ConsentRequest
-	return &r, p.transaction(ctx, func(ctx context.Context, connection *pop.Connection) error {
-		return p.Connection(ctx).Where("challenge = ?", challenge).LeftJoin("hydra_oauth2_consent_request_handled hr", "hr.challenge = challenge").First(&r)
-	})
+	r := &consent.ConsentRequest{}
+	return r, sqlcon.HandleError(r.FindInDB(p.Connection(ctx), challenge))
 }
 
-func (p *Persister) HandleConsentRequest(ctx context.Context, challenge string, r *consent.HandledConsentRequest) (cr *consent.ConsentRequest, err error) {
-	err = p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := c.Create(r)
-		if err != nil {
-			return sqlcon.HandleError(err)
-		}
-
-		cr, err = p.GetConsentRequest(ctx, challenge)
-		return err
-	})
-	return
+func (p *Persister) HandleConsentRequest(ctx context.Context, challenge string, r *consent.HandledConsentRequest) (*consent.ConsentRequest, error) {
+	err := p.Connection(ctx).Create(r)
+	if err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
+	return p.GetConsentRequest(ctx, challenge)
 }
 
 func (p *Persister) RevokeSubjectConsentSession(ctx context.Context, user string) error {
@@ -52,22 +45,20 @@ func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user,
 
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
 	return func(ctx context.Context, c *pop.Connection) error {
+		tn := consent.ConsentRequest{}.TableName()
 		challenges := popableStringSlice{
-			values: make([]string, 0),
+			Values: make([]string, 0),
 			from:   "",
 		}
 		if err := c.
 			Where(whereStmt, whereArgs...).
-			Select("h.challenge AS values").
-			Join(fmt.Sprintf("%s AS r", consent.ConsentRequest{}.TableName()), "r.challenge = h.challenge").
-			All(&pop.Model{
-				Value: &challenges,
-				As:    "h",
-			}); err != nil {
+			Select(fmt.Sprintf("%s.challenge AS values", tn)).
+			Join(fmt.Sprintf("%s AS r", tn), fmt.Sprintf("r.challenge = %s.challenge", tn)).
+			All(&challenges); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		for _, challenge := range challenges.values {
+		for _, challenge := range challenges.Values {
 			if err := p.RevokeAccessToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
 				// do nothing
 			} else if err != nil {
@@ -92,38 +83,44 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.HandledConsentRequest, error) {
 	var r consent.HandledConsentRequest
-	return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var cr consent.ConsentRequest
-		if err := c.Where("verifier = ?", verifier).First(&cr); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	var cr consent.ConsentRequest
+	c := p.Connection(ctx)
 
-		if err := c.Find(&r, cr.ID); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	// TODO err no rows
+	if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&cr); err != nil {
+		fmt.Printf("90: %s\n", err.Error())
+		return nil, sqlcon.HandleError(err)
+	}
 
-		if r.WasUsed {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
-		}
+	if err := c.Find(&r, cr.ID); err != nil {
+		fmt.Printf("95: %s\n", err.Error())
+		return nil, sqlcon.HandleError(err)
+	}
 
-		r.WasUsed = true
-		return sqlcon.HandleError(c.Update(&r))
-	})
+	if r.WasUsed {
+		fmt.Println("was used!!!!!!!!!!!!!!!!!")
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
+	}
+
+	r.WasUsed = true
+	err := sqlcon.HandleError(c.Update(&r))
+	if err != nil {
+		fmt.Printf("107: %s\n", err.Error())
+	}
+	return &r, err
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]consent.HandledConsentRequest, error) {
 	rs := make([]consent.HandledConsentRequest, 0)
+	tn := consent.HandledConsentRequest{}.TableName()
 
 	if err := p.Connection(ctx).
 		Where("r.subject = ? AND r.client_id = ? AND r.skip=FALSE", subject, client).
-		Where("h.error='{}' AND h.remember=TRUE").
-		Join("hydra_oauth2_consent_request AS r", "h.challenge = r.challenge").
-		Order("h.requested_at DESC").
+		Where(fmt.Sprintf("%s.error='{}' AND %s.remember=TRUE", tn, tn)).
+		Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+		Order(fmt.Sprintf("%s.requested_at DESC", tn)).
 		Limit(1).
-		All(&pop.Model{
-			Value: &rs,
-			As:    "h",
-		}); err != nil {
+		All(&rs); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 		}
@@ -135,17 +132,15 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]consent.HandledConsentRequest, error) {
 	rs := make([]consent.HandledConsentRequest, 0)
+	tn := consent.HandledConsentRequest{}.TableName()
 
 	if err := p.Connection(ctx).
 		Where("r.subject = ? AND r.skip=FALSE", subject).
-		Where("h.error='{}'").
-		Join("hydra_oauth2_consent_request AS r", "h.challenge = r.challenge").
-		Order("h.requested_at DESC").
+		Where(fmt.Sprintf("%s.error='{}'", tn)).
+		Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+		Order(fmt.Sprintf("%s.requested_at DESC", tn)).
 		Paginate(offset/limit+1, limit).
-		All(&pop.Model{
-			Value: &rs,
-			As:    "h",
-		}); err != nil {
+		All(&rs); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 		}
@@ -173,14 +168,13 @@ func (p *Persister) resolveHandledConsentRequests(requests []consent.HandledCons
 }
 
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
+	tn := consent.HandledConsentRequest{}.TableName()
+
 	n, err := p.Connection(ctx).
 		Where("r.subject = ? AND r.skip=FALSE", subject).
-		Where("h.error='{}'").
-		Join("hydra_oauth2_consent_request as r", "h.challenge = r.challenge").
-		Count(&pop.Model{
-			Value: &consent.HandledConsentRequest{},
-			As:    "h",
-		})
+		Where(fmt.Sprintf("%s.error='{}'", tn)).
+		Join("hydra_oauth2_consent_request as r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+		Count(&consent.HandledConsentRequest{})
 	return n, sqlcon.HandleError(err)
 }
 
@@ -230,9 +224,7 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRe
 func (p *Persister) GetLoginRequest(ctx context.Context, challenge string) (*consent.LoginRequest, error) {
 	var lr consent.LoginRequest
 	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := c.Select("r.*", "COALESCE(hr.was_used, false) as was_handled").
-			LeftJoin("hydra_oauth2_authentication_request_handled as hr", "r.challenge = hr.challenge").
-			Find(&lr, challenge)
+		err := (&lr).FindInDB(c, challenge)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return errors.WithStack(x.ErrNotFound)
@@ -262,7 +254,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 	var d consent.HandledLoginRequest
 	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		var ar consent.LoginRequest
-		if err := c.Where("verifier = ?", verifier).Select("challenge").First(&ar); err != nil {
+		if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&ar); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
@@ -372,7 +364,7 @@ func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (
 			return sqlcon.HandleError(err)
 		}
 
-		r, err := p.GetLogoutRequest(ctx, lr.Challenge)
+		r, err := p.GetLogoutRequest(ctx, lr.ID)
 		if err != nil {
 			return err
 		}
@@ -399,7 +391,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 			return sqlcon.HandleError(err)
 		}
 
-		r, err := p.GetLogoutRequest(ctx, lr.Challenge)
+		r, err := p.GetLogoutRequest(ctx, lr.ID)
 		if err != nil {
 			return err
 		}

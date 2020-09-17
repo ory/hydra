@@ -17,18 +17,16 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/stringsx"
 )
 
-var _ x.FositeStorer = &Persister{}
+var _ oauth2.AssertionJWTReader = &Persister{}
 
 type (
 	tableName  string
 	RequestSQL struct {
-		ID                int            `db:"pk"`
-		Signature         string         `db:"signature"`
+		ID                string         `db:"signature"`
 		Request           string         `db:"request_id"`
 		ConsentChallenge  sql.NullString `db:"challenge_id"`
 		RequestedAt       time.Time      `db:"requested_at"`
@@ -51,7 +49,6 @@ const (
 	sqlTableRefresh        tableName = "refresh"
 	sqlTableCode           tableName = "code"
 	sqlTablePKCE           tableName = "pkce"
-	sqlTableBlacklistedJTI tableName = "jti_blacklist"
 )
 
 func (r RequestSQL) TableName() string {
@@ -141,7 +138,7 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 	return &RequestSQL{
 		Request:           r.GetID(),
 		ConsentChallenge:  challenge,
-		Signature:         p.hashSignature(rawSignature, table),
+		ID:                p.hashSignature(rawSignature, table),
 		RequestedAt:       r.GetRequestedAt(),
 		Client:            r.GetClient().GetID(),
 		Scopes:            strings.Join(r.GetRequestedScopes(), "|"),
@@ -156,17 +153,17 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 	}, nil
 }
 
-func (p *Persister) getClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
+func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
 	jti := oauth2.NewBlacklistedJTI(j, time.Time{})
 	return jti, sqlcon.HandleError(p.Connection(ctx).Find(jti, jti.ID))
 }
 
-func (p *Persister) setClientAssertionJWT(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
+func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
 	return sqlcon.HandleError(p.Connection(ctx).Create(jti))
 }
 
 func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) error {
-	j, err := p.getClientAssertionJWT(ctx, jti)
+	j, err := p.GetClientAssertionJWT(ctx, jti)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		// the jti is not known => valid
 		return nil
@@ -184,11 +181,15 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// delete expired
-		if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < now()", oauth2.BlacklistedJTI{}.TableName())).Exec(); err != nil {
+		now := "now()"
+		if c.Dialect.Name() == "sqlite3" {
+			now = "CURRENT_TIMESTAMP"
+		}
+		if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < %s", oauth2.BlacklistedJTI{}.TableName(), now)).Exec(); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		if err := p.setClientAssertionJWT(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+		if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
 			// found a jti
 			return errors.WithStack(fosite.ErrJTIKnown)
 		} else if err != nil {

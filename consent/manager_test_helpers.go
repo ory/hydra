@@ -107,7 +107,7 @@ func MockLogoutRequest(key string, withClient bool) (c *LogoutRequest) {
 	}
 	return &LogoutRequest{
 		Subject:               "subject" + key,
-		Challenge:             "challenge" + key,
+		ID:                    "challenge" + key,
 		Verifier:              "verifier" + key,
 		SessionID:             "session" + key,
 		RPInitiated:           true,
@@ -827,7 +827,7 @@ func compareLogoutRequest(t *testing.T, a, b *LogoutRequest) {
 		assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
 	}
 
-	assert.EqualValues(t, a.Challenge, b.Challenge)
+	assert.EqualValues(t, a.ID, b.ID)
 	assert.EqualValues(t, a.Subject, b.Subject)
 	assert.EqualValues(t, a.Verifier, b.Verifier)
 	assert.EqualValues(t, a.RequestURL, b.RequestURL)

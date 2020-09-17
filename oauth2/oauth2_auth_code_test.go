@@ -165,11 +165,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					var m sync.Mutex
 					l := logrus.New()
 					l.Level = logrus.DebugLevel
-					var lph, cph func(w http.ResponseWriter, r *http.Request)
-					lp := mockProvider(&lph)
-					defer lp.Close()
-					cp := mockProvider(&cph)
-					defer lp.Close()
+					var loginProviderHandler, consentProviderHandler func(w http.ResponseWriter, r *http.Request)
+					loginProvider := mockProvider(&loginProviderHandler)
+					defer loginProvider.Close()
+					consentProvider := mockProvider(&consentProviderHandler)
+					defer consentProvider.Close()
 
 					fooUserIDToken, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
 						Subject:   "foouser",
@@ -195,8 +195,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					api := httptest.NewServer(apiRouter)
 					defer api.Close()
 
-					viper.Set(configuration.ViperKeyLoginURL, lp.URL)
-					viper.Set(configuration.ViperKeyConsentURL, cp.URL)
+					viper.Set(configuration.ViperKeyLoginURL, loginProvider.URL)
+					viper.Set(configuration.ViperKeyConsentURL, consentProvider.URL)
 					viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
 					viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
 
@@ -213,37 +213,37 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						RedirectURL: client.RedirectURIs[0], Scopes: []string{"hydra", "offline", "openid"},
 					}
 
-					require.NoError(t, reg.OAuth2Storage().(clientCreator).CreateClient(context.TODO(), &client))
+					require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client))
 					apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(api.URL).Host})
 
 					persistentCJ := newCookieJar()
 					var code string
 					for k, tc := range []struct {
-						authURL               string
-						cj                    http.CookieJar
-						d                     string
-						cb                    func(t *testing.T) httprouter.Handle
-						expectOAuthAuthError  bool
-						expectOAuthTokenError bool
-						lph, cph              func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
-						setup                 func()
-						expectRefreshToken    bool
-						expectIDToken         bool
+						authURL                                      string
+						cookieJar                                    http.CookieJar
+						desc                                         string
+						callbackHandler                              func(t *testing.T) httprouter.Handle
+						expectOAuthAuthError                         bool
+						expectOAuthTokenError                        bool
+						loginProviderHandler, consentProviderHandler func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
+						setup                                        func()
+						expectRefreshToken                           bool
+						expectIDToken                                bool
 
 						assertAccessToken, assertIDToken func(*testing.T, string)
 						assertRefreshToken               func(*testing.T, *oauth2.Token)
 					}{
 						{
-							d:       "Checks if request fails when audience doesn't match",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
-							cj:      newCookieJar(),
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Checks if request fails when audience doesn't match",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
+							cookieJar: newCookieJar(),
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) { t.Fatal("This should not have been called") }
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) { t.Fatal("This should not have been called") }
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.Empty(t, code)
@@ -259,10 +259,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:       "Perform OAuth2 flow with openid connect id token and verify the id token",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
-							cj:      newCookieJar(),
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Perform OAuth2 flow with openid connect id token and verify the id token",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
+							cookieJar: newCookieJar(),
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -279,7 +279,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -300,7 +300,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									assert.NotEmpty(t, code, "%s", r.URL.String())
@@ -327,10 +327,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:       "Perform OAuth2 flow with refreshing which fails due to expiry",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
-							cj:      newCookieJar(),
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Perform OAuth2 flow with refreshing which fails due to expiry",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
+							cookieJar: newCookieJar(),
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -344,7 +344,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -364,7 +364,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -382,10 +382,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								require.Error(t, err)
 							},
 						}, {
-							d:       "Checks if request fails when subject is empty",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
-							cj:      newCookieJar(),
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Checks if request fails when subject is empty",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://not-ory-api/")),
+							cookieJar: newCookieJar(),
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									challenge, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -401,10 +401,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) { t.Fatal("This should not have been called") }
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.Empty(t, code)
@@ -420,10 +420,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:       "Perform OAuth2 flow with refreshing which works just fine",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
-							cj:      newCookieJar(),
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Perform OAuth2 flow with refreshing which works just fine",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("nonce", "what-a-cool-nonce")),
+							cookieJar: newCookieJar(),
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -439,7 +439,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -459,7 +459,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -479,10 +479,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:       "Perform OAuth2 flow with audience",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")),
-							cj:      newCookieJar(),
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Perform OAuth2 flow with audience",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state", oauth2.SetAuthURLParam("audience", "https://api.ory.sh/")),
+							cookieJar: newCookieJar(),
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -511,13 +511,15 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
-									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+									challenge := r.URL.Query().Get("consent_challenge")
+									t.Logf("\n\n%s\n\n", r.URL)
+									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(challenge))
 									require.NoError(t, err)
 
 									rr := rrr.Payload
-									assert.True(t, rr.Skip)
+									assert.True(t, rr.Skip, "%+v", rr)
 									assert.EqualValues(t, "user-a", rr.Subject)
 									assert.EqualValues(t, client.GetID(), rr.Client.ClientID)
 									assert.EqualValues(t, client.GrantTypes, rr.Client.GrantTypes)
@@ -545,7 +547,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -597,10 +599,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						{
 							// First we need to create a persistent session in order to check if the other things work
 							// as expected
-							d:       "Creates a persisting session for the next test cases",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=login+consent&max_age=1",
-							cj:      persistentCJ,
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "Creates a persisting session for the next test cases",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=login+consent&max_age=1",
+							cookieJar: persistentCJ,
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -628,7 +630,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -660,7 +662,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -695,17 +697,17 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d: "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=none works",
+							desc: "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=none works",
 							setup: func() {
 								// In order to check if authenticatedAt/requestedAt works, we'll sleep first in order to ensure that authenticatedAt is in the past
 								// if handled correctly.
 								time.Sleep(time.Second + time.Millisecond)
 							},
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
-							cj:      persistentCJ,
-							lph:     acceptLogin(apiClient, "user-a", true, "user-a"),
-							cph:     acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
-							cb: func(t *testing.T) httprouter.Handle {
+							authURL:                oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cookieJar:              persistentCJ,
+							loginProviderHandler:   acceptLogin(apiClient, "user-a", true, "user-a"),
+							consentProviderHandler: acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -755,22 +757,22 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:                     "checks if prompt=none fails when no session is set",
+							desc:                  "checks if prompt=none fails when no session is set",
 							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none",
-							cj:                    newCookieJar(),
+							cookieJar:             newCookieJar(),
 							expectOAuthAuthError:  true,
 							expectOAuthTokenError: false,
 						},
 						{
-							d:                     "checks if consecutive authentications cause any issues (1/3)",
-							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
-							cj:                    persistentCJ,
-							lph:                   acceptLogin(apiClient, "user-a", true, "user-a"),
-							cph:                   acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
-							expectOAuthAuthError:  false,
-							expectOAuthTokenError: false,
-							expectRefreshToken:    true,
-							cb: func(t *testing.T) httprouter.Handle {
+							desc:                   "checks if consecutive authentications cause any issues (1/3)",
+							authURL:                oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cookieJar:              persistentCJ,
+							loginProviderHandler:   acceptLogin(apiClient, "user-a", true, "user-a"),
+							consentProviderHandler: acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							expectOAuthAuthError:   false,
+							expectOAuthTokenError:  false,
+							expectRefreshToken:     true,
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -779,15 +781,15 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:                     "checks if consecutive authentications cause any issues (2/3)",
-							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
-							cj:                    persistentCJ,
-							lph:                   acceptLogin(apiClient, "user-a", true, "user-a"),
-							cph:                   acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
-							expectOAuthAuthError:  false,
-							expectOAuthTokenError: false,
-							expectRefreshToken:    true,
-							cb: func(t *testing.T) httprouter.Handle {
+							desc:                   "checks if consecutive authentications cause any issues (2/3)",
+							authURL:                oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cookieJar:              persistentCJ,
+							loginProviderHandler:   acceptLogin(apiClient, "user-a", true, "user-a"),
+							consentProviderHandler: acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							expectOAuthAuthError:   false,
+							expectOAuthTokenError:  false,
+							expectRefreshToken:     true,
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -796,15 +798,15 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:                     "checks if consecutive authentications cause any issues (3/3)",
-							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
-							cj:                    persistentCJ,
-							lph:                   acceptLogin(apiClient, "user-a", true, "user-a"),
-							cph:                   acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
-							expectOAuthAuthError:  false,
-							expectOAuthTokenError: false,
-							expectRefreshToken:    true,
-							cb: func(t *testing.T) httprouter.Handle {
+							desc:                   "checks if consecutive authentications cause any issues (3/3)",
+							authURL:                oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=60",
+							cookieJar:              persistentCJ,
+							loginProviderHandler:   acceptLogin(apiClient, "user-a", true, "user-a"),
+							consentProviderHandler: acceptConsent(apiClient, []string{"hydra", "offline"}, true, "user-a"),
+							expectOAuthAuthError:   false,
+							expectOAuthTokenError:  false,
+							expectRefreshToken:     true,
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -813,17 +815,17 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:                     "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=none fails when maxAge is reached",
+							desc:                  "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=none fails when maxAge is reached",
 							authURL:               oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=none&max_age=1",
-							cj:                    persistentCJ,
+							cookieJar:             persistentCJ,
 							expectOAuthAuthError:  true,
 							expectOAuthTokenError: false,
 						},
 						{
-							d:       "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=login works",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=login",
-							cj:      persistentCJ,
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "checks if authenticatedAt/requestedAt is properly forwarded across the lifecycle by checking if prompt=login works",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state") + "&prompt=login",
+							cookieJar: persistentCJ,
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -844,7 +846,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -869,7 +871,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -882,10 +884,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							expectRefreshToken:    false,
 						},
 						{
-							d:       "requires re-authentication when id_token_hint is set to a user (\"foouser\") but the session is \"user-a\" and it also fails because the user id from the log in endpoint is not foouser",
-							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&id_token_hint=" + fooUserIDToken,
-							cj:      persistentCJ,
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							desc:      "requires re-authentication when id_token_hint is set to a user (\"foouser\") but the session is \"user-a\" and it also fails because the user id from the log in endpoint is not foouser",
+							authURL:   oauthConfig.AuthCodeURL("some-hardcoded-state") + "&id_token_hint=" + fooUserIDToken,
+							cookieJar: persistentCJ,
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -907,7 +909,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -932,7 +934,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.Empty(t, code)
@@ -968,10 +970,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							},
 						},
 						{
-							d:       "should not cause issues if max_age is very low and consent takes a long time",
+							desc:    "should not cause issues if max_age is very low and consent takes a long time",
 							authURL: oauthConfig.AuthCodeURL("some-hardcoded-state") + "&max_age=1",
-							// cj:      persistentCJ,
-							lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							// cookieJar:      persistentCJ,
+							loginProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 									require.NoError(t, err)
@@ -990,7 +992,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+							consentProviderHandler: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 								return func(w http.ResponseWriter, r *http.Request) {
 									_, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
 									require.NoError(t, err)
@@ -1011,7 +1013,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 									http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
 								}
 							},
-							cb: func(t *testing.T) httprouter.Handle {
+							callbackHandler: func(t *testing.T) httprouter.Handle {
 								return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 									code = r.URL.Query().Get("code")
 									require.NotEmpty(t, code)
@@ -1024,7 +1026,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							expectRefreshToken:    false,
 						},
 					} {
-						t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
+						t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.desc), func(t *testing.T) {
 							m.Lock()
 							defer m.Unlock()
 
@@ -1034,37 +1036,37 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 								tc.setup()
 							}
 
-							if tc.lph != nil {
-								lph = tc.lph(t)
+							if tc.loginProviderHandler != nil {
+								loginProviderHandler = tc.loginProviderHandler(t)
 							} else {
-								lph = noopHandlerDefaultStrategy(t)
+								loginProviderHandler = noopHandlerDefaultStrategy(t)
 							}
 
-							if tc.cph != nil {
-								cph = tc.cph(t)
+							if tc.consentProviderHandler != nil {
+								consentProviderHandler = tc.consentProviderHandler(t)
 							} else {
-								cph = noopHandlerDefaultStrategy(t)
+								consentProviderHandler = noopHandlerDefaultStrategy(t)
 							}
 
-							if tc.cb == nil {
-								tc.cb = noopHandler
+							if tc.callbackHandler == nil {
+								tc.callbackHandler = noopHandler
 							}
 
-							cb := tc.cb(t)
+							cb := tc.callbackHandler(t)
 							callbackHandler = &cb
 
 							req, err := http.NewRequest("GET", tc.authURL, nil)
 							require.NoError(t, err)
 
-							if tc.cj == nil {
-								tc.cj = newCookieJar()
+							if tc.cookieJar == nil {
+								tc.cookieJar = newCookieJar()
 							}
 
-							resp, err := (&http.Client{Jar: tc.cj}).Do(req)
+							resp, err := (&http.Client{Jar: tc.cookieJar}).Do(req)
 							require.NoError(t, err)
 							defer resp.Body.Close()
 
-							t.Logf("Cookies: %+v", tc.cj)
+							t.Logf("Cookies: %+v\nURL: %+v", tc.cookieJar, tc.authURL)
 
 							time.Sleep(time.Millisecond * 5)
 
@@ -1079,7 +1081,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 							}
 							require.NotEmpty(t, code, "body: %s\nreq: %s\nts: %s", body, req.URL.String(), ts.URL)
 
-							token, err := oauthConfig.Exchange(oauth2.NoContext, code)
+							token, err := oauthConfig.Exchange(context.Background(), code)
 
 							if tc.expectOAuthTokenError {
 								require.Error(t, err)

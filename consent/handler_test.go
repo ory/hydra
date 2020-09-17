@@ -106,10 +106,12 @@ func TestGetLogoutRequest(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
+				cl := &client.Client{ID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
-					Client:    &client.Client{ID: "client" + key},
-					Challenge: challenge,
-					WasUsed:   tc.used,
+					Client:  cl,
+					ID:      challenge,
+					WasUsed: tc.used,
 				}))
 			}
 
@@ -145,11 +147,17 @@ func TestGetLoginRequest(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.TODO(), &LoginRequest{
-					Client:     &client.Client{ID: "client" + key},
+				cl := &client.Client{ID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+					Client:     cl,
 					ID:         challenge,
-					WasHandled: tc.handled,
 				}))
+			}
+
+			if tc.handled {
+				_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasUsed: true})
+				require.NoError(t, err)
 			}
 
 			h := NewHandler(reg, conf)
@@ -184,8 +192,10 @@ func TestGetConsentRequest(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.TODO(), &ConsentRequest{
-					Client:     &client.Client{ID: "client" + key},
+				cl := &client.Client{ID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
+					Client:     cl,
 					ID:         challenge,
 					WasHandled: tc.handled,
 				}))

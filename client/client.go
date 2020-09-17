@@ -213,6 +213,14 @@ func (c *Client) BeforeSave(_ *pop.Connection) error {
 		c.Metadata = []byte("{}")
 	}
 
+	if c.Audience == nil {
+		c.Audience = sqlxx.StringSlicePipeDelimiter{}
+	}
+
+	if c.AllowedCORSOrigins == nil {
+		c.AllowedCORSOrigins = sqlxx.StringSlicePipeDelimiter{}
+	}
+
 	if c.CreatedAt.IsZero() {
 		c.CreatedAt = time.Now()
 	}

@@ -162,7 +162,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		SubjectObfuscated: fmt.Sprintf("subject_obfuscated-%04d", i),
 	}
 	lor := &consent.LogoutRequest{
-		Challenge:             fmt.Sprintf("challenge-%04d", i),
+		ID:                    fmt.Sprintf("challenge-%04d", i),
 		Subject:               fmt.Sprintf("subject-%04d", i),
 		SessionID:             fmt.Sprintf("session_id-%04d", i),
 		RequestURL:            fmt.Sprintf("http://request/%04d", i),

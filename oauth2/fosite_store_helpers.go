@@ -70,12 +70,12 @@ func NewBlacklistedJTI(jti string, exp time.Time) *BlacklistedJTI {
 	}
 }
 
-type assertionJWTReader interface {
+type AssertionJWTReader interface {
 	x.FositeStorer
 
-	getClientAssertionJWT(ctx context.Context, jti string) (*BlacklistedJTI, error)
+	GetClientAssertionJWT(ctx context.Context, jti string) (*BlacklistedJTI, error)
 
-	setClientAssertionJWT(context.Context, *BlacklistedJTI) error
+	SetClientAssertionJWTRaw(context.Context, *BlacklistedJTI) error
 }
 
 var defaultRequest = fosite.Request{
@@ -570,51 +570,51 @@ func testFositeSqlStoreTransactionRollbackOpenIdConnectSession(m InternalRegistr
 func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 	return func(t *testing.T) {
 		t.Run("case=basic setting works", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
 			jti := NewBlacklistedJTI("basic jti", time.Now().Add(time.Minute))
 
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
 
-			cmp, err := store.getClientAssertionJWT(context.Background(), jti.JTI)
+			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
 			require.NoError(t, err)
 			assert.Equal(t, jti, cmp)
 		})
 
 		t.Run("case=errors when the JTI is blacklisted", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
 			jti := NewBlacklistedJTI("already set jti", time.Now().Add(time.Minute))
-			require.NoError(t, store.setClientAssertionJWT(context.Background(), jti))
+			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			assert.True(t, errors.Is(store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown))
 		})
 
 		t.Run("case=deletes expired JTIs", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
 			expiredJTI := NewBlacklistedJTI("expired jti", time.Now().Add(-time.Minute))
-			require.NoError(t, store.setClientAssertionJWT(context.Background(), expiredJTI))
+			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), expiredJTI))
 			newJTI := NewBlacklistedJTI("some new jti", time.Now().Add(time.Minute))
 
 			require.NoError(t, store.SetClientAssertionJWT(context.Background(), newJTI.JTI, newJTI.Expiry))
 
-			_, err := store.getClientAssertionJWT(context.Background(), expiredJTI.JTI)
+			_, err := store.GetClientAssertionJWT(context.Background(), expiredJTI.JTI)
 			assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
-			cmp, err := store.getClientAssertionJWT(context.Background(), newJTI.JTI)
+			cmp, err := store.GetClientAssertionJWT(context.Background(), newJTI.JTI)
 			require.NoError(t, err)
 			assert.Equal(t, newJTI, cmp)
 		})
 
 		t.Run("case=inserts same JTI if expired", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
 			jti := NewBlacklistedJTI("going to be reused jti", time.Now().Add(-time.Minute))
-			require.NoError(t, store.setClientAssertionJWT(context.Background(), jti))
+			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			jti.Expiry = jti.Expiry.Add(2 * time.Minute)
 			assert.NoError(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry))
-			cmp, err := store.getClientAssertionJWT(context.Background(), jti.JTI)
+			cmp, err := store.GetClientAssertionJWT(context.Background(), jti.JTI)
 			assert.NoError(t, err)
 			assert.Equal(t, jti, cmp)
 		})
@@ -624,28 +624,28 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 func testFositeStoreClientAssertionJWTValid(m InternalRegistry) func(*testing.T) {
 	return func(t *testing.T) {
 		t.Run("case=returns valid on unknown JTI", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
 
 			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), "unknown jti"))
 		})
 
 		t.Run("case=returns invalid on known JTI", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
 			jti := NewBlacklistedJTI("known jti", time.Now().Add(time.Minute))
 
-			require.NoError(t, store.setClientAssertionJWT(context.Background(), jti))
+			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			assert.True(t, errors.Is(store.ClientAssertionJWTValid(context.Background(), jti.JTI), fosite.ErrJTIKnown))
 		})
 
 		t.Run("case=returns valid on expired JTI", func(t *testing.T) {
-			store, ok := m.OAuth2Storage().(assertionJWTReader)
+			store, ok := m.OAuth2Storage().(AssertionJWTReader)
 			require.True(t, ok)
-			jti := NewBlacklistedJTI("expired jti", time.Now().Add(-time.Minute))
+			jti := NewBlacklistedJTI("expired jti 2", time.Now().Add(-time.Minute))
 
-			require.NoError(t, store.setClientAssertionJWT(context.Background(), jti))
+			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), jti.JTI))
 		})

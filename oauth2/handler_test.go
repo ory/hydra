@@ -121,7 +121,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	defer ts.Close()
 
 	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-	_, err := c.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClient("foobar"))
+	_, err := c.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID("foobar"))
 	require.NoError(t, err)
 
 	ds := new(oauth2.Session)

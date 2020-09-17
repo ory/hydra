@@ -82,7 +82,7 @@ func (h *TokenHandler) DeleteToken(cmd *cobra.Command, args []string) {
 Please provide a Client ID using flags --client-id, or environment variables OAUTH2_CLIENT_ID
 `, cmd.UsageString())
 	}
-	_, err := handler.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClient(clientID))
+	_, err := handler.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID(clientID))
 	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Printf("Successfully deleted access tokens for client %s\n", clientID)
 }

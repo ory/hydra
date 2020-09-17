@@ -743,7 +743,7 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //       401: genericError
 //       500: genericError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	client := r.URL.Query().Get("client")
+	client := r.URL.Query().Get("client_id")
 
 	if client == "" {
 		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "client" is not defined but it should have been.`)))

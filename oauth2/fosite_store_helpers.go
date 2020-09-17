@@ -171,6 +171,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testHelperFlushTokens/db=%s", k), testHelperFlushTokens(store, time.Hour))
 	t.Run(fmt.Sprintf("case=testFositeStoreSetClientAssertionJWT/db=%s", k), testFositeStoreSetClientAssertionJWT(store))
 	t.Run(fmt.Sprintf("case=testFositeStoreClientAssertionJWTValid/db=%s", k), testFositeStoreClientAssertionJWTValid(store))
+	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
 }
 
 func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t *testing.T) {
@@ -361,6 +362,25 @@ func testHelperCreateGetDeleteAccessTokenSession(x InternalRegistry) func(t *tes
 		AssertObjectKeysEqual(t, &defaultRequest, res, "RequestedScope", "GrantedScope", "Form", "Session")
 
 		err = m.DeleteAccessTokenSession(ctx, "4321")
+		require.NoError(t, err)
+
+		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
+		assert.Error(t, err)
+	}
+}
+
+func testHelperDeleteAccessTokens(x InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		m := x.OAuth2Storage()
+		ctx := context.Background()
+
+		err := m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
+		require.NoError(t, err)
+
+		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
+		require.NoError(t, err)
+
+		err = m.DeleteAccessTokens(ctx, defaultRequest.Client.GetID())
 		require.NoError(t, err)
 
 		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})

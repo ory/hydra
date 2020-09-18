@@ -551,10 +551,12 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 
 	if err != nil {
-		switch err.Error() {
-		case fosite.ErrServerError.Error():
-		case fosite.ErrTemporarilyUnavailable.Error():
-		case fosite.ErrMisconfiguration.Error():
+		switch errors.Cause(err) {
+		case fosite.ErrServerError:
+			fallthrough
+		case fosite.ErrTemporarilyUnavailable:
+			fallthrough
+		case fosite.ErrMisconfiguration:
 			x.LogError(r, err, h.r.Logger())
 		default:
 			x.LogAudit(r, err, h.r.Logger())
@@ -596,15 +598,16 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 
 	if err != nil {
-		switch err.Error() {
-		case fosite.ErrServerError.Error():
-		case fosite.ErrTemporarilyUnavailable.Error():
-		case fosite.ErrMisconfiguration.Error():
+		switch errors.Cause(err) {
+		case fosite.ErrServerError:
+			fallthrough
+		case fosite.ErrTemporarilyUnavailable:
+			fallthrough
+		case fosite.ErrMisconfiguration:
 			x.LogError(r, err, h.r.Logger())
 		default:
 			x.LogAudit(r, err, h.r.Logger())
 		}
-
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}

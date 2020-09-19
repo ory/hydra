@@ -81,6 +81,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.GET(AuthPath, h.AuthHandler)
 	public.POST(AuthPath, h.AuthHandler)
 	public.GET(LogoutPath, h.LogoutHandler)
+	public.POST(LogoutPath, h.LogoutHandler)
 
 	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLoginURL))
 	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyConsentURL))

@@ -60,9 +60,10 @@ const (
 	JWKPath       = "/.well-known/jwks.json"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
-	IntrospectPath = "/oauth2/introspect"
-	RevocationPath = "/oauth2/revoke"
-	FlushPath      = "/oauth2/flush"
+	IntrospectPath   = "/oauth2/introspect"
+	RevocationPath   = "/oauth2/revoke"
+	FlushPath        = "/oauth2/flush"
+	DeleteTokensPath = "/oauth2/tokens"
 )
 
 type Handler struct {
@@ -103,7 +104,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)
-	admin.DELETE(TokenPath, h.DeleteHandler)
+	admin.DELETE(DeleteTokensPath, h.DeleteHandler)
 }
 
 // swagger:route GET /oauth2/sessions/logout public disconnectUser
@@ -727,7 +728,7 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
 }
 
-// swagger:route DELETE /oauth2/token admin deleteOAuth2Token
+// swagger:route DELETE /oauth2/tokens admin deleteOAuth2Token
 //
 // Delete OAuth2 Access Tokens from a client
 //

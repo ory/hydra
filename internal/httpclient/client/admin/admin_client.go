@@ -432,7 +432,7 @@ func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAut
 	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "deleteOAuth2Token",
 		Method:             "DELETE",
-		PathPattern:        "/oauth2/token",
+		PathPattern:        "/oauth2/tokens",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},

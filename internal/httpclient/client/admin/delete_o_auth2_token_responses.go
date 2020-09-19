@@ -43,7 +43,7 @@ func (o *DeleteOAuth2TokenReader) ReadResponse(response runtime.ClientResponse, 
 		return nil, result
 
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -61,7 +61,7 @@ type DeleteOAuth2TokenNoContent struct {
 }
 
 func (o *DeleteOAuth2TokenNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/token][%d] deleteOAuth2TokenNoContent ", 204)
+	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenNoContent ", 204)
 }
 
 func (o *DeleteOAuth2TokenNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -83,7 +83,7 @@ type DeleteOAuth2TokenUnauthorized struct {
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/token][%d] deleteOAuth2TokenUnauthorized  %+v", 401, o.Payload)
+	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
@@ -116,7 +116,7 @@ type DeleteOAuth2TokenInternalServerError struct {
 }
 
 func (o *DeleteOAuth2TokenInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/token][%d] deleteOAuth2TokenInternalServerError  %+v", 500, o.Payload)
+	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
 
 func (o *DeleteOAuth2TokenInternalServerError) GetPayload() *models.GenericError {

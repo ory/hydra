@@ -63,7 +63,7 @@ const (
 	IntrospectPath   = "/oauth2/introspect"
 	RevocationPath   = "/oauth2/revoke"
 	FlushPath        = "/oauth2/flush"
-	DeleteTokensPath = "/oauth2/tokens"
+	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 )
 
 type Handler struct {

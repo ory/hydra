@@ -127,6 +127,7 @@ New feature or request.
 - [ ] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 - [ ] Update clients from cli ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 - [ ] Expired token is considered an error ([hydra#2031](https://github.com/ory/hydra/issues/2031))
+- [ ] Find out if a login/consent challenge is still valid ([hydra#2057](https://github.com/ory/hydra/issues/2057))
 - [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota ([hydra#2033](https://github.com/ory/hydra/issues/2033))

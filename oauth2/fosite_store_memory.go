@@ -410,3 +410,18 @@ func (s *FositeMemoryStore) DeletePKCERequestSession(_ context.Context, code str
 	s.Unlock()
 	return nil
 }
+
+func (s *FositeMemoryStore) DeleteAccessTokens(ctx context.Context, clientID string) error {
+	s.Lock()
+	defer s.Unlock()
+
+	for sig, token := range s.AccessTokens {
+		if token.GetClient().GetID() == clientID {
+			if err := s.deleteAccessTokenSession(ctx, sig); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}

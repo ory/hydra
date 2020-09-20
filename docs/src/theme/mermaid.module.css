@@ -6,6 +6,10 @@
   cursor: pointer;
 }
 
+.graph {
+  margin-bottom: var(--ifm-leading)
+}
+
 .graph.overlay.visible {
   display: block;
 }

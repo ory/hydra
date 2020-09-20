@@ -2,6 +2,10 @@
   "name": "docusaurus-template",
   "version": "0.0.0",
   "private": true,
+  "consts": {
+    "prettierTarget": "{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}",
+    "prettierArgs": "--no-semi --single-quote --trailing-comma none"
+  },
   "scripts": {
     "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",
     "docusaurus": "docusaurus",
@@ -10,7 +14,8 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "format": "prettier --write '{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}' --no-semi --single-quote --trailing-comma none || true"
+    "format": "prettier --write ${npm_package_consts_prettierTarget} ${npm_package_consts_prettierArgs} || true",
+    "format:check": "prettier --check ${npm_package_consts_prettierTarget} ${npm_package_consts_prettierArgs}"
   },
   "dependencies": {
     "@docusaurus/core": "2.0.0-alpha.61",
@@ -21,10 +26,12 @@
     "@docusaurus/theme-classic": "2.0.0-alpha.61",
     "@docusaurus/theme-search-algolia": "2.0.0-alpha.61",
     "classnames": "2.2.6",
+    "file-loader": "^6.1.0",
     "mermaid": "8.6.4",
-    "node-fetch": "2.6.0",
+    "node-fetch": "^2.6.1",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "url-loader": "^4.1.0"
   },
   "browserslist": {
     "production": [
@@ -43,8 +50,9 @@
     "json-schema-ref-parser": "8.0.0",
     "prettier": "2.0.2",
     "ramda": "0.27.0",
+    "raw-loader": "^4.0.1",
     "remark-admonitions": "1.2.1",
-    "yaml": "1.8.3",
-    "widdershins": "3.6.7"
+    "widdershins": "4.0.1",
+    "yaml": "1.8.3"
   }
 }

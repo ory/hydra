@@ -428,7 +428,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	tt, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
+		x.LogAudit(r, err, h.r.Logger())
 		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
@@ -552,8 +552,18 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
+
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
+		switch errors.Cause(err) {
+		case fosite.ErrServerError:
+			fallthrough
+		case fosite.ErrTemporarilyUnavailable:
+			fallthrough
+		case fosite.ErrMisconfiguration:
+			x.LogError(r, err, h.r.Logger())
+		default:
+			x.LogAudit(r, err, h.r.Logger())
+		}
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -589,8 +599,18 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
+
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
+		switch errors.Cause(err) {
+		case fosite.ErrServerError:
+			fallthrough
+		case fosite.ErrTemporarilyUnavailable:
+			fallthrough
+		case fosite.ErrMisconfiguration:
+			x.LogError(r, err, h.r.Logger())
+		default:
+			x.LogAudit(r, err, h.r.Logger())
+		}
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}

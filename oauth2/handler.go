@@ -60,9 +60,10 @@ const (
 	JWKPath       = "/.well-known/jwks.json"
 
 	// IntrospectPath points to the OAuth2 introspection endpoint.
-	IntrospectPath = "/oauth2/introspect"
-	RevocationPath = "/oauth2/revoke"
-	FlushPath      = "/oauth2/flush"
+	IntrospectPath   = "/oauth2/introspect"
+	RevocationPath   = "/oauth2/revoke"
+	FlushPath        = "/oauth2/flush"
+	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 )
 
 type Handler struct {
@@ -81,6 +82,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.GET(AuthPath, h.AuthHandler)
 	public.POST(AuthPath, h.AuthHandler)
 	public.GET(LogoutPath, h.LogoutHandler)
+	public.POST(LogoutPath, h.LogoutHandler)
 
 	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLoginURL))
 	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyConsentURL))
@@ -103,6 +105,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
 	admin.POST(FlushPath, h.FlushHandler)
+	admin.DELETE(DeleteTokensPath, h.DeleteHandler)
 }
 
 // swagger:route GET /oauth2/sessions/logout public disconnectUser
@@ -425,7 +428,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	tt, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
+		x.LogAudit(r, err, h.r.Logger())
 		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
@@ -549,8 +552,18 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
+
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
+		switch errors.Cause(err) {
+		case fosite.ErrServerError:
+			fallthrough
+		case fosite.ErrTemporarilyUnavailable:
+			fallthrough
+		case fosite.ErrMisconfiguration:
+			x.LogError(r, err, h.r.Logger())
+		default:
+			x.LogAudit(r, err, h.r.Logger())
+		}
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -586,8 +599,18 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
+
 	if err != nil {
-		x.LogError(r, err, h.r.Logger())
+		switch errors.Cause(err) {
+		case fosite.ErrServerError:
+			fallthrough
+		case fosite.ErrTemporarilyUnavailable:
+			fallthrough
+		case fosite.ErrMisconfiguration:
+			x.LogError(r, err, h.r.Logger())
+		default:
+			x.LogAudit(r, err, h.r.Logger())
+		}
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -726,6 +749,37 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 	}
 
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
+}
+
+// swagger:route DELETE /oauth2/tokens admin deleteOAuth2Token
+//
+// Delete OAuth2 Access Tokens from a client
+//
+// This endpoint deletes OAuth2 access tokens issued for a client from the database
+//
+//     Consumes:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       401: genericError
+//       500: genericError
+func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	client := r.URL.Query().Get("client_id")
+
+	if client == "" {
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "client" is not defined but it should have been.`)))
+		return
+	}
+
+	if err := h.r.OAuth2Storage().DeleteAccessTokens(r.Context(), client); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // This function will not be called, OPTIONS request will be handled by cors

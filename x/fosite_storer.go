@@ -41,4 +41,6 @@ type FositeStorer interface {
 	RevokeAccessToken(ctx context.Context, requestID string) error
 
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
+
+	DeleteAccessTokens(ctx context.Context, clientID string) error
 }

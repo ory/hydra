@@ -53,6 +53,7 @@ import (
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
+	"github.com/ory/herodot"
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
@@ -172,7 +173,27 @@ func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.Claims) string {
 	return r
 }
 
-func TestStrategyLogout(t *testing.T) {
+func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWriter, r *http.Request) {
+	res, err := strategy.HandleOpenIDConnectLogout(w, r)
+	if errors.Cause(err) == ErrAbortOAuth2Request {
+		// Do nothing
+		return
+	} else if err != nil {
+		writer.WriteError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r,
+		urlx.CopyWithQuery(
+			urlx.ParseOrPanic(res.RedirectTo),
+			url.Values{"front_channel_logout_urls": {fmt.Sprintf("%s", res.FrontChannelLogoutURLs)}},
+		).String(),
+		http.StatusFound,
+	)
+
+}
+
+func runLogout(t *testing.T, method string) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
 
@@ -192,31 +213,21 @@ func TestStrategyLogout(t *testing.T) {
 	defer logoutApi.Close()
 
 	defaultRedirServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(fmt.Sprintf("redirected to default server%s%s", r.URL.Query().Get("state"), strings.TrimLeft(r.URL.Path, "/"))))
+		_ = r.ParseForm()
+		state := r.Form.Get("state")
+		_, _ = w.Write([]byte(fmt.Sprintf("redirected to default server%s%s", string(state), strings.TrimLeft(r.URL.Path, "/"))))
 	}))
 	defer defaultRedirServer.Close()
 
 	strategy := reg.ConsentStrategy()
 	logoutRouter := x.NewRouterPublic()
-
 	logoutRouter.GET("/oauth2/sessions/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		res, err := strategy.HandleOpenIDConnectLogout(w, r)
-		if errors.Cause(err) == ErrAbortOAuth2Request {
-			// Do nothing
-			return
-		} else if err != nil {
-			writer.WriteError(w, r, err)
-			return
-		}
-
-		http.Redirect(w, r,
-			urlx.CopyWithQuery(
-				urlx.ParseOrPanic(res.RedirectTo),
-				url.Values{"front_channel_logout_urls": {fmt.Sprintf("%s", res.FrontChannelLogoutURLs)}},
-			).String(),
-			http.StatusFound,
-		)
+		logoutHandler(strategy, writer, w, r)
 	})
+	logoutRouter.POST("/oauth2/sessions/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		logoutHandler(strategy, writer, w, r)
+	})
+
 	logoutServer := httptest.NewServer(logoutRouter)
 	defer logoutServer.Close()
 
@@ -491,9 +502,20 @@ func TestStrategyLogout(t *testing.T) {
 			cl := &http.Client{
 				Jar: tc.jar,
 			}
-			resp, err := cl.Get(
-				logoutServer.URL + "/oauth2/sessions/logout?" + tc.params.Encode(),
-			)
+
+			var err error
+			var resp *http.Response
+
+			if method == http.MethodGet {
+				resp, err = cl.Get(
+					logoutServer.URL + "/oauth2/sessions/logout?" + tc.params.Encode(),
+				)
+			} else if method == http.MethodPost {
+				resp, err = cl.PostForm(
+					logoutServer.URL+"/oauth2/sessions/logout",
+					tc.params,
+				)
+			}
 			require.NoError(t, err)
 			out, err := ioutil.ReadAll(resp.Body)
 			require.NoError(t, err)
@@ -509,6 +531,14 @@ func TestStrategyLogout(t *testing.T) {
 			assert.EqualValues(t, tc.expectBody, strings.Trim(string(out), "\n"), "%s\n%s", resp.Request.URL.String(), out)
 		})
 	}
+}
+
+func TestStrategyLogout(t *testing.T) {
+	runLogout(t, http.MethodGet)
+}
+
+func TestStrategyLogoutPost(t *testing.T) {
+	runLogout(t, http.MethodPost)
 }
 
 func TestStrategyLoginConsent(t *testing.T) {

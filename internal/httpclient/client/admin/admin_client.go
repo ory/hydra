@@ -43,6 +43,8 @@ type ClientService interface {
 
 	DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOAuth2ClientNoContent, error)
 
+	DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAuth2TokenNoContent, error)
+
 	FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams) (*FlushInactiveOAuth2TokensNoContent, error)
 
 	GetConsentRequest(params *GetConsentRequestParams) (*GetConsentRequestOK, error)
@@ -413,6 +415,42 @@ func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOA
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  DeleteOAuth2Token deletes o auth2 access tokens from a client
+
+  This endpoint deletes OAuth2 access tokens issued for a client from the database
+*/
+func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAuth2TokenNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteOAuth2TokenParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "deleteOAuth2Token",
+		Method:             "DELETE",
+		PathPattern:        "/oauth2/tokens",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DeleteOAuth2TokenReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteOAuth2TokenNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

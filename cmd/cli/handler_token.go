@@ -72,3 +72,17 @@ func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
 	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Println("Successfully flushed inactive access tokens")
 }
+
+func (h *TokenHandler) DeleteToken(cmd *cobra.Command, args []string) {
+	handler := configureClient(cmd)
+	clientID := flagx.MustGetString(cmd, "client-id")
+	if clientID == "" {
+		cmdx.Fatalf(`%s
+
+Please provide a Client ID using flags --client-id, or environment variables OAUTH2_CLIENT_ID
+`, cmd.UsageString())
+	}
+	_, err := handler.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID(clientID))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	fmt.Printf("Successfully deleted access tokens for client %s\n", clientID)
+}

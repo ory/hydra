@@ -145,6 +145,13 @@ type WellKnown struct {
 	EndSessionEndpoint string `json:"end_session_endpoint"`
 }
 
+// swagger:parameters deleteOAuth2Token
+type swaggerDeleteOAuth2Token struct {
+	//required: true
+	// in: query
+	ClientID string `json:"client_id"`
+}
+
 // swagger:model flushInactiveOAuth2TokensRequest
 type FlushInactiveOAuth2TokensRequest struct {
 	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history

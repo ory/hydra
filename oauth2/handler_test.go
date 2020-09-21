@@ -91,6 +91,45 @@ var flushRequests = []*fosite.Request{
 	},
 }
 
+func TestHandlerDeleteHandler(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(conf)
+
+	cm := reg.ClientManager()
+	store := reg.OAuth2Storage()
+
+	h := oauth2.NewHandler(reg, conf)
+
+	deleteRequest := &fosite.Request{
+		ID:             "del-1",
+		RequestedAt:    time.Now().Round(time.Second),
+		Client:         &client.Client{ID: "foobar"},
+		RequestedScope: fosite.Arguments{"fa", "ba"},
+		GrantedScope:   fosite.Arguments{"fa", "ba"},
+		Form:           url.Values{"foo": []string{"bar", "baz"}},
+		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+	}
+	require.NoError(t, store.CreateAccessTokenSession(nil, deleteRequest.ID, deleteRequest))
+	_ = cm.CreateClient(nil, deleteRequest.Client.(*client.Client))
+
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+		return h
+	})
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+
+	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
+	_, err := c.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID("foobar"))
+	require.NoError(t, err)
+
+	ds := new(oauth2.Session)
+	ctx := context.Background()
+	_, err = store.GetAccessTokenSession(ctx, "del-1", ds)
+	require.Error(t, err, "not_found")
+}
+
 func TestHandlerFlushHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")

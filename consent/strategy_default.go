@@ -747,10 +747,20 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	// logout flow.
 	redir := s.c.LogoutRedirectURL().String()
 
-	// The hint must be set if it's an RP-initiated logout flow.
-	hint := r.URL.Query().Get("id_token_hint")
-	state := r.URL.Query().Get("state")
-	requestedRedir := r.URL.Query().Get("post_logout_redirect_uri")
+	if err := r.ParseForm(); err != nil {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.
+			WithHint(
+				fmt.Sprintf(
+					`Logout failed because the "%s" request could not be parsed`,
+					r.Method,
+				),
+			),
+		)
+	}
+
+	hint := r.Form.Get("id_token_hint")
+	state := r.Form.Get("state")
+	requestedRedir := r.Form.Get("post_logout_redirect_uri")
 
 	if len(hint) == 0 {
 		// hint is not set, so this is an OP initiated logout
@@ -885,7 +895,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		}
 
 		redir = urlx.SetQuery(f, url.Values{
-			"state": {r.URL.Query().Get("state")},
+			"state": {state},
 		}).String()
 	}
 

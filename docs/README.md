@@ -8,7 +8,7 @@ To change the documentation locally, you need NodeJS installed. Next, install
 the dependencies:
 
 ```
-$ npm install
+$ npm
 ```
 
 ### Develop

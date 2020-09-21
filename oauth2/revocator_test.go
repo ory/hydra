@@ -23,6 +23,8 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/hydra/persistence/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -67,6 +69,12 @@ func createAccessTokenSessionPairwise(subject, client string, token string, expi
 	}
 }
 
+func countAccessTokens(t *testing.T, c *pop.Connection) int {
+	n, err := c.Count(&sql.OAuth2RequestSQL{Table: "access"})
+	require.NoError(t, err)
+	return n
+}
+
 func TestRevoke(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
@@ -90,7 +98,7 @@ func TestRevoke(t *testing.T) {
 	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 	createAccessTokenSession("siri", "encoded:client", tokens[3][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 
-	require.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
+	require.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 4)
 
 	client := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
@@ -101,20 +109,20 @@ func TestRevoke(t *testing.T) {
 		{
 			token: "invalid",
 			assert: func(t *testing.T) {
-				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
+				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 4)
 			},
 		},
 		{
 			token: tokens[3][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 4)
+				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 4)
 			},
 		},
 		{
 			token: tokens[0][1],
 			assert: func(t *testing.T) {
 				t.Logf("Tried to delete: %s %s", tokens[0][0], tokens[0][1])
-				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 3)
+				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 3)
 			},
 		},
 		{
@@ -123,13 +131,13 @@ func TestRevoke(t *testing.T) {
 		{
 			token: tokens[2][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 2)
+				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 2)
 			},
 		},
 		{
 			token: tokens[1][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, reg.OAuth2Storage().(*oauth2.FositeMemoryStore).AccessTokens, 1)
+				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 1)
 			},
 		},
 	} {

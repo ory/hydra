@@ -12,6 +12,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlxx"
+	sqlPersister "github.com/ory/hydra/persistence/sql"
 )
 
 func expectedClient(i int) *client.Client {
@@ -87,7 +88,7 @@ func expectedClient(i int) *client.Client {
 
 func expectedJWK(i int) *jwk.SQLData {
 	return &jwk.SQLData{
-		PK:      i,
+		ID:      i,
 		Set:     fmt.Sprintf("sid-%04d", i),
 		KID:     fmt.Sprintf("kid-%04d", i),
 		Version: i,
@@ -211,9 +212,9 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 	return cr, lr, ls, hcr, hlr, fols, lor
 }
 
-func expectedOauth2(i int) (*oauth2.SQLData, *oauth2.BlacklistedJTI) {
-	d := &oauth2.SQLData{
-		Signature: fmt.Sprintf("sig-%04d", i),
+func expectedOauth2(i int) (*sqlPersister.OAuth2RequestSQL, *oauth2.BlacklistedJTI) {
+	d := &sqlPersister.OAuth2RequestSQL{
+		ID: fmt.Sprintf("sig-%04d", i),
 		Request:   fmt.Sprintf("req-%04d", i),
 		ConsentChallenge: sql.NullString{
 			Valid: true,

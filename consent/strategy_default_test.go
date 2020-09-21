@@ -481,10 +481,11 @@ func TestStrategyLogout(t *testing.T) {
 				c.LoginSessionID = sqlxx.NullString(tc.sessionID)
 				c.Client.BackChannelLogoutURI = servers[k].URL
 				c.Subject = tc.subject
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c.Client))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{ID: c.LoginChallenge.String(), Client: c.Client, Verifier: c.ID }))
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), c))
 				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.ID, hc)
 				require.NoError(t, err)
-				require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c.Client))
 			}
 
 			cl := &http.Client{
@@ -547,6 +548,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 	persistentCJ3 := newCookieJar(t)
 	persistentCJ4 := newCookieJar(t)
 	nonexistentCJ := newAuthCookieJar(t, reg, ap.URL, "i-do-not-exist")
+
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ID: "client-id"}))
 
 	for k, tc := range []struct {
 		setup                 func()

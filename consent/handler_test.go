@@ -197,8 +197,15 @@ func TestGetConsentRequest(t *testing.T) {
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
 					Client:     cl,
 					ID:         challenge,
-					WasHandled: tc.handled,
 				}))
+
+				if tc.handled {
+					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
+						ID: challenge,
+						WasUsed: true,
+					})
+					require.NoError(t, err)
+				}
 			}
 
 			h := NewHandler(reg, conf)

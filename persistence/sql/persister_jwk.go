@@ -3,8 +3,6 @@ package sql
 import (
 	"context"
 	"encoding/json"
-	"time"
-
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
@@ -15,21 +13,6 @@ import (
 )
 
 var _ jwk.Manager = &Persister{}
-
-type (
-	jwkSQL struct {
-		ID        int       `db:"pk"`
-		Set       string    `db:"sid"`
-		KID       string    `db:"kid"`
-		Version   int       `db:"version"`
-		CreatedAt time.Time `db:"created_at"`
-		Key       string    `db:"keydata"`
-	}
-)
-
-func (d jwkSQL) TableName() string {
-	return "hydra_jwk"
-}
 
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
@@ -42,7 +25,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 		return errors.WithStack(err)
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Create(&jwkSQL{
+	return sqlcon.HandleError(p.Connection(ctx).Create(&jwk.SQLData{
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,
@@ -63,7 +46,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 				return err
 			}
 
-			if err := c.Create(&jwkSQL{
+			if err := c.Create(&jwk.SQLData{
 				Set:     set,
 				KID:     key.KeyID,
 				Version: 0,
@@ -77,7 +60,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 }
 
 func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
-	var j jwkSQL
+	var j jwk.SQLData
 	if err := p.Connection(ctx).
 		Where("sid = ? AND kid = ?", set, kid).
 		Order("created_at DESC").
@@ -101,7 +84,7 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 }
 
 func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
-	var js []jwkSQL
+	var js []jwk.SQLData
 	if err := p.Connection(ctx).
 		Where("sid = ?", set).
 		Order("created_at DESC").

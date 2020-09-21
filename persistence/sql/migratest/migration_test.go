@@ -3,6 +3,7 @@ package migratest
 import (
 	"context"
 	"fmt"
+	"github.com/ory/hydra/persistence/sql"
 	"testing"
 
 	"github.com/ory/x/logrusx"
@@ -93,7 +94,7 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=jwk migration %d", i), func(t *testing.T) {
 					expected := expectedJWK(i)
 					actual := &jwk.SQLData{}
-					require.NoError(t, c.Where("pk = ?", expected.PK).First(actual))
+					require.NoError(t, c.Where("pk = ?", expected.ID).First(actual))
 					assertEqualJWKs(t, expected, actual)
 				})
 			}
@@ -152,9 +153,9 @@ func TestMigrations(t *testing.T) {
 					tables = append(tables, "hydra_oauth2_pkce")
 				}
 				ed, ebjti := expectedOauth2(i)
-				ad := &oauth2.SQLData{}
+				ad := &sql.OAuth2RequestSQL{}
 				for _, table := range tables {
-					require.NoError(t, dbx.Get(ad, dbx.Rebind(fmt.Sprintf("select * from %s where signature = ?", table)), ed.Signature), "table: %s\n%+v", table, ed)
+					require.NoError(t, dbx.Get(ad, dbx.Rebind(fmt.Sprintf("select * from %s where signature = ?", table)), ed.ID), "table: %s\n%+v", table, ed)
 					assertEqualOauth2Data(t, ed, ad)
 				}
 

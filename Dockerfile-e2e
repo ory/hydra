@@ -12,7 +12,7 @@ ENV GO111MODULE=on
 ADD . .
 
 RUN go install .
-RUN go build -buildmode=plugin -o /memtest.so ./test/e2e/plugin/memtest.go
+RUN go build -buildmode=plugin -tags sqlite -o /memtest.so ./test/e2e/plugin/memtest.go
 
 ENTRYPOINT ["hydra"]
 

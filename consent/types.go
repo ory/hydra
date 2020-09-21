@@ -25,6 +25,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/x/sqlcon"
 	"net/http"
 	"time"
 
@@ -139,7 +140,7 @@ func (e *RequestDeniedError) Scan(value interface{}) error {
 }
 
 func (e *RequestDeniedError) Value() (driver.Value, error) {
-	if e == nil {
+	if !e.IsError() {
 		return "{}", nil
 	}
 
@@ -206,7 +207,7 @@ func (r *HandledConsentRequest) BeforeSave(_ *pop.Connection) error {
 
 func (r *HandledConsentRequest) AfterSave(c *pop.Connection) error {
 	r.ConsentRequest = &ConsentRequest{}
-	if err := c.Select("*").Where(fmt.Sprintf("%s = ?", (&pop.Model{Value: r.ConsentRequest}).IDField()), r.ID).First(r.ConsentRequest); err != nil {
+	if err := r.ConsentRequest.FindInDB(c, r.ID); err != nil {
 		return errors.WithStack(err)
 	}
 
@@ -218,6 +219,10 @@ func (r *HandledConsentRequest) AfterSave(c *pop.Connection) error {
 	}
 	r.Session = &ConsentRequestSessionData{AccessToken: r.SessionAccessToken, IDToken: r.SessionIDToken}
 	return nil
+}
+
+func (r *HandledConsentRequest) AfterFind(c *pop.Connection) error {
+	return r.AfterSave(c)
 }
 
 // The response used to return used consent requests
@@ -431,6 +436,14 @@ func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
+func (r *LogoutRequest) AfterFind(c *pop.Connection) error {
+	if r.ClientID.Valid {
+		r.Client = &client.Client{}
+		return sqlcon.HandleError(c.Find(r.Client, r.ClientID.String))
+	}
+	return nil
+}
+
 // Returned when the log out request was used.
 //
 // swagger:ignore
@@ -518,8 +531,13 @@ func (r *LoginRequest) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
+func (r *LoginRequest) AfterFind(c *pop.Connection) error {
+	r.Client = &client.Client{}
+	return sqlcon.HandleError(c.Find(r.Client, r.ClientID))
+}
+
 func (r *LoginRequest) FindInDB(c *pop.Connection, id string) error {
-	return c.Select("hydra_oauth2_authentication_request.*", "COALESCE(hr.was_used, 0) as was_handled").
+	return c.Select("hydra_oauth2_authentication_request.*", "COALESCE(hr.was_used, FALSE) as was_handled").
 		LeftJoin("hydra_oauth2_authentication_request_handled as hr", "hydra_oauth2_authentication_request.challenge = hr.challenge").
 		Find(r, id)
 }
@@ -608,7 +626,7 @@ func (r *ConsentRequest) AfterFind(c *pop.Connection) error {
 func (r *ConsentRequest) FindInDB(c *pop.Connection, id string) error {
 	return c.Select("COALESCE(hr.was_used, false) as was_handled", "hydra_oauth2_consent_request.*").
 		Where("hydra_oauth2_consent_request.challenge = ?", id).
-		LeftJoin("hydra_oauth2_consent_request_handled hr", "hr.challenge = hydra_oauth2_consent_request.challenge").
+		LeftJoin("hydra_oauth2_consent_request_handled AS hr", "hr.challenge = hydra_oauth2_consent_request.challenge").
 		First(r)
 }
 

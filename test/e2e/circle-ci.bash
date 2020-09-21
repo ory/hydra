@@ -12,7 +12,7 @@ export GO111MODULE=on
 if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
-(cd ../../; go build -o test/e2e/hydra . )
+(cd ../../; go build -tags sqlite -o test/e2e/hydra . )
 go build -buildmode=plugin -o ./memtest.so ./plugin/memtest.go
 
 # Install oauth2-client

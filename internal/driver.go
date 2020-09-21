@@ -75,7 +75,6 @@ func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Registry {
 	viper.Set(configuration.ViperKeyLogLevel, "debug")
 
-	// TODO using CRDB until sqlite is supported
 	//viper.Set(configuration.ViperKeyDSN, ConnectToCRDB(t))
 	viper.Set(configuration.ViperKeyDSN, "memory")
 
@@ -83,6 +82,8 @@ func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Regi
 	require.NoError(t, err)
 	require.NoError(t, r.Init())
 	require.NoError(t, r.Persister().MigrateUp(context.Background()))
+	//require.NoError(t, r.Persister().Connection(context.Background()).RawQuery("ALTER TABLE hydra_oauth2_consent_request_handled EXPERIMENTAL_AUDIT SET READ WRITE").Exec())
+	//require.NoError(t, r.Persister().Connection(context.Background()).RawQuery("ALTER TABLE hydra_oauth2_consent_request EXPERIMENTAL_AUDIT SET READ WRITE").Exec())
 	return r
 }
 

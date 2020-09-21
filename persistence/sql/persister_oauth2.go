@@ -24,22 +24,22 @@ import (
 var _ oauth2.AssertionJWTReader = &Persister{}
 
 type (
-	tableName  string
-	RequestSQL struct {
+	tableName        string
+	OAuth2RequestSQL struct {
 		ID                string         `db:"signature"`
 		Request           string         `db:"request_id"`
 		ConsentChallenge  sql.NullString `db:"challenge_id"`
-		RequestedAt       time.Time      `db:"requested_at"`
-		Client            string         `db:"client_id"`
-		Scopes            string         `db:"scope"`
-		GrantedScope      string         `db:"granted_scope"`
-		RequestedAudience string         `db:"requested_audience"`
-		GrantedAudience   string         `db:"granted_audience"`
-		Form              string         `db:"form_data"`
-		Subject           string         `db:"subject"`
-		Active            bool           `db:"active"`
-		Session           []byte         `db:"session_data"`
-		table             tableName      `db:"-"`
+		RequestedAt       time.Time `db:"requested_at"`
+		Client            string    `db:"client_id"`
+		Scopes            string    `db:"scope"`
+		GrantedScope      string    `db:"granted_scope"`
+		RequestedAudience string    `db:"requested_audience"`
+		GrantedAudience   string    `db:"granted_audience"`
+		Form              string    `db:"form_data"`
+		Subject           string    `db:"subject"`
+		Active            bool      `db:"active"`
+		Session           []byte    `db:"session_data"`
+		Table             tableName `db:"-"`
 	}
 )
 
@@ -51,11 +51,11 @@ const (
 	sqlTablePKCE    tableName = "pkce"
 )
 
-func (r RequestSQL) TableName() string {
-	return "hydra_oauth2_" + string(r.table)
+func (r OAuth2RequestSQL) TableName() string {
+	return "hydra_oauth2_" + string(r.Table)
 }
 
-func (r *RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
+func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
@@ -104,7 +104,7 @@ func (p *Persister) hashSignature(signature string, table tableName) string {
 	return signature
 }
 
-func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester, table tableName) (*RequestSQL, error) {
+func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		p.l.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -135,7 +135,7 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 		}
 	}
 
-	return &RequestSQL{
+	return &OAuth2RequestSQL{
 		Request:           r.GetID(),
 		ConsentChallenge:  challenge,
 		ID:                p.hashSignature(rawSignature, table),
@@ -149,7 +149,7 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 		Session:           session,
 		Subject:           subject,
 		Active:            true,
-		table:             table,
+		Table:             table,
 	}, nil
 }
 
@@ -225,7 +225,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 
 	var fr fosite.Requester
 	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) (err error) {
-		r := RequestSQL{table: table}
+		r := OAuth2RequestSQL{Table: table}
 
 		err = p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
 		if err == sql.ErrNoRows {
@@ -253,13 +253,13 @@ func (p *Persister) deleteSession(ctx context.Context, signature string, table t
 
 	return sqlcon.HandleError(
 		p.Connection(ctx).
-			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", RequestSQL{table: table}.TableName()), signature).
+			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", OAuth2RequestSQL{Table: table}.TableName()), signature).
 			Exec())
 }
 
 func (p *Persister) revokeSession(ctx context.Context, id string, table tableName) error {
 	if err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE request_id=?", RequestSQL{table: table}.TableName()),
+		fmt.Sprintf("DELETE FROM %s WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
 		id,
 	).Exec(); err == sql.ErrNoRows {
 		return errors.WithStack(fosite.ErrNotFound)
@@ -287,7 +287,7 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=?", RequestSQL{table: sqlTableCode}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false WHERE signature=?", OAuth2RequestSQL{Table: sqlTableCode}.TableName()),
 				signature).
 			Exec())
 }
@@ -350,7 +350,7 @@ func (p *Persister) RevokeAccessToken(ctx context.Context, id string) error {
 
 func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
 	err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", RequestSQL{table: sqlTableAccess}.TableName()),
+		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
 		time.Now().Add(-p.config.AccessTokenLifespan()),
 		notAfter,
 	).Exec()

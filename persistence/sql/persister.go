@@ -40,10 +40,6 @@ type (
 		ClientHasher() fosite.Hasher
 		KeyCipher() *jwk.AEAD
 	}
-	popableStringSlice struct {
-		Values []string `db:"values"`
-		from   string   `db:"-"`
-	}
 )
 
 func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
@@ -125,8 +121,4 @@ func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context,
 	}
 
 	return nil
-}
-
-func (s popableStringSlice) TableName() string {
-	return s.from
 }

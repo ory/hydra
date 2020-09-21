@@ -359,3 +359,10 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 	}
 	return sqlcon.HandleError(err)
 }
+
+func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) error {
+	return sqlcon.HandleError(
+		p.Connection(ctx).
+			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE client_id=?", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()), clientID).
+			Exec())
+}

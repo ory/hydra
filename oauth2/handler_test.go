@@ -94,7 +94,7 @@ var flushRequests = []*fosite.Request{
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -110,8 +110,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
 		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	}
-	require.NoError(t, store.CreateAccessTokenSession(nil, deleteRequest.ID, deleteRequest))
-	_ = cm.CreateClient(nil, deleteRequest.Client.(*client.Client))
+	require.NoError(t, cm.CreateClient(context.Background(), deleteRequest.Client.(*client.Client)))
+	require.NoError(t, store.CreateAccessTokenSession(context.Background(), deleteRequest.ID, deleteRequest))
 
 	r := x.NewRouterAdmin()
 	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {

@@ -195,13 +195,13 @@ func TestGetConsentRequest(t *testing.T) {
 				cl := &client.Client{ID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
-					Client:     cl,
-					ID:         challenge,
+					Client: cl,
+					ID:     challenge,
 				}))
 
 				if tc.handled {
 					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
-						ID: challenge,
+						ID:      challenge,
 						WasUsed: true,
 					})
 					require.NoError(t, err)

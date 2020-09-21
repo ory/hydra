@@ -23,13 +23,14 @@ package consent
 import (
 	"context"
 	"fmt"
-	"github.com/ory/x/sqlcon"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/ory/x/sqlcon"
 
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"

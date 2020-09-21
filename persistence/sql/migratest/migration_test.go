@@ -3,8 +3,9 @@ package migratest
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/persistence/sql"
 	"testing"
+
+	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"

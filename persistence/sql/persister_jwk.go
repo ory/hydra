@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"

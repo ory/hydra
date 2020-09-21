@@ -482,7 +482,7 @@ func TestStrategyLogout(t *testing.T) {
 				c.Client.BackChannelLogoutURI = servers[k].URL
 				c.Subject = tc.subject
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c.Client))
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{ID: c.LoginChallenge.String(), Client: c.Client, Verifier: c.ID }))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{ID: c.LoginChallenge.String(), Client: c.Client, Verifier: c.ID}))
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), c))
 				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.ID, hc)
 				require.NoError(t, err)

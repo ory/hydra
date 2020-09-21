@@ -71,12 +71,12 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar1.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar2.Client))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
-		ID:              ar1.SessionID.String(),
-		Subject:         ar1.Subject,
+		ID:      ar1.SessionID.String(),
+		Subject: ar1.Subject,
 	}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
-		ID:              ar2.SessionID.String(),
-		Subject:         ar2.Subject,
+		ID:      ar2.SessionID.String(),
+		Subject: ar2.Subject,
 	}))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), ar1))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), ar2))
@@ -87,11 +87,11 @@ func TestSDK(t *testing.T) {
 	cr4, hcr4 := MockConsentRequest("4", true, 3600, false, false, false)
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr3.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr4.Client))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr1.LoginChallenge.String(), Client: cr1.Client, Verifier: cr1.ID }))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr2.LoginChallenge.String(), Client: cr2.Client, Verifier: cr2.ID }))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Client: cr3.Client, Verifier: cr3.ID }))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr1.LoginChallenge.String(), Client: cr1.Client, Verifier: cr1.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr2.LoginChallenge.String(), Client: cr2.Client, Verifier: cr2.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Client: cr3.Client, Verifier: cr3.ID}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr3.LoginSessionID.String()}))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID }))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr4.LoginSessionID.String()}))
 	require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
 	require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))

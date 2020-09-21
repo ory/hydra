@@ -11,8 +11,8 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"github.com/ory/x/sqlxx"
 	sqlPersister "github.com/ory/hydra/persistence/sql"
+	"github.com/ory/x/sqlxx"
 )
 
 func assertEqualClients(t *testing.T, expected, actual *client.Client) {

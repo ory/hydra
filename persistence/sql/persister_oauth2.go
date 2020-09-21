@@ -29,17 +29,17 @@ type (
 		ID                string         `db:"signature"`
 		Request           string         `db:"request_id"`
 		ConsentChallenge  sql.NullString `db:"challenge_id"`
-		RequestedAt       time.Time `db:"requested_at"`
-		Client            string    `db:"client_id"`
-		Scopes            string    `db:"scope"`
-		GrantedScope      string    `db:"granted_scope"`
-		RequestedAudience string    `db:"requested_audience"`
-		GrantedAudience   string    `db:"granted_audience"`
-		Form              string    `db:"form_data"`
-		Subject           string    `db:"subject"`
-		Active            bool      `db:"active"`
-		Session           []byte    `db:"session_data"`
-		Table             tableName `db:"-"`
+		RequestedAt       time.Time      `db:"requested_at"`
+		Client            string         `db:"client_id"`
+		Scopes            string         `db:"scope"`
+		GrantedScope      string         `db:"granted_scope"`
+		RequestedAudience string         `db:"requested_audience"`
+		GrantedAudience   string         `db:"granted_audience"`
+		Form              string         `db:"form_data"`
+		Subject           string         `db:"subject"`
+		Active            bool           `db:"active"`
+		Session           []byte         `db:"session_data"`
+		Table             tableName      `db:"-"`
 	}
 )
 

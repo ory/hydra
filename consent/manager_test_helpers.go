@@ -24,9 +24,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/ory/x/sqlcon"
 	"testing"
 	"time"
+
+	"github.com/ory/x/sqlcon"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

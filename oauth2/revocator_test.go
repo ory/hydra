@@ -23,12 +23,14 @@ package oauth2_test
 import (
 	"context"
 	"fmt"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/hydra/persistence/sql"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/gobuffalo/pop/v5"
+
+	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/ory/hydra/internal/httpclient/client/public"
 	"github.com/ory/x/urlx"

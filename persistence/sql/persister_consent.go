@@ -103,12 +103,10 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	c := p.Connection(ctx)
 
 	if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&cr); err != nil {
-		fmt.Printf("90: %s\n", err.Error())
 		return nil, sqlcon.HandleError(err)
 	}
 
 	if err := c.Find(&r, cr.ID); err != nil {
-		fmt.Printf("95: %s\n", err.Error())
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -117,11 +115,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	}
 
 	r.WasUsed = true
-	err := sqlcon.HandleError(c.Update(&r))
-	if err != nil {
-		fmt.Printf("107: %s\n", err.Error())
-	}
-	return &r, err
+	return &r, sqlcon.HandleError(c.Update(&r))
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]consent.HandledConsentRequest, error) {
@@ -266,23 +260,22 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*consent.HandledLoginRequest, error) {
 	var d consent.HandledLoginRequest
-	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var ar consent.LoginRequest
-		if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&ar); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	c := p.Connection(ctx)
+	var ar consent.LoginRequest
+	if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&ar); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
-		if err := c.Find(&d, ar.ID); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	if err := c.Find(&d, ar.ID); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
-		if d.WasUsed {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Authentication verifier has been used already"))
-		}
+	if d.WasUsed {
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Authentication verifier has been used already"))
+	}
 
-		d.WasUsed = true
-		return sqlcon.HandleError(c.Update(&d))
-	})
+	d.WasUsed = true
+	return &d, sqlcon.HandleError(c.Update(&d))
 }
 
 func (p *Persister) CreateForcedObfuscatedLoginSession(ctx context.Context, session *consent.ForcedObfuscatedLoginSession) error {

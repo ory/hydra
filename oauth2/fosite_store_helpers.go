@@ -24,6 +24,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"github.com/gobuffalo/pop/v5"
 	"net/url"
 	"testing"
 	"time"
@@ -55,6 +56,11 @@ type BlacklistedJTI struct {
 	JTI    string    `db:"-"`
 	ID     string    `db:"signature"`
 	Expiry time.Time `db:"expires_at"`
+}
+
+func (j *BlacklistedJTI) AfterFind(_ *pop.Connection) error {
+	j.Expiry = j.Expiry.UTC()
+	return nil
 }
 
 func (BlacklistedJTI) TableName() string {

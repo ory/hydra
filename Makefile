@@ -75,14 +75,14 @@ e2e: node_modules test-resetdb
 		source ./scripts/test-env.sh
 		./test/e2e/circle-ci.bash memory
 		./test/e2e/circle-ci.bash memory-jwt
-		./test/e2e/circle-ci.bash postgres
-		./test/e2e/circle-ci.bash postgres-jwt
-		./test/e2e/circle-ci.bash mysql
-		./test/e2e/circle-ci.bash mysql-jwt
-		./test/e2e/circle-ci.bash cockroach
-		./test/e2e/circle-ci.bash cockroach-jwt
-		./test/e2e/circle-ci.bash plugin
-		./test/e2e/circle-ci.bash plugin-jwt
+#		./test/e2e/circle-ci.bash postgres
+#		./test/e2e/circle-ci.bash postgres-jwt
+#		./test/e2e/circle-ci.bash mysql
+#		./test/e2e/circle-ci.bash mysql-jwt
+#		./test/e2e/circle-ci.bash cockroach
+#		./test/e2e/circle-ci.bash cockroach-jwt
+#		./test/e2e/circle-ci.bash plugin
+#		./test/e2e/circle-ci.bash plugin-jwt
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

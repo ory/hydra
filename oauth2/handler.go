@@ -648,13 +648,11 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
-		x.LogError(r, err, h.r.Logger())
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
 		return
 	} else if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
-		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
 		return
 	} else if err != nil {
@@ -747,7 +745,6 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 	if h.c.ShareOAuth2Debug() {
 		query.Add("error_debug", rfErr.Debug)
 	}
-	fmt.Printf("Forwarding: %+v\n", err)
 
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
 }

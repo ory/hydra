@@ -1,2 +1,0 @@
-ALTER TABLE hydra_client ADD created_at timestamp NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE hydra_client ADD updated_at timestamp NULL DEFAULT CURRENT_TIMESTAMP;

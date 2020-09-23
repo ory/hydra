@@ -153,11 +153,11 @@ func TestGetLoginRequest(t *testing.T) {
 					Client: cl,
 					ID:     challenge,
 				}))
-			}
 
-			if tc.handled {
-				_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasUsed: true})
-				require.NoError(t, err)
+				if tc.handled {
+					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasUsed: true})
+					require.NoError(t, err)
+				}
 			}
 
 			h := NewHandler(reg, conf)

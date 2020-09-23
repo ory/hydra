@@ -55,24 +55,6 @@ func (m *RegistrySQL) WithDB(db *sqlx.DB) Registry {
 }
 
 func (m *RegistrySQL) Init() error {
-	//if m.db == nil {
-	//	// old db connection
-	//	options := append([]sqlcon.OptionModifier{}, m.dbalOptions...)
-	//	if m.Tracer().IsLoaded() {
-	//		options = append(options, sqlcon.WithDistributedTracing(), sqlcon.WithOmitArgsFromTraceSpans())
-	//	}
-	//
-	//	connection, err := sqlcon.NewSQLConnection(m.C.DSN(), m.Logger(), options...)
-	//	if err != nil {
-	//		return err
-	//	}
-	//
-	//	m.db, err = connection.GetDatabaseRetry(time.Second*5, time.Minute*5)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
-
 	if m.persister == nil {
 		// new db connection
 		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())

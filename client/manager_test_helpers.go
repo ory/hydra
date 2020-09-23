@@ -90,7 +90,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 			Contacts:                          []string{"aeneas1", "aeneas2"},
 			SecretExpiresAt:                   0,
 			SectorIdentifierURI:               "https://sector",
-			JSONWebKeys:                       &x.JoseJSONWebKeySet{JSONWebKeySet: &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}}},
+			JSONWebKeys:                       &x.JoseJSONWebKeySet{JSONWebKeySet: &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}, CertificateThumbprintSHA1: []uint8{}, CertificateThumbprintSHA256: []uint8{}}}}},
 			JSONWebKeysURI:                    "https://...",
 			TokenEndpointAuthMethod:           "none",
 			TokenEndpointAuthSigningAlgorithm: "RS256",

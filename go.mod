@@ -55,12 +55,12 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
-	golang.org/x/tools v0.0.0-20200313205530-4303120df7d8
-	gopkg.in/square/go-jose.v2 v2.5.0
+	golang.org/x/tools v0.0.0-20200721223218-6123e77877b2
+	gopkg.in/square/go-jose.v2 v2.5.1
 )
 
 replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200917134542-bbb3d452a468

@@ -75,12 +75,12 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		}
 
 		for _, hr := range hrs {
-			if err := p.RevokeAccessToken(ctx, hr.ID); errors.Cause(err) == fosite.ErrNotFound {
+			if err := p.RevokeAccessToken(ctx, hr.ID); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
-			if err := p.RevokeRefreshToken(ctx, hr.ID); errors.Cause(err) == fosite.ErrNotFound {
+			if err := p.RevokeRefreshToken(ctx, hr.ID); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {
 				return err
@@ -135,7 +135,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return p.resolveHandledConsentRequests(rs)
+	return p.resolveHandledConsentRequests(ctx, rs)
 }
 
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]consent.HandledConsentRequest, error) {
@@ -155,12 +155,23 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return p.resolveHandledConsentRequests(rs)
+	return p.resolveHandledConsentRequests(ctx, rs)
 }
 
-func (p *Persister) resolveHandledConsentRequests(requests []consent.HandledConsentRequest) ([]consent.HandledConsentRequest, error) {
+func (p *Persister) resolveHandledConsentRequests(ctx context.Context, requests []consent.HandledConsentRequest) ([]consent.HandledConsentRequest, error) {
 	var result []consent.HandledConsentRequest
 	for _, v := range requests {
+		_, err := p.GetConsentRequest(ctx, v.ID)
+		if err != nil {
+			return nil, err
+		} else if errors.Is(err, x.ErrNotFound) {
+			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+		}
+
+		// this will probably never error because we first check if the consent request actually exists
+		if err := v.AfterFind(p.Connection(ctx)); err != nil {
+			return nil, err
+		}
 		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
 			continue
 		}
@@ -369,21 +380,16 @@ func (p *Persister) RejectLogoutRequest(ctx context.Context, challenge string) e
 }
 
 func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*consent.LogoutRequest, error) {
+	c := p.Connection(ctx)
+
 	var lr consent.LogoutRequest
-	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := c.Where("verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE", verifier).Select("challenge").First(&lr); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	if err := c.Where("verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE", verifier).Select("challenge").First(&lr); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
-		if err := c.RawQuery("UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE verifier=?", verifier).Exec(); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	if err := c.RawQuery("UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE verifier=?", verifier).Exec(); err != nil {
+		return nil, sqlcon.HandleError(err)
+	}
 
-		r, err := p.GetLogoutRequest(ctx, lr.ID)
-		if err != nil {
-			return err
-		}
-		lr = *r
-		return nil
-	})
+	return p.GetLogoutRequest(ctx, lr.ID)
 }

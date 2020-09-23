@@ -100,7 +100,7 @@ func TestRevoke(t *testing.T) {
 	createAccessTokenSession("siri", "my-client", tokens[2][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 	createAccessTokenSession("siri", "encoded:client", tokens[3][0], now.Add(-time.Hour), reg.OAuth2Storage(), nil)
 
-	require.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 4)
+	require.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 
 	client := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
@@ -111,20 +111,20 @@ func TestRevoke(t *testing.T) {
 		{
 			token: "invalid",
 			assert: func(t *testing.T) {
-				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 4)
+				assert.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
 			token: tokens[3][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 4)
+				assert.Equal(t, 4, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
 			token: tokens[0][1],
 			assert: func(t *testing.T) {
 				t.Logf("Tried to delete: %s %s", tokens[0][0], tokens[0][1])
-				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 3)
+				assert.Equal(t, 3, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
@@ -133,13 +133,13 @@ func TestRevoke(t *testing.T) {
 		{
 			token: tokens[2][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 2)
+				assert.Equal(t, 2, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 		{
 			token: tokens[1][1],
 			assert: func(t *testing.T) {
-				assert.Len(t, countAccessTokens(t, reg.Persister().Connection(context.Background())), 1)
+				assert.Equal(t, 1, countAccessTokens(t, reg.Persister().Connection(context.Background())))
 			},
 		},
 	} {

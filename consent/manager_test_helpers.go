@@ -451,7 +451,6 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					got1, err = m.GetConsentRequest(context.Background(), "challenge"+tc.key)
 					require.NoError(t, err)
 					assert.True(t, got1.WasHandled)
-					fmt.Printf("got consent req %+v\n", got1)
 				})
 			}
 

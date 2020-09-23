@@ -124,7 +124,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(w, r)
 
-	if errors.Cause(err) == consent.ErrAbortOAuth2Request {
+	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		return
 	} else if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -554,12 +554,12 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 
 	if err != nil {
-		switch errors.Cause(err) {
-		case fosite.ErrServerError:
+		switch {
+		case errors.Is(err, fosite.ErrServerError):
 			fallthrough
-		case fosite.ErrTemporarilyUnavailable:
+		case errors.Is(err, fosite.ErrTemporarilyUnavailable):
 			fallthrough
-		case fosite.ErrMisconfiguration:
+		case errors.Is(err, fosite.ErrMisconfiguration):
 			x.LogError(r, err, h.r.Logger())
 		default:
 			x.LogAudit(r, err, h.r.Logger())
@@ -601,12 +601,12 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 
 	if err != nil {
-		switch errors.Cause(err) {
-		case fosite.ErrServerError:
+		switch {
+		case errors.Is(err, fosite.ErrServerError):
 			fallthrough
-		case fosite.ErrTemporarilyUnavailable:
+		case errors.Is(err, fosite.ErrTemporarilyUnavailable):
 			fallthrough
-		case fosite.ErrMisconfiguration:
+		case errors.Is(err, fosite.ErrMisconfiguration):
 			x.LogError(r, err, h.r.Logger())
 		default:
 			x.LogAudit(r, err, h.r.Logger())
@@ -647,7 +647,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(w, r, authorizeRequest)
-	if errors.Cause(err) == consent.ErrAbortOAuth2Request {
+	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogError(r, err, h.r.Logger())
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -747,6 +747,7 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 	if h.c.ShareOAuth2Debug() {
 		query.Add("error_debug", rfErr.Debug)
 	}
+	fmt.Printf("Forwarding: %+v\n", err)
 
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
 }

@@ -175,7 +175,7 @@ func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.Claims) string {
 
 func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWriter, r *http.Request) {
 	res, err := strategy.HandleOpenIDConnectLogout(w, r)
-	if errors.Cause(err) == ErrAbortOAuth2Request {
+	if errors.Is(err, ErrAbortOAuth2Request) {
 		// Do nothing
 		return
 	} else if err != nil {
@@ -1790,7 +1790,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					}
 				}
 
-				if errors.Cause(err) == ErrAbortOAuth2Request {
+				if errors.Is(err, ErrAbortOAuth2Request) {
 					// nothing to do, indicates redirect
 				} else if err != nil {
 					writer.WriteError(w, r, err)

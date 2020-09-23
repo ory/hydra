@@ -240,7 +240,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
-		if errors.Cause(err) == sqlcon.ErrNoRows {
+		if errors.Is(err, sqlcon.ErrNoRows) {
 			err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
 		}
 		h.r.Writer().WriteError(w, r, err)

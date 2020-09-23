@@ -89,7 +89,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	}
 
 	var forcedObfuscatedUserID string
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Cause(err) == x.ErrNotFound {
+	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Is(err, x.ErrNotFound) {
 		// do nothing
 	} else if err != nil {
 		return err
@@ -123,7 +123,7 @@ func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.R
 	}
 
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionID)
-	if errors.Cause(err) == x.ErrNotFound {
+	if errors.Is(err, x.ErrNotFound) {
 		s.r.Logger().
 			WithRequest(r).
 			WithError(err).Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
@@ -142,7 +142,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 
 	session, err := s.authenticationSession(w, r)
-	if errors.Cause(err) == ErrNoAuthenticationSessionFound {
+	if errors.Is(err, ErrNoAuthenticationSessionFound) {
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	} else if err != nil {
 		return err
@@ -174,7 +174,7 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	if err := s.matchesValueFromSession(r.Context(), ar.GetClient(), hintSub, session.Subject); errors.Cause(err) == ErrHintDoesNotMatchAuthentication {
+	if err := s.matchesValueFromSession(r.Context(), ar.GetClient(), hintSub, session.Subject); errors.Is(err, ErrHintDoesNotMatchAuthentication) {
 		return errors.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
 	}
 
@@ -414,7 +414,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 				Subject: session.Subject,
 			},
 		},
-	}); errors.Cause(err) == fosite.ErrLoginRequired {
+	}); errors.Is(err, fosite.ErrLoginRequired) {
 		// This indicates that something went wrong with checking the subject id - let's destroy the session to be safe
 		if err := s.revokeAuthenticationSession(w, r); err != nil {
 			return nil, err
@@ -518,7 +518,7 @@ func (s *DefaultStrategy) requestConsent(w http.ResponseWriter, r *http.Request,
 	// }
 
 	consentSessions, err := s.r.ConsentManager().FindGrantedAndRememberedConsentRequests(r.Context(), ar.GetClient().GetID(), authenticationSession.Subject)
-	if errors.Cause(err) == ErrNoPreviousConsentFound {
+	if errors.Is(err, ErrNoPreviousConsentFound) {
 		return s.forwardConsentRequest(w, r, ar, authenticationSession, nil)
 	} else if err != nil {
 		return err
@@ -776,7 +776,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		}
 
 		session, err := s.authenticationSession(w, r)
-		if errors.Cause(err) == ErrNoAuthenticationSessionFound {
+		if errors.Is(err, ErrNoAuthenticationSessionFound) {
 			// OP initiated log out but no session was found. Since we can not identify the user we can not call
 			// any RPs.
 			s.r.AuditLogger().
@@ -861,7 +861,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		},
 	) {
 		c, err := s.r.ClientManager().GetConcreteClient(r.Context(), aud)
-		if errors.Cause(err) == x.ErrNotFound {
+		if errors.Is(err, x.ErrNotFound) {
 			continue
 		} else if err != nil {
 			return nil, err
@@ -902,7 +902,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.
 	// Instead, we'll check this when we're actually revoking the cookie!
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), hintSid)
-	if errors.Cause(err) == x.ErrNotFound {
+	if errors.Is(err, x.ErrNotFound) {
 		// Such a session does not exist - maybe it has already been revoked? In any case, we can't do much except
 		// leaning back and redirecting back.
 		http.Redirect(w, r, redir, http.StatusFound)
@@ -944,7 +944,7 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		// came from an original cookie.
 
 		session, err := s.authenticationSession(w, r)
-		if errors.Cause(err) == ErrNoAuthenticationSessionFound {
+		if errors.Is(err, ErrNoAuthenticationSessionFound) {
 			// If we end up here it means that the cookie was revoked between the initial logout request
 			// and ending up here - possibly due to a duplicate submit. In that case, we really have nothing to
 			// do because the logout was already completed, apparently!

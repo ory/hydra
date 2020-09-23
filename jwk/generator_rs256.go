@@ -60,6 +60,8 @@ func (g *RS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 				Use:          use,
 				KeyID:        Ider("private", id),
 				Certificates: []*x509.Certificate{},
+				CertificateThumbprintSHA1: []uint8{},
+				CertificateThumbprintSHA256: []uint8{},
 			},
 			{
 				Algorithm:    "RS256",
@@ -67,6 +69,8 @@ func (g *RS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 				Key:          &key.PublicKey,
 				KeyID:        Ider("public", id),
 				Certificates: []*x509.Certificate{},
+				CertificateThumbprintSHA1: []uint8{},
+				CertificateThumbprintSHA256: []uint8{},
 			},
 		},
 	}, nil

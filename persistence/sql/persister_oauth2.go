@@ -276,6 +276,7 @@ func (p *Persister) GetAuthorizeCodeSession(ctx context.Context, signature strin
 }
 
 func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) (err error) {
+	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
@@ -341,6 +342,7 @@ func (p *Persister) RevokeAccessToken(ctx context.Context, id string) error {
 }
 
 func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
+	/* #nosec G201 table is static */
 	err := p.Connection(ctx).RawQuery(
 		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
 		time.Now().Add(-p.config.AccessTokenLifespan()),
@@ -353,6 +355,7 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 }
 
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) error {
+	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE client_id=?", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()), clientID).

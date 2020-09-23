@@ -24,10 +24,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"github.com/gobuffalo/pop/v5"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/gobuffalo/pop/v5"
 
 	"github.com/ory/hydra/x"
 

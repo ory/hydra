@@ -36,7 +36,7 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, challenge string, 
 			if err := c.Find(hr, r.ID); err != nil {
 				return nil, sqlcon.HandleError(err)
 			}
-			if hr.WasUsed == true {
+			if hr.WasUsed {
 				return nil, sqlcon.ErrNoRows
 			}
 			prevErrNil := false
@@ -47,7 +47,7 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, challenge string, 
 			if err := c.Update(r); err != nil {
 				return nil, sqlcon.HandleError(err)
 			}
-			if r.Error != nil && prevErrNil == false {
+			if r.Error != nil && !prevErrNil {
 				prevErrNil = false
 			}
 		}

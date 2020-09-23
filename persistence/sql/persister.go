@@ -19,7 +19,7 @@ import (
 var _ persistence.Persister = new(Persister)
 var _ storage.Transactional = new(Persister)
 
-const transactionContextKey = "transactionConnection"
+const transactionContextKey transactionContextType = "transactionConnection"
 
 var (
 	migrations = packr.New("migrations", "migrations")
@@ -40,6 +40,7 @@ type (
 		ClientHasher() fosite.Hasher
 		KeyCipher() *jwk.AEAD
 	}
+	transactionContextType string
 )
 
 func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {

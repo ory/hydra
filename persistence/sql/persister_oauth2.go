@@ -184,6 +184,7 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 		if c.Dialect.Name() == "sqlite3" {
 			now = "CURRENT_TIMESTAMP"
 		}
+		/* #nosec G201 table is static */
 		if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < %s", oauth2.BlacklistedJTI{}.TableName(), now)).Exec(); err != nil {
 			return sqlcon.HandleError(err)
 		}
@@ -243,6 +244,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 func (p *Persister) deleteSession(ctx context.Context, signature string, table tableName) error {
 	signature = p.hashSignature(signature, table)
 
+	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=?", OAuth2RequestSQL{Table: table}.TableName()), signature).
@@ -250,6 +252,7 @@ func (p *Persister) deleteSession(ctx context.Context, signature string, table t
 }
 
 func (p *Persister) revokeSession(ctx context.Context, id string, table tableName) error {
+	/* #nosec G201 table is static */
 	if err := p.Connection(ctx).RawQuery(
 		fmt.Sprintf("DELETE FROM %s WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
 		id,

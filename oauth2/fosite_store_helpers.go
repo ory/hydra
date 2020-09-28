@@ -178,12 +178,11 @@ func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t 
 	return func(t *testing.T) {
 		dbErrorIsConstraintError := func(dbErr error) {
 			assert.Error(t, dbErr)
-			switch err := errors.Cause(dbErr).(type) {
-			case *herodot.DefaultError:
-				assert.Equal(t, sqlcon.ErrUniqueViolation, err)
-			default:
-				t.Errorf("unexpected error type %s", err)
+			if ve := new(herodot.DefaultError); errors.As(dbErr, ve) {
+				assert.Equal(t, sqlcon.ErrUniqueViolation, ve)
+				return
 			}
+			t.Errorf("unexpected error type %s", dbErr)
 		}
 
 		requestId := uuid.New()

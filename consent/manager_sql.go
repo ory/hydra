@@ -85,12 +85,12 @@ JOIN hydra_oauth2_consent_request as r ON r.challenge = h.challenge WHERE %s`,
 	}
 
 	for _, challenge := range challenges {
-		if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
+		if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, challenge); errors.Is(err ,fosite.ErrNotFound) {
 			// do nothing
 		} else if err != nil {
 			return err
 		}
-		if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, challenge); errors.Cause(err) == fosite.ErrNotFound {
+		if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, challenge); errors.Is(err ,fosite.ErrNotFound) {
 			// do nothing
 		} else if err != nil {
 			return err
@@ -278,7 +278,7 @@ func (m *SQLManager) HandleConsentRequest(ctx context.Context, challenge string,
 		":"+strings.Join(sqlParamsConsentRequestHandled, ", :"),
 	), r); err != nil {
 		err = sqlcon.HandleError(err)
-		if errors.Cause(err) == sqlcon.ErrUniqueViolation {
+		if errors.Is(err, sqlcon.ErrUniqueViolation) {
 			return m.replaceUnusedConsentRequest(ctx, challenge, r)
 		}
 		return nil, err
@@ -478,7 +478,7 @@ func (m *SQLManager) resolveHandledConsentRequests(ctx context.Context, requests
 		r, err := m.GetConsentRequest(ctx, v.Challenge)
 		if err != nil {
 			return nil, err
-		} else if errors.Cause(err) == x.ErrNotFound {
+		} else if errors.Is(err ,fosite.ErrNotFound) {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		}
 

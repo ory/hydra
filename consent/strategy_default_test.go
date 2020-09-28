@@ -175,7 +175,7 @@ func genIDToken(t *testing.T, reg *driver.RegistryMemory, c jwtgo.Claims) string
 
 func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWriter, r *http.Request) {
 	res, err := strategy.HandleOpenIDConnectLogout(w, r)
-	if errors.Cause(err) == ErrAbortOAuth2Request {
+	if errors.Is(err,  ErrAbortOAuth2Request) {
 		// Do nothing
 		return
 	} else if err != nil {
@@ -190,7 +190,6 @@ func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWrit
 		).String(),
 		http.StatusFound,
 	)
-
 }
 
 func runLogout(t *testing.T, method string) {
@@ -264,14 +263,14 @@ func runLogout(t *testing.T, method string) {
 			d:                "should fail if non-rp initiated logout is initiated with state (indicating rp-flow)",
 			params:           url.Values{"state": {"foobar"}},
 			lph:              noopHandler,
-			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter state is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nLogout failed because query parameter state is set but id_token_hint is missing\",\"error_hint\":\"Logout failed because query parameter state is set but id_token_hint is missing\",\"status_code\":400}",
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{
 			d:                "should fail if non-rp initiated logout is initiated with post_logout_redirect_uri (indicating rp-flow)",
 			params:           url.Values{"post_logout_redirect_uri": {"foobar"}},
 			lph:              noopHandler,
-			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing","status_code":400,"request_id":""}`,
+			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nLogout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing\",\"error_hint\":\"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing\",\"status_code\":400}",
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{
@@ -327,7 +326,7 @@ func runLogout(t *testing.T, method string) {
 			d:                "should error when rp-flow without valid id token",
 			lph:              acceptLogoutChallenge(apiClient, "3"),
 			params:           url.Values{"state": {"1234"}, "post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"}, "id_token_hint": {"i am not valid"}},
-			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"token contains an invalid number of segments","status_code":400,"request_id":""}`,
+			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\ntoken contains an invalid number of segments\",\"error_hint\":\"token contains an invalid number of segments\",\"status_code\":400}",
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{
@@ -346,7 +345,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp1", "logout-subject-temp1"),
-			expectBody:       fmt.Sprintf(`{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because issuer claim value \"\" from query parameter id_token_hint does not match with issuer value from configuration \"%s\"","status_code":400,"request_id":""}`, conf.IssuerURL().String()),
+			expectBody:       fmt.Sprintf("{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nLogout failed because issuer claim value \\\"\\\" from query parameter id_token_hint does not match with issuer value from configuration \\\"%s\\\"\",\"error_hint\":\"Logout failed because issuer claim value \\\"\\\" from query parameter id_token_hint does not match with issuer value from configuration \\\"%s\\\"\",\"status_code\":400}", conf.IssuerURL().String(), conf.IssuerURL().String()),
 		},
 		{
 			d:   "should fail rp-inititated flow because id token hint is using wrong issuer",
@@ -365,7 +364,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp2", "logout-subject-temp2"),
-			expectBody:       fmt.Sprintf(`{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because issuer claim value \"some-issuer\" from query parameter id_token_hint does not match with issuer value from configuration \"%s\"","status_code":400,"request_id":""}`, conf.IssuerURL().String()),
+			expectBody:       fmt.Sprintf("{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nLogout failed because issuer claim value \\\"some-issuer\\\" from query parameter id_token_hint does not match with issuer value from configuration \\\"%s\\\"\",\"error_hint\":\"Logout failed because issuer claim value \\\"some-issuer\\\" from query parameter id_token_hint does not match with issuer value from configuration \\\"%s\\\"\",\"status_code\":400}", conf.IssuerURL().String(), conf.IssuerURL().String()),
 		},
 		{
 			d:   "should fail rp-inititated flow because iat is in the future",
@@ -384,7 +383,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp3", "logout-subject-temp3"),
-			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Token used before issued","status_code":400,"request_id":""}`,
+			expectBody:        "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nToken used before issued\",\"error_hint\":\"Token used before issued\",\"status_code\":400}",
 		},
 		{
 			d:   "should fail because post-logout url is not registered",
@@ -403,7 +402,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp4", "logout-subject-temp4"),
-			expectBody:       `{"error":"invalid_request","error_description":"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed","error_hint":"Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client","status_code":400,"request_id":""}`,
+			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nLogout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client\",\"error_hint\":\"Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client\",\"status_code\":400}",
 		},
 		{
 			d:   "should pass rp-inititated even when expiry is in the past",
@@ -1787,7 +1786,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 					}
 				}
 
-				if errors.Cause(err) == ErrAbortOAuth2Request {
+				if errors.Is(err, ErrAbortOAuth2Request) {
 					// nothing to do, indicates redirect
 				} else if err != nil {
 					writer.WriteError(w, r, err)

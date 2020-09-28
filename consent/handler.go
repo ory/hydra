@@ -161,7 +161,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, limit, offset)
-	if errors.Cause(err) == ErrNoPreviousConsentFound {
+	if errors.Is(err, ErrNoPreviousConsentFound) {
 		h.r.Writer().Write(w, r, []PreviousConsentSession{})
 		return
 	} else if err != nil {

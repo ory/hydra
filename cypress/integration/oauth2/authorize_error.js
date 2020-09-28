@@ -148,7 +148,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
     cy.get('#accept').click();
     cy.get('#accept').click();
 
-    cy.get('body').should('contain', 'invalid_grant');
+    cy.get('body').should('contain', 'unauthorized_client');
   });
 
   it('should return an error when an OAuth 2.0 Client requests a redirect_uri that is not preregistered', () => {

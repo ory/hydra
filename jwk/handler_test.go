@@ -69,11 +69,15 @@ func TestHandlerWellKnown(t *testing.T) {
 	resp := known.Key("public:test-id")
 	require.NotNil(t, resp, "Could not find key public")
 
-	assert.Empty(t, resp[0].CertificateThumbprintSHA1)
-	assert.Empty(t, resp[0].CertificateThumbprintSHA256)
-	assert.Empty(t, IDKS.Key("public:test-id")[0].CertificateThumbprintSHA1)
-	assert.Empty(t, IDKS.Key("public:test-id")[0].CertificateThumbprintSHA256)
-	resp[0].CertificateThumbprintSHA1 = nil
-	resp[0].CertificateThumbprintSHA256 = nil
+	for k, v := range resp {
+		if len(v.CertificateThumbprintSHA1) == 0 {
+			v.CertificateThumbprintSHA1 = nil
+		}
+		if len(v.CertificateThumbprintSHA256) == 0 {
+			v.CertificateThumbprintSHA256 = nil
+		}
+		resp[k]=v
+	}
+
 	assert.EqualValues(t, resp, IDKS.Key("public:test-id"))
 }

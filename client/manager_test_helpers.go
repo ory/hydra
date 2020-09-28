@@ -211,6 +211,17 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 
 	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {
 		require.NotNil(t, expected.JSONWebKeys)
+
+		for k, v := range expected.JSONWebKeys.JSONWebKeySet.Keys {
+			if v.CertificateThumbprintSHA1 == nil {
+				v.CertificateThumbprintSHA1 = make([]byte, 0)
+			}
+			if v.CertificateThumbprintSHA256 == nil {
+				v.CertificateThumbprintSHA256 = make([]byte, 0)
+			}
+			expected.JSONWebKeys.JSONWebKeySet.Keys[k]=v
+		}
+
 		assert.EqualValues(t, expected.JSONWebKeys.JSONWebKeySet, actual.GetJSONWebKeys())
 		assert.EqualValues(t, expected.JSONWebKeysURI, actual.GetJSONWebKeysURI())
 		assert.EqualValues(t, expected.TokenEndpointAuthMethod, actual.GetTokenEndpointAuthMethod())

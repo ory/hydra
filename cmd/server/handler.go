@@ -52,11 +52,12 @@ import (
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 
+	"go.uber.org/automaxprocs/maxprocs"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
-	"go.uber.org/automaxprocs/maxprocs"
 )
 
 var _ = &consent.Handler{}

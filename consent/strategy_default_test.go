@@ -175,7 +175,7 @@ func genIDToken(t *testing.T, reg *driver.RegistryMemory, c jwtgo.Claims) string
 
 func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWriter, r *http.Request) {
 	res, err := strategy.HandleOpenIDConnectLogout(w, r)
-	if errors.Is(err,  ErrAbortOAuth2Request) {
+	if errors.Is(err, ErrAbortOAuth2Request) {
 		// Do nothing
 		return
 	} else if err != nil {
@@ -383,7 +383,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp3", "logout-subject-temp3"),
-			expectBody:        "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nToken used before issued\",\"error_hint\":\"Token used before issued\",\"status_code\":400}",
+			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\\n\\nToken used before issued\",\"error_hint\":\"Token used before issued\",\"status_code\":400}",
 		},
 		{
 			d:   "should fail because post-logout url is not registered",

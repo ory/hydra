@@ -115,12 +115,12 @@ func (m *MemoryManager) RevokeSubjectClientConsentSession(ctx context.Context, u
 			delete(m.consentRequests, k)
 			m.m["consentRequests"].Unlock()
 
-			if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, c.Challenge); errors.Is(err ,fosite.ErrNotFound) {
+			if err := m.r.OAuth2Storage().RevokeAccessToken(ctx, c.Challenge); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
-			if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, c.Challenge); errors.Is(err ,fosite.ErrNotFound) {
+			if err := m.r.OAuth2Storage().RevokeRefreshToken(ctx, c.Challenge); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {
 				return err
@@ -229,7 +229,7 @@ func (m *MemoryManager) FindGrantedAndRememberedConsentRequests(ctx context.Cont
 	for _, c := range m.handledConsentRequests {
 		m.m["handledConsentRequests"].RUnlock()
 		cr, err := m.GetConsentRequest(ctx, c.Challenge)
-		if errors.Is(err ,fosite.ErrNotFound) {
+		if errors.Is(err, fosite.ErrNotFound) {
 			return nil, errors.WithStack(ErrNoPreviousConsentFound)
 		} else if err != nil {
 			return nil, err

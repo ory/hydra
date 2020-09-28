@@ -87,7 +87,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 	}
 
 	var forcedObfuscatedUserID string
-	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Is(err, fosite.ErrNotFound) {
+	if s, err := s.r.ConsentManager().GetForcedObfuscatedLoginSession(ctx, c.GetID(), hintSubject); errors.Is(err, x.ErrNotFound) {
 		// do nothing
 	} else if err != nil {
 		return err

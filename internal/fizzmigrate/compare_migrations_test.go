@@ -164,7 +164,7 @@ func TestMixMigrations(t *testing.T) {
 	for db, connect := range dbConnections {
 		t.Run("db="+db, func(t *testing.T) {
 			pop.SetLogger(func(lvl logging.Level, s string, args ...interface{}) {
-				t.Logf("Running SQL Query: %s", fmt.Sprintf(s,args...))
+				t.Logf("Running SQL Query: %s", fmt.Sprintf(s, args...))
 			})
 
 			c, dbx := connect(t)
@@ -177,11 +177,11 @@ func TestMixMigrations(t *testing.T) {
 				x.CleanSQLPop(t, c)
 				migrateOldUpSteps(t, dbx, db, i, func(_ int) {})
 				require.NoError(t, persister.MigrateUp(context.Background()))
-				t.Logf("migrate took: %dms",time.Now().Sub(start).Milliseconds())
+				t.Logf("migrate took: %dms", time.Now().Sub(start).Milliseconds())
 
 				start = time.Now()
 				schemas[i] = dump(t, db)
-				t.Logf("dump took: %dms",time.Now().Sub(start).Milliseconds())
+				t.Logf("dump took: %dms", time.Now().Sub(start).Milliseconds())
 			}
 			for _, s := range schemas {
 				assert.Equal(t, schemas[0], s)

@@ -76,7 +76,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		if len(v.CertificateThumbprintSHA256) == 0 {
 			v.CertificateThumbprintSHA256 = nil
 		}
-		resp[k]=v
+		resp[k] = v
 	}
 
 	assert.EqualValues(t, resp, IDKS.Key("public:test-id"))

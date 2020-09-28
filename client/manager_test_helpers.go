@@ -219,7 +219,7 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 			if v.CertificateThumbprintSHA256 == nil {
 				v.CertificateThumbprintSHA256 = make([]byte, 0)
 			}
-			expected.JSONWebKeys.JSONWebKeySet.Keys[k]=v
+			expected.JSONWebKeys.JSONWebKeySet.Keys[k] = v
 		}
 
 		assert.EqualValues(t, expected.JSONWebKeys.JSONWebKeySet, actual.GetJSONWebKeys())

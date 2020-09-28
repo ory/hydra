@@ -479,32 +479,32 @@ type bintree struct {
 }
 
 var _bintree = &bintree{nil, map[string]*bintree{
-	"jwk": &bintree{nil, map[string]*bintree{
-		"migrations": &bintree{nil, map[string]*bintree{
-			"sql": &bintree{nil, map[string]*bintree{
-				"cockroach": &bintree{nil, map[string]*bintree{
-					"1.sql": &bintree{jwkMigrationsSqlCockroach1Sql, map[string]*bintree{}},
-					"2.sql": &bintree{jwkMigrationsSqlCockroach2Sql, map[string]*bintree{}},
-					"3.sql": &bintree{jwkMigrationsSqlCockroach3Sql, map[string]*bintree{}},
-					"4.sql": &bintree{jwkMigrationsSqlCockroach4Sql, map[string]*bintree{}},
+	"jwk": {nil, map[string]*bintree{
+		"migrations": {nil, map[string]*bintree{
+			"sql": {nil, map[string]*bintree{
+				"cockroach": {nil, map[string]*bintree{
+					"1.sql": {jwkMigrationsSqlCockroach1Sql, map[string]*bintree{}},
+					"2.sql": {jwkMigrationsSqlCockroach2Sql, map[string]*bintree{}},
+					"3.sql": {jwkMigrationsSqlCockroach3Sql, map[string]*bintree{}},
+					"4.sql": {jwkMigrationsSqlCockroach4Sql, map[string]*bintree{}},
 				}},
-				"mysql": &bintree{nil, map[string]*bintree{
-					"4.sql": &bintree{jwkMigrationsSqlMysql4Sql, map[string]*bintree{}},
+				"mysql": {nil, map[string]*bintree{
+					"4.sql": {jwkMigrationsSqlMysql4Sql, map[string]*bintree{}},
 				}},
-				"postgres": &bintree{nil, map[string]*bintree{
-					"4.sql": &bintree{jwkMigrationsSqlPostgres4Sql, map[string]*bintree{}},
+				"postgres": {nil, map[string]*bintree{
+					"4.sql": {jwkMigrationsSqlPostgres4Sql, map[string]*bintree{}},
 				}},
-				"shared": &bintree{nil, map[string]*bintree{
-					"1.sql": &bintree{jwkMigrationsSqlShared1Sql, map[string]*bintree{}},
-					"2.sql": &bintree{jwkMigrationsSqlShared2Sql, map[string]*bintree{}},
-					"3.sql": &bintree{jwkMigrationsSqlShared3Sql, map[string]*bintree{}},
+				"shared": {nil, map[string]*bintree{
+					"1.sql": {jwkMigrationsSqlShared1Sql, map[string]*bintree{}},
+					"2.sql": {jwkMigrationsSqlShared2Sql, map[string]*bintree{}},
+					"3.sql": {jwkMigrationsSqlShared3Sql, map[string]*bintree{}},
 				}},
-				"tests": &bintree{nil, map[string]*bintree{
-					".gitkeep":   &bintree{jwkMigrationsSqlTestsGitkeep, map[string]*bintree{}},
-					"1_test.sql": &bintree{jwkMigrationsSqlTests1_testSql, map[string]*bintree{}},
-					"2_test.sql": &bintree{jwkMigrationsSqlTests2_testSql, map[string]*bintree{}},
-					"3_test.sql": &bintree{jwkMigrationsSqlTests3_testSql, map[string]*bintree{}},
-					"4_test.sql": &bintree{jwkMigrationsSqlTests4_testSql, map[string]*bintree{}},
+				"tests": {nil, map[string]*bintree{
+					".gitkeep":   {jwkMigrationsSqlTestsGitkeep, map[string]*bintree{}},
+					"1_test.sql": {jwkMigrationsSqlTests1_testSql, map[string]*bintree{}},
+					"2_test.sql": {jwkMigrationsSqlTests2_testSql, map[string]*bintree{}},
+					"3_test.sql": {jwkMigrationsSqlTests3_testSql, map[string]*bintree{}},
+					"4_test.sql": {jwkMigrationsSqlTests4_testSql, map[string]*bintree{}},
 				}},
 			}},
 		}},

@@ -7482,6 +7482,180 @@ p JSON.parse(result)
 </TabItem>
 </Tabs>
 
+<a id="opIddeleteOAuth2Token"></a>
+
+### Delete OAuth2 Access Tokens from a client
+
+```
+DELETE /oauth2/tokens?client_id=string HTTP/1.1
+Accept: application/json
+
+```
+
+This endpoint deletes OAuth2 access tokens issued for a client from the database
+
+<a id="delete-oauth2-access-tokens-from-a-client-parameters"></a>
+
+#### Parameters
+
+| Parameter | In    | Type   | Required | Description |
+| --------- | ----- | ------ | -------- | ----------- |
+| client_id | query | string | true     | none        |
+
+#### Responses
+
+<a id="delete-oauth2-access-tokens-from-a-client-responses"></a>
+
+##### Overview
+
+| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
+| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
+| typically 201. | None                                                                       |
+| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+
+##### Examples
+
+###### 401 response
+
+```json
+{
+  "debug": "The database adapter was unable to find the element",
+  "error": "The requested resource could not be found",
+  "error_description": "Object with ID 12345 does not exist",
+  "status_code": 404
+}
+```
+
+<aside class="success">This operation does not require authentication</aside>
+
+#### Code samples
+
+<Tabs groupId="code-samples" defaultValue="shell"
+  values={[{label: 'Shell', value: 'shell'}, {label: 'Go', value: 'go'}, {label: 'Node', value: 'node'},
+    {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
+<TabItem value="shell">
+
+```shell
+curl -X DELETE /oauth2/tokens?client_id=string \
+  -H 'Accept: application/json'
+```
+
+</TabItem>
+<TabItem value="go">
+
+```go
+package main
+
+import (
+    "bytes"
+    "net/http"
+)
+
+func main() {
+    headers := map[string][]string{
+        "Accept": []string{"application/json"},
+    }
+
+    var body []byte
+    // body = ...
+
+    req, err := http.NewRequest("DELETE", "/oauth2/tokens", bytes.NewBuffer(body))
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+```
+
+</TabItem>
+<TabItem value="node">
+
+```javascript
+const fetch = require('node-fetch')
+
+const headers = {
+  Accept: 'application/json'
+}
+
+fetch('/oauth2/tokens?client_id=string', {
+  method: 'DELETE',
+  headers
+})
+  .then((r) => r.json())
+  .then((body) => {
+    console.log(body)
+  })
+```
+
+</TabItem>
+<TabItem value="java">
+
+```java
+// This sample needs improvement.
+URL obj = new URL("/oauth2/tokens?client_id=string");
+
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("DELETE");
+
+int responseCode = con.getResponseCode();
+
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream())
+);
+
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+
+System.out.println(response.toString());
+```
+
+</TabItem>
+<TabItem value="python">
+
+```python
+import requests
+
+headers = {
+  'Accept': 'application/json'
+}
+
+r = requests.delete(
+  '/oauth2/tokens',
+  params={
+    'client_id': 'string'},
+  headers = headers)
+
+print r.json()
+```
+
+</TabItem>
+<TabItem value="ruby">
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Accept' => 'application/json'
+}
+
+result = RestClient.delete '/oauth2/tokens',
+  params: {
+    'client_id' => 'string'}, headers: headers
+
+p JSON.parse(result)
+```
+
+</TabItem>
+</Tabs>
+
 <a id="opIdgetVersion"></a>
 
 ### Get Service Version

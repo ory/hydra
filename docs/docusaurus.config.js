@@ -2,13 +2,12 @@ const config = require('./contrib/config.js')
 const fs = require('fs')
 const admonitions = require('remark-admonitions')
 
-const githubRepoName = config.projectSlug === 'ecosystem'
-  ? 'docs'
-  : config.projectSlug
+const githubRepoName =
+  config.projectSlug === 'ecosystem' ? 'docs' : config.projectSlug
 
 const links = [
   {
-    to: "/",
+    to: '/',
     activeBasePath: `${config.projectSlug}/docs`,
     label: `Docs`,
     position: 'left'
@@ -80,7 +79,9 @@ module.exports = {
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
-        href: `https://www.ory.sh/${config.projectSlug === 'ecosystem' ? '' : config.projectSlug}`
+        href: `https://www.ory.sh/${
+          config.projectSlug === 'ecosystem' ? '' : config.projectSlug
+        }`
       },
       items: links
     },

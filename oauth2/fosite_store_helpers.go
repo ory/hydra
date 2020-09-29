@@ -178,7 +178,7 @@ func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t 
 	return func(t *testing.T) {
 		dbErrorIsConstraintError := func(dbErr error) {
 			assert.Error(t, dbErr)
-			if ve := new(herodot.DefaultError); errors.As(dbErr, ve) {
+			if ve := new(herodot.DefaultError); errors.As(dbErr, &ve) {
 				assert.Equal(t, sqlcon.ErrUniqueViolation, ve)
 				return
 			}

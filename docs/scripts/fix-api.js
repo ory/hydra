@@ -32,6 +32,7 @@ fs.readFile(file, (err, b) => {
     // .replace(/<h2 id="toc([a-zA-Z0-9_\-]+)">([a-zA-Z0-9_\-]+)<\/h2>\n/gim, '## $2')
     // .replace(/<h1 id="ory-([a-zA-Z0-9_\-]+)">([a-zA-Z0-9_\-]+)<\/h2>\n/gim, '## $2')
     .replace(/\n\s*\n/g, '\n\n', -1)
+    .replace(/<br>/g, '<br/>', -1)
     .replace(/^-(\s.*)\n/gim, '-$1', -1)
     .replace(/\n\n---/gi, '\n---\n\n')
     // .replace(/\n\s*\n```/gi, '\n```')

@@ -4,10 +4,12 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-09-24)](#unreleased-2020-09-24)
+- [Unreleased (2020-09-29)](#unreleased-2020-09-29)
+- [1.8.0 (2020-09-29)](#180-2020-09-29)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
+    - [BREAKING CHANGES](#breaking-changes)
   - [1.7.4 (2020-08-31)](#174-2020-08-31)
     - [Bug Fixes](#bug-fixes-1)
   - [1.7.3 (2020-08-31)](#173-2020-08-31)
@@ -17,14 +19,14 @@
     - [Documentation](#documentation-1)
     - [Features](#features-1)
     - [Unclassified](#unclassified)
-    - [BREAKING CHANGES](#breaking-changes)
+    - [BREAKING CHANGES](#breaking-changes-1)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
     - [Bug Fixes](#bug-fixes-3)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-2)
     - [Features](#features-2)
     - [Unclassified](#unclassified-1)
-    - [BREAKING CHANGES](#breaking-changes-1)
+    - [BREAKING CHANGES](#breaking-changes-2)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
     - [Bug Fixes](#bug-fixes-4)
     - [Documentation](#documentation-3)
@@ -49,7 +51,7 @@
     - [Documentation](#documentation-6)
 - [1.5.0-beta.1 (2020-04-30)](#150-beta1-2020-04-30)
     - [Code Refactoring](#code-refactoring-3)
-    - [BREAKING CHANGES](#breaking-changes-2)
+    - [BREAKING CHANGES](#breaking-changes-3)
   - [1.4.10 (2020-04-30)](#1410-2020-04-30)
     - [Bug Fixes](#bug-fixes-9)
     - [Documentation](#documentation-7)
@@ -84,7 +86,7 @@
     - [Documentation](#documentation-14)
     - [Features](#features-8)
     - [Unclassified](#unclassified-5)
-    - [BREAKING CHANGES](#breaking-changes-3)
+    - [BREAKING CHANGES](#breaking-changes-4)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
     - [Impact](#impact)
     - [Severity](#severity)
@@ -468,13 +470,22 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.7.4...2b0f87f09656bd700f4fe7336efe1750bf3ca325) (2020-09-24)
+# Unreleased (2020-09-29)
+
+No significant changes have been made for this release.
+
+
+# [1.8.0](https://github.com/ory/hydra/compare/v1.7.4...v1.8.0) (2020-09-29)
 
 
 ### Bug Fixes
 
+* Bump deps to patch CVE-2020-15223  ([#2067](https://github.com/ory/hydra/issues/2067)) ([b36073a](https://github.com/ory/hydra/commit/b36073af4880f47da7702e3cc86d56edd5e3f514))
 * Downgrade log level for access rejections ([#2038](https://github.com/ory/hydra/issues/2038)) ([82208c4](https://github.com/ory/hydra/commit/82208c43a1a2e5d382db5ab35885b6b5042c9d54)), closes [#2031](https://github.com/ory/hydra/issues/2031)
 * Ignore x/net false positives ([fd14ad3](https://github.com/ory/hydra/commit/fd14ad30110d3ce1865e69dfaf8735f01dd40743))
+* Remove docker-e2e file ([096bc0c](https://github.com/ory/hydra/commit/096bc0c5a7908946eb5f76ffe634e5d372a47563)):
+
+    > The file and build pipeline have moved to https://github.com/ory/e2e-env.
 * Support HTTP POST method for logout ([#2043](https://github.com/ory/hydra/issues/2043)) ([29b2af4](https://github.com/ory/hydra/commit/29b2af4add8902f4461f9c53b2f59474b231d9c8))
 
 
@@ -502,6 +513,14 @@
 * Allow to automatically set GOMAXPROCS according to linux container quota ([#2034](https://github.com/ory/hydra/issues/2034)) ([39652ac](https://github.com/ory/hydra/commit/39652acb2d148a4deb0614725de27c1bf895c05b))
 * API for deleting a client's access tokens ([#2058](https://github.com/ory/hydra/issues/2058)) ([077c54a](https://github.com/ory/hydra/commit/077c54ab5143041d4189d5e79ca52920b91bc9b0)), closes [#1728](https://github.com/ory/hydra/issues/1728)
 * Improving the client update command description ([85b6e86](https://github.com/ory/hydra/commit/85b6e86d1957b270fe66de2cb917bcd0e21a6918))
+
+
+### BREAKING CHANGES
+
+* As part of this patch, a few things have changed in a breaking fashion:
+
+- OAuth2 Redirection URL error parameters `error_hint`, `error_debug` have been deprecated and now part of `error_description`. The parameters are still included for compatibility reasons but will be removed in a future release.
+- OAuth2 Error `revocation_client_mismatch` was not standardized and has been removed. Instead, you will now receive `unauthorized_client` with a description explaning why the flow failed.
 
 
 

@@ -554,16 +554,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 
 	if err != nil {
-		switch {
-		case errors.Is(err, fosite.ErrServerError):
-			fallthrough
-		case errors.Is(err, fosite.ErrTemporarilyUnavailable):
-			fallthrough
-		case errors.Is(err, fosite.ErrMisconfiguration):
-			x.LogError(r, err, h.r.Logger())
-		default:
-			x.LogAudit(r, err, h.r.Logger())
-		}
+		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -601,21 +592,20 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 
 	if err != nil {
-		switch {
-		case errors.Is(err, fosite.ErrServerError):
-			fallthrough
-		case errors.Is(err, fosite.ErrTemporarilyUnavailable):
-			fallthrough
-		case errors.Is(err, fosite.ErrMisconfiguration):
-			x.LogError(r, err, h.r.Logger())
-		default:
-			x.LogAudit(r, err, h.r.Logger())
-		}
+		h.logOrAudit(err, r)
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
 
 	h.r.OAuth2Provider().WriteAccessResponse(w, accessRequest, accessResponse)
+}
+
+func (h *Handler) logOrAudit(err error, r *http.Request) {
+	if errors.Is(err, fosite.ErrServerError) || errors.Is(err, fosite.ErrTemporarilyUnavailable) || errors.Is(err, fosite.ErrMisconfiguration) {
+		x.LogError(r, err, h.r.Logger())
+	} else {
+		x.LogAudit(r, err, h.r.Logger())
+	}
 }
 
 // swagger:route GET /oauth2/auth public oauthAuth

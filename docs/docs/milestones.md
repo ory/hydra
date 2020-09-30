@@ -25,7 +25,7 @@ A request for comments to discuss and share ideas.
 - [ ] Multi-region deployment support ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 - [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 
-## [v1.7.1](https://github.com/ory/hydra/milestone/40)
+## [v1.8.1](https://github.com/ory/hydra/milestone/40)
 
 _This milestone does not have a description._
 
@@ -35,6 +35,7 @@ Something is not working.
 
 #### Issues
 
+- [ ] Report expired JWT assertion token to client ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [x] Slow consent revocation request ([hydra#1997](https://github.com/ory/hydra/issues/1997))
 
 #### Pull Requests
@@ -47,7 +48,7 @@ New feature or request.
 
 #### Issues
 
-- [ ] Publish a generated csharp SDK ([hydra#2017](https://github.com/ory/hydra/issues/2017))
+- [x] Publish a generated csharp SDK ([hydra#2017](https://github.com/ory/hydra/issues/2017))
 
 #### Pull Requests
 
@@ -59,8 +60,8 @@ Affects documentation.
 
 #### Issues
 
-- [ ] Document GitLab setup with ORY Hydra as the OpenID Connect Provider ([hydra#2007](https://github.com/ory/hydra/issues/2007)) - [@Kim Neunert](https://github.com/k9ert)
 - [x] docs: Hydra supports two concepts of authorization ([hydra#1992](https://github.com/ory/hydra/issues/1992)) - [@hackerman](https://github.com/aeneasr)
+- [x] Document GitLab setup with ORY Hydra as the OpenID Connect Provider ([hydra#2007](https://github.com/ory/hydra/issues/2007)) - [@Kim Neunert](https://github.com/k9ert)
 
 #### Pull Requests
 
@@ -82,7 +83,7 @@ Affects Continuous Integration (CI).
 
 - [x] ci: fix etcd CVEs ([hydra#2003](https://github.com/ory/hydra/pull/2003)) - [@hackerman](https://github.com/aeneasr)
 
-## [v1.8.0](https://github.com/ory/hydra/milestone/39)
+## [v1.9.0](https://github.com/ory/hydra/milestone/39)
 
 _This milestone does not have a description._
 

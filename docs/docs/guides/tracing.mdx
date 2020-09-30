@@ -45,25 +45,29 @@ issue.
 
 ### Alright, how can I set this up locally?
 
-The [provided docker-compose file](https://github.com/ory/hydra/blob/master/quickstart-tracing.yml)
-in the project repository has tracing configuration which you can use to play around with - just uncomment
-the desired tracing provider. We will use Jaeger as an example.
+The
+[provided docker-compose file](https://github.com/ory/hydra/blob/master/quickstart-tracing.yml)
+in the project repository has tracing configuration which you can use to play
+around with - just uncomment the desired tracing provider. We will use Jaeger as
+an example.
 
 Simply run
+
 ```shell script
 $ docker-compose -f quickstart.yml \
     -f quickstart-tracing.yml \
     up --build
 ```
 
-Grab a coffee or stretch while you wait for everything to come up. You will then be able to navigate to the Jaeger UI
-which you have exposed on port `16686` at http://localhost:16686/search. You can now
-start making requests to Hydra and inspect traces!
+Grab a coffee or stretch while you wait for everything to come up. You will then
+be able to navigate to the Jaeger UI which you have exposed on port `16686` at
+http://localhost:16686/search. You can now start making requests to Hydra and
+inspect traces!
 
 As an example, here is a trace created by making a bad request to the
 `POST /clients` endpoint:
 
-<img alt="Sample Trace" src={useBaseUrl('/img/docs/sample_trace.png')}/>
+<img alt="Sample Trace" src={useBaseUrl('/img/docs/sample_trace.png')} />
 
 At a glance, you are able to see that:
 

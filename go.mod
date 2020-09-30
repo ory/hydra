@@ -31,7 +31,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/cli v0.0.12
-	github.com/ory/fosite v0.32.2
+	github.com/ory/fosite v0.34.0
 	github.com/ory/go-acc v0.2.5
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.1

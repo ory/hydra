@@ -65,7 +65,7 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Driver) []tls.Certif
 
 	if err == nil {
 		return cert
-	} else if errors.Cause(err) != tlsx.ErrNoCertificatesConfigured {
+	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {
 		d.Registry().Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 

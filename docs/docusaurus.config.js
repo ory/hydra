@@ -118,8 +118,7 @@ module.exports = {
             : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
         editUrl: `https://github.com/ory/${githubRepoName}/edit/master/docs`,
-        routeBasePath: '',
-        homePageId: 'index',
+        routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
         remarkPlugins: [admonitions]

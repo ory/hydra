@@ -183,9 +183,9 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 
 func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwtgo.MapClaims, error) {
 	token, err := s.r.OpenIDJWTStrategy().Decode(ctx, idTokenHint)
-	if ve, ok := errors.Cause(err).(*jwtgo.ValidationError); errors.Cause(err) == nil || (ok && ve.Errors == jwtgo.ValidationErrorExpired) {
+	if ve := new(jwtgo.ValidationError); errors.As(err, &ve) && ve.Errors == jwtgo.ValidationErrorExpired {
 		// Expired is ok
-	} else {
+	} else if err != nil {
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint(err.Error()))
 	}
 
@@ -349,7 +349,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(cl fosite.Client, subject, 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
 	ctx := r.Context()
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, x.ErrNotFound) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -588,7 +588,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
-	if errors.Is(err, sqlcon.ErrNoRows) {
+	if errors.Is(err, x.ErrNotFound) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err

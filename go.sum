@@ -883,8 +883,8 @@ github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnh
 github.com/ory/dockertest/v3 v3.5.4 h1:rYijlJuraj8D4OgC1DpYpCV8SGXrkviT3RVrjFy7OFc=
 github.com/ory/dockertest/v3 v3.5.4/go.mod h1:J8ZUbNB2FOhm1cFZW9xBpDsODqsSWcyYgtJYVPcnF70=
 github.com/ory/fosite v0.29.0/go.mod h1:0atSZmXO7CAcs6NPMI/Qtot8tmZYj04Nddoold4S2h0=
-github.com/ory/fosite v0.32.2 h1:iRV495P/9EyoYQ8qEHYxFQeeYCdDFawqjAML+qiMF9s=
-github.com/ory/fosite v0.32.2/go.mod h1:UeBhRgW6nAjTcd8S7kAo0IFsY/rTPyOXPq/t8N20Q8I=
+github.com/ory/fosite v0.34.0 h1:lCUX4f5BoiXBIRUYKeTne+aRl0v6StgWpyYKq+7ILw0=
+github.com/ory/fosite v0.34.0/go.mod h1:h+ize9gk0GvRyGjabriqSEmTkMhny+O95cijb8DVqPE=
 github.com/ory/fosite v0.33.0 h1:tK+3Luazv4vIBJY3uagOBryAQ3IG3cs6kfo8piGBhAY=
 github.com/ory/fosite v0.33.0/go.mod h1:h+ize9gk0GvRyGjabriqSEmTkMhny+O95cijb8DVqPE=
 github.com/ory/fosite v0.33.1-0.20200920071905-9cecb109a338 h1:pMTH+669M06E+ksBR8gYSrluesSLAz2d/gNp8zfqNx8=
@@ -916,7 +916,6 @@ github.com/ory/viper v1.7.4/go.mod h1:T6sodNZKNGPpashUOk7EtXz2isovz8oCd57GNVkkNm
 github.com/ory/viper v1.7.5 h1:+xVdq7SU3e1vNaCsk/ixsfxE4zylk1TJUiJrY647jUE=
 github.com/ory/viper v1.7.5/go.mod h1:ypOuyJmEUb3oENywQZRgeAMwqgOyDqwboO1tj3DjTaM=
 github.com/ory/x v0.0.84/go.mod h1:RXLPBG7B+hAViONVg0sHwK+U/ie1Y/NeXrq1JcARfoE=
-github.com/ory/x v0.0.85/go.mod h1:s44V8t3xyjWZREcU+mWlp4h302rTuM4aLXcW+y5FbQ8=
 github.com/ory/x v0.0.93/go.mod h1:lfcTaGXpTZs7IEQAW00r9EtTCOxD//SiP5uWtNiz31g=
 github.com/ory/x v0.0.110/go.mod h1:DJfkE3GdakhshNhw4zlKoRaL/ozg/lcTahA9OCih2BE=
 github.com/ory/x v0.0.127/go.mod h1:FwUujfFuCj5d+xgLn4fGMYPnzriR5bdAIulFXMtnK0M=
@@ -1428,7 +1427,6 @@ golang.org/x/tools v0.0.0-20191112195655-aa38f8e97acc/go.mod h1:b+2E5dAYhXwXZwtn
 golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20191125144606-a911d9008d1f/go.mod h1:b+2E5dAYhXwXZwtnZ6UAqBI28+e2cm9otk0dWdXHAEo=
 golang.org/x/tools v0.0.0-20191224055732-dd894d0a8a40/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
-golang.org/x/tools v0.0.0-20200113040837-eac381796e91/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20200117220505-0cba7a3a9ee9/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20200130002326-2f3ba24bd6e7/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.0.0-20200203215610-ab391d50b528/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=

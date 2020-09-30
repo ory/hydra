@@ -75,6 +75,7 @@
         "cli/hydra-serve-public", 
         "cli/hydra-token", 
         "cli/hydra-token-client", 
+        "cli/hydra-token-delete", 
         "cli/hydra-token-flush", 
         "cli/hydra-token-introspect", 
         "cli/hydra-token-revoke", 

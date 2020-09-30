@@ -36,6 +36,7 @@ Issue and Manage OAuth2 tokens
 
 * [hydra](hydra)	 - Run and manage ORY Hydra
 * [hydra token client](hydra-token-client)	 - An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow
+* [hydra token delete](hydra-token-delete)	 - Deletes access tokens of a client
 * [hydra token flush](hydra-token-flush)	 - Removes inactive access tokens from the database
 * [hydra token introspect](hydra-token-introspect)	 - Introspect an access or refresh token
 * [hydra token revoke](hydra-token-revoke)	 - Revoke an access or refresh token

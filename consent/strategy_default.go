@@ -30,8 +30,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/x/sqlcon"
-
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"

@@ -13,7 +13,6 @@ if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
 (cd ../../; go build -tags sqlite -o test/e2e/hydra . )
-go build -buildmode=plugin -o ./memtest.so ./plugin/memtest.go
 
 # Install oauth2-client
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then
@@ -89,21 +88,8 @@ case "$1" in
             export CYPRESS_jwt_enabled=true
             ;;
 
-        plugin)
-            DSN=plugin://./memtest.so \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=false
-            ;;
-
-        plugin-jwt)
-            DSN=plugin://./memtest.so \
-                OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
-                OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=true
-            ;;
         *)
-            echo $"Usage: $0 {memory|postgres|mysql|cockroach|plugin|memory-jwt|postgres-jwt|mysql-jwt|cockroach-jwt|plugin-jwt} [--watch]"
+            echo $"Usage: $0 {memory|postgres|mysql|cockroach|memory-jwt|postgres-jwt|mysql-jwt|cockroach-jwt} [--watch]"
             exit 1
 esac
 

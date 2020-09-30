@@ -15,6 +15,7 @@ require (
 	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gobuffalo/pop/v5 v5.2.0
+	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -63,4 +64,9 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
 
-replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200917134542-bbb3d452a468
+replace (
+	github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200924120546-ccabed8414d8
+	// github.com/gobuffalo/pop/v5 => ../pop
+	// github.com/ory/fosite => github.com/ory/fosite v0.33.1-0.20200917094606-b53f8f58f0b9
+	github.com/ory/fosite => ../fosite
+)

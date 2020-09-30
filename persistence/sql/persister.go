@@ -2,6 +2,9 @@ package sql
 
 import (
 	"context"
+	"database/sql"
+
+	"github.com/gobuffalo/x/randx"
 
 	"github.com/ory/fosite/storage"
 
@@ -49,7 +52,16 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 		return ctx, errors.WithStack(ErrTransactionOpen)
 	}
 
-	c, err := p.conn.NewTransaction()
+	tx, err := p.conn.Store.TransactionContextOptions(ctx, &sql.TxOptions{
+		Isolation: sql.LevelRepeatableRead,
+		ReadOnly:  false,
+	})
+	c := &pop.Connection{
+		TX:      tx,
+		Store:   tx,
+		ID:      randx.String(30),
+		Dialect: p.conn.Dialect,
+	}
 	return context.WithValue(ctx, transactionContextKey, c), err
 }
 

@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/fosite/storage"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
@@ -21,6 +23,7 @@ import (
 )
 
 var _ oauth2.AssertionJWTReader = &Persister{}
+var _ storage.Transactional = &Persister{}
 
 type (
 	tableName        string
@@ -206,15 +209,11 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 		return err
 	}
 
-	if err := p.Connection(ctx).Create(req); err != nil {
-		err = sqlcon.HandleError(err)
-		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
-			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-		}
-		return err
+	err = sqlcon.HandleError(p.Connection(ctx).Create(req))
+	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 	}
-
-	return nil
+	return err
 }
 
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
@@ -260,6 +259,9 @@ func (p *Persister) revokeSession(ctx context.Context, id string, table tableNam
 		return errors.WithStack(fosite.ErrNotFound)
 	} else if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+		} else if strings.Contains(err.Error(), "Error 1213") {
+			p.l.Infof("got error 1213: %+v", err)
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 		}
 		return err

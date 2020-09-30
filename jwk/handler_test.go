@@ -72,7 +72,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("public:test-id")))
 }
 
-func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey{
+func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
 	for k, v := range js {
 		if len(v.CertificateThumbprintSHA1) == 0 {
 			v.CertificateThumbprintSHA1 = nil

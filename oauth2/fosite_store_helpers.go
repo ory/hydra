@@ -42,7 +42,6 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/herodot"
 	"github.com/ory/x/sqlcon"
 
 	"github.com/ory/hydra/client"
@@ -183,13 +182,11 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 
 func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t *testing.T) {
 	return func(t *testing.T) {
-		dbErrorIsConstraintError := func(dbErr error) {
-			assert.Error(t, dbErr)
-			if ve := new(herodot.DefaultError); errors.As(dbErr, &ve) {
-				assert.Equal(t, sqlcon.ErrUniqueViolation, ve)
-				return
+		dbErrorIsConstraintError := func(err error) {
+			assert.Error(t, err)
+			if !errors.Is(err, sqlcon.ErrUniqueViolation) {
+				t.Errorf("unexpected error type %+v %T", err, err)
 			}
-			t.Errorf("unexpected error type %s", dbErr)
 		}
 
 		requestId := uuid.New()

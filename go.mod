@@ -66,7 +66,4 @@ require (
 
 replace (
 	github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20200924120546-ccabed8414d8
-	// github.com/gobuffalo/pop/v5 => ../pop
-	// github.com/ory/fosite => github.com/ory/fosite v0.33.1-0.20200917094606-b53f8f58f0b9
-	github.com/ory/fosite => ../fosite
 )

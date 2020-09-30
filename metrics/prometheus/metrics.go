@@ -1,5 +1,9 @@
 package prometheus
 
+const (
+	MetricsPrometheusPath = "/metrics/prometheus"
+)
+
 // Metrics prototypes
 // Example:
 // 	Counter      *prometheus.CounterVec

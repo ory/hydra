@@ -35,27 +35,18 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 		assert.EqualValues(t, http.StatusBadGateway, res.Code)
 	})
 
-	t.Run("case=missing-x-forwarded-proto", func(t *testing.T) {
-		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
-
+	t.Run("case=forced-http", func(t *testing.T) {
+		c := internal.NewConfigurationWithDefaults()
 		res := httptest.NewRecorder()
-		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{}, URL: new(url.URL)}, panicHandler)
-		assert.EqualValues(t, http.StatusBadGateway, res.Code)
-	})
-
-	t.Run("case=x-forwarded-proto-is-http", func(t *testing.T) {
-		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
-
-		res := httptest.NewRecorder()
-		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{"X-Forwarded-Proto": []string{"http"}}, URL: new(url.URL)}, panicHandler)
-		assert.EqualValues(t, http.StatusBadGateway, res.Code)
+		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{}, URL: new(url.URL)}, noopHandler)
+		assert.EqualValues(t, http.StatusNoContent, res.Code)
 	})
 
 	t.Run("case=missing-x-forwarded-for", func(t *testing.T) {
 		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
 
 		res := httptest.NewRecorder()
-		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{"X-Forwarded-Proto": []string{"https"}}, URL: new(url.URL)}, panicHandler)
+		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{}, URL: new(url.URL)}, panicHandler)
 		assert.EqualValues(t, http.StatusBadGateway, res.Code)
 	})
 
@@ -100,16 +91,55 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 		assert.EqualValues(t, http.StatusNoContent, res.Code)
 	})
 
+	t.Run("case=missing-x-forwarded-proto", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
+
+		res := httptest.NewRecorder()
+		RejectInsecureRequests(r, c)(res, &http.Request{
+			RemoteAddr: "127.0.0.1:123",
+			Header:     http.Header{},
+			URL:        new(url.URL)},
+			panicHandler,
+		)
+		assert.EqualValues(t, http.StatusBadGateway, res.Code)
+	})
+
+	t.Run("case=x-forwarded-proto-is-http", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
+
+		res := httptest.NewRecorder()
+		RejectInsecureRequests(r, c)(res, &http.Request{
+			RemoteAddr: "127.0.0.1:123",
+			Header: http.Header{
+				"X-Forwarded-Proto": []string{"http"},
+			}, URL: new(url.URL)},
+			panicHandler,
+		)
+		assert.EqualValues(t, http.StatusBadGateway, res.Code)
+	})
+
+	t.Run("case=remote-matches-cidr", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
+
+		res := httptest.NewRecorder()
+		RejectInsecureRequests(r, c)(res, &http.Request{
+			RemoteAddr: "127.0.0.1:123",
+			Header: http.Header{
+				"X-Forwarded-Proto": []string{"https"},
+			}, URL: new(url.URL)},
+			noopHandler,
+		)
+		assert.EqualValues(t, http.StatusNoContent, res.Code)
+	})
+
 	t.Run("case=passes-because-health-alive-endpoint", func(t *testing.T) {
 		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
 			RemoteAddr: "227.0.0.1:123",
-			Header: http.Header{
-				"X-Forwarded-Proto": []string{"https"},
-			},
-			URL: &url.URL{Path: "/health/alive"},
+			Header:     http.Header{},
+			URL:        &url.URL{Path: "/health/alive"},
 		},
 			noopHandler,
 		)
@@ -122,10 +152,22 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
 			RemoteAddr: "227.0.0.1:123",
-			Header: http.Header{
-				"X-Forwarded-Proto": []string{"https"},
-			},
-			URL: &url.URL{Path: "/health/alive"},
+			Header:     http.Header{},
+			URL:        &url.URL{Path: "/health/alive"},
+		},
+			noopHandler,
+		)
+		assert.EqualValues(t, http.StatusNoContent, res.Code)
+	})
+
+	t.Run("case=passes-because-metrics-prometheus-endpoint", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "126.0.0.1/24,127.0.0.1/24")
+
+		res := httptest.NewRecorder()
+		RejectInsecureRequests(r, c)(res, &http.Request{
+			RemoteAddr: "227.0.0.1:123",
+			Header:     http.Header{},
+			URL:        &url.URL{Path: "/metrics/prometheus"},
 		},
 			noopHandler,
 		)

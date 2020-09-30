@@ -196,14 +196,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e:
-          name: test-e2e-plugin
-          requires:
-            - test-e2e-memory
-          flavor: plugin
-          filters:
-            tags:
-              only: /.*/
       - changelog/generate:
           requires:
             - nancy/test
@@ -212,7 +204,6 @@ workflows:
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
-            - test-e2e-plugin
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -230,7 +221,6 @@ workflows:
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
-            - test-e2e-plugin
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -282,7 +272,6 @@ workflows:
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
-            - test-e2e-plugin
             - changelog/generate
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach

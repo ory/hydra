@@ -7,7 +7,7 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
@@ -15,6 +15,7 @@ import (
 // JSONWebKey It is important that this model object is named JSONWebKey for
 // "swagger generate spec" to generate only on definition of a
 // JSONWebKey.
+//
 // swagger:model JSONWebKey
 type JSONWebKey struct {
 

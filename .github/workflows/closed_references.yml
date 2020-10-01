@@ -16,9 +16,12 @@ jobs:
     name: Find closed references
     steps:
       - uses: actions/checkout@v2
-      - uses: ory/closed-reference-notifier@v1.1.4
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+      - uses: ory/closed-reference-notifier@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ignore: '.git,**/node_modules,docs,CHANGELOG.md,.bin,*.md'
+          ignore: ".git,**/node_modules,docs,CHANGELOG.md,.bin,*.md"
           issueLabels: upstream
           issueLimit: ${{ github.event.inputs.issueLimit || '5' }}

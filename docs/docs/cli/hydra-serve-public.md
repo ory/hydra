@@ -32,7 +32,7 @@ connection to be able to synchronize.
 ORY Hydra can be configured using environment variables as well as a configuration file. For more information
 on configuration options, open the configuration documentation:
 
->> https://github.com/ory/hydra/blob/undefined/docs/config.yaml <<
+>> https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md <<
 
 
 ```

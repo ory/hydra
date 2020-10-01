@@ -8,12 +8,10 @@ https://github.com/ory/meta/blob/master/templates/repository/CONTRIBUTING.md
 
 -->
 
-
 # Contributing to ORY {{Project}}
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 
 - [Introduction](#introduction)
 - [Contributing Code](#contributing-code)
@@ -143,23 +141,23 @@ please include a note in your commit message explaining why.
 
 ## How We Organize Our Work
 
-All repositories in the [ORY organization](https://github.com/ory) have their issues and pull requests 
+All repositories in the [ORY organization](https://github.com/ory) have their issues and pull requests
 monitored in the [ORY Monitoring Board](https://github.com/orgs/ory/projects/9). This allows
 for a transparent backlog of unanswered issues and pull requests across the ecosystem from those
 who are allowed to merge pull requests to the main branch.
 
 The process is as follows:
 
-1. *Cards* represent open issues and pull requests and are automatically assigned to the **Triage** column if
-the author is not one of the maintainers and no maintainer has answered yet.
-2. A maintainer assigns the issue or pull request to someone or adds the label *help wanted*
-which moves the card to **Requires Action**.
+1. _Cards_ represent open issues and pull requests and are automatically assigned to the **Triage** column if
+   the author is not one of the maintainers and no maintainer has answered yet.
+2. A maintainer assigns the issue or pull request to someone or adds the label _help wanted_
+   which moves the card to **Requires Action**.
 3. If a maintainer leaves a comment or review, the card moves to **Pending Reply**, implying that
-the original author needs to do something (e.g. implement a change, explain something in more detail, ...).
+   the original author needs to do something (e.g. implement a change, explain something in more detail, ...).
 4. If a non-maintainer pushes changes to the pull request or leaves a comment, the card moves
-back to **Requires Action**.
+   back to **Requires Action**.
 5. If a card stays inactive for 60 days or more days, we assume that public interest in the issue
-or change has waned, **archiving** the card.
+   or change has waned, **archiving** the card.
 6. If the issue is closed or the pull request merged or closed, the card is **archived** as well.
 
 We try our best to answer all issues and review all pull requests and hope that this transparent way

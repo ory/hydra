@@ -6,6 +6,5 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 // JoseJSONWebKeySet jose JSON web key set
-//
 // swagger:model JoseJSONWebKeySet
 type JoseJSONWebKeySet interface{}

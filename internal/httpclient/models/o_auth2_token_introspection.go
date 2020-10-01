@@ -7,7 +7,7 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
@@ -15,7 +15,6 @@ import (
 // OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 //
 // https://tools.ietf.org/html/rfc7662
-//
 // swagger:model oAuth2TokenIntrospection
 type OAuth2TokenIntrospection struct {
 

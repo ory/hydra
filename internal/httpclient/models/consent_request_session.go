@@ -6,12 +6,11 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // ConsentRequestSession Used to pass session data to a consent request.
-//
 // swagger:model consentRequestSession
 type ConsentRequestSession struct {
 

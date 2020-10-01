@@ -7,13 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // PreviousConsentSession The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
-//
 // swagger:model PreviousConsentSession
 type PreviousConsentSession struct {
 

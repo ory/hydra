@@ -7,13 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // PluginInterfaceType PluginInterfaceType plugin interface type
-//
 // swagger:model PluginInterfaceType
 type PluginInterfaceType struct {
 

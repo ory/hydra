@@ -7,13 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // JSONWebKeySetGeneratorRequest json web key set generator request
-//
 // swagger:model jsonWebKeySetGeneratorRequest
 type JSONWebKeySetGeneratorRequest struct {
 

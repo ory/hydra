@@ -9,13 +9,12 @@ import (
 	"strconv"
 
 	"github.com/go-openapi/errors"
-	"github.com/go-openapi/strfmt"
+	strfmt "github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // PluginConfigLinux PluginConfigLinux plugin config linux
-//
 // swagger:model PluginConfigLinux
 type PluginConfigLinux struct {
 

@@ -7,12 +7,13 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
 // OAuth2Client Client represents an OAuth 2.0 Client.
+//
 // swagger:model oAuth2Client
 type OAuth2Client struct {
 

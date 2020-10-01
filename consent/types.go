@@ -495,7 +495,7 @@ type LoginRequest struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client *client.Client `json:"client" db:"-"`
+	Client *client.Client `json:"client" belongs_to:"hydra_client" fk_id:"ClientID"`
 
 	ClientID string `json:"-" db:"client_id"`
 
@@ -525,21 +525,10 @@ func (_ LoginRequest) TableName() string {
 	return "hydra_oauth2_authentication_request"
 }
 
-func (r *LoginRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Client != nil {
-		r.ClientID = r.Client.ID
-	}
-	return nil
-}
-
-func (r *LoginRequest) AfterFind(c *pop.Connection) error {
-	r.Client = &client.Client{}
-	return sqlcon.HandleError(c.Find(r.Client, r.ClientID))
-}
-
 func (r *LoginRequest) FindInDB(c *pop.Connection, id string) error {
 	return c.Select("hydra_oauth2_authentication_request.*", "COALESCE(hr.was_used, FALSE) as was_handled").
 		LeftJoin("hydra_oauth2_authentication_request_handled as hr", "hydra_oauth2_authentication_request.challenge = hr.challenge").
+		Eager().
 		Find(r, id)
 }
 
@@ -573,7 +562,7 @@ type ConsentRequest struct {
 	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
-	Client   *client.Client `json:"client" db:"-"`
+	Client   *client.Client `json:"client" belongs_to:"hydra_client" fk_id:"ClientID"`
 	ClientID string         `json:"-" db:"client_id"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -612,22 +601,11 @@ func (_ ConsentRequest) TableName() string {
 	return "hydra_oauth2_consent_request"
 }
 
-func (r *ConsentRequest) BeforeSave(_ *pop.Connection) error {
-	if r.Client != nil {
-		r.ClientID = r.Client.ID
-	}
-	return nil
-}
-
-func (r *ConsentRequest) AfterFind(c *pop.Connection) error {
-	r.Client = &client.Client{}
-	return c.Find(r.Client, r.ClientID)
-}
-
 func (r *ConsentRequest) FindInDB(c *pop.Connection, id string) error {
 	return c.Select("COALESCE(hr.was_used, false) as was_handled", "hydra_oauth2_consent_request.*").
 		Where("hydra_oauth2_consent_request.challenge = ?", id).
 		LeftJoin("hydra_oauth2_consent_request_handled AS hr", "hr.challenge = hydra_oauth2_consent_request.challenge").
+		Eager().
 		First(r)
 }
 

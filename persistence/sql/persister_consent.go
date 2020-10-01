@@ -145,25 +145,22 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]consent.HandledConsentRequest, error) {
 	rs := make([]consent.HandledConsentRequest, 0)
 	tn := consent.HandledConsentRequest{}.TableName()
-
-	return rs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := c.
-			Where("r.subject = ? AND r.skip=FALSE", subject).
-			Where(fmt.Sprintf("%s.error='{}'", tn)).
-			Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
-			Order(fmt.Sprintf("%s.requested_at DESC", tn)).
-			Paginate(offset/limit+1, limit).
-			All(&rs)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) {
-				return errors.WithStack(consent.ErrNoPreviousConsentFound)
-			}
-			return sqlcon.HandleError(err)
+	c := p.Connection(ctx)
+	err := c.
+		Where("r.subject = ? AND r.skip=FALSE", subject).
+		Where(fmt.Sprintf("%s.error='{}'", tn)).
+		Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+		Order(fmt.Sprintf("%s.requested_at DESC", tn)).
+		Paginate(offset/limit+1, limit).
+		All(&rs)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
 		}
+		return nil, sqlcon.HandleError(err)
+	}
 
-		rs, err = p.resolveHandledConsentRequests(ctx, rs)
-		return err
-	})
+	return p.resolveHandledConsentRequests(ctx, rs)
 }
 
 func (p *Persister) resolveHandledConsentRequests(ctx context.Context, requests []consent.HandledConsentRequest) ([]consent.HandledConsentRequest, error) {

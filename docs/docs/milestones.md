@@ -126,6 +126,7 @@ New feature or request.
 - [ ] Token claims customization with Jsonnet ([hydra#1748](https://github.com/ory/hydra/issues/1748)) - [@hackerman](https://github.com/aeneasr)
 - [ ] Update clients from cli ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 - [ ] Find out if a login/consent challenge is still valid ([hydra#2057](https://github.com/ory/hydra/issues/2057))
+- [ ] Prometheus endpoint should not require x-forwarded-proto header ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 - [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 - [x] Add endpoint to Admin API to revoke access tokens ([hydra#1728](https://github.com/ory/hydra/issues/1728))

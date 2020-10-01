@@ -121,6 +121,7 @@ func TestMigrations(t *testing.T) {
 
 					ahcr := &consent.HandledConsentRequest{}
 					require.NoError(t, c.Q().Where("challenge = ?", ehcr.ID).First(ahcr))
+					require.NoError(t, ehcr.AfterFind(c))
 					assertEqualHandledConsentRequests(t, ehcr, ahcr)
 
 					ahlr := &consent.HandledLoginRequest{}

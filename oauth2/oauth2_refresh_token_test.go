@@ -178,6 +178,9 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 							}
 						case fosite.ErrServerError.Name:
 							// this happens when there is an error with the storage
+							if dbName == dbal.DriverCockroachDB && strings.Contains(e.Debug, "RETRY_WRITE_TOO_OLD") {
+								break
+							}
 							fallthrough
 						default:
 							// unfortunately, MySQL does not offer the same behaviour under the "REPEATABLE_READ" isolation

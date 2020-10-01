@@ -7,11 +7,12 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // AcceptConsentRequest The request payload used to accept a consent request.
+//
 // swagger:model acceptConsentRequest
 type AcceptConsentRequest struct {
 

@@ -7,7 +7,7 @@ package models
 
 import (
 	"github.com/go-openapi/errors"
-	strfmt "github.com/go-openapi/strfmt"
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
@@ -16,6 +16,7 @@ import (
 //
 // It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms
 // among others.
+//
 // swagger:model wellKnown
 type WellKnown struct {
 

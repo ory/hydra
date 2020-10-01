@@ -100,90 +100,99 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*consent.HandledConsentRequest, error) {
 	var r consent.HandledConsentRequest
 	var cr consent.ConsentRequest
-	c := p.Connection(ctx)
+	return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&cr); err != nil {
+			return sqlcon.HandleError(err)
+		}
 
-	if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&cr); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
+		if err := c.Find(&r, cr.ID); err != nil {
+			return sqlcon.HandleError(err)
+		}
 
-	if err := c.Find(&r, cr.ID); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
+		if r.WasUsed {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
+		}
 
-	if r.WasUsed {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already"))
-	}
-
-	r.WasUsed = true
-	return &r, sqlcon.HandleError(c.Update(&r))
+		r.WasUsed = true
+		return c.Update(&r)
+	})
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]consent.HandledConsentRequest, error) {
-	rs := make([]consent.HandledConsentRequest, 0)
+	rs := make([]consent.HandledConsentRequest, 0, 1)
 	tn := consent.HandledConsentRequest{}.TableName()
 
-	if err := p.Connection(ctx).
-		Where("r.subject = ? AND r.client_id = ? AND r.skip=FALSE", subject, client).
-		Where(fmt.Sprintf("%s.error='{}' AND %s.remember=TRUE", tn, tn)).
-		Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
-		Order(fmt.Sprintf("%s.requested_at DESC", tn)).
-		Limit(1).
-		All(&rs); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	return rs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := c.
+			Where("r.subject = ? AND r.client_id = ? AND r.skip=FALSE", subject, client).
+			Where(fmt.Sprintf("%s.error='{}' AND %s.remember=TRUE", tn, tn)).
+			Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+			Order(fmt.Sprintf("%s.requested_at DESC", tn)).
+			Limit(1).
+			All(&rs)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errors.WithStack(consent.ErrNoPreviousConsentFound)
+			}
+			return sqlcon.HandleError(err)
 		}
-		return nil, sqlcon.HandleError(err)
-	}
 
-	return p.resolveHandledConsentRequests(ctx, rs)
+		rs, err = p.resolveHandledConsentRequests(ctx, rs)
+		return err
+	})
 }
 
 func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subject string, limit, offset int) ([]consent.HandledConsentRequest, error) {
 	rs := make([]consent.HandledConsentRequest, 0)
 	tn := consent.HandledConsentRequest{}.TableName()
 
-	if err := p.Connection(ctx).
-		Where("r.subject = ? AND r.skip=FALSE", subject).
-		Where(fmt.Sprintf("%s.error='{}'", tn)).
-		Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
-		Order(fmt.Sprintf("%s.requested_at DESC", tn)).
-		Paginate(offset/limit+1, limit).
-		All(&rs); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	return rs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := c.
+			Where("r.subject = ? AND r.skip=FALSE", subject).
+			Where(fmt.Sprintf("%s.error='{}'", tn)).
+			Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+			Order(fmt.Sprintf("%s.requested_at DESC", tn)).
+			Paginate(offset/limit+1, limit).
+			All(&rs)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errors.WithStack(consent.ErrNoPreviousConsentFound)
+			}
+			return sqlcon.HandleError(err)
 		}
-		return nil, sqlcon.HandleError(err)
-	}
 
-	return p.resolveHandledConsentRequests(ctx, rs)
+		rs, err = p.resolveHandledConsentRequests(ctx, rs)
+		return err
+	})
 }
 
 func (p *Persister) resolveHandledConsentRequests(ctx context.Context, requests []consent.HandledConsentRequest) ([]consent.HandledConsentRequest, error) {
 	var result []consent.HandledConsentRequest
-	for _, v := range requests {
-		_, err := p.GetConsentRequest(ctx, v.ID)
-		if err != nil {
-			return nil, err
-		} else if errors.Is(err, x.ErrNotFound) {
-			return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
+	return result, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		for _, v := range requests {
+			_, err := p.GetConsentRequest(ctx, v.ID)
+			if errors.Is(err, sqlcon.ErrNoRows) {
+				return errors.WithStack(consent.ErrNoPreviousConsentFound)
+			} else if err != nil {
+				return err
+			}
+
+			// this will probably never error because we first check if the consent request actually exists
+			if err := v.AfterFind(p.Connection(ctx)); err != nil {
+				return err
+			}
+			if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
+				continue
+			}
+
+			result = append(result, v)
 		}
 
-		// this will probably never error because we first check if the consent request actually exists
-		if err := v.AfterFind(p.Connection(ctx)); err != nil {
-			return nil, err
+		if len(result) == 0 {
+			return errors.WithStack(consent.ErrNoPreviousConsentFound)
 		}
-		if v.RememberFor > 0 && v.RequestedAt.Add(time.Duration(v.RememberFor)*time.Second).Before(time.Now().UTC()) {
-			continue
-		}
-
-		result = append(result, v)
-	}
-
-	if len(result) == 0 {
-		return nil, errors.WithStack(consent.ErrNoPreviousConsentFound)
-	}
-
-	return result, nil
+		return nil
+	})
 }
 
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
@@ -271,22 +280,23 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*consent.HandledLoginRequest, error) {
 	var d consent.HandledLoginRequest
-	c := p.Connection(ctx)
-	var ar consent.LoginRequest
-	if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&ar); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
+	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		var ar consent.LoginRequest
+		if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&ar); err != nil {
+			return sqlcon.HandleError(err)
+		}
 
-	if err := c.Find(&d, ar.ID); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
+		if err := c.Find(&d, ar.ID); err != nil {
+			return sqlcon.HandleError(err)
+		}
 
-	if d.WasUsed {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Authentication verifier has been used already"))
-	}
+		if d.WasUsed {
+			return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Authentication verifier has been used already"))
+		}
 
-	d.WasUsed = true
-	return &d, sqlcon.HandleError(c.Update(&d))
+		d.WasUsed = true
+		return sqlcon.HandleError(c.Update(&d))
+	})
 }
 
 func (p *Persister) CreateForcedObfuscatedLoginSession(ctx context.Context, session *consent.ForcedObfuscatedLoginSession) error {
@@ -329,30 +339,31 @@ func (p *Persister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx contex
 }
 
 func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) ([]client.Client, error) {
-	c := p.Connection(ctx)
-	var ids []string
-	/* #nosec G201 - channel can either be "front" or "back" */
-	if err := c.RawQuery(
-		fmt.Sprintf(`SELECT DISTINCT(c.id) FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND r.login_session_id = ?`,
-			channel,
-			channel,
-		),
-		subject,
-		sid,
-	).All(&ids); err != nil {
-		return nil, sqlcon.HandleError(err)
-	}
-
-	cs := make([]client.Client, len(ids))
-	for k, id := range ids {
-		c, err := p.GetConcreteClient(ctx, id)
-		if err != nil {
-			return nil, err
+	var cs []client.Client
+	return cs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		var ids []string
+		/* #nosec G201 - channel can either be "front" or "back" */
+		if err := c.RawQuery(
+			fmt.Sprintf(`SELECT DISTINCT(c.id) FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND r.login_session_id = ?`,
+				channel,
+				channel,
+			),
+			subject,
+			sid,
+		).All(&ids); err != nil {
+			return sqlcon.HandleError(err)
 		}
-		cs[k] = *c
-	}
 
-	return cs, nil
+		cs = make([]client.Client, len(ids))
+		for k, id := range ids {
+			c, err := p.GetConcreteClient(ctx, id)
+			if err != nil {
+				return err
+			}
+			cs[k] = *c
+		}
+		return nil
+	})
 }
 
 func (p *Persister) CreateLogoutRequest(ctx context.Context, request *consent.LogoutRequest) error {

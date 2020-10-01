@@ -220,24 +220,28 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	rawSignature = p.hashSignature(rawSignature, table)
 
 	r := OAuth2RequestSQL{Table: table}
+	var fr fosite.Requester
 
-	err := p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, errors.WithStack(fosite.ErrNotFound)
-	} else if err != nil {
-		return nil, sqlcon.HandleError(err)
-	} else if !r.Active && table == sqlTableCode {
-		fr, err := r.toRequest(ctx, session, p)
-		if err != nil {
-			return nil, err
-		} else {
-			return fr, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.WithStack(fosite.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		} else if !r.Active && table == sqlTableCode {
+			fr, err = r.toRequest(ctx, session, p)
+			if err != nil {
+				return err
+			} else {
+				return errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+			}
+		} else if !r.Active {
+			return errors.WithStack(fosite.ErrInactiveToken)
 		}
-	} else if !r.Active {
-		return nil, errors.WithStack(fosite.ErrInactiveToken)
-	}
 
-	return r.toRequest(ctx, session, p)
+		fr, err = r.toRequest(ctx, session, p)
+		return err
+	})
 }
 
 func (p *Persister) deleteSession(ctx context.Context, signature string, table tableName) error {

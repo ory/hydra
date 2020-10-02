@@ -60,6 +60,7 @@ Affects documentation.
 
 #### Issues
 
+- [ ] Docs: reference configuration provides invalid bcrypt cost and some other outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) - [@Vincent](https://github.com/vinckr)
 - [x] docs: Hydra supports two concepts of authorization ([hydra#1992](https://github.com/ory/hydra/issues/1992)) - [@hackerman](https://github.com/aeneasr)
 - [x] Document GitLab setup with ORY Hydra as the OpenID Connect Provider ([hydra#2007](https://github.com/ory/hydra/issues/2007)) - [@Kim Neunert](https://github.com/k9ert)
 

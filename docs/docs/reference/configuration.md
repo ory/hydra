@@ -53,7 +53,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: panic
+  level: debug
 
   ## leak_sensitive_values ##
   #
@@ -67,7 +67,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
   #
-  leak_sensitive_values: true
+  leak_sensitive_values: false
 
   ## format ##
   #
@@ -108,7 +108,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 32957
+    port: 4000
 
     ## host ##
     #
@@ -142,7 +142,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -162,7 +162,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -177,9 +179,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
+        - DELETE
         - TRACE
-        - POST
-        - POST
+        - PATCH
 
       ## allowed_headers ##
       #
@@ -194,7 +196,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - qui pariatur in Ut in
+        - quis magna id
+        - amet minim sit reprehenderit
+        - incididunt sit Duis cupidatat tempor
 
       ## exposed_headers ##
       #
@@ -209,10 +213,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - sunt elit Duis reprehenderit nulla
-        - cillum aute
-        - in
-        - sunt reprehenderit sed eiusmod ex
+        - incididunt Ut proident
+        - non reprehenderit
+        - incididunt ad reprehenderit occaecat ut
 
       ## allow_credentials ##
       #
@@ -240,7 +243,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: false
+      options_passthrough: true
 
       ## max_age ##
       #
@@ -254,7 +257,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 19079642
+      max_age: 99281818
 
       ## debug ##
       #
@@ -268,7 +271,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: false
+      debug: true
 
     ## socket ##
     #
@@ -285,7 +288,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
       #
-      owner: adipisicing dolore amet exercitation non
+      owner: in
 
       ## group ##
       #
@@ -297,7 +300,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
       #
-      group: veniam Excepteur est consectetur quis
+      group: voluptate ullamco dolor do sunt
 
       ## mode ##
       #
@@ -315,7 +318,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
       #
-      mode: 475
+      mode: 438
 
     ## access_log ##
     #
@@ -334,7 +337,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
-      disable_for_health: false
+      disable_for_health: true
 
   ## admin ##
   #
@@ -349,7 +352,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 6026
+    port: 35091
 
     ## host ##
     #
@@ -420,9 +423,8 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
+        - CONNECT
         - PUT
-        - PATCH
-        - TRACE
 
       ## allowed_headers ##
       #
@@ -437,10 +439,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - in et consequat
-        - occaecat non
-        - id occaecat quis anim
-        - velit dolor
+        - reprehenderit voluptate aliquip
+        - ea veniam reprehenderit et ex
+        - laboris non
+        - sit consectetur consequat mollit Excepteur
 
       ## exposed_headers ##
       #
@@ -455,11 +457,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - eu sit ut sunt dolore
-        - do aliqua
-        - ex ea dolore
-        - cillum sunt incididunt ea
-        - enim
+        - quis et
+        - id laboris in
+        - sunt
 
       ## allow_credentials ##
       #
@@ -473,7 +473,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -501,7 +501,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 55808418
+      max_age: 61545848
 
       ## debug ##
       #
@@ -515,7 +515,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
     ## socket ##
     #
@@ -532,7 +532,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
       #
-      owner: est
+      owner: officia cupidatat ut incididunt et
 
       ## group ##
       #
@@ -544,7 +544,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
       #
-      group: velit fugiat amet Ut Excepteur
+      group: dolore nostrud laboris Excepteur in
 
       ## mode ##
       #
@@ -562,7 +562,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_MODE=<value>
       #
-      mode: 331
+      mode: 277
 
     ## access_log ##
     #
@@ -593,15 +593,15 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## path ##
+      ## base64 ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_PATH=<value>
+      #    $ export SERVE_TLS_KEY_BASE64=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_PATH=<value>
+      #    > set SERVE_TLS_KEY_BASE64=<value>
       #
-      path: /path/to/file.pem
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
 
     ## cert ##
     #
@@ -652,7 +652,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: Lax
 
     ## same_site_legacy_workaround ##
     #
@@ -681,7 +681,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: pariatur id sint
+dsn: ut in amet
 
 ## webfinger ##
 #
@@ -984,7 +984,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
+  scope: wildcard
 
   ## access_token ##
   #
@@ -1000,7 +1000,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_ACCESS_TOKEN=<value>
   #
-  access_token: opaque
+  access_token: jwt
 
 ## ttl ##
 #
@@ -1047,7 +1047,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: '-1'
+  refresh_token: -1
 
   ## id_token ##
   #
@@ -1075,7 +1075,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_AUTH_CODE=<value>
   #
-  auth_code: 10m
+  auth_code: 1h
 
 ## oauth2 ##
 #
@@ -1095,7 +1095,7 @@ oauth2:
   # - Windows Command Line (CMD):
   #    > set OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
   #
-  expose_internal_errors: false
+  expose_internal_errors: true
 
   ## hashers ##
   #
@@ -1121,7 +1121,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 82752775
+      cost: 35180830
 
   ## pkce ##
   #
@@ -1366,7 +1366,7 @@ tracing:
 # - Windows Command Line (CMD):
 #    > set VERSION=<value>
 #
-version: v0.0.66707848478-64793715857.25881Yit.0.0.0.0.0.42.0.7
+version: v9321666.0.0-7TpS3zk951y.0.0.0.0.3059085239.9879xeQENnVpHqm.1279712n.06062799a9e-F.0094358772ZSwv0YAz.vLQ1BI0X+Hd.oKt5sutl.UbaCQRbLUg.0wvAqVAcx.kL.IDqzmg.L.DfZd7F2f.xQK9a.fmiVYQ4OxM.rj
 
 ## cgroups ##
 #

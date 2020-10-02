@@ -15,7 +15,7 @@ version: '3'
 services:
 
   hydra-migrate:
-    image: oryd/hydra:v1.7.4
+    image: oryd/hydra:v1.8.0-pre.0
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
     command:

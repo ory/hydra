@@ -475,11 +475,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.8.1...7d3a1c8605b38950a5eed41fd159ab1f18ec8ffd) (2020-10-02)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.8.1...0561d74014775a656f8c8afa5ad20134e93aed20) (2020-10-02)
 
 
 ### Bug Fixes
 
+* Bump ory/fosite to v0.34.1 to address CVEs ([0561d74](https://github.com/ory/hydra/commit/0561d74014775a656f8c8afa5ad20134e93aed20))
 * Update link to config docs displayed on `hydra serve help` ([#2071](https://github.com/ory/hydra/issues/2071)) ([d619fab](https://github.com/ory/hydra/commit/d619fabc2eb159805f82089f2cfe1b28df0f4f31)), closes [#2065](https://github.com/ory/hydra/issues/2065)
 
 

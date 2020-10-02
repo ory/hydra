@@ -8,6 +8,7 @@ on:
 
 jobs:
   milestone:
+    if: github.repository_owner == 'ory'
     name: Synchronize Issue Labels
     runs-on: ubuntu-latest
     steps:

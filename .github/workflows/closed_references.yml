@@ -12,6 +12,7 @@ on:
 
 jobs:
   find_closed_references:
+    if: github.repository_owner == 'ory'
     runs-on: ubuntu-latest
     name: Find closed references
     steps:
@@ -22,5 +23,5 @@ jobs:
       - uses: ory/closed-reference-notifier@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          issueLabels: upstream
+          issueLabels: upstream,good first issue,help wanted
           issueLimit: ${{ github.event.inputs.issueLimit || '5' }}

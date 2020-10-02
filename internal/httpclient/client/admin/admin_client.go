@@ -940,6 +940,9 @@ annotations:
 prometheus.io/port: "4445"
 prometheus.io/path: "/metrics/prometheus"
 ```
+
+If the service supports TLS Edge Termination, this endpoint does not require the
+`X-Forwarded-Proto` header to be set.
 */
 func (a *Client) Prometheus(params *PrometheusParams) (*PrometheusOK, error) {
 	// TODO: Validate the params before sending

@@ -4,15 +4,16 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-10-01)](#unreleased-2020-10-01)
+- [Unreleased (2020-10-02)](#unreleased-2020-10-02)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
+    - [Features](#features)
   - [1.8.1 (2020-09-29)](#181-2020-09-29)
     - [Documentation](#documentation-1)
 - [1.8.0 (2020-09-29)](#180-2020-09-29)
     - [Bug Fixes](#bug-fixes-1)
     - [Documentation](#documentation-2)
-    - [Features](#features)
+    - [Features](#features-1)
     - [BREAKING CHANGES](#breaking-changes)
   - [1.7.4 (2020-08-31)](#174-2020-08-31)
     - [Bug Fixes](#bug-fixes-2)
@@ -21,14 +22,14 @@
     - [Bug Fixes](#bug-fixes-3)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation-3)
-    - [Features](#features-1)
+    - [Features](#features-2)
     - [Unclassified](#unclassified)
     - [BREAKING CHANGES](#breaking-changes-1)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
     - [Bug Fixes](#bug-fixes-4)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-4)
-    - [Features](#features-2)
+    - [Features](#features-3)
     - [Unclassified](#unclassified-1)
     - [BREAKING CHANGES](#breaking-changes-2)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
@@ -37,17 +38,17 @@
     - [Unclassified](#unclassified-2)
   - [1.5.2 (2020-06-23)](#152-2020-06-23)
     - [Bug Fixes](#bug-fixes-6)
-    - [Features](#features-3)
+    - [Features](#features-4)
   - [1.5.1 (2020-06-16)](#151-2020-06-16)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
     - [Bug Fixes](#bug-fixes-7)
     - [Documentation](#documentation-6)
-    - [Features](#features-4)
+    - [Features](#features-5)
     - [Unclassified](#unclassified-3)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
     - [Bug Fixes](#bug-fixes-8)
     - [Documentation](#documentation-7)
-    - [Features](#features-5)
+    - [Features](#features-6)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
     - [Bug Fixes](#bug-fixes-9)
@@ -65,7 +66,7 @@
   - [1.4.8 (2020-04-24)](#148-2020-04-24)
     - [Bug Fixes](#bug-fixes-12)
     - [Documentation](#documentation-10)
-    - [Features](#features-6)
+    - [Features](#features-7)
   - [1.4.7 (2020-04-24)](#147-2020-04-24)
     - [Bug Fixes](#bug-fixes-13)
     - [Documentation](#documentation-11)
@@ -79,7 +80,7 @@
     - [Bug Fixes](#bug-fixes-16)
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-14)
-    - [Features](#features-7)
+    - [Features](#features-8)
   - [1.4.2 (2020-04-03)](#142-2020-04-03)
     - [Documentation](#documentation-15)
   - [1.4.1 (2020-04-02)](#141-2020-04-02)
@@ -88,7 +89,7 @@
     - [Bug Fixes](#bug-fixes-18)
     - [Code Refactoring](#code-refactoring-5)
     - [Documentation](#documentation-16)
-    - [Features](#features-8)
+    - [Features](#features-9)
     - [Unclassified](#unclassified-5)
     - [BREAKING CHANGES](#breaking-changes-4)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
@@ -105,7 +106,7 @@
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
     - [Bug Fixes](#bug-fixes-20)
     - [Documentation](#documentation-18)
-    - [Features](#features-9)
+    - [Features](#features-10)
     - [Unclassified](#unclassified-6)
   - [1.2.3 (2020-01-31)](#123-2020-01-31)
     - [Unclassified](#unclassified-7)
@@ -474,7 +475,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.8.1...7a7208344600b48829e70ed1be51703e3a17e89d) (2020-10-01)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.8.1...7d3a1c8605b38950a5eed41fd159ab1f18ec8ffd) (2020-10-02)
 
 
 ### Bug Fixes
@@ -485,6 +486,18 @@
 ### Documentation
 
 * Add missing word in sentence ([#2082](https://github.com/ory/hydra/issues/2082)) ([7a72083](https://github.com/ory/hydra/commit/7a7208344600b48829e70ed1be51703e3a17e89d))
+* Update pkg.go.dev link in README ([#2084](https://github.com/ory/hydra/issues/2084)) ([ce3515f](https://github.com/ory/hydra/commit/ce3515f6f7e271dd36196d68288bd25bfd709d3c)):
+
+    > Remove www from the pkg.go.dev path.
+
+
+### Features
+
+* Metrics prometheus endpoint should not require x-forwarded-proto header ([#2074](https://github.com/ory/hydra/issues/2074)) ([7d3a1c8](https://github.com/ory/hydra/commit/7d3a1c8605b38950a5eed41fd159ab1f18ec8ffd)), closes [#2072](https://github.com/ory/hydra/issues/2072):
+
+    > - moved MetricsPrometheusPath constant to metrics/prometheus/metrics.go
+    > - added rule to allow insecure requests for MetricsPrometheusPath endpoint
+    > - arranged tls_termination_test.go test to cover all cases in RejectInsecureRequests function
 
 
 

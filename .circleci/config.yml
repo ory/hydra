@@ -213,6 +213,7 @@ workflows:
             - test-e2e-mysql
             - test-e2e-cockroach
             - test-e2e-plugin
+            - docs/build
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -246,6 +247,7 @@ workflows:
             - golangci/lint
             - sdk/generate
             - goreleaser/release
+            - docs/build
           filters:
             tags:
               only: /.*/

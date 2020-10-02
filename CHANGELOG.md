@@ -5,6 +5,7 @@
 **Table of Contents**
 
 - [Unreleased (2020-10-02)](#unreleased-2020-10-02)
+  - [1.8.2 (2020-10-02)](#182-2020-10-02)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -475,7 +476,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.8.1...0561d74014775a656f8c8afa5ad20134e93aed20) (2020-10-02)
+# Unreleased (2020-10-02)
+
+No significant changes have been made for this release.
+
+
+## [1.8.2](https://github.com/ory/hydra/compare/v1.8.1...v1.8.2) (2020-10-02)
 
 
 ### Bug Fixes

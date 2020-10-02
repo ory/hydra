@@ -264,7 +264,7 @@ workflows:
           filters:
             tags:
               only: /.*/
-             branches:
+            branches:
                only: master
       ## goreleaser
       -

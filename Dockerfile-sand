@@ -1,8 +1,23 @@
-#- sand image --------------------------------------------------------------
-FROM 899991151204.dkr.ecr.us-east-1.amazonaws.com/alpine:3.10-fips
-RUN apk add --update ca-certificates
-ADD tmp/dist/sand /bin/sand
-ADD entrypoint.sh /
+FROM 899991151204.dkr.ecr.us-east-1.amazonaws.com/golang:alpine as sand-builder
 
-ENTRYPOINT ["/entrypoint.sh"]
+RUN sudo apk add git \
+	gcc \
+	libc-dev
+
+ENV BUILD_ROOT=/go/src/github.com/ory/hydra/tmp/dist
+
+RUN mkdir -p /go/src/github.com/ory/hydra
+
+COPY --chown=app:app . /go/src/github.com/ory/hydra
+
+RUN cd /go/src/github.com/ory/hydra && \
+	make distbuild 
+
+RUN sudo cp /go/src/github.com/ory/hydra/tmp/dist/sand /usr/bin/sand
+#- sand image --------------------------------------------------------------
+FROM 899991151204.dkr.ecr.us-east-1.amazonaws.com/alpine:latest
+COPY --from=sand-builder --chown=app:app /usr/bin/sand /usr/bin/sand
+ADD entrypoint.sh /usr/bin/
+
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 EXPOSE 4444

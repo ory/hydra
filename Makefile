@@ -1,4 +1,4 @@
-BUILDER_IMAGE = 899991151204.dkr.ecr.us-east-1.amazonaws.com/goboring:1.13-alpine3.10
+BUILDER_IMAGE = 899991151204.dkr.ecr.us-east-1.amazonaws.com/golang:alpine
 
 SRCROOT ?= $(realpath .)
 BUILD_ROOT ?= $(SRCROOT)
@@ -30,23 +30,10 @@ build-linux:
 	&& echo "build successful. now checking goboring symbols exists..." && go tool nm $(BUILD_ROOT)/sand-linux | grep _Cfunc__goboringcrypto_ > /dev/null
 	tar cvzf $(BUILD_ROOT)/sand-$(VERSION)-linux.tgz $(BUILD_ROOT)/sand-linux
 
-dist:
-	docker pull $(BUILDER_IMAGE)
-	docker run --rm \
-	           -v $(SRCROOT):$(SRCROOT_D) \
-	           -w $(SRCROOT_D) \
-	           -e BUILD_ROOT=$(BUILD_ROOT_D) \
-	           -e UID=`id -u` \
-	           -e GID=`id -g` \
-	           $(BUILDER_IMAGE) \
-	           make distbuild
-
 distbuild: clean build build-osx build-linux
-	-chown -R $(UID):$(GID) $(SRCROOT)
 
 clean:
 	if [ -d $(BUILD_ROOT_D) ]; then rm -rf $(BUILD_ROOT_D); fi
-	-chown -R $(UID):$(GID) $(SRCROOT)
 	if [ -d $(SRCROOT)/vendor ]; then rm -rf $(SRCROOT)/vendor; fi
 
 .PHONY: bin default build build-osx build-linux dist distbuild clean

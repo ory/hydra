@@ -232,6 +232,7 @@ TheCrealm.
 
 
 
+
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -341,6 +342,7 @@ determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.
 
 <!--END ECOSYSTEM-->
+
 
 
 

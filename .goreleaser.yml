@@ -14,8 +14,6 @@ before:
 builds:
   -
     id: hydra
-    flags:
-      - -a
     ldflags:
       - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
     binary: hydra
@@ -31,7 +29,9 @@ builds:
       - 6
       - 7
     goos:
-      - freebsd
+      # See https://github.com/DataDog/dd-trace-go/issues/753
+      # See https://github.com/DataDog/dd-trace-go/pull/754
+      # - freebsd
       - linux
       - windows
       - darwin

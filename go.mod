@@ -14,7 +14,7 @@ require (
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
-	github.com/gobuffalo/pop/v5 v5.2.0
+	github.com/gobuffalo/pop/v5 v5.2.4
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -30,7 +30,7 @@ require (
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/cli v0.0.12
+	github.com/ory/cli v0.0.28
 	github.com/ory/fosite v0.34.1
 	github.com/ory/go-acc v0.2.5
 	github.com/ory/graceful v0.1.1

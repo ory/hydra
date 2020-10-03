@@ -26,6 +26,7 @@ func AddFositeExamples(r driver.Registry) {
 			Scope:         "fosite,openid,photos,offline",
 		},
 	} {
+		// #nosec G601
 		if err := r.ClientManager().CreateClient(context.Background(), &c); err != nil {
 			panic(err)
 		}

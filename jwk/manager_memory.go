@@ -68,7 +68,8 @@ func (m *MemoryManager) AddKey(ctx context.Context, set string, key *jose.JSONWe
 }
 
 func (m *MemoryManager) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
-	for _, key := range keys.Keys {
+	for k := range keys.Keys {
+		key := keys.Keys[k]
 		if err := m.AddKey(ctx, set, &key); err != nil {
 			return err
 		}

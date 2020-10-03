@@ -194,10 +194,12 @@ func (m *MemoryManager) HandleConsentRequest(ctx context.Context, challenge stri
 
 func (m *MemoryManager) VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error) {
 	m.m["consentRequests"].RLock()
-	for _, c := range m.consentRequests {
+	for k := range m.consentRequests {
+		c := m.consentRequests[k]
 		if c.Verifier == verifier {
 			m.m["handledConsentRequests"].RLock()
-			for _, h := range m.handledConsentRequests {
+			for kk := range m.handledConsentRequests {
+				h := m.handledConsentRequests[kk]
 				if h.Challenge == c.Challenge {
 					m.m["consentRequests"].RUnlock()
 					m.m["handledConsentRequests"].RUnlock()
@@ -433,10 +435,12 @@ func (m *MemoryManager) HandleLoginRequest(ctx context.Context, challenge string
 
 func (m *MemoryManager) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*HandledLoginRequest, error) {
 	m.m["authRequests"].RLock()
-	for _, c := range m.authRequests {
+	for k := range m.authRequests {
+		c := m.authRequests[k]
 		if c.Verifier == verifier {
 			m.m["handledAuthRequests"].RLock()
-			for _, h := range m.handledAuthRequests {
+			for kk := range m.handledAuthRequests {
+				h := m.handledAuthRequests[kk]
 				if h.Challenge == c.Challenge {
 					m.m["handledAuthRequests"].RUnlock()
 					m.m["authRequests"].RUnlock()
@@ -547,7 +551,8 @@ func (m *MemoryManager) RejectLogoutRequest(ctx context.Context, challenge strin
 
 func (m *MemoryManager) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*LogoutRequest, error) {
 	m.m["logoutRequests"].RLock()
-	for _, c := range m.logoutRequests {
+	for k := range m.logoutRequests {
+		c := m.logoutRequests[k]
 		if c.Verifier == verifier {
 			m.m["logoutRequests"].RUnlock()
 

@@ -301,6 +301,7 @@ func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http
 	var srv = graceful.WithDefaults(&http.Server{
 		Addr:    address,
 		Handler: handler,
+		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
 		TLSConfig: &tls.Config{
 			Certificates: cert,
 		},

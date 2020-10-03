@@ -15,7 +15,7 @@ version: '3'
 services:
 
   hydra-migrate:
-    image: oryd/hydra:v1.8.0-pre.1
+    image: oryd/hydra:v1.8.5
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
     command:

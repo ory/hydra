@@ -78,11 +78,11 @@ $ export SECRETS_SYSTEM=$(export LC_CTYPE=C; cat /dev/urandom | tr -dc 'a-zA-Z0-
 $ export DSN=postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable
 
 # Before starting, let's pull the latest ORY Hydra tag from docker.
-$ docker pull oryd/hydra:v1.8.0-pre.0
+$ docker pull oryd/hydra:v1.8.0-pre.1
 
 # This command will show you all the environment variables that you can set. Read this carefully.
 # It is the equivalent to `hydra help serve`.
-$ docker run -it --rm --entrypoint hydra oryd/hydra:v1.8.0-pre.0 help serve
+$ docker run -it --rm --entrypoint hydra oryd/hydra:v1.8.0-pre.1 help serve
 
 Starts all HTTP/2 APIs and connects to a database backend.
 [...]
@@ -92,7 +92,7 @@ Starts all HTTP/2 APIs and connects to a database backend.
 # It is the equivalent to `hydra migrate sql --yes postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable`
 $ docker run -it --rm \
   --network hydraguide \
-  oryd/hydra:v1.8.0-pre.0 \
+  oryd/hydra:v1.8.0-pre.1 \
   migrate sql --yes $DSN
 
 Applying `client` SQL migrations...
@@ -110,7 +110,7 @@ $ docker run -d \
   -e URLS_SELF_ISSUER=https://localhost:9000/ \
   -e URLS_CONSENT=http://localhost:9020/consent \
   -e URLS_LOGIN=http://localhost:9020/login \
-  oryd/hydra:v1.8.0-pre.0 serve all
+  oryd/hydra:v1.8.0-pre.1 serve all
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra
@@ -178,7 +178,7 @@ ORY Hydra can be managed using the Hydra Command Line Interface (CLI), which is
 using ORY Hydra's REST APIs. To see the available commands, run:
 
 ```shell
-$ docker run --rm -it --entrypoint hydra oryd/hydra:v1.8.0-pre.0 help
+$ docker run --rm -it --entrypoint hydra oryd/hydra:v1.8.0-pre.1 help
 Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider
 
 Usage:
@@ -237,7 +237,7 @@ URLs the client may request:
 $ docker run --rm -it \
   -e HYDRA_ADMIN_URL=https://ory-hydra-example--hydra:4445 \
   --network hydraguide \
-  oryd/hydra:v1.8.0-pre.0 \
+  oryd/hydra:v1.8.0-pre.1 \
   clients create --skip-tls-verify \
     --id facebook-photo-backup \
     --secret some-secret \
@@ -284,7 +284,7 @@ for an access token. The same thing happens with this command:
 $ docker run --rm -it \
   --network hydraguide \
   -p 9010:9010 \
-  oryd/hydra:v1.8.0-pre.0 \
+  oryd/hydra:v1.8.0-pre.1 \
   token user --skip-tls-verify \
     --port 9010 \
     --auth-url https://localhost:9000/oauth2/auth \

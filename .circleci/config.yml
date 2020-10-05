@@ -127,7 +127,7 @@ jobs:
 
   validate:
     docker:
-      - image: cimg/go:1.15-node
+      - image: circleci/golang:1.15-node
         environment:
           GO111MODULE: 'on'
     working_directory: /go/src/github.com/ory/hydra

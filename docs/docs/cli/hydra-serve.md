@@ -1,8 +1,7 @@
 ---
 id: hydra-serve
 title: hydra serve
-description:
-  hydra serve Parent command for starting public and administrative HTTP/2 APIs
+description: hydra serve Parent command for starting public and administrative HTTP/2 APIs
 ---
 
 <!--
@@ -43,6 +42,7 @@ configuration documentation:
 
 > > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md
 > > <<
+
 ### Options
 
 ```

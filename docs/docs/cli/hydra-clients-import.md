@@ -1,8 +1,7 @@
 ---
 id: hydra-clients-import
 title: hydra clients import
-description:
-  hydra clients import Import OAuth 2.0 Clients from one or more JSON files
+description: hydra clients import Import OAuth 2.0 Clients from one or more JSON files
 ---
 
 <!--
@@ -33,6 +32,7 @@ Example: hydra clients import client-1.json
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
 "--keybase" flag, for example: hydra clients import client-1.json --keybase
 keybase_username
+
 ```
 hydra clients import <path/to/file.json> [<path/to/other/file.json>...] [flags]
 ```

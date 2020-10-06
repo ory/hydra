@@ -42,7 +42,6 @@ to ORY Hydra's Admin Endpoint!
 </TabItem>
 <TabItem value="node">
 
-
 :::note
 
 Check out our
@@ -95,7 +94,6 @@ router.get('/', csrfProtection, (req, res, next) => {
 </TabItem>
 <TabItem value="html">
 
-
 ```html
 <form action="/logout" method="POST">
   <input type="hidden" name="_csrf" value="{{ .csrfToken }}" />
@@ -108,7 +106,6 @@ router.get('/', csrfProtection, (req, res, next) => {
 </TabItem>
 </Tabs>
 
-
 ## Accepting Logout
 
 <Tabs
@@ -117,7 +114,6 @@ router.get('/', csrfProtection, (req, res, next) => {
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
-
 
 :::note
 
@@ -145,7 +141,6 @@ router.post('/logout', csrfProtection, (req, res, next) => {
 </TabItem>
 </Tabs>
 
-
 ## Rejecting Logout
 
 <Tabs
@@ -154,7 +149,6 @@ router.post('/logout', csrfProtection, (req, res, next) => {
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
-
 
 :::note
 
@@ -182,4 +176,3 @@ router.post('/logout', csrfProtection, (req, res, next) => {
 
 </TabItem>
 </Tabs>
-

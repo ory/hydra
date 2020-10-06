@@ -18,7 +18,8 @@ List OAuth 2.0 Clients
 
 This command list an OAuth 2.0 Clients.
 
-Example: hydra clients list
+Example:
+hydra clients list
 
 ```
 hydra clients list [flags]

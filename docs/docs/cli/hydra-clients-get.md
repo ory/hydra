@@ -18,7 +18,8 @@ Get an OAuth 2.0 Client
 
 This command retrieves an OAuth 2.0 Clients by its ID.
 
-Example: hydra clients get client-1
+Example:
+hydra clients get client-1
 
 ```
 hydra clients get <id> [flags]

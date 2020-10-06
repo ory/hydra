@@ -33,7 +33,6 @@ Example: hydra clients import client-1.json
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
 "--keybase" flag, for example: hydra clients import client-1.json --keybase
 keybase_username
-
 ```
 hydra clients import <path/to/file.json> [<path/to/other/file.json>...] [flags]
 ```

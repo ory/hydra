@@ -28,7 +28,6 @@ authorization_code -r code -a core,foobar
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
 "--keybase" flag, for example: hydra clients create -n "my app" -g
 client_credentials -r token -a core,foobar --keybase keybase_username
-
 ```
 hydra clients create [flags]
 ```

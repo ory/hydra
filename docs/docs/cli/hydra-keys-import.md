@@ -29,7 +29,6 @@ public key as well.
 
 Examples: hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json hydra
 keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
-
 ```
 hydra keys import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]
 ```

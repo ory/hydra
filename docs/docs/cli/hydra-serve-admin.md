@@ -40,7 +40,6 @@ configuration documentation:
 
 > > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md
 > > <<
-
 ```
 hydra serve admin [flags]
 ```

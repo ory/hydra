@@ -29,7 +29,6 @@ are updated to their default values.
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
 "--keybase" flag, for example: hydra clients update client-1 -n "my updated app"
 -g client_credentials -r token -a core,foobar --keybase keybase_username
-
 ```
 hydra clients update <id> [flags]
 ```

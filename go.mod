@@ -20,7 +20,6 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.0
-	github.com/gorilla/websocket v1.4.2
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/jmoiron/sqlx v1.2.0

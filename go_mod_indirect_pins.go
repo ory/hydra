@@ -11,10 +11,6 @@ import (
 	_ "golang.org/x/tools/cmd/goimports"
 	_ "golang.org/x/tools/cmd/stringer"
 
-	// FIXME pins websocket to 1.4.2
-	// FIXME See https://github.com/gobuffalo/buffalo/pull/1999
-	_ "github.com/gorilla/websocket"
-
 	_ "github.com/ory/cli"
 
 	_ "github.com/sqs/goreturns"

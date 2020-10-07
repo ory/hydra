@@ -29,9 +29,7 @@ builds:
       - 6
       - 7
     goos:
-      # See https://github.com/DataDog/dd-trace-go/issues/753
-      # See https://github.com/DataDog/dd-trace-go/pull/754
-      # - freebsd
+      - freebsd
       - linux
       - windows
       - darwin

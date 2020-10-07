@@ -8,11 +8,3 @@ CVE-2020-15114
 CVE-2020-15136
 CVE-2020-15115
 # end
-
-# x/net false positives - see https://github.com/sonatype-nexus-community/nancy/issues/189
-CVE-2018-17142
-CVE-2018-17846
-CVE-2018-17143
-CVE-2018-17847
-CVE-2018-17848
-# end

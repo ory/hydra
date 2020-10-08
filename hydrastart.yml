@@ -1,0 +1,59 @@
+version: '3'
+
+networks:
+  hydraguide:
+    external: true    
+
+
+services:
+
+  hydra:
+    image: oryd/hydra:v1.7.4
+    ports:
+      - "4444:4444" # Public port
+      - "4445:4445" # Admin port
+      - "5555:5555" # Port for hydra token user
+    command:
+      serve all --dangerous-force-http
+    environment:
+      - URLS_SELF_ISSUER=http://127.0.0.1:4444
+      - URLS_CONSENT=http://127.0.0.1:9000/consent
+      - URLS_LOGIN=http://127.0.0.1:9000/login
+      - URLS_LOGOUT=http://127.0.0.1:9000/logout
+      - DSN=memory
+      - SECRETS_SYSTEM=youReallyNeedToChangeThis
+      - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
+      - OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
+      - SERVE_COOKIES_SAME_SITE_MODE=Lax
+    restart: unless-stopped
+    networks:
+      - hydraguide
+
+  consent:
+    environment:
+      - HYDRA_ADMIN_URL=http://hydra:4445
+    image: oryd/hydra-login-consent-node:v1.5.2
+    ports:
+      - "9000:3000"
+    restart: unless-stopped
+    networks:
+      - hydraguide
+
+  gitea:
+    image: gitea/gitea:latest
+    hostname: gitea.example.com
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    restart: always
+    networks:
+      - hydraguide
+    volumes:
+      - ./gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8000:3000"
+      - "2228:22"
+
+

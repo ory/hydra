@@ -4,8 +4,9 @@ package prometheus
 //
 // swagger:route GET /metrics/prometheus admin prometheus
 //
-// Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to
-// your deployment like so:
+// Get Snapshot Metrics from the Hydra Service.
+//
+// If you're using k8s, you can then add annotations to your deployment like so:
 //
 // ```
 // metadata:

@@ -741,7 +741,7 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 
 // swagger:route DELETE /oauth2/tokens admin deleteOAuth2Token
 //
-// Delete OAuth2 Access Tokens from a client
+// Delete OAuth2 Access Tokens from a Client
 //
 // This endpoint deletes OAuth2 access tokens issued for a client from the database
 //

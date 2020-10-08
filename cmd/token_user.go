@@ -33,6 +33,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/graceful"
+
 	"github.com/ory/hydra/cmd/cli"
 
 	"github.com/julienschmidt/httprouter"
@@ -173,10 +175,11 @@ and success.`,
 			cmdx.Must(err, "Unable to generate RSA key pair: %s", err)
 			cert, err := tlsx.CreateSelfSignedTLSCertificate(key)
 			cmdx.Must(err, "Unable to generate self-signed TLS Certificate: %s", err)
+			// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
 			tlsc = &tls.Config{Certificates: []tls.Certificate{*cert}}
 		}
 
-		server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r, TLSConfig: tlsc}
+		server := graceful.WithDefaults(&http.Server{Addr: fmt.Sprintf(":%d", port), Handler: r, TLSConfig: tlsc})
 		var shutdown = func() {
 			time.Sleep(time.Second * 1)
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)

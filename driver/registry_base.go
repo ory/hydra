@@ -35,10 +35,6 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-const (
-	MetricsPrometheusPath = "/metrics/prometheus"
-)
-
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
@@ -100,7 +96,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
 	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))
 
-	admin.Handler("GET", MetricsPrometheusPath, promhttp.Handler())
+	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())

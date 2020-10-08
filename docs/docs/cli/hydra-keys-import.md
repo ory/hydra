@@ -9,6 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra keys import
 
 Imports cryptographic keys of any format to the JSON Web Key Store
@@ -23,9 +24,8 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 Please be aware that importing a private key does not automatically import its public key as well.
 
 Examples:
-	hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json
-	hydra keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
-
+hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json
+hydra keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
 
 ```
 hydra keys import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]
@@ -51,5 +51,4 @@ hydra keys import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]
 
 ### SEE ALSO
 
-* [hydra keys](hydra-keys)	 - Manage JSON Web Keys
-
+- [hydra keys](hydra-keys) - Manage JSON Web Keys

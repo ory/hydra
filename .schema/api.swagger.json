@@ -798,7 +798,7 @@
     },
     "/metrics/prometheus": {
       "get": {
-        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
+        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
         "produces": [
           "plain/text"
         ],

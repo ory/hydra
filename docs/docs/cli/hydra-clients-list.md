@@ -9,6 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra clients list
 
 List OAuth 2.0 Clients
@@ -18,7 +19,7 @@ List OAuth 2.0 Clients
 This command list an OAuth 2.0 Clients.
 
 Example:
-  hydra clients list
+hydra clients list
 
 ```
 hydra clients list [flags]
@@ -45,5 +46,4 @@ hydra clients list [flags]
 
 ### SEE ALSO
 
-* [hydra clients](hydra-clients)	 - Manage OAuth 2.0 Clients
-
+- [hydra clients](hydra-clients) - Manage OAuth 2.0 Clients

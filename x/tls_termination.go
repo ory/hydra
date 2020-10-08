@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 
+	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/stringsx"
 )
@@ -51,7 +52,11 @@ type tlsConfig interface {
 
 func RejectInsecureRequests(reg tlsRegistry, c tlsConfig) negroni.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-		if r.TLS != nil || !c.ServesHTTPS() || r.URL.Path == healthx.AliveCheckPath || r.URL.Path == healthx.ReadyCheckPath {
+		if r.TLS != nil ||
+			!c.ServesHTTPS() ||
+			r.URL.Path == healthx.AliveCheckPath ||
+			r.URL.Path == healthx.ReadyCheckPath ||
+			r.URL.Path == prometheus.MetricsPrometheusPath {
 			next.ServeHTTP(rw, r)
 			return
 		}

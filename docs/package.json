@@ -2,9 +2,9 @@
   "name": "docusaurus-template",
   "version": "0.0.0",
   "private": true,
+  "prettier": "ory-prettier-styles",
   "consts": {
-    "prettierTarget": "{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}",
-    "prettierArgs": "--no-semi --single-quote --trailing-comma none"
+    "prettierTarget": "{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}"
   },
   "scripts": {
     "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",
@@ -13,18 +13,20 @@
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
+    "serve": "docusaurus serve",
     "deploy": "docusaurus deploy",
-    "format": "prettier --write ${npm_package_consts_prettierTarget} ${npm_package_consts_prettierArgs} || true",
-    "format:check": "prettier --check ${npm_package_consts_prettierTarget} ${npm_package_consts_prettierArgs}"
+    "format": "prettier --write ${npm_package_consts_prettierTarget}",
+    "format:check": "prettier --check ${npm_package_consts_prettierTarget}",
+    "postinstall": "patch-package"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.64",
-    "@docusaurus/plugin-content-docs": "2.0.0-alpha.64",
-    "@docusaurus/plugin-content-pages": "2.0.0-alpha.64",
-    "@docusaurus/plugin-google-analytics": "2.0.0-alpha.64",
-    "@docusaurus/plugin-sitemap": "2.0.0-alpha.64",
-    "@docusaurus/theme-classic": "2.0.0-alpha.64",
-    "@docusaurus/theme-search-algolia": "2.0.0-alpha.64",
+    "@docusaurus/core": "2.0.0-alpha.65",
+    "@docusaurus/plugin-content-docs": "2.0.0-alpha.65",
+    "@docusaurus/plugin-content-pages": "2.0.0-alpha.65",
+    "@docusaurus/plugin-google-analytics": "2.0.0-alpha.65",
+    "@docusaurus/plugin-sitemap": "2.0.0-alpha.65",
+    "@docusaurus/theme-classic": "2.0.0-alpha.65",
+    "@docusaurus/theme-search-algolia": "2.0.0-alpha.65",
     "classnames": "2.2.6",
     "file-loader": "^6.1.0",
     "mermaid": "8.6.4",
@@ -48,6 +50,8 @@
   "devDependencies": {
     "json-schema-faker": "0.5.0-rcv.25",
     "json-schema-ref-parser": "8.0.0",
+    "ory-prettier-styles": "^1.0.1",
+    "patch-package": "^6.2.2",
     "prettier": "2.0.2",
     "ramda": "0.27.0",
     "raw-loader": "^4.0.1",

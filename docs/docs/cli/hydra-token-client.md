@@ -9,6 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra token client
 
 An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow
@@ -48,5 +49,4 @@ hydra token client [flags]
 
 ### SEE ALSO
 
-* [hydra token](hydra-token)	 - Issue and Manage OAuth2 tokens
-
+- [hydra token](hydra-token) - Issue and Manage OAuth2 tokens

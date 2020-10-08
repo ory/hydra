@@ -14,6 +14,9 @@ package prometheus
 //      prometheus.io/path: "/metrics/prometheus"
 // ```
 //
+// If the service supports TLS Edge Termination, this endpoint does not require the
+// `X-Forwarded-Proto` header to be set.
+//
 //     Produces:
 //     - plain/text
 //

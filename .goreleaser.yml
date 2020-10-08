@@ -14,8 +14,6 @@ before:
 builds:
   -
     id: hydra
-    flags:
-      - -a
     ldflags:
       - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
     binary: hydra

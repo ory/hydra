@@ -9,6 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra serve public
 
 Serves Public HTTP/2 APIs
@@ -32,8 +33,7 @@ connection to be able to synchronize.
 ORY Hydra can be configured using environment variables as well as a configuration file. For more information
 on configuration options, open the configuration documentation:
 
->> https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md <<
-
+> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md <<
 
 ```
 hydra serve public [flags]
@@ -58,5 +58,4 @@ hydra serve public [flags]
 
 ### SEE ALSO
 
-* [hydra serve](hydra-serve)	 - Parent command for starting public and administrative HTTP/2 APIs
-
+- [hydra serve](hydra-serve) - Parent command for starting public and administrative HTTP/2 APIs

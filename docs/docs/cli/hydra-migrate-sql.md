@@ -9,6 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra migrate sql
 
 Create SQL schemas and apply migration plans
@@ -22,13 +23,12 @@ It is recommended to run this command close to the SQL instance (e.g. same subne
 This decreases risk of failure and decreases time required.
 
 You can read in the database URL using the -e flag, for example:
-	export DSN=...
-	hydra migrate sql -e
+export DSN=...
+hydra migrate sql -e
 
-### WARNING ###
+### WARNING
 
 Before running this command on an existing database, create a back up!
-
 
 ```
 hydra migrate sql <database-url> [flags]
@@ -51,5 +51,4 @@ hydra migrate sql <database-url> [flags]
 
 ### SEE ALSO
 
-* [hydra migrate](hydra-migrate)	 - Various migration helpers
-
+- [hydra migrate](hydra-migrate) - Various migration helpers

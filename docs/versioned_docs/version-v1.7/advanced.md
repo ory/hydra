@@ -111,7 +111,7 @@ reasons:
    token was revoked, which however defeats the purpose of using JSON Web Tokens
    in the first place.
 4. **Certain OpenID Connect features will not work** when using JSON Web Tokens
-   as Access Tokens, such as the pariwise subject identifier algorithm.
+   as Access Tokens, such as the pairwise subject identifier algorithm.
 5. **There is a better solution: Use
    [ORY Oathkeeper](https://github.com/ory/oathkeeper)!** ORY Oathkeeper is a
    proxy you deploy in front of your services. It will "convert" ORY Hydra's

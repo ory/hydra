@@ -41,6 +41,8 @@ Something is not working.
 #### Pull Requests
 
 - [x] Deprecate client flags in introspect ([hydra#2011](https://github.com/ory/hydra/pull/2011)) - [@hackerman](https://github.com/aeneasr)
+- [x] fix: bump ory/fosite to v0.34.1 to address CVEs ([hydra#2090](https://github.com/ory/hydra/pull/2090)) - [@hackerman](https://github.com/aeneasr)
+- [x] ci: resolve ci release issues ([hydra#2094](https://github.com/ory/hydra/pull/2094)) - [@hackerman](https://github.com/aeneasr)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -60,6 +62,7 @@ Affects documentation.
 
 #### Issues
 
+- [ ] Docs: reference configuration provides invalid bcrypt cost and some other outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) - [@Vincent](https://github.com/vinckr)
 - [x] docs: Hydra supports two concepts of authorization ([hydra#1992](https://github.com/ory/hydra/issues/1992)) - [@hackerman](https://github.com/aeneasr)
 - [x] Document GitLab setup with ORY Hydra as the OpenID Connect Provider ([hydra#2007](https://github.com/ory/hydra/issues/2007)) - [@Kim Neunert](https://github.com/k9ert)
 
@@ -74,6 +77,7 @@ Blocks milestones or other issues or pulls.
 #### Pull Requests
 
 - [x] Deprecate client flags in introspect ([hydra#2011](https://github.com/ory/hydra/pull/2011)) - [@hackerman](https://github.com/aeneasr)
+- [x] ci: resolve ci release issues ([hydra#2094](https://github.com/ory/hydra/pull/2094)) - [@hackerman](https://github.com/aeneasr)
 
 ### [Ci](https://github.com/ory/hydra/labels/ci)
 
@@ -126,13 +130,13 @@ New feature or request.
 - [ ] Token claims customization with Jsonnet ([hydra#1748](https://github.com/ory/hydra/issues/1748)) - [@hackerman](https://github.com/aeneasr)
 - [ ] Update clients from cli ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 - [ ] Find out if a login/consent challenge is still valid ([hydra#2057](https://github.com/ory/hydra/issues/2057))
-- [ ] Prometheus endpoint should not require x-forwarded-proto header ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 - [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 - [x] Add endpoint to Admin API to revoke access tokens ([hydra#1728](https://github.com/ory/hydra/issues/1728))
 - [x] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 - [x] Expired token is considered an error ([hydra#2031](https://github.com/ory/hydra/issues/2031))
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota ([hydra#2033](https://github.com/ory/hydra/issues/2033))
+- [x] Prometheus endpoint should not require x-forwarded-proto header ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

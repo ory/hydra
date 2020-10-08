@@ -19,6 +19,9 @@ define make-go-dependency
 		GOBIN=$(PWD)/.bin/ go install $1
 endef
 
+.bin/golangci-lint: Makefile
+		curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b .bin v1.31.0
+
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
 node_modules: package.json
@@ -29,6 +32,10 @@ node_modules: package.json
 
 docs/cli: .bin/clidoc
 		clidoc .
+
+.PHONY: lint
+lint: .bin/golangci-lint
+		golangci-lint run -v ./...
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test-legacy-migrations

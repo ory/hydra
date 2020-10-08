@@ -39,25 +39,24 @@ import (
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/reqlog"
 
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/x"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"github.com/spf13/cobra"
 	"github.com/urfave/negroni"
+	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/ory/graceful"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 
-	"go.uber.org/automaxprocs/maxprocs"
-
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 )
 
 var _ = &consent.Handler{}
@@ -272,7 +271,7 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 				healthx.AliveCheckPath,
 				healthx.ReadyCheckPath,
 				healthx.VersionPath,
-				driver.MetricsPrometheusPath,
+				prometheus.MetricsPrometheusPath,
 				"/",
 			},
 			BuildVersion: d.Registry().BuildVersion(),
@@ -302,6 +301,7 @@ func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http
 	var srv = graceful.WithDefaults(&http.Server{
 		Addr:    address,
 		Handler: handler,
+		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
 		TLSConfig: &tls.Config{
 			Certificates: cert,
 		},

@@ -9,6 +9,7 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra clients create
 
 Create a new OAuth 2.0 Client
@@ -22,11 +23,10 @@ ORY Hydra implements the OpenID Connect Dynamic Client registration specificatio
 as well.
 
 Example:
-  hydra clients create -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
+hydra clients create -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
 
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
-  hydra clients create -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
-
+hydra clients create -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
 
 ```
 hydra clients create [flags]
@@ -71,5 +71,4 @@ hydra clients create [flags]
 
 ### SEE ALSO
 
-* [hydra clients](hydra-clients)	 - Manage OAuth 2.0 Clients
-
+- [hydra clients](hydra-clients) - Manage OAuth 2.0 Clients

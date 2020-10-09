@@ -553,7 +553,7 @@ Official:
 * [User Login & Consent Example](https://github.com/ory/hydra-login-consent-node)
 
 Community:
-* [Kubernetes helm chart](https://github.com/kubernetes/charts/pull/1022)
+* [Kubernetes helm chart](https://k8s.ory.sh/helm/hydra.html)
 * [Werther - an Identity Provider over LDAP](https://github.com/i-core/werther)
 * [Terraform Provider](https://registry.terraform.io/providers/hypnoglow/oryhydra/latest) and its [source code](https://github.com/hypnoglow/terraform-provider-oryhydra).
 

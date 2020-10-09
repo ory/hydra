@@ -555,6 +555,7 @@ Official:
 Community:
 * [Kubernetes helm chart](https://github.com/kubernetes/charts/pull/1022)
 * [Werther - an Identity Provider over LDAP](https://github.com/i-core/werther)
+* [Terraform Provider](https://registry.terraform.io/providers/hypnoglow/oryhydra/latest) and its [source code](https://github.com/hypnoglow/terraform-provider-oryhydra).
 
 :warning: Outdated Community Projects:
 The following projects are outdated and won't work anymore in most cases. Having said that they still might help you to better understand how to integrate HYDRA and solve specific cases.

@@ -437,7 +437,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	resp := &fosite.IntrospectionResponse{
 		Active:          true,
 		AccessRequester: ar,
-		TokenType:       tt,
+		TokenUse:        tt,
 	}
 
 	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(tt)
@@ -475,7 +475,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Audience:          resp.GetAccessRequester().GetGrantedAudience(),
 		Issuer:            strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
 		ObfuscatedSubject: obfuscated,
-		TokenType:         string(resp.GetTokenType()),
+		TokenType:         string(resp.GetTokenUse()),
 	}); err != nil {
 		x.LogError(r, errors.WithStack(err), h.r.Logger())
 	}

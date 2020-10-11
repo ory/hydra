@@ -78,8 +78,11 @@ type Introspection struct {
 	// IssuerURL is a string representing the issuer of this token
 	Issuer string `json:"iss,omitempty"`
 
-	// TokenType is the introspected token's type, for example `access_token` or `refresh_token`.
+	// TokenType is the type of the token. It will always be `bearer`. Do not confuse this with TokenUse!
 	TokenType string `json:"token_type,omitempty"`
+
+	// TokenUse is the introspected token's use - is one of `access_token` or `refresh_token`.
+	TokenUse string `json:"token_use,omitempty"`
 
 	// Extra is arbitrary data set by the session.
 	Extra map[string]interface{} `json:"ext,omitempty"`

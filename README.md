@@ -522,14 +522,6 @@ The code for these tests is located in [./cypress/integration](./cypress/integra
 [./cypress/helpers](./cypress/helpers). The website you're seeing is located in
 [./test/e2e/oauth2-client](./test/e2e/oauth2-client).
 
-#### Making SQL Changes
-
-We embed the SQL files into the binary. If you make changes to any `.sql` file, you need to run:
-
-```shell script
-make sqlbin
-```
-
 #### Build Docker
 
 You can build a development Docker Image using:

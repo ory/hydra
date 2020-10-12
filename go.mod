@@ -61,5 +61,3 @@ require (
 	golang.org/x/tools v0.0.0-20200721223218-6123e77877b2
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
-
-replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.1.1-0.20200924193619-5ce72a770b26

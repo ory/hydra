@@ -13,7 +13,6 @@
 version: '3'
 
 services:
-
   hydra-migrate:
     image: oryd/hydra:v1.8.5
     environment:
@@ -23,6 +22,7 @@ services:
     restart: on-failure
 
   hydra:
+    image: oryd/hydra:v1.8.5
     depends_on:
       - hydra-migrate
     environment:

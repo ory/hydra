@@ -18,9 +18,10 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package token
 
 import (
+	"github.com/ory/hydra/cmd"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -30,11 +31,10 @@ import (
 var tokenIntrospectCmd = &cobra.Command{
 	Use:   "introspect <token>",
 	Short: "Introspect an access or refresh token",
-	Run:   cmdHandler.Introspection.Introspect,
+	Run:   cmd.cmdHandler.Introspection.Introspect,
 }
 
 func init() {
-	tokenCmd.AddCommand(tokenIntrospectCmd)
 	tokenIntrospectCmd.Flags().StringSlice("scope", []string{}, "Additionally check if scope was granted")
 	tokenIntrospectCmd.Flags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
 	tokenIntrospectCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "This field is DEPRECATED and has no effect. Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")

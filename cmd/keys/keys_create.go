@@ -18,22 +18,21 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package keys
 
 import (
+	"github.com/ory/hydra/cmd"
 	"github.com/spf13/cobra"
 )
 
-var clientsGetCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get an OAuth 2.0 Client",
-	Long: `This command retrieves an OAuth 2.0 Clients by its ID.
-
-Example:
-  hydra clients get client-1`,
-	Run: cmdHandler.Clients.GetClient,
+// createCmd represents the create command
+var keysCreateCmd = &cobra.Command{
+	Use:   "create <set> <key>",
+	Short: "Create a new JSON Web Key Set",
+	Run:   cmd.cmdHandler.Keys.CreateKeys,
 }
 
 func init() {
-	clientsCmd.AddCommand(clientsGetCmd)
+	keysCreateCmd.Flags().StringP("alg", "a", "RS256", "The algorithm to be used to generated they key. Supports: RS256, ES512, HS256")
+	keysCreateCmd.Flags().StringP("use", "u", "sig", "The intended use of this key")
 }

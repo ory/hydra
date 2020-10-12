@@ -18,22 +18,24 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package token
 
 import (
+	"github.com/ory/hydra/cmd"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
-// createCmd represents the create command
-var keysCreateCmd = &cobra.Command{
-	Use:   "create <set> <key>",
-	Short: "Create a new JSON Web Key Set",
-	Run:   cmdHandler.Keys.CreateKeys,
+// validateCmd represents the validate command
+var tokenRevokeCmd = &cobra.Command{
+	Use:   "revoke <token>",
+	Short: "Revoke an access or refresh token",
+	Run:   cmd.cmdHandler.Token.RevokeToken,
 }
 
 func init() {
-	keysCmd.AddCommand(keysCreateCmd)
-	keysCreateCmd.Flags().StringP("alg", "a", "RS256", "The algorithm to be used to generated they key. Supports: RS256, ES512, HS256")
-	keysCreateCmd.Flags().StringP("use", "u", "sig", "The intended use of this key")
-
+	tokenRevokeCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
+	tokenRevokeCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
+	tokenRevokeCmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 }

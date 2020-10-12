@@ -21,7 +21,13 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"github.com/ory/hydra/cmd/clients"
+	"github.com/ory/hydra/cmd/keys"
+	"github.com/ory/hydra/cmd/migrate"
+	"github.com/ory/hydra/cmd/token"
+	"github.com/ory/x/cmdx"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -54,7 +60,9 @@ var cmdHandler = cli.NewHandler()
 
 // Execute adds all child commands to the root command sets flags appropriately.
 func Execute() {
-	if err := RootCmd.Execute(); err != nil {
+	if err := RootCmd.Execute(); errors.Is(err, cmdx.ErrNoPrintButFail) {
+		os.Exit(-1)
+	} else if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
@@ -65,6 +73,11 @@ func init() {
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is $HOME/.hydra.yaml)")
 	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unkown certificate authorities")
+
+	clients.RegisterCommandRecursive(RootCmd)
+	keys.RegisterCommandRecursive(RootCmd)
+	migrate.RegisterCommandRecursive(RootCmd)
+	token.RegisterCommandRecursive(RootCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.

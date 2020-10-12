@@ -1,6 +1,7 @@
-package cmd
+package clients
 
 import (
+	"github.com/ory/hydra/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -19,11 +20,10 @@ If only the name flag (-n "my updated app") is provided, the all other fields ar
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
   hydra clients update client-1 -n "my updated app" -g client_credentials -r token -a core,foobar --keybase keybase_username
 `,
-	Run: cmdHandler.Clients.UpdateClient,
+	Run: cmd.cmdHandler.Clients.UpdateClient,
 }
 
 func init() {
-	clientsCmd.AddCommand(clientsUpdateCmd)
 	clientsUpdateCmd.Flags().StringSliceP("callbacks", "c", []string{}, "REQUIRED list of allowed callback URLs")
 	clientsUpdateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	clientsUpdateCmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")

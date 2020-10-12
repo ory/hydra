@@ -18,19 +18,20 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package migrate
 
 import (
 	"github.com/spf13/cobra"
 )
 
-// getCmd represents the get command
-var keysGetCmd = &cobra.Command{
-	Use:   "get <set>",
-	Short: "Get a new JSON Web Key Set",
-	Run:   cmdHandler.Keys.GetKeys,
+// migrateCmd represents the migrate command
+var migrateCmd = &cobra.Command{
+	Use:   "migrate",
+	Short: "Various migration helpers",
 }
 
-func init() {
-	keysCmd.AddCommand(keysGetCmd)
+func RegisterCommandRecursive(parent *cobra.Command) {
+	parent.AddCommand(migrateCmd)
+
+	migrateCmd.AddCommand(migrateSqlCmd)
 }

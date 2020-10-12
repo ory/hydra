@@ -18,16 +18,20 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package clients
 
 import (
-	"fmt"
-	"os"
+	"github.com/ory/hydra/cmd"
+	"github.com/spf13/cobra"
 )
 
-var osExit = os.Exit
+// clientsDeleteCmd represents the delete command
+var clientsDeleteCmd = &cobra.Command{
+	Use:   "delete <id> [<id>...]",
+	Short: "Delete an OAuth 2.0 Client",
+	Long: `This command deletes one or more OAuth 2.0 Clients by their respective IDs.
 
-func fatal(message string, args ...interface{}) {
-	fmt.Printf(message+"\n", args...)
-	osExit(1)
+Example:
+  hydra clients delete client-1 client-2 client-3`,
+	Run: cmd.cmdHandler.Clients.DeleteClient,
 }

@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package keys
 
 import (
 	"os"
@@ -34,21 +34,17 @@ var keysCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(keysCmd)
 	//keysCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
 	keysCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
 	keysCmd.PersistentFlags().Duration("fail-after", time.Minute, `Stop retrying after the specified duration`)
 	keysCmd.PersistentFlags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
-	keysCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
+}
 
-	// Here you will define your flags and configuration settings.
+func RegisterCommandRecursive(parent *cobra.Command) {
+	parent.AddCommand(keysCmd)
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// keysCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// keysCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	keysCmd.AddCommand(keysCreateCmd)
+	keysCmd.AddCommand(keysDeleteCmd)
+	keysCmd.AddCommand(keysGetCmd)
+	keysCmd.AddCommand(keysImportCmd)
 }

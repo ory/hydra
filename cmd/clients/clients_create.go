@@ -18,9 +18,10 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package clients
 
 import (
+	"github.com/ory/hydra/cmd"
 	"github.com/spf13/cobra"
 )
 
@@ -40,11 +41,10 @@ Example:
 To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
   hydra clients create -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
 `,
-	Run: cmdHandler.Clients.CreateClient,
+	Run: cmd.cmdHandler.Clients.CreateClient,
 }
 
 func init() {
-	clientsCmd.AddCommand(clientsCreateCmd)
 	clientsCreateCmd.Flags().String("id", "", "Give the client this id")
 	clientsCreateCmd.Flags().StringSliceP("callbacks", "c", []string{}, "REQUIRED list of allowed callback URLs")
 	clientsCreateCmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")

@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	"github.com/ory/hydra/cmd/token"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -83,7 +84,7 @@ func TestExecute(t *testing.T) {
 			args: []string{"serve", "all", "--sqa-opt-out"},
 			wait: func() bool {
 				client := &http.Client{
-					Transport: &transporter{
+					Transport: &token.transporter{
 						FakeTLSTermination: true,
 						Transport: &http.Transport{
 							TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

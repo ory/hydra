@@ -18,19 +18,25 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package token
 
 import (
+	"github.com/ory/hydra/cmd"
+	"os"
+	"time"
+
 	"github.com/spf13/cobra"
 )
 
-// deleteCmd represents the delete command
-var keysDeleteCmd = &cobra.Command{
-	Use:   "delete <set>",
-	Short: "Delete a new JSON Web Key Set",
-	Run:   cmdHandler.Keys.DeleteKeys,
+// flushCmd represents the flush command
+var tokenFlushCmd = &cobra.Command{
+	Use:   "flush",
+	Short: "Removes inactive access tokens from the database",
+	Run:   cmd.cmdHandler.Token.FlushTokens,
 }
 
 func init() {
-	keysCmd.AddCommand(keysDeleteCmd)
+	tokenFlushCmd.Flags().Duration("min-age", time.Duration(0), "Skip removing tokens which do not satisfy the minimum age (1s, 1m, 1h)")
+	tokenFlushCmd.Flags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
+	tokenFlushCmd.Flags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
 }

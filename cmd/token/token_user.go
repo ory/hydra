@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package token
 
 import (
 	"context"
@@ -270,7 +270,6 @@ and success.`,
 }
 
 func init() {
-	tokenCmd.AddCommand(tokenUserCmd)
 	tokenUserCmd.Flags().Bool("no-open", false, "Do not open the browser window automatically")
 	tokenUserCmd.Flags().IntP("port", "p", 4446, "The port on which the server should run")
 	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")

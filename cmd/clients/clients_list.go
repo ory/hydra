@@ -1,6 +1,9 @@
-package cmd
+package clients
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/ory/hydra/cmd"
+	"github.com/spf13/cobra"
+)
 
 var clientsListCmd = &cobra.Command{
 	Use:   "list",
@@ -9,11 +12,10 @@ var clientsListCmd = &cobra.Command{
 
 Example:
   hydra clients list`,
-	Run: cmdHandler.Clients.ListClients,
+	Run: cmd.cmdHandler.Clients.ListClients,
 }
 
 func init() {
-	clientsCmd.AddCommand(clientsListCmd)
 	clientsListCmd.Flags().Int("limit", 20, "The maximum amount of policies returned.")
 	clientsListCmd.Flags().Int("page", 1, "The number of page.")
 }

@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package token
 
 import (
 	"context"
@@ -62,27 +62,32 @@ been configured properly.
 
 This command should not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
+		fakeTLSTermination, err := cli.FakeTLSTermination(cmd)
+		if err != nil {
+			return err
+		}
 		/* #nosec G402 - we want to support dev environments, hence tls trickery */
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
 			Transport: &transporter{
-				FakeTLSTermination: flagx.MustGetBool(cmd, "fake-tls-termination"),
+				FakeTLSTermination: fakeTLSTermination,
 				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: fakeTLSTermination},
 				},
 			},
 		})
 
 		scopes := flagx.MustGetStringSlice(cmd, "scope")
 		audience := flagx.MustGetStringSlice(cmd, "audience")
-		cu := cli.RemoteURI(cmd)
+		cu, err := cli.AdminEndpointURI(cmd)
+		if err != nil {
+			return err
+		}
 
 		clientID := flagx.MustGetString(cmd, "client-id")
 		clientSecret := flagx.MustGetString(cmd, "client-secret")
 		if clientID == "" || clientSecret == "" {
-			fmt.Print(cmd.UsageString())
-			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
-			return
+			return fmt.Errorf("please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET")
 		}
 
 		oauthConfig := clientcredentials.Config{
@@ -101,16 +106,15 @@ and success.`,
 		} else {
 			fmt.Printf("%s\n", t.AccessToken)
 		}
+
+		return nil
 	},
 }
 
 func init() {
-	tokenCmd.AddCommand(tokenClientCmd)
-
 	tokenClientCmd.Flags().StringSlice("scope", []string{}, "OAuth2 scope to request")
 	tokenClientCmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
 	tokenClientCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenClientCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 	tokenClientCmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
-	tokenClientCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
 }

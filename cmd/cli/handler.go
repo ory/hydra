@@ -21,6 +21,8 @@
 package cli
 
 import (
+	"fmt"
+	"github.com/spf13/pflag"
 	"net/url"
 	"os"
 	"strings"
@@ -37,6 +39,58 @@ type Handler struct {
 	Introspection *IntrospectionHandler
 	Token         *TokenHandler
 	Migration     *MigrateHandler
+}
+
+const (
+	FlagAdminEndpoint     = "endpoint"
+	EnvAdminEndpoint      = "HYDRA_ADMIN_URL"
+	EnvDeprecatedEndpoint = "HYDRA_URL"
+
+	FlagFakeTLSTermination = "fake-tls-termination"
+)
+
+func RegisterEndpointFlag(flags *pflag.FlagSet) {
+	flags.String(FlagAdminEndpoint, os.Getenv(EnvAdminEndpoint), fmt.Sprintf("Set the URL of the ORY Hydra Admin endpoint, defaults to environment variable %s", EnvAdminEndpoint))
+}
+
+func AdminEndpoint(cmd *cobra.Command) (string, error) {
+	endpoint, err := cmd.Flags().GetString(FlagAdminEndpoint)
+	if err != nil {
+		return "", err
+	}
+
+	if endpoint == "" {
+		endpoint = os.Getenv(EnvDeprecatedEndpoint)
+		if endpoint == "" {
+			return "", fmt.Errorf("could not get the endpoint, neither from the --%s flag nor from the %s environmental variable", FlagAdminEndpoint, EnvAdminEndpoint)
+		} else {
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "WARN: the usage of the environment variable %s is deprecated and support will drop in a future release\n", EnvDeprecatedEndpoint)
+		}
+	}
+
+	return endpoint, nil
+}
+
+func AdminEndpointURI(cmd *cobra.Command) (*url.URL, error) {
+	endpoint, err := AdminEndpoint(cmd)
+	if err != nil {
+		return nil, err
+	}
+
+	u, err := url.ParseRequestURI(endpoint)
+	if err != nil {
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not parse URI %s: %+v", endpoint, err)
+		return nil, cmdx.FailSilently(cmd)
+	}
+	return u, nil
+}
+
+func RegisterFakeTLSTermination(flags *pflag.FlagSet) {
+	flags.Bool(FlagFakeTLSTermination, false, `Fake TLS termination by adding "X-Forwarded-Proto: https" to HTTP headers`)
+}
+
+func FakeTLSTermination(cmd *cobra.Command) (bool, error) {
+	return cmd.Flags().GetBool(FlagFakeTLSTermination)
 }
 
 func Remote(cmd *cobra.Command) string {

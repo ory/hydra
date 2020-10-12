@@ -18,24 +18,19 @@
  * @license 	Apache-2.0
  */
 
-package cmd
+package clients
 
 import (
-	"os"
-
+	"github.com/ory/hydra/cmd"
 	"github.com/spf13/cobra"
 )
 
-// validateCmd represents the validate command
-var tokenRevokeCmd = &cobra.Command{
-	Use:   "revoke <token>",
-	Short: "Revoke an access or refresh token",
-	Run:   cmdHandler.Token.RevokeToken,
-}
+var clientsGetCmd = &cobra.Command{
+	Use:   "get <id>",
+	Short: "Get an OAuth 2.0 Client",
+	Long: `This command retrieves an OAuth 2.0 Clients by its ID.
 
-func init() {
-	tokenCmd.AddCommand(tokenRevokeCmd)
-	tokenRevokeCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
-	tokenRevokeCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
-	tokenRevokeCmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+Example:
+  hydra clients get client-1`,
+	Run: cmd.cmdHandler.Clients.GetClient,
 }

@@ -932,9 +932,11 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 }
 
 /*
-  Prometheus gets snapshot metrics from the hydra service if you re using k8s you can then add annotations to your deployment like so
+  Prometheus gets snapshot metrics from the hydra service
 
-  ```
+  If you're using k8s, you can then add annotations to your deployment like so:
+
+```
 metadata:
 annotations:
 prometheus.io/port: "4445"

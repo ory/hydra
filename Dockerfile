@@ -1,7 +1,6 @@
 # To compile this image manually run:
 #
-# $ GO111MODULE=on GOOS=linux GOARCH=amd64 go build -tags sqlite && docker build -t oryd/hydra:v1.0.0-rc.7_oryOS.10 . && rm hydra
-FROM alpine:3.11
+FROM alpine:3.12
 
 RUN apk add -U --no-cache ca-certificates
 

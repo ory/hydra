@@ -104,6 +104,7 @@ Something is not working.
 - [ ] `loginRequest.requested_access_token_audience` should not be `null` ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 - [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens ([hydra#2042](https://github.com/ory/hydra/issues/2042))
 - [ ] Redirect URI should be able to contain plus (+) character ([hydra#2055](https://github.com/ory/hydra/issues/2055))
+- [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -137,6 +138,14 @@ New feature or request.
 - [x] Expired token is considered an error ([hydra#2031](https://github.com/ory/hydra/issues/2031))
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota ([hydra#2033](https://github.com/ory/hydra/issues/2033))
 - [x] Prometheus endpoint should not require x-forwarded-proto header ([hydra#2072](https://github.com/ory/hydra/issues/2072))
+
+### [Docs](https://github.com/ory/hydra/labels/docs)
+
+Affects documentation.
+
+#### Issues
+
+- [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

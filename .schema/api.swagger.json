@@ -798,14 +798,14 @@
     },
     "/metrics/prometheus": {
       "get": {
-        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
+        "description": "If you're using k8s, you can then add annotations to your deployment like so:\n\n```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
         "produces": [
           "plain/text"
         ],
         "tags": [
           "admin"
         ],
-        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
+        "summary": "Get Snapshot Metrics from the Hydra Service.",
         "operationId": "prometheus",
         "responses": {
           "200": {
@@ -1753,7 +1753,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Delete OAuth2 Access Tokens from a client",
+        "summary": "Delete OAuth2 Access Tokens from a Client",
         "operationId": "deleteOAuth2Token",
         "parameters": [
           {

@@ -4287,14 +4287,14 @@ p JSON.parse(result)
 
 <a id="opIdprometheus"></a>
 
-### Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to
-
-your deployment like so:
+### Get Snapshot Metrics from the Hydra Service.
 
 ```
 GET /metrics/prometheus HTTP/1.1
 
 ```
+
+If you're using k8s, you can then add annotations to your deployment like so:
 
 ```
 metadata:
@@ -4308,10 +4308,7 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 
 #### Responses
 
-<a
-  id="get-snapshot-metrics-from-the-hydra-service.-if-you're-using-k8s,-you-can-then-add-annotations-to
-your-deployment-like-so:-responses"
-></a>
+<a id="get-snapshot-metrics-from-the-hydra-service.-responses"></a>
 
 ##### Overview
 
@@ -7358,7 +7355,7 @@ p JSON.parse(result)
 
 <a id="opIddeleteOAuth2Token"></a>
 
-### Delete OAuth2 Access Tokens from a client
+### Delete OAuth2 Access Tokens from a Client
 
 ```
 DELETE /oauth2/tokens?client_id=string HTTP/1.1

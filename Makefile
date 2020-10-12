@@ -40,7 +40,7 @@ lint: .bin/golangci-lint
 # Runs full test suite including tests where databases are enabled
 .PHONY: test-legacy-migrations
 test-legacy-migrations: test-resetdb sqlbin
-		source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m ./internal/fizzmigrate
+		source scripts/test-env.sh && go test -tags legacy_migration_test sqlite -failfast -timeout=20m ./internal/fizzmigrate
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
@@ -49,7 +49,7 @@ test-legacy-migrations: test-resetdb sqlbin
 .PHONY: test
 test: .bin/go-acc
 		make test-resetdb
-		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m
+		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
@@ -71,7 +71,7 @@ test-resetdb: node_modules
 .PHONY: docker
 docker: .bin/packr2
 		packr2
-		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
+		GO111MODULE=on GOOS=linux GOARCH=amd64 go build -tags sqlite
 		packr2 clean
 		docker build -t oryd/hydra:latest .
 		docker build -f Dockerfile-alpine -t oryd/hydra:latest-alpine .
@@ -88,13 +88,11 @@ e2e: node_modules test-resetdb
 		./test/e2e/circle-ci.bash mysql-jwt
 		./test/e2e/circle-ci.bash cockroach
 		./test/e2e/circle-ci.bash cockroach-jwt
-		./test/e2e/circle-ci.bash plugin
-		./test/e2e/circle-ci.bash plugin-jwt
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
 quicktest:
-		go test -failfast -short ./...
+		go test -failfast -short -tags sqlite ./...
 
 # Formats the code
 .PHONY: format
@@ -138,6 +136,7 @@ install-stable: .bin/packr2
 		git checkout $$HYDRA_LATEST
 		packr2
 		GO111MODULE=on go install \
+				-tags sqlite \
 				-ldflags "-X github.com/ory/hydra/cmd.Version=$$HYDRA_LATEST -X github.com/ory/hydra/cmd.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.Commit=`git rev-parse HEAD`" \
 				.
 		packr2 clean
@@ -146,5 +145,5 @@ install-stable: .bin/packr2
 .PHONY: install
 install: .bin/packr2
 		packr2
-		GO111MODULE=on go install .
+		GO111MODULE=on go install -tags sqlite .
 		packr2 clean

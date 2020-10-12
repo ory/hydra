@@ -44,7 +44,7 @@ import (
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
-	r := internal.NewRegistryMemory(c)
+	r := internal.NewRegistryMemory(t, c)
 
 	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
 	for k, tc := range []struct {
@@ -156,10 +156,10 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				ar := fosite.NewAccessRequest(sess)
 				cl := &client.Client{ID: "foo-9", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}}
 				ar.Client = cl
-				if err := r.OAuth2Storage().CreateAccessTokenSession(nil, signature, ar); err != nil {
+				if err := r.ClientManager().CreateClient(context.Background(), cl); err != nil {
 					panic(err)
 				}
-				if err := r.ClientManager().CreateClient(context.Background(), cl); err != nil {
+				if err := r.OAuth2Storage().CreateAccessTokenSession(context.Background(), signature, ar); err != nil {
 					panic(err)
 				}
 			},

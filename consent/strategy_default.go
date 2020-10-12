@@ -30,6 +30,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/x/sqlcon"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
@@ -262,7 +264,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	if err := s.r.ConsentManager().CreateLoginRequest(
 		r.Context(),
 		&LoginRequest{
-			Challenge:         challenge,
+			ID:                challenge,
 			Verifier:          verifier,
 			CSRF:              csrf,
 			Skip:              skip,
@@ -347,7 +349,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(cl fosite.Client, subject, 
 func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledLoginRequest, error) {
 	ctx := r.Context()
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
-	if errors.Is(err, x.ErrNotFound) {
+	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -548,7 +550,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	if err := s.r.ConsentManager().CreateConsentRequest(
 		r.Context(),
 		&ConsentRequest{
-			Challenge:              challenge,
+			ID:                     challenge,
 			ACR:                    as.ACR,
 			Verifier:               verifier,
 			CSRF:                   csrf,
@@ -563,7 +565,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 			ForceSubjectIdentifier: as.ForceSubjectIdentifier,
 			OpenIDConnectContext:   as.LoginRequest.OpenIDConnectContext,
 			LoginSessionID:         as.LoginRequest.SessionID,
-			LoginChallenge:         sqlxx.NullString(as.LoginRequest.Challenge),
+			LoginChallenge:         sqlxx.NullString(as.LoginRequest.ID),
 			Context:                as.Context,
 		},
 	); err != nil {
@@ -586,7 +588,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
-	if errors.Is(err, x.ErrNotFound) {
+	if errors.Is(err, sqlcon.ErrNoRows) {
 		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
@@ -789,7 +791,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 		challenge := uuid.New()
 		if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &LogoutRequest{
 			RequestURL:  r.URL.String(),
-			Challenge:   challenge,
+			ID:          challenge,
 			Subject:     session.Subject,
 			SessionID:   session.ID,
 			Verifier:    uuid.New(),
@@ -912,7 +914,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	challenge := uuid.New()
 	if err := s.r.ConsentManager().CreateLogoutRequest(r.Context(), &LogoutRequest{
 		RequestURL:  r.URL.String(),
-		Challenge:   challenge,
+		ID:          challenge,
 		SessionID:   hintSid,
 		Subject:     session.Subject,
 		Verifier:    uuid.New(),

@@ -17,14 +17,13 @@ func NewDefaultDriver(l *logrusx.Logger, forcedHTTP bool, insecureRedirects []st
 		configuration.MustValidate(l, c)
 	}
 
-	r, err := NewRegistry(c)
+	r, err := NewRegistry(c, l)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to instantiate service registry.")
 	}
 
 	r.
 		WithConfig(c).
-		WithLogger(l).
 		WithBuildInfo(version, build, date)
 
 	if err = r.Init(); err != nil {

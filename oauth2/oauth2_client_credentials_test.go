@@ -52,7 +52,7 @@ func TestClientCredentials(t *testing.T) {
 			conf := internal.NewConfigurationWithDefaults()
 			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second)
 			viper.Set(configuration.ViperKeyAccessTokenStrategy, tc.d)
-			reg := internal.NewRegistryMemory(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			router := x.NewRouterPublic()
 			ts := httptest.NewServer(router)

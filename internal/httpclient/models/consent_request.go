@@ -21,7 +21,7 @@ type ConsentRequest struct {
 	// to express that, for example, a user authenticated using two factor authentication.
 	Acr string `json:"acr,omitempty"`
 
-	// Challenge is the identifier ("authorization challenge") of the consent authorization request. It is used to
+	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
 	// Required: true
 	Challenge *string `json:"challenge"`

@@ -39,21 +39,17 @@ type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
 	C            configuration.Provider
-	cm           client.Manager
 	ch           *client.Handler
 	fh           fosite.Hasher
 	kh           *jwk.Handler
 	cv           *client.Validator
 	hh           *healthx.Handler
 	kg           map[string]jwk.KeyGenerator
-	km           jwk.Manager
 	kc           *jwk.AEAD
 	cs           sessions.Store
 	csPrev       [][]byte
-	com          consent.Manager
 	cos          consent.Strategy
 	writer       herodot.Writer
-	fs           x.FositeStorer
 	fsc          fosite.ScopeStrategy
 	atjs         jwk.JWTStrategy
 	idtjs        jwk.JWTStrategy
@@ -424,4 +420,18 @@ func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 
 func (m *RegistryBase) Persister() persistence.Persister {
 	return m.persister
+}
+
+func (m *RegistryBase) Config() configuration.Provider {
+	return m.C
+}
+
+// WithOAuth2Provider forces an oauth2 provider which is only used for testing.
+func (m *RegistryBase) WithOAuth2Provider(f fosite.OAuth2Provider) {
+	m.fop = f
+}
+
+// WithConsentStrategy forces a consent strategy which is only used for testing.
+func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
+	m.cos = c
 }

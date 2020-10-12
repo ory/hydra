@@ -39,7 +39,7 @@ import (
 
 //func TestLogout(t *testing.T) {
 //	conf := internal.NewConfigurationWithDefaults()
-//	reg := internal.NewRegistryMemory(conf)
+//	reg := internal.NewRegistryMemory(t, conf)
 //
 //	r := x.NewRouterPublic()
 //	h := NewHandler(reg, conf)
@@ -103,13 +103,15 @@ func TestGetLogoutRequest(t *testing.T) {
 			challenge := "challenge" + key
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
+				cl := &client.Client{ID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
-					Client:    &client.Client{ID: "client" + key},
-					Challenge: challenge,
-					WasUsed:   tc.used,
+					Client:  cl,
+					ID:      challenge,
+					WasUsed: tc.used,
 				}))
 			}
 
@@ -142,14 +144,20 @@ func TestGetLoginRequest(t *testing.T) {
 			challenge := "challenge" + key
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.TODO(), &LoginRequest{
-					Client:     &client.Client{ID: "client" + key},
-					Challenge:  challenge,
-					WasHandled: tc.handled,
+				cl := &client.Client{ID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+					Client: cl,
+					ID:     challenge,
 				}))
+
+				if tc.handled {
+					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasUsed: true})
+					require.NoError(t, err)
+				}
 			}
 
 			h := NewHandler(reg, conf)
@@ -181,14 +189,23 @@ func TestGetConsentRequest(t *testing.T) {
 			challenge := "challenge" + key
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.TODO(), &ConsentRequest{
-					Client:     &client.Client{ID: "client" + key},
-					Challenge:  challenge,
-					WasHandled: tc.handled,
+				cl := &client.Client{ID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
+					Client: cl,
+					ID:     challenge,
 				}))
+
+				if tc.handled {
+					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
+						ID:      challenge,
+						WasUsed: true,
+					})
+					require.NoError(t, err)
+				}
 			}
 
 			h := NewHandler(reg, conf)

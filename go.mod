@@ -15,6 +15,7 @@ require (
 	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.7.1
 	github.com/gobuffalo/pop/v5 v5.2.4
+	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
 	github.com/google/uuid v1.1.1
@@ -48,7 +49,7 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.0 // indirect
 	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/toqueteos/webbrowser v1.2.0
@@ -60,3 +61,5 @@ require (
 	golang.org/x/tools v0.0.0-20200721223218-6123e77877b2
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
+
+replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.1.1-0.20200924193619-5ce72a770b26

@@ -26,12 +26,14 @@ import (
 	"github.com/ory/hydra/client"
 )
 
-var _, _ Manager = new(SQLManager), new(MemoryManager)
-
 type ForcedObfuscatedLoginSession struct {
 	ClientID          string `db:"client_id"`
 	Subject           string `db:"subject"`
 	SubjectObfuscated string `db:"subject_obfuscated"`
+}
+
+func (_ *ForcedObfuscatedLoginSession) TableName() string {
+	return "hydra_oauth2_obfuscated_authentication_session"
 }
 
 type Manager interface {

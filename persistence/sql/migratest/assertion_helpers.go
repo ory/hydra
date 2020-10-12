@@ -11,6 +11,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	sqlPersister "github.com/ory/hydra/persistence/sql"
 	"github.com/ory/x/sqlxx"
 )
 
@@ -104,7 +105,7 @@ func assertEqualForcedObfucscatedLoginSessions(t *testing.T, expected, actual *c
 	assert.Equal(t, expected, actual)
 }
 
-func assertEqualOauth2Data(t *testing.T, expected, actual *oauth2.SQLData) {
+func assertEqualOauth2Data(t *testing.T, expected, actual *sqlPersister.OAuth2RequestSQL) {
 	now := time.Now()
 	expected.RequestedAt = now
 	actual.RequestedAt = now

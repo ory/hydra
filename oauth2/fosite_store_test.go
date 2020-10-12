@@ -45,8 +45,8 @@ func TestMain(m *testing.M) {
 }
 
 var registries = make(map[string]driver.Registry)
-var cleanRegistries = func(*testing.T) {
-	registries["memory"] = internal.NewRegistryMemory(internal.NewConfigurationWithDefaults())
+var cleanRegistries = func(t *testing.T) {
+	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults())
 }
 
 // returns clean registries that can safely be used for one test

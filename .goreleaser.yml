@@ -8,10 +8,74 @@ env:
 before:
   hooks:
     - go mod download
-    - go install github.com/gobuffalo/packr/v2/packr2
-    - packr2
+    - make pack
 
 builds:
+  -
+    id: hydra-sqlite-darwin
+    flags:
+      - -tags
+      - sqlite
+    ldflags:
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
+      # - "-extldflags '-static'"
+    binary: hydra
+    env:
+      - CGO_ENABLED=1
+      - CC=o64-clang
+      - CXX=o64-clang++
+    goarch:
+      - amd64
+    goos:
+      - darwin
+
+  -
+    id: hydra-sqlite-linux
+    flags:
+      - -tags
+      - sqlite
+    ldflags:
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
+    binary: hydra
+    env:
+      - CGO_ENABLED=1
+    goarch:
+      - amd64
+    goos:
+      - linux
+  -
+    id: hydra-sqlite-linux-libmusl
+    flags:
+      - -tags
+      - sqlite
+    ldflags:
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
+    binary: hydra
+    env:
+      - CGO_ENABLED=1
+      - CC=musl-gcc
+    goarch:
+      - amd64
+    goos:
+      - linux
+  -
+    id: hydra-sqlite-windows
+    flags:
+      - -tags
+      - sqlite
+    ldflags:
+      - -s -w -X github.com/ory/hydra/cmd.Version={{.Tag}} -X github.com/ory/hydra/cmd.Commit={{.FullCommit}} -X github.com/ory/hydra/cmd.Date={{.Date}}
+      - "-extldflags '-static'"
+    binary: hydra
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+    goarch:
+      - amd64
+    goos:
+      - windows
+
   -
     id: hydra
     ldflags:
@@ -35,32 +99,84 @@ builds:
       - darwin
 
 archives:
-  - builds:
-      - hydra
-    id: hydra-archive
+  - id: hydra-sqlite
+    builds:
+      - hydra-sqlite-windows
+      - hydra-sqlite-darwin
+      - hydra-sqlite-linux
     replacements:
-      darwin: macOS
-      386: 32-bit
-      amd64: 64-bit
+      darwin: macos
+      386: 32bit
+      amd64: 64bit
+      arm: arm32
+    format_overrides:
+      -
+        goos: windows
+        format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - SECURITY.md
+    name_template: "{{ .ProjectName }}_{{ .Version }}-sqlite_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+
+  - id: hydra-sqlite-libmusl
+    builds:
+      - hydra-sqlite-linux-libmusl
+    replacements:
+      darwin: macos
+      386: 32bit
+      amd64: 64bit
+      arm: arm32
+    format_overrides:
+      -
+        goos: windows
+        format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - SECURITY.md
+    name_template: "{{ .ProjectName }}_{{ .Version }}-sqlite-libmusl_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+
+  - id: hydra
+    builds:
+      - hydra
+    replacements:
+      darwin: macos
+      386: 32bit
+      amd64: 64bit
+      arm: arm32
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - SECURITY.md
 
 snapshot:
   name_template: "{{ .Tag }}-next"
+
 changelog:
   sort: asc
+  filters:
+    exclude:
+      - ci skip
+      - Merge pull request
+      - Merge branch
+
 brews:
   - tap:
       owner: ory
       name: homebrew-hydra
-    goarm: 6
     ids:
-    - hydra-archive
+      - hydra-sqlite
     homepage:  https://www.ory.sh
     commit_author:
       name: aeneasr
-      email: aeneas@ory.sh
+      email: 3372410+aeneasr@users.noreply.github.com
 
 scoop:
   bucket:
@@ -69,10 +185,26 @@ scoop:
   homepage:  https://www.ory.sh
   commit_author:
     name: aeneasr
-    email: aeneas@ory.sh
+    email: 3372410+aeneasr@users.noreply.github.com
+
+checksum:
+  algorithm: sha256
 
 dockers:
-  - dockerfile: Dockerfile
+  - dockerfile: .docker/Dockerfile-sqlite
+    builds:
+      - hydra-sqlite-linux-libmusl
+    binaries:
+      - hydra
+    image_templates:
+      - "oryd/hydra:v{{ .Major }}-sqlite"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-sqlite"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-sqlite"
+      - "oryd/hydra:{{ .Tag }}-sqlite"
+      - "oryd/hydra:latest-sqlite"
+  - dockerfile: .docker/Dockerfile
+    builds:
+      - hydra
     binaries:
       - hydra
     image_templates:
@@ -81,15 +213,11 @@ dockers:
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
       - "oryd/hydra:{{ .Tag }}"
       - "oryd/hydra:latest"
-  - dockerfile: Dockerfile-alpine
-    binaries:
-      - hydra
-    image_templates:
-      - "oryd/hydra:v{{ .Major }}-alpine"
-      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-alpine"
-      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
-      - "oryd/hydra:{{ .Tag }}-alpine"
-      - "oryd/hydra:latest-alpine"
 
 release:
   prerelease: auto
+  name_template: "{{.Tag}}"
+  ids:
+    - hydra-sqlite
+    - hydra-sqlite-libmusl
+    - hydra

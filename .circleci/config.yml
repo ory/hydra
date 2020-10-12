@@ -55,7 +55,7 @@ jobs:
           paths:
             - "/go/pkg/mod"
             - ".bin"
-      - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m
+      - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
       #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
@@ -207,14 +207,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test-e2e:
-          name: test-e2e-plugin
-          requires:
-            - test-e2e-memory
-          flavor: plugin
-          filters:
-            tags:
-              only: /.*/
       - changelog/generate:
           requires:
             - nancy/test
@@ -223,7 +215,6 @@ workflows:
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
-            - test-e2e-plugin
             - docs/build
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
@@ -242,7 +233,6 @@ workflows:
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
-            - test-e2e-plugin
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -295,7 +285,6 @@ workflows:
             - test-e2e-postgres
             - test-e2e-mysql
             - test-e2e-cockroach
-            - test-e2e-plugin
             - changelog/generate
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach

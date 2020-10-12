@@ -17,7 +17,7 @@ import (
 // swagger:model loginRequest
 type LoginRequest struct {
 
-	// Challenge is the identifier ("login challenge") of the login request. It is used to
+	// ID is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
 	// Required: true
 	Challenge *string `json:"challenge"`

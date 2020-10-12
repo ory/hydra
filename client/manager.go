@@ -26,8 +26,6 @@ import (
 	"github.com/ory/fosite"
 )
 
-var _, _ Manager = new(SQLManager), new(MemoryManager)
-
 type Manager interface {
 	Storage
 

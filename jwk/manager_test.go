@@ -39,7 +39,7 @@ var testGenerator = &RS256Generator{}
 func TestManager(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	registries := map[string]driver.Registry{
-		"memory": internal.NewRegistryMemory(conf),
+		"memory": internal.NewRegistryMemory(t, conf),
 	}
 
 	if !testing.Short() {

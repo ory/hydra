@@ -1,13 +1,18 @@
 package driver
 
 import (
+	"context"
 	"strings"
 	"time"
+
+	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/ory/x/resilience"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
+
+	_ "github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/ory/hydra/persistence/sql"
 
@@ -19,7 +24,6 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 )
 
@@ -51,24 +55,6 @@ func (m *RegistrySQL) WithDB(db *sqlx.DB) Registry {
 }
 
 func (m *RegistrySQL) Init() error {
-	if m.db == nil {
-		// old db connection
-		options := append([]sqlcon.OptionModifier{}, m.dbalOptions...)
-		if m.Tracer().IsLoaded() {
-			options = append(options, sqlcon.WithDistributedTracing(), sqlcon.WithOmitArgsFromTraceSpans())
-		}
-
-		connection, err := sqlcon.NewSQLConnection(m.C.DSN(), m.Logger(), options...)
-		if err != nil {
-			return err
-		}
-
-		m.db, err = connection.GetDatabaseRetry(time.Second*5, time.Minute*5)
-		if err != nil {
-			return err
-		}
-	}
-
 	if m.persister == nil {
 		// new db connection
 		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())
@@ -84,9 +70,18 @@ func (m *RegistrySQL) Init() error {
 		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
 			return errors.WithStack(err)
 		}
-		m.persister, err = sql.NewPersister(c)
+		m.persister, err = sql.NewPersister(c, m, m.C, m.l)
 		if err != nil {
 			return err
+		}
+
+		// if dsn is memory we have to run the migrations on every start
+		if m.C.DSN() == configuration.DefaultSQLiteMemoryDSN {
+			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
+			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
+			if err := m.persister.MigrateUp(context.Background()); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -103,40 +98,28 @@ func (m *RegistrySQL) DB() *sqlx.DB {
 	return m.db
 }
 
-func (m *RegistrySQL) CanHandle(dsn string) bool {
+func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
 	scheme := strings.Split(dsn, "://")[0]
 	s := dbal.Canonicalize(scheme)
 	return s == dbal.DriverMySQL || s == dbal.DriverPostgreSQL || s == dbal.DriverCockroachDB
 }
 
 func (m *RegistrySQL) Ping() error {
-	return m.DB().Ping()
+	return m.Persister().Connection(context.Background()).Open()
 }
 
 func (m *RegistrySQL) ClientManager() client.Manager {
-	if m.cm == nil {
-		m.cm = client.NewSQLManager(m.DB(), m)
-	}
-	return m.cm
+	return m.Persister()
 }
 
 func (m *RegistrySQL) ConsentManager() consent.Manager {
-	if m.com == nil {
-		m.com = consent.NewSQLManager(m.DB(), m)
-	}
-	return m.com
+	return m.Persister()
 }
 
 func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
-	if m.fs == nil {
-		m.fs = oauth2.NewFositeSQLStore(m.DB(), m.r, m.C, m.KeyCipher())
-	}
-	return m.fs
+	return m.Persister()
 }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
-	if m.km == nil {
-		m.km = jwk.NewSQLManager(m.DB(), m)
-	}
-	return m.km
+	return m.Persister()
 }

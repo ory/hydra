@@ -94,7 +94,7 @@ var flushRequests = []*fosite.Request{
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -110,8 +110,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
 		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	}
-	require.NoError(t, store.CreateAccessTokenSession(nil, deleteRequest.ID, deleteRequest))
-	_ = cm.CreateClient(nil, deleteRequest.Client.(*client.Client))
+	require.NoError(t, cm.CreateClient(context.Background(), deleteRequest.Client.(*client.Client)))
+	require.NoError(t, store.CreateAccessTokenSession(context.Background(), deleteRequest.ID, deleteRequest))
 
 	r := x.NewRouterAdmin()
 	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
@@ -134,15 +134,15 @@ func TestHandlerFlushHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	cl := reg.ClientManager()
 	store := reg.OAuth2Storage()
 
 	h := oauth2.NewHandler(reg, conf)
 	for _, r := range flushRequests {
-		require.NoError(t, store.CreateAccessTokenSession(nil, r.ID, r))
-		_ = cl.CreateClient(nil, r.Client.(*client.Client))
+		_ = cl.CreateClient(context.Background(), r.Client.(*client.Client))
+		require.NoError(t, store.CreateAccessTokenSession(context.Background(), r.ID, r))
 	}
 
 	r := x.NewRouterAdmin()
@@ -192,7 +192,7 @@ func TestUserinfo(t *testing.T) {
 	viper.Set(configuration.ViperKeyScopeStrategy, "")
 	viper.Set(configuration.ViperKeyAuthCodeLifespan, lifespan)
 	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
@@ -430,7 +430,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	viper.Set(configuration.ViperKeyOIDCDiscoverySupportedClaims, []string{"sub"})
 	viper.Set(configuration.ViperKeyOAuth2ClientRegistrationURL, "http://client-register/registration")
 	viper.Set(configuration.ViperKeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	h := oauth2.NewHandler(reg, conf)
 

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ory/hydra/persistence/sql"
+
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
 
@@ -93,7 +95,7 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=jwk migration %d", i), func(t *testing.T) {
 					expected := expectedJWK(i)
 					actual := &jwk.SQLData{}
-					require.NoError(t, c.Where("pk = ?", expected.PK).First(actual))
+					require.NoError(t, c.Where("pk = ?", expected.ID).First(actual))
 					assertEqualJWKs(t, expected, actual)
 				})
 			}
@@ -105,11 +107,11 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=consent migration %d", i), func(t *testing.T) {
 					ecr, elr, els, ehcr, ehlr, efols, elor := expectedConsent(i)
 
-					acr, err := d.Registry().ConsentManager().GetConsentRequest(context.Background(), ecr.Challenge)
+					acr, err := d.Registry().ConsentManager().GetConsentRequest(context.Background(), ecr.ID)
 					require.NoError(t, err)
 					assertEqualConsentRequests(t, ecr, acr)
 
-					alr, err := d.Registry().ConsentManager().GetLoginRequest(context.Background(), elr.Challenge)
+					alr, err := d.Registry().ConsentManager().GetLoginRequest(context.Background(), elr.ID)
 					require.NoError(t, err)
 					assertEqualLoginRequests(t, elr, alr)
 
@@ -118,11 +120,12 @@ func TestMigrations(t *testing.T) {
 					assertEqualLoginSessions(t, els, als)
 
 					ahcr := &consent.HandledConsentRequest{}
-					require.NoError(t, c.Q().Where("challenge = ?", ehcr.Challenge).First(ahcr))
+					require.NoError(t, c.Q().Where("challenge = ?", ehcr.ID).First(ahcr))
+					require.NoError(t, ehcr.AfterFind(c))
 					assertEqualHandledConsentRequests(t, ehcr, ahcr)
 
 					ahlr := &consent.HandledLoginRequest{}
-					require.NoError(t, c.Q().Where("challenge = ?", ehlr.Challenge).First(ahlr))
+					require.NoError(t, c.Q().Where("challenge = ?", ehlr.ID).First(ahlr))
 					assertEqualHandledLoginRequests(t, ehlr, ahlr)
 
 					if efols != nil {
@@ -133,7 +136,7 @@ func TestMigrations(t *testing.T) {
 
 					if elor != nil {
 						alor := &consent.LogoutRequest{}
-						require.NoError(t, dbx.Get(alor, dbx.Rebind("select * from hydra_oauth2_logout_request where challenge = ?"), elor.Challenge))
+						require.NoError(t, dbx.Get(alor, dbx.Rebind("select * from hydra_oauth2_logout_request where challenge = ?"), elor.ID))
 						assertEqualLogoutRequests(t, elor, alor)
 					}
 				})
@@ -152,15 +155,15 @@ func TestMigrations(t *testing.T) {
 					tables = append(tables, "hydra_oauth2_pkce")
 				}
 				ed, ebjti := expectedOauth2(i)
-				ad := &oauth2.SQLData{}
+				ad := &sql.OAuth2RequestSQL{}
 				for _, table := range tables {
-					require.NoError(t, dbx.Get(ad, dbx.Rebind(fmt.Sprintf("select * from %s where signature = ?", table)), ed.Signature), "table: %s\n%+v", table, ed)
+					require.NoError(t, dbx.Get(ad, dbx.Rebind(fmt.Sprintf("select * from %s where signature = ?", table)), ed.ID), "table: %s\n%+v", table, ed)
 					assertEqualOauth2Data(t, ed, ad)
 				}
 
 				if i >= 11 {
 					abjti := &oauth2.BlacklistedJTI{}
-					require.NoError(t, c.Where("signature = ?", ebjti.Signature).First(abjti))
+					require.NoError(t, c.Where("signature = ?", ebjti.ID).First(abjti))
 					assertEqualOauth2BlacklistedJTIs(t, ebjti, abjti)
 				}
 			}

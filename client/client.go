@@ -24,6 +24,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v5"
+
 	jose "gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
 
 	"github.com/ory/fosite"
@@ -200,6 +202,36 @@ type Client struct {
 
 func (Client) TableName() string {
 	return "hydra_client"
+}
+
+func (c *Client) BeforeSave(_ *pop.Connection) error {
+	if c.JSONWebKeys == nil {
+		c.JSONWebKeys = new(x.JoseJSONWebKeySet)
+	}
+
+	if c.Metadata == nil {
+		c.Metadata = []byte("{}")
+	}
+
+	if c.Audience == nil {
+		c.Audience = sqlxx.StringSlicePipeDelimiter{}
+	}
+
+	if c.AllowedCORSOrigins == nil {
+		c.AllowedCORSOrigins = sqlxx.StringSlicePipeDelimiter{}
+	}
+
+	if c.CreatedAt.IsZero() {
+		c.CreatedAt = time.Now()
+	}
+	c.CreatedAt = c.CreatedAt.UTC()
+
+	if c.UpdatedAt.IsZero() {
+		c.UpdatedAt = time.Now()
+	}
+	c.UpdatedAt = c.UpdatedAt.UTC()
+
+	return nil
 }
 
 func (c *Client) GetID() string {

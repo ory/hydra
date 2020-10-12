@@ -39,7 +39,7 @@ func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Hour)
 	registries := map[string]driver.Registry{
-		"memory": internal.NewRegistryMemory(conf),
+		"memory": internal.NewRegistryMemory(t, conf),
 	}
 
 	if !testing.Short() {

@@ -1,6 +1,6 @@
 module github.com/ory/hydra
 
-go 1.14
+go 1.15
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -13,8 +13,8 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
 	github.com/gobuffalo/packr v1.24.0 // indirect
-	github.com/gobuffalo/packr/v2 v2.7.1
-	github.com/gobuffalo/pop/v5 v5.2.4
+	github.com/gobuffalo/packr/v2 v2.8.0
+	github.com/gobuffalo/pop/v5 v5.2.5-0.20201013071927-22480bdbe58a
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
@@ -22,9 +22,10 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.0
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
-	github.com/jackc/pgx/v4 v4.6.0
+	github.com/jackc/pgx/v4 v4.9.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
+	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20200611091901-487c5ec83473 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
@@ -61,5 +62,3 @@ require (
 	golang.org/x/tools v0.0.0-20200721223218-6123e77877b2
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
-
-replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.1.1-0.20200924193619-5ce72a770b26

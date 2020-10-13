@@ -5,6 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/luna-duclos/instrumentedsql"
+	"github.com/luna-duclos/instrumentedsql/opentracing"
+
 	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/ory/x/resilience"
@@ -29,8 +32,7 @@ import (
 
 type RegistrySQL struct {
 	*RegistryBase
-	db          *sqlx.DB
-	dbalOptions []sqlcon.OptionModifier
+	db *sqlx.DB
 }
 
 var _ Registry = new(RegistrySQL)
@@ -56,13 +58,23 @@ func (m *RegistrySQL) WithDB(db *sqlx.DB) Registry {
 
 func (m *RegistrySQL) Init() error {
 	if m.persister == nil {
+		var opts []instrumentedsql.Opt
+		if m.Tracer().IsLoaded() {
+			opts = []instrumentedsql.Opt{
+				instrumentedsql.WithTracer(opentracing.NewTracer(true)),
+				instrumentedsql.WithOmitArgs(),
+			}
+		}
+
 		// new db connection
 		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())
 		c, err := pop.NewConnection(&pop.ConnectionDetails{
-			URL:             sqlcon.FinalizeDSN(m.l, cleanedDSN),
-			IdlePool:        idlePool,
-			ConnMaxLifetime: connMaxLifetime,
-			Pool:            pool,
+			URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
+			IdlePool:                  idlePool,
+			ConnMaxLifetime:           connMaxLifetime,
+			Pool:                      pool,
+			UseInstrumentedDriver:     m.Tracer().IsLoaded(),
+			InstrumentedDriverOptions: opts,
 		})
 		if err != nil {
 			return errors.WithStack(err)

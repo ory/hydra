@@ -1,13 +1,13 @@
 version: 2.1
 
 orbs:
-  goreleaser: ory/goreleaser@0.1.18
+  goreleaser: ory/goreleaser@0.1.20
   slack: circleci/slack@3.4.2
   sdk: ory/sdk@0.1.38
   changelog: ory/changelog@0.1.4
   nancy: ory/nancy@0.0.13
   docs: ory/docs@0.0.8
-  golangci: ory/golangci@0.0.8
+  golangci: ory/golangci@0.0.9
 
 jobs:
 #  test-legacy-migrations:

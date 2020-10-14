@@ -3,7 +3,6 @@ package sql
 import (
 	"context"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -26,24 +25,22 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 }
 
 func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		o, err := p.GetClient(ctx, cl.GetID())
+	o, err := p.GetClient(ctx, cl.GetID())
+	if err != nil {
+		return err
+	}
+
+	if cl.Secret == "" {
+		cl.Secret = string(o.GetHashedSecret())
+	} else {
+		h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 		if err != nil {
-			return err
+			return errors.WithStack(err)
 		}
+		cl.Secret = string(h)
+	}
 
-		if cl.Secret == "" {
-			cl.Secret = string(o.GetHashedSecret())
-		} else {
-			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
-			if err != nil {
-				return errors.WithStack(err)
-			}
-			cl.Secret = string(h)
-		}
-
-		return sqlcon.HandleError(c.Update(cl))
-	})
+	return sqlcon.HandleError(p.Connection(ctx).Update(cl))
 }
 
 func (p *Persister) DeleteClient(ctx context.Context, id string) error {

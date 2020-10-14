@@ -12,7 +12,6 @@ import (
 
 	"github.com/ory/fosite/storage"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
@@ -181,26 +180,26 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 }
 
 func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		// delete expired
-		now := "now()"
-		if c.Dialect.Name() == "sqlite3" {
-			now = "CURRENT_TIMESTAMP"
-		}
-		/* #nosec G201 table is static */
-		if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < %s", oauth2.BlacklistedJTI{}.TableName(), now)).Exec(); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	c := p.Connection(ctx)
 
-		if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
-			// found a jti
-			return errors.WithStack(fosite.ErrJTIKnown)
-		} else if err != nil {
-			return err
-		}
-		// setting worked without a problem
-		return nil
-	})
+	// delete expired
+	now := "now()"
+	if c.Dialect.Name() == "sqlite3" {
+		now = "CURRENT_TIMESTAMP"
+	}
+	/* #nosec G201 table is static */
+	if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < %s", oauth2.BlacklistedJTI{}.TableName(), now)).Exec(); err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+		// found a jti
+		return errors.WithStack(fosite.ErrJTIKnown)
+	} else if err != nil {
+		return err
+	}
+	// setting worked without a problem
+	return nil
 }
 
 func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
@@ -220,28 +219,24 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	rawSignature = p.hashSignature(rawSignature, table)
 
 	r := OAuth2RequestSQL{Table: table}
-	var fr fosite.Requester
 
-	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
-		if errors.Is(err, sql.ErrNoRows) {
-			return errors.WithStack(fosite.ErrNotFound)
-		} else if err != nil {
-			return sqlcon.HandleError(err)
-		} else if !r.Active && table == sqlTableCode {
-			fr, err = r.toRequest(ctx, session, p)
-			if err != nil {
-				return err
-			} else {
-				return errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
-			}
-		} else if !r.Active {
-			return errors.WithStack(fosite.ErrInactiveToken)
+	err := p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, errors.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return nil, sqlcon.HandleError(err)
+	} else if !r.Active && table == sqlTableCode {
+		fr, err := r.toRequest(ctx, session, p)
+		if err != nil {
+			return nil, err
+		} else {
+			return fr, errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 		}
+	} else if !r.Active {
+		return nil, errors.WithStack(fosite.ErrInactiveToken)
+	}
 
-		fr, err = r.toRequest(ctx, session, p)
-		return err
-	})
+	return r.toRequest(ctx, session, p)
 }
 
 func (p *Persister) deleteSession(ctx context.Context, signature string, table tableName) error {

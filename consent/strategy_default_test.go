@@ -1766,12 +1766,12 @@ func TestStrategyLoginConsent(t *testing.T) {
 				tc.req.Form = r.Form
 
 				c, err := strategy.HandleOAuth2AuthorizationRequest(w, r, &tc.req)
-				t.Logf("DefaultStrategy returned at call %d:\n\tgot: %+v\n\texpected: %s", calls, c, err)
+				t.Logf("DefaultStrategy returned at call %d:\n\tresult: %+v\n\terr: %s", calls, c, err)
 
 				if tc.expectErr[calls] {
 					assert.Error(t, err)
 					if tc.expectErrType[calls] != nil {
-						assert.EqualError(t, tc.expectErrType[calls], err.Error(), "%+v", err)
+						assert.EqualError(t, err, tc.expectErrType[calls].Error(), "%+v", err)
 					}
 				} else {
 					require.NoError(t, err)

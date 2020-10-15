@@ -247,7 +247,6 @@ func runLogout(t *testing.T, method string) {
 		subject          string
 		sessionID        string
 		lph              func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
-		expectSession    *HandledConsentRequest
 		expectBody       string
 		backChannels     []func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
 		expectStatusCode int

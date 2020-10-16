@@ -17,21 +17,22 @@ services:
   hydra:
     depends_on:
       - jaeger
-#      - zipkin
-#      - datadog
+      # - zipkin
+      # - datadog
     environment:
       - TRACING_PROVIDER=jaeger
-#      - TRACING_PROVIDER=zipkin
-#      - TRACING_PROVIDER=datadog
-      # Jaeger
+      # - TRACING_PROVIDER=zipkin
+      # - TRACING_PROVIDER=datadog
+      ### Jaeger ###
       - TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
       - TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
       - TRACING_PROVIDERS_JAEGER_SAMPLING_TYPE=const
       - TRACING_PROVIDERS_JAEGER_SAMPLING_VALUE=1
-      # Zipkin
-      - TRACING_PROVIDERS_ZIPKIN_SERVER_URL=http://zipkin:9411/api/v2/spans
-      # DataDog (see env vars here: https://docs.datadoghq.com/tracing/setup/go/#configuration)
-      - DD_SERVICE=Hydra
+      ### Zipkin ###
+      # - TRACING_PROVIDERS_ZIPKIN_SERVER_URL=http://zipkin:9411/api/v2/spans
+      ### DataDog ###
+      ### See env vars here: https://docs.datadoghq.com/tracing/setup/go/#configuration) ###
+      # - DD_SERVICE=Hydra
 
   jaeger:
     image: jaegertracing/all-in-one:1.19.2

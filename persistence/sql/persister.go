@@ -112,7 +112,7 @@ func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context,
 		isNested = false
 
 		var err error
-		c, err = p.conn.NewTransaction()
+		c, err = p.conn.WithContext(ctx).NewTransaction()
 
 		if err != nil {
 			return errors.WithStack(err)

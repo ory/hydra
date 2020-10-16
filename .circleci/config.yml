@@ -29,7 +29,7 @@ jobs:
         environment:
           - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
-          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?parseTime=true&multiStatements=true
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
       - image: postgres:9.6
         environment:

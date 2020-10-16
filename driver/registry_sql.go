@@ -51,11 +51,6 @@ func NewRegistrySQL() *RegistrySQL {
 	return r
 }
 
-func (m *RegistrySQL) WithDB(db *sqlx.DB) Registry {
-	m.db = db
-	return m
-}
-
 func (m *RegistrySQL) Init() error {
 	if m.persister == nil {
 		var opts []instrumentedsql.Opt
@@ -98,16 +93,6 @@ func (m *RegistrySQL) Init() error {
 	}
 
 	return nil
-}
-
-func (m *RegistrySQL) DB() *sqlx.DB {
-	if m.db == nil {
-		if err := m.Init(); err != nil {
-			m.Logger().WithError(err).Fatalf("Unable to initialize database.")
-		}
-	}
-
-	return m.db
 }
 
 func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {

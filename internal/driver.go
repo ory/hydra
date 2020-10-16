@@ -11,8 +11,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
@@ -74,13 +72,6 @@ func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 
 func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Registry {
 	return newRegistryDefault(t, "memory", c)
-}
-
-func NewRegistrySQLFromDB(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
-	viper.Set(configuration.ViperKeyLogLevel, "debug")
-	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
-	_ = r.Init()
-	return r.(*driver.RegistrySQL)
 }
 
 func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {

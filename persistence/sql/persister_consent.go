@@ -80,6 +80,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 			} else if err != nil {
 				return err
 			}
+
 			if err := p.RevokeRefreshToken(ctx, hr.ID); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {

@@ -10,7 +10,6 @@ import (
 
 	"github.com/ory/hydra/persistence"
 
-	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
 
 	"github.com/ory/hydra/metrics/prometheus"
@@ -62,12 +61,6 @@ type Registry interface {
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
 	WithOAuth2Provider(f fosite.OAuth2Provider)
 	WithConsentStrategy(c consent.Strategy)
-}
-
-func MustNewRegistry(c configuration.Provider, l *logrusx.Logger) Registry {
-	r, err := NewRegistry(c, l)
-	cmdx.Must(err, "unable to initialize services: %s", err)
-	return r
 }
 
 func NewRegistry(c configuration.Provider, l *logrusx.Logger) (Registry, error) {

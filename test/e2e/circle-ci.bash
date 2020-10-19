@@ -41,14 +41,14 @@ case "$1" in
             ;;
 
         postgres)
-            ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1 &
+            ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_POSTGRESQL \
                 ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
         postgres-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1 &
+            ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_POSTGRESQL \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
@@ -57,14 +57,14 @@ case "$1" in
             ;;
 
         mysql)
-            ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1 &
+            ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_MYSQL \
                 ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
         mysql-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1 &
+            ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_MYSQL \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
@@ -73,14 +73,14 @@ case "$1" in
             ;;
 
         cockroach)
-            ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1 &
+            ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_COCKROACHDB \
                 ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
         cockroach-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1 &
+            ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_COCKROACHDB \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \

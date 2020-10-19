@@ -32,4 +32,6 @@ var migrateCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(migrateCmd)
+
+	migrateCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "","Config file (default is $HOME/hydra.yaml)")
 }

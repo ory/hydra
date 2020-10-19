@@ -10,7 +10,7 @@
 #                                                                         #
 ###########################################################################
 
-version: '3'
+version: '3.7'
 
 services:
 
@@ -38,6 +38,8 @@ services:
     image: jaegertracing/all-in-one:1.19.2
     ports:
       - "16686:16686" # The UI port
+    networks:
+      - intranet
 
 #  zipkin:
 #    image: openzipkin/zipkin:2

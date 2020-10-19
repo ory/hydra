@@ -527,7 +527,7 @@
           "else": {
             "properties": {
               "pairwise": {
-                "$comment": "This enforces pairwise to not be set iff 'enabled' does not contain 'pairwise'",
+                "$comment": "This enforces pairwise to not be set if 'enabled' does not contain 'pairwise'",
                 "not": {}
               }
             }

@@ -3,8 +3,6 @@ id: tracing
 title: Distributed Tracing
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
-
 Configuring Distributed Tracing (DT) will enable you to obtain a visualization
 of the call paths that take place in order to process a request made to Hydra.
 It's yet another tool that you can use to aid you in profiling, debugging and
@@ -67,7 +65,7 @@ inspect traces!
 As an example, here is a trace created by making a bad request to the
 `POST /clients` endpoint:
 
-<img alt="Sample Trace" src={useBaseUrl('/img/docs/sample_trace.png')} />
+![OpenTracing and OpenCensus exemplary trace in Jaeger UI](../images/sample_trace.png)
 
 At a glance, you are able to see that:
 

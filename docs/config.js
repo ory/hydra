@@ -6,27 +6,32 @@ module.exports = {
   updateTags: [
     {
       image: 'oryd/hydra',
-      files: [
-        'docs/docs/install.md',
-        'docs/docs/configure-deploy.mdx',
-        'quickstart.yml',
-        'quickstart-cockroach.yml',
-        'quickstart-cors.yml',
-        'quickstart-debug.yml',
-        'quickstart-jwt.yml',
-        'quickstart-mysql.yml',
-        'quickstart-postgres.yml',
-        'quickstart-prometheus.yml',
-        'quickstart-tracing.yml'
-      ]
+      files: ['docs/docs/install.md', 'docs/docs/configure-deploy.mdx']
     },
     {
-      replacer: ({ content, next }) =>
-        content.replace(
-          /v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/gi,
-          `${next}`
-        ),
+      replacer: ({ content, next, semverRegex }) =>
+        content.replace(semverRegex, `${next}`),
+      image: 'oryd/hydra',
       files: ['docs/docs/install.md']
+    },
+    {
+      replacer: ({ content, next, semverRegex }) =>
+        content.replace(
+          new RegExp('oryd/hydra:' + semverRegex.source, 'gi'),
+          `oryd/hydra:${next}-sqlite`
+        ),
+      files: ['quickstart.yml']
+    },
+    {
+      replacer: ({ content, next, semverRegex }) =>
+        content.replace(
+          new RegExp(
+            'oryd/hydra-login-consent-node:' + semverRegex.source,
+            'gi'
+          ),
+          `oryd/hydra-login-consent-node:${next}`
+        ),
+      files: ['quickstart.yml']
     }
   ],
   updateConfig: {

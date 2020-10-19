@@ -3,14 +3,12 @@ id: 5min-tutorial
 title: 5 Minute Tutorial
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
-
 This tutorial walks you through a quick setup of ORY Hydra, a PostgreSQL
 instance and an exemplary User Login & Consent App based on Docker Compose. You
 need to have the latest [Docker](https://www.docker.com) and
 [Docker Compose](https://docs.docker.com/compose) version installed.
 
-<img alt="OAuth2 Flow" src={useBaseUrl('img/docs/oauth2-flow.gif')} />;
+![OAuth2 Flow with Open Source OAuth2 Server ORY Hydra](images/oauth2-flow.gif)
 
 We will use the Docker Compose configuration in the ORY Hydra code base. Getting
 the Hydra source code is easy:
@@ -28,6 +26,7 @@ command to start the needed containers:
 $ docker-compose -f quickstart.yml \
     -f quickstart-postgres.yml \
     up --build
+
 Starting hydra_postgresd_1
 Starting hydra_hydra_1
 [...]
@@ -61,7 +60,7 @@ at targets page in Prometheus
 [http://localhost:9090/targets](http://localhost:9090/targets):
 
 ```shell script
-docker-compose -f quickstart.yml \
+$ docker-compose -f quickstart.yml \
   -f quickstart-prometheus.yml \
   up --build
 ```
@@ -114,8 +113,7 @@ just got and not the dummy value.
 $ docker-compose -f quickstart.yml exec hydra \
     hydra token introspect \
     --endpoint http://127.0.0.1:4445/ \
-
-UDYMha9TwsMBejEvKfnDOXkhgkLsnmUNYVQDklT5bD8.ZNpuNRC85erbIYDjPqhMwTinlvQmNTk_UvttcLQxFJY
+    UDYMha9TwsMBejEvKfnDOXkhgkLsnmUNYVQDklT5bD8.ZNpuNRC85erbIYDjPqhMwTinlvQmNTk_UvttcLQxFJY
 
 {
     "active": true,

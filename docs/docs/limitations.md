@@ -18,7 +18,7 @@ OAuth 2.0 Client Secrets are hashed using BCrypt. BCrypt has, by design, a
 maximum password length. The Golang BCrypt library has a maximum password length
 of 73 bytes. Any password longer will be "truncated":
 
-```
+```shell script
 $ hydra clients create --id long-secret \
 	--secret 525348e77144a9cee9a7471a8b67c50ea85b9e3eb377a3c1a3a23db88f9150eefe76e6a339fdbc62b817595f53d72549d9ebe36438f8c2619846b963e9f43a94 \
 	--endpoint http://localhost:4445 \

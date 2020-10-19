@@ -11,8 +11,8 @@ binaries, Docker Images and support various package managers.
 We recommend using Docker to run ORY Hydra:
 
 ```shell
-$ docker pull oryd/hydra:v1.8.5
-$ docker run --rm -it oryd/hydra:v1.8.5 help
+$ docker pull oryd/hydra:v1.9.0
+$ docker run --rm -it oryd/hydra:v1.9.0 help
 ```
 
 ## macOS
@@ -31,7 +31,7 @@ On linux, you can use `bash <(curl ...)` to fetch the latest stable binary
 using:
 
 ```shell
-$ bash <(curl https://raw.githubusercontent.com/ory/hydra/master/install.sh) -b . 1.4.8
+$ bash <(curl https://raw.githubusercontent.com/ory/hydra/master/install.sh) -b . v1.9.0
 $ ./hydra help
 ```
 

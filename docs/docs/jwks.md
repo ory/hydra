@@ -23,7 +23,7 @@ GEs=
 
 ... JWKs are the same, but formatted using JSON:
 
-```
+```json
 {
   "keys":
   [

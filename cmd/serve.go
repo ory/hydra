@@ -61,14 +61,8 @@ All sub-commands share command line flags and configuration options.
 func init() {
 	RootCmd.AddCommand(serveCmd)
 
-	// Here you will define your flags and configuration settings.
+	serveCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "","Config file (default is $HOME/hydra.yaml)")
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	serveCmd.PersistentFlags().Bool("dangerous-force-http", false, "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead")
 	serveCmd.PersistentFlags().StringSlice("dangerous-allow-insecure-redirect-urls", []string{}, "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs")
 

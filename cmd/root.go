@@ -62,9 +62,6 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is $HOME/.hydra.yaml)")
-	RootCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unkown certificate authorities")
 }
 
 // initConfig reads in config file and ENV variables if set.

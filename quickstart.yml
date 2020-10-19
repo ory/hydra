@@ -34,15 +34,6 @@ services:
         target: /etc/config/hydra
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
-      - URLS_SELF_ISSUER=http://127.0.0.1:4444
-      - URLS_CONSENT=http://127.0.0.1:3000/consent
-      - URLS_LOGIN=http://127.0.0.1:3000/login
-      - URLS_LOGOUT=http://127.0.0.1:3000/logout
-      - DSN=memory
-      - SECRETS_SYSTEM=youReallyNeedToChangeThis
-      - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
-      - OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
-      - SERVE_COOKIES_SAME_SITE_MODE=Lax
     restart: unless-stopped
     depends_on:
       - hydra-migrate
@@ -51,6 +42,8 @@ services:
 
   hydra-migrate:
     image: oryd/hydra:v1.8.5-sqlite
+    environment:
+      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
     command:
       migrate -c /etc/config/hydra/hydra.yml sql -e --yes
     volumes:

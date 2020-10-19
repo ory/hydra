@@ -1,5 +1,3 @@
-dsn: sqlite:///var/lib/sqlite/db.sqlite?_fk=true
-
 serve:
   cookies:
     same_site_mode: Lax

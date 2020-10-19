@@ -43,7 +43,13 @@ config.updateTags.forEach(({ files, image, replacer }) => {
   files.forEach((loc) => {
     replace(loc, (content) => {
       if (replacer) {
-        return replacer({ content, next })
+        return replacer({
+          content,
+          next,
+          semverRegex: new RegExp(
+            /(v|)(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/gi
+          )
+        })
       }
 
       return content.replace(

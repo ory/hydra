@@ -103,8 +103,8 @@ Something is not working.
 - [ ] RSA key generation is slow on ARM ([hydra#1989](https://github.com/ory/hydra/issues/1989))
 - [ ] `loginRequest.requested_access_token_audience` should not be `null` ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 - [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens ([hydra#2042](https://github.com/ory/hydra/issues/2042))
-- [ ] Redirect URI should be able to contain plus (+) character ([hydra#2055](https://github.com/ory/hydra/issues/2055))
 - [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
+- [x] Redirect URI should be able to contain plus (+) character ([hydra#2055](https://github.com/ory/hydra/issues/2055))
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 

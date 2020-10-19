@@ -3,7 +3,6 @@ id: login
 title: Login Flow
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
 import Mermaid from '@theme/Mermaid'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
@@ -78,14 +77,18 @@ correct endpoint for your interactions.
     {label: 'JavaScript', value: 'js'},
   ]}>
 <TabItem value="ui">
-<img src={useBaseUrl('/img/docs/oauth2-consumer.png')}/>
+
+![OAuth 2.0 Client](../images/oauth2-consumer.png)
+
 </TabItem>
 <TabItem value="html">
 
 ```html
 <a
-  href="https://<hydra-public>/oauth2/auth?client_id=...&response_type=...&scope=..."/>
-Login in with ORY Hydra</a>
+  href="https://<hydra-public>/oauth2/auth?client_id=...&response_type=...&scope=..."
+>
+  Login in with ORY Hydra</a
+>
 ```
 
 </TabItem>
@@ -94,7 +97,7 @@ Login in with ORY Hydra</a>
 ```js
 // ...
 window.location.href =
-  'https://<hydra-public>/oauth2/auth?client_id=...&response_type=...&scope=...'
+  'https://public.hydra.url/oauth2/auth?client_id=...&response_type=...&scope=...'
 ```
 
 </TabItem>
@@ -198,7 +201,9 @@ more details about the implementation check the
     {label: 'Login Challenge Response', value: 'json'},
   ]}>
 <TabItem value="ui">
-<img src={useBaseUrl('/img/docs/login-endpoint.png')}/>
+
+![OAuth 2.0 Login UI Screen](../images/login-endpoint.png)
+
 </TabItem>
 <TabItem value="curl">
 

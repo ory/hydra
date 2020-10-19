@@ -3,7 +3,6 @@ id: consent
 title: Consent Flow
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
 import Mermaid from '@theme/Mermaid'
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
@@ -60,10 +59,7 @@ Redirects when performing the OAuth2 flow:
 
 Once the login challenge is accepted, ORY Hydra will ask the user for consent:
 
-<img
-  src={useBaseUrl('/img/docs/google-consent-playground.png')}
-  alt="Exemplary Consent Screen"
-/>
+![OAuth 2.0 Asking for User Consent](../images/google-consent-playground.png)
 
 The UI is fully under your control, because ORY Hydra redirects the End-User's
 browser to the c
@@ -154,7 +150,9 @@ request! For more details about the implementation check the
     {label: 'Consent Challenge Response', value: 'json'},
   ]}>
 <TabItem value="ui">
-<img src={useBaseUrl('/img/docs/consent-endpoint.png')}/>
+
+![Exemplary OAuth 2.0 Consent Screen](../images/consent-endpoint.png)
+
 </TabItem>
 <TabItem value="curl">
 

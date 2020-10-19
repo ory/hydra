@@ -3,11 +3,6 @@ id: logout
 title: Logout Flow
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
-import Mermaid from '@theme/Mermaid'
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
-
 ORY Hydra implements
 [OpenID Connect RP-Initiated Logout 1.0](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
 and supports
@@ -89,7 +84,7 @@ Following step 1 from the flow above, the user-agent is redirected to the logout
 provider (e.g. `https://my-logout-provider/logout?challenge=...`). Next, the
 logout provider fetches information about the logout request:
 
-```node
+```js
 // This is node-js pseudo code and will not work if you copy it 1:1
 
 challenge = req.url.query.logout_challenge
@@ -108,19 +103,19 @@ fetch(
 
 The server response is a JSON object with the following keys:
 
-```
+```json
 {
-    // The user for whom the logout was request.
-    "subject": "user-id",
+  // The user for whom the logout was request.
+  "subject": "user-id",
 
-    // The login session ID that was requested to log out.
-    "sid": "abc..",
+  // The login session ID that was requested to log out.
+  "sid": "abc..",
 
-    // The original request URL.
-    "request_url": "https://hydra/oauth2/sessions/logout?id_token_hint=...",
+  // The original request URL.
+  "request_url": "https://hydra/oauth2/sessions/logout?id_token_hint=...",
 
-    // True if the request did not include a id_token_hint. False otherwise.
-    "rp_initiated": true|false
+  // True if the request did not include a id_token_hint. False otherwise.
+  "rp_initiated": true | false
 }
 ```
 
@@ -131,7 +126,7 @@ logout confirmation from the end-user when `rp_initiated` is set to true.
 When the logout provider decides to accept the logout request, the flow is
 completed as follows:
 
-```node
+```js
 fetch(
   'https://hydra/oauth2/auth/requests/logout/accept?' +
     querystring.stringify({ logout_challenge: challenge }),
@@ -150,7 +145,7 @@ fetch(
 
 You can also reject a logout request (e.g. if the user chose to not log out):
 
-```node
+```js
 fetch(
   'https://hydra/oauth2/auth/requests/logout/reject?' +
     querystring.stringify({ logout_challenge: challenge }),
@@ -224,7 +219,7 @@ validate the `logout_token` using the ID Token Public Key (can be fetched from
   only be unique in the context of a particular issuer. Its contents are opaque
   to the RP. Its syntax is the same as an OAuth 2.0 Client Identifier.
 
-```
+```json
 {
   "iss": "https://server.example.com",
   "aud": "s6BhdRkqt3",
@@ -232,8 +227,8 @@ validate the `logout_token` using the ID Token Public Key (can be fetched from
   "jti": "bWJq",
   "sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
   "events": {
-     "http://schemas.openid.net/event/backchannel-logout": {}
-   }
+    "http://schemas.openid.net/event/backchannel-logout": {}
+  }
 }
 ```
 

@@ -480,8 +480,8 @@ github.com/gobuffalo/pop v4.13.1+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcV
 github.com/gobuffalo/pop/v5 v5.0.11/go.mod h1:mZJHJbA3cy2V18abXYuVop2ldEJ8UZ2DK6qOekC5u5g=
 github.com/gobuffalo/pop/v5 v5.2.0/go.mod h1:Hj586Cr7FoTFNmvzyNdUcajv3r0A+W+bkil4RIX/zKo=
 github.com/gobuffalo/pop/v5 v5.2.4/go.mod h1:4mYDlrcXTnG2n9rG8p+c10X1QnfMc4YIRVmiC8ihMAI=
-github.com/gobuffalo/pop/v5 v5.2.5-0.20201016124833-8864afb2313e h1:a5qom2rtrxraMfJeKLriWj81WdLDTY3P2OmGvCmfJFs=
-github.com/gobuffalo/pop/v5 v5.2.5-0.20201016124833-8864afb2313e/go.mod h1:vcEDhh6cJ3WVENqJDFt/6z7zNb7lLnlN8vj3n5G9rYA=
+github.com/gobuffalo/pop/v5 v5.3.0 h1:B7A9egQsxd0PEJ0JMe6K+7gmBU9fo0tLyB1e6G2UjL4=
+github.com/gobuffalo/pop/v5 v5.3.0/go.mod h1:vcEDhh6cJ3WVENqJDFt/6z7zNb7lLnlN8vj3n5G9rYA=
 github.com/gobuffalo/release v1.0.35/go.mod h1:VtHFAKs61vO3wboCec5xr9JPTjYyWYcvaM3lclkc4x4=
 github.com/gobuffalo/release v1.0.38/go.mod h1:VtHFAKs61vO3wboCec5xr9JPTjYyWYcvaM3lclkc4x4=
 github.com/gobuffalo/release v1.0.42/go.mod h1:RPs7EtafH4oylgetOJpGP0yCZZUiO4vqHfTHJjSdpug=

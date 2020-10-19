@@ -42,18 +42,12 @@ on configuration options, open the configuration documentation:
 ### Options
 
 ```
+  -c, --config string                                    Config file (default is $HOME/hydra.yaml)
       --dangerous-allow-insecure-redirect-urls strings   DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs
       --dangerous-force-http                             DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead
       --disable-telemetry                                Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa
   -h, --help                                             help for serve
       --sqa-opt-out                                      Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa
-```
-
-### Options inherited from parent commands
-
-```
-      --config string     Config file (default is $HOME/.hydra.yaml)
-      --skip-tls-verify   Foolishly accept TLS certificates signed by unkown certificate authorities
 ```
 
 ### SEE ALSO

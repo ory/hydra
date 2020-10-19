@@ -10,7 +10,7 @@
 #                                                                         #
 ###########################################################################
 
-version: '3'
+version: '3.7'
 
 services:
   prometheus:
@@ -23,3 +23,5 @@ services:
       --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./quickstart-prometheus-config.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - intranet

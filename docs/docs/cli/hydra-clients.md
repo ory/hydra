@@ -26,13 +26,7 @@ Manage OAuth 2.0 Clients
       --fail-after duration    Stop retrying after the specified duration (default 1m0s)
       --fake-tls-termination   Fake tls termination by adding "X-Forwarded-Proto: https" to http headers
   -h, --help                   help for clients
-```
-
-### Options inherited from parent commands
-
-```
-      --config string     Config file (default is $HOME/.hydra.yaml)
-      --skip-tls-verify   Foolishly accept TLS certificates signed by unkown certificate authorities
+      --skip-tls-verify        Foolishly accept TLS certificates signed by unknown certificate authorities
 ```
 
 ### SEE ALSO

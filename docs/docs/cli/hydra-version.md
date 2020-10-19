@@ -28,13 +28,6 @@ hydra version [flags]
   -h, --help   help for version
 ```
 
-### Options inherited from parent commands
-
-```
-      --config string     Config file (default is $HOME/.hydra.yaml)
-      --skip-tls-verify   Foolishly accept TLS certificates signed by unkown certificate authorities
-```
-
 ### SEE ALSO
 
 - [hydra](hydra) - Run and manage ORY Hydra

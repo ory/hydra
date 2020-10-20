@@ -5,6 +5,7 @@ linters:
     - gosimple
     - bodyclose
     - staticcheck
+    - goimports
   disable:
     - ineffassign
     - deadcode

@@ -2,14 +2,15 @@ package sql_test
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/viper"
-	"testing"
-	"time"
 )
 
 func TestManagers(t *testing.T) {

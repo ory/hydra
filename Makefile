@@ -5,11 +5,9 @@ export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
-				  github.com/sqs/goreturns \
-				  github.com/ory/x/tools/listx \
+				  golang.org/x/tools/cmd/goimports \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
-				  golang.org/x/tools/cmd/goimports \
 				  github.com/ory/cli \
 				  github.com/gobuffalo/packr/v2/packr2 \
 				  github.com/go-bindata/go-bindata/go-bindata
@@ -96,8 +94,8 @@ quicktest:
 
 # Formats the code
 .PHONY: format
-format: .bin/goreturns node_modules
-		goreturns -w -local github.com/ory $$(listx .)
+format: .bin/goimports node_modules
+		goimports -w --local github.com/ory .
 		npm run format
 
 # Generates mocks

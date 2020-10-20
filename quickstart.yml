@@ -63,7 +63,7 @@ services:
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.5.2
+    image: oryd/hydra-login-consent-node:v1.9.0-pre.0
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -75,3 +75,4 @@ networks:
 
 volumes:
   hydra-sqlite:
+lite:

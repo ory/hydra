@@ -23,11 +23,13 @@ To find out more about edge cases like setting string array values through envir
 ## ORY Hydra Configuration
 #
 
+
 ## log ##
 #
 # Configures the logger
 #
 log:
+  
   ## level ##
   #
   # Sets the log level.
@@ -42,7 +44,7 @@ log:
   # - info
   # - debug
   # - trace
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export LOG_LEVEL=<value>
@@ -75,7 +77,7 @@ log:
   # - json
   # - json_pretty
   # - text
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export LOG_FORMAT=<value>
@@ -89,11 +91,13 @@ log:
 # Controls the configuration for the http(s) daemon(s).
 #
 serve:
+  
   ## public ##
   #
   # Controls the public daemon serving public API endpoints like /oauth2/auth, /oauth2/token, /.well-known/jwks.json
   #
   public:
+    
     ## port ##
     #
     # Default value: 4444
@@ -112,20 +116,21 @@ serve:
     #
     # Examples:
     # - localhost
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export SERVE_PUBLIC_HOST=<value>
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ''
+    host: ""
 
     ## cors ##
     #
     # Configures Cross Origin Resource Sharing for public endpoints.
     #
     cors:
+      
       ## enabled ##
       #
       # Sets whether CORS is enabled.
@@ -150,7 +155,7 @@ serve:
       # - - https://example.com
       #   - https://*.example.com
       #   - https://*.foo.example.com
-      #
+      # 
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
@@ -158,7 +163,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - "*"
 
       ## allowed_methods ##
       #
@@ -273,6 +278,7 @@ serve:
     # Sets the permissions of the unix socket
     #
     socket:
+      
       ## owner ##
       #
       # Owner of unix socket. If empty, the owner will be the user running hydra.
@@ -320,6 +326,7 @@ serve:
     # Access Log configuration for public server.
     #
     access_log:
+      
       ## disable_for_health ##
       #
       # Disable access log for health endpoints.
@@ -337,6 +344,7 @@ serve:
   ## admin ##
   #
   admin:
+    
     ## port ##
     #
     # Default value: 4445
@@ -355,20 +363,21 @@ serve:
     #
     # Examples:
     # - localhost
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export SERVE_ADMIN_HOST=<value>
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_HOST=<value>
     #
-    host: ''
+    host: ""
 
     ## cors ##
     #
     # Configures Cross Origin Resource Sharing for public endpoints.
     #
     cors:
+      
       ## enabled ##
       #
       # Sets whether CORS is enabled.
@@ -393,7 +402,7 @@ serve:
       # - - https://example.com
       #   - https://*.example.com
       #   - https://*.foo.example.com
-      #
+      # 
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
@@ -514,6 +523,7 @@ serve:
     # Sets the permissions of the unix socket
     #
     socket:
+      
       ## owner ##
       #
       # Owner of unix socket. If empty, the owner will be the user running hydra.
@@ -561,6 +571,7 @@ serve:
     # Access Log configuration for admin server.
     #
     access_log:
+      
       ## disable_for_health ##
       #
       # Disable access log for health endpoints.
@@ -580,11 +591,13 @@ serve:
   # Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.
   #
   tls:
+    
     ## key ##
     #
     # Configures the private key (pem encoded).
     #
     key:
+      
       ## base64 ##
       #
       # Set this value using environment variables on
@@ -600,6 +613,7 @@ serve:
     # Configures the private key (pem encoded).
     #
     cert:
+      
       ## path ##
       #
       # Set this value using environment variables on
@@ -628,6 +642,7 @@ serve:
   ## cookies ##
   #
   cookies:
+    
     ## same_site_mode ##
     #
     # Specify the SameSite mode that cookies should be sent with.
@@ -638,7 +653,7 @@ serve:
     # - Strict
     # - Lax
     # - None
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export SERVE_COOKIES_SAME_SITE_MODE=<value>
@@ -655,7 +670,7 @@ serve:
     #
     # Examples:
     # - true
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
@@ -681,11 +696,13 @@ dsn: minim id reprehenderit
 # Configures ./well-known/ settings.
 #
 webfinger:
+  
   ## jwks ##
   #
   # Configures the /.well-known/jwks.json endpoint.
   #
   jwks:
+    
     ## broadcast_keys ##
     #
     # A list of JSON Web Keys that should be exposed at that endpoint. This is usually the public key for verifying OpenID Connect ID Tokens. However, you might want to add additional keys here as well.
@@ -694,7 +711,7 @@ webfinger:
     #
     # Examples:
     # - hydra.jwt.access-token
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_JWKS_BROADCAST_KEYS=<value>
@@ -709,11 +726,12 @@ webfinger:
   # Configures OpenID Connect Discovery (/.well-known/openid-configuration).
   #
   oidc_discovery:
+    
     ## client_registration_url ##
     #
     # Examples:
     # - https://my-service.com/clients
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_CLIENT_REGISTRATION_URL=<value>
@@ -729,7 +747,7 @@ webfinger:
     # Examples:
     # - - email
     #   - username
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_SUPPORTED_CLAIMS=<value>
@@ -748,7 +766,7 @@ webfinger:
     # - - email
     #   - whatever
     #   - read.photos
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_SUPPORTED_SCOPE=<value>
@@ -766,7 +784,7 @@ webfinger:
     #
     # Examples:
     # - https://example.org/my-custom-userinfo-endpoint
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export WEBFINGER_OIDC_DISCOVERY_USERINFO_URL=<value>
@@ -780,6 +798,7 @@ webfinger:
 # Configures OpenID Connect features.
 #
 oidc:
+  
   ## subject_identifiers ##
   #
   # Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
@@ -790,8 +809,9 @@ oidc:
   #     - pairwise
   #   pairwise:
   #     salt: some-random-salt
-  #
+  # 
   subject_identifiers:
+    
     ## enabled ##
     #
     # A list of algorithms to enable.
@@ -811,6 +831,7 @@ oidc:
     # Configures the pairwise algorithm.
     #
     pairwise:
+      
       ## salt ##
       #
       # Set this value using environment variables on
@@ -826,6 +847,7 @@ oidc:
   # Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).
   #
   dynamic_client_registration:
+    
     ## default_scope ##
     #
     # The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the "scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
@@ -834,7 +856,7 @@ oidc:
     # - - openid
     #   - offline
     #   - offline_access
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=<value>
@@ -849,16 +871,18 @@ oidc:
 ## urls ##
 #
 urls:
+  
   ## self ##
   #
   self:
+    
     ## issuer ##
     #
     # This value will be used as the "issuer" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal to the public value.
     #
     # Examples:
     # - https://localhost:4444/
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export URLS_SELF_ISSUER=<value>
@@ -873,7 +897,7 @@ urls:
     #
     # Examples:
     # - https://localhost:4444/
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export URLS_SELF_PUBLIC=<value>
@@ -888,7 +912,7 @@ urls:
   #
   # Examples:
   # - https://my-login.app/login
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_LOGIN=<value>
@@ -903,7 +927,7 @@ urls:
   #
   # Examples:
   # - https://my-consent.app/consent
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_CONSENT=<value>
@@ -918,7 +942,7 @@ urls:
   #
   # Examples:
   # - https://my-logout.app/logout
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_LOGOUT=<value>
@@ -933,7 +957,7 @@ urls:
   #
   # Examples:
   # - https://my-error.app/error
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_ERROR=<value>
@@ -948,7 +972,7 @@ urls:
   #
   # Examples:
   # - https://my-example.app/logout-successful
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export URLS_POST_LOGOUT_REDIRECT=<value>
@@ -960,6 +984,7 @@ urls:
 ## strategies ##
 #
 strategies:
+  
   ## scope ##
   #
   # Defines how scopes are matched. For more details have a look at https://github.com/ory/fosite#scopes
@@ -970,7 +995,7 @@ strategies:
   # - exact
   # - wildcard
   # - DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export STRATEGIES_SCOPE=<value>
@@ -986,7 +1011,7 @@ strategies:
   # One of:
   # - opaque
   # - jwt
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export STRATEGIES_ACCESS_TOKEN=<value>
@@ -1000,6 +1025,7 @@ strategies:
 # Configures time to live.
 #
 ttl:
+  
   ## login_consent_request ##
   #
   # Configures how long a user login and consent flow may take.
@@ -1073,6 +1099,7 @@ ttl:
 ## oauth2 ##
 #
 oauth2:
+  
   ## expose_internal_errors ##
   #
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.
@@ -1081,7 +1108,7 @@ oauth2:
   #
   # Examples:
   # - true
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
@@ -1095,11 +1122,13 @@ oauth2:
   # Configures hashing algorithms. Supports only BCrypt at the moment.
   #
   hashers:
+    
     ## bcrypt ##
     #
     # Configures the BCrypt hashing algorithm used for hashing Client Secrets.
     #
     bcrypt:
+      
       ## cost ##
       #
       # Sets the BCrypt cost. The higher the value, the more CPU time is being used to generate hashes.
@@ -1119,13 +1148,14 @@ oauth2:
   ## pkce ##
   #
   pkce:
+    
     ## enforced ##
     #
     # Sets whether PKCE should be enforced for all clients.
     #
     # Examples:
     # - true
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export OAUTH2_PKCE_ENFORCED=<value>
@@ -1140,7 +1170,7 @@ oauth2:
     #
     # Examples:
     # - true
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS=<value>
@@ -1154,6 +1184,7 @@ oauth2:
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys
 #
 secrets:
+  
   ## system ##
   #
   # The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.
@@ -1162,7 +1193,7 @@ secrets:
   # - - this-is-the-primary-secret
   #   - this-is-an-old-secret
   #   - this-is-another-old-secret
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export SECRETS_SYSTEM=<value>
@@ -1182,7 +1213,7 @@ secrets:
   # - - this-is-the-primary-secret
   #   - this-is-an-old-secret
   #   - this-is-another-old-secret
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export SECRETS_COOKIE=<value>
@@ -1201,10 +1232,10 @@ secrets:
 # One of:
 # - cpu
 # - mem
-#
+# 
 # Examples:
 # - cpu
-#
+# 
 # Set this value using environment variables on
 # - Linux/macOS:
 #    $ export PROFILING=<value>
@@ -1218,6 +1249,7 @@ profiling: cpu
 # ORY Hydra supports distributed tracing.
 #
 tracing:
+  
   ## provider ##
   #
   # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
@@ -1226,10 +1258,10 @@ tracing:
   # - jaeger
   # - zipkin
   # - datadog
-  #
+  # 
   # Examples:
   # - jaeger
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export TRACING_PROVIDER=<value>
@@ -1244,7 +1276,7 @@ tracing:
   #
   # Examples:
   # - ORY Hydra
-  #
+  # 
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export TRACING_SERVICE_NAME=<value>
@@ -1256,18 +1288,20 @@ tracing:
   ## providers ##
   #
   providers:
+    
     ## jaeger ##
     #
     # Configures the jaeger tracing backend.
     #
     jaeger:
+      
       ## local_agent_address ##
       #
       # The address of the jaeger-agent where spans should be sent to.
       #
       # Examples:
       # - 127.0.0.1:6831
-      #
+      # 
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
@@ -1282,7 +1316,7 @@ tracing:
       #
       # Examples:
       # - jaeger
-      #
+      # 
       # Set this value using environment variables on
       # - Linux/macOS:
       #    $ export TRACING_PROVIDERS_JAEGER_PROPAGATION=<value>
@@ -1297,8 +1331,9 @@ tracing:
       # - type: const
       #   value: 1
       #   server_url: http://localhost:5778/sampling
-      #
+      # 
       sampling:
+        
         ## type ##
         #
         # Set this value using environment variables on
@@ -1335,8 +1370,9 @@ tracing:
     #
     # Examples:
     # - server_url: http://localhost:9411/api/v2/spans
-    #
+    # 
     zipkin:
+      
       ## server_url ##
       #
       # The address of Zipkin server where spans should be sent to.
@@ -1366,11 +1402,13 @@ version: v0.0.0-5036063.0.0.0.32743119740.0.6771267.4374+oAs3PyvZm.wlvn.G1sXXnME
 # ORY Hydra can respect Linux container CPU quota
 #
 cgroups:
+  
   ## v1 ##
   #
   # Configures parameters using cgroups v1 hierarchy
   #
   v1:
+    
     ## auto_max_procs_enabled ##
     #
     # Set GOMAXPROCS automatically according to cgroups limits
@@ -1379,7 +1417,7 @@ cgroups:
     #
     # Examples:
     # - true
-    #
+    # 
     # Set this value using environment variables on
     # - Linux/macOS:
     #    $ export CGROUPS_V1_AUTO_MAX_PROCS_ENABLED=<value>
@@ -1387,4 +1425,5 @@ cgroups:
     #    > set CGROUPS_V1_AUTO_MAX_PROCS_ENABLED=<value>
     #
     auto_max_procs_enabled: true
+
 ```

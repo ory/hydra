@@ -1,9 +1,10 @@
 package sql_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
+
+	"github.com/pborman/uuid"
 
 	"github.com/stretchr/testify/require"
 
@@ -46,9 +47,7 @@ func TestManagers(t *testing.T) {
 				ks, err := testGenerator.Generate("TestManagerKey", "sig")
 				require.NoError(t, err)
 
-				for name, r := range registries {
-					t.Run(fmt.Sprintf("case=%s", name), jwk.TestHelperManagerKey(r.KeyManager(), ks, "TestManagerKey"))
-				}
+				jwk.TestHelperManagerKey(m.KeyManager(), ks, uuid.New())
 			})
 
 			t.Run("TestManagerKeySet", func(t *testing.T) {
@@ -56,9 +55,7 @@ func TestManagers(t *testing.T) {
 				require.NoError(t, err)
 				ks.Key("private")
 
-				for name, r := range registries {
-					t.Run(fmt.Sprintf("case=%s", name), jwk.TestHelperManagerKeySet(r.KeyManager(), ks, "TestManagerKeySet"))
-				}
+				jwk.TestHelperManagerKeySet(m.KeyManager(), ks, uuid.New())
 			})
 		})
 	}

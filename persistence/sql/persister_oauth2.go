@@ -57,55 +57,6 @@ func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
 }
 
-func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
-	sess := r.Session
-	if !gjson.ValidBytes(sess) {
-		var err error
-		sess, err = p.r.KeyCipher().Decrypt(string(sess))
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
-	}
-
-	if session != nil {
-		if err := json.Unmarshal(sess, session); err != nil {
-			return nil, errors.WithStack(err)
-		}
-	} else {
-		p.l.Debugf("Got an empty session in toRequest")
-	}
-
-	c, err := p.GetClient(ctx, r.Client)
-	if err != nil {
-		return nil, err
-	}
-
-	val, err := url.ParseQuery(r.Form)
-	if err != nil {
-		return nil, errors.WithStack(err)
-	}
-
-	return &fosite.Request{
-		ID:                r.Request,
-		RequestedAt:       r.RequestedAt,
-		Client:            c,
-		RequestedScope:    stringsx.Splitx(r.Scopes, "|"),
-		GrantedScope:      stringsx.Splitx(r.GrantedScope, "|"),
-		RequestedAudience: stringsx.Splitx(r.RequestedAudience, "|"),
-		GrantedAudience:   stringsx.Splitx(r.GrantedAudience, "|"),
-		Form:              val,
-		Session:           session,
-	}, nil
-}
-
-// hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
-func (p *Persister) hashSignature(signature string, table tableName) string {
-	if table == sqlTableAccess && p.config.IsUsingJWTAsAccessTokens() {
-		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
-	}
-	return signature
-}
-
 func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
@@ -155,13 +106,53 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 	}, nil
 }
 
-func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
-	jti := oauth2.NewBlacklistedJTI(j, time.Time{})
-	return jti, sqlcon.HandleError(p.Connection(ctx).Find(jti, jti.ID))
+func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
+	sess := r.Session
+	if !gjson.ValidBytes(sess) {
+		var err error
+		sess, err = p.r.KeyCipher().Decrypt(string(sess))
+		if err != nil {
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	if session != nil {
+		if err := json.Unmarshal(sess, session); err != nil {
+			return nil, errors.WithStack(err)
+		}
+	} else {
+		p.l.Debugf("Got an empty session in toRequest")
+	}
+
+	c, err := p.GetClient(ctx, r.Client)
+	if err != nil {
+		return nil, err
+	}
+
+	val, err := url.ParseQuery(r.Form)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &fosite.Request{
+		ID:                r.Request,
+		RequestedAt:       r.RequestedAt,
+		Client:            c,
+		RequestedScope:    stringsx.Splitx(r.Scopes, "|"),
+		GrantedScope:      stringsx.Splitx(r.GrantedScope, "|"),
+		RequestedAudience: stringsx.Splitx(r.RequestedAudience, "|"),
+		GrantedAudience:   stringsx.Splitx(r.GrantedAudience, "|"),
+		Form:              val,
+		Session:           session,
+	}, nil
 }
 
-func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
-	return sqlcon.HandleError(p.Connection(ctx).Create(jti))
+// hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
+func (p *Persister) hashSignature(signature string, table tableName) string {
+	if table == sqlTableAccess && p.config.IsUsingJWTAsAccessTokens() {
+		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
+	}
+	return signature
 }
 
 func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) error {
@@ -203,17 +194,27 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 	})
 }
 
+func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
+	jti := oauth2.NewBlacklistedJTI(j, time.Time{})
+	return jti, sqlcon.HandleError(p.Connection(ctx).Find(jti, jti.ID))
+}
+
+func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
+	return sqlcon.HandleError(p.Connection(ctx).Create(jti))
+}
+
 func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
 	req, err := p.sqlSchemaFromRequest(signature, requester, table)
 	if err != nil {
 		return err
 	}
 
-	err = sqlcon.HandleError(p.Connection(ctx).Create(req))
-	if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if err := sqlcon.HandleError(p.Connection(ctx).Create(req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
+	} else if err != nil {
+		return err
 	}
-	return err
+	return nil
 }
 
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
@@ -259,13 +260,12 @@ func (p *Persister) revokeSession(ctx context.Context, id string, table tableNam
 	if err := p.Connection(ctx).RawQuery(
 		fmt.Sprintf("DELETE FROM %s WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
 		id,
-	).Exec(); err == sql.ErrNoRows {
+	).Exec(); errors.Is(err, sql.ErrNoRows) {
 		return errors.WithStack(fosite.ErrNotFound)
 	} else if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
-		} else if strings.Contains(err.Error(), "Error 1213") {
-			p.l.Infof("got error 1213: %+v", err)
+		} else if strings.Contains(err.Error(), "Error 1213") { // InnoDB Deadlock?
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 		}
 		return err

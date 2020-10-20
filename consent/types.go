@@ -25,18 +25,16 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/sqlcon"
 	"net/http"
 	"time"
 
 	"github.com/gobuffalo/pop/v5"
-
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/x/sqlxx"
-
 	"github.com/ory/hydra/client"
+	"github.com/ory/x/sqlcon"
+	"github.com/ory/x/sqlxx"
 )
 
 const (

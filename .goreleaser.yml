@@ -204,7 +204,7 @@ dockers:
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-sqlite"
       - "oryd/hydra:{{ .Tag }}-sqlite"
       - "oryd/hydra:latest-sqlite"
-  - dockerfile: .docker/Dockerfile
+  - dockerfile: .docker/Dockerfile-scratch
     builds:
       - hydra
     binaries:
@@ -215,6 +215,17 @@ dockers:
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}"
       - "oryd/hydra:{{ .Tag }}"
       - "oryd/hydra:latest"
+  - dockerfile: .docker/Dockerfile-alpine
+    builds:
+      - hydra
+    binaries:
+      - hydra
+    image_templates:
+      - "oryd/hydra:v{{ .Major }}-alpine"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-alpine"
+      - "oryd/hydra:v{{ .Major }}.{{ .Minor }}.{{ .Patch }}-alpine"
+      - "oryd/hydra:{{ .Tag }}-alpine"
+      - "oryd/hydra:latest-alpine"
 
 release:
   prerelease: auto

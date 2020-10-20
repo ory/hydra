@@ -99,8 +99,8 @@ func NewPersister(c *pop.Connection, r Dependencies, config configuration.Provid
 }
 
 func (p *Persister) Connection(ctx context.Context) *pop.Connection {
-	if c := ctx.Value(transactionContextKey); c != nil {
-		return c.(*pop.Connection).WithContext(ctx)
+	if c, ok := ctx.Value(transactionContextKey).(*pop.Connection); ok {
+		return c.WithContext(ctx)
 	}
 	return p.conn.WithContext(ctx)
 }

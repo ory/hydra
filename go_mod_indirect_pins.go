@@ -13,4 +13,6 @@ import (
 	_ "github.com/ory/cli"
 
 	_ "github.com/ory/go-acc"
+
+	_ "gopkg.in/DataDog/dd-trace-go.v1/ddtrace"
 )

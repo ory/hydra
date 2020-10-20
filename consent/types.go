@@ -25,10 +25,9 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/x/sqlcon"
 	"net/http"
 	"time"
-
-	"github.com/ory/x/sqlcon"
 
 	"github.com/gobuffalo/pop/v5"
 

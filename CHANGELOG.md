@@ -5,6 +5,7 @@
 **Table of Contents**
 
 - [Unreleased (2020-10-20)](#unreleased-2020-10-20)
+- [1.9.0-pre.1 (2020-10-20)](#190-pre1-2020-10-20)
 - [1.9.0-pre.0 (2020-10-20)](#190-pre0-2020-10-20)
     - [Bug Fixes](#bug-fixes)
     - [Code Refactoring](#code-refactoring)
@@ -481,6 +482,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Unreleased (2020-10-20)
+
+No significant changes have been made for this release.
+
+
+# [1.9.0-pre.1](https://github.com/ory/hydra/compare/v1.9.0-pre.0...v1.9.0-pre.1) (2020-10-20)
 
 No significant changes have been made for this release.
 

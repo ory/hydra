@@ -27,8 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/sqlcon"
-
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -431,6 +429,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
 					compareConsentRequest(t, c, got1)
 
+					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience"}
 					_, err = m.HandleConsentRequest(context.Background(), "challenge"+tc.key, h)
 					require.NoError(t, err)
 
@@ -438,6 +437,12 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got2.ConsentRequest)
 					assert.Equal(t, c.ID, got2.ID)
+					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
+
+					// Trying to update this again should return an error because the consent request was used.
+					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience", "new-audience-2"}
+					_, err = m.HandleConsentRequest(context.Background(), "challenge"+tc.key, h)
+					require.Error(t, err)
 
 					if tc.hasError {
 						assert.True(t, got2.HasError())
@@ -580,7 +585,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {
 							_, err := m.GetConsentRequest(context.Background(), id)
-							assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
+							assert.True(t, errors.Is(err, x.ErrNotFound))
 						})
 					}
 
@@ -590,6 +595,9 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					assert.Error(t, err, "%+v", r)
 				})
 			}
+
+			require.EqualError(t, m.RevokeSubjectConsentSession(context.Background(), "i-do-not-exist"), x.ErrNotFound.Error())
+			require.EqualError(t, m.RevokeSubjectClientConsentSession(context.Background(), "i-do-not-exist", "i-do-not-exist"), x.ErrNotFound.Error())
 		})
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
@@ -651,7 +659,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			t.Run("case=obfuscated", func(t *testing.T) {
 				_, err := m.GetForcedObfuscatedLoginSession(context.Background(), "fk-client-1", "obfuscated-1")
-				require.True(t, errors.Is(err, sqlcon.ErrNoRows))
+				require.True(t, errors.Is(err, x.ErrNotFound))
 
 				expect := &ForcedObfuscatedLoginSession{
 					ClientID:          "fk-client-1",
@@ -676,7 +684,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				assert.EqualValues(t, expect, got)
 
 				_, err = m.GetForcedObfuscatedLoginSession(context.Background(), "fk-client-1", "obfuscated-1")
-				require.True(t, errors.Is(err, sqlcon.ErrNoRows))
+				require.True(t, errors.Is(err, x.ErrNotFound))
 			})
 
 			t.Run("case=ListUserAuthenticatedClientsWithFrontAndBackChannelLogout", func(t *testing.T) {

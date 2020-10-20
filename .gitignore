@@ -24,3 +24,4 @@ hydra-login-consent-node
 ./cypress/screenshots
 *-packr.go
 packrd/
+persistence/sql/migrations/schema.sql

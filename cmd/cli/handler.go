@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -42,15 +43,21 @@ type Handler struct {
 }
 
 const (
-	FlagAdminEndpoint     = "endpoint"
 	EnvAdminEndpoint      = "HYDRA_ADMIN_URL"
 	EnvDeprecatedEndpoint = "HYDRA_URL"
 
+	FlagAdminEndpoint      = "endpoint"
 	FlagFakeTLSTermination = "fake-tls-termination"
+	FlagFailAfter          = "fail-after"
+	FlagAccessToken        = "access-token"
+	FlagSkipTLSVerify      = "skip-tls-verify"
 )
 
-func RegisterEndpointFlag(flags *pflag.FlagSet) {
+func RegisterConnectionFlags(flags *pflag.FlagSet) {
 	flags.String(FlagAdminEndpoint, os.Getenv(EnvAdminEndpoint), fmt.Sprintf("Set the URL of the ORY Hydra Admin endpoint, defaults to environment variable %s", EnvAdminEndpoint))
+	flags.Duration(FlagFailAfter, time.Minute, `Stop retrying after the specified duration`)
+	flags.String(FlagAccessToken, os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
+	flags.Bool(FlagSkipTLSVerify, false, "Foolishly accept TLS certificates signed by unkown certificate authorities")
 }
 
 func AdminEndpoint(cmd *cobra.Command) (string, error) {

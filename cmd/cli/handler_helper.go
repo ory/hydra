@@ -24,6 +24,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"github.com/sawadashota/encrypta"
 	"net"
 	"net/http"
 	"os"
@@ -32,7 +33,6 @@ import (
 	"github.com/ory/x/httpx"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/sawadashota/encrypta"
 	"github.com/spf13/cobra"
 
 	httptransport "github.com/go-openapi/runtime/client"
@@ -42,7 +42,7 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-func configureClient(cmd *cobra.Command) *hydra.OryHydra {
+func ConfigureClient(cmd *cobra.Command) *hydra.OryHydra {
 	return configureClientBase(cmd, true)
 }
 
@@ -57,7 +57,7 @@ func newTransport(cmd *cobra.Command) *transport {
 		Transport: httpx.NewResilientRoundTripper(
 			/* #nosec G402 - we want to support dev environments, hence tls trickery */
 			&http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, FlagSkipTLSVerify)},
 			},
 			time.Second,
 			flagx.MustGetDuration(cmd, "fail-after"),

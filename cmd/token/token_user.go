@@ -96,7 +96,7 @@ and success.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		/* #nosec G402 - we want to support dev environments, hence tls trickery */
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, cli.FlagSkipTLSVerify)},
 		}})
 
 		isSSL := flagx.MustGetBool(cmd, "https")

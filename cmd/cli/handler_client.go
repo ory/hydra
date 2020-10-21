@@ -23,6 +23,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ory/hydra/x"
 	"os"
 	"strings"
 
@@ -30,7 +31,6 @@ import (
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"
@@ -44,7 +44,7 @@ func newClientHandler() *ClientHandler {
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
@@ -58,7 +58,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		cmdx.Must(err, "Could not parse JSON from file %s: %s", path, err)
 
 		response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&c))
-		cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+		cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 		result := response.Payload
 
 		if c.ClientSecret == "" {
@@ -83,7 +83,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 
 func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	var err error
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 	secret := flagx.MustGetString(cmd, "secret")
 
 	var echoSecret bool
@@ -122,7 +122,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	result := response.Payload
 
 	fmt.Printf("OAuth 2.0 Client ID: %s\n", result.ClientID)
@@ -149,7 +149,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 
 func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 	newSecret := flagx.MustGetString(cmd, "secret")
 
 	var echoSecret bool
@@ -183,7 +183,7 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 	}
 
 	response, err := m.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(id).WithBody(&cc))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	result := response.Payload
 	fmt.Printf("%s OAuth 2.0 Client updated\n", result.ClientID)
 
@@ -205,39 +205,38 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	for _, c := range args {
 		_, err := m.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID(c))
-		cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+		cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	}
 
 	fmt.Println("OAuth 2.0 Client(s) deleted")
 }
 
 func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
-
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
 	response, err := m.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(args[0]))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	cl := response.Payload
 	fmt.Println(cmdx.FormatResponse(cl))
 }
 
 func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	limit := flagx.MustGetInt(cmd, "limit")
 	page := flagx.MustGetInt(cmd, "page")
 	offset := (limit * page) - limit
 
 	response, err := m.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(int64(limit))).WithOffset(pointerx.Int64(int64(offset))))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	cls := response.Payload
 
 	table := newTable()

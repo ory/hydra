@@ -18,33 +18,34 @@
  * @license 	Apache-2.0
  */
 
-package token
+package clients
 
 import (
+	"fmt"
 	"github.com/ory/hydra/cmd/cli"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/x/cmdx"
 	"github.com/spf13/cobra"
 )
 
-// tokenCmd represents the token command
-var tokenCmd = &cobra.Command{
-	Use:   "token",
-	Short: "Issue and Manage OAuth2 tokens",
-}
+func newGetCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:     "get <id>",
+		Args:    cobra.ExactArgs(1),
+		Short:   "Get an OAuth 2.0 Client",
+		Long:    "This command retrieves an OAuth 2.0 Clients by its ID.",
+		Example: "$ hydra clients get client-1",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			m := cli.ConfigureClient(cmd)
 
-func init() {
-	//tokenCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
+			response, err := m.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(args[0]))
+			if err != nil {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "The request failed with the following error message:\n%s", cli.FormatSwaggerError(err))
+				return cmdx.FailSilently(cmd)
+			}
 
-	cli.RegisterFakeTLSTermination(tokenCmd.PersistentFlags())
-	cli.RegisterConnectionFlags(tokenCmd.PersistentFlags())
-}
-
-func RegisterCommandRecursive(parent *cobra.Command) {
-	parent.AddCommand(tokenCmd)
-
-	tokenCmd.AddCommand(tokenClientCmd)
-	tokenCmd.AddCommand(tokenDeleteCmd)
-	tokenCmd.AddCommand(tokenFlushCmd)
-	tokenCmd.AddCommand(tokenIntrospectCmd)
-	tokenCmd.AddCommand(tokenRevokeCmd)
-	tokenCmd.AddCommand(tokenUserCmd)
+			cmdx.PrintRow(cmd, (*outputOAuth2Client)(response.Payload))
+			return nil
+		},
+	}
 }

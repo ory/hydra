@@ -21,12 +21,13 @@
 package clients
 
 import (
+	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/x/cmdx"
-	"os"
-	"time"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
+
+var packageFlags = pflag.NewFlagSet("clients package flags", pflag.ContinueOnError)
 
 // clientsCmd represents the clients command
 var clientsCmd = &cobra.Command{
@@ -35,22 +36,23 @@ var clientsCmd = &cobra.Command{
 }
 
 func init() {
-	//clientsCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
-	clientsCmd.PersistentFlags().Bool("fake-tls-termination", false, `Fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
-	clientsCmd.PersistentFlags().Duration("fail-after", time.Minute, `Stop retrying after the specified duration`)
-	clientsCmd.PersistentFlags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
-	clientsCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
+	cmdx.RegisterFormatFlags(packageFlags)
+	cli.RegisterConnectionFlags(packageFlags)
+	cli.RegisterFakeTLSTermination(packageFlags)
 
-	cmdx.RegisterFormatFlags(clientsCmd.PersistentFlags())
+	clientsCmd.PersistentFlags().AddFlagSet(packageFlags)
 }
 
 func RegisterCommandRecursive(parent *cobra.Command) {
+	cmd := clientsCmd
+	_ = cmd
 	parent.AddCommand(clientsCmd)
 
-	clientsCmd.AddCommand(clientsCreateCmd)
-	clientsCmd.AddCommand(clientsDeleteCmd)
-	clientsCmd.AddCommand(clientsGetCmd)
-	clientsCmd.AddCommand(clientsImportCmd)
-	clientsCmd.AddCommand(clientsListCmd)
-	clientsCmd.AddCommand(clientsUpdateCmd)
+	clientsCmd.AddCommand(newCreateCmd())
+	clientsCmd.AddCommand(newDeleteCmd())
+	clientsCmd.AddCommand(newGetCmd())
+	clientsCmd.AddCommand(newImportCmd())
+	clientsCmd.AddCommand(newListCmd())
+	clientsCmd.AddCommand(newUpdateCmd())
+	clientsCmd.AddCommand(clientsValidateCmd)
 }

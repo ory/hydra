@@ -17,20 +17,13 @@ module.exports = {
     {
       replacer: ({ content, next, semverRegex }) =>
         content.replace(
-          new RegExp('oryd/hydra:' + semverRegex.source, 'gi'),
+          /oryd\/hydra:v[0-9a-zA-Z\.\+\_-]+/g,
           `oryd/hydra:${next}-sqlite`
         ),
       files: ['quickstart.yml']
     },
     {
-      replacer: ({ content, next, semverRegex }) =>
-        content.replace(
-          new RegExp(
-            'oryd/hydra-login-consent-node:' + semverRegex.source,
-            'gi'
-          ),
-          `oryd/hydra-login-consent-node:${next}`
-        ),
+      image: "oryd/hydra-login-consent-node",
       files: ['quickstart.yml']
     }
   ],

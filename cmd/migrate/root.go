@@ -33,5 +33,6 @@ var migrateCmd = &cobra.Command{
 func RegisterCommandRecursive(parent *cobra.Command) {
 	parent.AddCommand(migrateCmd)
 
+	migrateCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file (default is $HOME/hydra.yaml)")
 	migrateCmd.AddCommand(migrateSqlCmd)
 }

@@ -55,35 +55,35 @@ func TestMatchScopes(t *testing.T) {
 		expectChallenge string
 	}{
 		{
-			granted:         []HandledConsentRequest{{Challenge: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []HandledConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar"},
 			expectChallenge: "1",
 		},
 		{
-			granted:         []HandledConsentRequest{{Challenge: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []HandledConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar", "baz"},
 			expectChallenge: "",
 		},
 		{
 			granted: []HandledConsentRequest{
-				{Challenge: "1", GrantedScope: []string{"foo", "bar"}},
-				{Challenge: "2", GrantedScope: []string{"foo", "bar"}},
+				{ID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ID: "2", GrantedScope: []string{"foo", "bar"}},
 			},
 			requested:       []string{"foo", "bar"},
 			expectChallenge: "1",
 		},
 		{
 			granted: []HandledConsentRequest{
-				{Challenge: "1", GrantedScope: []string{"foo", "bar"}},
-				{Challenge: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+				{ID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
 			requested:       []string{"foo", "bar", "baz"},
 			expectChallenge: "2",
 		},
 		{
 			granted: []HandledConsentRequest{
-				{Challenge: "1", GrantedScope: []string{"foo", "bar"}},
-				{Challenge: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+				{ID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
 			requested:       []string{"zab"},
 			expectChallenge: "",
@@ -95,7 +95,7 @@ func TestMatchScopes(t *testing.T) {
 				assert.Nil(t, got)
 				return
 			}
-			assert.Equal(t, tc.expectChallenge, got.Challenge)
+			assert.Equal(t, tc.expectChallenge, got.ID)
 		})
 	}
 }

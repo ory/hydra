@@ -27,6 +27,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/jwk"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
@@ -40,11 +42,12 @@ import (
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	viper.Set(configuration.ViperKeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 
 	router := x.NewRouterPublic()
+	var testGenerator = &jwk.RS256Generator{}
 	IDKS, _ := testGenerator.Generate("test-id", "sig")
 
 	h := reg.KeyHandler()

@@ -36,6 +36,7 @@ func init() {
 
 	cli.RegisterFakeTLSTermination(tokenCmd.PersistentFlags())
 	cli.RegisterConnectionFlags(tokenCmd.PersistentFlags())
+	tokenCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unknown certificate authorities")
 }
 
 func RegisterCommandRecursive(parent *cobra.Command) {

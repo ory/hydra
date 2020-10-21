@@ -84,6 +84,10 @@ const (
 	ViperKeyCGroupsV1AutoMaxProcsEnabled   = "cgroups.v1.auto_max_procs_enabled"
 )
 
+const DefaultSQLiteMemoryDSN = "sqlite://:memory:?_fk=true"
+
+const DSNMemory = "memory"
+
 func init() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
@@ -187,7 +191,18 @@ func (v *ViperProvider) CORSOptions(iface string) cors.Options {
 }
 
 func (v *ViperProvider) DSN() string {
-	return viperx.GetString(v.l, ViperKeyDSN, "", "DATABASE_URL")
+	dsn := viperx.GetString(v.l, ViperKeyDSN, "", "DATABASE_URL")
+
+	if dsn == DSNMemory {
+		return DefaultSQLiteMemoryDSN
+	}
+
+	if len(dsn) > 0 {
+		return dsn
+	}
+
+	v.l.Fatal("dsn must be set")
+	return ""
 }
 
 func (v *ViperProvider) EncryptSessionData() bool {

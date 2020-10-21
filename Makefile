@@ -2,13 +2,12 @@ SHELL=/bin/bash -o pipefail
 
 export GO111MODULE := on
 export PATH := .bin:${PATH}
+export PWD := $(shell pwd)
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
-				  github.com/sqs/goreturns \
-				  github.com/ory/x/tools/listx \
+				  golang.org/x/tools/cmd/goimports \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
-				  golang.org/x/tools/cmd/goimports \
 				  github.com/ory/cli \
 				  github.com/gobuffalo/packr/v2/packr2 \
 				  github.com/go-bindata/go-bindata/go-bindata
@@ -39,8 +38,12 @@ lint: .bin/golangci-lint
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test-legacy-migrations
-test-legacy-migrations: test-resetdb sqlbin
-		source scripts/test-env.sh && go test -tags legacy_migration_test -failfast -timeout=20m ./internal/fizzmigrate
+test-legacy-migrations: test-resetdb .bin/go-bindata
+		cd internal/fizzmigrate/client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
+		cd internal/fizzmigrate/consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
+		cd internal/fizzmigrate/jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
+		cd internal/fizzmigrate/oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
+		source scripts/test-env.sh && go test -tags legacy_migration_test sqlite -failfast -timeout=20m ./internal/fizzmigrate
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
@@ -49,7 +52,7 @@ test-legacy-migrations: test-resetdb sqlbin
 .PHONY: test
 test: .bin/go-acc
 		make test-resetdb
-		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m
+		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
@@ -69,13 +72,8 @@ test-resetdb: node_modules
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
-docker: .bin/packr2
-		packr2
-		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
-		packr2 clean
-		docker build -t oryd/hydra:latest .
-		docker build -f Dockerfile-alpine -t oryd/hydra:latest-alpine .
-		rm hydra
+docker:
+		docker build -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite .
 
 .PHONY: e2e
 e2e: node_modules test-resetdb
@@ -88,36 +86,22 @@ e2e: node_modules test-resetdb
 		./test/e2e/circle-ci.bash mysql-jwt
 		./test/e2e/circle-ci.bash cockroach
 		./test/e2e/circle-ci.bash cockroach-jwt
-		./test/e2e/circle-ci.bash plugin
-		./test/e2e/circle-ci.bash plugin-jwt
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
 quicktest:
-		go test -failfast -short ./...
+		go test -failfast -short -tags sqlite ./...
 
 # Formats the code
 .PHONY: format
-format: .bin/goreturns node_modules
-		goreturns -w -local github.com/ory $$(listx .)
+format: .bin/goimports node_modules
+		goimports -w --local github.com/ory .
 		npm run format
 
 # Generates mocks
 .PHONY: mocks
 mocks: .bin/mockgen
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-
-# Adds sql files to the binary using go-bindata
-.PHONY: sqlbin
-sqlbin: .bin/go-bindata
-		cd internal/fizzmigrate/client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
-		cd internal/fizzmigrate/consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
-		cd internal/fizzmigrate/jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
-		cd internal/fizzmigrate/oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
-
-# Runs all code generators
-.PHONY: gen
-gen: mocks sqlbin sdk
 
 # Generates the SDKs
 .PHONY: sdk
@@ -131,20 +115,23 @@ sdk: .bin/cli
 		swagger generate client -f ./.schema/api.swagger.json -t internal/httpclient -A Ory_Hydra
 		make format
 
-
 .PHONY: install-stable
-install-stable: .bin/packr2
+install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 		git checkout $$HYDRA_LATEST
-		packr2
+		make pack
 		GO111MODULE=on go install \
+				-tags sqlite \
 				-ldflags "-X github.com/ory/hydra/cmd.Version=$$HYDRA_LATEST -X github.com/ory/hydra/cmd.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.Commit=`git rev-parse HEAD`" \
 				.
 		packr2 clean
 		git checkout master
 
 .PHONY: install
-install: .bin/packr2
-		packr2
-		GO111MODULE=on go install .
+install: pack
+		GO111MODULE=on go install -tags sqlite .
 		packr2 clean
+
+.PHONY: pack
+pack: .bin/packr2
+		packr2

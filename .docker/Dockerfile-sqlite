@@ -1,0 +1,35 @@
+FROM alpine:3.12
+
+# Because this image is built for SQLite, we create /home/ory and /home/ory/sqlite which is owned by the ory user
+# and declare /home/ory/sqlite a volume.
+#
+# To get SQLite and Docker Volumes working with this image, mount the volume where SQLite should be written to at:
+#
+#   /home/ory/sqlite/some-file.
+
+RUN addgroup -S ory; \
+    adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
+    chown -R ory:ory /home/ory
+RUN apk add -U --no-cache ca-certificates
+
+WORKDIR /home/ory
+
+COPY hydra /usr/bin/hydra
+
+# By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
+# is required for read/write of SQLite.
+RUN mkdir -p /var/lib/sqlite
+RUN chown ory:ory /var/lib/sqlite
+VOLUME /var/lib/sqlite
+
+# Exposing the ory home directory to simplify passing in Hydra configuration (e.g. if the file $HOME/.hydra.yaml
+# exists, it will be automatically used as the configuration file).
+VOLUME /home/ory
+
+# Declare the standard ports used by Hydra (4433 for public service endpoint, 4434 for admin service endpoint)
+EXPOSE 4433 4434
+
+USER ory
+
+ENTRYPOINT ["hydra"]
+CMD ["serve"]

@@ -3,11 +3,13 @@ package driver
 import (
 	"github.com/pkg/errors"
 
+	"github.com/ory/fosite"
+	foauth2 "github.com/ory/fosite/handler/oauth2"
+
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/persistence"
 
-	"github.com/ory/x/cmdx"
 	"github.com/ory/x/tracing"
 
 	"github.com/ory/hydra/metrics/prometheus"
@@ -31,6 +33,8 @@ type Registry interface {
 	WithConfig(c configuration.Provider) Registry
 	WithLogger(l *logrusx.Logger) Registry
 
+	Config() configuration.Provider
+
 	WithBuildInfo(version, hash, date string) Registry
 	BuildVersion() string
 	BuildDate() string
@@ -53,15 +57,13 @@ type Registry interface {
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
+
+	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
+	WithOAuth2Provider(f fosite.OAuth2Provider)
+	WithConsentStrategy(c consent.Strategy)
 }
 
-func MustNewRegistry(c configuration.Provider) Registry {
-	r, err := NewRegistry(c)
-	cmdx.Must(err, "unable to initialize services: %s", err)
-	return r
-}
-
-func NewRegistry(c configuration.Provider) (Registry, error) {
+func NewRegistry(c configuration.Provider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errors.WithStack(err)
@@ -72,7 +74,7 @@ func NewRegistry(c configuration.Provider) (Registry, error) {
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
 
-	registry = registry.WithConfig(c)
+	registry = registry.WithLogger(l).WithConfig(c)
 
 	if err := registry.Init(); err != nil {
 		return nil, err

@@ -3,8 +3,6 @@ title: Run ORY Hydra in Docker
 id: configure-deploy
 ---
 
-import useBaseUrl from '@docusaurus/useBaseUrl'
-
 The goal of this chapter is to introduce you to a fully functional set up that
 includes ORY Hydra as well as our User Login & Consent Provider reference
 implementation.
@@ -78,11 +76,11 @@ $ export SECRETS_SYSTEM=$(export LC_CTYPE=C; cat /dev/urandom | tr -dc 'a-zA-Z0-
 $ export DSN=postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable
 
 # Before starting, let's pull the latest ORY Hydra tag from docker.
-$ docker pull oryd/hydra:v1.8.5
+$ docker pull oryd/hydra:v1.9.0-alpha.1
 
 # This command will show you all the environment variables that you can set. Read this carefully.
 # It is the equivalent to `hydra help serve`.
-$ docker run -it --rm --entrypoint hydra oryd/hydra:v1.8.5 help serve
+$ docker run -it --rm --entrypoint hydra oryd/hydra:v1.9.0-alpha.1 help serve
 
 Starts all HTTP/2 APIs and connects to a database backend.
 [...]
@@ -92,7 +90,7 @@ Starts all HTTP/2 APIs and connects to a database backend.
 # It is the equivalent to `hydra migrate sql --yes postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable`
 $ docker run -it --rm \
   --network hydraguide \
-  oryd/hydra:v1.8.5 \
+  oryd/hydra:v1.9.0-alpha.1 \
   migrate sql --yes $DSN
 
 Applying `client` SQL migrations...
@@ -110,7 +108,7 @@ $ docker run -d \
   -e URLS_SELF_ISSUER=https://localhost:9000/ \
   -e URLS_CONSENT=http://localhost:9020/consent \
   -e URLS_LOGIN=http://localhost:9020/login \
-  oryd/hydra:v1.8.5 serve all
+  oryd/hydra:v1.9.0-alpha.1 serve all
 
 # And check if it's running:
 $ docker logs ory-hydra-example--hydra
@@ -178,7 +176,7 @@ ORY Hydra can be managed using the Hydra Command Line Interface (CLI), which is
 using ORY Hydra's REST APIs. To see the available commands, run:
 
 ```shell
-$ docker run --rm -it --entrypoint hydra oryd/hydra:v1.8.5 help
+$ docker run --rm -it --entrypoint hydra oryd/hydra:v1.9.0-alpha.1 help
 Hydra is a cloud native high throughput OAuth2 and OpenID Connect provider
 
 Usage:
@@ -237,7 +235,7 @@ URLs the client may request:
 $ docker run --rm -it \
   -e HYDRA_ADMIN_URL=https://ory-hydra-example--hydra:4445 \
   --network hydraguide \
-  oryd/hydra:v1.8.5 \
+  oryd/hydra:v1.9.0-alpha.1 \
   clients create --skip-tls-verify \
     --id facebook-photo-backup \
     --secret some-secret \
@@ -284,7 +282,7 @@ for an access token. The same thing happens with this command:
 $ docker run --rm -it \
   --network hydraguide \
   -p 9010:9010 \
-  oryd/hydra:v1.8.5 \
+  oryd/hydra:v1.9.0-alpha.1 \
   token user --skip-tls-verify \
     --port 9010 \
     --auth-url https://localhost:9000/oauth2/auth \
@@ -303,11 +301,7 @@ If your browser does not open automatically, navigate to:
 open the link, as prompted, in your browser, and follow the steps shown there.
 You might encounter a screen like the following one:
 
-<img
-  alt="Insecure connection"
-  src={useBaseUrl('/images/docs/hydra/insecure-connection.png')}
-/>
-;
+![Allow connecting with self-signed TLS Certificate](images/insecure-connection.png)
 
 This happens because we run ORY Hydra with a self-signed TLS certificate. In
 production deployments, you would probably use a certificate signed by a trusted
@@ -319,8 +313,5 @@ proceed.
 
 When completed, you should land at a screen that looks like this one:
 
-<img
-  alt="OAuth 2.0 result"
-  src={useBaseUrl('/images/docs/hydra/install-result.png')}
-/>
-;
+![OAuth 2.0 access and refresh token in the result page](images/install-result.png)
+

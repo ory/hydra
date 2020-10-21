@@ -88,7 +88,7 @@ able to securely manage JSON Web Keys.
 ORY Hydra is a server implementation of the OAuth 2.0 authorization framework and the OpenID Connect Core 1.0. Existing OAuth2
 implementations usually ship as libraries or SDKs such as [node-oauth2-server](https://github.com/oauthjs/node-oauth2-server)
 or [fosite](https://github.com/ory/fosite/issues), or as fully featured identity solutions with user
-management and user interfaces, such as [Dex](https://github.com/coreos/dex).
+management and user interfaces, such as [Keycloak](https://www.keycloak.org).
 
 Implementing and using OAuth2 without understanding the whole specification is challenging and prone to errors, even when
 SDKs are being used. The primary goal of ORY Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
@@ -521,14 +521,6 @@ The code for these tests is located in [./cypress/integration](./cypress/integra
 [./cypress/support](./cypress/support) and
 [./cypress/helpers](./cypress/helpers). The website you're seeing is located in
 [./test/e2e/oauth2-client](./test/e2e/oauth2-client).
-
-#### Making SQL Changes
-
-We embed the SQL files into the binary. If you make changes to any `.sql` file, you need to run:
-
-```shell script
-make sqlbin
-```
 
 #### Build Docker
 

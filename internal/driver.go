@@ -11,8 +11,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/ory/viper"
 
 	"github.com/ory/hydra/driver"
@@ -72,34 +70,26 @@ func NewConfigurationWithDefaultsAndHTTPS() *configuration.ViperProvider {
 	return configuration.NewViperProvider(logrusx.New("", ""), false, nil).(*configuration.ViperProvider)
 }
 
-func NewRegistryMemory(c *configuration.ViperProvider) *driver.RegistryMemory {
-	viper.Set(configuration.ViperKeyLogLevel, "debug")
-	r := driver.NewRegistryMemory().WithConfig(c)
-	_ = r.Init()
-	return r.(*driver.RegistryMemory)
+func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Registry {
+	return newRegistryDefault(t, "memory", c)
 }
 
-func NewRegistrySQLFromDB(c *configuration.ViperProvider, db *sqlx.DB) *driver.RegistrySQL {
-	viper.Set(configuration.ViperKeyLogLevel, "debug")
-	r := driver.NewRegistrySQL().WithConfig(c).(*driver.RegistrySQL).WithDB(db)
-	_ = r.Init()
-	return r.(*driver.RegistrySQL)
+func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {
+	return newRegistryDefault(t, url, NewConfigurationWithDefaults())
 }
 
-func NewRegistrySQLFromURL(t *testing.T, url string) *driver.RegistrySQL {
-	conf := NewConfigurationWithDefaults()
+func newRegistryDefault(t *testing.T, url string, c configuration.Provider) driver.Registry {
+	viper.Set(configuration.ViperKeyLogLevel, "debug")
 	viper.Set(configuration.ViperKeyDSN, url)
-	reg, err := driver.NewRegistry(conf)
+	r, err := driver.NewRegistry(c, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)
-	r, ok := reg.(*driver.RegistrySQL)
-	require.True(t, ok)
 	require.NoError(t, r.Init())
 	return r
 }
 
-func CleanAndMigrate(reg *driver.RegistrySQL) func(*testing.T) {
+func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 	return func(t *testing.T) {
-		x.CleanSQL(t, reg.DB())
+		x.CleanSQLPop(t, reg.Persister().Connection(context.Background()))
 		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
 		t.Log("clean and migrate done")
 	}
@@ -131,7 +121,7 @@ func ConnectToCRDB(t *testing.T) string {
 	return url
 }
 
-func ConnectDatabases(t *testing.T) (pg, mysql, crdb *driver.RegistrySQL, clean func(*testing.T)) {
+func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
 	var pgURL, mysqlURL, crdbURL string
 	wg := sync.WaitGroup{}
 
@@ -148,7 +138,7 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb *driver.RegistrySQL, clean 
 	}()
 	go func() {
 		crdbURL = ConnectToCRDB(t)
-		t.Log("cddb done")
+		t.Log("crdb done")
 		wg.Done()
 	}()
 	t.Log("beginning to wait")
@@ -158,14 +148,14 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb *driver.RegistrySQL, clean 
 	pg = NewRegistrySQLFromURL(t, pgURL)
 	mysql = NewRegistrySQLFromURL(t, mysqlURL)
 	crdb = NewRegistrySQLFromURL(t, crdbURL)
-	dbs := []*driver.RegistrySQL{pg, mysql, crdb}
+	dbs := []driver.Registry{pg, mysql, crdb}
 
 	clean = func(t *testing.T) {
 		wg := sync.WaitGroup{}
 
 		wg.Add(len(dbs))
 		for _, db := range dbs {
-			go func(db *driver.RegistrySQL) {
+			go func(db driver.Registry) {
 				defer wg.Done()
 				CleanAndMigrate(db)(t)
 			}(db)

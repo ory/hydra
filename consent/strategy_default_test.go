@@ -115,7 +115,7 @@ func acceptRequest(apiClient *hydra.OryHydra, consent *models.AcceptConsentReque
 	}
 }
 
-func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID string) http.CookieJar {
+func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) http.CookieJar {
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
 	secrets := viper.GetStringSlice(configuration.ViperKeyGetCookieSecrets)
@@ -125,7 +125,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID str
 	}
 
 	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.C.ServesHTTPS(), CookieAuthenticationName))
+	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.Config().ServesHTTPS(), CookieAuthenticationName))
 
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	cookie.Options.HttpOnly = true
@@ -137,7 +137,7 @@ func newAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID str
 	return cj
 }
 
-func newValidAuthCookieJar(t *testing.T, reg *driver.RegistryMemory, u, sessionID, subject string) http.CookieJar {
+func newValidAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID, subject string) http.CookieJar {
 	cj := newAuthCookieJar(t, reg, u, sessionID)
 	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &LoginSession{
 		ID:              sessionID,
@@ -167,7 +167,7 @@ func acceptLogoutChallenge(api *hydra.OryHydra, key string) func(t *testing.T) f
 	}
 }
 
-func genIDToken(t *testing.T, reg *driver.RegistryMemory, c jwtgo.Claims) string {
+func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.Claims) string {
 	r, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r
@@ -194,7 +194,7 @@ func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWrit
 
 func runLogout(t *testing.T, method string) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	// jwts := reg.OpenIDJWTStrategy()
@@ -247,7 +247,6 @@ func runLogout(t *testing.T, method string) {
 		subject          string
 		sessionID        string
 		lph              func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
-		expectSession    *HandledConsentRequest
 		expectBody       string
 		backChannels     []func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
 		expectStatusCode int
@@ -491,10 +490,11 @@ func runLogout(t *testing.T, method string) {
 				c.LoginSessionID = sqlxx.NullString(tc.sessionID)
 				c.Client.BackChannelLogoutURI = servers[k].URL
 				c.Subject = tc.subject
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c.Client))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{ID: c.LoginChallenge.String(), Client: c.Client, Verifier: c.ID}))
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), c))
-				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.Challenge, hc)
+				_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), c.ID, hc)
 				require.NoError(t, err)
-				require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c.Client))
 			}
 
 			cl := &http.Client{
@@ -541,7 +541,7 @@ func TestStrategyLogoutPost(t *testing.T) {
 
 func TestStrategyLoginConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	var lph, cph, aph func(w http.ResponseWriter, r *http.Request)
 	lp := mockProvider(&lph)
@@ -576,6 +576,8 @@ func TestStrategyLoginConsent(t *testing.T) {
 	persistentCJ3 := newCookieJar(t)
 	persistentCJ4 := newCookieJar(t)
 	nonexistentCJ := newAuthCookieJar(t, reg, ap.URL, "i-do-not-exist")
+
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ID: "client-id"}))
 
 	for k, tc := range []struct {
 		setup                 func()
@@ -1766,12 +1768,12 @@ func TestStrategyLoginConsent(t *testing.T) {
 				tc.req.Form = r.Form
 
 				c, err := strategy.HandleOAuth2AuthorizationRequest(w, r, &tc.req)
-				t.Logf("DefaultStrategy returned at call %d:\n\tgot: %+v\n\texpected: %s", calls, c, err)
+				t.Logf("DefaultStrategy returned at call %d:\n\tresult: %+v\n\terr: %s", calls, c, err)
 
 				if tc.expectErr[calls] {
 					assert.Error(t, err)
 					if tc.expectErrType[calls] != nil {
-						assert.EqualError(t, tc.expectErrType[calls], err.Error(), "%+v", err)
+						assert.EqualError(t, err, tc.expectErrType[calls].Error(), "%+v", err)
 					}
 				} else {
 					require.NoError(t, err)

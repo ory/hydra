@@ -38,6 +38,7 @@ func init() {
 	keysCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
 	keysCmd.PersistentFlags().Duration("fail-after", time.Minute, `Stop retrying after the specified duration`)
 	keysCmd.PersistentFlags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
+	keysCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unknown certificate authorities")
 }
 
 func RegisterCommandRecursive(parent *cobra.Command) {

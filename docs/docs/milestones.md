@@ -15,6 +15,7 @@ New feature or request.
 
 - [ ] Reuse Detection in Refresh Token Rotation ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 - [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
+- [ ] Support AWS X-Ray as distributed trace ([hydra#2130](https://github.com/ory/hydra/issues/2130))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 
@@ -25,7 +26,7 @@ A request for comments to discuss and share ideas.
 - [ ] Multi-region deployment support ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 - [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 
-## [v1.8.1](https://github.com/ory/hydra/milestone/40)
+## [v1.9.1](https://github.com/ory/hydra/milestone/40)
 
 _This milestone does not have a description._
 
@@ -87,7 +88,7 @@ Affects Continuous Integration (CI).
 
 - [x] ci: fix etcd CVEs ([hydra#2003](https://github.com/ory/hydra/pull/2003)) - [@hackerman](https://github.com/aeneasr)
 
-## [v1.9.0](https://github.com/ory/hydra/milestone/39)
+## [v1.10.0](https://github.com/ory/hydra/milestone/39)
 
 _This milestone does not have a description._
 
@@ -103,8 +104,8 @@ Something is not working.
 - [ ] RSA key generation is slow on ARM ([hydra#1989](https://github.com/ory/hydra/issues/1989))
 - [ ] `loginRequest.requested_access_token_audience` should not be `null` ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 - [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens ([hydra#2042](https://github.com/ory/hydra/issues/2042))
-- [ ] Redirect URI should be able to contain plus (+) character ([hydra#2055](https://github.com/ory/hydra/issues/2055))
 - [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
+- [x] Redirect URI should be able to contain plus (+) character ([hydra#2055](https://github.com/ory/hydra/issues/2055))
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -122,7 +123,6 @@ New feature or request.
 - [ ] Remove "not before" claim "nbf" from JWT access token ([hydra#1542](https://github.com/ory/hydra/issues/1542))
 - [ ] No way to handle 409 GetLoginRequestConflict. ([hydra#1569](https://github.com/ory/hydra/issues/1569)) - [@Patrik](https://github.com/zepatrik)
 - [ ] Auth session cannot be prolonged even if the user is active ([hydra#1690](https://github.com/ory/hydra/issues/1690))
-- [ ] Migrate to gobuffalo/pop ([hydra#1730](https://github.com/ory/hydra/issues/1730)) - [@Patrik](https://github.com/zepatrik)
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY ([hydra#1760](https://github.com/ory/hydra/issues/1760)) - [@hackerman](https://github.com/aeneasr)
 - [ ] CLI Migration Down ([hydra#1763](https://github.com/ory/hydra/issues/1763))
 - [ ] Move to go-jose key generation ([hydra#1825](https://github.com/ory/hydra/issues/1825))
@@ -134,6 +134,7 @@ New feature or request.
 - [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 - [x] Add endpoint to Admin API to revoke access tokens ([hydra#1728](https://github.com/ory/hydra/issues/1728))
+- [x] Migrate to gobuffalo/pop ([hydra#1730](https://github.com/ory/hydra/issues/1730)) - [@Patrik](https://github.com/zepatrik)
 - [x] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 - [x] Expired token is considered an error ([hydra#2031](https://github.com/ory/hydra/issues/2031))
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota ([hydra#2033](https://github.com/ory/hydra/issues/2033))

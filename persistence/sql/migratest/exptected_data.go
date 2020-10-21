@@ -10,6 +10,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
+	sqlPersister "github.com/ory/hydra/persistence/sql"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlxx"
 )
@@ -87,7 +88,7 @@ func expectedClient(i int) *client.Client {
 
 func expectedJWK(i int) *jwk.SQLData {
 	return &jwk.SQLData{
-		PK:      i,
+		ID:      i,
 		Set:     fmt.Sprintf("sid-%04d", i),
 		KID:     fmt.Sprintf("kid-%04d", i),
 		Version: i,
@@ -97,7 +98,7 @@ func expectedJWK(i int) *jwk.SQLData {
 
 func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *consent.LoginSession, *consent.HandledConsentRequest, *consent.HandledLoginRequest, *consent.ForcedObfuscatedLoginSession, *consent.LogoutRequest) {
 	cr := &consent.ConsentRequest{
-		Challenge:              fmt.Sprintf("challenge-%04d", i),
+		ID:                     fmt.Sprintf("challenge-%04d", i),
 		RequestedScope:         sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_scope-%04d_1", i)},
 		RequestedAudience:      sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_audience-%04d_1", i)},
 		Skip:                   true,
@@ -114,7 +115,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		WasHandled:             true,
 	}
 	lr := &consent.LoginRequest{
-		Challenge:            fmt.Sprintf("challenge-%04d", i),
+		ID:                   fmt.Sprintf("challenge-%04d", i),
 		RequestedScope:       sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_scope-%04d_1", i)},
 		RequestedAudience:    sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_audience-%04d_1", i)},
 		Skip:                 true,
@@ -136,7 +137,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		GrantedAudience: sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("granted_audience-%04d_1", i)},
 		Remember:        true,
 		RememberFor:     i,
-		Challenge:       fmt.Sprintf("challenge-%04d", i),
+		ID:              fmt.Sprintf("challenge-%04d", i),
 		WasUsed:         true,
 		Error:           &consent.RequestDeniedError{},
 		SessionIDToken: map[string]interface{}{
@@ -154,7 +155,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		ForceSubjectIdentifier: fmt.Sprintf("force_subject_id-%04d", i),
 		Context:                sqlxx.JSONRawMessage(fmt.Sprintf("{\"context\": \"%04d\"}", i)),
 		Error:                  &consent.RequestDeniedError{},
-		Challenge:              fmt.Sprintf("challenge-%04d", i),
+		ID:                     fmt.Sprintf("challenge-%04d", i),
 		WasUsed:                true,
 	}
 	fols := &consent.ForcedObfuscatedLoginSession{
@@ -162,7 +163,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		SubjectObfuscated: fmt.Sprintf("subject_obfuscated-%04d", i),
 	}
 	lor := &consent.LogoutRequest{
-		Challenge:             fmt.Sprintf("challenge-%04d", i),
+		ID:                    fmt.Sprintf("challenge-%04d", i),
 		Subject:               fmt.Sprintf("subject-%04d", i),
 		SessionID:             fmt.Sprintf("session_id-%04d", i),
 		RequestURL:            fmt.Sprintf("http://request/%04d", i),
@@ -211,10 +212,10 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 	return cr, lr, ls, hcr, hlr, fols, lor
 }
 
-func expectedOauth2(i int) (*oauth2.SQLData, *oauth2.BlacklistedJTI) {
-	d := &oauth2.SQLData{
-		Signature: fmt.Sprintf("sig-%04d", i),
-		Request:   fmt.Sprintf("req-%04d", i),
+func expectedOauth2(i int) (*sqlPersister.OAuth2RequestSQL, *oauth2.BlacklistedJTI) {
+	d := &sqlPersister.OAuth2RequestSQL{
+		ID:      fmt.Sprintf("sig-%04d", i),
+		Request: fmt.Sprintf("req-%04d", i),
 		ConsentChallenge: sql.NullString{
 			Valid: true,
 		},
@@ -228,7 +229,7 @@ func expectedOauth2(i int) (*oauth2.SQLData, *oauth2.BlacklistedJTI) {
 		Session:           []byte(fmt.Sprintf("session-%04d", i)),
 	}
 	j := &oauth2.BlacklistedJTI{
-		Signature: fmt.Sprintf("sig-%04d", i),
+		ID: fmt.Sprintf("sig-%04d", i),
 	}
 	switch i {
 	case 1:

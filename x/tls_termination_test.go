@@ -25,7 +25,7 @@ func noopHandler(w http.ResponseWriter, r *http.Request) {
 
 func TestDoesRequestSatisfyTermination(t *testing.T) {
 	c := internal.NewConfigurationWithDefaultsAndHTTPS()
-	r := internal.NewRegistryMemory(c)
+	r := internal.NewRegistryMemory(t, c)
 
 	t.Run("case=tls-termination-disabled", func(t *testing.T) {
 		viper.Set(configuration.ViperKeyAllowTLSTerminationFrom, "")

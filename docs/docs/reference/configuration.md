@@ -986,13 +986,13 @@ strategies:
 
   ## include_all_scopes_when_empty ##
   #
-  # Defines how scopes are added if the request doesn't contains any scope. 
-  # 
+  # Defines how scopes are added if the request doesn't contains any scope.
+  #
   # Default value: false
   # One of:
   # - true
   # - false
-  # 
+  #
   # Set this value using environment variables on
   # - Linux/macOS:
   #    $ export STRATEGIES_INCLUDE_ALL_SCOPES_WHEN_EMPTY=<value>
@@ -1000,7 +1000,6 @@ strategies:
   #    > set STRATEGIES_INCLUDE_ALL_SCOPES_WHEN_EMPTY=<value>
   #
   include_all_scopes_when_empty: false
-
 
   ## access_token ##
   #

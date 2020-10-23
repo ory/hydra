@@ -82,6 +82,7 @@ const (
 	ViperKeyPKCEEnforcedForPublicClients   = "oauth2.pkce.enforced_for_public_clients"
 	ViperKeyLogLevel                       = "log.level"
 	ViperKeyCGroupsV1AutoMaxProcsEnabled   = "cgroups.v1.auto_max_procs_enabled"
+	ViperKeyAllScopesIncludedIfEmpty       = "strategies.include_all_scopes_when_empty"
 )
 
 const DefaultSQLiteMemoryDSN = "sqlite://:memory:?_fk=true"
@@ -501,4 +502,8 @@ func (v *ViperProvider) EnforcePKCEForPublicClients() bool {
 
 func (v *ViperProvider) CGroupsV1AutoMaxProcsEnabled() bool {
 	return viperx.GetBool(v.l, ViperKeyCGroupsV1AutoMaxProcsEnabled, false)
+}
+
+func (v *ViperProvider) IncludeAllScopesWhenEmpty() bool {
+	return viperx.GetBool(v.l, ViperKeyAllScopesIncludedIfEmpty, false, "STRATEGIES_INCLUDE_ALL_SCOPES_WHEN_EMPTY")
 }

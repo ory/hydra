@@ -44,8 +44,6 @@ func init() {
 }
 
 func RegisterCommandRecursive(parent *cobra.Command) {
-	cmd := clientsCmd
-	_ = cmd
 	parent.AddCommand(clientsCmd)
 
 	clientsCmd.AddCommand(newCreateCmd())
@@ -54,5 +52,5 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	clientsCmd.AddCommand(newImportCmd())
 	clientsCmd.AddCommand(newListCmd())
 	clientsCmd.AddCommand(newUpdateCmd())
-	clientsCmd.AddCommand(clientsValidateCmd)
+	clientsCmd.AddCommand(newValidateCmd())
 }

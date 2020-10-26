@@ -43,7 +43,6 @@ func newDeleteCmd() *cobra.Command {
 			errs := make(map[string]error)
 			for _, c := range args {
 				_, err := m.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID(c))
-				fmt.Fprintf(cmd.ErrOrStderr(), "got error %+v", err)
 				if err != nil {
 					errs[c] = errors.New(cli.FormatSwaggerError(err))
 					continue

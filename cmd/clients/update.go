@@ -31,8 +31,10 @@ To read a client from a JSON file, specify the filename argument. %s
 		RunE: updateClient,
 	}
 
-	registerClientFlags(cmd.LocalFlags())
-	cli.RegisterSecretEncryptionFlags(cmd.LocalFlags())
+	cmd.Flags().AddFlagSet(packageFlags)
+
+	registerClientFlags(cmd.Flags())
+	cli.RegisterSecretEncryptionFlags(cmd.Flags())
 
 	return cmd
 }

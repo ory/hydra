@@ -34,7 +34,8 @@ func newListCmd() *cobra.Command {
 		},
 	}
 
-	cli.RegisterPaginationFlags(cmd.LocalFlags())
+	cmd.Flags().AddFlagSet(packageFlags)
+	cli.RegisterPaginationFlags(cmd.Flags())
 
 	return cmd
 }

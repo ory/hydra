@@ -14,43 +14,47 @@ import (
 	"os"
 )
 
-var clientsValidateCmd = &cobra.Command{
-	Use:   "validate <client.json> [<client2.json> ...]",
-	Args:  cobra.MinimumNArgs(1),
-	Short: "Validate client JSON files",
-	Long:  fmt.Sprintf("Validate client JSON files that can be used with other commands. %s", helperStdInFile),
-	RunE: func(cmd *cobra.Command, args []string) (retErr error) {
-		for _, fn := range args {
-			var r io.Reader
-			if fn == "-" {
-				r = cmd.InOrStdin()
-			} else {
-				var err error
-				r, err = os.Open(fn)
+func newValidateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "validate <client.json> [<client2.json> ...]",
+		Args:  cobra.MinimumNArgs(1),
+		Short: "Validate client JSON files",
+		Long:  fmt.Sprintf("Validate client JSON files that can be used with other commands. %s", helperStdInFile),
+		RunE: func(cmd *cobra.Command, args []string) (retErr error) {
+			for _, fn := range args {
+				var r io.Reader
+				if fn == "-" {
+					r = cmd.InOrStdin()
+				} else {
+					var err error
+					r, err = os.Open(fn)
+					if err != nil {
+						_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open %s: %s\n", fn, err)
+						retErr = cmdx.FailSilently(cmd)
+						continue
+					}
+				}
+
+				data, err := ioutil.ReadAll(r)
 				if err != nil {
-					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open %s: %s\n", fn, err)
+					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not read %s: %s\n", fn, err)
 					retErr = cmdx.FailSilently(cmd)
 					continue
 				}
+
+				if err := validateClient(cmd, fn, string(data)); errors.Is(err, cmdx.ErrNoPrintButFail) {
+					retErr = err
+				} else if err != nil {
+					// unexpected error should fail the command immediately
+					return err
+				}
 			}
 
-			data, err := ioutil.ReadAll(r)
-			if err != nil {
-				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not read %s: %s\n", fn, err)
-				retErr = cmdx.FailSilently(cmd)
-				continue
-			}
+			return
+		},
+	}
 
-			if err := validateClient(cmd, fn, string(data)); errors.Is(err, cmdx.ErrNoPrintButFail) {
-				retErr = err
-			} else if err != nil {
-				// unexpected error should fail the command immediately
-				return err
-			}
-		}
-
-		return
-	},
+	return cmd
 }
 
 var (

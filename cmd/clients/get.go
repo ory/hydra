@@ -29,7 +29,7 @@ import (
 )
 
 func newGetCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "get <id>",
 		Args:    cobra.ExactArgs(1),
 		Short:   "Get an OAuth 2.0 Client",
@@ -48,4 +48,8 @@ func newGetCmd() *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().AddFlagSet(packageFlags)
+
+	return cmd
 }

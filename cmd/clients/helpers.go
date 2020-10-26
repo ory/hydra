@@ -17,13 +17,28 @@ import (
 	"testing"
 )
 
+func getFullCmdPath(cmd *cobra.Command) []string {
+	names := []string{cmd.Name()}
+
+	for p := cmd; p.HasParent(); p = p.Parent() {
+		names = append(names, p.Parent().Name())
+	}
+
+	// reverse names
+	for i, j := 0, len(names)-1; i < j; i, j = i+1, j-1 {
+		names[i], names[j] = names[j], names[i]
+	}
+
+	return names
+}
+
 func noopCors(handler http.Handler) http.Handler {
 	return handler
 }
 
 func setupTestCmd(t *testing.T, cmd *cobra.Command) (driver.Registry, func()) {
 	c := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(c)
+	reg := internal.NewRegistryMemory(t, c)
 	ra, rp := x.NewRouterAdmin(), x.NewRouterPublic()
 
 	reg.ClientHandler().SetRoutes(ra)
@@ -50,6 +65,9 @@ func assertContainedInJSON(t *testing.T, obj map[string]interface{}, j string) {
 	}
 }
 
+// asserts that all the fields from the input client are equal to the fields in the json string as well
+// as in the client from the registry
+// fields not included in the inputClient are not checked for equality
 func assertPartialClient(t *testing.T, inputClient map[string]interface{}, stdOut string, reg driver.Registry) {
 	newID := gjson.Get(stdOut, "client_id").Str
 

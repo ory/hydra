@@ -3,6 +3,7 @@ package clients
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/x/cmdx"
@@ -31,9 +32,24 @@ func TestDeleteCmd(t *testing.T) {
 		assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
 	})
 
-	runCase("returns error when the client ID is unknown", func(t *testing.T, cmd *cobra.Command, reg driver.Registry) {
-		stdErr := cmdx.ExecExpectedErr(t, cmd, "undefined client")
+	runCase("deletes multiple clients by ID", func(t *testing.T, cmd *cobra.Command, reg driver.Registry) {
+		c1 := &client.Client{
+			ID: "test-cid1",
+		}
+		c2 := &client.Client{
+			ID: "test-cid2",
+		}
+		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c1))
+		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c2))
 
-		t.Error(stdErr)
+		stdOut := cmdx.ExecNoErr(t, cmd, c1.ID, c2.ID)
+
+		assert.Equal(t, fmt.Sprintf("%s\n%s\n", c1.ID, c2.ID), stdOut)
+
+		// check if the clients are deleted in the manager
+		_, err := reg.ClientManager().GetClient(context.Background(), c1.ID)
+		assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
+		_, err = reg.ClientManager().GetClient(context.Background(), c2.ID)
+		assert.True(t, errors.Is(err, sqlcon.ErrNoRows))
 	})
 }

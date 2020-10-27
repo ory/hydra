@@ -82,7 +82,7 @@ const (
 	ViperKeyPKCEEnforcedForPublicClients   = "oauth2.pkce.enforced_for_public_clients"
 	ViperKeyLogLevel                       = "log.level"
 	ViperKeyCGroupsV1AutoMaxProcsEnabled   = "cgroups.v1.auto_max_procs_enabled"
-	ViperKeyAllScopesIncludedIfEmpty       = "strategies.include_all_scopes_when_empty"
+	ViperKeyGrantAllClientCredentialsScopesPerDefault       = "oauth2.client_credentials.default_grant_allowed_scope"
 )
 
 const DefaultSQLiteMemoryDSN = "sqlite://:memory:?_fk=true"

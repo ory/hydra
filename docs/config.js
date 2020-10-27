@@ -9,13 +9,13 @@ module.exports = {
       files: ['docs/docs/install.md', 'docs/docs/configure-deploy.mdx']
     },
     {
-      replacer: ({ content, next, semverRegex }) =>
-        content.replace(semverRegex, `${next}`),
+      replacer: ({ content, next }) =>
+        content.replace(/v[0-9a-zA-Z\.\+\_-]+/gi, `${next}`),
       image: 'oryd/hydra',
       files: ['docs/docs/install.md']
     },
     {
-      replacer: ({ content, next, semverRegex }) =>
+      replacer: ({ content, next }) =>
         content.replace(
           /oryd\/hydra:v[0-9a-zA-Z\.\+\_-]+/g,
           `oryd/hydra:${next}-sqlite`
@@ -25,6 +25,10 @@ module.exports = {
     {
       image: "oryd/hydra-login-consent-node",
       files: ['quickstart.yml']
+    },
+    {
+      image: "oryd/hydra",
+      files: ['quickstart-cockroach.yml', 'quickstart-mysql.yml', 'quickstart-postgres.yml']
     }
   ],
   updateConfig: {

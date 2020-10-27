@@ -23,9 +23,15 @@ Since hydra uses scp as the scope claim, you have to be sure your client librari
 MITREid doesn't mind if the parameters are passed in the body or in the query string. In order to work with hydra, you have to migrate all your calls that are using QS params to Body Parameters.
 
 For example, you should move from   
-``` curl -X POST  http://127.0.0.1/mitreid-server/token?grant_type=client_credentials -H "Authorization: $AUTH" ... ```
+\```
+curl -X POST  http://127.0.0.1/mitreid-server/token?grant_type=client_credentials -H "Authorization: $AUTH" ... 
+\```
+
 to
-``` curl -X POST  http://127.0.0.1/mitreid-server/token -H "Authorization: $AUTH" --data-urlencode 'grant_type=client_credentials' ... ```
+
+\```
+curl -X POST  http://127.0.0.1/mitreid-server/token -H "Authorization: $AUTH" --data-urlencode 'grant_type=client_credentials' ...
+\```
 
 #### Scope Strategies if no scope is requested
 

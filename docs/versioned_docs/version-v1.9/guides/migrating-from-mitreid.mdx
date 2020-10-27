@@ -16,6 +16,7 @@ This piece of documentation will try to give you some hints to move your current
 Scopes in hydra doesn't have a relational entity, every client defines its own array of scopes.
 
 #### Scope vs Scp
+
 Since hydra uses scp as the scope claim, you have to be sure your client libraries are capable to use both, we had to modify the behavior of our version of spring.security.oauth2 library following the example: [Custom claim](https://dev.to/toojannarong/spring-security-with-jwt-the-easiest-way-2i43)
 
 #### Query String Parameters

@@ -505,5 +505,5 @@ func (v *ViperProvider) CGroupsV1AutoMaxProcsEnabled() bool {
 }
 
 func (v *ViperProvider) IncludeAllScopesWhenEmpty() bool {
-	return viperx.GetBool(v.l, ViperKeyAllScopesIncludedIfEmpty, false, "STRATEGIES_INCLUDE_ALL_SCOPES_WHEN_EMPTY")
+	return viperx.GetBool(v.l, ViperKeyAllScopesIncludedIfEmpty, false)
 }

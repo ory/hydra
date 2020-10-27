@@ -31,7 +31,7 @@ On linux, you can use `bash <(curl ...)` to fetch the latest stable binary
 using:
 
 ```shell
-$ bash <(curl https://raw.githubusercontent.com/ory/hydra/master/install.sh) -b . v1.9.0-alpha.1
+$ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.1/install.sh) -b . v1.9.0-alpha.1
 $ ./hydra help
 ```
 
@@ -86,10 +86,4 @@ $ go install github.com/gobuffalo/packr/v2/packr2
 $ cd $(go env GOPATH)/src/github.com/ory/hydra
 $ GO111MODULE=on make install-stable
 $ $(go env GOPATH)/bin/hydra help
-```
-
-p
-
-```
-
 ```

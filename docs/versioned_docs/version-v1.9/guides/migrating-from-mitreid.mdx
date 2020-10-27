@@ -36,5 +36,5 @@ curl -X POST  http://127.0.0.1/mitreid-server/token -H "Authorization: $AUTH" --
 #### Scope Strategies if no scope is requested
 
 The last pitfall found during the migration was the difference of behavior when you request a *client_credentials* token and you don't specify any token,
-by default hydra doesn't return any scope but MITREid returns all associated scopes to the client. To enable this in hydra, you have set up the env variable *STRATEGIES_INCLUDE_ALL_SCOPES_WHEN_EMPTY=true*,
+by default hydra doesn't return any scope but MITREid returns all associated scopes to the client. To enable this in hydra, you have set up the env variable *OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=true*,
 after enable this capability hydra will start serving all the scopes assigned to this client 

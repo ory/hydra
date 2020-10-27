@@ -233,7 +233,7 @@ func TestViperProviderValidates(t *testing.T) {
 	// strategies
 	assert.Equal(t, "exact", c.ScopeStrategy())
 	assert.Equal(t, "opaque", c.AccessTokenStrategy())
-	assert.Equal(t, false, c.IncludeAllScopesWhenEmpty())
+	assert.Equal(t, false, c.GrantAllClientCredentialsScopesPerDefault())
 
 	// ttl
 	assert.Equal(t, 2*time.Hour, c.ConsentRequestMaxAge())

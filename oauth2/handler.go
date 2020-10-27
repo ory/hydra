@@ -579,7 +579,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		var scopes = accessRequest.GetRequestedScopes()
 
 		// Added for compatibility with MITREid
-		if h.c.IncludeAllScopesWhenEmpty() && len(scopes) == 0 {
+		if h.c.GrantAllClientCredentialsScopesPerDefault() && len(scopes) == 0 {
 			for _, scope := range accessRequest.GetClient().GetScopes() {
 				accessRequest.GrantScope(scope)
 			}

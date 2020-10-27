@@ -31,7 +31,7 @@ On linux, you can use `bash <(curl ...)` to fetch the latest stable binary
 using:
 
 ```shell
-$ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.5.2install.sh) -b . v1.5.2
+$ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.5.2/install.sh) -b . v1.5.2
 $ ./hydra help
 ```
 

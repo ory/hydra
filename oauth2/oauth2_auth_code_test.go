@@ -201,7 +201,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 					viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
 
 					client := hc.Client{
-						ID: "e2e-app-client" + km + strat.d, Secret: "secret", RedirectURIs: []string{ts.URL + "/callback"},
+						OutfacingID: "e2e-app-client" + km + strat.d, Secret: "secret", RedirectURIs: []string{ts.URL + "/callback"},
 						ResponseTypes: []string{"id_token", "code", "token"},
 						GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
 						Scope:         "hydra offline openid",
@@ -1156,7 +1156,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			var mutex sync.Mutex
 
 			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
-				ID:            "app-client",
+				OutfacingID:   "app-client",
 				Secret:        "secret",
 				RedirectURIs:  []string{ts.URL + "/callback"},
 				ResponseTypes: []string{"id_token", "code", "token"},

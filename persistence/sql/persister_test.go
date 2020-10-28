@@ -36,6 +36,8 @@ func TestManagers(t *testing.T) {
 			t.Run("case=autogenerate-key", client.TestHelperClientAutoGenerateKey(k, m.ClientManager()))
 
 			t.Run("case=auth-client", client.TestHelperClientAuthenticate(k, m.ClientManager()))
+
+			t.Run("case=update-two-clients", client.TestHelperUpdateTwoClients(k, m.ClientManager()))
 		})
 
 		t.Run("package=consent/manager="+k, consent.ManagerTests(m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))

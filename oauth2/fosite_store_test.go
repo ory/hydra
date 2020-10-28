@@ -85,7 +85,7 @@ func TestManagers(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			setupRegistries(t)
-			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{ID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
+			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 
 			viper.Set(configuration.ViperKeyEncryptSessionData, tc.enableSessionEncrypted)
 

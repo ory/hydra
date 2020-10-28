@@ -10,7 +10,7 @@ import (
 func AddFositeExamples(r driver.Registry) {
 	for _, c := range []client.Client{
 		{
-			ID:            "my-client",
+			OutfacingID:   "my-client",
 			Secret:        "foobar",
 			RedirectURIs:  []string{"http://localhost:3846/callback"},
 			ResponseTypes: []string{"id_token", "code", "token"},
@@ -18,7 +18,7 @@ func AddFositeExamples(r driver.Registry) {
 			Scope:         "fosite,openid,photos,offline",
 		},
 		{
-			ID:            "encoded:client",
+			OutfacingID:   "encoded:client",
 			Secret:        "encoded&password",
 			RedirectURIs:  []string{"http://localhost:3846/callback"},
 			ResponseTypes: []string{"id_token", "code", "token"},

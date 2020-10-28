@@ -81,7 +81,7 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=client migration %d", i), func(t *testing.T) {
 					expected := expectedClient(i)
 					actual := &client.Client{}
-					require.NoError(t, c.Find(actual, expected.ID))
+					require.NoError(t, c.Find(actual, expected.OutfacingID))
 					assertEqualClients(t, expected, actual)
 					lastClient = actual
 				})
@@ -129,7 +129,7 @@ func TestMigrations(t *testing.T) {
 					assertEqualHandledLoginRequests(t, ehlr, ahlr)
 
 					if efols != nil {
-						afols, err := d.Registry().ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), lastClient.ID, efols.SubjectObfuscated)
+						afols, err := d.Registry().ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), lastClient.OutfacingID, efols.SubjectObfuscated)
 						require.NoError(t, err)
 						assertEqualForcedObfucscatedLoginSessions(t, efols, afols)
 					}

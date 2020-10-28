@@ -13,7 +13,7 @@ import (
 
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
 	var cl client.Client
-	return &cl, sqlcon.HandleError(p.Connection(ctx).Find(&cl, id))
+	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("id = ?", id).First(&cl))
 }
 
 func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -22,7 +22,7 @@ func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, er
 
 func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		o, err := p.GetClient(ctx, cl.GetID())
+		o, err := p.GetConcreteClient(ctx, cl.GetID())
 		if err != nil {
 			return err
 		}
@@ -36,6 +36,8 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 			}
 			cl.Secret = string(h)
 		}
+		// set the internal primary key
+		cl.ID = o.ID
 
 		return sqlcon.HandleError(c.Update(cl))
 	})
@@ -65,7 +67,14 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 }
 
 func (p *Persister) DeleteClient(ctx context.Context, id string) error {
-	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: id}))
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		cl, err := p.GetConcreteClient(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
+	})
 }
 
 func (p *Persister) GetClients(ctx context.Context, limit, offset int) ([]client.Client, error) {

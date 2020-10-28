@@ -65,7 +65,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{ID: "foobar"},
+		Client:         &client.Client{OutfacingID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -74,7 +74,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-2",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{ID: "foobar"},
+		Client:         &client.Client{OutfacingID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -83,7 +83,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-3",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{ID: "foobar"},
+		Client:         &client.Client{OutfacingID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -104,7 +104,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	deleteRequest := &fosite.Request{
 		ID:             "del-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{ID: "foobar"},
+		Client:         &client.Client{OutfacingID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},

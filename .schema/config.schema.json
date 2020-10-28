@@ -768,6 +768,19 @@
               ]
             }
           }
+        },
+        "client_credentials": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "default_grant_allowed_scope": {
+              "type": "boolean",
+              "description": "Defines how scopes are added if the request doesn't contains any scope",
+              "examples": [
+                false
+              ]
+            }
+          }
         }
       }
     },

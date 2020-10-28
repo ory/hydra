@@ -23,18 +23,26 @@ Since hydra uses scp as the scope claim, you have to be sure your client librari
 MITREid doesn't mind if the parameters are passed in the body or in the query string. In order to work with hydra, you have to migrate all your calls that are using QS params to Body Parameters.
 
 For example, you should move from   
-\```
+```
 curl -X POST  http://127.0.0.1/mitreid-server/token?grant_type=client_credentials -H "Authorization: $AUTH" ... 
-\```
+```
 
 to
 
-\```
+```
 curl -X POST  http://127.0.0.1/mitreid-server/token -H "Authorization: $AUTH" --data-urlencode 'grant_type=client_credentials' ...
-\```
+```
 
 #### Scope Strategies if no scope is requested
 
-The last pitfall found during the migration was the difference of behavior when you request a *client_credentials* token and you don't specify any token,
-by default hydra doesn't return any scope but MITREid returns all associated scopes to the client. To enable this in hydra, you have set up the env variable *OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=true*,
-after enable this capability hydra will start serving all the scopes assigned to this client 
+The last pitfall found during the migration was the difference of behaviour when performing the `client_credentials` grant without specifying a scope. By default ORY Hydra returns an empty scope, but MITREid grants the default scope for the OAuth 2.0 Client.
+
+To change the behaviour in ORY Hydra, either set environment variable `OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=true` or alternatively add to ORY Hydra's configuration file:
+
+```yaml title="path/to/hydra.yaml"
+oauth2:
+  client_credentials:
+    default_grant_allowed_scope: true
+```
+
+Once set, ORY Hydra will behave like MITREid and grant the OAuth2 Client's scope when an empty scope is requested for a `client_credentials` grant.

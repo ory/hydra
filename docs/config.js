@@ -23,12 +23,16 @@ module.exports = {
       files: ['quickstart.yml']
     },
     {
-      image: "oryd/hydra-login-consent-node",
+      image: 'oryd/hydra-login-consent-node',
       files: ['quickstart.yml']
     },
     {
-      image: "oryd/hydra",
-      files: ['quickstart-cockroach.yml', 'quickstart-mysql.yml', 'quickstart-postgres.yml']
+      image: 'oryd/hydra',
+      files: [
+        'quickstart-cockroach.yml',
+        'quickstart-mysql.yml',
+        'quickstart-postgres.yml'
+      ]
     }
   ],
   updateConfig: {

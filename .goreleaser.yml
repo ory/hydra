@@ -179,6 +179,8 @@ brews:
     commit_author:
       name: aeneasr
       email: 3372410+aeneasr@users.noreply.github.com
+    install: |
+      bin.install "hydra"
 
 scoop:
   bucket:

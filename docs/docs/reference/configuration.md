@@ -49,7 +49,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: fatal
+  level: warn
 
   ## leak_sensitive_values ##
   #
@@ -63,7 +63,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
   #
-  leak_sensitive_values: true
+  leak_sensitive_values: false
 
   ## format ##
   #
@@ -82,7 +82,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: json
+  format: text
 
 ## serve ##
 #
@@ -104,7 +104,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 2398
+    port: 51856
 
     ## host ##
     #
@@ -119,7 +119,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_HOST=<value>
     #
-    host: ''
+    host: localhost
 
     ## cors ##
     #
@@ -173,9 +173,10 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - GET
         - HEAD
-        - PUT
+        - CONNECT
+        - PATCH
+        - CONNECT
         - PATCH
 
       ## allowed_headers ##
@@ -191,9 +192,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - qui
-        - mollit fugiat
-        - et Excepteur pariatur cupidatat culpa
+        - velit minim ipsum ut
 
       ## exposed_headers ##
       #
@@ -208,8 +207,11 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - sunt in labore nisi amet
-        - aute esse labore
+        - commodo laboris et
+        - exercitation et
+        - dolore
+        - tempor dolore laborum aliqua
+        - sint cupidatat
 
       ## allow_credentials ##
       #
@@ -223,7 +225,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -251,7 +253,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 69011760
+      max_age: 98699473
 
       ## debug ##
       #
@@ -265,7 +267,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
     ## socket ##
     #
@@ -282,7 +284,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
       #
-      owner: ad magna eiusmod velit sunt
+      owner: occaecat
 
       ## group ##
       #
@@ -294,7 +296,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
       #
-      group: ea magna
+      group: amet
 
       ## mode ##
       #
@@ -312,7 +314,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
       #
-      mode: 136
+      mode: 114
 
     ## access_log ##
     #
@@ -346,7 +348,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 10411
+    port: 33921
 
     ## host ##
     #
@@ -361,7 +363,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_HOST=<value>
     #
-    host: ''
+    host: localhost
 
     ## cors ##
     #
@@ -380,7 +382,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: false
+      enabled: true
 
       ## allowed_origins ##
       #
@@ -400,9 +402,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
+        - '*'
 
       ## allowed_methods ##
       #
@@ -417,8 +417,10 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - TRACE
         - PUT
+        - POST
+        - TRACE
+        - POST
 
       ## allowed_headers ##
       #
@@ -433,11 +435,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - Duis
-        - ex ad nisi
-        - est in consequat
-        - in culpa cupidatat qui
-        - aute ad deserunt consequat sint
+        - pariatur nisi incididunt
 
       ## exposed_headers ##
       #
@@ -452,11 +450,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - dolor aliqua
-        - Lorem commodo veniam est
-        - ullamco esse Ut id amet
-        - sunt ut minim deserunt tempor
-        - voluptate nisi
+        - aliqua id anim
 
       ## allow_credentials ##
       #
@@ -470,7 +464,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -498,7 +492,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 14961797
+      max_age: 29873431
 
       ## debug ##
       #
@@ -529,7 +523,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
       #
-      owner: culpa
+      owner: sit Lorem labore non veniam
 
       ## group ##
       #
@@ -541,7 +535,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
       #
-      group: cupidatat
+      group: Excepteur
 
       ## mode ##
       #
@@ -559,7 +553,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_MODE=<value>
       #
-      mode: 383
+      mode: 68
 
     ## access_log ##
     #
@@ -590,30 +584,30 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_BASE64=<value>
+      #    $ export SERVE_TLS_KEY_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_BASE64=<value>
+      #    > set SERVE_TLS_KEY_PATH=<value>
       #
-      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+      path: /path/to/file.pem
 
     ## cert ##
     #
     # Configures the private key (pem encoded).
     #
     cert:
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_CERT_BASE64=<value>
+      #    $ export SERVE_TLS_CERT_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_CERT_BASE64=<value>
+      #    > set SERVE_TLS_CERT_PATH=<value>
       #
-      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+      path: /path/to/file.pem
 
     ## allow_termination_from ##
     #
@@ -626,8 +620,6 @@ serve:
     #    > set SERVE_TLS_ALLOW_TERMINATION_FROM=<value>
     #
     allow_termination_from:
-      - 127.0.0.1/32
-      - 127.0.0.1/32
       - 127.0.0.1/32
 
   ## cookies ##
@@ -650,7 +642,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Strict
+    same_site_mode: Lax
 
     ## same_site_legacy_workaround ##
     #
@@ -679,7 +671,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: in
+dsn: tempor ea non
 
 ## webfinger ##
 #
@@ -706,8 +698,7 @@ webfinger:
     # - Windows Command Line (CMD):
     #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
     #
-    broadcast_keys:
-      - hydra.openid.id-token
+    broadcast_keys: hydra.jwt.access-token
 
   ## oidc_discovery ##
   #
@@ -1045,7 +1036,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: '-1'
+  refresh_token: 1h
 
   ## id_token ##
   #
@@ -1119,7 +1110,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 77520723
+      cost: 86089616
 
   ## pkce ##
   #
@@ -1159,18 +1150,16 @@ oauth2:
   client_credentials:
     ## default_grant_allowed_scope ##
     #
-    # Defines how scopes are added if the request doesn't contains any scope.
+    # Defines how scopes are added if the request doesn't contains any scope
     #
-    # Default value: false
-    # One of:
-    # - true
+    # Examples:
     # - false
     #
     # Set this value using environment variables on
     # - Linux/macOS:
-    #    $ export OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=<value>
+    #    $ export OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_ALLOWED_SCOPE=<value>
     # - Windows Command Line (CMD):
-    #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=<value>
+    #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_ALLOWED_SCOPE=<value>
     #
     default_grant_allowed_scope: false
 
@@ -1384,7 +1373,7 @@ tracing:
 # - Windows Command Line (CMD):
 #    > set VERSION=<value>
 #
-version: v194493.0.63007287130-0.9SCd.0.8288x.0+Goch-DsnnR.z.NRnY
+version: v0.571.0+MXU.Xjr.aL.P3otgtR.nRiwd5b2HT.FsVPGTKnt.V
 
 ## cgroups ##
 #
@@ -1411,5 +1400,5 @@ cgroups:
     # - Windows Command Line (CMD):
     #    > set CGROUPS_V1_AUTO_MAX_PROCS_ENABLED=<value>
     #
-    auto_max_procs_enabled: false
+    auto_max_procs_enabled: true
 ```

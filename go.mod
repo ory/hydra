@@ -63,4 +63,4 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
 
-replace github.com/gobuffalo/pop/v5 => github.com/zepatrik/pop/v5 v5.0.12-0.20201028144522-91a5f8eec0a1
+replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.3.2-0.20201029132236-f36afb546df1

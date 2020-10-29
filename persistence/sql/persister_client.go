@@ -13,10 +13,6 @@ import (
 
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
 	var cl client.Client
-	pop.Debug = true
-	defer func() {
-		pop.Debug = false
-	}()
 	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("id = ?", id).First(&cl))
 }
 

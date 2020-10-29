@@ -13,6 +13,10 @@ import (
 
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
 	var cl client.Client
+	pop.Debug = true
+	defer func() {
+		pop.Debug = false
+	}()
 	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("id = ?", id).First(&cl))
 }
 
@@ -67,14 +71,12 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 }
 
 func (p *Persister) DeleteClient(ctx context.Context, id string) error {
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		cl, err := p.GetConcreteClient(ctx, id)
-		if err != nil {
-			return err
-		}
+	cl, err := p.GetConcreteClient(ctx, id)
+	if err != nil {
+		return err
+	}
 
-		return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
-	})
+	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
 }
 
 func (p *Persister) GetClients(ctx context.Context, limit, offset int) ([]client.Client, error) {

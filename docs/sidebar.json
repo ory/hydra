@@ -30,7 +30,7 @@
         "guides/cookies", 
         "guides/scaling-hydra", 
         "guides/cors", 
-        "guides/gitlab",
+        "guides/gitlab", 
         "guides/migrating-from-MITREid"
       ]
     }, 

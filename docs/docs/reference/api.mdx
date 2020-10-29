@@ -103,7 +103,6 @@ if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client l
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /.well-known/jwks.json \
   -H 'Accept: application/json'
@@ -111,7 +110,6 @@ curl -X GET /.well-known/jwks.json \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -141,7 +139,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -161,7 +158,6 @@ fetch('/.well-known/jwks.json', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -189,7 +185,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -208,7 +203,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -225,7 +219,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIddiscoverOpenIDConfiguration"></a>
 
@@ -299,7 +292,6 @@ For a full list of clients go here: https://openid.net/developers/certified/
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /.well-known/openid-configuration \
   -H 'Accept: application/json'
@@ -307,7 +299,6 @@ curl -X GET /.well-known/openid-configuration \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -337,7 +328,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -357,7 +347,6 @@ fetch('/.well-known/openid-configuration', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -385,7 +374,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -404,7 +392,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -421,7 +408,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdisInstanceReady"></a>
 
@@ -472,7 +458,6 @@ refer to the cluster state, only to a single instance.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /health/ready \
   -H 'Accept: application/json'
@@ -480,7 +465,6 @@ curl -X GET /health/ready \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -510,7 +494,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -530,7 +513,6 @@ fetch('/health/ready', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -558,7 +540,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -577,7 +558,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -594,7 +574,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdoauthAuth"></a>
 
@@ -646,7 +625,6 @@ To learn more about this flow please refer to the specification: https://tools.i
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /oauth2/auth \
   -H 'Accept: application/json'
@@ -654,7 +632,6 @@ curl -X GET /oauth2/auth \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -684,7 +661,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -704,7 +680,6 @@ fetch('/oauth2/auth', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -732,7 +707,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -751,7 +725,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -768,7 +741,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdrevokeOAuth2Token"></a>
 
@@ -839,7 +811,6 @@ token: string
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X POST /oauth2/revoke \
   -H 'Content-Type: application/x-www-form-urlencoded' \  -H 'Accept: application/json'
@@ -847,7 +818,6 @@ curl -X POST /oauth2/revoke \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -878,7 +848,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -901,7 +870,6 @@ fetch('/oauth2/revoke', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -929,7 +897,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -949,7 +916,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -967,7 +933,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIddisconnectUser"></a>
 
@@ -1003,7 +968,6 @@ https://openid.net/specs/openid-connect-backchannel-1_0.html
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /oauth2/sessions/logout
 
@@ -1011,7 +975,6 @@ curl -X GET /oauth2/sessions/logout
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -1038,7 +1001,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -1053,7 +1015,6 @@ fetch('/oauth2/sessions/logout', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -1081,7 +1042,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -1095,7 +1055,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -1108,7 +1067,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdoauth2Token"></a>
 
@@ -1192,7 +1150,6 @@ client_id: string
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X POST /oauth2/token \
   -H 'Content-Type: application/x-www-form-urlencoded' \  -H 'Accept: application/json'
@@ -1200,7 +1157,6 @@ curl -X POST /oauth2/token \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -1231,7 +1187,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -1259,7 +1214,6 @@ fetch('/oauth2/token', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/oauth2/token");
@@ -1286,7 +1240,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -1306,7 +1259,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -1324,7 +1276,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIduserinfo"></a>
 
@@ -1393,7 +1344,6 @@ For more information please [refer to the spec](http://openid.net/specs/openid-c
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /userinfo \
   -H 'Accept: application/json' \  -H 'Authorization: Bearer {access-token}'
@@ -1401,7 +1351,6 @@ curl -X GET /userinfo \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -1432,7 +1381,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -1453,7 +1401,6 @@ fetch('/userinfo', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -1481,7 +1428,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -1501,7 +1447,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -1519,7 +1464,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="ory-hydra-administrative-endpoints"></a>
 
@@ -1658,7 +1602,6 @@ Status Code **200**
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /clients \
   -H 'Accept: application/json'
@@ -1666,7 +1609,6 @@ curl -X GET /clients \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -1696,7 +1638,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -1716,7 +1657,6 @@ fetch('/clients', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -1744,7 +1684,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -1763,7 +1702,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -1780,7 +1718,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdcreateOAuth2Client"></a>
 
@@ -1909,7 +1846,6 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X POST /clients \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -1917,7 +1853,6 @@ curl -X POST /clients \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -1947,7 +1882,6 @@ func main() {
 
 </TabItem>
 <TabItem value="node">
-
 
 ```javascript
 const fetch = require('node-fetch');
@@ -2020,7 +1954,6 @@ fetch('/clients', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/clients");
@@ -2047,7 +1980,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -2067,7 +1999,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -2085,7 +2016,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetOAuth2Client"></a>
 
@@ -2172,7 +2102,6 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /clients/{id} \
   -H 'Accept: application/json'
@@ -2180,7 +2109,6 @@ curl -X GET /clients/{id} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -2210,7 +2138,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -2230,7 +2157,6 @@ fetch('/clients/{id}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -2258,7 +2184,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -2277,7 +2202,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -2294,7 +2218,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdupdateOAuth2Client"></a>
 
@@ -2422,7 +2345,6 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /clients/{id} \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -2430,7 +2352,6 @@ curl -X PUT /clients/{id} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -2460,7 +2381,6 @@ func main() {
 
 </TabItem>
 <TabItem value="node">
-
 
 ```javascript
 const fetch = require('node-fetch');
@@ -2533,7 +2453,6 @@ fetch('/clients/{id}', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/clients/{id}");
@@ -2560,7 +2479,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -2580,7 +2498,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -2598,7 +2515,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIddeleteOAuth2Client"></a>
 
@@ -2657,7 +2573,6 @@ OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usuall
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X DELETE /clients/{id} \
   -H 'Accept: application/json'
@@ -2665,7 +2580,6 @@ curl -X DELETE /clients/{id} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -2695,7 +2609,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -2715,7 +2628,6 @@ fetch('/clients/{id}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -2743,7 +2655,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -2762,7 +2673,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -2779,7 +2689,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdisInstanceAlive"></a>
 
@@ -2830,7 +2739,6 @@ refer to the cluster state, only to a single instance.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /health/alive \
   -H 'Accept: application/json'
@@ -2838,7 +2746,6 @@ curl -X GET /health/alive \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -2868,7 +2775,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -2888,7 +2794,6 @@ fetch('/health/alive', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -2916,7 +2821,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -2935,7 +2839,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -2952,7 +2855,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetJsonWebKeySet"></a>
 
@@ -3028,7 +2930,6 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /keys/{set} \
   -H 'Accept: application/json'
@@ -3036,7 +2937,6 @@ curl -X GET /keys/{set} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -3066,7 +2966,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -3086,7 +2985,6 @@ fetch('/keys/{set}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -3114,7 +3012,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -3133,7 +3030,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -3150,7 +3046,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdupdateJsonWebKeySet"></a>
 
@@ -3256,7 +3151,6 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /keys/{set} \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -3264,7 +3158,6 @@ curl -X PUT /keys/{set} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -3294,7 +3187,6 @@ func main() {
 
 </TabItem>
 <TabItem value="node">
-
 
 ```javascript
 const fetch = require('node-fetch');
@@ -3341,7 +3233,6 @@ fetch('/keys/{set}', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/keys/{set}");
@@ -3368,7 +3259,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -3388,7 +3278,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -3406,7 +3295,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdcreateJsonWebKeySet"></a>
 
@@ -3494,7 +3382,6 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X POST /keys/{set} \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -3502,7 +3389,6 @@ curl -X POST /keys/{set} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -3533,7 +3419,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -3558,7 +3443,6 @@ fetch('/keys/{set}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -3586,7 +3470,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -3606,7 +3489,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -3624,7 +3506,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIddeleteJsonWebKeySet"></a>
 
@@ -3684,7 +3565,6 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X DELETE /keys/{set} \
   -H 'Accept: application/json'
@@ -3692,7 +3572,6 @@ curl -X DELETE /keys/{set} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -3722,7 +3601,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -3742,7 +3620,6 @@ fetch('/keys/{set}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -3770,7 +3647,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -3789,7 +3665,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -3806,7 +3681,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetJsonWebKey"></a>
 
@@ -3880,7 +3754,6 @@ This endpoint returns a singular JSON Web Key, identified by the set and the spe
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /keys/{set}/{kid} \
   -H 'Accept: application/json'
@@ -3888,7 +3761,6 @@ curl -X GET /keys/{set}/{kid} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -3918,7 +3790,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -3938,7 +3809,6 @@ fetch('/keys/{set}/{kid}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -3966,7 +3836,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -3985,7 +3854,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -4002,7 +3870,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdupdateJsonWebKey"></a>
 
@@ -4101,7 +3968,6 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /keys/{set}/{kid} \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -4109,7 +3975,6 @@ curl -X PUT /keys/{set}/{kid} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -4139,7 +4004,6 @@ func main() {
 
 </TabItem>
 <TabItem value="node">
-
 
 ```javascript
 const fetch = require('node-fetch');
@@ -4182,7 +4046,6 @@ fetch('/keys/{set}/{kid}', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/keys/{set}/{kid}");
@@ -4209,7 +4072,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -4229,7 +4091,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -4247,7 +4108,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIddeleteJsonWebKey"></a>
 
@@ -4308,7 +4168,6 @@ A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X DELETE /keys/{set}/{kid} \
   -H 'Accept: application/json'
@@ -4316,7 +4175,6 @@ curl -X DELETE /keys/{set}/{kid} \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -4346,7 +4204,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -4366,7 +4223,6 @@ fetch('/keys/{set}/{kid}', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -4394,7 +4250,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -4413,7 +4268,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -4430,7 +4284,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdprometheus"></a>
 
@@ -4473,7 +4326,6 @@ If the service supports TLS Edge Termination, this endpoint does not require the
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /metrics/prometheus
 
@@ -4481,7 +4333,6 @@ curl -X GET /metrics/prometheus
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -4508,7 +4359,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -4523,7 +4373,6 @@ fetch('/metrics/prometheus', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -4551,7 +4400,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -4565,7 +4413,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -4578,7 +4425,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetConsentRequest"></a>
 
@@ -4692,7 +4538,6 @@ or rejected the request.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /oauth2/auth/requests/consent?consent_challenge=string \
   -H 'Accept: application/json'
@@ -4700,7 +4545,6 @@ curl -X GET /oauth2/auth/requests/consent?consent_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -4730,7 +4574,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -4750,7 +4593,6 @@ fetch('/oauth2/auth/requests/consent?consent_challenge=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -4778,7 +4620,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -4798,7 +4639,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -4816,7 +4656,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdacceptConsentRequest"></a>
 
@@ -4902,7 +4741,6 @@ The response contains a redirect URL which the consent provider should redirect 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /oauth2/auth/requests/consent/accept?consent_challenge=string \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -4910,7 +4748,6 @@ curl -X PUT /oauth2/auth/requests/consent/accept?consent_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -4940,7 +4777,6 @@ func main() {
 
 </TabItem>
 <TabItem value="node">
-
 
 ```javascript
 const fetch = require('node-fetch');
@@ -4977,7 +4813,6 @@ fetch('/oauth2/auth/requests/consent/accept?consent_challenge=string', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/oauth2/auth/requests/consent/accept?consent_challenge=string");
@@ -5004,7 +4839,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -5025,7 +4859,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -5044,7 +4877,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdrejectConsentRequest"></a>
 
@@ -5125,7 +4957,6 @@ The response contains a redirect URL which the consent provider should redirect 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /oauth2/auth/requests/consent/reject?consent_challenge=string \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -5133,7 +4964,6 @@ curl -X PUT /oauth2/auth/requests/consent/reject?consent_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -5164,7 +4994,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -5192,7 +5021,6 @@ fetch('/oauth2/auth/requests/consent/reject?consent_challenge=string', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/oauth2/auth/requests/consent/reject?consent_challenge=string");
@@ -5219,7 +5047,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -5240,7 +5067,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -5259,7 +5085,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetLoginRequest"></a>
 
@@ -5368,7 +5193,6 @@ provider uses that challenge to fetch information on the OAuth2 request and then
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /oauth2/auth/requests/login?login_challenge=string \
   -H 'Accept: application/json'
@@ -5376,7 +5200,6 @@ curl -X GET /oauth2/auth/requests/login?login_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -5406,7 +5229,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -5426,7 +5248,6 @@ fetch('/oauth2/auth/requests/login?login_challenge=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -5454,7 +5275,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -5474,7 +5294,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -5492,7 +5311,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdacceptLoginRequest"></a>
 
@@ -5573,7 +5391,6 @@ The response contains a redirect URL which the login provider should redirect th
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /oauth2/auth/requests/login/accept?login_challenge=string \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -5581,7 +5398,6 @@ curl -X PUT /oauth2/auth/requests/login/accept?login_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -5612,7 +5428,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -5641,7 +5456,6 @@ fetch('/oauth2/auth/requests/login/accept?login_challenge=string', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/oauth2/auth/requests/login/accept?login_challenge=string");
@@ -5668,7 +5482,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -5689,7 +5502,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -5708,7 +5520,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdrejectLoginRequest"></a>
 
@@ -5787,7 +5598,6 @@ The response contains a redirect URL which the login provider should redirect th
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /oauth2/auth/requests/login/reject?login_challenge=string \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -5795,7 +5605,6 @@ curl -X PUT /oauth2/auth/requests/login/reject?login_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -5826,7 +5635,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -5854,7 +5662,6 @@ fetch('/oauth2/auth/requests/login/reject?login_challenge=string', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/oauth2/auth/requests/login/reject?login_challenge=string");
@@ -5881,7 +5688,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -5902,7 +5708,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -5921,7 +5726,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetLogoutRequest"></a>
 
@@ -5977,7 +5781,6 @@ Use this endpoint to fetch a logout request.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /oauth2/auth/requests/logout?logout_challenge=string \
   -H 'Accept: application/json'
@@ -5985,7 +5788,6 @@ curl -X GET /oauth2/auth/requests/logout?logout_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -6015,7 +5817,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -6035,7 +5836,6 @@ fetch('/oauth2/auth/requests/logout?logout_challenge=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -6063,7 +5863,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -6083,7 +5882,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -6101,7 +5899,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdacceptLogoutRequest"></a>
 
@@ -6157,7 +5954,6 @@ The response contains a redirect URL which the consent provider should redirect 
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /oauth2/auth/requests/logout/accept?logout_challenge=string \
   -H 'Accept: application/json'
@@ -6165,7 +5961,6 @@ curl -X PUT /oauth2/auth/requests/logout/accept?logout_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -6195,7 +5990,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -6215,7 +6009,6 @@ fetch('/oauth2/auth/requests/logout/accept?logout_challenge=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -6243,7 +6036,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -6263,7 +6055,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -6281,7 +6072,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdrejectLogoutRequest"></a>
 
@@ -6363,7 +6153,6 @@ status_code: 0
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X PUT /oauth2/auth/requests/logout/reject?logout_challenge=string \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -6371,7 +6160,6 @@ curl -X PUT /oauth2/auth/requests/logout/reject?logout_challenge=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -6402,7 +6190,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -6430,7 +6217,6 @@ fetch('/oauth2/auth/requests/logout/reject?logout_challenge=string', {
 </TabItem>
 <TabItem value="java">
 
-
 ```java
 // This sample needs improvement.
 URL obj = new URL("/oauth2/auth/requests/logout/reject?logout_challenge=string");
@@ -6457,7 +6243,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -6478,7 +6263,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -6497,7 +6281,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdlistSubjectConsentSessions"></a>
 
@@ -6688,7 +6471,6 @@ Status Code **200**
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /oauth2/auth/sessions/consent?subject=string \
   -H 'Accept: application/json'
@@ -6696,7 +6478,6 @@ curl -X GET /oauth2/auth/sessions/consent?subject=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -6726,7 +6507,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -6746,7 +6526,6 @@ fetch('/oauth2/auth/sessions/consent?subject=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -6774,7 +6553,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -6794,7 +6572,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -6812,7 +6589,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdrevokeConsentSessions"></a>
 
@@ -6873,7 +6649,6 @@ associated OAuth 2.0 Access Tokens.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X DELETE /oauth2/auth/sessions/consent?subject=string \
   -H 'Accept: application/json'
@@ -6881,7 +6656,6 @@ curl -X DELETE /oauth2/auth/sessions/consent?subject=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -6911,7 +6685,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -6931,7 +6704,6 @@ fetch('/oauth2/auth/sessions/consent?subject=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -6959,7 +6731,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -6979,7 +6750,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -6997,7 +6767,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdrevokeAuthenticationSession"></a>
 
@@ -7065,7 +6834,6 @@ invalidates-a-subject's-authentication-session-responses"
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X DELETE /oauth2/auth/sessions/login?subject=string \
   -H 'Accept: application/json'
@@ -7073,7 +6841,6 @@ curl -X DELETE /oauth2/auth/sessions/login?subject=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -7103,7 +6870,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -7123,7 +6889,6 @@ fetch('/oauth2/auth/sessions/login?subject=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -7151,7 +6916,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -7171,7 +6935,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -7189,7 +6952,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdflushInactiveOAuth2Tokens"></a>
 
@@ -7257,7 +7019,6 @@ automatically when performing the refresh flow.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X POST /oauth2/flush \
   -H 'Content-Type: application/json' \  -H 'Accept: application/json'
@@ -7265,7 +7026,6 @@ curl -X POST /oauth2/flush \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -7296,7 +7056,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -7319,7 +7078,6 @@ fetch('/oauth2/flush', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -7347,7 +7105,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -7367,7 +7124,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -7385,7 +7141,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdintrospectOAuth2Token"></a>
 
@@ -7474,7 +7229,6 @@ scopes, the result of active will be false.
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X POST /oauth2/introspect \
   -H 'Content-Type: application/x-www-form-urlencoded' \  -H 'Accept: application/json'
@@ -7482,7 +7236,6 @@ curl -X POST /oauth2/introspect \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -7513,7 +7266,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch');
 const input = '{
@@ -7537,7 +7289,6 @@ fetch('/oauth2/introspect', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -7565,7 +7316,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -7585,7 +7335,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -7603,7 +7352,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIddeleteOAuth2Token"></a>
 
@@ -7660,7 +7408,6 @@ This endpoint deletes OAuth2 access tokens issued for a client from the database
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X DELETE /oauth2/tokens?client_id=string \
   -H 'Accept: application/json'
@@ -7668,7 +7415,6 @@ curl -X DELETE /oauth2/tokens?client_id=string \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -7698,7 +7444,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -7718,7 +7463,6 @@ fetch('/oauth2/tokens?client_id=string', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -7746,7 +7490,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -7766,7 +7509,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -7784,7 +7526,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 <a id="opIdgetVersion"></a>
 
@@ -7830,7 +7571,6 @@ If the service supports TLS Edge Termination, this endpoint does not require the
     {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
 <TabItem value="shell">
 
-
 ```shell
 curl -X GET /version \
   -H 'Accept: application/json'
@@ -7838,7 +7578,6 @@ curl -X GET /version \
 
 </TabItem>
 <TabItem value="go">
-
 
 ```go
 package main
@@ -7868,7 +7607,6 @@ func main() {
 </TabItem>
 <TabItem value="node">
 
-
 ```javascript
 const fetch = require('node-fetch')
 
@@ -7888,7 +7626,6 @@ fetch('/version', {
 
 </TabItem>
 <TabItem value="java">
-
 
 ```java
 // This sample needs improvement.
@@ -7916,7 +7653,6 @@ System.out.println(response.toString());
 </TabItem>
 <TabItem value="python">
 
-
 ```python
 import requests
 
@@ -7935,7 +7671,6 @@ print r.json()
 </TabItem>
 <TabItem value="ruby">
 
-
 ```ruby
 require 'rest-client'
 require 'json'
@@ -7952,7 +7687,6 @@ p JSON.parse(result)
 
 </TabItem>
 </Tabs>
-
 
 ## Schemas
 

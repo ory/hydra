@@ -1153,7 +1153,7 @@ oauth2:
     #    > set OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS=<value>
     #
     enforced_for_public_clients: true
-  
+
   ## client_credentials ##
   #
   client_credentials:
@@ -1173,7 +1173,6 @@ oauth2:
     #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=<value>
     #
     default_grant_allowed_scope: false
-
 
 ## secrets ##
 #

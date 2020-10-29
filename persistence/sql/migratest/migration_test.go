@@ -81,7 +81,7 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=client migration %d", i), func(t *testing.T) {
 					expected := expectedClient(i)
 					actual := &client.Client{}
-					require.NoError(t, c.Find(actual, expected.OutfacingID))
+					require.NoError(t, c.Where("id = ?", expected.OutfacingID).First(actual))
 					assertEqualClients(t, expected, actual)
 					lastClient = actual
 				})

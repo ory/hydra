@@ -15,7 +15,7 @@ version: '3.7'
 services:
 
   hydra:
-    image: oryd/hydra:v1.9.0-alpha.1-sqlite
+    image: oryd/hydra:v1.9.0-alpha.2-sqlite
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
@@ -41,7 +41,7 @@ services:
       - intranet
 
   hydra-migrate:
-    image: oryd/hydra:v1.9.0-alpha.1-sqlite
+    image: oryd/hydra:v1.9.0-alpha.2-sqlite
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
     command:

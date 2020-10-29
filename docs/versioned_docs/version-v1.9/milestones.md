@@ -15,6 +15,7 @@ New feature or request.
 
 - [ ] Reuse Detection in Refresh Token Rotation ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 - [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
+- [ ] Support AWS X-Ray as distributed trace ([hydra#2130](https://github.com/ory/hydra/issues/2130))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 
@@ -25,7 +26,7 @@ A request for comments to discuss and share ideas.
 - [ ] Multi-region deployment support ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 - [ ] Device Authorization Grant ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 
-## [v1.8.1](https://github.com/ory/hydra/milestone/40)
+## [v1.9.1](https://github.com/ory/hydra/milestone/40)
 
 _This milestone does not have a description._
 
@@ -36,6 +37,8 @@ Something is not working.
 #### Issues
 
 - [ ] Report expired JWT assertion token to client ([hydra#2066](https://github.com/ory/hydra/issues/2066))
+- [ ] Client allowed_cors_origins not working ([hydra#1754](https://github.com/ory/hydra/issues/1754))
+- [ ] Client update changes it's PK to 0 ([hydra#2148](https://github.com/ory/hydra/issues/2148)) - [@Patrik](https://github.com/zepatrik)
 - [x] Slow consent revocation request ([hydra#1997](https://github.com/ory/hydra/issues/1997))
 
 #### Pull Requests
@@ -74,6 +77,10 @@ Affects documentation.
 
 Blocks milestones or other issues or pulls.
 
+#### Issues
+
+- [ ] Client update changes it's PK to 0 ([hydra#2148](https://github.com/ory/hydra/issues/2148)) - [@Patrik](https://github.com/zepatrik)
+
 #### Pull Requests
 
 - [x] Deprecate client flags in introspect ([hydra#2011](https://github.com/ory/hydra/pull/2011)) - [@hackerman](https://github.com/aeneasr)
@@ -87,7 +94,7 @@ Affects Continuous Integration (CI).
 
 - [x] ci: fix etcd CVEs ([hydra#2003](https://github.com/ory/hydra/pull/2003)) - [@hackerman](https://github.com/aeneasr)
 
-## [v1.9.0](https://github.com/ory/hydra/milestone/39)
+## [v1.10.0](https://github.com/ory/hydra/milestone/39)
 
 _This milestone does not have a description._
 
@@ -122,7 +129,6 @@ New feature or request.
 - [ ] Remove "not before" claim "nbf" from JWT access token ([hydra#1542](https://github.com/ory/hydra/issues/1542))
 - [ ] No way to handle 409 GetLoginRequestConflict. ([hydra#1569](https://github.com/ory/hydra/issues/1569)) - [@Patrik](https://github.com/zepatrik)
 - [ ] Auth session cannot be prolonged even if the user is active ([hydra#1690](https://github.com/ory/hydra/issues/1690))
-- [ ] Migrate to gobuffalo/pop ([hydra#1730](https://github.com/ory/hydra/issues/1730)) - [@Patrik](https://github.com/zepatrik)
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY ([hydra#1760](https://github.com/ory/hydra/issues/1760)) - [@hackerman](https://github.com/aeneasr)
 - [ ] CLI Migration Down ([hydra#1763](https://github.com/ory/hydra/issues/1763))
 - [ ] Move to go-jose key generation ([hydra#1825](https://github.com/ory/hydra/issues/1825))
@@ -134,6 +140,7 @@ New feature or request.
 - [x] cmd: Add upsert command for client CLI ([hydra#1086](https://github.com/ory/hydra/issues/1086)) - [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible ([hydra#1130](https://github.com/ory/hydra/issues/1130)) - [@hackerman](https://github.com/aeneasr)
 - [x] Add endpoint to Admin API to revoke access tokens ([hydra#1728](https://github.com/ory/hydra/issues/1728))
+- [x] Migrate to gobuffalo/pop ([hydra#1730](https://github.com/ory/hydra/issues/1730)) - [@Patrik](https://github.com/zepatrik)
 - [x] issueLogoutVerifier should allow POST requests as well ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 - [x] Expired token is considered an error ([hydra#2031](https://github.com/ory/hydra/issues/2031))
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota ([hydra#2033](https://github.com/ory/hydra/issues/2033))

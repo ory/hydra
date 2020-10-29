@@ -9,7 +9,7 @@ So, in this guide, we'll connect GitLab's omniauth-connector to ORY Hydra. We'll
 do that in a docker-based lab-environment in order to investigate the details
 before you do something like this in production.
 
-## Preparation
+## Prepare ORY Hydra for Gitlab Integration
 
 Even though we're mostly using ORY Hydra in a docker-container, having the
 command-line-client available is quite useful. So please install ORY Hydra as
@@ -24,8 +24,8 @@ minimal example. We assume basic knowledge, here.
 If you have not yet the source code of ORY Hydra, which we'll need for the
 `docker-compose` yaml-files and the gitlab-configuration, clone the repository:
 
-```shell
-git clone https://github.com/ory/hydra.git
+```shell script
+$ git clone https://github.com/ory/hydra.git
 ```
 
 We will access GitLab via the url http://gitlab.example.com. So we need to map
@@ -38,22 +38,30 @@ find this file in `/etc/hosts`, on windows, you should find it in
 ```
 
 As this POC will work with http instead of https, we need to whitelist the above
-domain-name to allow unencrypted http traffic. So add the following switch to
-the services.hydra.command-section in the quickstart.yml around line 24 so that
-the line looks like this:
+domain-name to allow unencrypted http traffic. We can achieve that by passing
+`--dangerous-allow-insecure-redirect-urls` to `serve all` (see the contents of `/contrib/quickstart/quickstart-gitlab.yml`):
 
+```yaml
+version: "3"
+
+services:
+  gitlab:
+    # ...
+
+  hydra:
+    command:
+      serve all --dangerous-force-http --dangerous-allow-insecure-redirect-urls http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback
 ```
-    serve all --dangerous-allow-insecure-redirect-urls http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback
-```
 
-## Spin up the instances and logging in
+## Spin up OAuth2 Server ORY Hydra and Gitlab Docker Containers
 
-Use this command to spinup the instances. This will show the logs on the
-terminal and it will take some time.
+Use this command to spin up the instances. This will show the logs on the
+terminal and take some time.
 
 ```shell
-docker-compose -f quickstart.yml \
-    -f quickstart-postgres.yml -f ./contrib/quickstart/quickstart-gitlab.yml \
+$ docker-compose -f quickstart.yml \
+    -f quickstart-postgres.yml \
+    -f contrib/quickstart/quickstart-gitea.yml \
     up --build
 ```
 
@@ -61,24 +69,9 @@ After this suceeds, you can access the login page
 [sign-in-page](http://localhost:8000/users/sign_in). Don't try to login, yet, we
 have to create the client in ORY Hydra, first.
 
-## Creating the client in ORY Hydra
+## Create OAuth2 Client for Gitlab
 
-Depending on whether you've the hydra-binary available, you can use it directly
-or the one in the docker-container.
-
-```shell
-$ hydra clients create \
-    --endpoint http://127.0.0.1:4445 \
-    --id gitlab \
-    --secret theSecret \
-    --grant-types authorization_code,refresh_token \
-    --response-types code,id_token, email \
-    --scope openid,offline_access,profile,email \
-    --callbacks http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback \
-    --token-endpoint-auth-method client_secret_post
-```
-
-or you can use the binary within the docker-container:
+Next we need to create the OAuth2 Client Gitlab will use to sign in:
 
 ```shell script
 $ docker-compose -f quickstart.yml exec hydra \

@@ -1,15 +1,15 @@
 ---
-id: gitea
-title: Gitea Hydra integration
+id: gitea-sign-in-oauth2-openid-connect-hydra
+title: Sign in to Gitea using ORY Hydra
 ---
 
-Gitea(self hosted Git service) has several OAuth2 related features. The relevant here is the possibility
-to sign into Gitea with (almost) any OAuth2 provider, in this case ORY Hydra.
+Gitea (self hosted Git service) has several OAuth2 related features. The relevant here is the possibility
+to sign in to Gitea with (almost) any OAuth2 provider, in this case ORY Hydra.
 So, in this guide, we'll connect Gitea's oauth2-openid-connector to ORY Hydra. We'll
 do that in a docker-based lab-environment in order to investigate the details
 before you do something like this in production.
 
-## Preparation
+## Prepare ORY Hydra for Gitea Integration
 
 Even though we're mostly using ORY Hydra in a docker-container, having the
 command-line-client available is quite useful. So please install ORY Hydra as
@@ -25,65 +25,55 @@ If you have not yet the source code of ORY Hydra, which we'll need for the
 `docker-compose` yaml-files, clone the repository:
 
 ```shell
-git clone https://github.com/ory/hydra.git
+$ git clone https://github.com/ory/hydra.git
 ```
 
-We will access GitLab via the url http://gitea.example.com. So we need to map
+We will access Gitea via the url http://gitea.example.com. So we need to map
 it to localhost. This is done by modifying the hosts-file. On an unixoid system
 find this file in `/etc/hosts`, on windows, you should find it in
 `c:\WINDOWS\system32\drivers\etc\hosts`. Add this line:
 
 ```
-127.0.0.1 gitea.example.com
+127.0.0.1	gitea.example.com
 ```
 
 As this POC will work with http instead of https, we need to whitelist the above
-domain-name to allow unencrypted http traffic. So add the following switch to
-the services.hydra.command-section in the hydrastart.yml around line 24 so that
-the line looks like this:
+domain-name to allow unencrypted http traffic. We can achieve that by passing
+`--dangerous-allow-insecure-redirect-urls` to `serve all` (see the contents of `/contrib/quickstart/quickstart-gitea.yml`):
 
+```yaml
+version: "3"
+
+services:
+  gitea:
+    # ...
+
+  hydra:
+    command:
+      serve all --dangerous-force-http --dangerous-allow-insecure-redirect-urls http://gitea.example.com:8000/users/auth/ORY_Hydra/callback
 ```
-    serve all --dangerous-allow-insecure-redirect-urls http://gitea.example.com:8000/users/auth/ORY_Hydra(whatever the name you give while registering oauth2 client in authsource)/callback
-```
 
-## Spin up the instances and logging in
+## Spin up OAuth2 Server ORY Hydra and Gitea Docker Containers
 
-Use this command to spinup the instances. This will show the logs on the
-terminal and it will take some time.
+Use this command to spin up the instances. This will show the logs on the
+terminal and take some time.
 
-```shell
-docker-compose -f hydrastart.yml \
-    -f hydrastart-postgres.yml   \
+```shell script
+$ docker-compose -f quickstart.yml \
+    -f quickstart-postgres.yml \
+    -f contrib/quickstart/quickstart-gitea.yml \
     up --build
 ```
 
-After this suceeds, you can access the login page
+After this succeeds, you can access the login page
 [sign-in-page](http://localhost:8000/users/sign_in). Don't try to login, yet, we
 have to create the client in ORY Hydra, first.
 
-Note: we would like to use 127.0.0.1 instead of localhost as a hostname during the configuration in hydra. 
+Note: we would like to use 127.0.0.1 instead of localhost as a hostname during the configuration in hydra.
 
-## Creating the client in ORY Hydra
+## Create OAuth2 Client for Gitea
 
-Depending on whether you've the hydra-binary available, you can use it directly
-or the one in the docker-container.
-
-```shell
-$ hydra clients create \
-    --endpoint http://127.0.0.1:4445 \
-    --id gitea-client \
-    --secret secret \
-    --grant-types authorization_code,refresh_token \
-    --response-types code,id_token \
-    --scope openid,offline \
-    --callbacks http://127.0.0.1:8000/user/oauth2/ORY_Hydra(auth source name you will create)/callback \
-    --token-endpoint-auth-method client_secret_post
-```
-
-Note: you can also use http://gitea.example.com:8000/users/auth/ORY_Hydra/callback
-
-
-or you can use the binary within the docker-container:
+Next we need to create the OAuth2 Client Gitea will use to sign in:
 
 ```shell script
 $ docker-compose -f hydrastart.yml exec hydra \
@@ -94,30 +84,19 @@ $ docker-compose -f hydrastart.yml exec hydra \
     --grant-types authorization_code,refresh_token \
     --response-types code,id_token \
     --scope openid,offline \
-    --callbacks http://127.0.0.1:8000/user/oauth2/ORY_Hydra(auth source name you will create)/callback \
+    --callbacks http://127.0.0.1:8000/user/oauth2/ORY_Hydra/callback \
     --token-endpoint-auth-method client_secret_post
-```
-After that you can bring up the server on which token user port is defined, check the workflow is running.
-
-```shell script
-$ docker-compose -f hydrastart.yml exec hydra \
-    hydra token user \
-    --client-id gitea-client \
-    --client-secret secret \
-    --endpoint http://127.0.0.1:4444/ \
-    --port 5555 \
-    --scope openid,offline
 ```
 
 ## OAuth2 Login
 
 With the first access of your
-[Gitea-instance](http://gitea.example.com:8000/), you will have to register admin user 
-and before that in server configuration make sure you define Gitea Base URL(with 127.0.0.1:8000 in our case) access and Gitea HTTP Listen Port(8000 in our case) which we have defined here.
+[Gitea-instance](http://gitea.example.com:3030/), you will have to register admin user
+and before that in server configuration make sure you define Gitea Base URL (with `gitea.example.com:3030` in our case) access and Gitea HTTP Listen Port (`3000` in our case) which we have defined here.
 
-After that login with the registered admin user and go to the site administration 
+After that login with the registered admin user and go to the site administration
 where you will find the auth source panel, where you can register oauth2 and openid provider with the client-id(in our case gitea-client)
-and with the secret(in our case secret), also discovery url (which will be http://127.0.0.1:4444/.well-known/openid-configuration ) 
+and with the secret(in our case secret), also discovery url (which will be http://127.0.0.1:4444/.well-known/openid-configuration )
 you can hit this url in browser to check the work around with the api, here in our case gitea instance will be accessing the well-known discovery url,
 so if we give 127.0.0.1 it will try to point its own localhost instead we should point to hydra's well-known api right!
 so we will define hydra hostname(in our case hyda, check out the hydrastart.yml to cross check) instead of 127.0.0.1 and it will look like this http://hydra:4444/.well-known/openid-configuration
@@ -135,7 +114,7 @@ So now, let's look at the individual pieces and how all of them work together.
 
 Gitea has some [documentation](https://docs.gitea.io/en-us/install-with-docker//) about
 how to use their docker-images. It has also an example for docker-compose. The
-`hydrastart.yaml` file in the hydra directory doesn't contain 
+`hydrastart.yaml` file in the hydra directory doesn't contain
 surprising things about gitea instance:
 
 Below is typical docker-compose, in our case it may differ slightly. check out the hydrastart.yml file
@@ -253,7 +232,7 @@ After trying to login you get a message like this:
 The "redirect_uri" parameter does not match any of the OAuth 2.0 Client's pre-registered redirect urls.
 
 Check the request in network field in inspect, and see where the request is going.
-Make sure it should not get confused with the localhost and 127.0.0.1 
+Make sure it should not get confused with the localhost and 127.0.0.1
 in our case we have defined 127.0.0.1 as localhost in gitea server configuration, right!
 (by default it was written localhost).
 

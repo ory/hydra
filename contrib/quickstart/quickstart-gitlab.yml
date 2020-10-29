@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   gitlab:
@@ -16,3 +16,7 @@ services:
     - './contrib/quickstart/gitlab/config:/etc/gitlab'
     - './contrib/quickstart/gitlab/logs:/var/log/gitlab'
     - './contrib/quickstart/gitlab/data:/var/opt/gitlab'
+
+  hydra:
+    command:
+      serve all --dangerous-force-http --dangerous-allow-insecure-redirect-urls http://gitlab.example.com:8000/users/auth/ORY_Hydra/callback

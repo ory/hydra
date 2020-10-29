@@ -576,7 +576,16 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.c.IssuerURL().String(), "/") + "/"
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
-		for _, scope := range accessRequest.GetRequestedScopes() {
+		var scopes = accessRequest.GetRequestedScopes()
+
+		// Added for compatibility with MITREid
+		if h.c.GrantAllClientCredentialsScopesPerDefault() && len(scopes) == 0 {
+			for _, scope := range accessRequest.GetClient().GetScopes() {
+				accessRequest.GrantScope(scope)
+			}
+		}
+
+		for _, scope := range scopes {
 			if h.r.ScopeStrategy()(accessRequest.GetClient().GetScopes(), scope) {
 				accessRequest.GrantScope(scope)
 			}

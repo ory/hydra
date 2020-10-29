@@ -23,7 +23,7 @@ module.exports = {
       files: ['quickstart.yml']
     },
     {
-      image: "oryd/hydra-login-consent-node",
+      image: 'oryd/hydra-login-consent-node',
       files: ['quickstart.yml']
     },
     {

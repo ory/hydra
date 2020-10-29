@@ -37,10 +37,12 @@ to ORY Hydra's Admin Endpoint!
   ]}>
 <TabItem value="ui">
 
+
 ![OAuth2 Login UI Screen](../images/login-endpoint.png)
 
 </TabItem>
 <TabItem value="node">
+
 
 :::note
 
@@ -102,6 +104,7 @@ router.get('/login', csrfProtection, (req, res, next) => {
 </TabItem>
 <TabItem value="html">
 
+
 ```html
 <form action="/login" method="POST">
   <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
@@ -119,6 +122,7 @@ router.get('/login', csrfProtection, (req, res, next) => {
 </TabItem>
 </Tabs>
 
+
 ## Accepting the Login Request
 
 <Tabs
@@ -127,6 +131,7 @@ router.get('/login', csrfProtection, (req, res, next) => {
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
+
 
 :::note
 
@@ -186,6 +191,7 @@ router.post('/login', csrfProtection, (req, res, next) => {
 </TabItem>
 </Tabs>
 
+
 ## Rejecting the Login Request
 
 <Tabs
@@ -194,6 +200,7 @@ router.post('/login', csrfProtection, (req, res, next) => {
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
+
 
 ```typescript
 // You can deny the login request at any point - for example if the system is currently undergoing maintenance
@@ -211,3 +218,4 @@ hydraAdmin
 
 </TabItem>
 </Tabs>
+

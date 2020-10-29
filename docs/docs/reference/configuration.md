@@ -1153,6 +1153,27 @@ oauth2:
     #    > set OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS=<value>
     #
     enforced_for_public_clients: true
+  
+  ## client_credentials ##
+  #
+  client_credentials:
+    ## default_grant_allowed_scope ##
+    #
+    # Defines how scopes are added if the request doesn't contains any scope.
+    #
+    # Default value: false
+    # One of:
+    # - true
+    # - false
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=<value>
+    # - Windows Command Line (CMD):
+    #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=<value>
+    #
+    default_grant_allowed_scope: false
+
 
 ## secrets ##
 #

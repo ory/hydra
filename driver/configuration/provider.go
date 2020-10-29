@@ -69,6 +69,7 @@ type Provider interface {
 	EnforcePKCEForPublicClients() bool
 
 	CGroupsV1AutoMaxProcsEnabled() bool
+	GrantAllClientCredentialsScopesPerDefault() bool
 }
 
 func MustValidate(l *logrusx.Logger, p Provider) {

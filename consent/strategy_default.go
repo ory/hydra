@@ -332,7 +332,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(cl fosite.Client, subject, 
 	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
 		algorithm, ok := s.r.SubjectIdentifierAlgorithm()[c.SubjectType]
 		if !ok {
-			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf(`Subject Identifier Algorithm "%s" was requested by OAuth 2.0 Client "%s", but is not configured.`, c.SubjectType, c.ID)))
+			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf(`Subject Identifier Algorithm "%s" was requested by OAuth 2.0 Client "%s", but is not configured.`, c.SubjectType, c.OutfacingID)))
 		}
 
 		if len(forcedIdentifier) > 0 {
@@ -683,7 +683,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 
 		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwtgo.MapClaims{
 			"iss":    s.c.IssuerURL().String(),
-			"aud":    []string{c.ID},
+			"aud":    []string{c.OutfacingID},
 			"iat":    time.Now().UTC().Unix(),
 			"jti":    uuid.New(),
 			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},
@@ -695,7 +695,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 			return err
 		}
 
-		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.ID, token: t})
+		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.OutfacingID, token: t})
 	}
 
 	var wg sync.WaitGroup

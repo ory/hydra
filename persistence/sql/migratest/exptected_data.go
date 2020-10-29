@@ -17,8 +17,8 @@ import (
 
 func expectedClient(i int) *client.Client {
 	c := &client.Client{
-		PK:                                int64(i),
-		ID:                                fmt.Sprintf("client-%04d", i),
+		ID:                                int64(i),
+		OutfacingID:                       fmt.Sprintf("client-%04d", i),
 		Name:                              fmt.Sprintf("Client %04d", i),
 		Secret:                            fmt.Sprintf("secret-%04d", i),
 		RedirectURIs:                      []string{fmt.Sprintf("http://redirect/%04d_1", i)},

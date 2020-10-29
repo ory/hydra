@@ -149,7 +149,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		secret = c.Secret
 	}
 
-	c.ID = ps.ByName("id")
+	c.OutfacingID = ps.ByName("id")
 	if err := h.r.ClientValidator().Validate(&c); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

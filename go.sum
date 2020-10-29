@@ -477,11 +477,8 @@ github.com/gobuffalo/pop v4.8.3+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcVD
 github.com/gobuffalo/pop v4.8.4+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcVDpJWGsxjVjMPnkiThWg=
 github.com/gobuffalo/pop v4.13.1+incompatible h1:AhbqPxNOBN/DBb2DBaiBqzOXIBQXxEYzngHHJ+ytP4g=
 github.com/gobuffalo/pop v4.13.1+incompatible/go.mod h1:DwBz3SD5SsHpTZiTubcsFWcVDpJWGsxjVjMPnkiThWg=
-github.com/gobuffalo/pop/v5 v5.0.11/go.mod h1:mZJHJbA3cy2V18abXYuVop2ldEJ8UZ2DK6qOekC5u5g=
-github.com/gobuffalo/pop/v5 v5.2.0/go.mod h1:Hj586Cr7FoTFNmvzyNdUcajv3r0A+W+bkil4RIX/zKo=
-github.com/gobuffalo/pop/v5 v5.2.4/go.mod h1:4mYDlrcXTnG2n9rG8p+c10X1QnfMc4YIRVmiC8ihMAI=
-github.com/gobuffalo/pop/v5 v5.3.1 h1:dJbBPy6e0G0VRjn28md3fk16wpYIBv5iYVQWd0eqmkQ=
-github.com/gobuffalo/pop/v5 v5.3.1/go.mod h1:vcEDhh6cJ3WVENqJDFt/6z7zNb7lLnlN8vj3n5G9rYA=
+github.com/gobuffalo/pop/v5 v5.3.2-0.20201029132236-f36afb546df1 h1:0ae/j500iOmCqMZK9260020ZUdele6sBpQ/pdxck7ek=
+github.com/gobuffalo/pop/v5 v5.3.2-0.20201029132236-f36afb546df1/go.mod h1:vcEDhh6cJ3WVENqJDFt/6z7zNb7lLnlN8vj3n5G9rYA=
 github.com/gobuffalo/release v1.0.35/go.mod h1:VtHFAKs61vO3wboCec5xr9JPTjYyWYcvaM3lclkc4x4=
 github.com/gobuffalo/release v1.0.38/go.mod h1:VtHFAKs61vO3wboCec5xr9JPTjYyWYcvaM3lclkc4x4=
 github.com/gobuffalo/release v1.0.42/go.mod h1:RPs7EtafH4oylgetOJpGP0yCZZUiO4vqHfTHJjSdpug=
@@ -1320,7 +1317,6 @@ golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297/go.mod h1:z5CRVTTTmAJ677TzLL
 golang.org/x/net v0.0.0-20191003171128-d98b1b443823/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200202094626-16171245cfb2/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
-golang.org/x/net v0.0.0-20200219183655-46282727080f/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200226121028-0de0cce0169b/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
 golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e h1:3G+cUijn7XD+S4eJFddp53Pv7+slrESplyjG25HgL+k=
 golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e/go.mod h1:qpuaurCH72eLCgpAm/N6yyVIVM9cpaDIP3A8BGJEC5A=

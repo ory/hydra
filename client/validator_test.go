@@ -53,59 +53,59 @@ func TestValidate(t *testing.T) {
 		{
 			in: new(Client),
 			check: func(t *testing.T, c *Client) {
-				assert.NotEmpty(t, c.ID)
+				assert.NotEmpty(t, c.OutfacingID)
 				assert.NotEmpty(t, c.GetID())
-				assert.Equal(t, c.GetID(), c.ID)
+				assert.Equal(t, c.GetID(), c.OutfacingID)
 			},
 		},
 		{
-			in: &Client{ID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.GetID(), c.ID)
+				assert.Equal(t, c.GetID(), c.OutfacingID)
 			},
 		},
 		{
-			in: &Client{ID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.GetID(), c.ID)
+				assert.Equal(t, c.GetID(), c.OutfacingID)
 			},
 		},
 		{
-			in:        &Client{ID: "foo", UserinfoSignedResponseAlg: "foo"},
+			in:        &Client{OutfacingID: "foo", UserinfoSignedResponseAlg: "foo"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{OutfacingID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{OutfacingID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, TokenEndpointAuthMethod: "private_key_jwt", TokenEndpointAuthSigningAlgorithm: "HS256"},
+			in:        &Client{OutfacingID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, TokenEndpointAuthMethod: "private_key_jwt", TokenEndpointAuthSigningAlgorithm: "HS256"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in: &Client{ID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			in: &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, []string{"https://foo/"}, []string(c.PostLogoutRedirectURIs))
 			},
 		},
 		{
-			in: &Client{ID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "public", c.SubjectType)
 			},
@@ -115,19 +115,19 @@ func TestValidate(t *testing.T) {
 				viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(c)
 			},
-			in: &Client{ID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
 			},
 		},
 		{
-			in: &Client{ID: "foo", SubjectType: "pairwise"},
+			in: &Client{OutfacingID: "foo", SubjectType: "pairwise"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
 			},
 		},
 		{
-			in:        &Client{ID: "foo", SubjectType: "foo"},
+			in:        &Client{OutfacingID: "foo", SubjectType: "foo"},
 			expectErr: true,
 		},
 	} {

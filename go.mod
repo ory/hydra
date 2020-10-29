@@ -62,3 +62,5 @@ require (
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
+
+replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.3.2-0.20201029132236-f36afb546df1

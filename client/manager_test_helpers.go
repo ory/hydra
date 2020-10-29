@@ -39,7 +39,7 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		c := &Client{
-			ID:                "foo",
+			OutfacingID:       "foo",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
@@ -54,7 +54,7 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		require.NoError(t, m.CreateClient(ctx, &Client{
-			ID:           "1234321",
+			OutfacingID:  "1234321",
 			Secret:       "secret",
 			RedirectURIs: []string{"http://redirect"},
 		}))
@@ -68,14 +68,28 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	}
 }
 
+func TestHelperUpdateTwoClients(_ string, m Manager) func(t *testing.T) {
+	return func(t *testing.T) {
+		c1, c2 := &Client{OutfacingID: "klojdfc", Name: "test client 1"}, &Client{OutfacingID: "jlsdfkj", Name: "test client 2"}
+
+		require.NoError(t, m.CreateClient(context.Background(), c1))
+		require.NoError(t, m.CreateClient(context.Background(), c2))
+
+		c1.Name, c2.Name = "updated klojdfc client 1", "updated klojdfc client 2"
+
+		assert.NoError(t, m.UpdateClient(context.Background(), c1))
+		assert.NoError(t, m.UpdateClient(context.Background(), c2))
+	}
+}
+
 func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.TODO()
-		_, err := m.GetClient(ctx, "4321")
-		assert.NotNil(t, err)
+		ctx := context.Background()
+		_, err := m.GetClient(ctx, "1234")
+		require.Error(t, err)
 
 		c := &Client{
-			ID:                                "1234",
+			OutfacingID:                       "1234",
 			Name:                              "name",
 			Secret:                            "secret",
 			RedirectURIs:                      []string{"http://redirect", "http://redirect1"},
@@ -107,14 +121,14 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 			BackChannelLogoutSessionRequired:  true,
 		}
 
-		assert.NoError(t, m.CreateClient(ctx, c))
+		require.NoError(t, m.CreateClient(ctx, c))
 		assert.Equal(t, c.GetID(), "1234")
 		if k != "http" {
 			assert.NotEmpty(t, c.GetHashedSecret())
 		}
 
 		assert.NoError(t, m.CreateClient(ctx, &Client{
-			ID:                "2-1234",
+			OutfacingID:       "2-1234",
 			Name:              "name",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
@@ -130,8 +144,8 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		ds, err := m.GetClients(ctx, 100, 0)
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds[0].ID, ds[1].ID)
-		assert.NotEqual(t, ds[0].ID, ds[1].ID)
+		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
+		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
 		// test if SecretExpiresAt was set properly
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
@@ -144,7 +158,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 		assert.NoError(t, err)
 
 		err = m.UpdateClient(ctx, &Client{
-			ID:                "2-1234",
+			OutfacingID:       "2-1234",
 			Name:              "name-new",
 			Secret:            "secret-new",
 			RedirectURIs:      []string{"http://redirect/new"},

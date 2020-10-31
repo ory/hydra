@@ -37,10 +37,10 @@ import (
 //
 // swagger:model oAuth2Client
 type Client struct {
-	PK int64 `json:"-" db:"pk"`
+	ID int64 `json:"-" db:"pk"`
 
 	// ID  is the id for this client.
-	ID string `json:"client_id" db:"id"`
+	OutfacingID string `json:"client_id" db:"id"`
 
 	// Name is the human-readable string name of the client to be presented to the
 	// end-user during authorization.
@@ -235,7 +235,7 @@ func (c *Client) BeforeSave(_ *pop.Connection) error {
 }
 
 func (c *Client) GetID() string {
-	return c.ID
+	return c.OutfacingID
 }
 
 func (c *Client) GetRedirectURIs() []string {

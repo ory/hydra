@@ -94,9 +94,10 @@ quicktest:
 
 # Formats the code
 .PHONY: format
-format: .bin/goimports node_modules
+format: .bin/goimports node_modules docs/node_modules
 		goimports -w --local github.com/ory .
 		npm run format
+		cd docs; npm run format
 
 # Generates mocks
 .PHONY: mocks

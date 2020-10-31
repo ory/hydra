@@ -70,7 +70,7 @@ func NewValidatorWithClient(conf Configuration, client *http.Client) *Validator 
 
 func (v *Validator) Validate(c *Client) error {
 	id := uuid.New()
-	c.ID = stringsx.Coalesce(c.ID, id)
+	c.OutfacingID = stringsx.Coalesce(c.OutfacingID, id)
 
 	if c.TokenEndpointAuthMethod == "" {
 		c.TokenEndpointAuthMethod = "client_secret_basic"

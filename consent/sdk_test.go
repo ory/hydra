@@ -135,7 +135,7 @@ func TestSDK(t *testing.T) {
 	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1"))
 	require.Error(t, err)
 
-	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject(cr4.Subject).WithClient(&cr4.Client.ID))
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject(cr4.Subject).WithClient(&cr4.Client.OutfacingID))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithAll(pointerx.Bool(true)))

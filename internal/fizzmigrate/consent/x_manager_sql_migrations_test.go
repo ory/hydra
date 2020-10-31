@@ -32,7 +32,7 @@ func TestXXMigrations(t *testing.T) {
 
 	var clients []client.Client
 	for k := range migrateClient.Migrations[dbal.DriverMySQL].Box.List() {
-		clients = append(clients, client.Client{ID: fmt.Sprintf("%d-client", k+1)})
+		clients = append(clients, client.Client{OutfacingID: fmt.Sprintf("%d-client", k+1)})
 	}
 
 	migratest.RunPackrMigrationTests(

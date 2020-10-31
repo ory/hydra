@@ -65,7 +65,7 @@ func TestClientCredentials(t *testing.T) {
 			})
 
 			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
-				ID:            "app-client",
+				OutfacingID:   "app-client",
 				Secret:        "secret",
 				RedirectURIs:  []string{ts.URL + "/callback"},
 				ResponseTypes: []string{"token"},
@@ -165,6 +165,117 @@ func TestClientCredentials(t *testing.T) {
 						assert.Empty(t, data["aud"])
 						assert.EqualValues(t, data["nbf"], data["iat"])
 						assert.EqualValues(t, []interface{}{"foobar"}, data["scp"])
+					},
+					expectAccessToken: true,
+					expectError:       false,
+				},
+				{
+					d: "should pass without scopes",
+					c: &clientcredentials.Config{
+						ClientID:     "app-client",
+						ClientSecret: "secret",
+						TokenURL:     ts.URL + "/oauth2/token",
+						Scopes:       []string{},
+					},
+					assertAccessToken: func(t *testing.T, token string) {
+						if tc.d != "jwt" {
+							return
+						}
+						body, err := jwt.DecodeSegment(strings.Split(token, ".")[1])
+						require.NoError(t, err)
+
+						data := map[string]interface{}{}
+						require.NoError(t, json.Unmarshal(body, &data))
+						assert.EqualValues(t, "app-client", data["client_id"])
+						assert.EqualValues(t, []interface{}{}, data["scp"])
+					},
+					expectAccessToken: true,
+					expectError:       false,
+				},
+			} {
+				t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+					ccc.c.AuthStyle = goauth2.AuthStyleInHeader
+					tok, err := ccc.c.Token(context.Background())
+
+					if ccc.expectError {
+						require.Error(t, err)
+					} else {
+						require.NoError(t, err)
+					}
+
+					if ccc.expectAccessToken {
+						assert.NotEmpty(t, tok.AccessToken)
+						assert.Empty(t, tok.RefreshToken)
+						assert.Empty(t, tok.Extra("id_token"))
+					} else {
+						assert.Nil(t, tok)
+					}
+
+					if ccc.assertAccessToken != nil {
+						ccc.assertAccessToken(t, tok.AccessToken)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestClientCredentialsGrantAllScopes(t *testing.T) {
+	for _, tc := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
+		t.Run("tc="+tc.d, func(t *testing.T) {
+			conf := internal.NewConfigurationWithDefaults()
+			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second)
+			viper.Set(configuration.ViperKeyAccessTokenStrategy, tc.d)
+			viper.Set(configuration.ViperKeyGrantAllClientCredentialsScopesPerDefault, true)
+
+			reg := internal.NewRegistryMemory(t, conf)
+
+			router := x.NewRouterPublic()
+			ts := httptest.NewServer(router)
+			defer ts.Close()
+			viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
+
+			handler := NewHandler(reg, conf)
+			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+				return h
+			})
+
+			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
+				OutfacingID:   "app-client",
+				Secret:        "secret",
+				RedirectURIs:  []string{ts.URL + "/callback"},
+				ResponseTypes: []string{"token"},
+				GrantTypes:    []string{"client_credentials"},
+				Scope:         "foobar foo2bar",
+				Audience:      []string{"https://api.ory.sh/"},
+			}))
+
+			for k, ccc := range []struct {
+				d                 string
+				c                 *clientcredentials.Config
+				assertAccessToken func(*testing.T, string)
+				expectAccessToken bool
+				expectError       bool
+			}{
+				{
+					d: "should pass with multiple scopes",
+					c: &clientcredentials.Config{
+						ClientID:     "app-client",
+						ClientSecret: "secret",
+						TokenURL:     ts.URL + "/oauth2/token",
+						Scopes:       []string{},
+					},
+					assertAccessToken: func(t *testing.T, token string) {
+						if tc.d != "jwt" {
+							return
+						}
+						body, err := jwt.DecodeSegment(strings.Split(token, ".")[1])
+						require.NoError(t, err)
+
+						data := map[string]interface{}{}
+						require.NoError(t, json.Unmarshal(body, &data))
+						assert.EqualValues(t, "app-client", data["client_id"])
+						assert.EqualValues(t, []interface{}{"foobar", "foo2bar"}, data["scp"])
 					},
 					expectAccessToken: true,
 					expectError:       false,

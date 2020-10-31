@@ -234,7 +234,7 @@ func runLogout(t *testing.T, method string) {
 	viper.Set(configuration.ViperKeyLogoutURL, logoutProviderServer.URL)
 	viper.Set(configuration.ViperKeyLogoutRedirectURL, defaultRedirServer.URL)
 
-	defaultClient := &client.Client{ID: uuid.New(), PostLogoutRedirectURIs: []string{defaultRedirServer.URL + "/custom"}}
+	defaultClient := &client.Client{OutfacingID: uuid.New(), PostLogoutRedirectURIs: []string{defaultRedirServer.URL + "/custom"}}
 	require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), defaultClient))
 
 	jar1 := newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-1", "logout-subject-1")
@@ -335,7 +335,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": defaultClient.ID,
+					"aud": defaultClient.OutfacingID,
 					"sub": "logout-subject-temp1",
 					"sid": "logout-session-temp1",
 					"exp": time.Now().Add(-time.Hour).Unix(),
@@ -353,7 +353,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": defaultClient.ID,
+					"aud": defaultClient.OutfacingID,
 					"iss": "some-issuer",
 					"sub": "logout-subject-temp2",
 					"sid": "logout-session-temp2",
@@ -372,7 +372,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": defaultClient.ID,
+					"aud": defaultClient.OutfacingID,
 					"iss": conf.IssuerURL().String(),
 					"sub": "logout-subject-temp3",
 					"sid": "logout-session-temp3",
@@ -391,7 +391,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {"https://this-is-not-a-valid-redirect-url/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": defaultClient.ID,
+					"aud": defaultClient.OutfacingID,
 					"iss": conf.IssuerURL().String(),
 					"sub": "logout-subject-temp4",
 					"sid": "logout-session-temp4",
@@ -410,7 +410,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": defaultClient.ID,
+					"aud": defaultClient.OutfacingID,
 					"iss": conf.IssuerURL().String(),
 					"sub": "logout-subject-temp5",
 					"sid": "logout-session-temp5",
@@ -429,7 +429,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": []string{defaultClient.ID}, // make sure this works with string slices too
+					"aud": []string{defaultClient.OutfacingID}, // make sure this works with string slices too
 					"iss": conf.IssuerURL().String(),
 					"sub": "logout-subject-3",
 					"sid": "logout-session-3",
@@ -455,7 +455,7 @@ func runLogout(t *testing.T, method string) {
 				"state":                    {"1234"},
 				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
 				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-					"aud": []string{defaultClient.ID}, // make sure this works with string slices too
+					"aud": []string{defaultClient.OutfacingID}, // make sure this works with string slices too
 					"iss": conf.IssuerURL().String(),
 					"sub": "logout-subject-3",
 					"sid": "i-do-not-exist",
@@ -577,7 +577,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 	persistentCJ4 := newCookieJar(t)
 	nonexistentCJ := newAuthCookieJar(t, reg, ap.URL, "i-do-not-exist")
 
-	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ID: "client-id"}))
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "client-id"}))
 
 	for k, tc := range []struct {
 		setup                 func()
@@ -598,7 +598,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 	}{
 		{
 			d:                     "This should fail because a login verifier was given that doesn't exist in the store",
-			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}}},
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}}},
 			lv:                    "invalid",
 			expectErrType:         []error{fosite.ErrAccessDenied},
 			expectErr:             []bool{true},
@@ -606,7 +606,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should fail because a consent verifier was given but no login verifier",
-			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}}},
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}}},
 			lv:                    "",
 			cv:                    "invalid",
 			expectErrType:         []error{fosite.ErrAccessDenied},
@@ -617,7 +617,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 			d: "This should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)",
 			req: fosite.AuthorizeRequest{
 				Request: fosite.Request{
-					Client:         &client.Client{ID: "client-id"},
+					Client:         &client.Client{OutfacingID: "client-id"},
 					RequestedScope: []string{"scope-a"},
 				},
 			},
@@ -645,7 +645,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should fail because the request was redirected but the login endpoint rejected the request",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
 					vr, err := apiClient.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
@@ -670,7 +670,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should fail because no cookie jar / invalid csrf",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			lph: passAuthentication(apiClient, false),
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -685,7 +685,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		{
 			d:     "This should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists",
 			jar:   newCookieJar(t),
-			req:   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			lph:   passAuthentication(apiClient, false),
 			other: "display=page&ui_locales=de+en&acr_values=1+2",
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -715,14 +715,14 @@ func TestStrategyLoginConsent(t *testing.T) {
 			d:                     "This should fail because consent verifier was set but does not exist",
 			jar:                   newCookieJar(t),
 			cv:                    "invalid",
-			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			expectFinalStatusCode: http.StatusForbidden,
 			expectErrType:         []error{fosite.ErrAccessDenied},
 			expectErr:             []bool{true},
 		},
 		{
 			d:   "This should fail because consent endpoints denies the request after login was granted",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: newCookieJar(t),
 			lph: passAuthentication(apiClient, false),
 			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -750,7 +750,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should pass because login and consent have been granted",
-			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:                   newCookieJar(t),
 			lph:                   passAuthentication(apiClient, false),
 			cph:                   passAuthorization(apiClient, false),
@@ -770,7 +770,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should pass and set acr values properly",
-			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:                   newCookieJar(t),
 			lph:                   passAuthentication(apiClient, false),
 			cph:                   passAuthorization(apiClient, false),
@@ -790,7 +790,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should pass because login and consent have been granted, this time we remember the decision",
-			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:                   persistentCJ,
 			lph:                   passAuthentication(apiClient, true),
 			cph:                   passAuthorization(apiClient, true),
@@ -810,7 +810,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should pass because login and consent have been granted, this time we remember the decision",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -844,7 +844,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should pass because login and consent have been granted, this time we remember the decision",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -878,7 +878,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should pass because login was remembered and session id should be set and session context should also work",
-			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -935,7 +935,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme and acustom domain",
-			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://redirection-scheme/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://redirection-scheme/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			prompt:                "none",
 			jar:                   persistentCJ,
 			lph:                   passAuthentication(apiClient, false),
@@ -945,7 +945,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme",
-			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://localhost/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "custom://localhost/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			prompt:                "none",
 			jar:                   persistentCJ,
 			lph:                   passAuthentication(apiClient, false),
@@ -955,7 +955,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should pass because prompt=none, client is public, redirection scheme is HTTP and host is localhost",
-			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "http://localhost/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{RedirectURI: mustParseURL(t, "http://localhost/path"), Request: fosite.Request{Client: &client.Client{TokenEndpointAuthMethod: "none", OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			prompt:                "none",
 			jar:                   persistentCJ,
 			lph:                   passAuthentication(apiClient, true),
@@ -1039,7 +1039,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// },
 		{
 			d:   "This should fail at login screen because subject from accept does not match subject from session",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1069,7 +1069,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should pass and confirm previous authentication and consent because it is a authorization_code",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", Secret: "should-not-be-included"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", Secret: "should-not-be-included"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1125,7 +1125,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:      "This should pass and require re-authentication although session is set (because prompt=login)",
-			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:    persistentCJ,
 			prompt: "login+consent",
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1188,7 +1188,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:      "This should pass and require re-authentication although session is set (because max_age=1)",
-			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:    persistentCJ,
 			maxAge: "1",
 			setup: func() {
@@ -1242,7 +1242,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should fail because max_age=1 but prompt=none",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ,
 			setup: func() {
 				time.Sleep(time.Second * 2)
@@ -1256,7 +1256,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		{
 			d:                     "This should fail because prompt is none but no auth session exists",
 			prompt:                "none",
-			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:                   newCookieJar(t),
 			expectFinalStatusCode: http.StatusBadRequest,
 			expectErrType:         []error{fosite.ErrLoginRequired},
@@ -1265,7 +1265,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		{
 			d:      "This should fail because prompt is none and consent is missing a permission which requires re-authorization of the app",
 			prompt: "none",
-			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a", "this-scope-has-not-been-granted-before"}}},
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a", "this-scope-has-not-been-granted-before"}}},
 			jar:    persistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1296,7 +1296,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:      "This pass and properly require authentication as well as authorization because prompt is set to login and consent - although previous session exists",
-			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:    persistentCJ,
 			prompt: "login+consent",
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1337,7 +1337,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:                     "This should fail because id_token_hint does not match authentication session and prompt is none",
-			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:                   persistentCJ,
 			prompt:                "none",
 			idTokenHint:           fooUserIDToken,
@@ -1347,7 +1347,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:           "This should pass and require authentication because id_token_hint does not match subject from session",
-			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:         persistentCJ,
 			idTokenHint: fooUserIDToken,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1378,7 +1378,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:           "This should pass and require authentication because id_token_hint does not match subject from session",
-			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:         persistentCJ,
 			idTokenHint: fooUserIDToken,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1444,7 +1444,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should pass as regularly even though id_token_hint is expired",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
 			jar: newCookieJar(t),
 			idTokenHint: genIDToken(t, reg, jwt.IDTokenClaims{
 				Subject:   "user",
@@ -1461,7 +1461,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// Pairwise auth
 		{
 			d:   "This should pass as regularly and create a new session with pairwise subject set by hydra",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ3,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1494,7 +1494,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		}, // these tests depend on one another
 		{
 			d:   "This should pass as regularly and create a new session with pairwise subject and also with the ID token set",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ3,
 			idTokenHint: genIDToken(t, reg, jwt.IDTokenClaims{
 				Subject:   "c737d5e1fec8896d096d49f6b1a73eb45ac7becb87de9ac3f0a350bad2a9c9fd",
@@ -1533,7 +1533,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should pass as regularly and create a new session with pairwise subject set login request",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ4,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1567,7 +1567,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		}, // these tests depend on one another
 		{
 			d:   "This should pass as regularly and create a new session with pairwise subject set on login request and also with the ID token set",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ3,
 			idTokenHint: genIDToken(t, reg, jwt.IDTokenClaims{
 				Subject:   "forced-auth-user",
@@ -1608,7 +1608,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		// checks revoking sessions
 		{
 			d:   "This should pass as regularly and create a new session and forward data",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ2,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1631,7 +1631,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:      "This should pass and also revoke the session cookie",
-			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:    persistentCJ2,
 			prompt: "login",
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
@@ -1655,7 +1655,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		}, // these two tests depend on one another
 		{
 			d:   "This should require re-authentication because the session was revoked in the previous test",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: persistentCJ2,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1684,7 +1684,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:   "This should require re-authentication because the session does not exist in the store",
-			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar: nonexistentCJ,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
 				return func(w http.ResponseWriter, r *http.Request) {
@@ -1713,7 +1713,7 @@ func TestStrategyLoginConsent(t *testing.T) {
 		},
 		{
 			d:           "This should fail because the user from the ID token does not match the user from the accept login request",
-			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
 			jar:         newCookieJar(t),
 			idTokenHint: fooUserIDToken,
 			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {

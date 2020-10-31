@@ -428,7 +428,7 @@ func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
 	if r.Client != nil {
 		r.ClientID = sql.NullString{
 			Valid:  true,
-			String: r.Client.ID,
+			String: r.Client.OutfacingID,
 		}
 	}
 	return nil
@@ -437,7 +437,7 @@ func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
 func (r *LogoutRequest) AfterFind(c *pop.Connection) error {
 	if r.ClientID.Valid {
 		r.Client = &client.Client{}
-		return sqlcon.HandleError(c.Find(r.Client, r.ClientID.String))
+		return sqlcon.HandleError(c.Where("id = ?", r.ClientID.String).First(r.Client))
 	}
 	return nil
 }
@@ -492,7 +492,7 @@ type LoginRequest struct {
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client *client.Client `json:"client" belongs_to:"hydra_client" fk_id:"ClientID"`
+	Client *client.Client `json:"client" db:"-"`
 
 	ClientID string `json:"-" db:"client_id"`
 
@@ -525,8 +525,19 @@ func (_ LoginRequest) TableName() string {
 func (r *LoginRequest) FindInDB(c *pop.Connection, id string) error {
 	return c.Select("hydra_oauth2_authentication_request.*", "COALESCE(hr.was_used, FALSE) as was_handled").
 		LeftJoin("hydra_oauth2_authentication_request_handled as hr", "hydra_oauth2_authentication_request.challenge = hr.challenge").
-		Eager().
 		Find(r, id)
+}
+
+func (r *LoginRequest) BeforeSave(_ *pop.Connection) error {
+	if r.Client != nil {
+		r.ClientID = r.Client.OutfacingID
+	}
+	return nil
+}
+
+func (r *LoginRequest) AfterFind(c *pop.Connection) error {
+	r.Client = &client.Client{}
+	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
 }
 
 // Contains information on an ongoing consent request.
@@ -559,7 +570,7 @@ type ConsentRequest struct {
 	OpenIDConnectContext *OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
-	Client   *client.Client `json:"client" belongs_to:"hydra_client" fk_id:"ClientID"`
+	Client   *client.Client `json:"client" db:"-"`
 	ClientID string         `json:"-" db:"client_id"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
@@ -602,8 +613,19 @@ func (r *ConsentRequest) FindInDB(c *pop.Connection, id string) error {
 	return c.Select("COALESCE(hr.was_used, false) as was_handled", "hydra_oauth2_consent_request.*").
 		Where("hydra_oauth2_consent_request.challenge = ?", id).
 		LeftJoin("hydra_oauth2_consent_request_handled AS hr", "hr.challenge = hydra_oauth2_consent_request.challenge").
-		Eager().
 		First(r)
+}
+
+func (r *ConsentRequest) BeforeSave(_ *pop.Connection) error {
+	if r.Client != nil {
+		r.ClientID = r.Client.OutfacingID
+	}
+	return nil
+}
+
+func (r *ConsentRequest) AfterFind(c *pop.Connection) error {
+	r.Client = &client.Client{}
+	return sqlcon.HandleError(c.Where("id = ?", r.ClientID).First(r.Client))
 }
 
 // Used to pass session data to a consent request.

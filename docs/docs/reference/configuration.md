@@ -1251,6 +1251,7 @@ tracing:
   # - jaeger
   # - zipkin
   # - datadog
+  # - elastic-apm
   #
   # Examples:
   # - jaeger

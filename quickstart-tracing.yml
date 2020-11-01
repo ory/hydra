@@ -23,6 +23,7 @@ services:
       - TRACING_PROVIDER=jaeger
       # - TRACING_PROVIDER=zipkin
       # - TRACING_PROVIDER=datadog
+      # - TRACING_PROVIDER=elastic-apm
       ### Jaeger ###
       - TRACING_PROVIDERS_JAEGER_SAMPLING_SERVER_URL=http://jaeger:5778/sampling
       - TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=jaeger:6831
@@ -33,6 +34,12 @@ services:
       ### DataDog ###
       ### See env vars here: https://docs.datadoghq.com/tracing/setup/go/#configuration) ###
       # - DD_SERVICE=Hydra
+      ### Elastic APM ###
+      ### See env vars here: https://www.elastic.co/guide/en/apm/agent/go/1.x/configuration.html) ###
+      # - ELASTIC_APM_SERVER_URL="http://apm-server:8200"
+      # - ELASTIC_APM_SERVICE_NAME="ORY Hydra"
+      # - ELASTIC_APM_SERVICE_VERSION="1.9.0"
+      # - ELASTIC_APM_ENVIRONMENT="devel"
 
   jaeger:
     image: jaegertracing/all-in-one:1.19.2

@@ -843,7 +843,8 @@
           "enum": [
             "jaeger",
             "zipkin",
-            "datadog"
+            "datadog",
+            "elastic-apm"
           ],
           "examples": [
             "jaeger"

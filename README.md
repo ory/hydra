@@ -419,13 +419,6 @@ You need Go 1.13+ with `GO111MODULE=on` and (for the test suites):
 
 It is possible to develop ORY Hydra on Windows, but please be aware that all guides assume a Unix shell like bash or zsh.
 
-#### Workflows
-
-##### Install Tools
-
-When cloning ORY Hydra, run `make deps`. It will download several required dependencies. If you haven't run the command
-in a while it's probably a good idea to run it again.
-
 #### Formatting Code
 
 You can format all code using `make format`. Our CI checks if your code is properly formatted.

@@ -153,6 +153,7 @@ Affects documentation.
 #### Issues
 
 - [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
+- [x] 'make deps' Not work ([hydra#2154](https://github.com/ory/hydra/issues/2154)) - [@hackerman](https://github.com/aeneasr)
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

@@ -743,7 +743,8 @@
                   "type": "integer",
                   "description": "Sets the BCrypt cost. The higher the value, the more CPU time is being used to generate hashes.",
                   "default": 10,
-                  "minimum": 8
+                  "minimum": 4,
+                  "maximum": 31
                 }
               }
             }

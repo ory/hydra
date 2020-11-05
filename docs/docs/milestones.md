@@ -66,6 +66,7 @@ Affects documentation.
 #### Issues
 
 - [ ] Docs: reference configuration provides invalid bcrypt cost and some other outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) - [@Vincent](https://github.com/vinckr)
+- [ ] Configuration is not recognized by certain docker containers ([hydra#2164](https://github.com/ory/hydra/issues/2164)) - [@hackerman](https://github.com/aeneasr)
 - [x] docs: Hydra supports two concepts of authorization ([hydra#1992](https://github.com/ory/hydra/issues/1992)) - [@hackerman](https://github.com/aeneasr)
 - [x] Document GitLab setup with ORY Hydra as the OpenID Connect Provider ([hydra#2007](https://github.com/ory/hydra/issues/2007)) - [@Kim Neunert](https://github.com/k9ert)
 
@@ -111,6 +112,7 @@ Something is not working.
 - [ ] `loginRequest.requested_access_token_audience` should not be `null` ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 - [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens ([hydra#2042](https://github.com/ory/hydra/issues/2042))
 - [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
+- [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) - [@hackerman](https://github.com/aeneasr)
 - [x] Redirect URI should be able to contain plus (+) character ([hydra#2055](https://github.com/ory/hydra/issues/2055))
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)

@@ -22,9 +22,9 @@ includes both login and consent.
   width="560"
   height="315"
   src="https://www.youtube.com/embed/txUmfORzu8Y"
-  frameborder="0"
-  allowfullscreen
-></iframe>
+  frameBorder="0"
+  allowFullScreen
+/>
 
 :::info
 
@@ -224,13 +224,9 @@ most cases, you will show an HTML form similar to:
 </form>
 ```
 
-Once the End-User authenticated successfully, you either **accept** the login
-challenge, or you **reject** (e.g. the user is not allowed to perform OAuth2
-flows) the login challenge.
-
 ### Accepting the Consent Flow
 
-To accept the Consent Challenge, make a HTTP PUT request with
+To accept the Consent Challenge, make an HTTP PUT request with
 `Content-Type: application/json` and a JSON payload (see
 [Accept Consent Request HTTP API Reference](../reference/api#schemaacceptconsentrequest))
 

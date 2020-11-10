@@ -429,7 +429,32 @@
           "additionalProperties": false,
           "description": "Configures OpenID Connect Discovery (/.well-known/openid-configuration).",
           "properties": {
+            "jwks_url": {
+              "type": "string",
+              "description": "Overwrites the JWKS URL",
+              "format": "uri",
+              "examples": [
+                "https://my-service.com/.well-known/jwks.json"
+              ]
+            },
+            "token_url": {
+              "type": "string",
+              "description": "Overwrites the OAuth2 Token URL",
+              "format": "uri",
+              "examples": [
+                "https://my-service.com/oauth2/token"
+              ]
+            },
+            "auth_url": {
+              "type": "string",
+              "description": "Overwrites the OAuth2 Auth URL",
+              "format": "uri",
+              "examples": [
+                "https://my-service.com/oauth2/auth"
+              ]
+            },
             "client_registration_url": {
+              "description": "Sets the OpenID Connect Dynamic Client Registration Endpoint",
               "type": "string",
               "format": "uri",
               "examples": [

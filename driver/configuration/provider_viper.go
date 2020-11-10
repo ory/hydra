@@ -37,6 +37,9 @@ type ViperProvider struct {
 const (
 	ViperKeyWellKnownKeys                 = "webfinger.jwks.broadcast_keys"
 	ViperKeyOAuth2ClientRegistrationURL   = "webfinger.oidc_discovery.client_registration_url"
+	ViperKLeyOAuth2TokenURL               = "webfinger.oidc_discovery.token_url"
+	ViperKLeyOAuth2AuthURL                = "webfinger.oidc_discovery.auth_url"
+	ViperKeyJWKSURL                       = "webfinger.oidc_discovery.jwks_url"
 	ViperKeyOIDCDiscoverySupportedClaims  = "webfinger.oidc_discovery.supported_claims"
 	ViperKeyOIDCDiscoverySupportedScope   = "webfinger.oidc_discovery.supported_scope"
 	ViperKeyOIDCDiscoveryUserinfoEndpoint = "webfinger.oidc_discovery.userinfo_url"
@@ -446,12 +449,20 @@ func (v *ViperProvider) IssuerURL() *url.URL {
 	return urlRoot(urlx.ParseOrFatal(v.l, strings.TrimRight(viperx.GetString(v.l, ViperKeyIssuerURL, v.fallbackURL("/", v.publicHost(), v.publicPort()), "OAUTH2_ISSUER_URL", "ISSUER", "ISSUER_URL"), "/")+"/"))
 }
 
-func (v *ViperProvider) OAuth2AuthURL() string {
-	return "/oauth2/auth" // this should not have the host etc prepended...
-}
-
 func (v *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
 	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyOAuth2ClientRegistrationURL, "", "OAUTH2_CLIENT_REGISTRATION_URL"))
+}
+
+func (v *ViperProvider) OAuth2TokenURL() *url.URL {
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKLeyOAuth2TokenURL, urlx.AppendPaths(v.IssuerURL(), "/oauth2/token").String()))
+}
+
+func (v *ViperProvider) OAuth2AuthURL() *url.URL {
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKLeyOAuth2AuthURL, urlx.AppendPaths(v.IssuerURL(), "/oauth2/auth").String()))
+}
+
+func (v *ViperProvider) JWKSURL() *url.URL {
+	return urlx.ParseOrFatal(v.l, viperx.GetString(v.l, ViperKeyJWKSURL, urlx.AppendPaths(v.IssuerURL(), "/.well-known/jwks.json").String()))
 }
 
 func (v *ViperProvider) AllowTLSTerminationFrom() []string {

@@ -27,8 +27,10 @@ type Provider interface {
 	ErrorURL() *url.URL
 	PublicURL() *url.URL
 	IssuerURL() *url.URL
-	OAuth2AuthURL() string
+	OAuth2AuthURL() *url.URL
+	OAuth2TokenURL() *url.URL
 	OAuth2ClientRegistrationURL() *url.URL
+	JWKSURL() *url.URL
 	AllowTLSTerminationFrom() []string
 	AccessTokenStrategy() string
 	SubjectIdentifierAlgorithmSalt() string

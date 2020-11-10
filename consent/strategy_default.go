@@ -233,7 +233,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	csrf := strings.Replace(uuid.New(), "-", "", -1)
 
 	// Generate the request URL
-	iu := urlx.AppendPaths(s.c.IssuerURL(), s.c.OAuth2AuthURL())
+	iu := s.c.OAuth2AuthURL()
 	iu.RawQuery = r.URL.RawQuery
 
 	var idTokenHintClaims jwtgo.MapClaims

@@ -69,6 +69,9 @@ webfinger:
     broadcast_keys:
       - hydra.openid.id-token
   oidc_discovery:
+    jwks_url: https://example.com/jwks.json
+    auth_url: https://example.com/auth
+    token_url: https://example.com/token
     client_registration_url: https://example.com
     supported_claims:
       - username

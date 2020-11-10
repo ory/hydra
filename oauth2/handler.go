@@ -84,9 +84,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.GET(LogoutPath, h.LogoutHandler)
 	public.POST(LogoutPath, h.LogoutHandler)
 
-	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLoginURL))
-	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyConsentURL))
-	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusInternalServerError, configuration.ViperKeyLogoutURL))
+	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, configuration.ViperKeyLoginURL))
+	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, configuration.ViperKeyConsentURL))
+	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, configuration.ViperKeyLogoutURL))
 	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
 		"You logged out successfully!",
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
@@ -224,9 +224,9 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.Writer().Write(w, r, &WellKnown{
 		Issuer:                             strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
-		AuthURL:                            urlx.AppendPaths(h.c.IssuerURL(), AuthPath).String(),
-		TokenURL:                           urlx.AppendPaths(h.c.IssuerURL(), TokenPath).String(),
-		JWKsURI:                            urlx.AppendPaths(h.c.IssuerURL(), JWKPath).String(),
+		AuthURL:                            h.c.OAuth2AuthURL().String(),
+		TokenURL:                           h.c.OAuth2TokenURL().String(),
+		JWKsURI:                            h.c.JWKSURL().String(),
 		RevocationEndpoint:                 urlx.AppendPaths(h.c.IssuerURL(), RevocationPath).String(),
 		RegistrationEndpoint:               h.c.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                       h.c.SubjectTypesSupported(),
@@ -277,7 +277,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		rfcerr := fosite.ErrorToRFC6749Error(err)
 		if rfcerr.StatusCode() == http.StatusUnauthorized {
-			w.Header().Set("WWW-Authenticate", fmt.Sprintf("error=%s,error_description=%s,error_hint=%s", rfcerr.Name, rfcerr.Description, rfcerr.Hint))
+			w.Header().Set("WWW-Authenticate", fmt.Sprintf("error=%s,error_description=%s,error_hint=%s", rfcerr.ErrorField, rfcerr.DescriptionField, rfcerr.HintField))
 		}
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -292,7 +292,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	c, ok := ar.GetClient().(*client.Client)
 	if !ok {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client")))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client.")))
 		return
 	}
 
@@ -341,7 +341,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 
 		h.r.Writer().Write(w, r, interim)
 	} else {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unsupported userinfo signing algorithm \"%s\"", c.UserinfoSignedResponseAlg))))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
 		return
 	}
 }
@@ -437,7 +437,8 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	resp := &fosite.IntrospectionResponse{
 		Active:          true,
 		AccessRequester: ar,
-		TokenType:       tt,
+		TokenUse:        tt,
+		AccessTokenType: "Bearer",
 	}
 
 	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(tt)
@@ -475,7 +476,8 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Audience:          resp.GetAccessRequester().GetGrantedAudience(),
 		Issuer:            strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
 		ObfuscatedSubject: obfuscated,
-		TokenType:         string(resp.GetTokenType()),
+		TokenType:         resp.GetAccessTokenType(),
+		TokenUse:          string(resp.GetTokenUse()),
 	}); err != nil {
 		x.LogError(r, errors.WithStack(err), h.r.Logger())
 	}
@@ -739,10 +741,10 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 
 func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error) {
 	rfErr := fosite.ErrorToRFC6749Error(err)
-	query := url.Values{"error": {rfErr.Name}, "error_description": {rfErr.Description}, "error_hint": {rfErr.Hint}}
+	query := url.Values{"error": {rfErr.ErrorField}, "error_description": {rfErr.DescriptionField}, "error_hint": {rfErr.HintField}}
 
 	if h.c.ShareOAuth2Debug() {
-		query.Add("error_debug", rfErr.Debug)
+		query.Add("error_debug", rfErr.DebugField)
 	}
 
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
@@ -767,7 +769,7 @@ func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httpro
 	client := r.URL.Query().Get("client_id")
 
 	if client == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter "client" is not defined but it should have been.`)))
+		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client' is not defined but it should have been.`)))
 		return
 	}
 

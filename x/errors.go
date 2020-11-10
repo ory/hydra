@@ -29,14 +29,14 @@ import (
 
 var (
 	ErrNotFound = &fosite.RFC6749Error{
-		Code:        http.StatusNotFound,
-		Name:        http.StatusText(http.StatusNotFound),
-		Description: "Unable to located the requested resource",
+		CodeField:        http.StatusNotFound,
+		ErrorField:       http.StatusText(http.StatusNotFound),
+		DescriptionField: "Unable to located the requested resource",
 	}
 	ErrConflict = &fosite.RFC6749Error{
-		Code:        http.StatusConflict,
-		Name:        http.StatusText(http.StatusConflict),
-		Description: "Unable to process the requested resource because of conflict in the current state",
+		CodeField:        http.StatusConflict,
+		ErrorField:       http.StatusText(http.StatusConflict),
+		DescriptionField: "Unable to process the requested resource because of conflict in the current state",
 	}
 )
 

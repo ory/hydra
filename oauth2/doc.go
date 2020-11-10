@@ -143,6 +143,12 @@ type WellKnown struct {
 
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint string `json:"end_session_endpoint"`
+
+	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
+	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
+	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
+	// (using the request_uri parameter).
+	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
 }
 
 // swagger:parameters deleteOAuth2Token

@@ -447,9 +447,9 @@ func TestHandlerWellKnown(t *testing.T) {
 
 	trueConfig := oauth2.WellKnown{
 		Issuer:                             strings.TrimRight(conf.IssuerURL().String(), "/") + "/",
-		AuthURL:                            urlx.AppendPaths(conf.IssuerURL(), oauth2.AuthPath).String(),
-		TokenURL:                           urlx.AppendPaths(conf.IssuerURL(), oauth2.TokenPath).String(),
-		JWKsURI:                            urlx.AppendPaths(conf.IssuerURL(), oauth2.JWKPath).String(),
+		AuthURL:                            conf.OAuth2AuthURL().String(),
+		TokenURL:                           conf.OAuth2TokenURL().String(),
+		JWKsURI:                            conf.JWKSURL().String(),
 		RevocationEndpoint:                 urlx.AppendPaths(conf.IssuerURL(), oauth2.RevocationPath).String(),
 		RegistrationEndpoint:               conf.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                       []string{"pairwise", "public"},

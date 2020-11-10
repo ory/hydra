@@ -4,7 +4,7 @@ go 1.15
 
 //replace github.com/ory/fosite => ../fosite
 
-replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201109171311-3731efd11b93
+replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201110164931-a34286055bd6
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -58,8 +58,6 @@ require (
 	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
-	go.elastic.co/apm/module/apmot v1.8.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.13.0 // indirect
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect

@@ -8,25 +8,26 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/gobuffalo/pop/v5"
-	"github.com/pkg/errors"
 
 	"github.com/ory/x/sqlcon"
 )
 
 func (p *Persister) MigrationStatus(_ context.Context, w io.Writer) error {
-	return errors.WithStack(p.mb.Status(w))
+	return errorsx.WithStack(p.mb.Status(w))
 }
 
 func (p *Persister) MigrateDown(_ context.Context, steps int) error {
-	return errors.WithStack(p.mb.Down(steps))
+	return errorsx.WithStack(p.mb.Down(steps))
 }
 
 func (p *Persister) MigrateUp(_ context.Context) error {
 	if err := p.migrateOldMigrationTables(); err != nil {
 		return err
 	}
-	return errors.WithStack(p.mb.Up())
+	return errorsx.WithStack(p.mb.Up())
 }
 
 func (p *Persister) MigrateUpTo(_ context.Context, steps int) (int, error) {
@@ -34,7 +35,7 @@ func (p *Persister) MigrateUpTo(_ context.Context, steps int) (int, error) {
 		return 0, err
 	}
 	n, err := p.mb.UpTo(steps)
-	return n, errors.WithStack(err)
+	return n, errorsx.WithStack(err)
 }
 
 func (p *Persister) PrepareMigration(_ context.Context) error {
@@ -64,7 +65,7 @@ func (p *Persister) migrateOldMigrationTables() error {
 	}
 
 	if err := pop.CreateSchemaMigrations(p.conn); err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 
 	// in this order the migrations only depend on already done ones
@@ -92,14 +93,14 @@ func (p *Persister) migrateOldMigrationTables() error {
 			// fizz standard version pattern: YYYYMMDDhhmmss
 			migrationNumber, err := strconv.ParseInt(m.ID, 10, 0)
 			if err != nil {
-				return errors.WithStack(err)
+				return errorsx.WithStack(err)
 			}
 
 			/* #nosec G201 - i is static (0..3) and migrationNumber is from the database */
 			if err := p.conn.RawQuery(
 				fmt.Sprintf("INSERT INTO schema_migration (version) VALUES ('2019%02d%08d')", i+1, migrationNumber)).
 				Exec(); err != nil {
-				return errors.WithStack(err)
+				return errorsx.WithStack(err)
 			}
 		}
 

@@ -21,7 +21,7 @@ func TestToRFCError(t *testing.T) {
 				valid: true,
 			},
 			expect: &fosite.RFC6749Error{
-				ErrorField:        "not empty",
+				ErrorField:       "not empty",
 				DescriptionField: "",
 				CodeField:        fosite.ErrInvalidRequest.CodeField,
 				DebugField:       "",
@@ -34,7 +34,7 @@ func TestToRFCError(t *testing.T) {
 				valid:       true,
 			},
 			expect: &fosite.RFC6749Error{
-				ErrorField:        "request_denied",
+				ErrorField:       "request_denied",
 				DescriptionField: "not empty",
 				CodeField:        fosite.ErrInvalidRequest.CodeField,
 				DebugField:       "",
@@ -43,7 +43,7 @@ func TestToRFCError(t *testing.T) {
 		{
 			input: &RequestDeniedError{valid: true},
 			expect: &fosite.RFC6749Error{
-				ErrorField:        "request_denied",
+				ErrorField:       "request_denied",
 				DescriptionField: "",
 				HintField:        "",
 				CodeField:        fosite.ErrInvalidRequest.CodeField,

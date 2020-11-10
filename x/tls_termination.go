@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 
@@ -16,7 +18,7 @@ import (
 func MatchesRange(r *http.Request, ranges []string) error {
 	remoteIP, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 
 	check := []string{remoteIP}
@@ -27,7 +29,7 @@ func MatchesRange(r *http.Request, ranges []string) error {
 	for _, rn := range ranges {
 		_, cidr, err := net.ParseCIDR(rn)
 		if err != nil {
-			return errors.WithStack(err)
+			return errorsx.WithStack(err)
 		}
 
 		for _, ip := range check {

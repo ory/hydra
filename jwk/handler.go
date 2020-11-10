@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/x/stringslice"
 
 	"github.com/ory/hydra/x"
@@ -195,7 +197,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 	}
 
 	generator, found := h.r.KeyGenerators()[keyRequest.Algorithm]
@@ -244,7 +246,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
@@ -287,7 +289,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 

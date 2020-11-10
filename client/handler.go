@@ -25,6 +25,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/herodot"
 	"github.com/ory/x/sqlcon"
 
@@ -84,14 +86,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
 	if len(c.Secret) == 0 {
 		secretb, err := x.GenerateSecret(26)
 		if err != nil {
-			h.r.Writer().WriteError(w, r, errors.WithStack(err))
+			h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 			return
 		}
 		c.Secret = string(secretb)
@@ -140,7 +142,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 

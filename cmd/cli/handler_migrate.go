@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/x/cmdx"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/driver"
@@ -72,7 +73,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	fmt.Println("The following migration is planned:")
 	fmt.Println("")
 	if err := p.MigrationStatus(context.Background(), os.Stdout); err != nil {
-		fmt.Printf("Could not get the migration status:\n%+v\n", errors.WithStack(err))
+		fmt.Printf("Could not get the migration status:\n%+v\n", errorsx.WithStack(err))
 		os.Exit(1)
 		return
 	}
@@ -88,7 +89,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 
 	// apply migrations
 	if err := p.MigrateUp(context.Background()); err != nil {
-		fmt.Printf("Could not apply migrations:\n%+v\n", errors.WithStack(err))
+		fmt.Printf("Could not apply migrations:\n%+v\n", errorsx.WithStack(err))
 	}
 
 	fmt.Println("Successfully applied migrations!")

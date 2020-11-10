@@ -3,8 +3,9 @@ package sql
 import (
 	"context"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/gobuffalo/pop/v5"
-	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -32,7 +33,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 		} else {
 			h, err := p.r.ClientHasher().Hash(ctx, []byte(cl.Secret))
 			if err != nil {
-				return errors.WithStack(err)
+				return errorsx.WithStack(err)
 			}
 			cl.Secret = string(h)
 		}
@@ -46,11 +47,11 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 func (p *Persister) Authenticate(ctx context.Context, id string, secret []byte) (*client.Client, error) {
 	c, err := p.GetConcreteClient(ctx, id)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	if err := p.r.ClientHasher().Compare(ctx, c.GetHashedSecret(), secret); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	return c, nil

@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/ory/x/errorsx"
+
 	jose "gopkg.in/square/go-jose.v2"
 )
 
@@ -20,13 +21,13 @@ func (n *JoseJSONWebKeySet) Scan(value interface{}) error {
 	if len(v) == 0 {
 		return nil
 	}
-	return errors.WithStack(json.Unmarshal([]byte(v), n))
+	return errorsx.WithStack(json.Unmarshal([]byte(v), n))
 }
 
 func (n *JoseJSONWebKeySet) Value() (driver.Value, error) {
 	value, err := json.Marshal(n)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 	return string(value), nil
 }

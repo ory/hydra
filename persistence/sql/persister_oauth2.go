@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/fosite/storage"
 
 	"github.com/gobuffalo/pop/v5"
@@ -67,13 +69,13 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 
 	session, err := json.Marshal(r.GetSession())
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	if p.config.EncryptSessionData() {
 		ciphertext, err := p.r.KeyCipher().Encrypt(session)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 		session = []byte(ciphertext)
 	}
@@ -112,13 +114,13 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 		var err error
 		sess, err = p.r.KeyCipher().Decrypt(string(sess))
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 	}
 
 	if session != nil {
 		if err := json.Unmarshal(sess, session); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 	} else {
 		p.l.Debugf("Got an empty session in toRequest")
@@ -131,7 +133,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 
 	val, err := url.ParseQuery(r.Form)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	return &fosite.Request{
@@ -165,7 +167,7 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 	}
 	if j.Expiry.After(time.Now()) {
 		// the jti is not expired yet => invalid
-		return errors.WithStack(fosite.ErrJTIKnown)
+		return errorsx.WithStack(fosite.ErrJTIKnown)
 	}
 	// the jti is expired => valid
 	return nil
@@ -185,7 +187,7 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 
 		if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
 			// found a jti
-			return errors.WithStack(fosite.ErrJTIKnown)
+			return errorsx.WithStack(fosite.ErrJTIKnown)
 		} else if err != nil {
 			return err
 		}
@@ -226,7 +228,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		err := p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
 		if errors.Is(err, sql.ErrNoRows) {
-			return errors.WithStack(fosite.ErrNotFound)
+			return errorsx.WithStack(fosite.ErrNotFound)
 		} else if err != nil {
 			return sqlcon.HandleError(err)
 		} else if !r.Active && table == sqlTableCode {
@@ -234,10 +236,10 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 			if err != nil {
 				return err
 			} else {
-				return errors.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
 			}
 		} else if !r.Active {
-			return errors.WithStack(fosite.ErrInactiveToken)
+			return errorsx.WithStack(fosite.ErrInactiveToken)
 		}
 
 		fr, err = r.toRequest(ctx, session, p)
@@ -261,7 +263,7 @@ func (p *Persister) revokeSession(ctx context.Context, id string, table tableNam
 		fmt.Sprintf("DELETE FROM %s WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
 		id,
 	).Exec(); errors.Is(err, sql.ErrNoRows) {
-		return errors.WithStack(fosite.ErrNotFound)
+		return errorsx.WithStack(fosite.ErrNotFound)
 	} else if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 			return errors.Wrap(fosite.ErrSerializationFailure, err.Error())

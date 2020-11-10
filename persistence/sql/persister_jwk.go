@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
@@ -18,12 +20,12 @@ var _ jwk.Manager = &Persister{}
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
 	if err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 
 	encrypted, err := p.r.KeyCipher().Encrypt(out)
 	if err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 
 	return sqlcon.HandleError(p.Connection(ctx).Create(&jwk.SQLData{
@@ -39,7 +41,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 		for _, key := range keys.Keys {
 			out, err := json.Marshal(key)
 			if err != nil {
-				return errors.WithStack(err)
+				return errorsx.WithStack(err)
 			}
 
 			encrypted, err := p.r.KeyCipher().Encrypt(out)
@@ -71,12 +73,12 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 
 	key, err := p.r.KeyCipher().Decrypt(j.Key)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	var c jose.JSONWebKey
 	if err := json.Unmarshal(key, &c); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	return &jose.JSONWebKeySet{
@@ -101,18 +103,18 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 	for _, d := range js {
 		key, err := p.r.KeyCipher().Decrypt(d.Key)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 
 		var c jose.JSONWebKey
 		if err := json.Unmarshal(key, &c); err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 		keys.Keys = append(keys.Keys, c)
 	}
 
 	if len(keys.Keys) == 0 {
-		return nil, errors.WithStack(x.ErrNotFound)
+		return nil, errorsx.WithStack(x.ErrNotFound)
 	}
 
 	return keys, nil

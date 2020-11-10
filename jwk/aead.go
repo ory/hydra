@@ -23,6 +23,8 @@ package jwk
 import (
 	"encoding/base64"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/gtank/cryptopasta"
@@ -55,7 +57,7 @@ func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
 
 	ciphertext, err := cryptopasta.Encrypt(plaintext, aeadKey(keys[0]))
 	if err != nil {
-		return "", errors.WithStack(err)
+		return "", errorsx.WithStack(err)
 	}
 
 	return base64.URLEncoding.EncodeToString(ciphertext), nil
@@ -83,12 +85,12 @@ func (c *AEAD) decrypt(ciphertext string, key []byte) ([]byte, error) {
 
 	raw, err := base64.URLEncoding.DecodeString(ciphertext)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	plaintext, err := cryptopasta.Decrypt(raw, aeadKey(key))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	return plaintext, nil

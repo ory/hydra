@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/luna-duclos/instrumentedsql"
 	"github.com/luna-duclos/instrumentedsql/opentracing"
 
@@ -13,8 +15,6 @@ import (
 	"github.com/ory/x/resilience"
 
 	"github.com/gobuffalo/pop/v5"
-	"github.com/pkg/errors"
-
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/ory/hydra/persistence/sql"
@@ -72,10 +72,10 @@ func (m *RegistrySQL) Init() error {
 			InstrumentedDriverOptions: opts,
 		})
 		if err != nil {
-			return errors.WithStack(err)
+			return errorsx.WithStack(err)
 		}
 		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
-			return errors.WithStack(err)
+			return errorsx.WithStack(err)
 		}
 		m.persister, err = sql.NewPersister(c, m, m.C, m.l)
 		if err != nil {

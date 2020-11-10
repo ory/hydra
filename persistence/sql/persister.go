@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/gobuffalo/x/randx"
 
 	"github.com/ory/fosite/storage"
@@ -49,7 +51,7 @@ type (
 func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 	_, ok := ctx.Value(transactionContextKey).(*pop.Connection)
 	if ok {
-		return ctx, errors.WithStack(ErrTransactionOpen)
+		return ctx, errorsx.WithStack(ErrTransactionOpen)
 	}
 
 	tx, err := p.conn.Store.TransactionContextOptions(ctx, &sql.TxOptions{
@@ -68,7 +70,7 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 func (p *Persister) Commit(ctx context.Context) error {
 	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
 	if !ok || c.TX == nil {
-		return errors.WithStack(ErrNoTransactionOpen)
+		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
 	return c.TX.Commit()
@@ -77,7 +79,7 @@ func (p *Persister) Commit(ctx context.Context) error {
 func (p *Persister) Rollback(ctx context.Context) error {
 	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
 	if !ok || c.TX == nil {
-		return errors.WithStack(ErrNoTransactionOpen)
+		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
 	return c.TX.Rollback()
@@ -86,7 +88,7 @@ func (p *Persister) Rollback(ctx context.Context) error {
 func NewPersister(c *pop.Connection, r Dependencies, config configuration.Provider, l *logrusx.Logger) (*Persister, error) {
 	mb, err := pop.NewMigrationBox(migrations, c)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	return &Persister{
@@ -115,14 +117,14 @@ func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context,
 		c, err = p.conn.WithContext(ctx).NewTransaction()
 
 		if err != nil {
-			return errors.WithStack(err)
+			return errorsx.WithStack(err)
 		}
 	}
 
 	if err := f(context.WithValue(ctx, transactionContextKey, c), c); err != nil {
 		if !isNested {
 			if err := c.TX.Rollback(); err != nil {
-				return errors.WithStack(err)
+				return errorsx.WithStack(err)
 			}
 		}
 		return err
@@ -130,7 +132,7 @@ func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context,
 
 	// commit if there is no wrapping transaction
 	if !isNested {
-		return errors.WithStack(c.TX.Commit())
+		return errorsx.WithStack(c.TX.Commit())
 	}
 
 	return nil

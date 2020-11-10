@@ -38,6 +38,7 @@ Something is not working.
 
 - [ ] Report expired JWT assertion token to client ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [ ] Client allowed_cors_origins not working ([hydra#1754](https://github.com/ory/hydra/issues/1754))
+- [ ] CORS error with v1.9 on localhost ([hydra#2165](https://github.com/ory/hydra/issues/2165)) - [@hackerman](https://github.com/aeneasr)
 - [x] Slow consent revocation request ([hydra#1997](https://github.com/ory/hydra/issues/1997))
 - [x] Client update changes it's PK to 0 ([hydra#2148](https://github.com/ory/hydra/issues/2148)) - [@Patrik](https://github.com/zepatrik)
 
@@ -80,6 +81,7 @@ Blocks milestones or other issues or pulls.
 
 #### Issues
 
+- [ ] CORS error with v1.9 on localhost ([hydra#2165](https://github.com/ory/hydra/issues/2165)) - [@hackerman](https://github.com/aeneasr)
 - [x] Client update changes it's PK to 0 ([hydra#2148](https://github.com/ory/hydra/issues/2148)) - [@Patrik](https://github.com/zepatrik)
 
 #### Pull Requests
@@ -155,6 +157,7 @@ Affects documentation.
 #### Issues
 
 - [ ] Docs: rendering issue (?) on reference REST API ([hydra#2092](https://github.com/ory/hydra/issues/2092)) - [@Vincent](https://github.com/vinckr)
+- [ ] Add list of possible errors to REST API documentation ([hydra#2166](https://github.com/ory/hydra/issues/2166))
 - [x] 'make deps' Not work ([hydra#2154](https://github.com/ory/hydra/issues/2154)) - [@hackerman](https://github.com/aeneasr)
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)

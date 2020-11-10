@@ -11,5 +11,7 @@ sdk/php
 vendor
 dist
 .bin
-test
+test/e2e
+test/mock-*
+test/stub
 cypress

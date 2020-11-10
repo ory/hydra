@@ -10,10 +10,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/ory/x/logrusx"
-	"github.com/ory/x/serverx"
-
 	"github.com/ory/hydra/metrics/prometheus"
+	"github.com/ory/x/logrusx"
 
 	"github.com/gorilla/sessions"
 
@@ -124,7 +122,7 @@ func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
 		h := herodot.NewJSONWriter(m.Logger())
-		h.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
+		h.ErrorEnhancer = x.ErrorEnhancer
 		m.writer = h
 	}
 	return m.writer

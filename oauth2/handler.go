@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pborman/uuid"
+
 	"github.com/ory/x/errorsx"
 
 	jwt2 "github.com/dgrijalva/jwt-go"
@@ -299,18 +301,23 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
+	delete(interim, "nonce")
+	delete(interim, "at_hash")
+	delete(interim, "c_hash")
+	delete(interim, "rat")
+	delete(interim, "exp")
+
+	if aud := interim["aud"].([]string); !ok || len(aud) == 0 {
+		interim["aud"] = []string{c.GetID()}
+	}
+
+	if _, ok := interim["jti"]; !ok {
+		interim["jti"] = uuid.New()
+	}
+	interim["iat"] = time.Now().Unix()
+
 	if c.UserinfoSignedResponseAlg == "RS256" {
-		interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
-
-		delete(interim, "nonce")
-		delete(interim, "at_hash")
-		delete(interim, "c_hash")
-		delete(interim, "auth_time")
-		delete(interim, "iat")
-		delete(interim, "rat")
-		delete(interim, "exp")
-		delete(interim, "jti")
-
 		keyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
@@ -330,18 +337,6 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/jwt")
 		_, _ = w.Write([]byte(token))
 	} else if c.UserinfoSignedResponseAlg == "" || c.UserinfoSignedResponseAlg == "none" {
-		interim := ar.GetSession().(*Session).IDTokenClaims().ToMap()
-		delete(interim, "aud")
-		delete(interim, "iss")
-		delete(interim, "nonce")
-		delete(interim, "at_hash")
-		delete(interim, "c_hash")
-		delete(interim, "auth_time")
-		delete(interim, "iat")
-		delete(interim, "rat")
-		delete(interim, "exp")
-		delete(interim, "jti")
-
 		h.r.Writer().Write(w, r, interim)
 	} else {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))

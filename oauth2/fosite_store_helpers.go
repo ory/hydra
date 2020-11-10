@@ -154,7 +154,7 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Helper()
 	if k != "memory" {
-		t.Run(fmt.Sprintf("case=testHelperCreateGetDeleteAuthorizeCodes/db=%s", k), testHelperUniqueConstraints(store, k))
+		t.Run(fmt.Sprintf("case=testHelperUniqueConstraints/db=%s", k), testHelperRequestIDMultiples(store, k))
 		t.Run("case=testFositeSqlStoreTransactionsCommitAccessToken", testFositeSqlStoreTransactionCommitAccessToken(store))
 		t.Run("case=testFositeSqlStoreTransactionsRollbackAccessToken", testFositeSqlStoreTransactionRollbackAccessToken(store))
 		t.Run("case=testFositeSqlStoreTransactionCommitRefreshToken", testFositeSqlStoreTransactionCommitRefreshToken(store))
@@ -180,21 +180,12 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
 }
 
-func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t *testing.T) {
+func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
-		dbErrorIsConstraintError := func(err error) {
-			assert.Error(t, err)
-			if !errors.Is(err, sqlcon.ErrUniqueViolation) {
-				t.Errorf("unexpected error type %+v %T", err, err)
-			}
-		}
-
 		requestId := uuid.New()
 		mockRequestForeignKey(t, requestId, m, true)
 		cl := &client.Client{OutfacingID: "foobar"}
 
-		signatureOne := uuid.New()
-		signatureTwo := uuid.New()
 		fositeRequest := &fosite.Request{
 			ID:          requestId,
 			Client:      cl,
@@ -202,18 +193,19 @@ func testHelperUniqueConstraints(m InternalRegistry, storageType string) func(t 
 			Session:     &Session{},
 		}
 
-		err := m.OAuth2Storage().CreateRefreshTokenSession(context.TODO(), signatureOne, fositeRequest)
-		assert.NoError(t, err)
-		err = m.OAuth2Storage().CreateAccessTokenSession(context.TODO(), signatureOne, fositeRequest)
-		assert.NoError(t, err)
-
-		// attempting to insert new records with the SAME requestID should fail as there is a unique index
-		// on the request_id column
-
-		err = m.OAuth2Storage().CreateRefreshTokenSession(context.TODO(), signatureTwo, fositeRequest)
-		dbErrorIsConstraintError(err)
-		err = m.OAuth2Storage().CreateAccessTokenSession(context.TODO(), signatureTwo, fositeRequest)
-		dbErrorIsConstraintError(err)
+		for i := 0; i < 4; i++ {
+			signature := uuid.New()
+			err := m.OAuth2Storage().CreateRefreshTokenSession(context.TODO(), signature, fositeRequest)
+			assert.NoError(t, err)
+			err = m.OAuth2Storage().CreateAccessTokenSession(context.TODO(), signature, fositeRequest)
+			assert.NoError(t, err)
+			err = m.OAuth2Storage().CreateOpenIDConnectSession(context.TODO(), signature, fositeRequest)
+			assert.NoError(t, err)
+			err = m.OAuth2Storage().CreatePKCERequestSession(context.TODO(), signature, fositeRequest)
+			assert.NoError(t, err)
+			err = m.OAuth2Storage().CreateAuthorizeCodeSession(context.TODO(), signature, fositeRequest)
+			assert.NoError(t, err)
+		}
 	}
 }
 

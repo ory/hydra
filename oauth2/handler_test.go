@@ -380,6 +380,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
+									OutfacingID:               "foobar-client",
 									UserinfoSignedResponseAlg: "RS256",
 								},
 								Session: session,
@@ -398,6 +399,8 @@ func TestUserinfo(t *testing.T) {
 				})
 				require.NoError(t, err)
 				assert.EqualValues(t, "alice", claims.Claims.(jwt2.MapClaims)["sub"])
+				assert.EqualValues(t, []interface{}{"foobar-client"}, claims.Claims.(jwt2.MapClaims)["aud"], "%#v", claims.Claims)
+				assert.NotEmpty(t, claims.Claims.(jwt2.MapClaims)["jti"])
 			},
 		},
 	} {

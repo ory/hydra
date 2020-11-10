@@ -314,9 +314,6 @@ func (c *Client) GetTokenEndpointAuthSigningAlgorithm() string {
 }
 
 func (c *Client) GetRequestObjectSigningAlgorithm() string {
-	if c.RequestObjectSigningAlgorithm == "" {
-		return "RS256"
-	}
 	return c.RequestObjectSigningAlgorithm
 }
 

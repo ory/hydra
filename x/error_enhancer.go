@@ -1,10 +1,12 @@
 package x
 
 import (
+	"net/http"
+
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/herodot"
-	"github.com/pkg/errors"
-	"net/http"
 )
 
 type enhancedError struct {
@@ -26,6 +28,6 @@ func ErrorEnhancer(r *http.Request, err error) interface{} {
 
 	return &enhancedError{
 		RFC6749Error: fosite.ErrorToRFC6749Error(err),
-		RequestID: r.Header.Get("X-Request-Id"),
+		RequestID:    r.Header.Get("X-Request-Id"),
 	}
 }

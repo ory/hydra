@@ -28,8 +28,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/gobuffalo/pop/v5"
-	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -117,7 +118,7 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	return &fosite.RFC6749Error{
 		ErrorField:       e.Name,
 		DescriptionField: e.Description,
-		HintField:             e.Hint,
+		HintField:        e.Hint,
 		CodeField:        e.Code,
 		DebugField:       e.Debug,
 	}
@@ -130,7 +131,7 @@ func (e *RequestDeniedError) Scan(value interface{}) error {
 	}
 
 	if err := json.Unmarshal([]byte(v), e); err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 
 	e.valid = true
@@ -144,7 +145,7 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 
 	value, err := json.Marshal(e)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	return string(value), nil
@@ -206,7 +207,7 @@ func (r *HandledConsentRequest) BeforeSave(_ *pop.Connection) error {
 func (r *HandledConsentRequest) AfterSave(c *pop.Connection) error {
 	r.ConsentRequest = &ConsentRequest{}
 	if err := r.ConsentRequest.FindInDB(c, r.ID); err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 
 	if r.SessionAccessToken == nil {
@@ -383,12 +384,12 @@ func (n *OpenIDConnectContext) Scan(value interface{}) error {
 	if len(v) == 0 {
 		return nil
 	}
-	return errors.WithStack(json.Unmarshal([]byte(v), n))
+	return errorsx.WithStack(json.Unmarshal([]byte(v), n))
 }
 
 func (n *OpenIDConnectContext) Value() (driver.Value, error) {
 	value, err := json.Marshal(n)
-	return value, errors.WithStack(err)
+	return value, errorsx.WithStack(err)
 }
 
 // Contains information about an ongoing logout request.

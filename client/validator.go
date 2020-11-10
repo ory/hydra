@@ -27,8 +27,9 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/stringslice"
@@ -76,19 +77,19 @@ func (v *Validator) Validate(c *Client) error {
 		c.TokenEndpointAuthMethod = "client_secret_basic"
 	} else if c.TokenEndpointAuthMethod == "private_key_jwt" {
 		if len(c.JSONWebKeysURI) == 0 && c.JSONWebKeys == nil {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("When token_endpoint_auth_method is 'private_key_jwt', either jwks or jwks_uri must be set."))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("When token_endpoint_auth_method is 'private_key_jwt', either jwks or jwks_uri must be set."))
 		}
 		if c.TokenEndpointAuthSigningAlgorithm != "" && !isSupportedAuthTokenSigningAlg(c.TokenEndpointAuthSigningAlgorithm) {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Only RS256, RS384, RS512, PS256, PS384, PS512, ES256, ES384 and ES512 are supported as algorithms for private key authentication."))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Only RS256, RS384, RS512, PS256, PS384, PS512, ES256, ES384 and ES512 are supported as algorithms for private key authentication."))
 		}
 	}
 
 	if len(c.JSONWebKeysURI) > 0 && c.JSONWebKeys != nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Fields jwks and jwks_uri can not both be set, you must choose one."))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Fields jwks and jwks_uri can not both be set, you must choose one."))
 	}
 
 	if len(c.Secret) > 0 && len(c.Secret) < 6 {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field client_secret must contain a secret that is at least 6 characters long."))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field client_secret must contain a secret that is at least 6 characters long."))
 	}
 
 	if len(c.Scope) == 0 {
@@ -98,20 +99,20 @@ func (v *Validator) Validate(c *Client) error {
 	for k, origin := range c.AllowedCORSOrigins {
 		u, err := url.Parse(origin)
 		if err != nil {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s from allowed_cors_origins could not be parsed: %s", origin, err))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s from allowed_cors_origins could not be parsed: %s", origin, err))
 		}
 
 		if u.Scheme != "https" && u.Scheme != "http" {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s must use https:// or http:// as HTTP scheme.", origin))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s must use https:// or http:// as HTTP scheme.", origin))
 		}
 
 		if u.User != nil && len(u.User.String()) > 0 {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s has HTTP user and/or password set which is not allowed.", origin))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s has HTTP user and/or password set which is not allowed.", origin))
 		}
 
 		u.Path = strings.TrimRight(u.Path, "/")
 		if len(u.Path)+len(u.RawQuery)+len(u.Fragment) > 0 {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s must have an empty path, query, and fragment but one of the parts is not empty.", origin))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s must have an empty path, query, and fragment but one of the parts is not empty.", origin))
 		}
 
 		c.AllowedCORSOrigins[k] = u.String()
@@ -131,25 +132,25 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.UserinfoSignedResponseAlg != "none" && c.UserinfoSignedResponseAlg != "RS256" {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field userinfo_signed_response_alg can either be 'none' or 'RS256'."))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field userinfo_signed_response_alg can either be 'none' or 'RS256'."))
 	}
 
 	var redirs []url.URL
 	for _, r := range c.RedirectURIs {
 		u, err := url.ParseRequestURI(r)
 		if err != nil {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Unable to parse redirect URL: %s", r))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Unable to parse redirect URL: %s", r))
 		}
 		redirs = append(redirs, *u)
 
 		if strings.Contains(r, "#") {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)."))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)."))
 		}
 	}
 
 	if c.SubjectType != "" {
 		if !stringslice.Has(v.conf.SubjectTypesSupported(), c.SubjectType) {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported()))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported()))
 		}
 	} else {
 		if stringslice.Has(v.conf.SubjectTypesSupported(), "public") {
@@ -162,7 +163,7 @@ func (v *Validator) Validate(c *Client) error {
 	for _, l := range c.PostLogoutRedirectURIs {
 		u, err := url.ParseRequestURI(l)
 		if err != nil {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Unable to parse post_logout_redirect_uri: %s", l))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Unable to parse post_logout_redirect_uri: %s", l))
 		}
 
 		var found bool
@@ -175,7 +176,7 @@ func (v *Validator) Validate(c *Client) error {
 		}
 
 		if !found {
-			return errors.WithStack(fosite.ErrInvalidRequest.
+			return errorsx.WithStack(fosite.ErrInvalidRequest.
 				WithHintf(`post_logout_redirect_uri "%s" must match the domain, port, scheme of at least one of the registered redirect URIs but did not'`, l),
 			)
 		}
@@ -187,31 +188,31 @@ func (v *Validator) Validate(c *Client) error {
 func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Value of sector_identifier_uri could not be parsed because %s.", err))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("Value of sector_identifier_uri could not be parsed because %s.", err))
 	}
 
 	if l.Scheme != "https" {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Value sector_identifier_uri must be an HTTPS URL but it is not."))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Value sector_identifier_uri must be an HTTPS URL but it is not."))
 	}
 
 	response, err := v.c.Get(location)
 	if err != nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}
 	defer response.Body.Close()
 
 	var urls []string
 	if err := json.NewDecoder(response.Body).Decode(&urls); err != nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Unable to decode values from sector_identifier_uri: %s", err)))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Unable to decode values from sector_identifier_uri: %s", err)))
 	}
 
 	if len(urls) == 0 {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug("Array from sector_identifier_uri contains no items"))
+		return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Array from sector_identifier_uri contains no items"))
 	}
 
 	for _, r := range redirectURIs {
 		if !stringslice.Has(urls, r) {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Redirect URL \"%s\" does not match values from sector_identifier_uri.", r)))
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(fmt.Sprintf("Redirect URL \"%s\" does not match values from sector_identifier_uri.", r)))
 		}
 	}
 

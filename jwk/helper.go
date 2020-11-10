@@ -28,6 +28,8 @@ import (
 	"encoding/pem"
 	"fmt"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/hydra/x"
 
 	"github.com/pborman/uuid"
@@ -141,7 +143,7 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	case *ecdsa.PrivateKey:
 		b, err := x509.MarshalECPrivateKey(k)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 		return &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}, nil
 	default:

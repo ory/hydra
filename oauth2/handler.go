@@ -30,6 +30,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/errorsx"
+
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -292,7 +294,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	c, ok := ar.GetClient().(*client.Client)
 	if !ok {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client.")))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHint("Unable to type assert to *client.Client.")))
 		return
 	}
 
@@ -341,7 +343,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 
 		h.r.Writer().Write(w, r, interim)
 	} else {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrServerError.WithHintf("Unsupported userinfo signing algorithm '%s'.", c.UserinfoSignedResponseAlg)))
 		return
 	}
 }
@@ -406,17 +408,17 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	var ctx = r.Context()
 
 	if r.Method != "POST" {
-		err := errors.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
+		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	} else if err := r.ParseMultipartForm(1 << 20); err != nil && err != http.ErrNotMultipart {
-		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
+		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	} else if len(r.PostForm) == 0 {
-		err := errors.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
+		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
@@ -429,7 +431,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	tt, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, token, fosite.TokenType(tokenType), session, strings.Split(scope, " ")...)
 	if err != nil {
 		x.LogAudit(r, err, h.r.Logger())
-		err := errors.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
+		err := errorsx.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
 	}
@@ -452,7 +454,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 
 	session, ok := resp.GetAccessRequester().GetSession().(*Session)
 	if !ok {
-		err := errors.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
+		err := errorsx.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
 		x.LogError(r, err, h.r.Logger())
 		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
 		return
@@ -479,7 +481,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		TokenType:         resp.GetAccessTokenType(),
 		TokenUse:          string(resp.GetTokenUse()),
 	}); err != nil {
-		x.LogError(r, errors.WithStack(err), h.r.Logger())
+		x.LogError(r, errorsx.WithStack(err), h.r.Logger())
 	}
 }
 
@@ -769,7 +771,7 @@ func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httpro
 	client := r.URL.Query().Get("client_id")
 
 	if client == "" {
-		h.r.Writer().WriteError(w, r, errors.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client' is not defined but it should have been.`)))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client' is not defined but it should have been.`)))
 		return
 	}
 

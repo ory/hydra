@@ -3,6 +3,8 @@ package driver
 import (
 	"github.com/pkg/errors"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 
@@ -66,7 +68,7 @@ type Registry interface {
 func NewRegistry(c configuration.Provider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	registry, ok := driver.(Registry)

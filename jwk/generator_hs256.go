@@ -25,8 +25,9 @@ import (
 	"crypto/x509"
 	"io"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/pborman/uuid"
-	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
@@ -37,7 +38,7 @@ func (g *HS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
 	key := &[16]byte{}
 	_, err := io.ReadFull(rand.Reader, key[:])
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	if id == "" {

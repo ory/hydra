@@ -23,7 +23,8 @@ package x
 import (
 	"context"
 
-	"github.com/pkg/errors"
+	"github.com/ory/x/errorsx"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -52,14 +53,14 @@ func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
 	}
 	s, err := bcrypt.GenerateFromPassword(data, cf)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 	return s, nil
 }
 
 func (b *BCrypt) Compare(ctx context.Context, hash, data []byte) error {
 	if err := bcrypt.CompareHashAndPassword(hash, data); err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 	return nil
 }

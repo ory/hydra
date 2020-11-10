@@ -23,8 +23,9 @@ package consent
 import (
 	"net/http"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/gorilla/sessions"
-	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/mapx"
@@ -71,7 +72,7 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.St
 	session.Options.Secure = secure
 	session.Options.SameSite = sameSiteMode
 	if err := session.Save(r, w); err != nil {
-		return errors.WithStack(err)
+		return errorsx.WithStack(err)
 	}
 	if sameSiteMode == http.SameSiteNoneMode && sameSiteLegacyWorkaround {
 		return createCsrfSession(w, r, store, legacyCsrfSessionName(name), csrf, secure, 0, false)
@@ -81,11 +82,11 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.St
 
 func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCSRF string, sameSiteLegacyWorkaround, secure bool) error {
 	if cookie, err := getCsrfSession(r, store, name, sameSiteLegacyWorkaround, secure); err != nil {
-		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("CSRF session cookie could not be decoded"))
+		return errorsx.WithStack(fosite.ErrRequestForbidden.WithDebug("CSRF session cookie could not be decoded"))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {
-		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("No CSRF value available in the session cookie"))
+		return errorsx.WithStack(fosite.ErrRequestForbidden.WithDebug("No CSRF value available in the session cookie"))
 	} else if csrf != expectedCSRF {
-		return errors.WithStack(fosite.ErrRequestForbidden.WithDebug("The CSRF value from the token does not match the CSRF value from the data store"))
+		return errorsx.WithStack(fosite.ErrRequestForbidden.WithDebug("The CSRF value from the token does not match the CSRF value from the data store"))
 	}
 
 	return nil

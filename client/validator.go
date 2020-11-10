@@ -76,7 +76,7 @@ func (v *Validator) Validate(c *Client) error {
 		c.TokenEndpointAuthMethod = "client_secret_basic"
 	} else if c.TokenEndpointAuthMethod == "private_key_jwt" {
 		if len(c.JSONWebKeysURI) == 0 && c.JSONWebKeys == nil {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("When token_endpoint_auth_method is \"private_key_jwt\", either jwks or jwks_uri must be set."))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("When token_endpoint_auth_method is 'private_key_jwt', either jwks or jwks_uri must be set."))
 		}
 		if c.TokenEndpointAuthSigningAlgorithm != "" && !isSupportedAuthTokenSigningAlg(c.TokenEndpointAuthSigningAlgorithm) {
 			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Only RS256, RS384, RS512, PS256, PS384, PS512, ES256, ES384 and ES512 are supported as algorithms for private key authentication."))
@@ -98,20 +98,20 @@ func (v *Validator) Validate(c *Client) error {
 	for k, origin := range c.AllowedCORSOrigins {
 		u, err := url.Parse(origin)
 		if err != nil {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s from allowed_cors_origins could not be parsed: %s", origin, err)))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s from allowed_cors_origins could not be parsed: %s", origin, err))
 		}
 
 		if u.Scheme != "https" && u.Scheme != "http" {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s must use https:// or http:// as HTTP scheme.", origin)))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s must use https:// or http:// as HTTP scheme.", origin))
 		}
 
 		if u.User != nil && len(u.User.String()) > 0 {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s has HTTP user and/or password set which is not allowed.", origin)))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s has HTTP user and/or password set which is not allowed.", origin))
 		}
 
 		u.Path = strings.TrimRight(u.Path, "/")
 		if len(u.Path)+len(u.RawQuery)+len(u.Fragment) > 0 {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Origin URL %s must have an empty path, query, and fragment but one of the parts is not empty.", origin)))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Origin URL %s must have an empty path, query, and fragment but one of the parts is not empty.", origin))
 		}
 
 		c.AllowedCORSOrigins[k] = u.String()
@@ -131,7 +131,7 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.UserinfoSignedResponseAlg != "none" && c.UserinfoSignedResponseAlg != "RS256" {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field userinfo_signed_response_alg can either be \"none\" or \"RS256\"."))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Field userinfo_signed_response_alg can either be 'none' or 'RS256'."))
 	}
 
 	var redirs []url.URL
@@ -143,13 +143,13 @@ func (v *Validator) Validate(c *Client) error {
 		redirs = append(redirs, *u)
 
 		if strings.Contains(r, "#") {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)"))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHint("Redirect URIs must not contain fragments (#)."))
 		}
 	}
 
 	if c.SubjectType != "" {
 		if !stringslice.Has(v.conf.SubjectTypesSupported(), c.SubjectType) {
-			return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported())))
+			return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported()))
 		}
 	} else {
 		if stringslice.Has(v.conf.SubjectTypesSupported(), "public") {
@@ -187,7 +187,7 @@ func (v *Validator) Validate(c *Client) error {
 func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {
-		return errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("Value of sector_identifier_uri could not be parsed: %s", err)))
+		return errors.WithStack(fosite.ErrInvalidRequest.WithHintf("Value of sector_identifier_uri could not be parsed because %s.", err))
 	}
 
 	if l.Scheme != "https" {

@@ -43,9 +43,9 @@ func (g *SubjectIdentifierAlgorithmPairwise) Obfuscate(subject string, client *c
 	// sub = SHA-256 ( sector_identifier || local_account_id || salt ).
 	var id string
 	if len(client.SectorIdentifierURI) == 0 && len(client.RedirectURIs) > 1 {
-		return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("OAuth 2.0 Client %s has multiple redirect_uris but no sector_identifier_uri was set which is not allowed when performing using subject type pairwise. Please reconfigure the OAuth 2.0 client properly.", client.OutfacingID)))
+		return "", errors.WithStack(fosite.ErrInvalidRequest.WithHintf("OAuth 2.0 Client %s has multiple redirect_uris but no sector_identifier_uri was set which is not allowed when performing using subject type pairwise. Please reconfigure the OAuth 2.0 client properly.", client.OutfacingID))
 	} else if len(client.SectorIdentifierURI) == 0 && len(client.RedirectURIs) == 0 {
-		return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf("OAuth 2.0 Client %s neither specifies a sector_identifier_uri nor a redirect_uri which is not allowed when performing using subject type pairwise. Please reconfigure the OAuth 2.0 client properly.", client.OutfacingID)))
+		return "", errors.WithStack(fosite.ErrInvalidRequest.WithHintf("OAuth 2.0 Client %s neither specifies a sector_identifier_uri nor a redirect_uri which is not allowed when performing using subject type pairwise. Please reconfigure the OAuth 2.0 client properly.", client.OutfacingID))
 	} else if len(client.SectorIdentifierURI) > 0 {
 		id = client.SectorIdentifierURI
 	} else {

@@ -111,15 +111,15 @@ func (e *RequestDeniedError) toRFCError() *fosite.RFC6749Error {
 	}
 
 	if e.Code == 0 {
-		e.Code = fosite.ErrInvalidRequest.Code
+		e.Code = fosite.ErrInvalidRequest.CodeField
 	}
 
 	return &fosite.RFC6749Error{
-		Name:        e.Name,
-		Description: e.Description,
-		Hint:        e.Hint,
-		Code:        e.Code,
-		Debug:       e.Debug,
+		ErrorField:       e.Name,
+		DescriptionField: e.Description,
+		HintField:             e.Hint,
+		CodeField:        e.Code,
+		DebugField:       e.Debug,
 	}
 }
 

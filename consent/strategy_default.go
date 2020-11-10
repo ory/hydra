@@ -332,7 +332,7 @@ func (s *DefaultStrategy) obfuscateSubjectIdentifier(cl fosite.Client, subject, 
 	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
 		algorithm, ok := s.r.SubjectIdentifierAlgorithm()[c.SubjectType]
 		if !ok {
-			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHint(fmt.Sprintf(`Subject Identifier Algorithm "%s" was requested by OAuth 2.0 Client "%s", but is not configured.`, c.SubjectType, c.OutfacingID)))
+			return "", errors.WithStack(fosite.ErrInvalidRequest.WithHintf(`Subject Identifier Algorithm '%s' was requested by OAuth 2.0 Client '%s' but is not configured.`, c.SubjectType, c.OutfacingID))
 		}
 
 		if len(forcedIdentifier) > 0 {
@@ -350,7 +350,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted, or is invalid."))
+		return nil, errors.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted or is invalid."))
 	} else if err != nil {
 		return nil, err
 	}
@@ -361,7 +361,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
-		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The login request has expired, please try again."))
+		return nil, errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The login request has expired. Please try again."))
 	}
 
 	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.ServesHTTPS()); err != nil {
@@ -643,7 +643,7 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 	for _, c := range clients {
 		u, err := url.Parse(c.FrontChannelLogoutURI)
 		if err != nil {
-			return nil, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unable to parse frontchannel_logout_uri: %s", c.FrontChannelLogoutURI)).WithDebug(err.Error()))
+			return nil, errors.WithStack(fosite.ErrServerError.WithHintf("Unable to parse frontchannel_logout_uri because %s.", c.FrontChannelLogoutURI).WithDebug(err.Error()))
 		}
 
 		urls = append(urls, urlx.SetQuery(u, url.Values{
@@ -767,12 +767,12 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 		if len(state) > 0 {
 			// state can only be set if it's an RP-initiated logout flow. If not, we should throw an error.
-			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter state is set but id_token_hint is missing"))
+			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter state is set but id_token_hint is missing."))
 		}
 
 		if len(requestedRedir) > 0 {
 			// post_logout_redirect_uri can only be set if it's an RP-initiated logout flow. If not, we should throw an error.
-			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing"))
+			return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing."))
 		}
 
 		session, err := s.authenticationSession(w, r)
@@ -818,12 +818,10 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	mksi := mapx.KeyStringToInterface(claims)
 	if !claims.VerifyIssuer(s.c.IssuerURL().String(), true) {
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.
-			WithHint(
-				fmt.Sprintf(
-					`Logout failed because issuer claim value "%s" from query parameter id_token_hint does not match with issuer value from configuration "%s"`,
+			WithHintf(
+					`Logout failed because issuer claim value '%s' from query parameter id_token_hint does not match with issuer value from configuration '%s'.`,
 					mapx.GetStringDefault(mksi, "iss", ""),
 					s.c.IssuerURL().String(),
-				),
 			),
 		)
 	}
@@ -831,24 +829,22 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 	now := time.Now().UTC().Unix()
 	if !claims.VerifyIssuedAt(now, true) {
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.
-			WithHint(
-				fmt.Sprintf(
-					`Logout failed because iat claim value "%.0f" from query parameter id_token_hint is before now ("%d")`,
+			WithHintf(
+					`Logout failed because iat claim value '%.0f' from query parameter id_token_hint is before now ('%d').`,
 					mapx.GetFloat64Default(mksi, "iat", float64(0)),
 					now,
-				),
 			),
 		)
 	}
 
 	hintSid := mapx.GetStringDefault(mksi, "sid", "")
 	if len(hintSid) == 0 {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter id_token_hint is missing sid claim"))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter id_token_hint is missing sid claim."))
 	}
 
 	// It doesn't really make sense to use the subject value from the ID Token because it might be obfuscated.
 	if hintSub := mapx.GetStringDefault(mksi, "sub", ""); len(hintSub) == 0 {
-		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter id_token_hint is missing sub claim"))
+		return nil, errors.WithStack(fosite.ErrInvalidRequest.WithHint("Logout failed because query parameter id_token_hint is missing sub claim."))
 	}
 
 	// Let's find the client by cycling through the audiences. Typically, we only have one audience
@@ -872,7 +868,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 	if cl == nil {
 		return nil, errors.WithStack(fosite.ErrInvalidRequest.
-			WithHint("Logout failed because none of the listed audiences is a registered OAuth 2.0 Client"))
+			WithHint("Logout failed because none of the listed audiences is a registered OAuth 2.0 Client."))
 	}
 
 	if len(requestedRedir) > 0 {
@@ -881,7 +877,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 			if w == requestedRedir {
 				u, err := url.Parse(w)
 				if err != nil {
-					return nil, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unable to parse post_logout_redirect_uri: %s", w)).WithDebug(err.Error()))
+					return nil, errors.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unable to parse post_logout_redirect_uri '%s' because %s.", w, err)).WithDebug(err.Error()))
 				}
 
 				f = u
@@ -890,7 +886,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 		if f == nil {
 			return nil, errors.WithStack(fosite.ErrInvalidRequest.
-				WithHint("Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client"),
+				WithHint("Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client."),
 			)
 		}
 

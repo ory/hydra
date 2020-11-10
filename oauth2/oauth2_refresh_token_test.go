@@ -126,15 +126,15 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			for err := range errorsCh {
 				if err != nil {
 					if e := (&fosite.RFC6749Error{}); errors.As(err, &e) {
-						switch e.Name {
+						switch e.ErrorField {
 
 						// change logic below when the refresh handler starts returning 'fosite.ErrInvalidRequest' for other reasons.
 						// as of now, this error is only returned due to concurrent transactions competing to refresh using the same token.
 
-						case fosite.ErrInvalidRequest.Name:
+						case fosite.ErrInvalidRequest.ErrorField:
 							// the error description copy is defined by RFC 6749 and should not be different regardless of
 							// the underlying transactional aware storage backend used by hydra
-							assert.Equal(t, fosite.ErrInvalidRequest.Description, e.Description)
+							assert.Equal(t, fosite.ErrInvalidRequest.DescriptionField, e.DescriptionField)
 							// the database error debug copy will be different depending on the underlying database used
 							switch dbName {
 							case dbal.DriverMySQL:
@@ -156,7 +156,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									// postgres: pq: could not serialize access due to concurrent update: Unable to serialize access due to a concurrent update in another session: The request could not be completed due to concurrent access
 									"concurrent update",
 								} {
-									if strings.Contains(e.Debug, errSubstr) {
+									if strings.Contains(e.DebugField, errSubstr) {
 										matched = true
 										break
 									}
@@ -170,15 +170,15 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									"Raw error: %T %+v\n"+
 									"Raw cause: %T %+v",
 									storageVersion,
-									e.Description,
-									e.Debug,
-									e.Hint,
+									e.DescriptionField,
+									e.DebugField,
+									e.HintField,
 									err, err,
 									e, e)
 							}
-						case fosite.ErrServerError.Name:
+						case fosite.ErrServerError.ErrorField:
 							// this happens when there is an error with the storage
-							if dbName == dbal.DriverCockroachDB && strings.Contains(e.Debug, "RETRY_WRITE_TOO_OLD") {
+							if dbName == dbal.DriverCockroachDB && strings.Contains(e.DebugField, "RETRY_WRITE_TOO_OLD") {
 								break
 							}
 							fallthrough
@@ -197,11 +197,11 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									"Error debug: %s\n"+
 									"Error hint: %s\n"+
 									"Raw error: %+v",
-									e.Name,
+									e.ErrorField,
 									storageVersion,
-									e.Description,
-									e.Debug,
-									e.Hint,
+									e.DescriptionField,
+									e.DebugField,
+									e.HintField,
 									err)
 							}
 						}

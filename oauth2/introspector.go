@@ -43,12 +43,12 @@ type Introspection struct {
 
 	// ID is aclient identifier for the OAuth 2.0 client that
 	// requested this token.
-	ClientID string `json:"client_id,omitempty"`
+	ClientID string `json:"client_id"`
 
 	// Subject of the token, as defined in JWT [RFC7519].
 	// Usually a machine-readable identifier of the resource owner who
 	// authorized this token.
-	Subject string `json:"sub,omitempty"`
+	Subject string `json:"sub"`
 
 	// ObfuscatedSubject is set when the subject identifier algorithm was set to "pairwise" during authorization.
 	// It is the `sub` value of the ID Token that was issued.
@@ -56,33 +56,33 @@ type Introspection struct {
 
 	// Expires at is an integer timestamp, measured in the number of seconds
 	// since January 1 1970 UTC, indicating when this token will expire.
-	ExpiresAt int64 `json:"exp,omitempty"`
+	ExpiresAt int64 `json:"exp"`
 
 	// Issued at is an integer timestamp, measured in the number of seconds
 	// since January 1 1970 UTC, indicating when this token was
 	// originally issued.
-	IssuedAt int64 `json:"iat,omitempty"`
+	IssuedAt int64 `json:"iat"`
 
 	// NotBefore is an integer timestamp, measured in the number of seconds
 	// since January 1 1970 UTC, indicating when this token is not to be
 	// used before.
-	NotBefore int64 `json:"nbf,omitempty"`
+	NotBefore int64 `json:"nbf"`
 
 	// Username is a human-readable identifier for the resource owner who
 	// authorized this token.
 	Username string `json:"username,omitempty"`
 
 	// Audience contains a list of the token's intended audiences.
-	Audience []string `json:"aud,omitempty"`
+	Audience []string `json:"aud"`
 
 	// IssuerURL is a string representing the issuer of this token
-	Issuer string `json:"iss,omitempty"`
+	Issuer string `json:"iss"`
 
 	// TokenType is the introspected token's type, typically `Bearer`.
-	TokenType string `json:"token_type,omitempty"`
+	TokenType string `json:"token_type"`
 
 	// TokenUse is the introspected token's use, for example `access_token` or `refresh_token`.
-	TokenUse string `json:"token_use,omitempty"`
+	TokenUse string `json:"token_use"`
 
 	// Extra is arbitrary data set by the session.
 	Extra map[string]interface{} `json:"ext,omitempty"`

@@ -247,6 +247,7 @@ func TestViperProviderValidates(t *testing.T) {
 
 	// oauth2
 	assert.Equal(t, true, c.ShareOAuth2Debug())
+	assert.Equal(t, true, c.OAuth2LegacyErrors())
 	assert.Equal(t, 20, c.BCryptCost())
 	assert.Equal(t, true, c.PKCEEnforced())
 	assert.Equal(t, true, c.EnforcePKCEForPublicClients())

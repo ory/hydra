@@ -112,6 +112,7 @@ ttl:
 
 oauth2:
   expose_internal_errors: true
+  include_legacy_error_fields: true
   hashers:
     bcrypt:
       cost: 20

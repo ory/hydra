@@ -754,6 +754,14 @@
             true
           ]
         },
+        "include_legacy_error_fields": {
+          "type": "boolean",
+          "description": "Set this to true if you want to include the `error_hint` and `error_debug` legacy fields in error responses. We recommend to set this to `false` unless you have clients using these fields.",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
         "hashers": {
           "type": "object",
           "additionalProperties": false,

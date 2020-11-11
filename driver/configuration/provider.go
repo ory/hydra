@@ -38,6 +38,7 @@ type Provider interface {
 	OIDCDiscoverySupportedClaims() []string
 	OIDCDiscoveryUserinfoEndpoint() string
 	ShareOAuth2Debug() bool
+	OAuth2LegacyErrors() bool
 	DSN() string
 	EncryptSessionData() bool
 	BCryptCost() int

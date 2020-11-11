@@ -44,6 +44,7 @@ Something is not working.
 
 #### Pull Requests
 
+- [ ] Prepare OpenID Connect Conformity test suite with new profiles and regression fixes ([hydra#2170](https://github.com/ory/hydra/pull/2170)) - [@hackerman](https://github.com/aeneasr)
 - [x] Deprecate client flags in introspect ([hydra#2011](https://github.com/ory/hydra/pull/2011)) - [@hackerman](https://github.com/aeneasr)
 - [x] fix: bump ory/fosite to v0.34.1 to address CVEs ([hydra#2090](https://github.com/ory/hydra/pull/2090)) - [@hackerman](https://github.com/aeneasr)
 - [x] ci: resolve ci release issues ([hydra#2094](https://github.com/ory/hydra/pull/2094)) - [@hackerman](https://github.com/aeneasr)
@@ -58,6 +59,7 @@ New feature or request.
 
 #### Pull Requests
 
+- [ ] Prepare OpenID Connect Conformity test suite with new profiles and regression fixes ([hydra#2170](https://github.com/ory/hydra/pull/2170)) - [@hackerman](https://github.com/aeneasr)
 - [x] perf: add (client_id, subject) index to access and refresh tables to improve revocation performance ([hydra#2001](https://github.com/ory/hydra/pull/2001)) - [@hackerman](https://github.com/aeneasr)
 
 ### [Docs](https://github.com/ory/hydra/labels/docs)

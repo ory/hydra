@@ -4,7 +4,7 @@ go 1.15
 
 //replace github.com/ory/fosite => ../fosite
 
-replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201110164931-a34286055bd6
+replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201111105646-fa018027e84a
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

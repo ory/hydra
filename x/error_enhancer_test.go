@@ -44,27 +44,27 @@ func TestErrorEnhancer(t *testing.T) {
 	}{
 		{
 			in:  sqlcon.ErrNoRows,
-			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\",\"status_code\":404,\"request_id\":\"\"}",
+			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\"}",
 		},
 		{
 			in:  errorsx.WithStack(sqlcon.ErrNoRows),
-			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\",\"status_code\":404,\"request_id\":\"\"}",
+			out: "{\"error\":\"Unable to locate the resource\",\"error_description\":\"\"}",
 		},
 		{
 			in:  errors.New("bla"),
-			out: "{\"error\":\"error\",\"error_description\":\"The error is unrecognizable.\",\"status_code\":500,\"error_debug\":\"bla\",\"request_id\":\"\"}",
+			out: "{\"error\":\"error\",\"error_description\":\"The error is unrecognizable\"}",
 		},
 		{
 			in:  errors2.New("bla"),
-			out: "{\"error\":\"error\",\"error_description\":\"The error is unrecognizable.\",\"status_code\":500,\"error_debug\":\"bla\",\"request_id\":\"\"}",
+			out: "{\"error\":\"error\",\"error_description\":\"The error is unrecognizable\"}",
 		},
 		{
 			in:  fosite.ErrInvalidRequest,
-			out: "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_hint\":\"Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters. Make sure that the client you are using has exactly whitelisted the redirect_uri you specified.\",\"status_code\":400,\"request_id\":\"\"}",
+			out: "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters. Make sure that the client you are using has exactly whitelisted the redirect_uri you specified.\"}",
 		},
 		{
 			in:  errorsx.WithStack(fosite.ErrInvalidRequest),
-			out: "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed\",\"error_hint\":\"Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters. Make sure that the client you are using has exactly whitelisted the redirect_uri you specified.\",\"status_code\":400,\"request_id\":\"\"}",
+			out: "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Make sure that the various parameters are correct, be aware of case sensitivity and trim your parameters. Make sure that the client you are using has exactly whitelisted the redirect_uri you specified.\"}",
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {

@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -738,13 +737,8 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 }
 
 func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error) {
-	rfErr := fosite.ErrorToRFC6749Error(err)
-	query := url.Values{"error": {rfErr.ErrorField}, "error_description": {rfErr.DescriptionField}, "error_hint": {rfErr.HintField}}
-
-	if h.c.ShareOAuth2Debug() {
-		query.Add("error_debug", rfErr.DebugField)
-	}
-
+	rfcErr := fosite.ErrorToRFC6749Error(err).WithLegacyFormat(h.c.OAuth2LegacyErrors()).WithExposeDebug(h.c.ShareOAuth2Debug())
+	query := rfcErr.ToValues()
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
 }
 

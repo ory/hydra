@@ -86,6 +86,8 @@ const (
 	ViperKeyLogLevel                                  = "log.level"
 	ViperKeyCGroupsV1AutoMaxProcsEnabled              = "cgroups.v1.auto_max_procs_enabled"
 	ViperKeyGrantAllClientCredentialsScopesPerDefault = "oauth2.client_credentials.default_grant_allowed_scope"
+	ViperKeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
+	ViperKeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 )
 
 const DefaultSQLiteMemoryDSN = "sqlite://:memory:?_fk=true"
@@ -500,7 +502,11 @@ func (v *ViperProvider) OIDCDiscoveryUserinfoEndpoint() string {
 }
 
 func (v *ViperProvider) ShareOAuth2Debug() bool {
-	return viperx.GetBool(v.l, "oauth2.expose_internal_errors", false, "OAUTH2_SHARE_ERROR_DEBUG")
+	return viperx.GetBool(v.l, ViperKeyExposeOAuth2Debug, false, "OAUTH2_SHARE_ERROR_DEBUG")
+}
+
+func (v *ViperProvider) OAuth2LegacyErrors() bool {
+	return viperx.GetBool(v.l, ViperKeyOAuth2LegacyErrors, false)
 }
 
 func (v *ViperProvider) PKCEEnforced() bool {

@@ -304,7 +304,6 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	delete(interim, "nonce")
 	delete(interim, "at_hash")
 	delete(interim, "c_hash")
-	delete(interim, "rat")
 	delete(interim, "exp")
 
 	if aud := interim["aud"].([]string); !ok || len(aud) == 0 {
@@ -324,9 +323,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		token, _, err := h.r.OpenIDJWTStrategy().Generate(r.Context(), jwt2.MapClaims(interim), &jwt.Headers{
-			Extra: map[string]interface{}{
-				"kid": keyID,
-			},
+			Extra: map[string]interface{}{"kid": keyID},
 		})
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
@@ -460,6 +457,12 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		obfuscated = session.Claims.Subject
 	}
 
+	audience := resp.GetAccessRequester().GetGrantedAudience()
+	if audience == nil {
+		// prevent null
+		audience = fosite.Arguments{}
+	}
+
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	if err = json.NewEncoder(w).Encode(&Introspection{
 		Active:            resp.IsActive(),
@@ -470,11 +473,12 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Subject:           session.GetSubject(),
 		Username:          session.GetUsername(),
 		Extra:             session.Extra,
-		Audience:          resp.GetAccessRequester().GetGrantedAudience(),
+		Audience:          audience,
 		Issuer:            strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
 		ObfuscatedSubject: obfuscated,
 		TokenType:         resp.GetAccessTokenType(),
 		TokenUse:          string(resp.GetTokenUse()),
+		NotBefore:         resp.GetAccessRequester().GetRequestedAt().Unix(),
 	}); err != nil {
 		x.LogError(r, errorsx.WithStack(err), h.r.Logger())
 	}
@@ -685,7 +689,6 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	authorizeRequest.SetID(session.ID)
-
 	claims := &jwt.IDTokenClaims{
 		Subject:                             session.ConsentRequest.SubjectIdentifier,
 		Issuer:                              strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",

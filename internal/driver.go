@@ -74,6 +74,10 @@ func NewRegistryMemory(t *testing.T, c *configuration.ViperProvider) driver.Regi
 	return newRegistryDefault(t, "memory", c)
 }
 
+func NewMockedRegistry(t *testing.T) driver.Registry {
+	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults())
+}
+
 func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {
 	return newRegistryDefault(t, url, NewConfigurationWithDefaults())
 }

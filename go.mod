@@ -4,7 +4,7 @@ go 1.15
 
 //replace github.com/ory/fosite => ../fosite
 
-replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201111105646-fa018027e84a
+replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201111120223-2dd6bac4058e
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -15,6 +15,7 @@ require (
 	github.com/go-openapi/swag v0.19.7
 	github.com/go-openapi/validate v0.19.6
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
+	github.com/gobuffalo/httptest v1.0.2
 	github.com/gobuffalo/packr v1.24.0 // indirect
 	github.com/gobuffalo/packr/v2 v2.8.0
 	github.com/gobuffalo/pop/v5 v5.3.1

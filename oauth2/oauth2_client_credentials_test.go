@@ -23,16 +23,11 @@ package oauth2_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"net/http/httptest"
+	"github.com/google/uuid"
+	"github.com/tidwall/gjson"
 	"net/url"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/google/uuid"
-	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/httpx"
@@ -50,7 +45,6 @@ import (
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
 )
 
 func TestClientCredentials(t *testing.T) {
@@ -199,92 +193,28 @@ func TestClientCredentials(t *testing.T) {
 		t.Run("strategy=opaque", run("opaque"))
 		t.Run("strategy=jwt", run("jwt"))
 	})
-}
 
-func TestClientCredentialsGrantAllScopes(t *testing.T) {
-	for _, tc := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
-		t.Run("tc="+tc.d, func(t *testing.T) {
-			conf := internal.NewConfigurationWithDefaults()
-			viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second)
-			viper.Set(configuration.ViperKeyAccessTokenStrategy, tc.d)
-			viper.Set(configuration.ViperKeyGrantAllClientCredentialsScopesPerDefault, true)
+	t.Run("case=should grant default scopes if configured to do ", func(t *testing.T) {
+		viper.Set(configuration.ViperKeyGrantAllClientCredentialsScopesPerDefault, true)
 
-			reg := internal.NewRegistryMemory(t, conf)
+		run := func(strategy string) func(t *testing.T) {
+			return func(t *testing.T) {
+				viper.Set(configuration.ViperKeyAccessTokenStrategy, strategy)
 
-			router := x.NewRouterPublic()
-			ts := httptest.NewServer(router)
-			defer ts.Close()
-			viper.Set(configuration.ViperKeyIssuerURL, ts.URL)
+				cl, conf := newClient(t)
+				defaultScope := conf.Scopes
+				conf.Scopes = []string{}
 
-			handler := NewHandler(reg, conf)
-			handler.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
-				return h
-			})
+				token, err := getToken(t, conf)
+				require.NoError(t, err)
 
-			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
-				OutfacingID:   "app-client",
-				Secret:        "secret",
-				RedirectURIs:  []string{ts.URL + "/callback"},
-				ResponseTypes: []string{"token"},
-				GrantTypes:    []string{"client_credentials"},
-				Scope:         "foobar foo2bar",
-				Audience:      []string{"https://api.ory.sh/"},
-			}))
-
-			for k, ccc := range []struct {
-				d                 string
-				c                 *clientcredentials.Config
-				assertAccessToken func(*testing.T, string)
-				expectAccessToken bool
-				expectError       bool
-			}{
-				{
-					d: "should pass with multiple scopes",
-					c: &clientcredentials.Config{
-						ClientID:     "app-client",
-						ClientSecret: "secret",
-						TokenURL:     ts.URL + "/oauth2/token",
-						Scopes:       []string{},
-					},
-					assertAccessToken: func(t *testing.T, token string) {
-						if tc.d != "jwt" {
-							return
-						}
-						body, err := jwt.DecodeSegment(strings.Split(token, ".")[1])
-						require.NoError(t, err)
-
-						data := map[string]interface{}{}
-						require.NoError(t, json.Unmarshal(body, &data))
-						assert.EqualValues(t, "app-client", data["client_id"])
-						assert.EqualValues(t, []interface{}{"foobar", "foo2bar"}, data["scp"])
-					},
-					expectAccessToken: true,
-					expectError:       false,
-				},
-			} {
-				t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
-					ccc.c.AuthStyle = goauth2.AuthStyleInHeader
-					tok, err := ccc.c.Token(context.Background())
-
-					if ccc.expectError {
-						require.Error(t, err)
-					} else {
-						require.NoError(t, err)
-					}
-
-					if ccc.expectAccessToken {
-						assert.NotEmpty(t, tok.AccessToken)
-						assert.Empty(t, tok.RefreshToken)
-						assert.Empty(t, tok.Extra("id_token"))
-					} else {
-						assert.Nil(t, tok)
-					}
-
-					if ccc.assertAccessToken != nil {
-						ccc.assertAccessToken(t, tok.AccessToken)
-					}
-				})
+				// We reset this so that introspectToken is going to check for the default scope.
+				conf.Scopes = defaultScope
+				inspectToken(t, token, cl, conf, strategy)
 			}
-		})
-	}
+		}
+
+		t.Run("strategy=opaque", run("opaque"))
+		t.Run("strategy=jwt", run("jwt"))
+	})
 }

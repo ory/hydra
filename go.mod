@@ -2,9 +2,9 @@ module github.com/ory/hydra
 
 go 1.15
 
-//replace github.com/ory/fosite => ../fosite
+replace github.com/ory/fosite => ../fosite
 
-replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201111120223-2dd6bac4058e
+//replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201111120223-2dd6bac4058e
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

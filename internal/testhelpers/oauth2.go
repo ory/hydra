@@ -2,8 +2,18 @@ package testhelpers
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
+	"golang.org/x/oauth2"
+
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/ioutilx"
 
 	"github.com/gobuffalo/httptest"
 
@@ -37,10 +47,79 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 	// SendDebugMessagesToClients: true,
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
-	if reg.Config().AccessTokenStrategy() == "jwt" {
-		internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
-	}
+	internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
 	reg.RegisterRoutes(admin, public)
 	return publicTS, adminTS
+}
+
+func IntrospectToken(t *testing.T, conf *oauth2.Config, token *oauth2.Token, adminTS *httptest.Server) gjson.Result {
+	require.NotEmpty(t, token.AccessToken)
+
+	req := httpx.MustNewRequest("POST", adminTS.URL+"/oauth2/introspect",
+		strings.NewReader((url.Values{"token": {token.AccessToken}}).Encode()),
+		"application/x-www-form-urlencoded")
+
+	req.SetBasicAuth(conf.ClientID, conf.ClientSecret)
+	res, err := adminTS.Client().Do(req)
+	require.NoError(t, err)
+	defer res.Body.Close()
+	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
+}
+
+func Userinfo(t *testing.T, token *oauth2.Token, publicTS *httptest.Server) gjson.Result {
+	require.NotEmpty(t, token.AccessToken)
+
+	req := httpx.MustNewRequest("GET", publicTS.URL+"/userinfo", nil, "")
+	req.Header.Set("Authorization", "Bearer "+token.AccessToken)
+
+	res, err := publicTS.Client().Do(req)
+	require.NoError(t, err)
+
+	defer res.Body.Close()
+	return gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
+}
+
+func HTTPServerNotImplementedHandler(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("This should not have been called")
+	}
+}
+
+func NewUI(t *testing.T, login, consent http.HandlerFunc) {
+	if login == nil {
+		login = HTTPServerNotImplementedHandler
+	}
+
+	if consent == nil {
+		login = HTTPServerNotImplementedHandler
+	}
+
+	lt := httptest.NewServer(login)
+	ct := httptest.NewServer(consent)
+
+	t.Cleanup(lt.Close)
+	t.Cleanup(ct.Close)
+
+	viper.Set(configuration.ViperKeyLoginURL, lt.URL)
+	viper.Set(configuration.ViperKeyConsentURL, ct.URL)
+}
+
+func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {
+	if h == nil {
+		h = HTTPServerNotImplementedHandler
+	}
+
+	r := httprouter.New()
+	r.GET("/"+prefix, func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		h(w, r)
+	})
+	ts := httptest.NewServer(r)
+	t.Cleanup(ts.Close)
+
+	return ts.URL + "/" + prefix
 }

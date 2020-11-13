@@ -23,15 +23,12 @@ package oauth2_test
 import (
 	"context"
 	"encoding/json"
-	"github.com/google/uuid"
-	"github.com/tidwall/gjson"
 	"net/url"
 	"strings"
 	"testing"
 
-	"github.com/ory/hydra/internal/testhelpers"
-	"github.com/ory/x/httpx"
-	"github.com/ory/x/ioutilx"
+	"github.com/google/uuid"
+	"github.com/tidwall/gjson"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
@@ -39,12 +36,13 @@ import (
 	goauth2 "golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
+	"github.com/ory/hydra/internal/testhelpers"
+
 	"github.com/ory/viper"
 
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
-	. "github.com/ory/hydra/oauth2"
 )
 
 func TestClientCredentials(t *testing.T) {
@@ -89,15 +87,7 @@ func TestClientCredentials(t *testing.T) {
 	}
 
 	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string) {
-		require.NotEmpty(t, token.AccessToken)
-
-		req := httpx.MustNewRequest("POST", admin.URL+IntrospectPath,
-			strings.NewReader((url.Values{"token": {token.AccessToken}}).Encode()),
-			"application/x-www-form-urlencoded")
-		req.SetBasicAuth(cl.OutfacingID, conf.ClientSecret)
-		res, err := public.Client().Do(req)
-		require.NoError(t, err)
-		defer res.Body.Close()
+		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.OutfacingID, ClientSecret: conf.ClientSecret}, token, admin)
 
 		check := func(res gjson.Result) {
 			assert.EqualValues(t, cl.OutfacingID, res.Get("client_id").String(), "%s", res.Raw)
@@ -110,7 +100,6 @@ func TestClientCredentials(t *testing.T) {
 			assert.EqualValues(t, encodeOr(t, conf.EndpointParams["audience"], "[]"), res.Get("aud").Raw, "%s", res.Raw)
 		}
 
-		introspection := gjson.ParseBytes(ioutilx.MustReadAll(res.Body))
 		check(introspection)
 		assert.True(t, introspection.Get("active").Bool())
 		assert.EqualValues(t, "access_token", introspection.Get("token_use").String())

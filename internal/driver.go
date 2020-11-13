@@ -57,7 +57,7 @@ func resetConfig() {
 	viper.Set(configuration.ViperKeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
 	viper.Set(configuration.ViperKeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
 
-	viper.Set(configuration.ViperKeyLogLevel, "debug")
+	viper.Set(configuration.ViperKeyLogLevel, "trace")
 }
 
 func NewConfigurationWithDefaults() *configuration.ViperProvider {

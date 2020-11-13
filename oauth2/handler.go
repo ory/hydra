@@ -305,17 +305,17 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	delete(interim, "at_hash")
 	delete(interim, "c_hash")
 	delete(interim, "exp")
+	delete(interim, "sid")
+	delete(interim, "jti")
 
 	if aud := interim["aud"].([]string); !ok || len(aud) == 0 {
 		interim["aud"] = []string{c.GetID()}
 	}
 
-	if _, ok := interim["jti"]; !ok {
-		interim["jti"] = uuid.New()
-	}
-	interim["iat"] = time.Now().Unix()
-
 	if c.UserinfoSignedResponseAlg == "RS256" {
+		interim["jti"] = uuid.New()
+		interim["iat"] = time.Now().Unix()
+
 		keyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
@@ -690,16 +690,18 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	authorizeRequest.SetID(session.ID)
 	claims := &jwt.IDTokenClaims{
-		Subject:                             session.ConsentRequest.SubjectIdentifier,
-		Issuer:                              strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
-		IssuedAt:                            time.Now().UTC(),
+		Subject: session.ConsentRequest.SubjectIdentifier,
+		Issuer:  strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
+
 		AuthTime:                            time.Time(session.AuthenticatedAt),
 		RequestedAt:                         session.RequestedAt,
 		Extra:                               session.Session.IDToken,
 		AuthenticationContextClassReference: session.ConsentRequest.ACR,
 
-		// We do not need to pass the audience because it's included directly by ORY Fosite
-		// Audience:    []string{authorizeRequest.GetClient().GetID()},
+		// These are required for work around https://github.com/ory/fosite/issues/530
+		Nonce:    authorizeRequest.GetRequestForm().Get("nonce"),
+		Audience: []string{authorizeRequest.GetClient().GetID()},
+		IssuedAt: time.Now().Truncate(time.Second).UTC(),
 
 		// This is set by the fosite strategy
 		// ExpiresAt:   time.Now().Add(h.IDTokenLifespan).UTC(),

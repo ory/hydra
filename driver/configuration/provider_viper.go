@@ -37,7 +37,7 @@ type ViperProvider struct {
 const (
 	ViperKeyWellKnownKeys                 = "webfinger.jwks.broadcast_keys"
 	ViperKeyOAuth2ClientRegistrationURL   = "webfinger.oidc_discovery.client_registration_url"
-	ViperKLeyOAuth2TokenURL               = "webfinger.oidc_discovery.token_url"
+	ViperKLeyOAuth2TokenURL               = "webfinger.oidc_discovery.token_url" // #nosec G101
 	ViperKLeyOAuth2AuthURL                = "webfinger.oidc_discovery.auth_url"
 	ViperKeyJWKSURL                       = "webfinger.oidc_discovery.jwks_url"
 	ViperKeyOIDCDiscoverySupportedClaims  = "webfinger.oidc_discovery.supported_claims"

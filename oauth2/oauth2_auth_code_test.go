@@ -27,7 +27,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -49,7 +48,6 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/internal"
@@ -61,11 +59,6 @@ import (
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 )
-
-func newCookieJar() http.CookieJar {
-	c, _ := cookiejar.New(nil)
-	return c
-}
 
 func noopHandler(t *testing.T) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -93,16 +86,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	viper.Set(configuration.ViperKeyAccessTokenStrategy, "opaque")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 
-	newIDToken := func(t *testing.T, subject string) string {
-		token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
-			Subject:   subject,
-			ExpiresAt: time.Now().Add(time.Hour),
-			IssuedAt:  time.Now(),
-		}.ToMapClaims(), jwt.NewHeaders())
-		require.NoError(t, err)
-		return token
-	}
-
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {
 		secret := uuid.New()
 		c := &hc.Client{
@@ -129,15 +112,9 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	adminClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
 
-	newEmptyJarClient := func() *http.Client {
-		return &http.Client{
-			Jar: newCookieJar(),
-		}
-	}
-
 	getAuthorizeCode := func(t *testing.T, conf *oauth2.Config, c *http.Client, params ...oauth2.AuthCodeOption) (string, *http.Response) {
 		if c == nil {
-			c = newEmptyJarClient()
+			c = testhelpers.NewEmptyJarClient(t)
 		}
 
 		state := uuid.New()
@@ -235,6 +212,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
 		assert.EqualValues(t, reg.Config().IssuerURL().String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
+		assert.Equal(t, "1", claims.Get("acr").String(), "%s", claims)
 
 		require.Len(t, claims.Get("aud").Array(), 1, "%s", claims)
 		assert.EqualValues(t, c.ClientID, claims.Get("aud").Array()[0].String(), "%s", claims)
@@ -367,7 +345,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
-		_, err := newEmptyJarClient().Get(conf.AuthCodeURL(uuid.New()))
+		_, err := testhelpers.NewEmptyJarClient(t).Get(conf.AuthCodeURL(uuid.New()))
 		require.NoError(t, err)
 	})
 
@@ -408,7 +386,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			acceptConsentHandler(t, c, subject, nil),
 		)
 
-		oc := newEmptyJarClient()
+		oc := testhelpers.NewEmptyJarClient(t)
 		code, _ := getAuthorizeCode(t, conf, oc,
 			oauth2.SetAuthURLParam("nonce", nonce),
 			oauth2.SetAuthURLParam("prompt", "login consent"),
@@ -445,7 +423,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			require.NotEmpty(t, code)
 			token, err := conf.Exchange(context.Background(), code)
 			require.NoError(t, err)
-			introspectAccessToken(t, conf, token, subject)
+			original := introspectAccessToken(t, conf, token, subject)
 
 			t.Run("followup=run the flow three more times", func(t *testing.T) {
 				for i := 0; i < 3; i++ {
@@ -458,7 +436,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 						require.NotEmpty(t, code)
 						token, err := conf.Exchange(context.Background(), code)
 						require.NoError(t, err)
-						introspectAccessToken(t, conf, token, subject)
+						followup := introspectAccessToken(t, conf, token, subject)
+						assert.Equal(t, original.Get("auth_time").Int(), followup.Get("auth_time").Int())
 					})
 				}
 			})
@@ -505,7 +484,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			acceptConsentHandler(t, c, subject, nil),
 		)
 
-		oc := newEmptyJarClient()
+		oc := testhelpers.NewEmptyJarClient(t)
 		code, _ := getAuthorizeCode(t, conf, oc,
 			oauth2.SetAuthURLParam("prompt", "none"),
 		)
@@ -523,7 +502,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			acceptConsentHandler(t, c, subject, nil),
 		)
 
-		oc := newEmptyJarClient()
+		oc := testhelpers.NewEmptyJarClient(t)
 
 		// Create login session for aeneas-rekkas
 		code, _ := getAuthorizeCode(t, conf, oc)
@@ -531,7 +510,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 		// Perform authentication for aeneas-rekkas which fails because id_token_hint is patrik-neu
 		code, _ = getAuthorizeCode(t, conf, oc,
-			oauth2.SetAuthURLParam("id_token_hint", newIDToken(t, "patrik-neu")),
+			oauth2.SetAuthURLParam("id_token_hint", testhelpers.NewIDToken(t, reg, "patrik-neu")),
 		)
 		require.Empty(t, code)
 	})
@@ -803,7 +782,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					require.NoError(t, err)
 
 					if tc.cj == nil {
-						tc.cj = newCookieJar()
+						tc.cj = testhelpers.NewEmptyCookieJar(t)
 					}
 
 					resp, err := (&http.Client{Jar: tc.cj}).Do(req)

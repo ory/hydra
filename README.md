@@ -518,6 +518,23 @@ The code for these tests is located in [./cypress/integration](./cypress/integra
 [./cypress/helpers](./cypress/helpers). The website you're seeing is located in
 [./test/e2e/oauth2-client](./test/e2e/oauth2-client).
 
+##### OpenID Connect Conformity Tests
+
+To run ORY Hydra against the OpenID Connect conformity suite, run
+
+```shell script
+$ test/conformity/start.sh --build
+```
+
+and then in a separate shell
+
+```shell script
+$ test/conformity/test.sh
+```
+
+Running these tests will take a significant amount of time which is why they are not part
+of the CircleCI pipeline.
+
 #### Build Docker
 
 You can build a development Docker Image using:

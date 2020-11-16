@@ -1,0 +1,1031 @@
+{
+  "server": {
+    "discoveryUrl": "https://hydra:4444/.well-known/openid-configuration"
+  },
+  "client": {
+    "client_name": "oidc-conform"
+  },
+  "client2": {
+    "client_name": "oidc-conform-secondary"
+  },
+  "browser": [
+    {
+      "match": "https://hydra:4444*",
+      "tasks": [
+        {
+          "task": "Login",
+          "optional": true,
+          "match": "http://consent:3000/login*",
+          "commands": [
+            [
+              "text",
+              "id",
+              "email",
+              "foo@bar.com"
+            ],
+            [
+              "text",
+              "id",
+              "password",
+              "foobar"
+            ],
+            [
+              "click",
+              "id",
+              "accept"
+            ]
+          ]
+        },
+        {
+          "task": "Authorize Client",
+          "optional": true,
+          "match": "http://consent:3000/consent*",
+          "commands": [
+            [
+              "click",
+              "id",
+              "openid"
+            ],
+            [
+              "click",
+              "id",
+              "accept"
+            ]
+          ]
+        },
+        {
+          "task": "Verify Complete",
+          "match": "https://httpd:8443*"
+        }
+      ]
+    }
+  ],
+  "override": {
+    "oidcc-scope-profile": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "profile"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-scope-email": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "email"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-scope-address": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "address"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-scope-phone": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "phone"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-scope-all": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "phone"
+                ],
+                [
+                  "click",
+                  "id",
+                  "address"
+                ],
+                [
+                  "click",
+                  "id",
+                  "email"
+                ],
+                [
+                  "click",
+                  "id",
+                  "profile"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-ensure-other-scope-order-succeeds": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "email"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-registration-logo-uri": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "wait",
+                  "id",
+                  "login-title",
+                  10,
+                  ".*",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-registration-policy-uri": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "wait",
+                  "id",
+                  "login-title",
+                  10,
+                  ".*",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-registration-tos-uri": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "wait",
+                  "id",
+                  "login-title",
+                  10,
+                  ".*",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-prompt-login": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "wait",
+                  "id",
+                  "login-title",
+                  10,
+                  ".*",
+                  "update-image-placeholder-optional"
+                ],
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-prompt-none-logged-in": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "remember"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "remember"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-max-age-1": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "wait",
+                  "id",
+                  "login-title",
+                  10,
+                  ".*",
+                  "update-image-placeholder-optional"
+                ],
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-max-age-10000": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "remember"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "remember"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-id-token-hint": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "remember"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "remember"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-ensure-registered-redirect-uri": {
+      "browser": [
+        {
+          "comment": "expect an immediate error page",
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Expect redirect uri mismatch error page",
+              "match": "https://hydra:4444/oauth2/fallbacks/error*",
+              "commands": [
+                [
+                  "wait",
+                  "xpath",
+                  "//*",
+                  10,
+                  "The OAuth2 request resulted in an error.",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-refresh-token": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "offline_access"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-refresh-token-rp-key-rotation": {
+      "browser": [
+        {
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Login",
+              "optional": true,
+              "match": "http://consent:3000/login*",
+              "commands": [
+                [
+                  "text",
+                  "id",
+                  "email",
+                  "foo@bar.com"
+                ],
+                [
+                  "text",
+                  "id",
+                  "password",
+                  "foobar"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Authorize Client",
+              "optional": true,
+              "match": "http://consent:3000/consent*",
+              "commands": [
+                [
+                  "click",
+                  "id",
+                  "openid"
+                ],
+                [
+                  "click",
+                  "id",
+                  "offline_access"
+                ],
+                [
+                  "click",
+                  "id",
+                  "accept"
+                ]
+              ]
+            },
+            {
+              "task": "Verify Complete",
+              "match": "https://httpd:8443*"
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-ensure-redirect-uri-in-authorization-request": {
+      "browser": [
+        {
+          "comment": "expect an immediate error page",
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Expect redirect uri mismatch error page",
+              "match": "https://hydra:4444/oauth2/fallbacks/error*",
+              "commands": [
+                [
+                  "wait",
+                  "xpath",
+                  "//*",
+                  10,
+                  "The OAuth2 request resulted in an error.",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-redirect-uri-query-mismatch": {
+      "browser": [
+        {
+          "comment": "expect an immediate error page",
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Expect redirect uri mismatch error page",
+              "match": "https://hydra:4444/oauth2/fallbacks/error*",
+              "commands": [
+                [
+                  "wait",
+                  "xpath",
+                  "//*",
+                  10,
+                  "The OAuth2 request resulted in an error.",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "oidcc-redirect-uri-query-added": {
+      "browser": [
+        {
+          "comment": "expect an immediate error page",
+          "match": "https://hydra:4444*",
+          "tasks": [
+            {
+              "task": "Expect redirect uri mismatch error page",
+              "match": "https://hydra:4444/oauth2/fallbacks/error*",
+              "commands": [
+                [
+                  "wait",
+                  "xpath",
+                  "//*",
+                  10,
+                  "The OAuth2 request resulted in an error.",
+                  "update-image-placeholder"
+                ]
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

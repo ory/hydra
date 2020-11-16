@@ -319,7 +319,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
 
 					time.Sleep(time.Second) // Make sure AuthAt does not equal...
-					updatedAuth2 := time.Now()
+					updatedAuth2 := time.Now().Truncate(time.Second).UTC()
 					require.NoError(t, m.ConfirmLoginSession(context.Background(), tc.s.ID, updatedAuth2, "some-other-subject", true))
 
 					got2, err := m.GetRememberedLoginSession(context.Background(), tc.s.ID)

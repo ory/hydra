@@ -14,26 +14,31 @@ https://github.com/ory/meta/blob/master/templates/repository/CONTRIBUTING.md
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Introduction](#introduction)
+- [FAQ](#faq)
+- [How can I contribute?](#how-can-i-contribute)
+- [Communication](#communication)
 - [Contributing Code](#contributing-code)
+- [Documentation](#documentation)
 - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Code Style](#code-style)
-- [Documentation](#documentation)
 - [Pull request procedure](#pull-request-procedure)
-- [Communication](#communication)
+  - [Working with Forks](#working-with-forks)
 - [Conduct](#conduct)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Introduction
 
-Please note: We take ORY {{Project}}'s security and our users' trust very
-seriously. If you believe you have found a security issue in ORY {{Project}},
-please responsibly disclose by contacting us at office@ory.sh.
+There are many ways in which you can contribute, beyond writing code. The goal of this document is to provide a high-level overview of how you can get involved.
 
-First: if you're unsure or afraid of anything, just ask or submit the issue or
-pull request anyways. You won't be yelled at for giving it your best effort. The
-worst that can happen is that you'll be politely asked to change something. We
-appreciate any sort of contributions, and don't want a wall of rules to get in
+_Please note_: We take ORY {{Project}}'s security and our users' trust very
+seriously. If you believe you have found a security issue in ORY {{Project}},
+please responsibly disclose by contacting us at security@ory.sh.
+
+First:
+As a potential contributor, your changes and ideas are welcome at any hour of the day or night, weekdays, weekends, and holidays. Please do not ever hesitate to ask a question or send a pull request.
+
+If you are unsure, just ask or submit the issue or pull request anyways. You won't be yelled at for giving it your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions, and don't want a wall of rules to get in
 the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
@@ -41,6 +46,53 @@ talk to us! You can find out our thoughts and ensure that your contribution
 won't clash or be obviated by ORY {{Project}}'s normal direction. A great way to
 do this is via the [ORY Community](https://community.ory.sh/) or join the
 [ORY Chat](https://www.ory.sh/chat).
+
+## FAQ
+
+- I am new to the community. Where can I find the [ORY Community Code of Conduct?](CODE_OF_CONDUCT.md)
+
+- I have a question. Where can I get [answers to questions regarding ORY {{Project}}?](#communication)
+
+- I would like to contribute but I am not sure how. Are there [easy ways to contribute?](#how-can-i-contribute)
+  [Or good first issues?](https://github.com/search?l=&o=desc&q=label%3A%22help+wanted%22+label%3A%22good+first+issue%22+is%3Aopen+user%3Aory+user%3Aory-corp&s=updated&type=Issues)
+
+- I want to talk to other ORY {{Project}} users. [How can I become a part of the community?](#communication)
+
+- I would like to know what I am agreeing to when I contribute to ORY {{Project}}. Does ORY have [a Contributors License Agreement?](https://cla-assistant.io/ory/)
+
+- I would like updates about new versions of ORY {{Project}}. [How are new releases announced?](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)
+
+## How can I contribute?
+
+If you want to start contributing code right away, we have a [list of good first issues](https://github.com/ory/{{Project}}/labels/good%20first%20issue).
+
+There are many other ways you can contribute without writing any code. Here are a few things you can do to help out:
+
+- **Give us a star.** It may not seem like much, but it really makes a difference. This is something that everyone can do to help out ORY {{Project}}. Github stars help the project gain visibility and stand out.
+
+- **Join the community.** Sometimes helping people can be as easy as listening to their problems and offering a different perspective. Join our Slack, have a look at discussions in the forum and take part in our weekly hangout. More info on this in [Communication](#communication).
+
+- **Helping with open issues.**
+  We have a lot of open issues for ORY {{Project}} and some of them may lack necessary information, some are duplicates of older issues. You can help out by guiding people through the process of filling out the issue template, asking for clarifying information, or pointing them to existing issues that match their description of the problem.
+
+- **Reviewing documentation changes.**
+  Most documentation just needs a review for proper spelling and grammar. If you think a document can be improved in any way, feel free to hit the `edit` button at the top of the page. More info on contributing to documentation here.
+
+- **Help with tests.**
+  Some pull requests may lack proper tests or test plans. These are needed for the change to be implemented safely.
+
+## Communication
+
+We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
+questions, discuss bugs and feature requests, talk to other users of ORY, etc.
+
+We have a [forum](https://community.ory.sh/). This is a great place for in-depth discussions and lots of code examples, logs and similar data.
+
+You can also join our weekly hangout, if you want to speak to the ORY team directly or ask some questions. You can find more info on the hangouts in [Slack](https://www.ory.sh/chat).
+
+If you want to receive regular notifications about updates to ORY {{Project}}, consider joining the mailing list. We will _only_ send you vital information on the projects that you are interested in.
+
+Also [follow us on twitter](https://twitter.com/orycorp).
 
 ## Contributing Code
 
@@ -54,14 +106,28 @@ contributors get reviewed**. After a pull request is made other contributors
 will offer feedback, and if the patch passes review a maintainer will accept it
 with a comment. When pull requests fail testing, authors are expected to update
 their pull requests to address the failures until the tests pass and the pull
-request merges successfully.
+request merges successfully. Look here for more info on the [Pull request procedure](#pull-request-procedure).
 
 At least one review from a maintainer is required for all patches (even patches
 from maintainers).
 
+Before your contributions can be merged you need to sign our [Contributor License Agreement](https://cla-assistant.io/ory/).
+
+This agreement defines the terms under which your code is contributed to ORY.
+More specifically it declares that you have the right to, and actually do, grant us the rights to use your contribution. You can see the Apache 2.0 license under
+which our projects are published [here](https://github.com/ory/meta/blob/master/LICENSE).
+
 Reviewers should leave a "LGTM" comment once they are satisfied with the patch.
 If the patch was submitted by a maintainer with write access, the pull request
 should be merged by the submitter after review.
+
+## Documentation
+
+Please provide documentation when changing, removing, or adding features.
+Documentation resides in the project's [docs](docs) folder. Generate API and
+configuration reference documentation using `cd docs; npm run gen`.
+
+For further instructions please head over to [docs/README.md](docs/README.md).
 
 ## Disclosing vulnerabilities
 
@@ -75,45 +141,6 @@ Please follow these guidelines when formatting source code:
 - Go code should match the output of `gofmt -s` and pass `golangci-lint run`.
 - NodeJS and JavaScript code should be prettified using `npm run format` where
   appropriate.
-
-## Documentation
-
-Please provide documentation when changing, removing, or adding features.
-Documentation resides in the project's `docs` folder.
-
-In cases where a project does not have a `docs` folder check the README for instructions.
-
-The commands listed below work exclusively for projects with a `docs` folder
-
-### Develop
-
-To change the documentation locally, you need NodeJS installed and the project
-checked out locally. Next, `cd` into `docs` and install the dependencies:
-
-```shell script
-$ cd docs
-$ npm install
-```
-
-#### Start
-
-To start a local development server with hot reloading, run:
-
-```shell script
-$ npm start
-```
-
-This command opens up a browser window. Please note that changes to the sidebar are not hot-reloaded
-and require a restart of the command.
-
-#### Build
-
-The `npm build` generates static content into the `build` directory and can be
-served using any static contents hosting service.
-
-```shell script
-$ npm build
-```
 
 ## Pull request procedure
 
@@ -139,34 +166,32 @@ Normally, all pull requests must include tests that test your change.
 Occasionally, a change will be very difficult to test for. In those cases,
 please include a note in your commit message explaining why.
 
-## How We Organize Our Work
+### Working with Forks
 
-All repositories in the [ORY organization](https://github.com/ory) have their issues and pull requests
-monitored in the [ORY Monitoring Board](https://github.com/orgs/ory/projects/9). This allows
-for a transparent backlog of unanswered issues and pull requests across the ecosystem from those
-who are allowed to merge pull requests to the main branch.
+```
+# First you clone the original repository
+git clone git@github.com:ory/{{Project}}.git
 
-The process is as follows:
+# Next you add a git remote that is your fork:
+git remote add fork git@github.com:<YOUR-GITHUB-USERNAME-HERE>/{{Project}}.git
 
-1. _Cards_ represent open issues and pull requests and are automatically assigned to the **Triage** column if
-   the author is not one of the maintainers and no maintainer has answered yet.
-2. A maintainer assigns the issue or pull request to someone or adds the label _help wanted_
-   which moves the card to **Requires Action**.
-3. If a maintainer leaves a comment or review, the card moves to **Pending Reply**, implying that
-   the original author needs to do something (e.g. implement a change, explain something in more detail, ...).
-4. If a non-maintainer pushes changes to the pull request or leaves a comment, the card moves
-   back to **Requires Action**.
-5. If a card stays inactive for 60 days or more days, we assume that public interest in the issue
-   or change has waned, **archiving** the card.
-6. If the issue is closed or the pull request merged or closed, the card is **archived** as well.
+# Next you fetch the latest changes from origin for master:
+git fetch origin
+git checkout master
+git pull --rebase
 
-We try our best to answer all issues and review all pull requests and hope that this transparent way
-of keeping a backlog helps you better understand how heavy the workload is.
+# Next you create a new feature branch off of master:
+git checkout my-feature-branch
 
-## Communication
+# Now you do your work and commit your changes:
+git add -A
+git commit -a -m "fix: this is the subject line" -m "This is the body line. Closes #123"
 
-We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
-questions, discuss bugs, etc.
+# And the last step is pushing this to your fork
+git push -u fork my-feature-branch
+```
+
+Now go to the project's GitHub Pull Request page and click "New pull request"
 
 ## Conduct
 

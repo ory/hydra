@@ -1,11 +1,15 @@
 package testhelpers
 
 import (
+	"context"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ory/fosite/token/jwt"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/require"
@@ -24,8 +28,14 @@ import (
 	"github.com/ory/viper"
 )
 
-func NoOpMiddleware(h http.Handler) http.Handler {
-	return h
+func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
+	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
+		Subject:   subject,
+		ExpiresAt: time.Now().Add(time.Hour),
+		IssuedAt:  time.Now(),
+	}.ToMapClaims(), jwt.NewHeaders())
+	require.NoError(t, err)
+	return token
 }
 
 func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
@@ -122,4 +132,16 @@ func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {
 	t.Cleanup(ts.Close)
 
 	return ts.URL + "/" + prefix
+}
+
+func NewEmptyCookieJar(t *testing.T) *cookiejar.Jar {
+	c, err := cookiejar.New(&cookiejar.Options{})
+	require.NoError(t, err)
+	return c
+}
+
+func NewEmptyJarClient(t *testing.T) *http.Client {
+	return &http.Client{
+		Jar: NewEmptyCookieJar(t),
+	}
 }

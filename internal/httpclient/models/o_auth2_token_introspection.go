@@ -71,8 +71,11 @@ type OAuth2TokenIntrospection struct {
 	// authorized this token.
 	Sub string `json:"sub,omitempty"`
 
-	// TokenType is the introspected token's type, for example `access_token` or `refresh_token`.
+	// TokenType is the introspected token's type, typically `Bearer`.
 	TokenType string `json:"token_type,omitempty"`
+
+	// TokenUse is the introspected token's use, for example `access_token` or `refresh_token`.
+	TokenUse string `json:"token_use,omitempty"`
 
 	// Username is a human-readable identifier for the resource owner who
 	// authorized this token.

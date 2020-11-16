@@ -311,6 +311,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //
 //     Responses:
 //       200: completedRequest
+//       400: genericError
 //       404: genericError
 //       401: genericError
 //       500: genericError
@@ -328,12 +329,12 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 
 	if p.Subject == "" {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload can not be empty"))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' must not be empty.")))
 		return
 	}
 
@@ -343,7 +344,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		h.r.Writer().WriteError(w, r, err)
 		return
 	} else if ar.Subject != "" && p.Subject != ar.Subject {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.New("Subject from payload does not match subject from previous authentication"))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Field 'subject' does not match subject from previous authentication.")))
 		return
 	}
 
@@ -351,7 +352,10 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 		p.Remember = true // If skip is true remember is also true to allow consecutive calls as the same user!
 		p.AuthenticatedAt = ar.AuthenticatedAt
 	} else {
-		p.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC())
+		p.AuthenticatedAt = sqlxx.NullTime(time.Now().UTC().
+			// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
+			Truncate(time.Second))
+		ar.AuthenticatedAt = p.AuthenticatedAt
 	}
 	p.RequestedAt = ar.RequestedAt
 
@@ -399,6 +403,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: completedRequest
+//       400: genericError
 //       401: genericError
 //       404: genericError
 //       500: genericError
@@ -416,7 +421,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&p); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithWrap(err).WithHintf("Unable to decode body because: %s", err)))
 		return
 	}
 

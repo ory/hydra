@@ -82,11 +82,11 @@ func createCsrfSession(w http.ResponseWriter, r *http.Request, store sessions.St
 
 func validateCsrfSession(r *http.Request, store sessions.Store, name, expectedCSRF string, sameSiteLegacyWorkaround, secure bool) error {
 	if cookie, err := getCsrfSession(r, store, name, sameSiteLegacyWorkaround, secure); err != nil {
-		return errorsx.WithStack(fosite.ErrRequestForbidden.WithDebug("CSRF session cookie could not be decoded"))
+		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("CSRF session cookie could not be decoded."))
 	} else if csrf, err := mapx.GetString(cookie.Values, "csrf"); err != nil {
-		return errorsx.WithStack(fosite.ErrRequestForbidden.WithDebug("No CSRF value available in the session cookie"))
+		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("No CSRF value available in the session cookie."))
 	} else if csrf != expectedCSRF {
-		return errorsx.WithStack(fosite.ErrRequestForbidden.WithDebug("The CSRF value from the token does not match the CSRF value from the data store"))
+		return errorsx.WithStack(fosite.ErrRequestForbidden.WithHint("The CSRF value from the token does not match the CSRF value from the data store."))
 	}
 
 	return nil

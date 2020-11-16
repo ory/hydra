@@ -76,6 +76,12 @@ type WellKnown struct {
 	// URL of the OP's Dynamic Client Registration Endpoint.
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
+	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
+	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
+	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
+	// (using the request_uri parameter).
+	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
+
 	// Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
 	RequestParameterSupported bool `json:"request_parameter_supported,omitempty"`
 

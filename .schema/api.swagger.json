@@ -1112,6 +1112,12 @@
               "$ref": "#/definitions/completedRequest"
             }
           },
+          "400": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
           "401": {
             "description": "genericError",
             "schema": {
@@ -1171,6 +1177,12 @@
             "description": "completedRequest",
             "schema": {
               "$ref": "#/definitions/completedRequest"
+            }
+          },
+          "400": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
             }
           },
           "401": {
@@ -2904,7 +2916,11 @@
           "type": "string"
         },
         "token_type": {
-          "description": "TokenType is the introspected token's type, for example `access_token` or `refresh_token`.",
+          "description": "TokenType is the introspected token's type, typically `Bearer`.",
+          "type": "string"
+        },
+        "token_use": {
+          "description": "TokenUse is the introspected token's use, for example `access_token` or `refresh_token`.",
           "type": "string"
         },
         "username": {
@@ -3168,6 +3184,13 @@
           "description": "URL of the OP's Dynamic Client Registration Endpoint.",
           "type": "string",
           "example": "https://playground.ory.sh/ory-hydra/admin/client"
+        },
+        "request_object_signing_alg_values_supported": {
+          "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,\nwhich are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when\nthe Request Object is passed by value (using the request parameter) and when it is passed by reference\n(using the request_uri parameter).",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "request_parameter_supported": {
           "description": "Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.",

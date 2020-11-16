@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "prettier": "ory-prettier-styles",
-  "consts": {
+  "config": {
     "prettierTarget": "{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}"
   },
   "scripts": {
@@ -15,8 +15,8 @@
     "swizzle": "docusaurus swizzle",
     "serve": "docusaurus serve",
     "deploy": "docusaurus deploy",
-    "format": "prettier --write ${npm_package_consts_prettierTarget}",
-    "format:check": "prettier --check ${npm_package_consts_prettierTarget}",
+    "format": "prettier --write ${npm_package_config_prettierTarget}",
+    "format:check": "prettier --check ${npm_package_config_prettierTarget}",
     "postinstall": "patch-package"
   },
   "dependencies": {

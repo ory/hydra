@@ -22,7 +22,6 @@ package consent
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -126,9 +125,8 @@ func (s *DefaultStrategy) authenticationSession(w http.ResponseWriter, r *http.R
 
 	session, err := s.r.ConsentManager().GetRememberedLoginSession(r.Context(), sessionID)
 	if errors.Is(err, x.ErrNotFound) {
-		s.r.Logger().
-			WithRequest(r).
-			WithError(err).Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
+		s.r.Logger().WithRequest(r).WithError(err).
+			Debug("User logout skipped because cookie exists and session value exist but are not remembered any more.")
 		return nil, errorsx.WithStack(ErrNoAuthenticationSessionFound)
 	} else if err != nil {
 		return nil, err
@@ -159,16 +157,16 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	if maxAge > 0 && session.AuthenticatedAt.UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
+	if maxAge > 0 && time.Time(session.AuthenticatedAt).UTC().Add(time.Second*time.Duration(maxAge)).Before(time.Now().UTC()) {
 		if stringslice.Has(prompt, "none") {
-			return errorsx.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because prompt is set to \"none\" and authentication time reached max_age"))
+			return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because prompt is set to 'none' and authentication time reached 'max_age'."))
 		}
 		return s.forwardAuthenticationRequest(w, r, ar, "", time.Time{}, nil)
 	}
 
 	idTokenHint := ar.GetRequestForm().Get("id_token_hint")
 	if idTokenHint == "" {
-		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
+		return s.forwardAuthenticationRequest(w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
 	}
 
 	hintSub, err := s.getSubjectFromIDTokenHint(r.Context(), idTokenHint)
@@ -177,10 +175,10 @@ func (s *DefaultStrategy) requestAuthentication(w http.ResponseWriter, r *http.R
 	}
 
 	if err := s.matchesValueFromSession(r.Context(), ar.GetClient(), hintSub, session.Subject); errors.Is(err, ErrHintDoesNotMatchAuthentication) {
-		return errorsx.WithStack(fosite.ErrLoginRequired.WithDebug("Request failed because subject claim from id_token_hint does not match subject from authentication session"))
+		return errorsx.WithStack(fosite.ErrLoginRequired.WithHint("Request failed because subject claim from id_token_hint does not match subject from authentication session."))
 	}
 
-	return s.forwardAuthenticationRequest(w, r, ar, session.Subject, session.AuthenticatedAt, session)
+	return s.forwardAuthenticationRequest(w, r, ar, session.Subject, time.Time(session.AuthenticatedAt), session)
 }
 
 func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint string) (jwtgo.MapClaims, error) {
@@ -193,7 +191,7 @@ func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint 
 
 	claims, ok := token.Claims.(jwtgo.MapClaims)
 	if !ok {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request as decoding id token from id_token_hint to jwt.MapClaims failed"))
+		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Failed to validate OpenID Connect request as decoding id token from id_token_hint to jwt.MapClaims failed."))
 	}
 
 	return claims, nil
@@ -207,7 +205,7 @@ func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idToken
 
 	sub, _ := claims["sub"].(string)
 	if sub == "" {
-		return "", errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject"))
+		return "", errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Failed to validate OpenID Connect request because provided id token from id_token_hint does not have a subject."))
 	}
 
 	return sub, nil
@@ -215,7 +213,7 @@ func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idToken
 
 func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, subject string, authenticatedAt time.Time, session *LoginSession) error {
 	if (subject != "" && authenticatedAt.IsZero()) || (subject == "" && !authenticatedAt.IsZero()) {
-		return errorsx.WithStack(fosite.ErrServerError.WithDebug("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date"))
+		return errorsx.WithStack(fosite.ErrServerError.WithHint("Consent strategy returned a non-empty subject with an empty auth date, or an empty subject with a non-empty auth date."))
 	}
 
 	skip := false
@@ -226,7 +224,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	// Let'id validate that prompt is actually not "none" if we can't skip authentication
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "none") && !skip {
-		return errorsx.WithStack(fosite.ErrLoginRequired.WithDebug(`Prompt "none" was requested, but no existing login session was found`))
+		return errorsx.WithStack(fosite.ErrLoginRequired.WithHint(`Prompt 'none' was requested, but no existing login session was found.`))
 	}
 
 	// Set up csrf/challenge/verifier values
@@ -252,12 +250,8 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 	if session != nil {
 		sessionID = session.ID
 	} else {
-		if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &LoginSession{
-			ID:              sessionID,
-			Subject:         "",
-			AuthenticatedAt: time.Now().UTC(),
-			Remember:        false,
-		}); err != nil {
+		// Create a stub session so that we can later update it.
+		if err := s.r.ConsentManager().CreateLoginSession(r.Context(), &LoginSession{ID: sessionID}); err != nil {
 			return err
 		}
 	}
@@ -276,7 +270,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 			Client:            sanitizeClientFromRequest(ar),
 			RequestURL:        iu.String(),
 			AuthenticatedAt:   sqlxx.NullTime(authenticatedAt),
-			RequestedAt:       time.Now().UTC(),
+			RequestedAt:       time.Now().Truncate(time.Second).UTC(),
 			SessionID:         sqlxx.NullString(sessionID),
 			OpenIDConnectContext: &OpenIDConnectContext{
 				IDTokenHintClaims: idTokenHintClaims,
@@ -352,7 +346,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	session, err := s.r.ConsentManager().VerifyAndInvalidateLoginRequest(ctx, verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithDebug("The login verifier has already been used, has not been granted or is invalid."))
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The login verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
 	}
@@ -363,7 +357,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The login request has expired. Please try again."))
+		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
 	}
 
 	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.ServesHTTPS()); err != nil {
@@ -371,7 +365,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if session.LoginRequest.Skip && !session.Remember {
-		return nil, errorsx.WithStack(fosite.ErrServerError.WithDebug("The login request was previously remembered and can only be forgotten using the reject feature."))
+		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The login request was previously remembered and can only be forgotten using the reject feature."))
 	}
 
 	if session.LoginRequest.Skip && session.Subject != session.LoginRequest.Subject {
@@ -380,7 +374,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 			return nil, err
 		}
 
-		return nil, errorsx.WithStack(fosite.ErrServerError.WithDebug("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
+		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
 	subjectIdentifier, err := s.obfuscateSubjectIdentifier(req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
@@ -438,7 +432,11 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	if !session.LoginRequest.Skip {
-		if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, session.Subject, session.Remember); err != nil {
+		if time.Time(session.AuthenticatedAt).IsZero() {
+			return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("Expected the handled login request to contain a valid authenticated_at value but it was zero. This is a bug which should be reported to https://github.com/ory/hydra."))
+		}
+
+		if err := s.r.ConsentManager().ConfirmLoginSession(r.Context(), sessionID, time.Time(session.AuthenticatedAt), session.Subject, session.Remember); err != nil {
 			return nil, err
 		}
 	}
@@ -541,7 +539,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 
 	prompt := stringsx.Splitx(ar.GetRequestForm().Get("prompt"), " ")
 	if stringslice.Has(prompt, "none") && !skip {
-		return errorsx.WithStack(fosite.ErrConsentRequired.WithDebug(`Prompt "none" was requested, but no previous consent was found`))
+		return errorsx.WithStack(fosite.ErrConsentRequired.WithHint(`Prompt 'none' was requested, but no previous consent was found.`))
 	}
 
 	// Set up csrf/challenge/verifier values
@@ -591,13 +589,13 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester, verifier string) (*HandledConsentRequest, error) {
 	session, err := s.r.ConsentManager().VerifyAndInvalidateConsentRequest(r.Context(), verifier)
 	if errors.Is(err, sqlcon.ErrNoRows) {
-		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithDebug("The consent verifier has already been used, has not been granted, or is invalid."))
+		return nil, errorsx.WithStack(fosite.ErrAccessDenied.WithHint("The consent verifier has already been used, has not been granted, or is invalid."))
 	} else if err != nil {
 		return nil, err
 	}
 
 	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
-		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithDebug("The consent request has expired, please try again."))
+		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The consent request has expired, please try again."))
 	}
 
 	if session.HasError() {
@@ -606,7 +604,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 
 	if time.Time(session.ConsentRequest.AuthenticatedAt).IsZero() {
-		return nil, errorsx.WithStack(fosite.ErrServerError.WithDebug("The authenticatedAt value was not set."))
+		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
 
 	if err := validateCsrfSession(r, s.r.CookieStore(), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.ServesHTTPS()); err != nil {
@@ -751,12 +749,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 
 	if err := r.ParseForm(); err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.
-			WithHint(
-				fmt.Sprintf(
-					`Logout failed because the "%s" request could not be parsed`,
-					r.Method,
-				),
-			),
+			WithHintf("Logout failed because the '%s' request could not be parsed.", r.Method),
 		)
 	}
 
@@ -879,7 +872,7 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 			if w == requestedRedir {
 				u, err := url.Parse(w)
 				if err != nil {
-					return nil, errorsx.WithStack(fosite.ErrServerError.WithHint(fmt.Sprintf("Unable to parse post_logout_redirect_uri '%s' because %s.", w, err)).WithDebug(err.Error()))
+					return nil, errorsx.WithStack(fosite.ErrServerError.WithHintf("Unable to parse post_logout_redirect_uri '%s'.", w).WithDebug(err.Error()))
 				}
 
 				f = u

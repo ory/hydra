@@ -55,10 +55,10 @@ type RequestHandlerResponse struct {
 
 // swagger:ignore
 type LoginSession struct {
-	ID              string    `db:"id"`
-	AuthenticatedAt time.Time `db:"authenticated_at"`
-	Subject         string    `db:"subject"`
-	Remember        bool      `db:"remember"`
+	ID              string         `db:"id"`
+	AuthenticatedAt sqlxx.NullTime `db:"authenticated_at"`
+	Subject         string         `db:"subject"`
+	Remember        bool           `db:"remember"`
 }
 
 func (_ LoginSession) TableName() string {

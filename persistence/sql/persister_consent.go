@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/gobuffalo/pop/v5"
@@ -257,11 +259,11 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (*
 	return &s, nil
 }
 
-func (p *Persister) ConfirmLoginSession(ctx context.Context, id string, subject string, remember bool) error {
+func (p *Persister) ConfirmLoginSession(ctx context.Context, id string, authenticatedAt time.Time, subject string, remember bool) error {
 	return sqlcon.HandleError(
 		p.Connection(ctx).Update(&consent.LoginSession{
 			ID:              id,
-			AuthenticatedAt: time.Now().UTC(),
+			AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
 			Subject:         subject,
 			Remember:        remember,
 		}))

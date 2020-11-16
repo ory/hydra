@@ -2,10 +2,6 @@ module github.com/ory/hydra
 
 go 1.15
 
-//replace github.com/ory/fosite => ../fosite
-
-replace github.com/ory/fosite => github.com/ory/fosite v0.35.2-0.20201113160124-d324ecf9357f
-
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
@@ -37,7 +33,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/cli v0.0.28
-	github.com/ory/fosite v0.34.1
+	github.com/ory/fosite v0.36.0
 	github.com/ory/go-acc v0.2.5
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.1

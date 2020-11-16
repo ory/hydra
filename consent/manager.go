@@ -22,6 +22,7 @@ package consent
 
 import (
 	"context"
+	"time"
 
 	"github.com/ory/hydra/client"
 )
@@ -53,7 +54,7 @@ type Manager interface {
 	CreateLoginSession(ctx context.Context, session *LoginSession) error
 	DeleteLoginSession(ctx context.Context, id string) error
 	RevokeSubjectLoginSession(ctx context.Context, user string) error
-	ConfirmLoginSession(ctx context.Context, id string, subject string, remember bool) error
+	ConfirmLoginSession(ctx context.Context, id string, authTime time.Time, subject string, remember bool) error
 
 	CreateLoginRequest(ctx context.Context, req *LoginRequest) error
 	GetLoginRequest(ctx context.Context, challenge string) (*LoginRequest, error)

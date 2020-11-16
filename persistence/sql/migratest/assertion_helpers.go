@@ -65,8 +65,8 @@ func assertEqualLoginRequests(t *testing.T, expected, actual *consent.LoginReque
 
 func assertEqualLoginSessions(t *testing.T, expected, actual *consent.LoginSession) {
 	now := time.Now()
-	expected.AuthenticatedAt = now
-	actual.AuthenticatedAt = now
+	expected.AuthenticatedAt = sqlxx.NullTime(now)
+	actual.AuthenticatedAt = sqlxx.NullTime(now)
 
 	assert.Equal(t, expected, actual)
 }

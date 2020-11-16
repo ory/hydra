@@ -34,6 +34,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/tidwall/gjson"
+
+	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/x/ioutilx"
+
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pborman/uuid"
@@ -132,7 +137,7 @@ func newValidAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID, subj
 	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.TODO(), &LoginSession{
 		ID:              sessionID,
 		Subject:         subject,
-		AuthenticatedAt: time.Now(),
+		AuthenticatedAt: sqlxx.NullTime(time.Now()),
 		Remember:        true,
 	}))
 	return cj
@@ -252,14 +257,14 @@ func runLogout(t *testing.T, method string) {
 			d:                "should fail if non-rp initiated logout is initiated with state (indicating rp-flow)",
 			params:           url.Values{"state": {"foobar"}},
 			lph:              noopHandler,
-			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because query parameter state is set but id_token_hint is missing.\",\"error_hint\":\"Logout failed because query parameter state is set but id_token_hint is missing.\",\"status_code\":400}",
+			expectBody:       "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because query parameter state is set but id_token_hint is missing.\"}",
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{
 			d:                "should fail if non-rp initiated logout is initiated with post_logout_redirect_uri (indicating rp-flow)",
 			params:           url.Values{"post_logout_redirect_uri": {"foobar"}},
 			lph:              noopHandler,
-			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing.\",\"error_hint\":\"Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing.\",\"status_code\":400}",
+			expectBody:       "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because query parameter post_logout_redirect_uri is set but id_token_hint is missing.\"}",
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{
@@ -315,7 +320,7 @@ func runLogout(t *testing.T, method string) {
 			d:                "should error when rp-flow without valid id token",
 			lph:              acceptLogoutChallenge(apiClient, "3"),
 			params:           url.Values{"state": {"1234"}, "post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"}, "id_token_hint": {"i am not valid"}},
-			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. token contains an invalid number of segments\",\"error_hint\":\"token contains an invalid number of segments\",\"status_code\":400}",
+			expectBody:       "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. token contains an invalid number of segments\"}",
 			expectStatusCode: http.StatusBadRequest,
 		},
 		{
@@ -334,7 +339,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp1", "logout-subject-temp1"),
-			expectBody:       fmt.Sprintf("{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because issuer claim value '' from query parameter id_token_hint does not match with issuer value from configuration '%s'.\",\"error_hint\":\"Logout failed because issuer claim value '' from query parameter id_token_hint does not match with issuer value from configuration '%s'.\",\"status_code\":400}", conf.IssuerURL().String(), conf.IssuerURL().String()),
+			expectBody:       fmt.Sprintf("{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because issuer claim value '' from query parameter id_token_hint does not match with issuer value from configuration '%s'.\"}", conf.IssuerURL().String()),
 		},
 		{
 			d:   "should fail rp-inititated flow because id token hint is using wrong issuer",
@@ -353,7 +358,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp2", "logout-subject-temp2"),
-			expectBody:       fmt.Sprintf("{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because issuer claim value 'some-issuer' from query parameter id_token_hint does not match with issuer value from configuration '%s'.\",\"error_hint\":\"Logout failed because issuer claim value 'some-issuer' from query parameter id_token_hint does not match with issuer value from configuration '%s'.\",\"status_code\":400}", conf.IssuerURL().String(), conf.IssuerURL().String()),
+			expectBody:       fmt.Sprintf("{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because issuer claim value 'some-issuer' from query parameter id_token_hint does not match with issuer value from configuration '%s'.\"}", conf.IssuerURL().String()),
 		},
 		{
 			d:   "should fail rp-inititated flow because iat is in the future",
@@ -372,7 +377,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp3", "logout-subject-temp3"),
-			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Token used before issued\",\"error_hint\":\"Token used before issued\",\"status_code\":400}",
+			expectBody:       "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Token used before issued\"}",
 		},
 		{
 			d:   "should fail because post-logout url is not registered",
@@ -391,7 +396,7 @@ func runLogout(t *testing.T, method string) {
 			},
 			expectStatusCode: http.StatusBadRequest,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp4", "logout-subject-temp4"),
-			expectBody:       "{\"error\":\"invalid_request\",\"error_verbose\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client.\",\"error_hint\":\"Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client.\",\"status_code\":400}",
+			expectBody:       "{\"error\":\"invalid_request\",\"error_description\":\"The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Logout failed because query parameter post_logout_redirect_uri is not a whitelisted as a post_logout_redirect_uri for the client.\"}",
 		},
 		{
 			d:   "should pass rp-inititated even when expiry is in the past",
@@ -527,6 +532,1036 @@ func TestStrategyLogout(t *testing.T) {
 
 func TestStrategyLogoutPost(t *testing.T) {
 	runLogout(t, http.MethodPost)
+}
+
+func TestStrategyLoginConsentNext(t *testing.T) {
+	reg := internal.NewMockedRegistry(t)
+	viper.Set(configuration.ViperKeyAccessTokenStrategy, "opaque")
+	viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
+	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
+	t.Logf("Public URL: %s", publicTS.URL)
+	t.Logf("Admin URL: %s", adminTS.URL)
+
+	adminClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
+
+	//nonexistentCJ := newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist")
+
+	acceptLoginHandler := func(t *testing.T, subject string, payload *models.AcceptLoginRequest) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			// login payloads are checked in ../oauth/auth_code tests
+			if payload == nil {
+				payload = &models.AcceptLoginRequest{Subject: &subject}
+			}
+			payload.Subject = &subject
+
+			v, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+				WithBody(payload))
+			require.NoError(t, err)
+			require.NotEmpty(t, *v.Payload.RedirectTo)
+			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
+		}
+	}
+
+	acceptConsentHandler := func(t *testing.T, payload *models.AcceptConsentRequest) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			// consent payloads are checked in ../oauth/auth_code tests
+			if payload == nil {
+				payload = &models.AcceptConsentRequest{}
+			}
+
+			v, err := adminClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
+				WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
+				WithBody(payload))
+			require.NoError(t, err)
+			require.NotEmpty(t, *v.Payload.RedirectTo)
+			http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
+		}
+	}
+
+	newClient := func(t *testing.T, redir string) *client.Client {
+		secret := uuid.New()
+		c := &client.Client{
+			OutfacingID:  uuid.New(),
+			Secret:       secret,
+			RedirectURIs: []string{redir},
+		}
+		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
+		c.Secret = secret
+		return c
+	}
+
+	makeRequest := func(t *testing.T, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
+		if hc == nil {
+			hc = testhelpers.NewEmptyJarClient(t)
+		}
+
+		values.Add("response_type", "code")
+		values.Add("state", uuid.New())
+		values.Add("client_id", oc.OutfacingID)
+		res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(), values).String())
+		require.NoError(t, err)
+		defer res.Body.Close()
+
+		return gjson.ParseBytes(ioutilx.MustReadAll(res.Body)), res
+	}
+
+	t.Run("case=should fail because a login verifier was given that doesn't exist in the store", func(t *testing.T) {
+		testhelpers.NewUI(t, testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+
+		_, res := makeRequest(t, nil, c, url.Values{"login_verifier": {"does-not-exist"}})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.Contains(t, res.Request.URL.Query().Get("error_description"), "The login verifier has already been used, has not been granted, or is invalid.")
+	})
+
+	t.Run("case=should fail because a non-existing consent verifier was given", func(t *testing.T) {
+		testhelpers.NewUI(t, testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+
+		_, res := makeRequest(t, nil, c, url.Values{"consent_verifier": {"does-not-exist"}})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.Contains(t, res.Request.URL.Query().Get("error_description"), "The consent verifier has already been used, has not been granted, or is invalid.")
+	})
+
+	t.Run("case=should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
+		testhelpers.NewUI(t, testhelpers.HTTPServerNotImplementedHandler, testhelpers.HTTPServerNoExpectedCallHandler(t))
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNoExpectedCallHandler(t)))
+
+		_, res := makeRequest(t, nil, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.NotEmpty(t, res.Request.URL.Query().Get("login_challenge"), "%s", res.Request.URL)
+	})
+
+	t.Run("case=should fail because the request was redirected but consent endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
+		testhelpers.NewUI(t, acceptLoginHandler(t, "aeneas-rekkas", nil), testhelpers.HTTPServerNotImplementedHandler)
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNoExpectedCallHandler(t)))
+
+		_, res := makeRequest(t, nil, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.NotEmpty(t, res.Request.URL.Query().Get("consent_challenge"), "%s", res.Request.URL)
+	})
+
+	t.Run("case=should fail because the request was redirected but the login endpoint rejected the request", func(t *testing.T) {
+		testhelpers.NewUI(t, func(w http.ResponseWriter, r *http.Request) {
+			vr, err := adminClient.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
+				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+				WithBody(&models.RejectRequest{
+					Error:            fosite.ErrInteractionRequired.ErrorField,
+					ErrorDescription: "expect-reject-login",
+					StatusCode:       int64(fosite.ErrInteractionRequired.CodeField),
+				}))
+			require.NoError(t, err)
+			assert.NotEmpty(t, *vr.Payload.RedirectTo)
+			http.Redirect(w, r, *vr.Payload.RedirectTo, http.StatusFound)
+		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+
+		_, res := makeRequest(t, nil, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.Contains(t, res.Request.URL.Query().Get("error_description"), "expect-reject-login")
+	})
+
+	t.Run("case=should fail because no cookie jar invalid csrf", func(t *testing.T) {
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		testhelpers.NewUI(t, acceptLoginHandler(t, "aeneas-rekkas", nil),
+			testhelpers.HTTPServerNoExpectedCallHandler(t))
+
+		hc := new(http.Client)
+		_, res := makeRequest(t, hc, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.Contains(t, res.Request.URL.Query().Get("error_description"), "No CSRF value available in the session cookie.")
+	})
+
+	t.Run("case=should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists", func(t *testing.T) {
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		testhelpers.NewUI(t, acceptLoginHandler(t, "aeneas-rekkas", nil),
+			testhelpers.HTTPServerNoExpectedCallHandler(t))
+
+		hc := new(http.Client)
+		_, res := makeRequest(t, hc, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.Contains(t, res.Request.URL.Query().Get("error_description"), "No CSRF value available in the session cookie.")
+	})
+
+	t.Run("case=should because consent endpoints denies the request after login was granted", func(t *testing.T) {
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		testhelpers.NewUI(t,
+			acceptLoginHandler(t, "aeneas-rekkas", nil),
+			func(w http.ResponseWriter, r *http.Request) {
+				vr, err := adminClient.Admin.RejectConsentRequest(
+					admin.NewRejectConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
+						WithBody(&models.RejectRequest{
+							Error:            fosite.ErrInteractionRequired.ErrorField,
+							ErrorDescription: "expect-reject-consent",
+							StatusCode:       int64(fosite.ErrInteractionRequired.CodeField)}))
+				require.NoError(t, err)
+				require.NotEmpty(t, *vr.Payload.RedirectTo)
+				http.Redirect(w, r, *vr.Payload.RedirectTo, http.StatusFound)
+			})
+
+		_, res := makeRequest(t, nil, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.Contains(t, res.Request.URL.Query().Get("error_description"), "expect-reject-consent")
+	})
+
+	t.Run("case=should pass if both login and consent are granted", func(t *testing.T) {
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		testhelpers.NewUI(t,
+			acceptLoginHandler(t, "aeneas-rekkas", nil),
+			acceptConsentHandler(t, nil))
+
+		_, res := makeRequest(t, nil, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.NotEmpty(t, res.Request.URL.Query().Get("code"))
+	})
+
+	t.Run("case=should pass and set acr values properly", func(t *testing.T) {
+		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
+		testhelpers.NewUI(t,
+			acceptLoginHandler(t, "aeneas-rekkas", nil),
+			acceptConsentHandler(t, nil))
+
+		_, res := makeRequest(t, nil, c, url.Values{})
+		assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+		assert.NotEmpty(t, res.Request.URL.Query().Get("code"))
+	})
+
+	t.Run("case=should pass because login and consent have been granted, this time we remember the decision", func(t *testing.T) {
+		c := &client.Client{OutfacingID: uuid.New(), TokenEndpointAuthMethod: "none",
+			RedirectURIs: []string{testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
+				"custom://redirection-scheme/path", "custom://localhost/path"}}
+		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
+
+		subject := "aeneas-rekkas"
+		testhelpers.NewUI(t,
+			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true, RememberFor: 0}),
+			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true, RememberFor: 0}))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+
+		t.Run("followup=perform first flow", func(t *testing.T) {
+			_, res := makeRequest(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
+			assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+			assert.NotEmpty(t, res.Request.URL.Query().Get("code"))
+		})
+
+		// By not waiting here we ensure that there are no race conditions when it comes to authenticated_at and
+		// requested_at time comparisons:
+		//
+		//	time.Sleep(time.Second)
+
+		t.Run("followup=should pass because prompt=none, client is public, redirection scheme is HTTP and host is localhost", func(t *testing.T) {
+			testhelpers.NewUI(t, func(w http.ResponseWriter, r *http.Request) {
+				res, err := adminClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+				require.NoError(t, err)
+				assert.True(t, *res.Payload.Skip)
+				assert.Equal(t, subject, *res.Payload.Subject)
+				acceptLoginHandler(t, subject, nil)(w, r)
+			}, func(w http.ResponseWriter, r *http.Request) {
+				res, err := adminClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+				require.NoError(t, err)
+				assert.True(t, res.Payload.Skip)
+				assert.Equal(t, subject, res.Payload.Subject)
+				assert.NotEmpty(t, res.Payload.LoginSessionID)
+				assert.NotEmpty(t, res.Payload.LoginChallenge)
+				acceptConsentHandler(t, nil)(w, r)
+			})
+
+			_, res := makeRequest(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}, "prompt": {"none"}})
+			assert.EqualValues(t, http.StatusNotImplemented, res.StatusCode)
+			assert.NotEmpty(t, res.Request.URL.Query().Get("code"), "%s", res.Request.URL.String())
+		})
+
+		return
+
+		t.Run("followup=check remember values", func(t *testing.T) {
+			for _, redir := range c.RedirectURIs[1:] {
+				t.Run("redir=should pass because prompt=none, client is public, and redirection is "+redir, func(t *testing.T) {
+					testhelpers.NewUI(t,
+						acceptLoginHandler(t, subject, nil),
+						acceptConsentHandler(t, nil))
+
+					_, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(), url.Values{
+						"response_type": {"code"},
+						"state":         {uuid.New()},
+						"redirect_uri":  {redir},
+						"client_id":     {c.OutfacingID},
+						"prompt":        {"none"},
+					}).String())
+					require.Error(t, err)
+					assert.Contains(t, err.Error(), redir)
+					assert.Contains(t, err.Error(), "error=login_required")
+				})
+			}
+		})
+	})
+
+	/*
+		{
+			d:   "This should fail at login screen because subject from accept does not match subject from session",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					lr := res.Payload
+
+					assert.True(t, *lr.Skip)
+					assert.Equal(t, "user", *lr.Subject)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("fooser"),
+							Remember:    false,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.Error(t, err)
+					require.Empty(t, vr)
+					w.WriteHeader(http.StatusBadRequest)
+				}
+			},
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{ErrAbortOAuth2Request},
+			expectErr:             []bool{true},
+		},
+
+		{
+			d:   "This should pass and confirm previous authentication and consent because it is a authorization_code",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", Secret: "should-not-be-included"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+
+					assert.True(t, *rr.Skip)
+					assert.Equal(t, "user", *rr.Subject)
+					assert.Empty(t, rr.Client.ClientSecret)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("user"),
+							Remember:    false,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					rr := rrr.Payload
+					assert.True(t, rr.Skip)
+					assert.Equal(t, "client-id", rr.Client.ClientID)
+					assert.Equal(t, "user", rr.Subject)
+					assert.Empty(t, rr.Client.ClientSecret)
+
+					passAuthorization(apiClient, false)(t)(w, r)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       false,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
+			d:      "This should pass and require re-authentication although session is set (because prompt=login)",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:    persistentCJ,
+			prompt: "login+consent",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+
+					assert.False(t, *rr.Skip)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("user"),
+							Remember:    true,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					rr := rrr.Payload
+					assert.False(t, rr.Skip)
+
+					body := `{"grant_scope": ["scope-a"], "remember": true}`
+					require.NoError(t, err)
+					req, err := http.NewRequest("PUT", api.URL+"/oauth2/auth/requests/consent/accept?challenge="+r.URL.Query().Get("consent_challenge"), strings.NewReader(body))
+					req.Header.Add("Content-Type", "application/json")
+					require.NoError(t, err)
+
+					hres, err := http.DefaultClient.Do(req)
+					require.NoError(t, err)
+					defer hres.Body.Close()
+
+					var v models.CompletedRequest
+					require.NoError(t, json.NewDecoder(hres.Body).Decode(&v))
+					require.EqualValues(t, http.StatusOK, hres.StatusCode)
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       true,
+				RememberFor:    0,
+				Session:        NewConsentRequestSessionData(),
+			},
+		},
+		{
+			d:      "This should pass and require re-authentication although session is set (because max_age=1)",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:    persistentCJ,
+			maxAge: "1",
+			setup: func() {
+				time.Sleep(time.Second * 2)
+			},
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("user"),
+							Remember:    true,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					rr := rrr.Payload
+					assert.True(t, rr.Skip)
+
+					passAuthorization(apiClient, false)(t)(w, r)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "user", SubjectIdentifier: "user"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       false,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
+			d:   "This should fail because max_age=1 but prompt=none",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ,
+			setup: func() {
+				time.Sleep(time.Second * 2)
+			},
+			maxAge:                "1",
+			prompt:                "none",
+			expectFinalStatusCode: fosite.ErrLoginRequired.StatusCode(),
+			expectErrType:         []error{fosite.ErrLoginRequired},
+			expectErr:             []bool{true},
+		},
+		{
+			d:                     "This should fail because prompt is none but no auth session exists",
+			prompt:                "none",
+			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:                   newCookieJar(t),
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{fosite.ErrLoginRequired},
+			expectErr:             []bool{true},
+		},
+		{
+			d:      "This should fail because prompt is none and consent is missing a permission which requires re-authorization of the app",
+			prompt: "none",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a", "this-scope-has-not-been-granted-before"}}},
+			jar:    persistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.True(t, *rr.Skip)
+					assert.Equal(t, "user", *rr.Subject)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("user"),
+							Remember:    false,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrConsentRequired},
+			expectErr:             []bool{true, true},
+		},
+		{
+			d:      "This pass and properly require authentication as well as authorization because prompt is set to login and consent - although previous session exists",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:    persistentCJ,
+			prompt: "login+consent",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("user"),
+							Remember:    false,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					rr := rrr.Payload
+					assert.False(t, rr.Skip)
+
+					passAuthorization(apiClient, false)(t)(w, r)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:                     "This should fail because id_token_hint does not match authentication session and prompt is none",
+			req:                   fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:                   persistentCJ,
+			prompt:                "none",
+			idTokenHint:           fooUserIDToken,
+			expectFinalStatusCode: fosite.ErrLoginRequired.StatusCode(),
+			expectErrType:         []error{fosite.ErrLoginRequired},
+			expectErr:             []bool{true},
+		},
+		{
+			d:           "This should pass and require authentication because id_token_hint does not match subject from session",
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:         persistentCJ,
+			idTokenHint: fooUserIDToken,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("not-foouser"),
+							Remember:    false,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: fosite.ErrLoginRequired.StatusCode(),
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrLoginRequired},
+			expectErr:             []bool{true, true},
+		},
+		{
+			d:           "This should pass and require authentication because id_token_hint does not match subject from session",
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:         persistentCJ,
+			idTokenHint: fooUserIDToken,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:     pointerx.String("foouser"),
+							Remember:    false,
+							RememberFor: 0,
+							Acr:         "1",
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					rrr, err := apiClient.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+					require.NoError(t, err)
+					rr := rrr.Payload
+					assert.False(t, rr.Skip)
+
+					vr, err := apiClient.Admin.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
+						WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
+						WithBody(&models.AcceptConsentRequest{
+							GrantScope:  []string{"scope-a"},
+							Remember:    false,
+							RememberFor: 0,
+							Session: &models.ConsentRequestSession{
+								AccessToken: map[string]interface{}{"foo": "bar"},
+								IDToken:     map[string]interface{}{"bar": "baz"},
+							},
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{Subject: "foouser", SubjectIdentifier: "foouser"},
+				GrantedScope:   []string{"scope-a"},
+				Remember:       false,
+				RememberFor:    0,
+				Session: &ConsentRequestSessionData{
+					AccessToken: map[string]interface{}{"foo": "bar"},
+					IDToken:     map[string]interface{}{"bar": "baz"},
+				},
+			},
+		},
+		{
+			d:   "This should pass as regularly even though id_token_hint is expired",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			jar: newCookieJar(t),
+			idTokenHint: genIDToken(t, reg, jwt.IDTokenClaims{
+				Subject:   "user",
+				ExpiresAt: time.Now().Add(-time.Hour),
+				IssuedAt:  time.Now(),
+			}.ToMapClaims()),
+			lph:                   passAuthentication(apiClient, false),
+			cph:                   passAuthorization(apiClient, false),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+
+		// Pairwise auth
+		{
+			d:   "This should pass as regularly and create a new session with pairwise subject set by hydra",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ3,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("auth-user"),
+							Remember: true,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{
+					Subject:           "auth-user",
+					SubjectIdentifier: "c737d5e1fec8896d096d49f6b1a73eb45ac7becb87de9ac3f0a350bad2a9c9fd", // this is sha256("fooauth-user76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+				},
+				GrantedScope: []string{"scope-a"},
+				Remember:     false,
+				RememberFor:  0,
+				Session:      NewConsentRequestSessionData(),
+			},
+		}, // these tests depend on one another
+		{
+			d:   "This should pass as regularly and create a new session with pairwise subject and also with the ID token set",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ3,
+			idTokenHint: genIDToken(t, reg, jwt.IDTokenClaims{
+				Subject:   "c737d5e1fec8896d096d49f6b1a73eb45ac7becb87de9ac3f0a350bad2a9c9fd",
+				ExpiresAt: time.Now().Add(time.Hour),
+				IssuedAt:  time.Now(),
+			}.ToMapClaims()),
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("auth-user"),
+							Remember: false,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					require.NotEmpty(t, *v.RedirectTo)
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{
+					Subject:           "auth-user",
+					SubjectIdentifier: "c737d5e1fec8896d096d49f6b1a73eb45ac7becb87de9ac3f0a350bad2a9c9fd",
+				},
+				GrantedScope: []string{"scope-a"},
+				Remember:     false,
+				RememberFor:  0,
+				Session:      NewConsentRequestSessionData(),
+			},
+		},
+		{
+			d:   "This should pass as regularly and create a new session with pairwise subject set login request",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ4,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:                pointerx.String("auth-user"),
+							ForceSubjectIdentifier: "forced-auth-user",
+							Remember:               true,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{
+					Subject:           "auth-user",
+					SubjectIdentifier: "forced-auth-user",
+				},
+				GrantedScope: []string{"scope-a"},
+				Remember:     false,
+				RememberFor:  0,
+				Session:      NewConsentRequestSessionData(),
+			},
+		}, // these tests depend on one another
+		{
+			d:   "This should pass as regularly and create a new session with pairwise subject set on login request and also with the ID token set",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id", SubjectType: "pairwise", SectorIdentifierURI: "foo"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ3,
+			idTokenHint: genIDToken(t, reg, jwt.IDTokenClaims{
+				Subject:   "forced-auth-user",
+				ExpiresAt: time.Now().Add(time.Hour),
+				IssuedAt:  time.Now(),
+			}.ToMapClaims()),
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:                pointerx.String("auth-user"),
+							ForceSubjectIdentifier: "forced-auth-user",
+							Remember:               false,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+			expectSession: &HandledConsentRequest{
+				ConsentRequest: &ConsentRequest{
+					Subject:           "auth-user",
+					SubjectIdentifier: "forced-auth-user",
+				},
+				GrantedScope: []string{"scope-a"},
+				Remember:     false,
+				RememberFor:  0,
+				Session:      NewConsentRequestSessionData(),
+			},
+		},
+
+		// checks revoking sessions
+		{
+			d:   "This should pass as regularly and create a new session and forward data",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ2,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("auth-user"),
+							Remember: true,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:      "This should pass and also revoke the session cookie",
+			req:    fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:    persistentCJ2,
+			prompt: "login",
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("not-auth-user"),
+							Remember: false,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		}, // these two tests depend on one another
+		{
+			d:   "This should require re-authentication because the session was revoked in the previous test",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: persistentCJ2,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+					assert.Empty(t, "", rr.Subject)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("foouser"),
+							Remember: true,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:   "This should require re-authentication because the session does not exist in the store",
+			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar: nonexistentCJ,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+					assert.Empty(t, "", rr.Subject)
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("foouser"),
+							Remember: true,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			cph:                   acceptRequest(apiClient, nil),
+			expectFinalStatusCode: http.StatusOK,
+			expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
+			expectErr:             []bool{true, true, false},
+		},
+		{
+			d:           "This should fail because the user from the ID token does not match the user from the accept login request",
+			req:         fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},
+			jar:         newCookieJar(t),
+			idTokenHint: fooUserIDToken,
+			lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
+				return func(w http.ResponseWriter, r *http.Request) {
+					res, err := apiClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+					require.NoError(t, err)
+					rr := res.Payload
+					assert.False(t, *rr.Skip)
+					assert.EqualValues(t, "", *rr.Subject)
+					assert.EqualValues(t, "foouser", rr.OidcContext.IDTokenHintClaims.(map[string]interface{})["sub"])
+
+					vr, err := apiClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+						WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+						WithBody(&models.AcceptLoginRequest{
+							Subject:  pointerx.String("not-foouser"),
+							Remember: false,
+						}))
+					require.NoError(t, err)
+					v := vr.Payload
+
+					http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
+				}
+			},
+			expectFinalStatusCode: http.StatusBadRequest,
+			expectErrType:         []error{ErrAbortOAuth2Request, fosite.ErrLoginRequired},
+			expectErr:             []bool{true, true},
+		},
+	*/
+
+	/*
+		calls := -1
+		aph = func(w http.ResponseWriter, r *http.Request) {
+			calls++
+			require.True(t, len(tc.expectErrType) >= calls+1, "%d (expect) < %d (got)", len(tc.expectErrType), calls+1)
+			require.True(t, len(tc.expectErr) >= calls+1, "%d (expect) < %d (got)", len(tc.expectErr), calls+1)
+			require.NoError(t, r.ParseForm())
+			tc.req.Form = r.Form
+
+			c, err := strategy.HandleOAuth2AuthorizationRequest(w, r, &tc.req)
+			t.Logf("DefaultStrategy returned at call %d:\n\tresult: %+v\n\terr: %s", calls, c, err)
+
+			if tc.expectErr[calls] {
+				assert.Error(t, err)
+				if tc.expectErrType[calls] != nil {
+					assert.EqualError(t, err, tc.expectErrType[calls].Error(), "%+v", err)
+				}
+			} else {
+				require.NoError(t, err)
+				if tc.expectSession != nil {
+					require.NotNil(t, c)
+					assert.EqualValues(t, tc.expectSession.GrantedScope, c.GrantedScope)
+					assert.EqualValues(t, tc.expectSession.Remember, c.Remember)
+					assert.EqualValues(t, tc.expectSession.Session, c.Session)
+					assert.EqualValues(t, tc.expectSession.RememberFor, c.RememberFor)
+					assert.EqualValues(t, tc.expectSession.ConsentRequest.Subject, c.ConsentRequest.Subject)
+					assert.EqualValues(t, tc.expectSession.ConsentRequest.SubjectIdentifier, c.ConsentRequest.SubjectIdentifier)
+				}
+			}
+
+			if errors.Is(err, ErrAbortOAuth2Request) {
+				// nothing to do, indicates redirect
+			} else if err != nil {
+				writer.WriteError(w, r, err)
+			} else {
+				writer.Write(w, r, c)
+			}
+		}
+
+		cl := &http.Client{
+			Jar: tc.jar,
+		}
+		resp, err := cl.Get(
+			ap.URL + "?" +
+				"login_verifier=" + tc.lv + "&" +
+				"consent_verifier=" + tc.cv + "&" +
+				"prompt=" + tc.prompt + "&" +
+				"max_age=" + tc.maxAge + "&" +
+				"id_token_hint=" + tc.idTokenHint + "&" + tc.other,
+		)
+		require.NoError(t, err)
+		out, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
+		resp.Body.Close()
+		assert.EqualValues(t, tc.expectFinalStatusCode, resp.StatusCode, "%s\n%s", resp.Request.URL.String(), out)
+		// assert.Empty(t, resp.Request.URL.String())
+	*/
 }
 
 func TestStrategyLoginConsent(t *testing.T) {
@@ -964,69 +1999,6 @@ func TestStrategyLoginConsent(t *testing.T) {
 				},
 			},
 		},
-		// This test is disabled because it breaks OIDC Conformity Tests
-		// {
-		// 	d:   "This should pass but require consent because it's not an authorization_code flow",
-		// 	req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"token", "code", "id_token"}, Request: fosite.Request{Client: &client.Client{ID: "client-id"}, RequestedScope: []string{"scope-a"}}},
-		// 	jar: persistentCJ,
-		// 	lph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
-		// 		return func(w http.ResponseWriter, r *http.Request) {
-		// 			rr, res, err := apiClient.GetLoginRequest(r.URL.Query().Get("login_challenge"))
-		// 			require.NoError(t, err)
-		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			assert.True(t, *rr.Skip)
-		// 			assert.Equal(t, "user", rr.Subject)
-		//
-		// 			v, res, err := apiClient.AcceptLoginRequest(r.URL.Query().Get("login_challenge"), swagger.AcceptLoginRequest{
-		// 				Subject:     "user",
-		// 				Remember:    false,
-		// 				RememberFor: 0,
-		// 				Acr:         "1",
-		// 			})
-		// 			require.NoError(t, err)
-		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			require.NotEmpty(t, *v.RedirectTo)
-		// 			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
-		// 		}
-		// 	},
-		// 	cph: func(t *testing.T) func(w http.ResponseWriter, r *http.Request) {
-		// 		return func(w http.ResponseWriter, r *http.Request) {
-		// 			rr, res, err := apiClient.GetConsentRequest(r.URL.Query().Get("consent_challenge"))
-		// 			require.NoError(t, err)
-		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			assert.False(t, *rr.Skip)
-		// 			assert.Equal(t, "client-id", rr.Client.ID)
-		// 			assert.Equal(t, "user", rr.Subject)
-		//
-		// 			v, res, err := apiClient.AcceptConsentRequest(r.URL.Query().Get("consent_challenge"), swagger.AcceptConsentRequest{
-		// 				GrantedScope:  []string{"scope-a"},
-		// 				Remember:    false,
-		// 				RememberFor: 0,
-		// 				Session: &models.ConsentRequestSessionData{
-		// 					AccessToken: map[string]interface{}{"foo": "bar"},
-		// 					IDToken:     map[string]interface{}{"bar": "baz"},
-		// 				},
-		// 			})
-		// 			require.NoError(t, err)
-		// 			require.EqualValues(t, http.StatusOK, res.StatusCode)
-		// 			require.NotEmpty(t, *v.RedirectTo)
-		// 			http.Redirect(w, r, *v.RedirectTo, http.StatusFound)
-		// 		}
-		// 	},
-		// 	expectFinalStatusCode: http.StatusOK,
-		// 	expectErrType:         []error{ErrAbortOAuth2Request, ErrAbortOAuth2Request, nil},
-		// 	expectErr:             []bool{true, true, false},
-		// 	expectSession: &HandledConsentRequest{
-		// 		ConsentRequest: &ConsentRequest{Subject: "user"},
-		// 		GrantedScope:   []string{"scope-a"},
-		// 		Remember:       false,
-		// 		RememberFor:    0,
-		// 		Session: &ConsentRequestSessionData{
-		// 			AccessToken: map[string]interface{}{"foo": "bar"},
-		// 			IDToken:     map[string]interface{}{"bar": "baz"},
-		// 		},
-		// 	},
-		// },
 		{
 			d:   "This should fail at login screen because subject from accept does not match subject from session",
 			req: fosite.AuthorizeRequest{ResponseTypes: fosite.Arguments{"code"}, Request: fosite.Request{Client: &client.Client{OutfacingID: "client-id"}, RequestedScope: []string{"scope-a"}}},

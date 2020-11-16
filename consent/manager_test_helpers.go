@@ -266,7 +266,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 				require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
 					ID:              fmt.Sprintf("fk-login-session-%s", k),
-					AuthenticatedAt: time.Now().Round(time.Second).UTC(),
+					AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}))
 
@@ -287,14 +287,14 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				{
 					s: LoginSession{
 						ID:              "session1",
-						AuthenticatedAt: time.Now().Round(time.Second).Add(-time.Minute).UTC(),
+						AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).Add(-time.Minute).UTC()),
 						Subject:         "subject1",
 					},
 				},
 				{
 					s: LoginSession{
 						ID:              "session2",
-						AuthenticatedAt: time.Now().Round(time.Minute).Add(-time.Minute).UTC(),
+						AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Minute).Add(-time.Minute).UTC()),
 						Subject:         "subject2",
 					},
 				},
@@ -309,22 +309,23 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					_, err = m.GetRememberedLoginSession(context.Background(), tc.s.ID)
 					require.EqualError(t, err, x.ErrNotFound.Error())
 
-					require.NoError(t, m.ConfirmLoginSession(context.Background(), tc.s.ID, tc.s.Subject, true))
+					updatedAuth := time.Time(tc.s.AuthenticatedAt).Add(time.Second)
+					require.NoError(t, m.ConfirmLoginSession(context.Background(), tc.s.ID, updatedAuth, tc.s.Subject, true))
 
 					got, err := m.GetRememberedLoginSession(context.Background(), tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got.ID)
-					assert.NotEqual(t, tc.s.AuthenticatedAt.Unix(), got.AuthenticatedAt.Unix()) // this was updated from confirm...
+					assert.Equal(t, updatedAuth.Unix(), time.Time(got.AuthenticatedAt).Unix()) // this was updated from confirm...
 					assert.EqualValues(t, tc.s.Subject, got.Subject)
 
 					time.Sleep(time.Second) // Make sure AuthAt does not equal...
-					require.NoError(t, m.ConfirmLoginSession(context.Background(), tc.s.ID, "some-other-subject", true))
+					updatedAuth2 := time.Now()
+					require.NoError(t, m.ConfirmLoginSession(context.Background(), tc.s.ID, updatedAuth2, "some-other-subject", true))
 
 					got2, err := m.GetRememberedLoginSession(context.Background(), tc.s.ID)
 					require.NoError(t, err)
 					assert.EqualValues(t, tc.s.ID, got2.ID)
-					assert.NotEqual(t, tc.s.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix()) // this was updated from confirm...
-					assert.NotEqual(t, got.AuthenticatedAt.Unix(), got2.AuthenticatedAt.Unix())  // this was updated from confirm...
+					assert.Equal(t, updatedAuth2.Unix(), time.Time(got2.AuthenticatedAt).Unix()) // this was updated from confirm...
 					assert.EqualValues(t, "some-other-subject", got2.Subject)
 				})
 			}
@@ -488,19 +489,19 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		t.Run("case=revoke-auth-request", func(t *testing.T) {
 			require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
 				ID:              "rev-session-1",
-				AuthenticatedAt: time.Now(),
+				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				Subject:         "subject-1",
 			}))
 
 			require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
 				ID:              "rev-session-2",
-				AuthenticatedAt: time.Now(),
+				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				Subject:         "subject-2",
 			}))
 
 			require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
 				ID:              "rev-session-3",
-				AuthenticatedAt: time.Now(),
+				AuthenticatedAt: sqlxx.NullTime(time.Now()),
 				Subject:         "subject-1",
 			}))
 
@@ -705,7 +706,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					t.Run(fmt.Sprintf("create/session=%s/subject=%s", id, subject), func(t *testing.T) {
 						ls := &LoginSession{
 							ID:              id,
-							AuthenticatedAt: time.Now(),
+							AuthenticatedAt: sqlxx.NullTime(time.Now()),
 							Subject:         subject,
 						}
 						require.NoError(t, m.CreateLoginSession(context.Background(), ls))

@@ -179,6 +179,12 @@ that your company deserves a spot here, reach out to
             <td><a href="https://www.arduino.cc/">arduino.cc</a></td>
         </tr>
         <tr>
+            <td>Adopter *</td>
+            <td>DataDetect</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/datadetect.svg" alt="Datadetect"></td>
+            <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
+        </tr>
+        <tr>
             <td>Sponsor</td>
             <td>OrderMyGear</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/ordermygear.svg" alt="OrderMyGear"></td>

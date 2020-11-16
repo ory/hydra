@@ -1,5 +1,5 @@
-titleOnly: true
-commitsOnly: false
+titleOnly: false
+commitsOnly: true
 titleAndCommits: false
 
 types:

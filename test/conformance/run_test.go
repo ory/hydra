@@ -93,6 +93,7 @@ var (
 
 func waitForServices(t *testing.T) {
 	var conformOk, hydraOk bool
+	start := time.Now()
 	for {
 		res, err := client.Get(server.String())
 		conformOk = err == nil && res.StatusCode == 200
@@ -102,6 +103,10 @@ func waitForServices(t *testing.T) {
 
 		if conformOk && hydraOk {
 			break
+		}
+
+		if time.Since(start).Minutes() > 2 {
+			t.Fatalf("Waiting for service exceeded timeout of two minutes.")
 		}
 
 		t.Logf("Waiting for deployments to come alive...")

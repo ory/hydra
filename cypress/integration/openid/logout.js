@@ -1,4 +1,4 @@
-import { deleteClients, prng } from '../../helpers';
+import { deleteClients, prng } from '../../helpers'
 
 const nc = () => ({
   client_id: prng(),
@@ -7,12 +7,12 @@ const nc = () => ({
   subject_type: 'public',
   redirect_uris: [`${Cypress.env('client_url')}/openid/callback`],
   grant_types: ['authorization_code']
-});
+})
 
 describe('OpenID Connect Logout', () => {
   after(() => {
-    cy.wrap(deleteClients());
-  });
+    cy.wrap(deleteClients())
+  })
 
   describe('logout without id_token_hint', () => {
     beforeEach(() => {
@@ -20,19 +20,19 @@ describe('OpenID Connect Logout', () => {
         'oauth2_authentication_session',
         'oauth2_authentication_session_insecure',
         'connect.sid'
-      );
-    });
+      )
+    })
 
     before(() => {
-      cy.wrap(deleteClients());
-    });
+      cy.wrap(deleteClients())
+    })
 
     const client = {
       ...nc(),
       backchannel_logout_uri: `${Cypress.env(
         'client_url'
       )}/openid/session/end/bc`
-    };
+    }
 
     it('should log in and remember login without id_token_hint', function() {
       cy.authCodeFlow(
@@ -42,14 +42,14 @@ describe('OpenID Connect Logout', () => {
           consent: { scope: ['openid'], remember: true }
         },
         'openid'
-      );
+      )
 
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.true;
-        });
-    });
+          expect(has_session).to.be.true
+        })
+    })
 
     it('should show the logout page and complete logout without id_token_hint', () => {
       // cy.request(`${Cypress.env('client_url')}/openid/session/check`)
@@ -60,12 +60,12 @@ describe('OpenID Connect Logout', () => {
 
       cy.visit(`${Cypress.env('client_url')}/openid/session/end?simple=1`, {
         failOnStatusCode: false
-      });
+      })
 
-      cy.get('#accept').click();
+      cy.get('#accept').click()
 
-      cy.get('h1').should('contain', 'Your log out request however succeeded.');
-    });
+      cy.get('h1').should('contain', 'Your log out request however succeeded.')
+    })
 
     it('should show the login screen again because we logged out', () => {
       cy.authCodeFlow(
@@ -76,9 +76,9 @@ describe('OpenID Connect Logout', () => {
           createClient: false
         },
         'openid'
-      );
-    });
-  });
+      )
+    })
+  })
 
   // The Back-Channel test should run before the front-channel test because otherwise both tests need a long time to finish.
   describe('Back-Channel', () => {
@@ -87,19 +87,19 @@ describe('OpenID Connect Logout', () => {
         'oauth2_authentication_session',
         'oauth2_authentication_session_insecure',
         'connect.sid'
-      );
-    });
+      )
+    })
 
     before(() => {
-      cy.wrap(deleteClients());
-    });
+      cy.wrap(deleteClients())
+    })
 
     const client = {
       ...nc(),
       backchannel_logout_uri: `${Cypress.env(
         'client_url'
       )}/openid/session/end/bc`
-    };
+    }
 
     it('should log in and remember login with back-channel', function() {
       cy.authCodeFlow(
@@ -109,37 +109,37 @@ describe('OpenID Connect Logout', () => {
           consent: { scope: ['openid'], remember: true }
         },
         'openid'
-      );
+      )
 
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.true;
-        });
-    });
+          expect(has_session).to.be.true
+        })
+    })
 
     it('should show the logout page and complete logout with back-channel', () => {
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.true;
-        });
+          expect(has_session).to.be.true
+        })
 
       cy.visit(`${Cypress.env('client_url')}/openid/session/end`, {
         failOnStatusCode: false
-      });
+      })
 
-      cy.get('#accept').click();
+      cy.get('#accept').click()
 
-      cy.get('h1').should('contain', 'Your log out request however succeeded.');
+      cy.get('h1').should('contain', 'Your log out request however succeeded.')
 
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.false;
-        });
-    });
-  });
+          expect(has_session).to.be.false
+        })
+    })
+  })
 
   describe('Front-Channel', () => {
     beforeEach(() => {
@@ -147,19 +147,19 @@ describe('OpenID Connect Logout', () => {
         'oauth2_authentication_session',
         'oauth2_authentication_session_insecure',
         'connect.sid'
-      );
-    });
+      )
+    })
 
     before(() => {
-      cy.wrap(deleteClients());
-    });
+      cy.wrap(deleteClients())
+    })
 
     const client = {
       ...nc(),
       frontchannel_logout_uri: `${Cypress.env(
         'client_url'
       )}/openid/session/end/fc`
-    };
+    }
 
     it('should log in and remember login with front-channel', () => {
       cy.authCodeFlow(
@@ -169,35 +169,35 @@ describe('OpenID Connect Logout', () => {
           consent: { scope: ['openid'], remember: true }
         },
         'openid'
-      );
+      )
 
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.true;
-        });
-    });
+          expect(has_session).to.be.true
+        })
+    })
 
     it('should show the logout page and complete logout with front-channel', () => {
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.true;
-        });
+          expect(has_session).to.be.true
+        })
 
       cy.visit(`${Cypress.env('client_url')}/openid/session/end`, {
         failOnStatusCode: false
-      });
+      })
 
-      cy.get('#accept').click();
+      cy.get('#accept').click()
 
-      cy.get('h1').should('contain', 'Your log out request however succeeded.');
+      cy.get('h1').should('contain', 'Your log out request however succeeded.')
 
       cy.request(`${Cypress.env('client_url')}/openid/session/check`)
         .its('body')
         .then(({ has_session }) => {
-          expect(has_session).to.be.false;
-        });
-    });
-  });
-});
+          expect(has_session).to.be.false
+        })
+    })
+  })
+})

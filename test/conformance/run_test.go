@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/stringslice"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,6 +13,8 @@ import (
 	"os/exec"
 	"testing"
 	"time"
+
+	"github.com/ory/x/stringslice"
 
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"

@@ -11,13 +11,13 @@ describe('OpenID Connect Authorize Code Grant', () => {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should return an access, refresh, and ID token', function() {
+  it('should return an access, refresh, and ID token', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['openid'] } }, 'openid')
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const {
           result,
           token: { access_token, id_token, refresh_token },

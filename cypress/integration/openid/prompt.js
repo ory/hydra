@@ -10,7 +10,7 @@ describe('OpenID Connect Prompt', () => {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should fail prompt=none when no session exists', function() {
+  it('should fail prompt=none when no session exists', function () {
     const client = nc()
     cy.wrap(createClient(client))
 
@@ -28,7 +28,7 @@ describe('OpenID Connect Prompt', () => {
     })
   })
 
-  it('should pass with prompt=none if both login and consent were remembered', function() {
+  it('should pass with prompt=none if both login and consent were remembered', function () {
     const client = nc()
 
     cy.authCodeFlow(
@@ -46,7 +46,7 @@ describe('OpenID Connect Prompt', () => {
       }&client_secret=${client.client_secret}&scope=openid`
     )
       .its('body')
-      .then(body => {
+      .then((body) => {
         const {
           result,
           token: { access_token }
@@ -56,7 +56,7 @@ describe('OpenID Connect Prompt', () => {
       })
   })
 
-  it('should require login with prompt=login even when session exists', function() {
+  it('should require login with prompt=login even when session exists', function () {
     const client = nc()
 
     cy.authCodeFlow(
@@ -74,11 +74,11 @@ describe('OpenID Connect Prompt', () => {
       }&client_secret=${client.client_secret}&scope=openid&prompt=login`
     )
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body).to.contain('Please log in')
       })
   })
-  it('should require consent with prompt=consent even when session exists', function() {
+  it('should require consent with prompt=consent even when session exists', function () {
     const client = nc()
 
     cy.authCodeFlow(
@@ -96,7 +96,7 @@ describe('OpenID Connect Prompt', () => {
       }&client_secret=${client.client_secret}&scope=openid&prompt=consent`
     )
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body).to.contain('An application requests access to your data!')
       })
   })

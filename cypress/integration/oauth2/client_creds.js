@@ -1,6 +1,6 @@
 import { createClient, prng } from '../../helpers'
 
-describe('The OAuth 2.0 Authorization Code Grant', function() {
+describe('The OAuth 2.0 Authorization Code Grant', function () {
   const nc = () => ({
     client_id: prng(),
     client_secret: prng(),
@@ -8,7 +8,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
     grant_types: ['client_credentials']
   })
 
-  it('should return an Access Token but not Refresh or ID Token for client_credentials flow', function() {
+  it('should return an Access Token but not Refresh or ID Token for client_credentials flow', function () {
     const client = nc()
     cy.wrap(createClient(client))
 
@@ -19,7 +19,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
       { failOnStatusCode: false }
     )
       .its('body')
-      .then(body => {
+      .then((body) => {
         const {
           result,
           token: { access_token, id_token, refresh_token } = {}

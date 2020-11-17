@@ -1,6 +1,6 @@
 import { prng } from '../../helpers'
 
-describe('The OAuth 2.0 Authorization Code Grant', function() {
+describe('The OAuth 2.0 Authorization Code Grant', function () {
   const nc = () => ({
     client_id: prng(),
     client_secret: prng(),
@@ -11,7 +11,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should return an Access, Refresh, and ID Token when scope offline_access and openid are granted', function() {
+  it('should return an Access, Refresh, and ID Token when scope offline_access and openid are granted', function () {
     const client = nc()
     cy.authCodeFlow(client, {
       consent: { scope: ['offline_access', 'openid'] }
@@ -19,7 +19,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const {
           result,
           token: { access_token, id_token, refresh_token }
@@ -32,13 +32,13 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
       })
   })
 
-  it('should return an Access and Refresh Token when scope offline_access is granted', function() {
+  it('should return an Access and Refresh Token when scope offline_access is granted', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['offline_access'] } })
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const {
           result,
           token: { access_token, id_token, refresh_token }
@@ -51,13 +51,13 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
       })
   })
 
-  it('should return an Access and ID Token when scope offline_access is granted', function() {
+  it('should return an Access and ID Token when scope offline_access is granted', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['openid'] } })
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const {
           result,
           token: { access_token, id_token, refresh_token }
@@ -70,13 +70,13 @@ describe('The OAuth 2.0 Authorization Code Grant', function() {
       })
   })
 
-  it('should return an Access Token when no scope is granted', function() {
+  it('should return an Access Token when no scope is granted', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: [] } })
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const {
           result,
           token: { access_token, id_token, refresh_token }

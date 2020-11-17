@@ -9,20 +9,20 @@ describe('OpenID Connect Token Introspection', () => {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should introspect access token', function() {
+  it('should introspect access token', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['offline_access'] } })
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const { result } = JSON.parse(content)
         expect(result).to.equal('success')
       })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/introspect/at`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body.result).to.equal('success')
         expect(body.body.active).to.be.true
         expect(body.body.sub).to.be.equal('foo@bar.com')
@@ -30,20 +30,20 @@ describe('OpenID Connect Token Introspection', () => {
       })
   })
 
-  it('should introspect refresh token', function() {
+  it('should introspect refresh token', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['offline_access'] } })
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const { result } = JSON.parse(content)
         expect(result).to.equal('success')
       })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/introspect/rt`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body.result).to.equal('success')
         expect(body.body.active).to.be.true
         expect(body.body.sub).to.be.equal('foo@bar.com')

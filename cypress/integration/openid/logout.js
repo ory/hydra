@@ -34,7 +34,7 @@ describe('OpenID Connect Logout', () => {
       )}/openid/session/end/bc`
     }
 
-    it('should log in and remember login without id_token_hint', function() {
+    it('should log in and remember login without id_token_hint', function () {
       cy.authCodeFlow(
         client,
         {
@@ -101,7 +101,7 @@ describe('OpenID Connect Logout', () => {
       )}/openid/session/end/bc`
     }
 
-    it('should log in and remember login with back-channel', function() {
+    it('should log in and remember login with back-channel', function () {
       cy.authCodeFlow(
         client,
         {

@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 const blacklistedSid = []
 
-const isStatusOk = res =>
+const isStatusOk = (res) =>
   res.ok
     ? Promise.resolve(res)
     : Promise.reject(
@@ -55,8 +55,8 @@ app.use(
   })
 )
 
-const nc = req =>
-  Issuer.discover(config.public).then(issuer => {
+const nc = (req) =>
+  Issuer.discover(config.public).then((issuer) => {
     // This is neccessary when working with docker...
     issuer.metadata.token_endpoint = new URL(
       '/oauth2/token',
@@ -131,11 +131,11 @@ app.get('/oauth2/callback', async (req, res) => {
       scope: req.session.scope,
       code: req.query.code
     })
-    .then(token => {
+    .then((token) => {
       req.session.oauth2_flow = { token } // code returns {access_token} because why not...
       res.send({ result: 'success', token })
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.data.payload) {
         res.send(JSON.stringify(err.data.payload))
         return
@@ -144,16 +144,16 @@ app.get('/oauth2/callback', async (req, res) => {
     })
 })
 
-app.get('/oauth2/refresh', function(req, res) {
+app.get('/oauth2/refresh', function (req, res) {
   oauth2
     .create(req.session.credentials)
     .accessToken.create(req.session.oauth2_flow.token)
     .refresh()
-    .then(token => {
+    .then((token) => {
       req.session.oauth2_flow = token // refresh returns {token:{access_token}} because why not...
       res.send({ result: 'success', token: token.token })
     })
-    .catch(err => {
+    .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -166,7 +166,7 @@ app.get('/oauth2/revoke', (req, res) => {
     .then(() => {
       res.sendStatus(201)
     })
-    .catch(err => {
+    .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -179,7 +179,7 @@ app.get('/oauth2/validate-jwt', (req, res) => {
   jwt.verify(
     req.session.oauth2_flow.token.access_token,
     (header, callback) => {
-      client.getSigningKey(header.kid, function(err, key) {
+      client.getSigningKey(header.kid, function (err, key) {
         const signingKey = key.publicKey || key.rsaPublicKey
         callback(null, signingKey)
       })
@@ -205,9 +205,9 @@ app.get('/oauth2/introspect/at', (req, res) => {
     body: params
   })
     .then(isStatusOk)
-    .then(res => res.json())
-    .then(body => res.json({ result: 'success', body }))
-    .catch(err => {
+    .then((res) => res.json())
+    .then((body) => res.json({ result: 'success', body }))
+    .catch((err) => {
       console.error(err)
       res.send(JSON.stringify({ error: err.toString() }))
     })
@@ -222,9 +222,9 @@ app.get('/oauth2/introspect/rt', async (req, res) => {
     body: params
   })
     .then(isStatusOk)
-    .then(res => res.json())
-    .then(body => res.json({ result: 'success', body }))
-    .catch(err => {
+    .then((res) => res.json())
+    .then((body) => res.json({ result: 'success', body }))
+    .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -249,10 +249,10 @@ app.get('/oauth2/cc', (req, res) => {
   oauth2
     .create(credentials)
     .clientCredentials.getToken({ scope: req.query.scope.split(' ') })
-    .then(token => {
+    .then((token) => {
       res.send({ result: 'success', token })
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.data.payload) {
         res.send(JSON.stringify(err.data.payload))
         return
@@ -313,12 +313,12 @@ app.get('/openid/callback', async (req, res) => {
       nonce: req.session.nonce,
       response_type: 'code'
     })
-    .then(ts => {
+    .then((ts) => {
       req.session.openid_token = ts
       req.session.openid_claims = ts.claims
       res.send({ result: 'success', token: ts, claims: ts.claims })
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err)
       res.send(JSON.stringify({ error: err.toString() }))
     })
@@ -328,8 +328,8 @@ app.get('/openid/userinfo', async (req, res) => {
   const client = await nc(req)
   client
     .userinfo(req.session.openid_token.access_token)
-    .then(ui => res.json(ui))
-    .catch(err => {
+    .then((ui) => res.json(ui))
+    .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -339,7 +339,7 @@ app.get('/openid/revoke/at', async (req, res) => {
   client
     .revoke(req.session.openid_token.access_token)
     .then(() => res.json({ result: 'success' }))
-    .catch(err => {
+    .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -349,7 +349,7 @@ app.get('/openid/revoke/rt', async (req, res) => {
   client
     .revoke(req.session.openid_token.refresh_token)
     .then(() => res.json({ result: 'success' }))
-    .catch(err => {
+    .catch((err) => {
       res.send(JSON.stringify({ error: err.toString() }))
     })
 })
@@ -456,6 +456,6 @@ app.get('/openid/session/check', async (req, res) => {
   })
 })
 
-app.listen(config.port, function() {
+app.listen(config.port, function () {
   console.log(`Listening on port ${config.port}!`)
 })

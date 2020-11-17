@@ -303,7 +303,7 @@ func checkStatus(t *testing.T, testID string) (string, status) {
 	t.Logf("Got status %s for %s", state, testID)
 	switch state {
 	case "INTERRUPTED":
-		require.FailNowf(t, "Test was INTERRUPTED", "Status returned was INTERRUPTED: %s", body)
+		t.Logf("Test was INTERRUPTED: %s", body)
 		return state, statusRetry
 	case "FINISHED":
 		result := gjson.GetBytes(body, "result").String()

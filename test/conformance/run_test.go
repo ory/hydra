@@ -6,12 +6,15 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/x/pointerx"
 	"io"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/url"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
@@ -99,9 +102,9 @@ var (
 
 		{"planName": {"oidcc-formpost-basic-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
 	}
-	server    = urlx.ParseOrPanic("https://127.0.0.1:8443")
-	config, _ = ioutil.ReadFile("./config.json")
-	client    = http.Client{
+	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
+	config, _  = ioutil.ReadFile("./config.json")
+	httpClient = &http.Client{
 		Transport: httpx.NewResilientRoundTripper(&http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
@@ -110,6 +113,11 @@ var (
 	}
 
 	workdir string
+
+	hydra = client.NewHTTPClientWithConfig(nil, &client.TransportConfig{
+		Host:     "127.0.0.1:4445",
+		BasePath: "/",
+		Schemes:  []string{"https"}})
 )
 
 func init() {
@@ -120,10 +128,10 @@ func waitForServices(t *testing.T) {
 	var conformOk, hydraOk bool
 	start := time.Now()
 	for {
-		res, err := client.Get(server.String())
+		res, err := httpClient.Get(server.String())
 		conformOk = err == nil && res.StatusCode == 200
 
-		res, err = client.Get("https://127.0.0.1:4444/health/ready")
+		res, err = httpClient.Get("https://127.0.0.1:4444/health/ready")
 		hydraOk = err == nil && res.StatusCode == 200
 
 		if conformOk && hydraOk {
@@ -167,7 +175,7 @@ func TestPlans(t *testing.T) {
 }
 
 func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
-	res, err := client.Post(href, "application/json", payload)
+	res, err := httpClient.Post(href, "application/json", payload)
 	require.NoError(t, err)
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
@@ -249,12 +257,26 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 					case "oidcc-server-rotate-keys":
 						if state == "CONFIGURED" {
 							t.Logf("Rotating ID Token keys....")
-							cmd := exec.Command("docker-compose", "-f", "quickstart.yml", "-f", "quickstart-postgres.yml", "-f", "test/conformance/docker-compose.yml", "run", "hydra", "keys", "create", "--endpoint=https://127.0.0.1:4445/", "hydra.openid.id-token", "-a", "RS256", "--skip-tls-verify")
-							var buf bytes.Buffer
-							cmd.Dir = workdir
-							cmd.Stderr = &buf
-							cmd.Stdout = &buf
-							require.NoError(t, cmd.Run(), "%s", buf.String())
+
+							conf := backoff.NewExponentialBackOff()
+							conf.MaxElapsedTime = time.Minute * 5
+							conf.MaxInterval = time.Second * 5
+							conf.InitialInterval = time.Second
+							var err error
+
+							for {
+								bo := conf.NextBackOff()
+								require.NotEqual(t, backoff.Stop, bo, "%+v", err)
+
+								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
+									Alg: pointerx.String("RS256"),
+								}))
+								if err == nil {
+									break
+								}
+
+								time.Sleep(bo)
+							}
 
 							makePost(t, urlx.AppendPaths(server, "/api/runner/", gjson.GetBytes(body, "id").String()).String(), nil, 200)
 						}
@@ -269,7 +291,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 }
 
 func checkStatus(t *testing.T, testID string) (string, status) {
-	res, err := client.Get(urlx.AppendPaths(server, "/api/info", testID).String())
+	res, err := httpClient.Get(urlx.AppendPaths(server, "/api/info", testID).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)

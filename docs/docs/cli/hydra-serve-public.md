@@ -16,24 +16,30 @@ Serves Public HTTP/2 APIs
 
 ### Synopsis
 
-This command opens one port and listens to HTTP/2 API requests. The exposed API handles requests coming from
-the public internet, like OAuth 2.0 Authorization and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation,
-and OpenID Connect Discovery.
+This command opens one port and listens to HTTP/2 API requests. The exposed API
+handles requests coming from the public internet, like OAuth 2.0 Authorization
+and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation, and
+OpenID Connect Discovery.
 
-This command is configurable using the same options available to "serve admin" and "serve all".
+This command is configurable using the same options available to "serve admin"
+and "serve all".
 
-It is generally recommended to use this command only if you require granular control over the privileged and public APIs.
-For example, you might want to run different TLS certificates or CORS settings on the public and privileged API.
+It is generally recommended to use this command only if you require granular
+control over the privileged and public APIs. For example, you might want to run
+different TLS certificates or CORS settings on the public and privileged API.
 
-This command does not work with the "memory" database. Both services (privileged, public) MUST use the same database
-connection to be able to synchronize.
+This command does not work with the "memory" database. Both services
+(privileged, public) MUST use the same database connection to be able to
+synchronize.
 
 ## Configuration
 
-ORY Hydra can be configured using environment variables as well as a configuration file. For more information
-on configuration options, open the configuration documentation:
+ORY Hydra can be configured using environment variables as well as a
+configuration file. For more information on configuration options, open the
+configuration documentation:
 
-> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md <<
+> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md
+> > <<
 
 ```
 hydra serve public [flags]
@@ -57,4 +63,5 @@ hydra serve public [flags]
 
 ### SEE ALSO
 
-- [hydra serve](hydra-serve) - Parent command for starting public and administrative HTTP/2 APIs
+- [hydra serve](hydra-serve) - Parent command for starting public and
+  administrative HTTP/2 APIs

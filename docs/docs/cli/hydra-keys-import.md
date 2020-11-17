@@ -1,7 +1,9 @@
 ---
 id: hydra-keys-import
 title: hydra keys import
-description: hydra keys import Imports cryptographic keys of any format to the JSON Web Key Store
+description:
+  hydra keys import Imports cryptographic keys of any format to the JSON Web Key
+  Store
 ---
 
 <!--
@@ -18,14 +20,15 @@ Imports cryptographic keys of any format to the JSON Web Key Store
 
 This command allows you to import cryptographic keys to the JSON Web Key Store.
 
-Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If the JSON Web Key Set exists already,
-the imported keys will be added to that set. Otherwise, a new set will be created.
+Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If
+the JSON Web Key Set exists already, the imported keys will be added to that
+set. Otherwise, a new set will be created.
 
-Please be aware that importing a private key does not automatically import its public key as well.
+Please be aware that importing a private key does not automatically import its
+public key as well.
 
-Examples:
-hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json
-hydra keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
+Examples: hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json hydra
+keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
 
 ```
 hydra keys import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]

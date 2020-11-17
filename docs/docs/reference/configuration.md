@@ -7,22 +7,27 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file which supports all
-configuration settings listed below.
+If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file
+which supports all configuration settings listed below.
 
-You can load the config file from another source using the `-c path/to/config.yaml` or `--config path/to/config.yaml`
-flag: `hydra --config path/to/config.yaml`.
+You can load the config file from another source using the
+`-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
+`hydra --config path/to/config.yaml`.
 
-Config files can be formatted as JSON, YAML and TOML. Some configuration values support reloading without server restart.
-All configuration values can be set using environment variables, as documented below.
+Config files can be formatted as JSON, YAML and TOML. Some configuration values
+support reloading without server restart. All configuration values can be set
+using environment variables, as documented below.
 
-This reference configuration documents all keys, also deprecated ones!
-It is a reference for all possible configuration values.
+This reference configuration documents all keys, also deprecated ones! It is a
+reference for all possible configuration values.
 
-If you are looking for an example configuration, it is better to try out the quickstart.
+If you are looking for an example configuration, it is better to try out the
+quickstart.
 
-To find out more about edge cases like setting string array values through environmental variables head to the
-[Configuring ORY services](https://www.ory.sh/docs/ecosystem/configuring) section.
+To find out more about edge cases like setting string array values through
+environmental variables head to the
+[Configuring ORY services](https://www.ory.sh/docs/ecosystem/configuring)
+section.
 
 ```yaml
 ## ORY Hydra Configuration

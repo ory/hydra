@@ -3,30 +3,37 @@ title: REST API
 id: api
 ---
 
-Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here.
+Welcome to the ORY Hydra HTTP API documentation. You will find documentation for
+all HTTP APIs here.
 
 import Tabs from '@theme/Tabs'
 import TabItem from '@theme/TabItem'
 
 :::info
 
-You are viewing REST API documentation. This documentation is auto-generated from a swagger specification which
-itself is generated from annotations in the source code of the project. It is possible that this documentation includes
-bugs and that code samples are incomplete or wrong.
+You are viewing REST API documentation. This documentation is auto-generated
+from a swagger specification which itself is generated from annotations in the
+source code of the project. It is possible that this documentation includes bugs
+and that code samples are incomplete or wrong.
 
 If you find issues in the respective documentation, please do not edit the
-Markdown files directly (as they are generated) but raise an issue on the project's GitHub presence instead. This documentation
-will improve over time with your help! If you have ideas how to improve this part of the documentation, feel free to
-share them in a [GitHub issue](https://github.com/ory/docs/issues/new) any time.
+Markdown files directly (as they are generated) but raise an issue on the
+project's GitHub presence instead. This documentation will improve over time
+with your help! If you have ideas how to improve this part of the documentation,
+feel free to share them in a
+[GitHub issue](https://github.com/ory/docs/issues/new) any time.
 
 :::
 
 ## Authentication
 
-- HTTP Authentication, scheme: basic - OAuth 2.0 Authorization. - Flow: authorizationCode
+- HTTP Authentication, scheme: basic - OAuth 2.0 Authorization. - Flow:
+  authorizationCode
 
-  - OAuth 2.0 Authorization URL = [https://hydra.demo.ory.sh/oauth2/auth](https://hydra.demo.ory.sh/oauth2/auth)
-  - OAuth 2.0 Token URL = [https://hydra.demo.ory.sh/oauth2/token](https://hydra.demo.ory.sh/oauth2/token)
+  - OAuth 2.0 Authorization URL =
+    [https://hydra.demo.ory.sh/oauth2/auth](https://hydra.demo.ory.sh/oauth2/auth)
+  - OAuth 2.0 Token URL =
+    [https://hydra.demo.ory.sh/oauth2/token](https://hydra.demo.ory.sh/oauth2/token)
   - OAuth 2.0 Scope
 
     | Scope          | Scope Description                                                            |
@@ -49,8 +56,9 @@ Accept: application/json
 
 ```
 
-This endpoint returns JSON Web Keys to be used as public keys for verifying OpenID Connect ID Tokens and,
-if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
+This endpoint returns JSON Web Keys to be used as public keys for verifying
+OpenID Connect ID Tokens and, if enabled, OAuth 2.0 JWT Access Tokens. This
+endpoint can be used with client libraries like
 [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 
 #### Responses
@@ -230,12 +238,14 @@ Accept: application/json
 
 ```
 
-The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
-your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
-flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
+The well known endpoint an be used to retrieve information for OpenID Connect
+clients. We encourage you to not roll your own OpenID Connect client but to use
+an OpenID Connect client library instead. You can learn more on this flow at
+https://openid.net/specs/openid-connect-discovery-1_0.html .
 
-Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
-For a full list of clients go here: https://openid.net/developers/certified/
+Popular libraries for OpenID Connect clients include oidc-client-js
+(JavaScript), go-oidc (Golang), and others. For a full list of clients go here:
+https://openid.net/developers/certified/
 
 #### Responses
 
@@ -419,14 +429,14 @@ Accept: application/json
 
 ```
 
-This endpoint returns a 200 status code when the HTTP server is up running and the environment dependencies (e.g.
-the database) are responsive as well.
+This endpoint returns a 200 status code when the HTTP server is up running and
+the environment dependencies (e.g. the database) are responsive as well.
 
 If the service supports TLS Edge Termination, this endpoint does not require the
 `X-Forwarded-Proto` header to be set.
 
-Be aware that if you are running multiple nodes of this service, the health status will never
-refer to the cluster state, only to a single instance.
+Be aware that if you are running multiple nodes of this service, the health
+status will never refer to the cluster state, only to a single instance.
 
 #### Responses
 
@@ -585,10 +595,12 @@ Accept: application/json
 
 ```
 
-This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
-OAuth2 is a very popular protocol and a library for your programming language will exists.
+This endpoint is not documented here because you should never use your own
+implementation to perform OAuth2 flows. OAuth2 is a very popular protocol and a
+library for your programming language will exists.
 
-To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
+To learn more about this flow please refer to the specification:
+https://tools.ietf.org/html/rfc6749
 
 #### Responses
 
@@ -753,10 +765,11 @@ Accept: application/json
 
 ```
 
-Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
-longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
-Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
-the client the token was generated for.
+Revoking a token (both access and refresh) means that the tokens will be
+invalid. A revoked access token can no longer be used to make access requests,
+and a revoked refresh token can no longer be used to refresh an access token.
+Revoking a refresh token also invalidates the access token that was created with
+it. A token may only be revoked by the client the token was generated for.
 
 #### Request body
 
@@ -943,7 +956,8 @@ GET /oauth2/sessions/logout HTTP/1.1
 
 ```
 
-This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:
+This endpoint initiates and completes user logout at ORY Hydra and initiates
+OpenID Connect Front-/Back-channel logout:
 
 https://openid.net/specs/openid-connect-frontchannel-1_0.html
 https://openid.net/specs/openid-connect-backchannel-1_0.html
@@ -1079,14 +1093,16 @@ Accept: application/json
 
 ```
 
-The client makes a request to the token endpoint by sending the
-following parameters using the "application/x-www-form-urlencoded" HTTP
-request entity-body.
+The client makes a request to the token endpoint by sending the following
+parameters using the "application/x-www-form-urlencoded" HTTP request
+entity-body.
 
-> Do not implement a client for this endpoint yourself. Use a library. There are many libraries
-> available for any programming language. You can find a list of libraries here: https://oauth.net/code/
+> Do not implement a client for this endpoint yourself. Use a library. There are
+> many libraries available for any programming language. You can find a list of
+> libraries here: https://oauth.net/code/
 >
-> Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
+> Do note that Hydra SDK does not implement this endpoint properly. Use one of
+> the libraries listed above!
 
 #### Request body
 
@@ -1287,10 +1303,11 @@ Accept: application/json
 
 ```
 
-This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
-the provided OAuth 2.0 Access Token.
+This endpoint returns the payload of the ID Token, including the idTokenExtra
+values, of the provided OAuth 2.0 Access Token.
 
-For more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
+For more information please
+[refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
 
 #### Responses
 
@@ -1479,11 +1496,20 @@ Accept: application/json
 
 ```
 
-This endpoint lists all clients in the database, and never returns client secrets.
+This endpoint lists all clients in the database, and never returns client
+secrets.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
-The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
-Multiple links can be included in this header, and will be separated by a comma.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
+Usually, OAuth 2.0 clients are generated for applications which want to consume
+your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will
+need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected
+and only callable by first-party components. The "Link" header is also included
+in successful responses, which contains one or more links for pagination,
+formatted like so:
+'<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"',
+where page is one of the following applicable pages: 'first', 'next', 'last',
+and 'previous'. Multiple links can be included in this header, and will be
+separated by a comma.
 
 <a id="list-oauth-2.0-clients-parameters"></a>
 
@@ -1730,9 +1756,16 @@ Accept: application/json
 
 ```
 
-Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
+Create a new OAuth 2.0 client If you pass `client_secret` the secret will be
+used, otherwise a random secret will be generated. The secret will be returned
+in the response and you will not be able to retrieve it later on. Write the
+secret down and keep it somwhere safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
+Usually, OAuth 2.0 clients are generated for applications which want to consume
+your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will
+need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected
+and only callable by first-party components.
 
 #### Request body
 
@@ -2029,7 +2062,11 @@ Accept: application/json
 
 Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
+Usually, OAuth 2.0 clients are generated for applications which want to consume
+your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will
+need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected
+and only callable by first-party components.
 
 <a id="get-an-oauth-2.0-client.-parameters"></a>
 
@@ -2230,9 +2267,15 @@ Accept: application/json
 
 ```
 
-Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will
+be updated and returned via the API. This is the only time you will be able to
+retrieve the client secret, so write it down and keep it safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
+Usually, OAuth 2.0 clients are generated for applications which want to consume
+your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will
+need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected
+and only callable by first-party components.
 
 #### Request body
 
@@ -2528,7 +2571,11 @@ Accept: application/json
 
 Delete an existing OAuth 2.0 Client by its ID.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
+Usually, OAuth 2.0 clients are generated for applications which want to consume
+your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will
+need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected
+and only callable by first-party components.
 
 <a id="deletes-an-oauth-2.0-client-parameters"></a>
 
@@ -2700,14 +2747,15 @@ Accept: application/json
 
 ```
 
-This endpoint returns a 200 status code when the HTTP server is up running.
-This status does currently not include checks whether the database connection is working.
+This endpoint returns a 200 status code when the HTTP server is up running. This
+status does currently not include checks whether the database connection is
+working.
 
 If the service supports TLS Edge Termination, this endpoint does not require the
 `X-Forwarded-Proto` header to be set.
 
-Be aware that if you are running multiple nodes of this service, the health status will never
-refer to the cluster state, only to a single instance.
+Be aware that if you are running multiple nodes of this service, the health
+status will never refer to the cluster state, only to a single instance.
 
 #### Responses
 
@@ -2868,7 +2916,12 @@ Accept: application/json
 
 This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that
+represents a cryptographic key. A JWK Set is a JSON data structure that
+represents a set of JWKs. A JSON Web Key is identified by its set and key id.
+ORY Hydra uses this functionality to store cryptographic keys used for TLS and
+JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing
+user-defined keys as well.
 
 <a id="retrieve-a-json-web-key-set-parameters"></a>
 
@@ -3058,9 +3111,15 @@ Accept: application/json
 
 ```
 
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+Use this method if you do not want to let Hydra generate the JWKs for you, but
+instead save your own.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that
+represents a cryptographic key. A JWK Set is a JSON data structure that
+represents a set of JWKs. A JSON Web Key is identified by its set and key id.
+ORY Hydra uses this functionality to store cryptographic keys used for TLS and
+JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing
+user-defined keys as well.
 
 #### Request body
 
@@ -3307,9 +3366,17 @@ Accept: application/json
 
 ```
 
-This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
+This endpoint is capable of generating JSON Web Key Sets for you. There a
+different strategies available, such as symmetric cryptographic keys (HS256,
+HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON
+Web Key Set does not exist, it will be created.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that
+represents a cryptographic key. A JWK Set is a JSON data structure that
+represents a set of JWKs. A JSON Web Key is identified by its set and key id.
+ORY Hydra uses this functionality to store cryptographic keys used for TLS and
+JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing
+user-defined keys as well.
 
 #### Request body
 
@@ -3517,9 +3584,15 @@ Accept: application/json
 
 ```
 
-Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
+Use this endpoint to delete a complete JSON Web Key Set and all the keys in that
+set.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that
+represents a cryptographic key. A JWK Set is a JSON data structure that
+represents a set of JWKs. A JSON Web Key is identified by its set and key id.
+ORY Hydra uses this functionality to store cryptographic keys used for TLS and
+JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing
+user-defined keys as well.
 
 <a id="delete-a-json-web-key-set-parameters"></a>
 
@@ -3692,7 +3765,8 @@ Accept: application/json
 
 ```
 
-This endpoint returns a singular JSON Web Key, identified by the set and the specific key ID (kid).
+This endpoint returns a singular JSON Web Key, identified by the set and the
+specific key ID (kid).
 
 <a id="fetch-a-json-web-key-parameters"></a>
 
@@ -3882,9 +3956,15 @@ Accept: application/json
 
 ```
 
-Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+Use this method if you do not want to let Hydra generate the JWKs for you, but
+instead save your own.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that
+represents a cryptographic key. A JWK Set is a JSON data structure that
+represents a set of JWKs. A JSON Web Key is identified by its set and key id.
+ORY Hydra uses this functionality to store cryptographic keys used for TLS and
+JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing
+user-defined keys as well.
 
 #### Request body
 
@@ -4121,7 +4201,12 @@ Accept: application/json
 
 Use this endpoint to delete a single JSON Web Key.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that
+represents a cryptographic key. A JWK Set is a JSON data structure that
+represents a set of JWKs. A JSON Web Key is identified by its set and key id.
+ORY Hydra uses this functionality to store cryptographic keys used for TLS and
+JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing
+user-defined keys as well.
 
 <a id="delete-a-json-web-key-parameters"></a>
 
@@ -4436,16 +4521,21 @@ Accept: application/json
 
 ```
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
+Hydra asks the login provider to authenticate the subject and then tell ORY
+Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the
+resources on the subject's behalf.
 
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
-grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
+The consent provider which handles this request and is a web app implemented and
+hosted by you. It shows a subject interface which asks the subject to grant or
+deny the client access to the requested scope ("Application my-dropbox-app wants
+write access to all your private files").
 
-The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
-or rejected the request.
+The consent challenge is appended to the consent provider's URL to which the
+subject's user-agent (browser) is redirected to. The consent provider uses that
+challenge to fetch information on the OAuth2 request and then tells ORY Hydra if
+the subject accepted or rejected the request.
 
 <a id="get-consent-request-information-parameters"></a>
 
@@ -4668,22 +4758,29 @@ Accept: application/json
 
 ```
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
+Hydra asks the login provider to authenticate the subject and then tell ORY
+Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the
+resources on the subject's behalf.
 
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
-grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
+The consent provider which handles this request and is a web app implemented and
+hosted by you. It shows a subject interface which asks the subject to grant or
+deny the client access to the requested scope ("Application my-dropbox-app wants
+write access to all your private files").
 
-The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
-or rejected the request.
+The consent challenge is appended to the consent provider's URL to which the
+subject's user-agent (browser) is redirected to. The consent provider uses that
+challenge to fetch information on the OAuth2 request and then tells ORY Hydra if
+the subject accepted or rejected the request.
 
-This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
-The consent provider includes additional information, such as session data for access and ID tokens, and if the
-consent request should be used as basis for future requests.
+This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0
+client to access resources on his/her behalf. The consent provider includes
+additional information, such as session data for access and ID tokens, and if
+the consent request should be used as basis for future requests.
 
-The response contains a redirect URL which the consent provider should redirect the user-agent to.
+The response contains a redirect URL which the consent provider should redirect
+the user-agent to.
 
 #### Request body
 
@@ -4889,21 +4986,28 @@ Accept: application/json
 
 ```
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
-the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
+Hydra asks the login provider to authenticate the subject and then tell ORY
+Hydra now about it. If the subject authenticated, he/she must now be asked if
+the OAuth 2.0 Client which initiated the flow should be allowed to access the
+resources on the subject's behalf.
 
-The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
-grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
+The consent provider which handles this request and is a web app implemented and
+hosted by you. It shows a subject interface which asks the subject to grant or
+deny the client access to the requested scope ("Application my-dropbox-app wants
+write access to all your private files").
 
-The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
-or rejected the request.
+The consent challenge is appended to the consent provider's URL to which the
+subject's user-agent (browser) is redirected to. The consent provider uses that
+challenge to fetch information on the OAuth2 request and then tells ORY Hydra if
+the subject accepted or rejected the request.
 
-This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
-The consent provider must include a reason why the consent was not granted.
+This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0
+client to access resources on his/her behalf. The consent provider must include
+a reason why the consent was not granted.
 
-The response contains a redirect URL which the consent provider should redirect the user-agent to.
+The response contains a redirect URL which the consent provider should redirect
+the user-agent to.
 
 #### Request body
 
@@ -5096,13 +5200,17 @@ Accept: application/json
 
 ```
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
-a subject (in OAuth2 the proper name for subject is "resource owner").
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
+Hydra asks the login provider (sometimes called "identity provider") to
+authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate
+("show the subject a login screen") a subject (in OAuth2 the proper name for
+subject is "resource owner").
 
-The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
-provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+The authentication challenge is appended to the login provider URL to which the
+subject's user-agent (browser) is redirected to. The login provider uses that
+challenge to fetch information on the OAuth2 request and then accept or reject
+the requested authentication process.
 
 <a id="get-a-login-request-parameters"></a>
 
@@ -5323,19 +5431,25 @@ Accept: application/json
 
 ```
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
-a subject (in OAuth2 the proper name for subject is "resource owner").
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
+Hydra asks the login provider (sometimes called "identity provider") to
+authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate
+("show the subject a login screen") a subject (in OAuth2 the proper name for
+subject is "resource owner").
 
-The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
-provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+The authentication challenge is appended to the login provider URL to which the
+subject's user-agent (browser) is redirected to. The login provider uses that
+challenge to fetch information on the OAuth2 request and then accept or reject
+the requested authentication process.
 
-This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as
-the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting
-a cookie.
+This endpoint tells ORY Hydra that the subject has successfully authenticated
+and includes additional information such as the subject's ID and if ORY Hydra
+should remember the subject's subject agent for future authentication attempts
+by setting a cookie.
 
-The response contains a redirect URL which the login provider should redirect the user-agent to.
+The response contains a redirect URL which the login provider should redirect
+the user-agent to.
 
 #### Request body
 
@@ -5532,18 +5646,23 @@ Accept: application/json
 
 ```
 
-When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
-provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
-a subject (in OAuth2 the proper name for subject is "resource owner").
+When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY
+Hydra asks the login provider (sometimes called "identity provider") to
+authenticate the subject and then tell ORY Hydra now about it. The login
+provider is an web-app you write and host, and it must be able to authenticate
+("show the subject a login screen") a subject (in OAuth2 the proper name for
+subject is "resource owner").
 
-The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
-provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
+The authentication challenge is appended to the login provider URL to which the
+subject's user-agent (browser) is redirected to. The login provider uses that
+challenge to fetch information on the OAuth2 request and then accept or reject
+the requested authentication process.
 
-This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
-was be denied.
+This endpoint tells ORY Hydra that the subject has not authenticated and
+includes a reason why the authentication was be denied.
 
-The response contains a redirect URL which the login provider should redirect the user-agent to.
+The response contains a redirect URL which the login provider should redirect
+the user-agent to.
 
 #### Request body
 
@@ -5910,10 +6029,11 @@ Accept: application/json
 
 ```
 
-When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
-No body is required.
+When a user or an application requests ORY Hydra to log out a user, this
+endpoint is used to confirm that logout request. No body is required.
 
-The response contains a redirect URL which the consent provider should redirect the user-agent to.
+The response contains a redirect URL which the consent provider should redirect
+the user-agent to.
 
 <a id="accept-a-logout-request-parameters"></a>
 
@@ -6084,10 +6204,11 @@ Accept: application/json
 
 ```
 
-When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
-No body is required.
+When a user or an application requests ORY Hydra to log out a user, this
+endpoint is used to deny that logout request. No body is required.
 
-The response is empty as the logout provider has to chose what action to perform next.
+The response is empty as the logout provider has to chose what action to perform
+next.
 
 #### Request body
 
@@ -6292,12 +6413,16 @@ Accept: application/json
 
 ```
 
-This endpoint lists all subject's granted consent sessions, including client and granted scope.
-If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
-empty JSON array with status code 200 OK.
+This endpoint lists all subject's granted consent sessions, including client and
+granted scope. If the subject is unknown or has not granted any consent sessions
+yet, the endpoint returns an empty JSON array with status code 200 OK.
 
-The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
-Multiple links can be included in this header, and will be separated by a comma.
+The "Link" header is also included in successful responses, which contains one
+or more links for pagination, formatted like so:
+'<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>;
+rel="{page}"', where page is one of the following applicable pages: 'first',
+'next', 'last', and 'previous'. Multiple links can be included in this header,
+and will be separated by a comma.
 
 <a id="lists-all-consent-sessions-of-a-subject-parameters"></a>
 
@@ -6600,8 +6725,8 @@ Accept: application/json
 
 ```
 
-This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
-associated OAuth 2.0 Access Tokens.
+This endpoint revokes a subject's granted consent sessions for a specific OAuth
+2.0 Client and invalidates all associated OAuth 2.0 Access Tokens.
 
 <a id="revokes-consent-sessions-of-a-subject-for-a-specific-oauth-2.0-client-parameters"></a>
 
@@ -6780,8 +6905,9 @@ Accept: application/json
 
 ```
 
-This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
+This endpoint invalidates a subject's authentication session. After revoking the
+authentication session, the subject has to re-authenticate at ORY Hydra. This
+endpoint does not invalidate any tokens and does not work with OpenID Connect
 Front- or Back-channel logout.
 
 <a
@@ -6964,9 +7090,10 @@ Accept: application/json
 
 ```
 
-This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
-not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
-automatically when performing the refresh flow.
+This endpoint flushes expired OAuth2 access tokens from the database. You can
+set a time after which no tokens will be not be touched, in case you want to
+keep recent tokens for auditing. Refresh tokens can not be flushed as they are
+deleted automatically when performing the refresh flow.
 
 #### Request body
 
@@ -7153,11 +7280,14 @@ Accept: application/json
 
 ```
 
-The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
-is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
-set additional data for a token by setting `accessTokenExtra` during the consent flow.
+The introspection endpoint allows to check if a token (both refresh and access)
+is active or not. An active token is neither expired nor revoked. If a token is
+active, additional information on the token will be included. You can set
+additional data for a token by setting `accessTokenExtra` during the consent
+flow.
 
-For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
+For more information
+[read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 
 #### Request body
 
@@ -7178,13 +7308,12 @@ scope: string
 
 ##### Detailed descriptions
 
-**» token**: The string value of the token. For access tokens, this
-is the "access_token" value returned from the token endpoint
-defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
-value returned.
+**» token**: The string value of the token. For access tokens, this is the
+"access_token" value returned from the token endpoint defined in OAuth 2.0. For
+refresh tokens, this is the "refresh_token" value returned.
 
-**» scope**: An optional, space separated list of required scopes. If the access token was not granted one of the
-scopes, the result of active will be false.
+**» scope**: An optional, space separated list of required scopes. If the access
+token was not granted one of the scopes, the result of active will be false.
 
 #### Responses
 
@@ -7537,7 +7666,8 @@ Accept: application/json
 
 ```
 
-This endpoint returns the service version typically notated using semantic versioning.
+This endpoint returns the service version typically notated using semantic
+versioning.
 
 If the service supports TLS Edge Termination, this endpoint does not require the
 `X-Forwarded-Proto` header to be set.
@@ -7720,7 +7850,8 @@ _ContainerWaitOKBodyError container waiting error, if any_
 {}
 ```
 
-_JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger._
+_JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and
+Swagger._
 
 #### Properties
 
@@ -7754,9 +7885,8 @@ _None_
 }
 ```
 
-_It is important that this model object is named JSONWebKey for
-"swagger generate spec" to generate only on definition of a
-JSONWebKey._
+_It is important that this model object is named JSONWebKey for "swagger
+generate spec" to generate only on definition of a JSONWebKey._
 
 #### Properties
 
@@ -7812,11 +7942,10 @@ JSONWebKey._
 }
 ```
 
-_It is important that this model object is named JSONWebKeySet for
-"swagger generate spec" to generate only on definition of a
-JSONWebKeySet. Since one with the same name is previously defined as
-client.Client.JSONWebKeys and this one is last, this one will be
-effectively written in the swagger spec._
+_It is important that this model object is named JSONWebKeySet for "swagger
+generate spec" to generate only on definition of a JSONWebKeySet. Since one with
+the same name is previously defined as client.Client.JSONWebKeys and this one is
+last, this one will be effectively written in the swagger spec._
 
 #### Properties
 
@@ -8330,8 +8459,8 @@ _PluginSettings Settings that can be modified by users._
 }
 ```
 
-_The response used to return used consent requests
-same as HandledLoginRequest, just with consent_request exposed as json_
+_The response used to return used consent requests same as HandledLoginRequest,
+just with consent_request exposed as json_
 
 #### Properties
 
@@ -8461,7 +8590,8 @@ _HandledLoginRequest is the request payload used to accept a login request._
 }
 ```
 
-_The response payload sent when accepting or rejecting a login or consent request._
+_The response payload sent when accepting or rejecting a login or consent
+request._
 
 #### Properties
 
@@ -8889,7 +9019,8 @@ _Client represents an OAuth 2.0 Client._
 }
 ```
 
-_Introspection contains an access token's session data as specified by IETF RFC 7662, see:_
+_Introspection contains an access token's session data as specified by IETF RFC
+7662, see:_
 
 #### Properties
 

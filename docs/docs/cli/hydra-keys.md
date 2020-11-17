@@ -35,4 +35,5 @@ Manage JSON Web Keys
 - [hydra keys create](hydra-keys-create) - Create a new JSON Web Key Set
 - [hydra keys delete](hydra-keys-delete) - Delete a new JSON Web Key Set
 - [hydra keys get](hydra-keys-get) - Get a new JSON Web Key Set
-- [hydra keys import](hydra-keys-import) - Imports cryptographic keys of any format to the JSON Web Key Store
+- [hydra keys import](hydra-keys-import) - Imports cryptographic keys of any
+  format to the JSON Web Key Store

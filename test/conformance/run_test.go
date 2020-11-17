@@ -6,10 +6,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/x/pointerx"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -18,6 +14,11 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/x/pointerx"
 
 	"github.com/cenkalti/backoff/v3"
 

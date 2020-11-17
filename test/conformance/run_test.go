@@ -22,6 +22,15 @@ import (
 	"github.com/ory/x/urlx"
 )
 
+type status int
+
+const (
+	statusFailed status = iota
+	statusRetry
+	statusRunning
+	statusSuccess
+)
+
 var (
 	skipWhenShort = []string{"oidcc-test-plan"}
 
@@ -185,6 +194,8 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 				return
 			}
 
+			var retries int
+		retry:
 			body = makePost(t, urlx.CopyWithQuery(
 				urlx.AppendPaths(server, "/api/runner"),
 				url.Values{"test": {module}, "plan": {plan}, "variant": {v.Get("variant").Raw}}).String(), nil, 201)
@@ -193,7 +204,19 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 				time.Sleep(time.Millisecond * 100)
 
 				state, passed := checkStatus(t, gjson.GetBytes(body, "id").String())
-				if passed {
+				switch passed {
+				case statusRetry:
+					t.Logf("Retrying test: %s", module)
+					retries++
+					if retries > 5 {
+						t.Fatalf("Exceeded maximum retries %d for test %s in plan %s", retries, module, plan)
+						return
+					} else {
+						goto retry
+					}
+				case statusFailed:
+					return
+				case statusSuccess:
 					break
 				}
 
@@ -217,7 +240,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 	})
 }
 
-func checkStatus(t *testing.T, testID string) (state string, passed bool) {
+func checkStatus(t *testing.T, testID string) (string, status) {
 	res, err := client.Get(urlx.AppendPaths(server, "/api/info", testID).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
@@ -225,23 +248,23 @@ func checkStatus(t *testing.T, testID string) (state string, passed bool) {
 	require.NoError(t, err)
 	require.Equal(t, 200, res.StatusCode, "%s", body)
 
-	state = gjson.GetBytes(body, "status").String()
+	state := gjson.GetBytes(body, "status").String()
 	switch state {
 	case "INTERRUPTED":
 		t.Fatalf("Status returned was INTERRUPTED: %s", body)
-		return
+		return state, statusRetry
 	case "FINISHED":
 		status := gjson.GetBytes(body, "result").String()
 
 		if status == "PASSED" || status == "WARNING" || status == "SKIPPED" || status == "REVIEW" {
-			return state, true
+			return state, statusSuccess
 		} else if status == "FAILED" {
 			t.Fatalf("Expected status not to be FAILED got: %s", body)
-			return
+			return state, statusFailed
 		}
 
 		t.Fatalf("Unexpected status: %s", body)
-		return
+		return state, statusFailed
 	case "CONFIGURED":
 		fallthrough
 	case "CREATED":
@@ -249,9 +272,9 @@ func checkStatus(t *testing.T, testID string) (state string, passed bool) {
 	case "RUNNING":
 		fallthrough
 	case "WAITING":
-		return state, false
+		return state, statusRunning
 	}
 
 	t.Fatalf("Unexpected state: %s", body)
-	return
+	return state, statusFailed
 }

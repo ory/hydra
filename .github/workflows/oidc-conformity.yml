@@ -2,6 +2,7 @@ name: "OpenID Connect Conformity Tests"
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   oidc-conformity:

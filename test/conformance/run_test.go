@@ -8,11 +8,17 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"os/exec"
+	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/cenkalti/backoff/v3"
+
+	"github.com/ory/x/httpx"
 
 	"github.com/ory/x/stringslice"
 
@@ -93,16 +99,22 @@ var (
 
 		{"planName": {"oidcc-formpost-basic-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
 	}
-	server    = urlx.ParseOrPanic("https://localhost:8443")
+	server    = urlx.ParseOrPanic("https://127.0.0.1:8443")
 	config, _ = ioutil.ReadFile("./config.json")
 	client    = http.Client{
-		Transport: &http.Transport{
+		Transport: httpx.NewResilientRoundTripper(&http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
 			},
-		},
+		}, time.Second*5, time.Second*15),
 	}
+
+	workdir string
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func waitForServices(t *testing.T) {
 	var conformOk, hydraOk bool
@@ -119,7 +131,7 @@ func waitForServices(t *testing.T) {
 		}
 
 		if time.Since(start).Minutes() > 2 {
-			t.Fatalf("Waiting for service exceeded timeout of two minutes.")
+			require.FailNow(t, "Waiting for service exceeded timeout of two minutes.")
 		}
 
 		t.Logf("Waiting for deployments to come alive...")
@@ -129,6 +141,10 @@ func waitForServices(t *testing.T) {
 
 func TestPlans(t *testing.T) {
 	waitForServices(t)
+
+	var err error
+	workdir, err = filepath.Abs("../../")
+	require.NoError(t, err)
 
 	t.Run("parallel=true", func(t *testing.T) {
 		for k := range plans {
@@ -181,6 +197,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 	gjson.GetBytes(body, "modules").ForEach(func(_, v gjson.Result) bool {
 		module := v.Get("testModule").String()
 
+		t.Logf("Running testModule %s for plan %s", module, plan)
 		t.Run("testModule="+module, func(t *testing.T) {
 			if isParallel {
 				t.Parallel()
@@ -194,46 +211,57 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 				return
 			}
 
-			var retries int
-		retry:
-			body = makePost(t, urlx.CopyWithQuery(
-				urlx.AppendPaths(server, "/api/runner"),
-				url.Values{"test": {module}, "plan": {plan}, "variant": {v.Get("variant").Raw}}).String(), nil, 201)
+			params := url.Values{"test": {module}, "plan": {plan}, "variant": {v.Get("variant").Raw}}
 
-			for {
-				time.Sleep(time.Millisecond * 100)
+			const maxRetries = 5
+			for retry := 1; retry <= maxRetries; retry++ {
+				time.Sleep(time.Duration(rand.Intn(5000)) * time.Millisecond)
 
-				state, passed := checkStatus(t, gjson.GetBytes(body, "id").String())
-				switch passed {
-				case statusRetry:
-					t.Logf("Retrying test: %s", module)
-					retries++
-					if retries > 5 {
-						t.Fatalf("Exceeded maximum retries %d for test %s in plan %s", retries, module, plan)
+				t.Logf("Creating retry %d/%d testModule %s for plan %s with params: %+v", retry, maxRetries, module, plan, params)
+				body := makePost(t, urlx.CopyWithQuery(urlx.AppendPaths(server, "/api/runner"), params).String(),
+					nil, 201)
+
+				conf := backoff.NewExponentialBackOff()
+				conf.MaxElapsedTime = time.Minute * 5
+				conf.MaxInterval = time.Second * 5
+				conf.InitialInterval = time.Second
+
+				for {
+					nb := conf.NextBackOff()
+					if nb == backoff.Stop {
+						t.Logf("Waited %.2f minutes for a status change for testModule %s for plan %s but received none. Retrying with a fresh test...", conf.MaxElapsedTime.Minutes(), module, plan)
 						return
-					} else {
-						goto retry
 					}
-				case statusFailed:
-					return
-				case statusSuccess:
-					break
-				}
+					time.Sleep(nb)
 
-				switch module {
-				case "oidcc-server-rotate-keys":
-					if state == "CONFIGURED" {
-						t.Logf("Rotating ID Token keys....")
-						cmd := exec.Command("./hydra/hydra", "keys", "create", "--endpoint=https://127.0.0.1:4445/", "hydra.openid.id-token", "-a", "RS256", "--skip-tls-verify")
-						var buf bytes.Buffer
-						cmd.Stderr = &buf
-						cmd.Stdout = &buf
-						require.NoError(t, cmd.Run(), "%s", buf.String())
+					state, passed := checkStatus(t, gjson.GetBytes(body, "id").String())
+					switch passed {
+					case statusRetry:
+						t.Logf("Status from testModule %s for plan %s with params marked the test for retry. Retrying with a fresh test...", module, plan)
+						break
+					case statusFailed:
+						return
+					case statusSuccess:
+						return
+					}
 
-						makePost(t, urlx.AppendPaths(server, "/api/runner/", gjson.GetBytes(body, "id").String()).String(), nil, 200)
+					switch module {
+					case "oidcc-server-rotate-keys":
+						if state == "CONFIGURED" {
+							t.Logf("Rotating ID Token keys....")
+							cmd := exec.Command("docker-compose", "-f", "quickstart.yml", "-f", "quickstart-postgres.yml", "-f", "test/conformance/docker-compose.yml", "run", "hydra", "keys", "create", "--endpoint=https://127.0.0.1:4445/", "hydra.openid.id-token", "-a", "RS256", "--skip-tls-verify")
+							var buf bytes.Buffer
+							cmd.Dir = workdir
+							cmd.Stderr = &buf
+							cmd.Stdout = &buf
+							require.NoError(t, cmd.Run(), "%s", buf.String())
+
+							makePost(t, urlx.AppendPaths(server, "/api/runner/", gjson.GetBytes(body, "id").String()).String(), nil, 200)
+						}
 					}
 				}
 			}
+			require.FailNowf(t, "Retries exceeded", "Exceeded maximum retries %d for test %s in plan %s", maxRetries, module, plan)
 		})
 
 		return true
@@ -249,21 +277,23 @@ func checkStatus(t *testing.T, testID string) (string, status) {
 	require.Equal(t, 200, res.StatusCode, "%s", body)
 
 	state := gjson.GetBytes(body, "status").String()
+	t.Logf("Got status %s for %s", state, testID)
 	switch state {
 	case "INTERRUPTED":
-		t.Fatalf("Status returned was INTERRUPTED: %s", body)
+		require.FailNowf(t, "Test was INTERRUPTED", "Status returned was INTERRUPTED: %s", body)
 		return state, statusRetry
 	case "FINISHED":
-		status := gjson.GetBytes(body, "result").String()
+		result := gjson.GetBytes(body, "result").String()
+		t.Logf("Got result %s for %s", result, testID)
 
-		if status == "PASSED" || status == "WARNING" || status == "SKIPPED" || status == "REVIEW" {
+		if result == "PASSED" || result == "WARNING" || result == "SKIPPED" || result == "REVIEW" {
 			return state, statusSuccess
-		} else if status == "FAILED" {
-			t.Fatalf("Expected status not to be FAILED got: %s", body)
+		} else if result == "FAILED" {
+			require.FailNowf(t, "Test was FAILED", "Expected status not to be FAILED got: %s", body)
 			return state, statusFailed
 		}
 
-		t.Fatalf("Unexpected status: %s", body)
+		require.FailNowf(t, "Test failed with another error", "Unexpected status: %s", body)
 		return state, statusFailed
 	case "CONFIGURED":
 		fallthrough
@@ -275,6 +305,6 @@ func checkStatus(t *testing.T, testID string) (string, status) {
 		return state, statusRunning
 	}
 
-	t.Fatalf("Unexpected state: %s", body)
+	require.FailNowf(t, "Unexpected state", "Unexpected state: %s", body)
 	return state, statusFailed
 }

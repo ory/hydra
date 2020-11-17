@@ -9,7 +9,7 @@ describe('OpenID Connect Token Revokation', () => {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should be able to revoke the access token', function() {
+  it('should be able to revoke the access token', function () {
     const client = nc()
     cy.authCodeFlow(
       client,
@@ -19,14 +19,14 @@ describe('OpenID Connect Token Revokation', () => {
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const { result } = JSON.parse(content)
         expect(result).to.equal('success')
       })
 
     cy.request(`${Cypress.env('client_url')}/openid/revoke/at`)
       .its('body')
-      .then(response => {
+      .then((response) => {
         expect(response.result).to.equal('success')
       })
 
@@ -34,12 +34,12 @@ describe('OpenID Connect Token Revokation', () => {
       failOnStatusCode: false
     })
       .its('body')
-      .then(response => {
+      .then((response) => {
         expect(response.error).to.contain('request_unauthorized')
       })
   })
 
-  it('should be able to revoke the refresh token', function() {
+  it('should be able to revoke the refresh token', function () {
     const client = nc()
     cy.authCodeFlow(
       client,
@@ -49,7 +49,7 @@ describe('OpenID Connect Token Revokation', () => {
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const { result } = JSON.parse(content)
         expect(result).to.equal('success')
       })
@@ -58,7 +58,7 @@ describe('OpenID Connect Token Revokation', () => {
       failOnStatusCode: false
     })
       .its('body')
-      .then(response => {
+      .then((response) => {
         expect(response.result).to.equal('success')
       })
 
@@ -66,7 +66,7 @@ describe('OpenID Connect Token Revokation', () => {
       failOnStatusCode: false
     })
       .its('body')
-      .then(response => {
+      .then((response) => {
         expect(response.error).to.contain('request_unauthorized')
       })
   })

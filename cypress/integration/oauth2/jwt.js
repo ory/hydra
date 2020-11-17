@@ -1,7 +1,7 @@
 import { prng } from '../../helpers'
 
 describe('The OAuth 2.0 Refresh Token Grant', () => {
-  before(function() {
+  before(function () {
     // this must be a function otherwise this.skip() fails because the context is wrong
     if (
       Cypress.env('jwt_enabled') !== 'true' &&
@@ -25,7 +25,7 @@ describe('The OAuth 2.0 Refresh Token Grant', () => {
 
     cy.request(`${Cypress.env('client_url')}/oauth2/refresh`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         const { result, token } = body
         expect(result).to.equal('success')
 
@@ -37,7 +37,7 @@ describe('The OAuth 2.0 Refresh Token Grant', () => {
 
     cy.request(`${Cypress.env('client_url')}/oauth2/validate-jwt`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         console.log(body)
         expect(body.sub).to.eq('foo@bar.com')
         expect(body.client_id).to.eq(client.client_id)

@@ -54,12 +54,11 @@ Cypress.Commands.add(
     }
 
     cy.visit(
-      `${Cypress.env('client_url')}/${path}/code?client_id=${client_id ||
-        client.client_id}&client_secret=${client_secret ||
-        client.client_secret}&scope=${(scope || client.scope).replace(
-        ' ',
-        '+'
-      )}&prompt=${prompt}`,
+      `${Cypress.env('client_url')}/${path}/code?client_id=${
+        client_id || client.client_id
+      }&client_secret=${client_secret || client.client_secret}&scope=${(
+        scope || client.scope
+      ).replace(' ', '+')}&prompt=${prompt}`,
       { failOnStatusCode: false }
     )
 
@@ -79,7 +78,7 @@ Cypress.Commands.add(
     }
 
     if (!skipConsent) {
-      acceptScope.forEach(s => {
+      acceptScope.forEach((s) => {
         cy.get(`#${s}`).click()
       })
 

@@ -13,7 +13,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       grant_types: ['authorization_code', 'refresh_token']
     })
 
-    it('should return an error when rejecting login', function() {
+    it('should return an error when rejecting login', function () {
       const client = nc()
       cy.authCodeFlow(client, {
         login: { accept: false },
@@ -22,7 +22,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
 
       cy.get('body')
         .invoke('text')
-        .then(content => {
+        .then((content) => {
           const {
             result,
             error_description,
@@ -39,7 +39,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
         })
     })
 
-    it('should return an error when rejecting consent', function() {
+    it('should return an error when rejecting consent', function () {
       const client = nc()
       cy.authCodeFlow(client, {
         consent: { accept: false }
@@ -47,7 +47,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
 
       cy.get('body')
         .invoke('text')
-        .then(content => {
+        .then((content) => {
           const {
             result,
             error_description,

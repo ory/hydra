@@ -11,11 +11,17 @@ describe('OAuth 2.0 End-User Authorization', () => {
 
   const hasConsent = (client, body) => {
     let found = false
-    body.forEach(({ consent_request: { client: { client_id } } }) => {
-      if (client_id === client.client_id) {
-        found = true
+    body.forEach(
+      ({
+        consent_request: {
+          client: { client_id }
+        }
+      }) => {
+        if (client_id === client.client_id) {
+          found = true
+        }
       }
-    })
+    )
     return found
   }
 
@@ -33,10 +39,10 @@ describe('OAuth 2.0 End-User Authorization', () => {
         '/oauth2/auth/sessions/consent?subject=foo@bar.com'
     )
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body.length).to.be.greaterThan(0)
         expect(hasConsent(client, body)).to.be.true
-        body.forEach(consent => {
+        body.forEach((consent) => {
           expect(
             consent.handled_at.match(
               /^[2-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
@@ -56,21 +62,21 @@ describe('OAuth 2.0 End-User Authorization', () => {
         '/oauth2/auth/sessions/consent?subject=foo@bar.com'
     )
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body.length).to.eq(0)
         expect(hasConsent(client, body)).to.be.false
       })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/introspect/at`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body.result).to.equal('success')
         expect(body.body.active).to.be.false
       })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/introspect/rt`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         expect(body.result).to.equal('success')
         expect(body.body.active).to.be.false
       })

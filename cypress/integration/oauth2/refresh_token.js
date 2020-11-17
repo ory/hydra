@@ -1,6 +1,6 @@
 import { prng } from '../../helpers'
 
-describe('OAuth 2.0 JSON Web Token Access Tokens', function() {
+describe('OAuth 2.0 JSON Web Token Access Tokens', function () {
   const nc = () => ({
     client_id: prng(),
     client_secret: prng(),
@@ -9,13 +9,13 @@ describe('OAuth 2.0 JSON Web Token Access Tokens', function() {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should return an Access and Refresh Token and refresh the Access Token', function() {
+  it('should return an Access and Refresh Token and refresh the Access Token', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['offline_access'] } })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/refresh`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         const { result, token } = body
         expect(result).to.equal('success')
         expect(token.access_token).to.not.be.empty
@@ -23,7 +23,7 @@ describe('OAuth 2.0 JSON Web Token Access Tokens', function() {
       })
   })
 
-  it('should return an Access, ID, and Refresh Token and refresh the Access Token and ID Token', function() {
+  it('should return an Access, ID, and Refresh Token and refresh the Access Token and ID Token', function () {
     const client = nc()
     cy.authCodeFlow(client, {
       consent: { scope: ['offline_access', 'openid'] }
@@ -31,7 +31,7 @@ describe('OAuth 2.0 JSON Web Token Access Tokens', function() {
 
     cy.request(`${Cypress.env('client_url')}/oauth2/refresh`)
       .its('body')
-      .then(body => {
+      .then((body) => {
         const { result, token } = body
         expect(result).to.equal('success')
         expect(token.access_token).to.not.be.empty

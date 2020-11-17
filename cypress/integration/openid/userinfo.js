@@ -9,13 +9,13 @@ describe('OpenID Connect Userinfo', () => {
     grant_types: ['authorization_code', 'refresh_token']
   })
 
-  it('should return a proper userinfo response', function() {
+  it('should return a proper userinfo response', function () {
     const client = nc()
     cy.authCodeFlow(client, { consent: { scope: ['openid'] } }, 'openid')
 
     cy.get('body')
       .invoke('text')
-      .then(content => {
+      .then((content) => {
         const { result } = JSON.parse(content)
         expect(result).to.equal('success')
       })

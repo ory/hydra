@@ -1,7 +1,9 @@
 ---
 id: hydra-version
 title: hydra version
-description: hydra version Display this binary's version, build time and git hash of this build
+description:
+  hydra version Display this binary's version, build time and git hash of this
+  build
 ---
 
 <!--

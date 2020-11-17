@@ -1,7 +1,8 @@
 ---
 id: hydra-serve
 title: hydra serve
-description: hydra serve Parent command for starting public and administrative HTTP/2 APIs
+description:
+  hydra serve Parent command for starting public and administrative HTTP/2 APIs
 ---
 
 <!--
@@ -16,13 +17,15 @@ Parent command for starting public and administrative HTTP/2 APIs
 
 ### Synopsis
 
-ORY Hydra exposes two ports, a public and an administrative port. The public port is responsible
-for handling requests from the public internet, such as the OAuth 2.0 Authorize and Token URLs. The administrative
-port handles administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys, and managing User Login
-and Consent sessions.
+ORY Hydra exposes two ports, a public and an administrative port. The public
+port is responsible for handling requests from the public internet, such as the
+OAuth 2.0 Authorize and Token URLs. The administrative port handles
+administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys,
+and managing User Login and Consent sessions.
 
-It is recommended to run "hydra serve all". If you need granular control over CORS settings or similar, you may
-want to run "hydra serve admin" and "hydra serve public" separately.
+It is recommended to run "hydra serve all". If you need granular control over
+CORS settings or similar, you may want to run "hydra serve admin" and "hydra
+serve public" separately.
 
 To learn more about each individual command, run:
 
@@ -34,10 +37,12 @@ All sub-commands share command line flags and configuration options.
 
 ## Configuration
 
-ORY Hydra can be configured using environment variables as well as a configuration file. For more information
-on configuration options, open the configuration documentation:
+ORY Hydra can be configured using environment variables as well as a
+configuration file. For more information on configuration options, open the
+configuration documentation:
 
-> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md <<
+> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md
+> > <<
 
 ### Options
 
@@ -54,5 +59,6 @@ on configuration options, open the configuration documentation:
 
 - [hydra](hydra) - Run and manage ORY Hydra
 - [hydra serve admin](hydra-serve-admin) - Serves Administrative HTTP/2 APIs
-- [hydra serve all](hydra-serve-all) - Serves both public and administrative HTTP/2 APIs
+- [hydra serve all](hydra-serve-all) - Serves both public and administrative
+  HTTP/2 APIs
 - [hydra serve public](hydra-serve-public) - Serves Public HTTP/2 APIs

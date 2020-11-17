@@ -18,8 +18,7 @@ Delete an OAuth 2.0 Client
 
 This command deletes one or more OAuth 2.0 Clients by their respective IDs.
 
-Example:
-hydra clients delete client-1 client-2 client-3
+Example: hydra clients delete client-1 client-2 client-3
 
 ```
 hydra clients delete <id> [<id>...] [flags]

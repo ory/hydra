@@ -16,14 +16,15 @@ Create SQL schemas and apply migration plans
 
 ### Synopsis
 
-Run this command on a fresh SQL installation and when you upgrade Hydra to a new minor version. For example,
-upgrading Hydra 0.7.0 to 0.8.0 requires running this command.
+Run this command on a fresh SQL installation and when you upgrade Hydra to a new
+minor version. For example, upgrading Hydra 0.7.0 to 0.8.0 requires running this
+command.
 
-It is recommended to run this command close to the SQL instance (e.g. same subnet) instead of over the public internet.
-This decreases risk of failure and decreases time required.
+It is recommended to run this command close to the SQL instance (e.g. same
+subnet) instead of over the public internet. This decreases risk of failure and
+decreases time required.
 
-You can read in the database URL using the -e flag, for example:
-export DSN=...
+You can read in the database URL using the -e flag, for example: export DSN=...
 hydra migrate sql -e
 
 ### WARNING

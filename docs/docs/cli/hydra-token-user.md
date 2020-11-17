@@ -1,7 +1,9 @@
 ---
 id: hydra-token-user
 title: hydra token user
-description: hydra token user An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow
+description:
+  hydra token user An exemplary OAuth 2.0 Client performing the OAuth 2.0
+  Authorize Code Flow
 ---
 
 <!--
@@ -16,11 +18,12 @@ An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow
 
 ### Synopsis
 
-Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
-This command will help you to see if ORY Hydra has been configured properly.
+Starts an exemplary web server that acts as an OAuth 2.0 Client performing the
+Authorize Code Flow. This command will help you to see if ORY Hydra has been
+configured properly.
 
-This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
-and success.
+This command must not be used for anything else than manual testing or demo
+purposes. The server will terminate on error and success.
 
 ```
 hydra token user [flags]

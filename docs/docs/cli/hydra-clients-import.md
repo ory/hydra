@@ -1,7 +1,8 @@
 ---
 id: hydra-clients-import
 title: hydra clients import
-description: hydra clients import Import OAuth 2.0 Clients from one or more JSON files
+description:
+  hydra clients import Import OAuth 2.0 Clients from one or more JSON files
 ---
 
 <!--
@@ -16,23 +17,22 @@ Import OAuth 2.0 Clients from one or more JSON files
 
 ### Synopsis
 
-This command reads in each listed JSON file and imports their contents as OAuth 2.0 Clients.
+This command reads in each listed JSON file and imports their contents as OAuth
+2.0 Clients.
 
 The format for the JSON file is:
 
-{
-"client_id": "...",
-"client_secret": "...",
-// ... all other fields of the OAuth 2.0 Client model are allowed here
-}
+{ "client_id": "...", "client_secret": "...", // ... all other fields of the
+OAuth 2.0 Client model are allowed here }
 
-Please be aware that this command does not update existing clients. If the client exists already, this command will fail.
+Please be aware that this command does not update existing clients. If the
+client exists already, this command will fail.
 
-Example:
-hydra clients import client-1.json
+Example: hydra clients import client-1.json
 
-To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
-hydra clients import client-1.json --keybase keybase_username
+To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
+"--keybase" flag, for example: hydra clients import client-1.json --keybase
+keybase_username
 
 ```
 hydra clients import <path/to/file.json> [<path/to/other/file.json>...] [flags]

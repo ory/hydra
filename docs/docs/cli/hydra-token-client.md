@@ -1,7 +1,9 @@
 ---
 id: hydra-token-client
 title: hydra token client
-description: hydra token client An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow
+description:
+  hydra token client An exemplary OAuth 2.0 Client performing the OAuth 2.0
+  Client Credentials Flow
 ---
 
 <!--
@@ -16,11 +18,11 @@ An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow
 
 ### Synopsis
 
-Performs the OAuth 2.0 Client Credentials Flow. This command will help you to see if ORY Hydra has
-been configured properly.
+Performs the OAuth 2.0 Client Credentials Flow. This command will help you to
+see if ORY Hydra has been configured properly.
 
-This command should not be used for anything else than manual testing or demo purposes. The server will terminate on error
-and success.
+This command should not be used for anything else than manual testing or demo
+purposes. The server will terminate on error and success.
 
 ```
 hydra token client [flags]

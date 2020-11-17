@@ -2,8 +2,13 @@
   "name": "@oryd/hydra",
   "version": "0.0.0",
   "private": true,
+  "prettier": "ory-prettier-styles",
+  "config": {
+    "prettierTarget": "{test,cypress}/**/*.js"
+  },
   "scripts": {
-    "format": "prettier --single-quote --trailing-comma none --write \"{test,cypress}/**/*.js\"",
+    "format": "prettier --write ${npm_package_config_prettierTarget}",
+    "format:check": "prettier --check ${npm_package_config_prettierTarget}",
     "test": "cypress run",
     "test:watch": "cypress open",
     "wait-on": "wait-on",
@@ -11,6 +16,7 @@
   },
   "devDependencies": {
     "cypress": "^3.8.1",
+    "ory-prettier-styles": "^1.1.1",
     "prettier": "^1.17.0",
     "standard": "^12.0.1",
     "wait-on": "^3.2.0"

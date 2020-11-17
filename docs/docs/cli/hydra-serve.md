@@ -1,8 +1,7 @@
 ---
 id: hydra-serve
 title: hydra serve
-description:
-  hydra serve Parent command for starting public and administrative HTTP/2 APIs
+description: hydra serve Parent command for starting public and administrative HTTP/2 APIs
 ---
 
 <!--

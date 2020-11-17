@@ -1,7 +1,7 @@
 name: "OpenID Connect Conformity Tests"
 
 on:
-  push:
+  workflow_dispatch:
 
 jobs:
   oidc-conformity:
@@ -16,4 +16,4 @@ jobs:
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
-        run: ./test/conformance/test.sh -v -short -parallel 4
+        run: ./test/conformance/test.sh -v -short -parallel 2

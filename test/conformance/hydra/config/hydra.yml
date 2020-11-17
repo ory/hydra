@@ -39,6 +39,9 @@ oidc:
       - profile
 
 oauth2:
+  hashers:
+    bcrypt:
+      cost: 4
   session:
     encrypt_at_rest: false
 

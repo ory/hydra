@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/x/stringslice"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -21,6 +22,8 @@ import (
 )
 
 var (
+	skipWhenShort = []string{"oidcc-test-plan"}
+
 	plans = []url.Values{
 		{"planName": {"oidcc-formpost-implicit-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
 		{"planName": {"oidcc-formpost-basic-certification-test-plan"}, "variant": {"{\"server_metadata\":\"discovery\",\"client_registration\":\"dynamic_client\"}"}},
@@ -148,6 +151,12 @@ func makePost(t *testing.T, href string, payload io.Reader, esc int) []byte {
 }
 
 func createPlan(t *testing.T, extra url.Values, isParallel bool) {
+	planName := extra.Get("planName")
+	if stringslice.Has(skipWhenShort, planName) && testing.Short() {
+		t.Skipf("Skipping test plan '%s' because short tests", planName)
+		return
+	}
+
 	// https://localhost:8443/api/plan?planName=oidcc-formpost-basic-certification-test-plan&variant={"server_metadata":"discovery","client_registration":"dynamic_client"}&variant={"server_metadata":"discovery","client_registration":"dynamic_client"}
 	//planConfig, err := sjson.SetBytes(config, "alias", uuid.New())
 	//require.NoError(t, err)

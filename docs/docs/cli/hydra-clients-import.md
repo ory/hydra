@@ -1,7 +1,8 @@
 ---
 id: hydra-clients-import
 title: hydra clients import
-description: hydra clients import Import OAuth 2.0 Clients from one or more JSON files
+description:
+  hydra clients import Import OAuth 2.0 Clients from one or more JSON files
 ---
 
 <!--

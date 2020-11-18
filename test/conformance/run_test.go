@@ -239,7 +239,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 					nb := conf.NextBackOff()
 					if nb == backoff.Stop {
 						t.Logf("Waited %.2f minutes for a status change for testModule %s for plan %s but received none. Retrying with a fresh test...", conf.MaxElapsedTime.Minutes(), module, plan)
-						return
+						break
 					}
 					time.Sleep(nb)
 
@@ -249,7 +249,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 						t.Logf("Status from testModule %s for plan %s with params marked the test for retry. Retrying with a fresh test...", module, plan)
 						break
 					case statusFailed:
-						return
+						panic("This statement should never be reached")
 					case statusSuccess:
 						return
 					}

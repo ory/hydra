@@ -885,9 +885,12 @@ func (s *DefaultStrategy) issueLogoutVerifier(w http.ResponseWriter, r *http.Req
 			)
 		}
 
-		redir = urlx.SetQuery(f, url.Values{
-			"state": {state},
-		}).String()
+		params := url.Values{}
+		if state != "" {
+			params.Add("state", state)
+		}
+
+		redir = urlx.SetQuery(f, params).String()
 	}
 
 	// We do not really want to verify if the user (from id token hint) has a session here because it doesn't really matter.

@@ -17,4 +17,4 @@ jobs:
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests
-        run: ./test/conformance/test.sh -v -short -parallel 8
+        run: ./test/conformance/test.sh -v -short -parallel 16

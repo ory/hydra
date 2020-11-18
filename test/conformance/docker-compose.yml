@@ -66,6 +66,7 @@ services:
     restart: unless-stopped
 
   consent:
+    image: oryd/hydra-login-consent-node:latest
     environment:
       HYDRA_ADMIN_URL: https://hydra:4445
       NODE_TLS_REJECT_UNAUTHORIZED: 0

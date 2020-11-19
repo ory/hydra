@@ -181,7 +181,7 @@ func logoutHandler(strategy Strategy, writer herodot.Writer, w http.ResponseWrit
 	http.Redirect(w, r,
 		urlx.CopyWithQuery(
 			urlx.ParseOrPanic(res.RedirectTo),
-			url.Values{"front_channel_logout_urls": {fmt.Sprintf("%s", res.FrontChannelLogoutURLs)}},
+			url.Values{},
 		).String(),
 		http.StatusFound,
 	)
@@ -243,6 +243,7 @@ func runLogout(t *testing.T, method string) {
 		sessionID        string
 		lph              func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
 		expectBody       string
+		expectRequestURI string
 		backChannels     []func(t *testing.T) func(w http.ResponseWriter, r *http.Request)
 		expectStatusCode int
 		jar              http.CookieJar
@@ -416,6 +417,7 @@ func runLogout(t *testing.T, method string) {
 			expectStatusCode: http.StatusOK,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp5", "logout-subject-temp5"),
 			expectBody:       "redirected to default server1234custom",
+			expectRequestURI: "/custom?state=1234",
 		},
 		{
 			d:   "should pass rp-inititated flow",
@@ -462,6 +464,26 @@ func runLogout(t *testing.T, method string) {
 			expectStatusCode: http.StatusOK,
 			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp6", "logout-subject-temp6"),
 			expectBody:       "redirected to default server1234custom",
+		},
+		{
+			d:   "should not append a state param if no state was passed to logout server",
+			lph: acceptLogoutChallenge(apiClient, "temp7"),
+			params: url.Values{
+				"post_logout_redirect_uri": {defaultRedirServer.URL + "/custom"},
+				"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
+					"aud": defaultClient.OutfacingID,
+					"iss": conf.IssuerURL().String(),
+					"sub": "logout-subject-temp7",
+					"sid": "logout-session-temp7",
+					"exp": time.Now().Add(-time.Hour).Unix(),
+					"iat": time.Now().Add(-time.Hour * 2).Unix(),
+				})},
+			},
+			expectStatusCode: http.StatusOK,
+			jar:              newValidAuthCookieJar(t, reg, logoutServer.URL, "logout-session-temp7", "logout-subject-temp7"),
+			subject:          "logout-subject-7",
+			expectBody:       "redirected to default servercustom",
+			expectRequestURI: "/custom",
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
@@ -522,6 +544,10 @@ func runLogout(t *testing.T, method string) {
 
 			assert.EqualValues(t, tc.expectStatusCode, resp.StatusCode, "%s\n%s", resp.Request.URL.String(), out)
 			assert.EqualValues(t, tc.expectBody, strings.Trim(string(out), "\n"), "%s\n%s", resp.Request.URL.String(), out)
+
+			if tc.expectRequestURI != "" {
+				assert.EqualValues(t, tc.expectRequestURI, resp.Request.URL.RequestURI(), "%s\n%s", resp.Request.URL.String(), out)
+			}
 		})
 	}
 }

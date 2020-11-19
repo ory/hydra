@@ -1,4 +1,6 @@
 const fs = require('fs')
+const prettier = require('prettier')
+const prettierStyles = require('ory-prettier-styles')
 
 if (process.argv.length !== 3 || process.argv[1] === 'help') {
   console.error(`
@@ -41,9 +43,13 @@ fs.readFile(file, (err, b) => {
     // .replace(/^> Body parameter/gim, '### Request body',-1)
     .replace(/^> ([0-9]+) Response$/gim, '###### $1 response', -1)
 
-  fs.writeFile(file, t, (err) => {
-    if (err) {
-      throw err
+  fs.writeFile(
+    file,
+    prettier.format(t, { ...prettierStyles, parser: 'mdx' }),
+    (err) => {
+      if (err) {
+        throw err
+      }
     }
-  })
+  )
 })

@@ -5,10 +5,12 @@ const admonitions = require('remark-admonitions')
 const githubRepoName =
   config.projectSlug === 'ecosystem' ? 'docs' : config.projectSlug
 
+const baseUrl = config.baseUrl ? config.baseUrl : `/${config.projectSlug}/docs/`
+
 const links = [
   {
     to: '/',
-    activeBasePath: `${config.projectSlug}/docs`,
+    activeBasePath: baseUrl,
     label: `Docs`,
     position: 'left'
   },
@@ -43,8 +45,10 @@ module.exports = {
   title: config.projectName,
   tagline: config.projectTagLine,
   url: `https://www.ory.sh/`,
-  baseUrl: `/${config.projectSlug}/docs/`,
+  baseUrl,
   favicon: 'img/favico.png',
+  onBrokenLinks: 'error',
+  onBrokenMarkdownLinks: 'error',
   organizationName: 'ory', // Usually your GitHub org/user name.
   projectName: config.projectSlug, // Usually your repo name.
   themeConfig: {
@@ -66,9 +70,7 @@ module.exports = {
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
-        href: `https://www.ory.sh/${
-          config.projectSlug === 'ecosystem' ? '' : config.projectSlug
-        }`
+        href: `https://www.ory.sh/${config.projectSlug}`
       },
       items: [
         ...links,

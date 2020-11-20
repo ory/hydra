@@ -114,7 +114,7 @@ Affects documentation.
 
 - [ ] docs: fix omissions in the description
       ([hydra#2173](https://github.com/ory/hydra/pull/2173)) -
-      [@hackerman](https://github.com/aeneasr)
+      [@Vincent](https://github.com/vinckr)
 - [x] docs: remove introspect security spec
       ([hydra#2002](https://github.com/ory/hydra/pull/2002))
 

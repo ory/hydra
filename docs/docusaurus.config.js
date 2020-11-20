@@ -39,22 +39,6 @@ const links = [
   }
 ]
 
-let version = ['latest']
-
-if (fs.existsSync('./versions.json')) {
-  version = require('./versions.json')
-  if (version && version.length > 0) {
-    links.push({
-      label: version[0],
-      position: 'right',
-      to: 'versions'
-    })
-  }
-  if (version.length === 0) {
-    version = ['master']
-  }
-}
-
 module.exports = {
   title: config.projectName,
   tagline: config.projectTagLine,
@@ -71,8 +55,11 @@ module.exports = {
     algolia: {
       apiKey: '8463c6ece843b377565726bb4ed325b0',
       indexName: 'ory',
-      algoliaOptions: {
-        facetFilters: [`tags:${config.projectSlug}`, `version:${version[0]}`]
+      contextualSearch: true,
+      searchParameters: {
+        // facetFilters: [
+        //   `tags:${config.projectSlug}`,
+        // ]
       }
     },
     navbar: {
@@ -83,7 +70,20 @@ module.exports = {
           config.projectSlug === 'ecosystem' ? '' : config.projectSlug
         }`
       },
-      items: links
+      items: [
+        ...links,
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
+          dropdownActiveClassDisabled: true,
+          dropdownItemsAfter: [
+            {
+              to: '/versions',
+              label: 'All versions'
+            }
+          ]
+        }
+      ]
     },
     footer: {
       style: 'dark',
@@ -122,7 +122,8 @@ module.exports = {
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        remarkPlugins: [admonitions]
+        remarkPlugins: [admonitions],
+        disableVersioning: false
       }
     ],
     '@docusaurus/plugin-content-pages',

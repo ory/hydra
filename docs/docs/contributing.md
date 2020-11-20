@@ -9,7 +9,7 @@ Thank you for contributing changes to this document! Because we use a central re
 to synchronize this file across all our repositories, make sure to make your edits
 in the correct file, which you can find here:
 
-https://github.com/ory/meta/blob/master/templates/repository/CONTRIBUTING.md
+https://github.com/ory/meta/blob/master/templates/repository/common/CONTRIBUTING.md
 
 -->
 
@@ -60,7 +60,7 @@ do this is via the [ORY Community](https://community.ory.sh/) or join the
 ## FAQ
 
 - I am new to the community. Where can I find the
-  [ORY Community Code of Conduct?](CODE_OF_CONDUCT.md)
+  [ORY Community Code of Conduct?](https://github.com/ory/{{Project}}/blob/master/CODE_OF_CONDUCT.md)
 
 - I have a question. Where can I get
   [answers to questions regarding ORY {{Project}}?](#communication)
@@ -118,7 +118,7 @@ questions, discuss bugs and feature requests, talk to other users of ORY, etc.
 We have a [forum](https://community.ory.sh/). This is a great place for in-depth
 discussions and lots of code examples, logs and similar data.
 
-You can also join our weekly hangout, if you want to speak to the ORY team
+You can also join our community hangout, if you want to speak to the ORY team
 directly or ask some questions. You can find more info on the hangouts in
 [Slack](https://www.ory.sh/chat).
 
@@ -162,10 +162,12 @@ should be merged by the submitter after review.
 ## Documentation
 
 Please provide documentation when changing, removing, or adding features.
-Documentation resides in the project's [docs](docs) folder. Generate API and
-configuration reference documentation using `cd docs; npm run gen`.
+Documentation resides in the project's
+[docs](https://github.com/ory/{{Project}}/tree/master/docs) folder. Generate API
+and configuration reference documentation using `cd docs; npm run gen`.
 
-For further instructions please head over to [docs/README.md](docs/README.md).
+For further instructions please head over to
+[docs/README.md](https://github.com/ory/{{Project}}/blob/master/README.md).
 
 ## Disclosing vulnerabilities
 

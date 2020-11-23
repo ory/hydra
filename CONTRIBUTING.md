@@ -4,7 +4,7 @@ Thank you for contributing changes to this document! Because we use a central re
 to synchronize this file across all our repositories, make sure to make your edits
 in the correct file, which you can find here:
 
-https://github.com/ory/meta/blob/master/templates/repository/CONTRIBUTING.md
+https://github.com/ory/meta/blob/master/templates/repository/common/CONTRIBUTING.md
 
 -->
 
@@ -29,17 +29,22 @@ https://github.com/ory/meta/blob/master/templates/repository/CONTRIBUTING.md
 
 ## Introduction
 
-There are many ways in which you can contribute, beyond writing code. The goal of this document is to provide a high-level overview of how you can get involved.
+There are many ways in which you can contribute, beyond writing code. The goal
+of this document is to provide a high-level overview of how you can get
+involved.
 
 _Please note_: We take ORY {{Project}}'s security and our users' trust very
 seriously. If you believe you have found a security issue in ORY {{Project}},
 please responsibly disclose by contacting us at security@ory.sh.
 
-First:
-As a potential contributor, your changes and ideas are welcome at any hour of the day or night, weekdays, weekends, and holidays. Please do not ever hesitate to ask a question or send a pull request.
+First: As a potential contributor, your changes and ideas are welcome at any
+hour of the day or night, weekdays, weekends, and holidays. Please do not ever
+hesitate to ask a question or send a pull request.
 
-If you are unsure, just ask or submit the issue or pull request anyways. You won't be yelled at for giving it your best effort. The worst that can happen is that you'll be politely asked to change something. We appreciate any sort of contributions, and don't want a wall of rules to get in
-the way of that.
+If you are unsure, just ask or submit the issue or pull request anyways. You
+won't be yelled at for giving it your best effort. The worst that can happen is
+that you'll be politely asked to change something. We appreciate any sort of
+contributions, and don't want a wall of rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
@@ -49,48 +54,72 @@ do this is via the [ORY Community](https://community.ory.sh/) or join the
 
 ## FAQ
 
-- I am new to the community. Where can I find the [ORY Community Code of Conduct?](CODE_OF_CONDUCT.md)
+- I am new to the community. Where can I find the
+  [ORY Community Code of Conduct?](https://github.com/ory/{{Project}}/blob/master/CODE_OF_CONDUCT.md)
 
-- I have a question. Where can I get [answers to questions regarding ORY {{Project}}?](#communication)
+- I have a question. Where can I get
+  [answers to questions regarding ORY {{Project}}?](#communication)
 
-- I would like to contribute but I am not sure how. Are there [easy ways to contribute?](#how-can-i-contribute)
+- I would like to contribute but I am not sure how. Are there
+  [easy ways to contribute?](#how-can-i-contribute)
   [Or good first issues?](https://github.com/search?l=&o=desc&q=label%3A%22help+wanted%22+label%3A%22good+first+issue%22+is%3Aopen+user%3Aory+user%3Aory-corp&s=updated&type=Issues)
 
-- I want to talk to other ORY {{Project}} users. [How can I become a part of the community?](#communication)
+- I want to talk to other ORY {{Project}} users.
+  [How can I become a part of the community?](#communication)
 
-- I would like to know what I am agreeing to when I contribute to ORY {{Project}}. Does ORY have [a Contributors License Agreement?](https://cla-assistant.io/ory/)
+- I would like to know what I am agreeing to when I contribute to ORY
+  {{Project}}. Does ORY have
+  [a Contributors License Agreement?](https://cla-assistant.io/ory/)
 
-- I would like updates about new versions of ORY {{Project}}. [How are new releases announced?](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)
+- I would like updates about new versions of ORY {{Project}}.
+  [How are new releases announced?](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)
 
 ## How can I contribute?
 
-If you want to start contributing code right away, we have a [list of good first issues](https://github.com/ory/{{Project}}/labels/good%20first%20issue).
+If you want to start contributing code right away, we have a
+[list of good first issues](https://github.com/ory/{{Project}}/labels/good%20first%20issue).
 
-There are many other ways you can contribute without writing any code. Here are a few things you can do to help out:
+There are many other ways you can contribute without writing any code. Here are
+a few things you can do to help out:
 
-- **Give us a star.** It may not seem like much, but it really makes a difference. This is something that everyone can do to help out ORY {{Project}}. Github stars help the project gain visibility and stand out.
+- **Give us a star.** It may not seem like much, but it really makes a
+  difference. This is something that everyone can do to help out ORY
+  {{Project}}. Github stars help the project gain visibility and stand out.
 
-- **Join the community.** Sometimes helping people can be as easy as listening to their problems and offering a different perspective. Join our Slack, have a look at discussions in the forum and take part in our weekly hangout. More info on this in [Communication](#communication).
+- **Join the community.** Sometimes helping people can be as easy as listening
+  to their problems and offering a different perspective. Join our Slack, have a
+  look at discussions in the forum and take part in our weekly hangout. More
+  info on this in [Communication](#communication).
 
-- **Helping with open issues.**
-  We have a lot of open issues for ORY {{Project}} and some of them may lack necessary information, some are duplicates of older issues. You can help out by guiding people through the process of filling out the issue template, asking for clarifying information, or pointing them to existing issues that match their description of the problem.
+- **Helping with open issues.** We have a lot of open issues for ORY {{Project}}
+  and some of them may lack necessary information, some are duplicates of older
+  issues. You can help out by guiding people through the process of filling out
+  the issue template, asking for clarifying information, or pointing them to
+  existing issues that match their description of the problem.
 
-- **Reviewing documentation changes.**
-  Most documentation just needs a review for proper spelling and grammar. If you think a document can be improved in any way, feel free to hit the `edit` button at the top of the page. More info on contributing to documentation here.
+- **Reviewing documentation changes.** Most documentation just needs a review
+  for proper spelling and grammar. If you think a document can be improved in
+  any way, feel free to hit the `edit` button at the top of the page. More info
+  on contributing to documentation here.
 
-- **Help with tests.**
-  Some pull requests may lack proper tests or test plans. These are needed for the change to be implemented safely.
+- **Help with tests.** Some pull requests may lack proper tests or test plans.
+  These are needed for the change to be implemented safely.
 
 ## Communication
 
 We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of ORY, etc.
 
-We have a [forum](https://community.ory.sh/). This is a great place for in-depth discussions and lots of code examples, logs and similar data.
+We have a [forum](https://community.ory.sh/). This is a great place for in-depth
+discussions and lots of code examples, logs and similar data.
 
-You can also join our weekly hangout, if you want to speak to the ORY team directly or ask some questions. You can find more info on the hangouts in [Slack](https://www.ory.sh/chat).
+You can also join our community hangout, if you want to speak to the ORY team
+directly or ask some questions. You can find more info on the hangouts in
+[Slack](https://www.ory.sh/chat).
 
-If you want to receive regular notifications about updates to ORY {{Project}}, consider joining the mailing list. We will _only_ send you vital information on the projects that you are interested in.
+If you want to receive regular notifications about updates to ORY {{Project}},
+consider joining the mailing list. We will _only_ send you vital information on
+the projects that you are interested in.
 
 Also [follow us on twitter](https://twitter.com/orycorp).
 
@@ -106,16 +135,20 @@ contributors get reviewed**. After a pull request is made other contributors
 will offer feedback, and if the patch passes review a maintainer will accept it
 with a comment. When pull requests fail testing, authors are expected to update
 their pull requests to address the failures until the tests pass and the pull
-request merges successfully. Look here for more info on the [Pull request procedure](#pull-request-procedure).
+request merges successfully. Look here for more info on the
+[Pull request procedure](#pull-request-procedure).
 
 At least one review from a maintainer is required for all patches (even patches
 from maintainers).
 
-Before your contributions can be merged you need to sign our [Contributor License Agreement](https://cla-assistant.io/ory/).
+Before your contributions can be merged you need to sign our
+[Contributor License Agreement](https://cla-assistant.io/ory/).
 
 This agreement defines the terms under which your code is contributed to ORY.
-More specifically it declares that you have the right to, and actually do, grant us the rights to use your contribution. You can see the Apache 2.0 license under
-which our projects are published [here](https://github.com/ory/meta/blob/master/LICENSE).
+More specifically it declares that you have the right to, and actually do, grant
+us the rights to use your contribution. You can see the Apache 2.0 license under
+which our projects are published
+[here](https://github.com/ory/meta/blob/master/LICENSE).
 
 Reviewers should leave a "LGTM" comment once they are satisfied with the patch.
 If the patch was submitted by a maintainer with write access, the pull request
@@ -124,10 +157,12 @@ should be merged by the submitter after review.
 ## Documentation
 
 Please provide documentation when changing, removing, or adding features.
-Documentation resides in the project's [docs](docs) folder. Generate API and
-configuration reference documentation using `cd docs; npm run gen`.
+Documentation resides in the project's
+[docs](https://github.com/ory/{{Project}}/tree/master/docs) folder. Generate API
+and configuration reference documentation using `cd docs; npm run gen`.
 
-For further instructions please head over to [docs/README.md](docs/README.md).
+For further instructions please head over to
+[docs/README.md](https://github.com/ory/{{Project}}/blob/master/README.md).
 
 ## Disclosing vulnerabilities
 

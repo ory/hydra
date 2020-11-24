@@ -76,6 +76,6 @@ try {
 ### API Docs
 
 API docs are available
-[here](https://github.com/ory/hydra/blob/master/sdk/php/swagger/README.md).
+[here](https://github.com/ory/sdk/blob/master/clients/hydra/php/README.md).
 Please note that those docs are generated and may introduce bugs if code
 examples are used 1:1.

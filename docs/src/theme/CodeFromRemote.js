@@ -34,7 +34,7 @@ const CodeFromRemote = ({url, link, ...props}) => {
         return content
       })
       .then(setContent)
-      .catch(console.err)
+      .catch(console.error)
   }, [])
 
   return (

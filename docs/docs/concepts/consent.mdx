@@ -62,7 +62,7 @@ Once the login challenge is accepted, ORY Hydra will ask the user for consent:
 ![OAuth 2.0 Asking for User Consent](../images/google-consent-playground.png)
 
 The UI is fully under your control, because ORY Hydra redirects the End-User's
-browser to the c
+browser to the "Consent Endpoint" established in your config:
 
 ```yaml title="hydra serve all -c path/to/hydra/config.yml"
 # Can also be set using the environment variable:
@@ -280,7 +280,7 @@ The server responds with JSON
 
 which is the URL your application must the End-User's browser to.
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+Check the ["Implementing the Consent Endpoint" Guide](../guides/consent) for
 examples using the ORY Hydra SDK in different languages.
 
 ### Rejecting the Consent Flow

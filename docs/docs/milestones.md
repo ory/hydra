@@ -112,11 +112,11 @@ Affects documentation.
 
 #### Pull Requests
 
-- [ ] docs: fix omissions in the description
-      ([hydra#2173](https://github.com/ory/hydra/pull/2173)) -
-      [@Vincent](https://github.com/vinckr)
 - [x] docs: remove introspect security spec
       ([hydra#2002](https://github.com/ory/hydra/pull/2002))
+- [x] docs: fix omissions in the description
+      ([hydra#2173](https://github.com/ory/hydra/pull/2173)) -
+      [@Vincent](https://github.com/vinckr)
 
 ### [Blocking](https://github.com/ory/hydra/labels/blocking)
 

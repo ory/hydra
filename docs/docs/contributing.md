@@ -38,9 +38,9 @@ There are many ways in which you can contribute, beyond writing code. The goal
 of this document is to provide a high-level overview of how you can get
 involved.
 
-_Please note_: We take ORY Hydra's security and our users' trust very
-seriously. If you believe you have found a security issue in ORY Hydra,
-please responsibly disclose by contacting us at security@ory.sh.
+_Please note_: We take ORY Hydra's security and our users' trust very seriously.
+If you believe you have found a security issue in ORY Hydra, please responsibly
+disclose by contacting us at security@ory.sh.
 
 First: As a potential contributor, your changes and ideas are welcome at any
 hour of the day or night, weekdays, weekends, and holidays. Please do not ever
@@ -53,8 +53,8 @@ contributions, and don't want a wall of rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
-won't clash or be obviated by ORY Hydra's normal direction. A great way to
-do this is via the [ORY Community](https://community.ory.sh/) or join the
+won't clash or be obviated by ORY Hydra's normal direction. A great way to do
+this is via the [ORY Community](https://community.ory.sh/) or join the
 [ORY Chat](https://www.ory.sh/chat).
 
 ## FAQ
@@ -72,8 +72,8 @@ do this is via the [ORY Community](https://community.ory.sh/) or join the
 - I want to talk to other ORY Hydra users.
   [How can I become a part of the community?](#communication)
 
-- I would like to know what I am agreeing to when I contribute to ORY
-  Hydra. Does ORY have
+- I would like to know what I am agreeing to when I contribute to ORY Hydra.
+  Does ORY have
   [a Contributors License Agreement?](https://cla-assistant.io/ory/)
 
 - I would like updates about new versions of ORY Hydra.
@@ -88,16 +88,16 @@ There are many other ways you can contribute without writing any code. Here are
 a few things you can do to help out:
 
 - **Give us a star.** It may not seem like much, but it really makes a
-  difference. This is something that everyone can do to help out ORY
-  Hydra. Github stars help the project gain visibility and stand out.
+  difference. This is something that everyone can do to help out ORY Hydra.
+  Github stars help the project gain visibility and stand out.
 
 - **Join the community.** Sometimes helping people can be as easy as listening
   to their problems and offering a different perspective. Join our Slack, have a
   look at discussions in the forum and take part in our weekly hangout. More
   info on this in [Communication](#communication).
 
-- **Helping with open issues.** We have a lot of open issues for ORY Hydra
-  and some of them may lack necessary information, some are duplicates of older
+- **Helping with open issues.** We have a lot of open issues for ORY Hydra and
+  some of them may lack necessary information, some are duplicates of older
   issues. You can help out by guiding people through the process of filling out
   the issue template, asking for clarifying information, or pointing them to
   existing issues that match their description of the problem.
@@ -163,8 +163,8 @@ should be merged by the submitter after review.
 
 Please provide documentation when changing, removing, or adding features.
 Documentation resides in the project's
-[docs](https://github.com/ory/Hydra/tree/master/docs) folder. Generate API
-and configuration reference documentation using `cd docs; npm run gen`.
+[docs](https://github.com/ory/Hydra/tree/master/docs) folder. Generate API and
+configuration reference documentation using `cd docs; npm run gen`.
 
 For further instructions please head over to
 [docs/README.md](https://github.com/ory/Hydra/blob/master/README.md).
@@ -249,8 +249,8 @@ community a safe place for you and we've got your back.
   marginalized groups.
 - Private harassment is also unacceptable. No matter who you are, if you feel
   you have been or are being harassed or made uncomfortable by a community
-  member, please contact one of the channel ops or a member of the ORY
-  Hydra core team immediately.
+  member, please contact one of the channel ops or a member of the ORY Hydra
+  core team immediately.
 - Likewise any spamming, trolling, flaming, baiting or other attention-stealing
   behaviour is not welcome.
 

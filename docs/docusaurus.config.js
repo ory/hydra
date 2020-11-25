@@ -61,9 +61,7 @@ module.exports = {
       indexName: 'ory',
       contextualSearch: true,
       searchParameters: {
-        // facetFilters: [
-        //   `tags:${config.projectSlug}`,
-        // ]
+        facetFilters: [[`tags:${config.projectSlug}`, `tags:docs`]]
       }
     },
     navbar: {

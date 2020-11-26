@@ -1,6 +1,4 @@
 const config = require('./contrib/config.js')
-const fs = require('fs')
-const admonitions = require('remark-admonitions')
 
 const githubRepoName =
   config.projectSlug === 'ecosystem' ? 'docs' : config.projectSlug
@@ -56,6 +54,18 @@ module.exports = {
       trackingID: 'UA-71865250-1',
       anonymizeIP: true
     },
+    prism: {
+      theme: require('prism-react-renderer/themes/github'),
+      darkTheme: require('prism-react-renderer/themes/dracula'),
+      additionalLanguages: [
+        'pug'
+      ],
+    },
+    announcementBar: {
+      id: 'supportus',
+      content:
+        `Sign up for <a href="${config.newsletter}">important security announcements</a> and if you like ${config.projectName} give it a ⭐️ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/facebook/docusaurus">GitHub</a>!`,
+    },
     algolia: {
       apiKey: '8463c6ece843b377565726bb4ed325b0',
       indexName: 'ory',
@@ -65,9 +75,11 @@ module.exports = {
       }
     },
     navbar: {
+      hideOnScroll: true,
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
+        srcDark: `img/logo-${config.projectSlug}.svg`,
         href: `https://www.ory.sh/${config.projectSlug}`
       },
       items: [
@@ -122,7 +134,6 @@ module.exports = {
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        remarkPlugins: [admonitions],
         disableVersioning: false
       }
     ],

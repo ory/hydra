@@ -1,45 +1,94 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import fetch from 'node-fetch'
 import CodeBlock from '@theme/CodeBlock'
-import styles from './CodeFromRemote.module.css';
+import styles from './CodeFromRemote.module.css'
 
-const CodeFromRemote = ({url, link, ...props}) => {
+const detectLanguage = (src) => {
+  const ext = src.split('.').pop()
+  switch (ext) {
+    case 'jsx':
+      return 'jsx'
+    case 'tsx':
+      return 'tsx'
+    case 'ts':
+      return 'typescript'
+    case 'go':
+      return 'go'
+    case 'yaml':
+    case 'yml':
+      return 'yaml'
+    case 'js':
+      return 'javascript'
+    case 'html':
+      return 'html'
+    case 'pug':
+      return 'pug'
+    default:
+      return ext
+  }
+}
+
+const findPath = (src) => {
+  const matches = src.match(new RegExp('https://github.com/[^/]+/[^/]+/blob/[^/]+/(.+)', 'i')) || []
+  if (matches.length >= 2) {
+    return matches[1]
+  }
+  return src
+}
+
+const findLine = (needle, haystack) => {
+  if (!needle) {
+    return 0
+  }
+
+  const index = haystack.findIndex((s) => s.indexOf(needle) > -1)
+
+  if (index === -1) {
+    return 0
+  }
+
+  return index
+}
+
+const transform = (
+  { startAt, endAt }
+) => (content) => {
+  let lines = content.split('\n')
+
+  const startIndex = findLine(startAt, lines)
+  if (startIndex > 0) {
+    lines = ['// ...', ...lines.slice(startIndex, -1)]
+  }
+
+  const endIndex = findLine(endAt, lines)
+  if (endIndex > 0) {
+    lines = [...lines.slice(0, endIndex+1), '// ...']
+  }
+
+  return lines.join('\n')
+}
+
+const CodeFromRemote = (props) => {
+  const { src } = props
   const [content, setContent] = useState('')
-  let {src, lang, title} = props
-
-  if (url) {
-    src = url
-      .replace('github.com', 'raw.githubusercontent.com')
-      .replace('/blob/', '/')
-  }
-
-  if (link) {
-    title= link
-  }
 
   useEffect(() => {
-    fetch(src)
-      .then(body => body.text())
-      .then((content) => {
-        // https://github.com/ory/kratos-selfservice-ui-react-native/blob/master/App.tsx#L37-L65
-        const params = src.match(/^https:\/\/raw.githubusercontent.com\/.+#L([0-9]+)-L([0-9]+)$/) || []
-
-        if (params.length === 3) {
-          const lines = content.split('\n')
-          lines.splice(0, params[1] - 1)
-          lines.splice(params[2] - params[1] - 1)
-          return lines.join('\n')
-        }
-
-        return content
-      })
+    fetch(
+      src
+        .replace('github.com', 'raw.githubusercontent.com')
+        .replace('/blob/', '/'))
+      .then((body) => body.text())
+      .then(transform(props))
       .then(setContent)
       .catch(console.error)
   }, [])
 
+  const lang = `language-${detectLanguage(src)}`
+  const title = `title="${findPath(src)}"`
+
   return (
     <div className={styles.container}>
-      <CodeBlock metastring={title && `title="${title}"`} className={lang && `language-${lang}`} children={content}/>
+      <CodeBlock metastring={title} className={lang} children={content}/>
     </div>
   )
 }

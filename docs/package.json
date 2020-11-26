@@ -30,6 +30,8 @@
     "file-loader": "^6.1.0",
     "mermaid": "8.6.4",
     "node-fetch": "^2.6.1",
+    "prism-react-renderer": "^1.1.1",
+    "prismjs": "^1.22.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "url-loader": "^4.1.0"

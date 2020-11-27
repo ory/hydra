@@ -59,7 +59,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEVEL=<value>
   #
-  level: debug
+  level: panic
 
   ## leak_sensitive_values ##
   #
@@ -73,7 +73,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
   #
-  leak_sensitive_values: true
+  leak_sensitive_values: false
 
   ## format ##
   #
@@ -92,7 +92,7 @@ log:
   # - Windows Command Line (CMD):
   #    > set LOG_FORMAT=<value>
   #
-  format: text
+  format: json
 
 ## serve ##
 #
@@ -114,7 +114,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_PUBLIC_PORT=<value>
     #
-    port: 50196
+    port: 1
 
     ## host ##
     #
@@ -168,7 +168,9 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -183,9 +185,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - TRACE
         - POST
-        - HEAD
 
       ## allowed_headers ##
       #
@@ -200,9 +200,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - sit dolore labore aliqua
-        - aliqua
-        - aute sunt pariatur proident commodo
+        - ''
 
       ## exposed_headers ##
       #
@@ -217,7 +215,7 @@ serve:
       #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - ipsum veniam sit incididunt
+        - ''
 
       ## allow_credentials ##
       #
@@ -231,7 +229,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -245,7 +243,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
       #
-      options_passthrough: true
+      options_passthrough: false
 
       ## max_age ##
       #
@@ -259,7 +257,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
       #
-      max_age: 65427458
+      max_age: 0
 
       ## debug ##
       #
@@ -273,7 +271,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
       #
-      debug: true
+      debug: false
 
     ## socket ##
     #
@@ -290,7 +288,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
       #
-      owner: enim
+      owner: ''
 
       ## group ##
       #
@@ -302,7 +300,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
       #
-      group: incididunt culpa ut dolor
+      group: ''
 
       ## mode ##
       #
@@ -320,7 +318,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
       #
-      mode: 188
+      mode: 0
 
     ## access_log ##
     #
@@ -354,7 +352,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_PORT=<value>
     #
-    port: 12206
+    port: 1
 
     ## host ##
     #
@@ -369,7 +367,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_ADMIN_HOST=<value>
     #
-    host: ''
+    host: localhost
 
     ## cors ##
     #
@@ -388,7 +386,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ENABLED=<value>
       #
-      enabled: true
+      enabled: false
 
       ## allowed_origins ##
       #
@@ -408,7 +406,9 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_ORIGINS=<value>
       #
       allowed_origins:
-        - '*'
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
 
       ## allowed_methods ##
       #
@@ -423,9 +423,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_METHODS=<value>
       #
       allowed_methods:
-        - PUT
-        - OPTIONS
-        - CONNECT
+        - POST
 
       ## allowed_headers ##
       #
@@ -440,10 +438,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_ALLOWED_HEADERS=<value>
       #
       allowed_headers:
-        - nostrud eiusmod nisi
-        - id
-        - ea non fugiat ut irure
-        - sit dolor commodo
+        - ''
 
       ## exposed_headers ##
       #
@@ -458,10 +453,7 @@ serve:
       #    > set SERVE_ADMIN_CORS_EXPOSED_HEADERS=<value>
       #
       exposed_headers:
-        - adipisicing et ex nulla consequat
-        - dolor deserunt
-        - nisi incididunt
-        - dolor dolore
+        - ''
 
       ## allow_credentials ##
       #
@@ -475,7 +467,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_ALLOW_CREDENTIALS=<value>
       #
-      allow_credentials: true
+      allow_credentials: false
 
       ## options_passthrough ##
       #
@@ -503,7 +495,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_CORS_MAX_AGE=<value>
       #
-      max_age: 51719476
+      max_age: 0
 
       ## debug ##
       #
@@ -534,7 +526,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
       #
-      owner: elit
+      owner: ''
 
       ## group ##
       #
@@ -546,7 +538,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_GROUP=<value>
       #
-      group: aute sint ea adipisicing
+      group: ''
 
       ## mode ##
       #
@@ -564,7 +556,7 @@ serve:
       # - Windows Command Line (CMD):
       #    > set SERVE_ADMIN_SOCKET_MODE=<value>
       #
-      mode: 322
+      mode: 0
 
     ## access_log ##
     #
@@ -595,15 +587,15 @@ serve:
     # Configures the private key (pem encoded).
     #
     key:
-      ## base64 ##
+      ## path ##
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_BASE64=<value>
+      #    $ export SERVE_TLS_KEY_PATH=<value>
       # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_BASE64=<value>
+      #    > set SERVE_TLS_KEY_PATH=<value>
       #
-      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+      path: /path/to/file.pem
 
     ## cert ##
     #
@@ -653,7 +645,7 @@ serve:
     # - Windows Command Line (CMD):
     #    > set SERVE_COOKIES_SAME_SITE_MODE=<value>
     #
-    same_site_mode: Lax
+    same_site_mode: Strict
 
     ## same_site_legacy_workaround ##
     #
@@ -682,7 +674,7 @@ serve:
 # - Windows Command Line (CMD):
 #    > set DSN=<value>
 #
-dsn: Excepteur labore laboris ut est
+dsn: ''
 
 ## webfinger ##
 #
@@ -716,7 +708,54 @@ webfinger:
   # Configures OpenID Connect Discovery (/.well-known/openid-configuration).
   #
   oidc_discovery:
+    ## jwks_url ##
+    #
+    # Overwrites the JWKS URL
+    #
+    # Examples:
+    # - https://my-service.com/.well-known/jwks.json
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
+    # - Windows Command Line (CMD):
+    #    > set WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
+    #
+    jwks_url: https://my-service.com/.well-known/jwks.json
+
+    ## token_url ##
+    #
+    # Overwrites the OAuth2 Token URL
+    #
+    # Examples:
+    # - https://my-service.com/oauth2/token
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export WEBFINGER_OIDC_DISCOVERY_TOKEN_URL=<value>
+    # - Windows Command Line (CMD):
+    #    > set WEBFINGER_OIDC_DISCOVERY_TOKEN_URL=<value>
+    #
+    token_url: https://my-service.com/oauth2/token
+
+    ## auth_url ##
+    #
+    # Overwrites the OAuth2 Auth URL
+    #
+    # Examples:
+    # - https://my-service.com/oauth2/auth
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export WEBFINGER_OIDC_DISCOVERY_AUTH_URL=<value>
+    # - Windows Command Line (CMD):
+    #    > set WEBFINGER_OIDC_DISCOVERY_AUTH_URL=<value>
+    #
+    auth_url: https://my-service.com/oauth2/auth
+
     ## client_registration_url ##
+    #
+    # Sets the OpenID Connect Dynamic Client Registration Endpoint
     #
     # Examples:
     # - https://my-service.com/clients
@@ -984,7 +1023,7 @@ strategies:
   # - Windows Command Line (CMD):
   #    > set STRATEGIES_SCOPE=<value>
   #
-  scope: DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
+  scope: exact
 
   ## access_token ##
   #
@@ -1047,7 +1086,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: -1
+  refresh_token: 1h
 
   ## id_token ##
   #
@@ -1095,7 +1134,41 @@ oauth2:
   # - Windows Command Line (CMD):
   #    > set OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
   #
-  expose_internal_errors: false
+  expose_internal_errors: true
+
+  ## session ##
+  #
+  session:
+    ## Encrypt OAuth2 Session ##
+    #
+    # If set to true (default) ORY Hydra encrypt OAuth2 and OpenID Connect session data using AES-GCM and the system secret before persisting it in the database.
+    #
+    # Default value: true
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OAUTH2_SESSION_ENCRYPT_AT_REST=<value>
+    # - Windows Command Line (CMD):
+    #    > set OAUTH2_SESSION_ENCRYPT_AT_REST=<value>
+    #
+    encrypt_at_rest: false
+
+  ## include_legacy_error_fields ##
+  #
+  # Set this to true if you want to include the `error_hint` and `error_debug` legacy fields in error responses. We recommend to set this to `false` unless you have clients using these fields.
+  #
+  # Default value: false
+  #
+  # Examples:
+  # - true
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_INCLUDE_LEGACY_ERROR_FIELDS=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_INCLUDE_LEGACY_ERROR_FIELDS=<value>
+  #
+  include_legacy_error_fields: true
 
   ## hashers ##
   #
@@ -1113,7 +1186,7 @@ oauth2:
       #
       # Default value: 10
       #
-      # Minimum value: 8
+      # Minimum value: 4
       #
       # Maximum value: 31
       #
@@ -1123,7 +1196,7 @@ oauth2:
       # - Windows Command Line (CMD):
       #    > set OAUTH2_HASHERS_BCRYPT_COST=<value>
       #
-      cost: 12
+      cost: 4
 
   ## pkce ##
   #
@@ -1387,7 +1460,7 @@ tracing:
 # - Windows Command Line (CMD):
 #    > set VERSION=<value>
 #
-version: v0.0.933279065-0.43qhs.5497.0.027721lS.607306avZ3YQBW.22678684644.511350L.0+BD57mbvGUG8.i.ZpbWuGHH6.k2OT.aU3lZ.AMc
+version: v0.0.0
 
 ## cgroups ##
 #

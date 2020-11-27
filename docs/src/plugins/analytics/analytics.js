@@ -14,12 +14,17 @@ export default (function () {
 
   return {
     onRouteUpdate({location}) {
-      // Set page so that subsequent hits on this page are attributed
-      // to this page. This is recommended for Single-page Applications.
-      window.ga('set', 'page', location.pathname);
-      // Always refer to the variable on window in-case it gets
-      // overridden elsewhere.
-      window.ga('send', 'pageview');
+      if (typeof window.gtag !== 'function') {
+        return
+      }
+
+
+      const pagePath = location
+        ? location.pathname + location.search + location.hash
+        : undefined
+      window.gtag('config', 'UA-71865250-1', {
+        'page_path': pagePath
+      });
     },
   };
 })();

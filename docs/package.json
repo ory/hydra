@@ -4,7 +4,7 @@
   "private": true,
   "prettier": "ory-prettier-styles",
   "config": {
-    "prettierTarget": "{docs/**,docs,scripts,static,contrib}/*.{md,mdx,json,js,css,html}|*.{js,md}"
+    "prettierTarget": "{docs/**,docs,scripts,static,contrib,src,src/**}/*.{md,mdx,json,js,css,html}|*.{js,md}"
   },
   "scripts": {
     "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",

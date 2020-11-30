@@ -1,5 +1,5 @@
 {
-  "Introduction": ["index", "5min-tutorial", "install"],
+  "Introduction": ["index", "5min-tutorial", "install", "contributing"],
   "Concepts": [
     "concepts/before-oauth2", 
     "concepts/oauth2", 

@@ -3,7 +3,6 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ORY Hydra Configuration",
   "type": "object",
-  "additionalProperties": false,
   "definitions": {
     "http_method": {
       "type": "string",
@@ -19,8 +18,7 @@
         "TRACE"
       ]
     },
-    "port_number": {
-      "type": "integer",
+    "portNumber": {
       "description": "The port to listen on.",
       "minimum": 1,
       "maximum": 65535
@@ -254,9 +252,10 @@
           "properties": {
             "port": {
               "default": 4444,
+              "type": "integer",
               "allOf": [
                 {
-                  "$ref": "#/definitions/port_number"
+                  "$ref": "#/definitions/portNumber"
                 }
               ]
             },
@@ -294,9 +293,10 @@
           "properties": {
             "port": {
               "default": 4445,
+              "type": "integer",
               "allOf": [
                 {
-                  "$ref": "#/definitions/port_number"
+                  "$ref": "#/definitions/portNumber"
                 }
               ]
             },
@@ -510,7 +510,7 @@
           "additionalProperties": false,
           "description": "Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms",
           "properties": {
-            "enabled": {
+            "supported_types": {
               "type": "array",
               "description": "A list of algorithms to enable.",
               "items": {
@@ -680,7 +680,8 @@
           "enum": [
             "opaque",
             "jwt"
-          ]
+          ],
+          "default": "opaque"
         }
       }
     },

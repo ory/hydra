@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package driver
+package oauth2cors
 
 import (
 	"context"
@@ -26,7 +26,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x"
+
 	"github.com/ory/hydra/oauth2"
 
 	"github.com/gobwas/glob"
@@ -35,17 +38,22 @@ import (
 	"github.com/ory/fosite"
 )
 
-func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Provider) func(h http.Handler) http.Handler {
-	if !conf.CORSEnabled(iface) {
+func Middleware(reg interface {
+	Config() *config.ViperProvider
+	x.RegistryLogger
+	oauth2.Registry
+	client.Registry
+}) func(h http.Handler) http.Handler {
+	opts, enabled := reg.Config().PublicCORS()
+	if !enabled {
 		return func(h http.Handler) http.Handler {
 			return h
 		}
 	}
-	corsOptions := conf.CORSOptions(iface)
 
-	var alwaysAllow bool = len(corsOptions.AllowedOrigins) == 0
+	var alwaysAllow = len(opts.AllowedOrigins) == 0
 	var patterns []glob.Glob
-	for _, o := range corsOptions.AllowedOrigins {
+	for _, o := range opts.AllowedOrigins {
 		if o == "*" {
 			alwaysAllow = true
 		}
@@ -63,14 +71,14 @@ func OAuth2AwareCORSMiddleware(iface string, reg Registry, conf configuration.Pr
 	}
 
 	options := cors.Options{
-		AllowedOrigins:     corsOptions.AllowedOrigins,
-		AllowedMethods:     corsOptions.AllowedMethods,
-		AllowedHeaders:     corsOptions.AllowedHeaders,
-		ExposedHeaders:     corsOptions.ExposedHeaders,
-		MaxAge:             corsOptions.MaxAge,
-		AllowCredentials:   corsOptions.AllowCredentials,
-		OptionsPassthrough: corsOptions.OptionsPassthrough,
-		Debug:              corsOptions.Debug,
+		AllowedOrigins:     opts.AllowedOrigins,
+		AllowedMethods:     opts.AllowedMethods,
+		AllowedHeaders:     opts.AllowedHeaders,
+		ExposedHeaders:     opts.ExposedHeaders,
+		MaxAge:             opts.MaxAge,
+		AllowCredentials:   opts.AllowCredentials,
+		OptionsPassthrough: opts.OptionsPassthrough,
+		Debug:              opts.Debug,
 		AllowOriginRequestFunc: func(r *http.Request, origin string) bool {
 			if alwaysAllow {
 				return true

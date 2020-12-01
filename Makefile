@@ -10,6 +10,7 @@ GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
 				  github.com/ory/cli \
 				  github.com/gobuffalo/packr/v2/packr2 \
+				  github.com/markbates/pkger/cmd/pkger \
 				  github.com/go-bindata/go-bindata/go-bindata
 
 define make-go-dependency
@@ -123,7 +124,7 @@ install-stable:
 		make pack
 		GO111MODULE=on go install \
 				-tags sqlite \
-				-ldflags "-X github.com/ory/hydra/cmd.Version=$$HYDRA_LATEST -X github.com/ory/hydra/cmd.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.Commit=`git rev-parse HEAD`" \
+				-ldflags "-X github.com/ory/hydra/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/driver/config.Commit=`git rev-parse HEAD`" \
 				.
 		packr2 clean
 		git checkout master
@@ -134,5 +135,6 @@ install: pack
 		packr2 clean
 
 .PHONY: pack
-pack: .bin/packr2
+pack: .bin/packr2 .bin/pkger
 		packr2
+		pkger -exclude node_modules -exclude docs -exclude .git -exclude .github -exclude .bin -exclude test -exclude script -exclude contrib

@@ -1,4 +1,4 @@
-package configuration
+package config
 
 import (
 	"fmt"
@@ -9,19 +9,26 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/tracing"
-	"github.com/ory/x/urlx"
-	"github.com/ory/x/viperx"
+	"github.com/spf13/pflag"
+
+	"github.com/ory/x/configx"
+	"github.com/ory/x/dbal"
 
 	"github.com/rs/cors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/viper"
+	"github.com/ory/x/tracing"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/x"
 )
+
+func newProvider() *ViperProvider {
+	return MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
+}
 
 func setupEnv(env map[string]string) func(t *testing.T) (func(), func()) {
 	return func(t *testing.T) (setup func(), clean func()) {
@@ -49,15 +56,17 @@ func TestSubjectTypesSupported(t *testing.T) {
 		{
 			d: "Load legacy environment variable in legacy format",
 			env: setupEnv(map[string]string{
-				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)): "public,pairwise,foobar",
+				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)):            "public,pairwise",
+				strings.ToUpper(strings.Replace("oidc.subject_identifiers.pairwise.salt", ".", "_", -1)): "some-salt",
 			}),
 			e: []string{"public", "pairwise"},
 		},
 		{
 			d: "Load legacy environment variable in legacy format",
 			env: setupEnv(map[string]string{
-				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)): "public,pairwise,foobar",
-				strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)):   "jwt",
+				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)):            "public,pairwise",
+				strings.ToUpper(strings.Replace("oidc.subject_identifiers.pairwise.salt", ".", "_", -1)): "some-salt",
+				strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)):              "jwt",
 			}),
 			e: []string{"public"},
 		},
@@ -65,8 +74,8 @@ func TestSubjectTypesSupported(t *testing.T) {
 		t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
 			setup, clean := tc.env(t)
 			setup()
-			p := NewViperProvider(logrusx.New("", ""), false, nil)
-			viper.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
+			p := newProvider()
+			p.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
 			assert.EqualValues(t, tc.e, p.SubjectTypesSupported())
 			clean()
 		})
@@ -74,36 +83,39 @@ func TestSubjectTypesSupported(t *testing.T) {
 }
 
 func TestWellKnownKeysUnique(t *testing.T) {
-	p := NewViperProvider(logrusx.New("", ""), false, nil)
-	assert.EqualValues(t, []string{x.OAuth2JWTKeyName, x.OpenIDConnectKeyName}, p.WellKnownKeys(x.OAuth2JWTKeyName, x.OpenIDConnectKeyName, x.OpenIDConnectKeyName))
+	p := newProvider()
+	assert.EqualValues(t, []string{x.OpenIDConnectKeyName, x.OAuth2JWTKeyName}, p.WellKnownKeys(x.OAuth2JWTKeyName, x.OpenIDConnectKeyName, x.OpenIDConnectKeyName))
 }
 
 func TestCORSOptions(t *testing.T) {
-	p := NewViperProvider(logrusx.New("", ""), false, nil)
-	viper.Set("serve.public.cors.enabled", true)
+	p := newProvider()
+	p.Set("serve.public.cors.enabled", true)
+
+	conf, enabled := p.PublicCORS()
+	assert.True(t, enabled)
 
 	assert.EqualValues(t, cors.Options{
-		AllowedOrigins:     []string{},
-		AllowedMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowedOrigins:     []string{"*"},
+		AllowedMethods:     []string{"POST", "GET", "PUT", "PATCH", "DELETE"},
 		AllowedHeaders:     []string{"Authorization", "Content-Type"},
 		ExposedHeaders:     []string{"Content-Type"},
 		AllowCredentials:   true,
 		OptionsPassthrough: false,
 		MaxAge:             0,
 		Debug:              false,
-	}, p.CORSOptions("public"))
+	}, conf)
 }
 
 func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := NewViperProvider(l, false, nil)
+	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
 
 	value := p.AdminDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	viper.Set(ViperKeyAdminDisableHealthAccessLog, "true")
+	p.Set(ViperKeyAdminDisableHealthAccessLog, "true")
 
 	value = p.AdminDisableHealthAccessLog()
 	assert.Equal(t, true, value)
@@ -113,12 +125,12 @@ func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := NewViperProvider(l, false, nil)
+	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
 
 	value := p.PublicDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	viper.Set(ViperKeyPublicDisableHealthAccessLog, "true")
+	p.Set(ViperKeyPublicDisableHealthAccessLog, "true")
 
 	value = p.PublicDisableHealthAccessLog()
 	assert.Equal(t, true, value)
@@ -127,12 +139,12 @@ func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
 func TestViperProvider_IssuerURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
-	viper.Set(ViperKeyIssuerURL, "http://hydra.localhost")
-	p := NewViperProvider(l, false, nil)
+	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
+	p.Set(ViperKeyIssuerURL, "http://hydra.localhost")
 	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
 
-	viper.Set(ViperKeyIssuerURL, "http://hydra.localhost/")
-	p2 := NewViperProvider(l, false, nil)
+	p2 := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
+	p2.Set(ViperKeyIssuerURL, "http://hydra.localhost/")
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 }
 
@@ -140,34 +152,31 @@ func TestViperProvider_CookieSameSiteMode(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := NewViperProvider(l, false, nil)
+	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
+	p.Set("dangerous-force-http", false)
+	p.Set(ViperKeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
 
-	viper.Set(ViperKeyCookieSameSiteMode, "none")
+	p.Set(ViperKeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
 
-	p = NewViperProvider(l, true, nil)
-	viper.Reset()
+	p = MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
+	p.Set("dangerous-force-http", true)
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
-	viper.Set(ViperKeyCookieSameSiteMode, "none")
+	p.Set(ViperKeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
 }
 
 func TestViperProviderValidates(t *testing.T) {
 	l := logrusx.New("", "")
-	viper.Reset()
-	viperx.InitializeConfig(
-		"hydra",
-		"../../internal",
-		l,
-	)
-
-	require.NoError(t, viperx.ValidateFromURL("../../.schema/config.schema.json"))
-	c := NewViperProvider(l, false, nil)
+	flags := pflag.NewFlagSet("config", pflag.ContinueOnError)
+	configx.RegisterFlags(flags)
+	require.NoError(t, flags.Parse([]string{"--config", "../../internal/.hydra.yaml"}))
+	c := MustNew(flags, l)
 
 	// log
-	assert.Equal(t, "debug", viper.Get(ViperKeyLogLevel))
-	assert.Equal(t, "json", viper.Get("log.format"))
+	assert.Equal(t, "debug", c.Source().String(ViperKeyLogLevel))
+	assert.Equal(t, "json", c.Source().String("log.format"))
 
 	// serve
 	assert.Equal(t, "localhost:1", c.PublicListenOn())
@@ -186,8 +195,6 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, expectedPublicPermission, c.PublicSocketPermission())
 	assert.Equal(t, expectedAdminPermission, c.AdminSocketPermission())
 
-	assert.Equal(t, false, c.CORSEnabled("public"))
-	assert.Equal(t, false, c.CORSEnabled("admin"))
 	expectedCors := cors.Options{
 		AllowedOrigins:     []string{"https://example.com"},
 		AllowedMethods:     []string{"GET"},
@@ -198,16 +205,23 @@ func TestViperProviderValidates(t *testing.T) {
 		Debug:              false,
 		OptionsPassthrough: true,
 	}
-	assert.Equal(t, expectedCors, c.CORSOptions("public"))
-	assert.Equal(t, expectedCors, c.CORSOptions("admin"))
+
+	gc, enabled := c.AdminCORS()
+	assert.False(t, enabled)
+	assert.Equal(t, expectedCors, gc)
+
+	gc, enabled = c.PublicCORS()
+	assert.False(t, enabled)
+	assert.Equal(t, expectedCors, gc)
+
 	assert.Equal(t, []string{"127.0.0.1/32"}, c.AllowTLSTerminationFrom())
-	assert.Equal(t, "/path/to/file.pem", viper.Get("serve.tls.key.path"))
-	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", viper.Get("serve.tls.cert.base64"))
+	assert.Equal(t, "/path/to/file.pem", c.Source().String("serve.tls.key.path"))
+	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", c.Source().String("serve.tls.cert.base64"))
 	assert.Equal(t, http.SameSiteLaxMode, c.CookieSameSiteMode())
 	assert.Equal(t, true, c.CookieSameSiteLegacyWorkaround())
 
 	// dsn
-	assert.Equal(t, DefaultSQLiteMemoryDSN, c.DSN())
+	assert.Equal(t, dbal.InMemoryDSN, c.DSN())
 
 	// webfinger
 	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys())
@@ -217,7 +231,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, urlx.ParseOrPanic("https://example.com/token"), c.OAuth2TokenURL())
 	assert.Equal(t, []string{"sub", "username"}, c.OIDCDiscoverySupportedClaims())
 	assert.Equal(t, []string{"offline_access", "offline", "openid", "whatever"}, c.OIDCDiscoverySupportedScope())
-	assert.Equal(t, "https://example.com", c.OIDCDiscoveryUserinfoEndpoint())
+	assert.Equal(t, urlx.ParseOrPanic("https://example.com"), c.OIDCDiscoveryUserinfoEndpoint())
 
 	// oidc
 	assert.Equal(t, []string{"pairwise"}, c.SubjectTypesSupported())
@@ -254,24 +268,26 @@ func TestViperProviderValidates(t *testing.T) {
 
 	// secrets
 	assert.Equal(t, []byte{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}, c.GetSystemSecret())
-	assert.Equal(t, [][]uint8{{0x64, 0x40, 0x5f, 0xd4, 0x66, 0xc9, 0x8c, 0x88, 0xa7, 0xf2, 0xcb, 0x95, 0xcd, 0x95, 0xcb, 0xa3, 0x41, 0x49, 0x8b, 0x97, 0xba, 0x9e, 0x92, 0xee, 0x4c, 0xaf, 0xe0, 0x71, 0x23, 0x28, 0xeb, 0xfc}}, c.GetCookieSecrets())
+	assert.Equal(t, [][]uint8{[]byte("some-random-cookie-secret")}, c.GetCookieSecrets())
 
 	// profiling
-	assert.Equal(t, "cpu", viper.Get("profiling"))
+	assert.Equal(t, "cpu", c.Source().String("profiling"))
 
 	// tracing
-	assert.Equal(t, "jaeger", c.TracingProvider())
-	assert.Equal(t, "hydra service", c.TracingServiceName())
-	assert.Equal(t, &tracing.JaegerConfig{
-		LocalAgentHostPort: "127.0.0.1:6831",
-		SamplerType:        "const",
-		SamplerValue:       1,
-		SamplerServerURL:   "http://sampling",
-		Propagation:        "jaeger",
-	}, c.TracingJaegerConfig())
-	assert.Equal(t, &tracing.ZipkinConfig{
-		ServerURL: "http://zipkin/api/v2/spans",
-	}, c.TracingZipkinConfig())
+	assert.EqualValues(t, &tracing.Config{
+		ServiceName: "hydra service",
+		Provider:    "jaeger",
+		Jaeger: &tracing.JaegerConfig{
+			LocalAgentHostPort: "127.0.0.1:6831",
+			SamplerType:        "const",
+			SamplerValue:       1,
+			SamplerServerURL:   "http://sampling",
+			Propagation:        "jaeger",
+		},
+		Zipkin: &tracing.ZipkinConfig{
+			ServerURL: "http://zipkin/api/v2/spans",
+		},
+	}, c.Tracing())
 }
 
 func TestSetPerm(t *testing.T) {
@@ -281,7 +297,7 @@ func TestSetPerm(t *testing.T) {
 
 	// We cannot test setting owner and group, because we don't know what the
 	// tester has access to.
-	(&UnixPermission{
+	_ = (&UnixPermission{
 		Owner: "",
 		Group: "",
 		Mode:  0654,

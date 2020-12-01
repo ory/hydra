@@ -4,7 +4,6 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 )
@@ -26,8 +25,4 @@ type Registry interface {
 	ConsentManager() Manager
 	ConsentStrategy() Strategy
 	SubjectIdentifierAlgorithm() map[string]SubjectIdentifierAlgorithm
-}
-
-type Configuration interface {
-	configuration.Provider
 }

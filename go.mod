@@ -31,19 +31,19 @@ require (
 	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
-	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20200611091901-487c5ec83473
+	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20201103091713-40d03108b6f4
 	github.com/markbates/pkger v0.17.1
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/cli v0.0.34-0.20201201165647-90959c860c1c
+	github.com/ory/cli v0.0.34
 	github.com/ory/fosite v0.36.0
 	github.com/ory/go-acc v0.2.5
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.1
-	github.com/ory/x v0.0.165-0.20201201183249-3c89b44a6e6f
+	github.com/ory/x v0.0.166
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1

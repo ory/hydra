@@ -22,6 +22,8 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/ory/x/configx"
 )
 
 // migrateCmd represents the migrate command
@@ -32,6 +34,5 @@ var migrateCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(migrateCmd)
-
-	migrateCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file (default is $HOME/hydra.yaml)")
+	configx.RegisterFlags(migrateCmd.PersistentFlags())
 }

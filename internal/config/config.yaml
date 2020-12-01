@@ -303,7 +303,7 @@ oidc:
   # -> https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
   subject_identifiers:
     # which algorithms to enable. Defaults to "public"
-    enabled:
+    supported_types:
       - pairwise
       - public
     # configures the pairwise algorithm

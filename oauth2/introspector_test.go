@@ -37,9 +37,7 @@ import (
 
 	"github.com/ory/hydra/x"
 
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 
 	"github.com/stretchr/testify/assert"
@@ -52,8 +50,8 @@ import (
 
 func TestIntrospectorSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyScopeStrategy, "wildcard")
-	viper.Set(configuration.ViperKeyIssuerURL, "foobariss")
+	conf.Set(config.ViperKeyScopeStrategy, "wildcard")
+	conf.Set(config.ViperKeyIssuerURL, "https://foobariss")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
@@ -107,8 +105,8 @@ func TestIntrospectorSDK(t *testing.T) {
 			//	expectCode:     http.StatusUnauthorized,
 			//	prepare: func(*testing.T) *hydra.OAuth2Api {
 			//		client := hydra.NewOAuth2ApiWithBasePath(server.URL)
-			//		client.Configuration.Username = "foo"
-			//		client.Configuration.Password = "foo"
+			//		client.config.Username = "foo"
+			//		client.config.Password = "foo"
 			//		return client
 			//	},
 			// },
@@ -127,7 +125,7 @@ func TestIntrospectorSDK(t *testing.T) {
 				description: "should pass using bearer authorization",
 				// prepare: func(*testing.T) *hydra.OAuth2Api {
 				//	client := hydra.NewOAuth2ApiWithBasePath(server.URL)
-				//	client.Configuration.DefaultHeader["Authorization"] = "bearer " + tokens[2][1]
+				//	client.config.DefaultHeader["Authorization"] = "bearer " + tokens[2][1]
 				//	return client
 				// },
 				token:          tokens[0][1],
@@ -137,7 +135,7 @@ func TestIntrospectorSDK(t *testing.T) {
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")
-					assert.Equal(t, "foobariss/", c.Iss, "issuer")
+					assert.Equal(t, "https://foobariss/", c.Iss, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
 				},
 			},
@@ -151,7 +149,7 @@ func TestIntrospectorSDK(t *testing.T) {
 					assert.Equal(t, "alice", c.Sub)
 					assert.Equal(t, now.Add(time.Hour).Unix(), c.Exp, "expires at")
 					assert.Equal(t, now.Unix(), c.Iat, "issued at")
-					assert.Equal(t, "foobariss/", c.Iss, "issuer")
+					assert.Equal(t, "https://foobariss/", c.Iss, "issuer")
 					assert.Equal(t, map[string]interface{}{"foo": "bar"}, c.Ext)
 				},
 			},
@@ -172,8 +170,8 @@ func TestIntrospectorSDK(t *testing.T) {
 					client = c.prepare(t)
 				} else {
 					client = hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
-					// client.Configuration.Username = "my-client"
-					// client.Configuration.Password = "foobar"
+					// client.config.Username = "my-client"
+					// client.config.Password = "foobar"
 				}
 
 				ctx, err := client.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().

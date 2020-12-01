@@ -38,16 +38,14 @@ import (
 
 	"github.com/ory/hydra/internal/testhelpers"
 
-	"github.com/ory/viper"
-
 	hc "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 )
 
 func TestClientCredentials(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	viper.Set(configuration.ViperKeyAccessTokenStrategy, "opaque")
+	reg.Config().Set(config.ViperKeyAccessTokenStrategy, "opaque")
 	public, admin := testhelpers.NewOAuth2Server(t, reg)
 
 	var newClient = func(t *testing.T) (*hc.Client, clientcredentials.Config) {
@@ -142,7 +140,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass with audience", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				viper.Set(configuration.ViperKeyAccessTokenStrategy, strategy)
+				reg.Config().Set(config.ViperKeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				getAndInspectToken(t, cl, conf, strategy)
@@ -156,7 +154,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass without audience", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				viper.Set(configuration.ViperKeyAccessTokenStrategy, strategy)
+				reg.Config().Set(config.ViperKeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				conf.EndpointParams = url.Values{}
@@ -171,7 +169,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass without scope", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				viper.Set(configuration.ViperKeyAccessTokenStrategy, strategy)
+				reg.Config().Set(config.ViperKeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				conf.Scopes = []string{}
@@ -184,11 +182,11 @@ func TestClientCredentials(t *testing.T) {
 	})
 
 	t.Run("case=should grant default scopes if configured to do ", func(t *testing.T) {
-		viper.Set(configuration.ViperKeyGrantAllClientCredentialsScopesPerDefault, true)
+		reg.Config().Set(config.ViperKeyGrantAllClientCredentialsScopesPerDefault, true)
 
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				viper.Set(configuration.ViperKeyAccessTokenStrategy, strategy)
+				reg.Config().Set(config.ViperKeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				defaultScope := conf.Scopes

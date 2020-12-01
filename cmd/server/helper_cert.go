@@ -30,8 +30,6 @@ import (
 
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/viper"
-
 	"github.com/ory/hydra/driver"
 
 	"github.com/pkg/errors"
@@ -55,55 +53,55 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.CertificateThumbprintSHA1 = sig1[:]
 }
 
-func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Driver) []tls.Certificate {
+func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry) []tls.Certificate {
 	cert, err := tlsx.Certificate(
-		viper.GetString("serve.tls.cert.base64"),
-		viper.GetString("serve.tls.key.base64"),
-		viper.GetString("serve.tls.cert.path"),
-		viper.GetString("serve.tls.key.path"),
+		d.Config().Source().String("serve.tls.cert.base64"),
+		d.Config().Source().String("serve.tls.key.base64"),
+		d.Config().Source().String("serve.tls.cert.path"),
+		d.Config().Source().String("serve.tls.key.path"),
 	)
 
 	if err == nil {
 		return cert
 	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {
-		d.Registry().Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
+		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 
-	_, priv, err := jwk.AsymmetricKeypair(context.Background(), d.Registry(), &jwk.RS256Generator{KeyLength: 4069}, tlsKeyName)
+	_, priv, err := jwk.AsymmetricKeypair(context.Background(), d, &jwk.RS256Generator{KeyLength: 4069}, tlsKeyName)
 	if err != nil {
-		d.Registry().Logger().WithError(err).Fatal("Unable to fetch HTTPS TLS key pairs")
+		d.Logger().WithError(err).Fatal("Unable to fetch HTTPS TLS key pairs")
 	}
 
 	if len(priv.Certificates) == 0 {
 		cert, err := tlsx.CreateSelfSignedCertificate(priv.Key)
 		if err != nil {
-			d.Registry().Logger().WithError(err).Fatalf(`Could not generate a self signed TLS certificate`)
+			d.Logger().WithError(err).Fatalf(`Could not generate a self signed TLS certificate`)
 		}
 
 		AttachCertificate(priv, cert)
-		if err := d.Registry().KeyManager().DeleteKey(context.TODO(), tlsKeyName, priv.KeyID); err != nil {
-			d.Registry().Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
+		if err := d.KeyManager().DeleteKey(context.TODO(), tlsKeyName, priv.KeyID); err != nil {
+			d.Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
 		}
 
-		if err := d.Registry().KeyManager().AddKey(context.TODO(), tlsKeyName, priv); err != nil {
-			d.Registry().Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
+		if err := d.KeyManager().AddKey(context.TODO(), tlsKeyName, priv); err != nil {
+			d.Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
 		}
 	}
 
 	block, err := jwk.PEMBlockForKey(priv.Key)
 	if err != nil {
-		d.Registry().Logger().WithError(err).Fatalf("Could not encode key to PEM")
+		d.Logger().WithError(err).Fatalf("Could not encode key to PEM")
 	}
 
 	if len(priv.Certificates) == 0 {
-		d.Registry().Logger().Fatal("TLS certificate chain can not be empty")
+		d.Logger().Fatal("TLS certificate chain can not be empty")
 	}
 
 	pemCert := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: priv.Certificates[0].Raw})
 	pemKey := pem.EncodeToMemory(block)
 	ct, err := tls.X509KeyPair(pemCert, pemKey)
 	if err != nil {
-		d.Registry().Logger().WithError(err).Fatalf("Could not decode certificate")
+		d.Logger().WithError(err).Fatalf("Could not decode certificate")
 	}
 
 	return []tls.Certificate{ct}

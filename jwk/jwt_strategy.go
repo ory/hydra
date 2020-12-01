@@ -26,6 +26,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/ory/hydra/driver/config"
+
 	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
 
@@ -43,7 +45,7 @@ type RS256JWTStrategy struct {
 
 	RS256JWTStrategy *jwt.RS256JWTStrategy
 	r                InternalRegistry
-	c                Configuration
+	c                *config.ViperProvider
 	rs               func() string
 
 	publicKey    *rsa.PublicKey

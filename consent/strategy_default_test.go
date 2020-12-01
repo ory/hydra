@@ -49,8 +49,6 @@ import (
 
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/viper"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/pointerx"
@@ -60,7 +58,7 @@ import (
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/internal/httpclient/client/admin"
@@ -113,7 +111,7 @@ func acceptRequest(apiClient *hydra.OryHydra, consent *models.AcceptConsentReque
 func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) http.CookieJar {
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
-	secrets := viper.GetStringSlice(configuration.ViperKeyGetCookieSecrets)
+	secrets := reg.Config().Source().Strings(config.ViperKeyGetCookieSecrets)
 	bs := make([][]byte, len(secrets))
 	for k, s := range secrets {
 		bs[k] = []byte(s)
@@ -225,9 +223,9 @@ func runLogout(t *testing.T, method string) {
 	logoutServer := httptest.NewServer(logoutRouter)
 	defer logoutServer.Close()
 
-	viper.Set(configuration.ViperKeyIssuerURL, logoutServer.URL)
-	viper.Set(configuration.ViperKeyLogoutURL, logoutProviderServer.URL)
-	viper.Set(configuration.ViperKeyLogoutRedirectURL, defaultRedirServer.URL)
+	conf.Set(config.ViperKeyIssuerURL, logoutServer.URL)
+	conf.Set(config.ViperKeyLogoutURL, logoutProviderServer.URL)
+	conf.Set(config.ViperKeyLogoutRedirectURL, defaultRedirServer.URL)
 
 	defaultClient := &client.Client{OutfacingID: uuid.New(), PostLogoutRedirectURIs: []string{defaultRedirServer.URL + "/custom"}}
 	require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), defaultClient))
@@ -562,8 +560,8 @@ func TestStrategyLogoutPost(t *testing.T) {
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	viper.Set(configuration.ViperKeyAccessTokenStrategy, "opaque")
-	viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
+	reg.Config().Set(config.ViperKeyAccessTokenStrategy, "opaque")
+	reg.Config().Set(config.ViperKeyConsentRequestMaxAge, time.Hour)
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 	t.Logf("Public URL: %s", publicTS.URL)
 	t.Logf("Admin URL: %s", adminTS.URL)
@@ -633,7 +631,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	}
 
 	t.Run("case=should fail because a login verifier was given that doesn't exist in the store", func(t *testing.T) {
-		testhelpers.NewUI(t, testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
 		_, res := makeRequest(t, nil, c, url.Values{"login_verifier": {"does-not-exist"}})
@@ -642,7 +640,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should fail because a non-existing consent verifier was given", func(t *testing.T) {
-		testhelpers.NewUI(t, testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 
 		_, res := makeRequest(t, nil, c, url.Values{"consent_verifier": {"does-not-exist"}})
@@ -651,7 +649,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
-		testhelpers.NewUI(t, testhelpers.HTTPServerNotImplementedHandler, testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewUI(t, reg.Config(), testhelpers.HTTPServerNotImplementedHandler, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNoExpectedCallHandler(t)))
 
 		_, res := makeRequest(t, nil, c, url.Values{})
@@ -660,7 +658,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should fail because the request was redirected but consent endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
-		testhelpers.NewUI(t, acceptLoginHandler(t, "aeneas-rekkas", nil), testhelpers.HTTPServerNotImplementedHandler)
+		testhelpers.NewUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", nil), testhelpers.HTTPServerNotImplementedHandler)
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNoExpectedCallHandler(t)))
 
 		_, res := makeRequest(t, nil, c, url.Values{})
@@ -669,7 +667,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should fail because the request was redirected but the login endpoint rejected the request", func(t *testing.T) {
-		testhelpers.NewUI(t, func(w http.ResponseWriter, r *http.Request) {
+		testhelpers.NewUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 			vr, err := adminClient.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 				WithBody(&models.RejectRequest{
@@ -690,7 +688,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because no cookie jar invalid csrf", func(t *testing.T) {
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewUI(t, acceptLoginHandler(t, "aeneas-rekkas", nil),
+		testhelpers.NewUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", nil),
 			testhelpers.HTTPServerNoExpectedCallHandler(t))
 
 		hc := new(http.Client)
@@ -701,7 +699,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists", func(t *testing.T) {
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewUI(t, acceptLoginHandler(t, "aeneas-rekkas", nil),
+		testhelpers.NewUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", nil),
 			testhelpers.HTTPServerNoExpectedCallHandler(t))
 
 		hc := new(http.Client)
@@ -712,7 +710,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should because consent endpoints denies the request after login was granted", func(t *testing.T) {
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewUI(t,
+		testhelpers.NewUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			func(w http.ResponseWriter, r *http.Request) {
 				vr, err := adminClient.Admin.RejectConsentRequest(
@@ -733,7 +731,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should pass if both login and consent are granted", func(t *testing.T) {
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewUI(t,
+		testhelpers.NewUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			acceptConsentHandler(t, nil))
 
@@ -744,7 +742,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should pass and set acr values properly", func(t *testing.T) {
 		c := newClient(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewUI(t,
+		testhelpers.NewUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			acceptConsentHandler(t, nil))
 
@@ -760,7 +758,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 
 		subject := "aeneas-rekkas"
-		testhelpers.NewUI(t,
+		testhelpers.NewUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true, RememberFor: 0}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true, RememberFor: 0}))
 
@@ -778,7 +776,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		//	time.Sleep(time.Second)
 
 		t.Run("followup=should pass because prompt=none, client is public, redirection scheme is HTTP and host is localhost", func(t *testing.T) {
-			testhelpers.NewUI(t, func(w http.ResponseWriter, r *http.Request) {
+			testhelpers.NewUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 				res, err := adminClient.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
 				require.NoError(t, err)
 				assert.True(t, *res.Payload.Skip)
@@ -804,7 +802,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		t.Run("followup=check remember values", func(t *testing.T) {
 			for _, redir := range c.RedirectURIs[1:] {
 				t.Run("redir=should pass because prompt=none, client is public, and redirection is "+redir, func(t *testing.T) {
-					testhelpers.NewUI(t,
+					testhelpers.NewUI(t, reg.Config(),
 						acceptLoginHandler(t, subject, nil),
 						acceptConsentHandler(t, nil))
 
@@ -1612,13 +1610,13 @@ func TestStrategyLoginConsent(t *testing.T) {
 
 	strategy := reg.ConsentStrategy()
 
-	viper.Set(configuration.ViperKeyLoginURL, lp.URL)
-	viper.Set(configuration.ViperKeyConsentURL, cp.URL)
-	viper.Set(configuration.ViperKeyIssuerURL, ap.URL)
-	viper.Set(configuration.ViperKeyConsentRequestMaxAge, time.Hour)
-	viper.Set(configuration.ViperKeyScopeStrategy, "exact")
-	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
-	viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	conf.Set(config.ViperKeyLoginURL, lp.URL)
+	conf.Set(config.ViperKeyConsentURL, cp.URL)
+	conf.Set(config.ViperKeyIssuerURL, ap.URL)
+	conf.Set(config.ViperKeyConsentRequestMaxAge, time.Hour)
+	conf.Set(config.ViperKeyScopeStrategy, "exact")
+	conf.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	conf.Set(config.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 
 	apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(api.URL).Host})
 

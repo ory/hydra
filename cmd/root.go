@@ -23,26 +23,13 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
-
-	"github.com/ory/hydra/driver/configuration"
 
 	"github.com/spf13/cobra"
-
-	"github.com/ory/viper"
 
 	"github.com/ory/hydra/cmd/cli"
 )
 
 var cfgFile string
-
-var (
-	Version = "master"
-	Date    = "undefined"
-	Commit  = "undefined"
-)
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -58,68 +45,4 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
-}
-
-func init() {
-	cobra.OnInitialize(initConfig)
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// enable ability to specify config file via flag
-		viper.SetConfigFile(cfgFile)
-	} else {
-		path := absPathify("$HOME")
-		if _, err := os.Stat(filepath.Join(path, ".hydra.yml")); err != nil {
-			_, _ = os.Create(filepath.Join(path, ".hydra.yml"))
-		}
-
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".hydra") // name of config file (without extension)
-		viper.AddConfigPath("$HOME")  // adding home directory as first search path
-	}
-
-	viper.SetDefault(configuration.ViperKeyLogLevel, "info")
-
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf(`Config file not found because "%s"`, err)
-		fmt.Println("")
-	}
-}
-
-func absPathify(inPath string) string {
-	if strings.HasPrefix(inPath, "$HOME") {
-		inPath = userHomeDir() + inPath[5:]
-	}
-
-	if strings.HasPrefix(inPath, "$") {
-		end := strings.Index(inPath, string(os.PathSeparator))
-		inPath = os.Getenv(inPath[1:end]) + inPath[end:]
-	}
-
-	if filepath.IsAbs(inPath) {
-		return filepath.Clean(inPath)
-	}
-
-	p, err := filepath.Abs(inPath)
-	if err == nil {
-		return filepath.Clean(p)
-	}
-	return ""
-}
-
-func userHomeDir() string {
-	if runtime.GOOS == "windows" {
-		home := os.Getenv("HOMEDRIVE") + os.Getenv("HOMEPATH")
-		if home == "" {
-			home = os.Getenv("USERPROFILE")
-		}
-		return home
-	}
-	return os.Getenv("HOME")
 }

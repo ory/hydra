@@ -27,6 +27,8 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/ory/hydra/driver/config"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/pborman/uuid"
@@ -51,17 +53,17 @@ var (
 
 type Validator struct {
 	c    *http.Client
-	conf Configuration
+	conf *config.ViperProvider
 }
 
-func NewValidator(conf Configuration) *Validator {
+func NewValidator(conf *config.ViperProvider) *Validator {
 	return &Validator{
 		c:    http.DefaultClient,
 		conf: conf,
 	}
 }
 
-func NewValidatorWithClient(conf Configuration, client *http.Client) *Validator {
+func NewValidatorWithClient(conf *config.ViperProvider, client *http.Client) *Validator {
 	return &Validator{
 		c:    client,
 		conf: conf,

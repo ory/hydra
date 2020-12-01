@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/spf13/pflag"
+
 	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
 
-	"github.com/ory/viper"
 	"github.com/ory/x/sqlcon/dockertest"
 
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
@@ -57,8 +58,8 @@ func TestMigrations(t *testing.T) {
 			if db == "mysql" {
 				url = "mysql://" + url
 			}
-			viper.Set(configuration.ViperKeyDSN, url)
-			d := driver.NewDefaultDriver(logrusx.New("", ""), true, []string{}, "", "", "", false)
+
+			d := driver.New(pflag.NewFlagSet("", pflag.ContinueOnError), driver.ForceConfigValue(config.ViperKeyDSN, url))
 			var dbx *sqlx.DB
 			require.NoError(t,
 				dbal.Connect(url, logrusx.New("", ""), func() error {
@@ -107,11 +108,11 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=consent migration %d", i), func(t *testing.T) {
 					ecr, elr, els, ehcr, ehlr, efols, elor := expectedConsent(i)
 
-					acr, err := d.Registry().ConsentManager().GetConsentRequest(context.Background(), ecr.ID)
+					acr, err := d.ConsentManager().GetConsentRequest(context.Background(), ecr.ID)
 					require.NoError(t, err)
 					assertEqualConsentRequests(t, ecr, acr)
 
-					alr, err := d.Registry().ConsentManager().GetLoginRequest(context.Background(), elr.ID)
+					alr, err := d.ConsentManager().GetLoginRequest(context.Background(), elr.ID)
 					require.NoError(t, err)
 					assertEqualLoginRequests(t, elr, alr)
 
@@ -129,7 +130,7 @@ func TestMigrations(t *testing.T) {
 					assertEqualHandledLoginRequests(t, ehlr, ahlr)
 
 					if efols != nil {
-						afols, err := d.Registry().ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), lastClient.OutfacingID, efols.SubjectObfuscated)
+						afols, err := d.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), lastClient.OutfacingID, efols.SubjectObfuscated)
 						require.NoError(t, err)
 						assertEqualForcedObfucscatedLoginSessions(t, efols, afols)
 					}

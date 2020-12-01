@@ -44,7 +44,7 @@ import (
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/x"
 )
 
@@ -71,10 +71,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c Configuration
+	c *config.ViperProvider
 }
 
-func NewHandler(r InternalRegistry, c Configuration) *Handler {
+func NewHandler(r InternalRegistry, c *config.ViperProvider) *Handler {
 	return &Handler{r: r, c: c}
 }
 
@@ -87,14 +87,14 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.GET(LogoutPath, h.LogoutHandler)
 	public.POST(LogoutPath, h.LogoutHandler)
 
-	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, configuration.ViperKeyLoginURL))
-	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, configuration.ViperKeyConsentURL))
-	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, configuration.ViperKeyLogoutURL))
+	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.ViperKeyLoginURL))
+	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.ViperKeyConsentURL))
+	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, config.ViperKeyLogoutURL))
 	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
 		"You logged out successfully!",
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
 		http.StatusOK,
-		configuration.ViperKeyLogoutRedirectURL,
+		config.ViperKeyLogoutRedirectURL,
 	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 
@@ -236,7 +236,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                        h.c.OIDCDiscoverySupportedClaims(),
 		ScopesSupported:                        h.c.OIDCDiscoverySupportedScope(),
-		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint(),
+		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint().String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
 		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},

@@ -24,7 +24,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -120,7 +120,7 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 		Description: r.URL.Query().Get("error_description"),
 		Hint:        r.URL.Query().Get("error_hint"),
 		Debug:       r.URL.Query().Get("error_debug"),
-		Key:         configuration.ViperKeyErrorURL,
+		Key:         config.ViperKeyErrorURL,
 	}); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

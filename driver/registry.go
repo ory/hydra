@@ -21,7 +21,7 @@ import (
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
@@ -32,16 +32,10 @@ type Registry interface {
 
 	Init() error
 
-	WithConfig(c configuration.Provider) Registry
+	WithConfig(c *config.ViperProvider) Registry
 	WithLogger(l *logrusx.Logger) Registry
 
-	Config() configuration.Provider
-
-	WithBuildInfo(version, hash, date string) Registry
-	BuildVersion() string
-	BuildDate() string
-	BuildHash() string
-
+	Config() *config.ViperProvider
 	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
@@ -65,7 +59,7 @@ type Registry interface {
 	WithConsentStrategy(c consent.Strategy)
 }
 
-func NewRegistry(c configuration.Provider, l *logrusx.Logger) (Registry, error) {
+func NewRegistryFromDSN(c *config.ViperProvider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)

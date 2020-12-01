@@ -10,8 +10,6 @@ import (
 	"github.com/luna-duclos/instrumentedsql"
 	"github.com/luna-duclos/instrumentedsql/opentracing"
 
-	"github.com/ory/hydra/driver/configuration"
-
 	"github.com/ory/x/resilience"
 
 	"github.com/gobuffalo/pop/v5"
@@ -83,7 +81,7 @@ func (m *RegistrySQL) Init() error {
 		}
 
 		// if dsn is memory we have to run the migrations on every start
-		if m.C.DSN() == configuration.DefaultSQLiteMemoryDSN {
+		if m.C.DSN() == dbal.InMemoryDSN {
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
 			if err := m.persister.MigrateUp(context.Background()); err != nil {

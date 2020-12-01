@@ -29,7 +29,10 @@ const detectLanguage = (src) => {
 }
 
 const findPath = (src) => {
-  const matches = src.match(new RegExp('https://github.com/[^/]+/[^/]+/blob/[^/]+/(.+)', 'i')) || []
+  const matches =
+    src.match(
+      new RegExp('https://github.com/[^/]+/[^/]+/blob/[^/]+/(.+)', 'i')
+    ) || []
   if (matches.length >= 2) {
     return matches[1]
   }
@@ -50,9 +53,7 @@ const findLine = (needle, haystack) => {
   return index
 }
 
-const transform = (
-  { startAt, endAt }
-) => (content) => {
+const transform = ({ startAt, endAt }) => (content) => {
   let lines = content.split('\n')
 
   const startIndex = findLine(startAt, lines)
@@ -62,7 +63,7 @@ const transform = (
 
   const endIndex = findLine(endAt, lines)
   if (endIndex > 0) {
-    lines = [...lines.slice(0, endIndex+1), '// ...']
+    lines = [...lines.slice(0, endIndex + 1), '// ...']
   }
 
   return lines.join('\n')
@@ -76,7 +77,8 @@ const CodeFromRemote = (props) => {
     fetch(
       src
         .replace('github.com', 'raw.githubusercontent.com')
-        .replace('/blob/', '/'))
+        .replace('/blob/', '/')
+    )
       .then((body) => body.text())
       .then(transform(props))
       .then(setContent)
@@ -88,7 +90,7 @@ const CodeFromRemote = (props) => {
 
   return (
     <div className={styles.container}>
-      <CodeBlock metastring={title} className={lang} children={content}/>
+      <CodeBlock metastring={title} className={lang} children={content} />
     </div>
   )
 }

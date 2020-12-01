@@ -15,7 +15,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/persistence"
 	"github.com/ory/x/logrusx"
@@ -38,7 +38,7 @@ type (
 		conn   *pop.Connection
 		mb     pop.MigrationBox
 		r      Dependencies
-		config configuration.Provider
+		config *config.ViperProvider
 		l      *logrusx.Logger
 	}
 	Dependencies interface {
@@ -85,7 +85,7 @@ func (p *Persister) Rollback(ctx context.Context) error {
 	return c.TX.Rollback()
 }
 
-func NewPersister(c *pop.Connection, r Dependencies, config configuration.Provider, l *logrusx.Logger) (*Persister, error) {
+func NewPersister(c *pop.Connection, r Dependencies, config *config.ViperProvider, l *logrusx.Logger) (*Persister, error) {
 	mb, err := pop.NewMigrationBox(migrations, c)
 	if err != nil {
 		return nil, errorsx.WithStack(err)

@@ -145,8 +145,8 @@ func TestRevoke(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			//
-			//client.Configuration.Username = "my-client"
-			//client.Configuration.Password = "foobar"
+			//client.config.Username = "my-client"
+			//client.config.Password = "foobar"
 			_, err := client.Public.RevokeOAuth2Token(
 				public.NewRevokeOAuth2TokenParams().WithToken(c.token),
 				httptransport.BasicAuth("my-client", "foobar"),

@@ -30,18 +30,16 @@ import (
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/viper"
-
 	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
 )
 
 func TestValidate(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
-	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"openid"})
+	c.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.Set(config.ViperKeyDefaultClientScope, []string{"openid"})
 
 	v := NewValidator(c)
 	for k, tc := range []struct {
@@ -112,7 +110,7 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			v: func(t *testing.T) *Validator {
-				viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise"})
+				c.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(c)
 			},
 			in: &Client{OutfacingID: "foo"},

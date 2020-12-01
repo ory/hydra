@@ -26,29 +26,24 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/pointerx"
-
-	"github.com/ory/hydra/internal/httpclient/client"
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/x/urlx"
-
-	"github.com/ory/hydra/x"
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
 )
 
 func TestSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyIssuerURL, "https://www.ory.sh")
-	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Minute)
+	conf.Set(config.ViperKeyIssuerURL, "https://www.ory.sh")
+	conf.Set(config.ViperKeyAccessTokenLifespan, time.Minute)
 	reg := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterPublic()

@@ -37,57 +37,6 @@ import (
 	. "github.com/ory/hydra/consent"
 )
 
-//func TestLogout(t *testing.T) {
-//	conf := internal.NewConfigurationWithDefaults()
-//	reg := internal.NewRegistryMemory(t, conf)
-//
-//	r := x.NewRouterPublic()
-//	h := NewHandler(reg, conf)
-//
-//	sid := uuid.New()
-//
-//	r.Handle("GET", "/login", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-//		cookie, _ := reg.CookieStore().Get(r, CookieAuthenticationName)
-//		require.NoError(t, reg.ConsentManager().CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
-//			ID:              sid,
-//			Subject:         "foo",
-//			AuthenticatedAt: time.Now(),
-//		}))
-//
-//		cookie.Values[CookieAuthenticationSIDName] = sid
-//		cookie.Options.MaxAge = 60
-//
-//		require.NoError(t, cookie.Save(r, w))
-//	})
-//
-//	r.Handle("GET", "/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-//	})
-//
-//	h.SetRoutes(r.RouterAdmin(), r)
-//	ts := httptest.NewServer(r)
-//	defer ts.Close()
-//
-//	viper.Set(configuration.ViperKeyLogoutRedirectURL, ts.URL+"/logout")
-//
-//	u, err := url.Parse(ts.URL)
-//	require.NoError(t, err)
-//
-//	cj, err := cookiejar.New(new(cookiejar.Options))
-//	require.NoError(t, err)
-//
-//	c := &http.Client{Jar: cj}
-//	resp, err := c.Get(ts.URL + "/login")
-//	require.NoError(t, err)
-//	require.EqualValues(t, http.StatusOK, resp.StatusCode)
-//	require.Len(t, cj.Cookies(u), 1)
-//
-//	resp, err = c.Get(ts.URL + "/oauth2/auth/sessions/login/revoke")
-//	require.NoError(t, err)
-//	require.EqualValues(t, http.StatusOK, resp.StatusCode)
-//	assert.Len(t, cj.Cookies(u), 0)
-//	assert.EqualValues(t, ts.URL+"/logout", resp.Request.URL.String())
-//}
-
 func TestGetLogoutRequest(t *testing.T) {
 	for k, tc := range []struct {
 		exists bool

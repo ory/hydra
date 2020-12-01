@@ -25,17 +25,17 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/gtank/cryptopasta"
 	"github.com/pkg/errors"
 )
 
 type AEAD struct {
-	c configuration.Provider
+	c *config.ViperProvider
 }
 
-func NewAEAD(c configuration.Provider) *AEAD {
+func NewAEAD(c *config.ViperProvider) *AEAD {
 	return &AEAD{c: c}
 }
 

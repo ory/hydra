@@ -12,10 +12,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/viper"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/logrusx"
 )
 
 type MigrateHandler struct{}
@@ -25,11 +23,12 @@ func newMigrateHandler() *MigrateHandler {
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	var d driver.Driver
+	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
-		d = driver.NewDefaultDriver(logrusx.New("", ""), false, nil, "", "", "", false)
-		if len(d.Configuration().DSN()) == 0 {
+		d = driver.New(cmd.Flags(), driver.DisableValidation(),
+			driver.DisablePreloading())
+		if len(d.Config().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
 			fmt.Println("When using flag -e, environment variable DSN must be set")
@@ -42,11 +41,11 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 			return
 		}
-		viper.Set(configuration.ViperKeyDSN, args[0])
-		d = driver.NewDefaultDriver(logrusx.New("", ""), false, nil, "", "", "", false)
+		d = driver.New(cmd.Flags(), driver.ForceConfigValue(config.ViperKeyDSN, args[0]), driver.DisableValidation(),
+			driver.DisablePreloading())
 	}
 
-	p := d.Registry().Persister()
+	p := d.Persister()
 	conn := p.Connection(context.Background())
 	if conn == nil {
 		fmt.Println(cmd.UsageString())

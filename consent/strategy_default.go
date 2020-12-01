@@ -29,6 +29,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/hydra/driver/config"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/sqlcon"
@@ -64,13 +66,13 @@ const (
 )
 
 type DefaultStrategy struct {
-	c Configuration
+	c *config.ViperProvider
 	r InternalRegistry
 }
 
 func NewStrategy(
 	r InternalRegistry,
-	c Configuration,
+	c *config.ViperProvider,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		c: c,

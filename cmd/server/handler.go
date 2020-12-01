@@ -29,14 +29,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gobuffalo/packr/v2"
-
-	"github.com/ory/x/viperx"
-
 	analytics "github.com/ory/analytics-go/v4"
 
-	"github.com/ory/x/flagx"
-	"github.com/ory/x/logrusx"
 	"github.com/ory/x/reqlog"
 
 	"github.com/julienschmidt/httprouter"
@@ -52,7 +46,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/oauth2"
@@ -61,14 +55,23 @@ import (
 
 var _ = &consent.Handler{}
 
-func EnhanceMiddleware(d driver.Driver, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface string) http.Handler {
+func EnhanceMiddleware(d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface string) http.Handler {
 	if !x.AddressIsUnixSocket(address) {
-		n.UseFunc(x.RejectInsecureRequests(d.Registry(), d.Configuration()))
+		n.UseFunc(x.RejectInsecureRequests(d, d.Config()))
 	}
 	n.UseHandler(router)
-	if enableCORS {
-		options := d.Configuration().CORSOptions(iface)
-		d.Registry().Logger().
+
+	if !enableCORS {
+		return n
+	}
+
+	options, enabled := d.Config().CORS(iface)
+	if !enabled {
+		return n
+	}
+
+	if enabled {
+		d.Logger().
 			WithField("options", fmt.Sprintf("%+v", options)).
 			Infof("Enabling CORS on interface: %s", address)
 		return cors.New(options).Handler(n)
@@ -76,117 +79,78 @@ func EnhanceMiddleware(d driver.Driver, n *negroni.Negroni, address string, rout
 	return n
 }
 
-func isDSNAllowed(d driver.Driver) {
-	if d.Configuration().DSN() == "memory" {
-		d.Registry().Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
+func isDSNAllowed(r driver.Registry) {
+	if r.Config().DSN() == "memory" {
+		r.Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
 	}
 }
 
-var schemas = packr.New("schemas", "../../.schema")
+func RunServeAdmin(cmd *cobra.Command, args []string) {
+	d := driver.New(cmd.Flags())
+	isDSNAllowed(d)
 
-func watchAndValidateViper(l *logrusx.Logger) {
-	schema, err := schemas.Find("config.schema.json")
-	if err != nil {
-		l.WithError(err).Fatal("Unable to open configuration JSON Schema.")
-	}
-	viperx.WatchAndValidateViper(l, schema, "ORY Hydra", []string{"log", "serve", "dsn", "profiling"}, "")
+	admin, _, adminmw, _ := setup(d, cmd)
+	cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go serve(d, cmd, &wg,
+		EnhanceMiddleware(d, adminmw, d.Config().AdminListenOn(), admin.Router, true, "admin"),
+		d.Config().AdminListenOn(), d.Config().AdminSocketPermission(), cert,
+	)
+
+	wg.Wait()
 }
 
-func RunServeAdmin(version, build, date string) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
-		logger := logrusx.New("", "")
-		watchAndValidateViper(logger)
-		d := driver.NewDefaultDriver(
-			logger,
-			flagx.MustGetBool(cmd, "dangerous-force-http"),
-			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date, true,
-		).CallRegistry()
+func RunServePublic(cmd *cobra.Command, args []string) {
+	d := driver.New(cmd.Flags())
+	isDSNAllowed(d)
 
-		isDSNAllowed(d)
+	_, public, _, publicmw := setup(d, cmd)
+	cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
 
-		admin, _, adminmw, _ := setup(d, cmd)
-		cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-		var wg sync.WaitGroup
-		wg.Add(1)
+	go serve(d, cmd, &wg,
+		EnhanceMiddleware(d, publicmw, d.Config().PublicListenOn(), public.Router, false, "public"),
+		d.Config().PublicListenOn(), d.Config().PublicSocketPermission(), cert,
+	)
 
-		go serve(d, cmd, &wg,
-			EnhanceMiddleware(d, adminmw, d.Configuration().AdminListenOn(), admin.Router, d.Configuration().CORSEnabled("admin"), "admin"),
-			d.Configuration().AdminListenOn(), d.Configuration().AdminSocketPermission(), cert,
-		)
-
-		wg.Wait()
-	}
+	wg.Wait()
 }
 
-func RunServePublic(version, build, date string) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
-		logger := logrusx.New("", "")
-		watchAndValidateViper(logger)
-		d := driver.NewDefaultDriver(
-			logger,
-			flagx.MustGetBool(cmd, "dangerous-force-http"),
-			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date, true,
-		).CallRegistry()
+func RunServeAll(cmd *cobra.Command, args []string) {
+	d := driver.New(cmd.Flags())
 
-		isDSNAllowed(d)
+	admin, public, adminmw, publicmw := setup(d, cmd)
+	cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
 
-		_, public, _, publicmw := setup(d, cmd)
-		cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-		var wg sync.WaitGroup
-		wg.Add(1)
+	go serve(d, cmd, &wg,
+		EnhanceMiddleware(d, publicmw, d.Config().PublicListenOn(), public.Router, false, "public"),
+		d.Config().PublicListenOn(), d.Config().PublicSocketPermission(), cert,
+	)
 
-		go serve(d, cmd, &wg,
-			EnhanceMiddleware(d, publicmw, d.Configuration().PublicListenOn(), public.Router, false, "public"),
-			d.Configuration().PublicListenOn(), d.Configuration().PublicSocketPermission(), cert,
-		)
+	go serve(d, cmd, &wg,
+		EnhanceMiddleware(d, adminmw, d.Config().AdminListenOn(), admin.Router, true, "admin"),
+		d.Config().AdminListenOn(), d.Config().AdminSocketPermission(), cert,
+	)
 
-		wg.Wait()
-	}
+	wg.Wait()
 }
 
-func RunServeAll(version, build, date string) func(cmd *cobra.Command, args []string) {
-	return func(cmd *cobra.Command, args []string) {
-		logger := logrusx.New("", "")
-		watchAndValidateViper(logger)
-		d := driver.NewDefaultDriver(
-			logger,
-			flagx.MustGetBool(cmd, "dangerous-force-http"),
-			flagx.MustGetStringSlice(cmd, "dangerous-allow-insecure-redirect-urls"),
-			version, build, date, true,
-		).CallRegistry()
+func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
+	fmt.Println(banner(config.Version))
 
-		admin, public, adminmw, publicmw := setup(d, cmd)
-		cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
-
-		var wg sync.WaitGroup
-		wg.Add(2)
-
-		go serve(d, cmd, &wg,
-			EnhanceMiddleware(d, publicmw, d.Configuration().PublicListenOn(), public.Router, false, "public"),
-			d.Configuration().PublicListenOn(), d.Configuration().PublicSocketPermission(), cert,
-		)
-
-		go serve(d, cmd, &wg,
-			EnhanceMiddleware(d, adminmw, d.Configuration().AdminListenOn(), admin.Router, d.Configuration().CORSEnabled("admin"), "admin"),
-			d.Configuration().AdminListenOn(), d.Configuration().AdminSocketPermission(), cert,
-		)
-
-		wg.Wait()
-	}
-}
-
-func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
-	fmt.Println(banner(d.Registry().BuildVersion()))
-
-	if d.Configuration().CGroupsV1AutoMaxProcsEnabled() {
-		_, err := maxprocs.Set(maxprocs.Logger(d.Registry().Logger().Infof))
+	if d.Config().CGroupsV1AutoMaxProcsEnabled() {
+		_, err := maxprocs.Set(maxprocs.Logger(d.Logger().Infof))
 
 		if err != nil {
-			d.Registry().Logger().WithError(err).Fatal("Couldn't set GOMAXPROCS")
+			d.Logger().WithError(err).Fatal("Couldn't set GOMAXPROCS")
 		}
 	}
 
@@ -196,44 +160,45 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	admin = x.NewRouterAdmin()
 	public = x.NewRouterPublic()
 
-	if tracer := d.Registry().Tracer(); tracer.IsLoaded() {
+	if tracer := d.Tracer(); tracer.IsLoaded() {
 		adminmw.Use(tracer)
 		publicmw.Use(tracer)
 	}
 
 	adminLogger := reqlog.
-		NewMiddlewareFromLogger(d.Registry().Logger(),
-			fmt.Sprintf("hydra/admin: %s", d.Configuration().IssuerURL().String()))
-	if d.Configuration().AdminDisableHealthAccessLog() {
+		NewMiddlewareFromLogger(d.Logger(),
+			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL().String()))
+	if d.Config().AdminDisableHealthAccessLog() {
 		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
 	adminmw.Use(adminLogger)
-	adminmw.Use(d.Registry().PrometheusManager())
+	adminmw.Use(d.PrometheusManager())
 
 	publicLogger := reqlog.NewMiddlewareFromLogger(
-		d.Registry().Logger(),
-		fmt.Sprintf("hydra/public: %s", d.Configuration().IssuerURL().String()),
+		d.Logger(),
+		fmt.Sprintf("hydra/public: %s", d.Config().IssuerURL().String()),
 	)
-	if d.Configuration().PublicDisableHealthAccessLog() {
+	if d.Config().PublicDisableHealthAccessLog() {
 		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
 	publicmw.Use(publicLogger)
-	publicmw.Use(d.Registry().PrometheusManager())
+	publicmw.Use(d.PrometheusManager())
 
 	metrics := metricsx.New(
 		cmd,
-		d.Registry().Logger(),
+		d.Logger(),
+		d.Config().Source(),
 		&metricsx.Options{
 			Service: "ory-hydra",
 			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
-				d.Configuration().IssuerURL().String(),
-				d.Configuration().DSN(),
+				d.Config().IssuerURL().String(),
+				d.Config().DSN(),
 			)),
-			IsDevelopment: d.Configuration().DSN() == "memory" ||
-				d.Configuration().IssuerURL().String() == "" ||
-				strings.Contains(d.Configuration().IssuerURL().String(), "localhost"),
+			IsDevelopment: d.Config().DSN() == "memory" ||
+				d.Config().IssuerURL().String() == "" ||
+				strings.Contains(d.Config().IssuerURL().String(), "localhost"),
 			WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",
 			WhitelistedPaths: []string{
 				jwk.KeyHandlerPath,
@@ -274,9 +239,9 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 				prometheus.MetricsPrometheusPath,
 				"/",
 			},
-			BuildVersion: d.Registry().BuildVersion(),
-			BuildTime:    d.Registry().BuildDate(),
-			BuildHash:    d.Registry().BuildHash(),
+			BuildVersion: config.Version,
+			BuildTime:    config.Date,
+			BuildHash:    config.Commit,
 			Config: &analytics.Config{
 				Endpoint:             "https://sqa.ory.sh",
 				GzipCompressionLevel: 6,
@@ -290,12 +255,12 @@ func setup(d driver.Driver, cmd *cobra.Command) (admin *x.RouterAdmin, public *x
 	adminmw.Use(metrics)
 	publicmw.Use(metrics)
 
-	d.Registry().RegisterRoutes(admin, public)
+	d.RegisterRoutes(admin, public)
 
 	return
 }
 
-func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http.Handler, address string, permission *configuration.UnixPermission, cert []tls.Certificate) {
+func serve(d driver.Registry, cmd *cobra.Command, wg *sync.WaitGroup, handler http.Handler, address string, permission *config.UnixPermission, cert []tls.Certificate) {
 	defer wg.Done()
 
 	var srv = graceful.WithDefaults(&http.Server{
@@ -307,13 +272,13 @@ func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http
 		},
 	})
 
-	if d.Registry().Tracer().IsLoaded() {
-		srv.RegisterOnShutdown(d.Registry().Tracer().Close)
+	if d.Tracer().IsLoaded() {
+		srv.RegisterOnShutdown(d.Tracer().Close)
 	}
 
 	if err := graceful.Graceful(func() error {
 		var err error
-		d.Registry().Logger().Infof("Setting up http server on %s", address)
+		d.Logger().Infof("Setting up http server on %s", address)
 		if x.AddressIsUnixSocket(address) {
 			addr := strings.TrimPrefix(address, "unix:")
 			unixListener, e := net.Listen("unix", addr)
@@ -326,11 +291,11 @@ func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http
 			}
 			err = srv.Serve(unixListener)
 		} else {
-			if !d.Configuration().ServesHTTPS() {
-				d.Registry().Logger().Warnln("HTTPS disabled. Never do this in production.")
+			if !d.Config().ServesHTTPS() {
+				d.Logger().Warnln("HTTPS disabled. Never do this in production.")
 				err = srv.ListenAndServe()
-			} else if len(d.Configuration().AllowTLSTerminationFrom()) > 0 {
-				d.Registry().Logger().Infoln("TLS termination enabled, disabling https.")
+			} else if len(d.Config().AllowTLSTerminationFrom()) > 0 {
+				d.Logger().Infoln("TLS termination enabled, disabling https.")
 				err = srv.ListenAndServe()
 			} else {
 				err = srv.ListenAndServeTLS("", "")
@@ -339,6 +304,6 @@ func serve(d driver.Driver, cmd *cobra.Command, wg *sync.WaitGroup, handler http
 
 		return err
 	}, srv.Shutdown); err != nil {
-		d.Registry().Logger().WithError(err).Fatal("Could not gracefully run server")
+		d.Logger().WithError(err).Fatal("Could not gracefully run server")
 	}
 }

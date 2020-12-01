@@ -81,7 +81,7 @@ webfinger:
 
 oidc:
   subject_identifiers:
-    enabled:
+    supported_types:
       - pairwise
     pairwise:
       salt: random_salt

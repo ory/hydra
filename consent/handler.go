@@ -26,24 +26,22 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/ory/x/errorsx"
-
-	"github.com/ory/x/sqlxx"
-	"github.com/ory/x/stringsx"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/x/pagination"
-	"github.com/ory/x/urlx"
-
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/errorsx"
+	"github.com/ory/x/pagination"
+	"github.com/ory/x/sqlxx"
+	"github.com/ory/x/stringsx"
+	"github.com/ory/x/urlx"
 )
 
 type Handler struct {
 	r InternalRegistry
-	c Configuration
+	c *config.ViperProvider
 }
 
 const (
@@ -55,7 +53,7 @@ const (
 
 func NewHandler(
 	r InternalRegistry,
-	c Configuration,
+	c *config.ViperProvider,
 ) *Handler {
 	return &Handler{
 		c: c,

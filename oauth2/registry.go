@@ -5,7 +5,6 @@ import (
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 )
@@ -28,8 +27,4 @@ type Registry interface {
 	OpenIDJWTStrategy() jwk.JWTStrategy
 
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
-}
-
-type Configuration interface {
-	configuration.Provider
 }

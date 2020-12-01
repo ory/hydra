@@ -23,8 +23,8 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/ory/x/logrusx"
-	"github.com/ory/x/viperx"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/x/configx"
 )
 
 var serveControls = `## Configuration
@@ -32,7 +32,7 @@ var serveControls = `## Configuration
 ORY Hydra can be configured using environment variables as well as a configuration file. For more information
 on configuration options, open the configuration documentation:
 
->> https://github.com/ory/hydra/blob/` + Commit + `/docs/docs/reference/configuration.md <<
+>> https://github.com/ory/hydra/blob/` + config.Commit + `/docs/docs/reference/config.md <<
 `
 
 // serveCmd represents the host command
@@ -61,12 +61,8 @@ All sub-commands share command line flags and configuration options.
 func init() {
 	RootCmd.AddCommand(serveCmd)
 
-	serveCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "Config file (default is $HOME/hydra.yaml)")
-
+	configx.RegisterFlags(serveCmd.PersistentFlags())
 	serveCmd.PersistentFlags().Bool("dangerous-force-http", false, "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead")
 	serveCmd.PersistentFlags().StringSlice("dangerous-allow-insecure-redirect-urls", []string{}, "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs")
-
-	disableTelemetryEnv := viperx.GetBool(logrusx.New("ORY Hydra", Version), "sqa.opt_out", false, "DISABLE_TELEMETRY")
-	serveCmd.PersistentFlags().Bool("disable-telemetry", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
-	serveCmd.PersistentFlags().Bool("sqa-opt-out", disableTelemetryEnv, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
+	serveCmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
 }

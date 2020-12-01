@@ -22,10 +22,9 @@ import (
 	"github.com/gobuffalo/httptest"
 
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
-	"github.com/ory/viper"
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
@@ -40,10 +39,10 @@ func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
 
 func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
-	viper.Set(configuration.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Second*2)
-	viper.Set(configuration.ViperKeyRefreshTokenLifespan, time.Second*3)
-	viper.Set(configuration.ViperKeyScopeStrategy, "exact")
+	reg.Config().Set(config.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg.Config().Set(config.ViperKeyAccessTokenLifespan, time.Second*2)
+	reg.Config().Set(config.ViperKeyRefreshTokenLifespan, time.Second*3)
+	reg.Config().Set(config.ViperKeyScopeStrategy, "exact")
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()
 
@@ -53,7 +52,7 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 	adminTS = httptest.NewServer(admin)
 	t.Cleanup(adminTS.Close)
 
-	viper.Set(configuration.ViperKeyIssuerURL, publicTS.URL)
+	reg.Config().Set(config.ViperKeyIssuerURL, publicTS.URL)
 	// SendDebugMessagesToClients: true,
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
@@ -100,7 +99,7 @@ func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
 	}
 }
 
-func NewUI(t *testing.T, login, consent http.HandlerFunc) {
+func NewUI(t *testing.T, c *config.ViperProvider, login, consent http.HandlerFunc) {
 	if login == nil {
 		login = HTTPServerNotImplementedHandler
 	}
@@ -115,8 +114,8 @@ func NewUI(t *testing.T, login, consent http.HandlerFunc) {
 	t.Cleanup(lt.Close)
 	t.Cleanup(ct.Close)
 
-	viper.Set(configuration.ViperKeyLoginURL, lt.URL)
-	viper.Set(configuration.ViperKeyConsentURL, ct.URL)
+	c.Set(config.ViperKeyLoginURL, lt.URL)
+	c.Set(config.ViperKeyConsentURL, ct.URL)
 }
 
 func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {

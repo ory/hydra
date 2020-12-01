@@ -2,7 +2,6 @@ package client
 
 import (
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/driver/configuration"
 	"github.com/ory/hydra/x"
 )
 
@@ -15,8 +14,4 @@ type Registry interface {
 	ClientValidator() *Validator
 	ClientManager() Manager
 	ClientHasher() fosite.Hasher
-}
-
-type Configuration interface {
-	configuration.Provider
 }

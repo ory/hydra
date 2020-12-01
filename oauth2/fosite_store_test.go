@@ -28,10 +28,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/viper"
-
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
 	"github.com/ory/x/sqlcon/dockertest"
@@ -87,9 +85,8 @@ func TestManagers(t *testing.T) {
 			setupRegistries(t)
 			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 
-			viper.Set(configuration.ViperKeyEncryptSessionData, tc.enableSessionEncrypted)
-
 			for k, store := range registries {
+				store.Config().Set(config.ViperKeyEncryptSessionData, tc.enableSessionEncrypted)
 				TestHelperRunner(t, store, k)
 			}
 		})

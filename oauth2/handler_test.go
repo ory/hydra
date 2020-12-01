@@ -40,9 +40,7 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/x/urlx"
 
@@ -93,7 +91,7 @@ var flushRequests = []*fosite.Request{
 
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	conf.Set(config.ViperKeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	cm := reg.ClientManager()
@@ -132,8 +130,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 
 func TestHandlerFlushHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	conf.Set(config.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.Set(config.ViperKeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	cl := reg.ClientManager()
@@ -189,9 +187,9 @@ func TestHandlerFlushHandler(t *testing.T) {
 
 func TestUserinfo(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyScopeStrategy, "")
-	viper.Set(configuration.ViperKeyAuthCodeLifespan, lifespan)
-	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
+	conf.Set(config.ViperKeyScopeStrategy, "")
+	conf.Set(config.ViperKeyAuthCodeLifespan, lifespan)
+	conf.Set(config.ViperKeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf)
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
@@ -427,12 +425,12 @@ func TestUserinfo(t *testing.T) {
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	viper.Set(configuration.ViperKeyIssuerURL, "http://hydra.localhost")
-	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
-	viper.Set(configuration.ViperKeyOIDCDiscoverySupportedClaims, []string{"sub"})
-	viper.Set(configuration.ViperKeyOAuth2ClientRegistrationURL, "http://client-register/registration")
-	viper.Set(configuration.ViperKeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+	conf.Set(config.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.Set(config.ViperKeyIssuerURL, "http://hydra.localhost")
+	conf.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
+	conf.Set(config.ViperKeyOIDCDiscoverySupportedClaims, []string{"sub"})
+	conf.Set(config.ViperKeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+	conf.Set(config.ViperKeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	h := oauth2.NewHandler(reg, conf)
@@ -459,7 +457,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
 		ClaimsSupported:                        conf.OIDCDiscoverySupportedClaims(),
 		ScopesSupported:                        conf.OIDCDiscoverySupportedScope(),
-		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint(),
+		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint().String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:                 []string{"query", "fragment"},

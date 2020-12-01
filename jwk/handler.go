@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ory/hydra/driver/config"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/stringslice"
@@ -43,10 +45,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c Configuration
+	c *config.ViperProvider
 }
 
-func NewHandler(r InternalRegistry, c Configuration) *Handler {
+func NewHandler(r InternalRegistry, c *config.ViperProvider) *Handler {
 	return &Handler{r: r, c: c}
 }
 

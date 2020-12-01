@@ -13,14 +13,13 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/viper"
 )
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Hour)
+	conf.Set(config.ViperKeyAccessTokenLifespan, time.Hour)
 	registries := map[string]driver.Registry{
 		"memory": internal.NewRegistryMemory(t, conf),
 	}

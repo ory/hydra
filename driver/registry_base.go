@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/x/oauth2cors"
+
 	"github.com/ory/hydra/persistence"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -27,7 +29,7 @@ import (
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
@@ -36,7 +38,7 @@ import (
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
-	C            configuration.Provider
+	C            *config.ViperProvider
 	ch           *client.Handler
 	fh           fosite.Hasher
 	kh           *jwk.Handler
@@ -83,7 +85,7 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 
 func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = OAuth2AwareCORSMiddleware("public", m.r, m.C)
+		m.oa2mw = oauth2cors.Middleware(m.r)
 	}
 	return m.oa2mw
 }
@@ -114,7 +116,7 @@ func (m *RegistryBase) BuildHash() string {
 	return m.buildHash
 }
 
-func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
+func (m *RegistryBase) WithConfig(c *config.ViperProvider) Registry {
 	m.C = c
 	return m.r
 }
@@ -394,17 +396,11 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectId
 
 func (m *RegistryBase) Tracer() *tracing.Tracer {
 	if m.trc == nil {
-		m.trc = &tracing.Tracer{
-			ServiceName:  m.C.TracingServiceName(),
-			JaegerConfig: m.C.TracingJaegerConfig(),
-			ZipkinConfig: m.C.TracingZipkinConfig(),
-			Provider:     m.C.TracingProvider(),
-			Logger:       m.Logger(),
-		}
-
-		if err := m.trc.Setup(); err != nil {
+		t, err := tracing.New(m.l, m.C.Tracing())
+		if err != nil {
 			m.Logger().WithError(err).Fatalf("Unable to initialize Tracer.")
 		}
+		m.trc = t
 	}
 
 	return m.trc
@@ -421,7 +417,7 @@ func (m *RegistryBase) Persister() persistence.Persister {
 	return m.persister
 }
 
-func (m *RegistryBase) Config() configuration.Provider {
+func (m *RegistryBase) Config() *config.ViperProvider {
 	return m.C
 }
 

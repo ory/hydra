@@ -19,7 +19,8 @@ ORY Hydra SDKs. The goal for this document is to have document this for multiple
 programming languages. If you are an expert in one of these languages, your help
 is highly appreciated in improving these docs!
 
-Code shown here is taken out of the ORY Hydra Login & Consent Node Reference application which you can find on GitHub.
+Code shown here is taken out of the ORY Hydra Login & Consent Node Reference
+application which you can find on GitHub.
 
 [![ory/hydra-login-consent-node - GitHub](https://gh-card.dev/repos/ory/hydra-login-consent-node.svg)](https://github.com/ory/hydra-login-consent-node)
 
@@ -59,11 +60,7 @@ to ORY Hydra's Admin Endpoint!
 
 ## Accepting the Consent Request
 
-<Tabs
-  defaultValue="node"
-  values={[
-    {label: 'NodeJS', value: 'node'},
-  ]}>
+<Tabs defaultValue="node" values={[{ label: 'NodeJS', value: 'node' }]}>
   <TabItem value="node">
     <CodeFromRemote
       startAt="let grantScope = req.body.grant_scope"
@@ -75,11 +72,7 @@ to ORY Hydra's Admin Endpoint!
 
 ## Rejecting the Consent Request
 
-<Tabs
-  defaultValue="node"
-  values={[
-    {label: 'NodeJS', value: 'node'},
-  ]}>
+<Tabs defaultValue="node" values={[{ label: 'NodeJS', value: 'node' }]}>
   <TabItem value="node">
     <CodeFromRemote
       startAt="if (req.body.submit === 'Deny access') {"
@@ -91,11 +84,7 @@ to ORY Hydra's Admin Endpoint!
 
 ## Skipping Consent Screen
 
-<Tabs
-  defaultValue="node"
-  values={[
-    {label: 'NodeJS', value: 'node'},
-  ]}>
+<Tabs defaultValue="node" values={[{ label: 'NodeJS', value: 'node' }]}>
   <TabItem value="node">
     <CodeFromRemote
       startAt="// This section processes consent requests and either shows the consent UI"
@@ -107,14 +96,8 @@ to ORY Hydra's Admin Endpoint!
 
 ## Complete Endpoint
 
-<Tabs
-  defaultValue="node"
-  values={[
-    {label: 'NodeJS', value: 'node'},
-  ]}>
+<Tabs defaultValue="node" values={[{ label: 'NodeJS', value: 'node' }]}>
   <TabItem value="node">
-    <CodeFromRemote
-      src="https://github.com/ory/hydra-login-consent-node/blob/master/src/routes/consent.ts"
-    />
+    <CodeFromRemote src="https://github.com/ory/hydra-login-consent-node/blob/master/src/routes/consent.ts" />
   </TabItem>
 </Tabs>

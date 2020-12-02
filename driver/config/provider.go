@@ -29,70 +29,69 @@ import (
 )
 
 const (
-	ViperKeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
-	ViperKeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
-	ViperKLeyOAuth2TokenURL                           = "webfinger.oidc_discovery.token_url" // #nosec G101
-	ViperKLeyOAuth2AuthURL                            = "webfinger.oidc_discovery.auth_url"
-	ViperKeyJWKSURL                                   = "webfinger.oidc_discovery.jwks_url"
-	ViperKeyOIDCDiscoverySupportedClaims              = "webfinger.oidc_discovery.supported_claims"
-	ViperKeyOIDCDiscoverySupportedScope               = "webfinger.oidc_discovery.supported_scope"
-	ViperKeyOIDCDiscoveryUserinfoEndpoint             = "webfinger.oidc_discovery.userinfo_url"
-	ViperKeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
-	ViperKeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
-	ViperKeyDSN                                       = "dsn"
-	ViperKeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
-	ViperKeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
-	ViperKeyAdminListenOnHost                         = "serve.admin.host"
-	ViperKeyAdminListenOnPort                         = "serve.admin.port"
-	ViperKeyAdminSocketOwner                          = "serve.admin.socket.owner"
-	ViperKeyAdminSocketGroup                          = "serve.admin.socket.group"
-	ViperKeyAdminSocketMode                           = "serve.admin.socket.mode"
-	ViperKeyAdminDisableHealthAccessLog               = "serve.admin.access_log.disable_for_health"
-	ViperKeyPublicListenOnHost                        = "serve.public.host"
-	ViperKeyPublicListenOnPort                        = "serve.public.port"
-	ViperKeyPublicSocketOwner                         = "serve.public.socket.owner"
-	ViperKeyPublicSocketGroup                         = "serve.public.socket.group"
-	ViperKeyPublicSocketMode                          = "serve.public.socket.mode"
-	ViperKeyPublicDisableHealthAccessLog              = "serve.public.access_log.disable_for_health"
-	ViperKeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
-	ViperKeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
-	ViperKeyConsentRequestMaxAge                      = "ttl.login_consent_request"
-	ViperKeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
-	ViperKeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
-	ViperKeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
-	ViperKeyAuthCodeLifespan                          = "ttl.auth_code"
-	ViperKeyScopeStrategy                             = "strategies.scope"
-	ViperKeyGetCookieSecrets                          = "secrets.cookie"
-	ViperKeyGetSystemSecret                           = "secrets.system"
-	ViperKeyLogoutRedirectURL                         = "urls.post_logout_redirect"
-	ViperKeyLoginURL                                  = "urls.login"
-	ViperKeyLogoutURL                                 = "urls.logout"
-	ViperKeyConsentURL                                = "urls.consent"
-	ViperKeyErrorURL                                  = "urls.error"
-	ViperKeyPublicURL                                 = "urls.self.public"
-	ViperKeyIssuerURL                                 = "urls.self.issuer"
-	ViperKeyAllowTLSTerminationFrom                   = "serve.tls.allow_termination_from"
-	ViperKeyAccessTokenStrategy                       = "strategies.access_token"
-	ViperKeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
-	ViperKeyPKCEEnforced                              = "oauth2.pkce.enforced"
-	ViperKeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
-	ViperKeyLogLevel                                  = "log.level"
-	ViperKeyCGroupsV1AutoMaxProcsEnabled              = "cgroups.v1.auto_max_procs_enabled"
-	ViperKeyGrantAllClientCredentialsScopesPerDefault = "oauth2.client_credentials.default_grant_allowed_scope"
-	ViperKeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
-	ViperKeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
+	KeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
+	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
+	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
+	KeyOAuth2AuthURL                             = "webfinger.oidc_discovery.auth_url"
+	KeyJWKSURL                                   = "webfinger.oidc_discovery.jwks_url"
+	KeyOIDCDiscoverySupportedClaims              = "webfinger.oidc_discovery.supported_claims"
+	KeyOIDCDiscoverySupportedScope               = "webfinger.oidc_discovery.supported_scope"
+	KeyOIDCDiscoveryUserinfoEndpoint             = "webfinger.oidc_discovery.userinfo_url"
+	KeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
+	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
+	KeyDSN                                       = "dsn"
+	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
+	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
+	KeyAdminListenOnHost                         = "serve.admin.host"
+	KeyAdminListenOnPort                         = "serve.admin.port"
+	KeyAdminSocketOwner                          = "serve.admin.socket.owner"
+	KeyAdminSocketGroup                          = "serve.admin.socket.group"
+	KeyAdminSocketMode                           = "serve.admin.socket.mode"
+	KeyAdminDisableHealthAccessLog               = "serve.admin.access_log.disable_for_health"
+	KeyPublicListenOnHost                        = "serve.public.host"
+	KeyPublicListenOnPort                        = "serve.public.port"
+	KeyPublicSocketOwner                         = "serve.public.socket.owner"
+	KeyPublicSocketGroup                         = "serve.public.socket.group"
+	KeyPublicSocketMode                          = "serve.public.socket.mode"
+	KeyPublicDisableHealthAccessLog              = "serve.public.access_log.disable_for_health"
+	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
+	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
+	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
+	KeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
+	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
+	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
+	KeyAuthCodeLifespan                          = "ttl.auth_code"
+	KeyScopeStrategy                             = "strategies.scope"
+	KeyGetCookieSecrets                          = "secrets.cookie"
+	KeyGetSystemSecret                           = "secrets.system"
+	KeyLogoutRedirectURL                         = "urls.post_logout_redirect"
+	KeyLoginURL                                  = "urls.login"
+	KeyLogoutURL                                 = "urls.logout"
+	KeyConsentURL                                = "urls.consent"
+	KeyErrorURL                                  = "urls.error"
+	KeyPublicURL                                 = "urls.self.public"
+	KeyIssuerURL                                 = "urls.self.issuer"
+	KeyAllowTLSTerminationFrom                   = "serve.tls.allow_termination_from"
+	KeyAccessTokenStrategy                       = "strategies.access_token"
+	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
+	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
+	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
+	KeyLogLevel                                  = "log.level"
+	KeyCGroupsV1AutoMaxProcsEnabled              = "cgroups.v1.auto_max_procs_enabled"
+	KeyGrantAllClientCredentialsScopesPerDefault = "oauth2.client_credentials.default_grant_allowed_scope"
+	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
+	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 )
 
 const DSNMemory = "memory"
 
-type ViperProvider struct {
+type Provider struct {
 	l               *logrusx.Logger
-	ss              [][]byte
 	generatedSecret []byte
 	p               *configx.Provider
 }
 
-func MustNew(flags *pflag.FlagSet, l *logrusx.Logger) *ViperProvider {
+func MustNew(flags *pflag.FlagSet, l *logrusx.Logger) *Provider {
 	p, err := New(flags, l)
 	if err != nil {
 		l.WithError(err).Fatalf("Unable to load config.")
@@ -100,7 +99,7 @@ func MustNew(flags *pflag.FlagSet, l *logrusx.Logger) *ViperProvider {
 	return p
 }
 
-func New(flags *pflag.FlagSet, l *logrusx.Logger) (*ViperProvider, error) {
+func New(flags *pflag.FlagSet, l *logrusx.Logger) (*Provider, error) {
 	f, err := pkger.Open("/.schema/config.schema.json")
 	if err != nil {
 		return nil, err
@@ -115,7 +114,7 @@ func New(flags *pflag.FlagSet, l *logrusx.Logger) (*ViperProvider, error) {
 		schema,
 		flags,
 		configx.WithStderrValidationReporter(),
-		configx.OmitKeysFromTracing([]string{"dsn","secrets.system","secrets.cookie"}),
+		configx.OmitKeysFromTracing([]string{"dsn", "secrets.system", "secrets.cookie"}),
 		configx.WithImmutables([]string{"log", "serve", "dsn", "profiling"}),
 		configx.WithLogrusWatcher(l),
 	)
@@ -123,18 +122,18 @@ func New(flags *pflag.FlagSet, l *logrusx.Logger) (*ViperProvider, error) {
 		return nil, err
 	}
 
-	return &ViperProvider{l: l, p: p}, nil
+	return &Provider{l: l, p: p}, nil
 }
 
-func (p *ViperProvider) Set(key string, value interface{}) {
+func (p *Provider) Set(key string, value interface{}) {
 	p.p.Set(key, value)
 }
 
-func (p *ViperProvider) Source() *configx.Provider {
+func (p *Provider) Source() *configx.Provider {
 	return p.p
 }
 
-func (p *ViperProvider) cors(prefix string) (cors.Options, bool) {
+func (p *Provider) cors(prefix string) (cors.Options, bool) {
 	return p.p.CORS(prefix, cors.Options{
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
@@ -143,7 +142,7 @@ func (p *ViperProvider) cors(prefix string) (cors.Options, bool) {
 	})
 }
 
-func (p *ViperProvider) CORS(iface string) (cors.Options, bool) {
+func (p *Provider) CORS(iface string) (cors.Options, bool) {
 	switch iface {
 	case "admin":
 		return p.AdminCORS()
@@ -154,45 +153,45 @@ func (p *ViperProvider) CORS(iface string) (cors.Options, bool) {
 	}
 }
 
-func (p *ViperProvider) PublicCORS() (cors.Options, bool) {
+func (p *Provider) PublicCORS() (cors.Options, bool) {
 	return p.cors("serve.public")
 }
 
-func (p *ViperProvider) AdminCORS() (cors.Options, bool) {
+func (p *Provider) AdminCORS() (cors.Options, bool) {
 	return p.cors("serve.admin")
 }
 
-func (p *ViperProvider) getAddress(address string, port int) string {
+func (p *Provider) getAddress(address string, port int) string {
 	if strings.HasPrefix(address, "unix:") {
 		return address
 	}
 	return fmt.Sprintf("%s:%d", address, port)
 }
 
-func (p *ViperProvider) InsecureRedirects() []string {
+func (p *Provider) InsecureRedirects() []string {
 	return p.p.Strings("dangerous-allow-insecure-redirect-urls")
 }
 
-func (p *ViperProvider) WellKnownKeys(include ...string) []string {
+func (p *Provider) WellKnownKeys(include ...string) []string {
 	if p.AccessTokenStrategy() == "jwt" {
 		include = append(include, x.OAuth2JWTKeyName)
 	}
 
 	include = append(include, x.OpenIDConnectKeyName)
-	return stringslice.Unique(append(p.p.Strings(ViperKeyWellKnownKeys), include...))
+	return stringslice.Unique(append(p.p.Strings(KeyWellKnownKeys), include...))
 }
 
-func (p *ViperProvider) ServesHTTPS() bool {
+func (p *Provider) ServesHTTPS() bool {
 	return !p.forcedHTTP()
 }
 
-func (p *ViperProvider) IsUsingJWTAsAccessTokens() bool {
+func (p *Provider) IsUsingJWTAsAccessTokens() bool {
 	return p.AccessTokenStrategy() != "opaque"
 }
 
-func (p *ViperProvider) SubjectTypesSupported() []string {
+func (p *Provider) SubjectTypesSupported() []string {
 	types := stringslice.Filter(
-		p.p.StringsF(ViperKeySubjectTypesSupported, []string{"public"}),
+		p.p.StringsF(KeySubjectTypesSupported, []string{"public"}),
 		func(s string) bool {
 			return !(s == "public" || s == "pairwise")
 		},
@@ -218,15 +217,15 @@ func (p *ViperProvider) SubjectTypesSupported() []string {
 	return types
 }
 
-func (p *ViperProvider) DefaultClientScope() []string {
+func (p *Provider) DefaultClientScope() []string {
 	return p.p.StringsF(
-		ViperKeyDefaultClientScope,
+		KeyDefaultClientScope,
 		[]string{"offline_access", "offline", "openid"},
 	)
 }
 
-func (p *ViperProvider) DSN() string {
-	dsn := p.p.String(ViperKeyDSN)
+func (p *Provider) DSN() string {
+	dsn := p.p.String(KeyDSN)
 
 	if dsn == DSNMemory {
 		return dbal.InMemoryDSN
@@ -240,74 +239,74 @@ func (p *ViperProvider) DSN() string {
 	return ""
 }
 
-func (p *ViperProvider) EncryptSessionData() bool {
-	return p.p.BoolF(ViperKeyEncryptSessionData, true)
+func (p *Provider) EncryptSessionData() bool {
+	return p.p.BoolF(KeyEncryptSessionData, true)
 }
 
-func (p *ViperProvider) DataSourcePlugin() string {
-	return p.p.String(ViperKeyDSN)
+func (p *Provider) DataSourcePlugin() string {
+	return p.p.String(KeyDSN)
 }
 
-func (p *ViperProvider) BCryptCost() int {
-	return p.p.IntF(ViperKeyBCryptCost, 10)
+func (p *Provider) BCryptCost() int {
+	return p.p.IntF(KeyBCryptCost, 10)
 }
 
-func (p *ViperProvider) AdminListenOn() string {
-	host := p.p.String(ViperKeyAdminListenOnHost)
-	port := p.p.IntF(ViperKeyAdminListenOnPort, 4445)
+func (p *Provider) AdminListenOn() string {
+	host := p.p.String(KeyAdminListenOnHost)
+	port := p.p.IntF(KeyAdminListenOnPort, 4445)
 	return p.getAddress(host, port)
 }
 
-func (p *ViperProvider) AdminDisableHealthAccessLog() bool {
-	return p.p.Bool(ViperKeyAdminDisableHealthAccessLog)
+func (p *Provider) AdminDisableHealthAccessLog() bool {
+	return p.p.Bool(KeyAdminDisableHealthAccessLog)
 }
 
-func (p *ViperProvider) PublicListenOn() string {
+func (p *Provider) PublicListenOn() string {
 	return p.getAddress(p.publicHost(), p.publicPort())
 }
 
-func (p *ViperProvider) PublicDisableHealthAccessLog() bool {
-	return p.p.Bool(ViperKeyPublicDisableHealthAccessLog)
+func (p *Provider) PublicDisableHealthAccessLog() bool {
+	return p.p.Bool(KeyPublicDisableHealthAccessLog)
 }
 
-func (p *ViperProvider) publicHost() string {
-	return p.p.String(ViperKeyPublicListenOnHost)
+func (p *Provider) publicHost() string {
+	return p.p.String(KeyPublicListenOnHost)
 }
 
-func (p *ViperProvider) publicPort() int {
-	return p.p.IntF(ViperKeyPublicListenOnPort, 4444)
+func (p *Provider) publicPort() int {
+	return p.p.IntF(KeyPublicListenOnPort, 4444)
 }
 
-func (p *ViperProvider) PublicSocketPermission() *UnixPermission {
+func (p *Provider) PublicSocketPermission() *UnixPermission {
 	return &UnixPermission{
-		Owner: p.p.String(ViperKeyPublicSocketOwner),
-		Group: p.p.String(ViperKeyPublicSocketGroup),
-		Mode:  os.FileMode(p.p.IntF(ViperKeyPublicSocketMode, 0755)),
+		Owner: p.p.String(KeyPublicSocketOwner),
+		Group: p.p.String(KeyPublicSocketGroup),
+		Mode:  os.FileMode(p.p.IntF(KeyPublicSocketMode, 0755)),
 	}
 }
 
-func (p *ViperProvider) adminHost() string {
-	return p.p.String(ViperKeyAdminListenOnHost)
+func (p *Provider) adminHost() string {
+	return p.p.String(KeyAdminListenOnHost)
 }
 
-func (p *ViperProvider) adminPort() int {
-	return p.p.IntF(ViperKeyAdminListenOnPort, 4445)
+func (p *Provider) adminPort() int {
+	return p.p.IntF(KeyAdminListenOnPort, 4445)
 }
 
-func (p *ViperProvider) AdminSocketPermission() *UnixPermission {
+func (p *Provider) AdminSocketPermission() *UnixPermission {
 	return &UnixPermission{
-		Owner: p.p.String(ViperKeyAdminSocketOwner),
-		Group: p.p.String(ViperKeyAdminSocketGroup),
-		Mode:  os.FileMode(p.p.IntF(ViperKeyAdminSocketMode, 0755)),
+		Owner: p.p.String(KeyAdminSocketOwner),
+		Group: p.p.String(KeyAdminSocketGroup),
+		Mode:  os.FileMode(p.p.IntF(KeyAdminSocketMode, 0755)),
 	}
 }
 
-func (p *ViperProvider) forcedHTTP() bool {
+func (p *Provider) forcedHTTP() bool {
 	return p.p.Bool("dangerous-force-http")
 }
 
-func (p *ViperProvider) CookieSameSiteMode() http.SameSite {
-	sameSiteModeStr := p.p.String(ViperKeyCookieSameSiteMode)
+func (p *Provider) CookieSameSiteMode() http.SameSite {
+	sameSiteModeStr := p.p.String(KeyCookieSameSiteMode)
 	switch strings.ToLower(sameSiteModeStr) {
 	case "lax":
 		return http.SameSiteLaxMode
@@ -326,40 +325,40 @@ func (p *ViperProvider) CookieSameSiteMode() http.SameSite {
 	}
 }
 
-func (p *ViperProvider) CookieSameSiteLegacyWorkaround() bool {
-	return p.p.Bool(ViperKeyCookieSameSiteLegacyWorkaround)
+func (p *Provider) CookieSameSiteLegacyWorkaround() bool {
+	return p.p.Bool(KeyCookieSameSiteLegacyWorkaround)
 }
 
-func (p *ViperProvider) ConsentRequestMaxAge() time.Duration {
-	return p.p.DurationF(ViperKeyConsentRequestMaxAge, time.Minute*30)
+func (p *Provider) ConsentRequestMaxAge() time.Duration {
+	return p.p.DurationF(KeyConsentRequestMaxAge, time.Minute*30)
 }
 
-func (p *ViperProvider) AccessTokenLifespan() time.Duration {
-	return p.p.DurationF(ViperKeyAccessTokenLifespan, time.Hour)
+func (p *Provider) AccessTokenLifespan() time.Duration {
+	return p.p.DurationF(KeyAccessTokenLifespan, time.Hour)
 }
 
-func (p *ViperProvider) RefreshTokenLifespan() time.Duration {
-	return p.p.DurationF(ViperKeyRefreshTokenLifespan, time.Hour*720)
+func (p *Provider) RefreshTokenLifespan() time.Duration {
+	return p.p.DurationF(KeyRefreshTokenLifespan, time.Hour*720)
 }
 
-func (p *ViperProvider) IDTokenLifespan() time.Duration {
-	return p.p.DurationF(ViperKeyIDTokenLifespan, time.Hour)
+func (p *Provider) IDTokenLifespan() time.Duration {
+	return p.p.DurationF(KeyIDTokenLifespan, time.Hour)
 }
 
-func (p *ViperProvider) AuthCodeLifespan() time.Duration {
-	return p.p.DurationF(ViperKeyAuthCodeLifespan, time.Minute*10)
+func (p *Provider) AuthCodeLifespan() time.Duration {
+	return p.p.DurationF(KeyAuthCodeLifespan, time.Minute*10)
 }
 
-func (p *ViperProvider) ScopeStrategy() string {
-	return p.p.String(ViperKeyScopeStrategy)
+func (p *Provider) ScopeStrategy() string {
+	return p.p.String(KeyScopeStrategy)
 }
 
-func (p *ViperProvider) Tracing() *tracing.Config {
+func (p *Provider) Tracing() *tracing.Config {
 	return p.p.TracingConfig("ORY Hydra")
 }
 
-func (p *ViperProvider) GetCookieSecrets() [][]byte {
-	secrets := p.p.Strings(ViperKeyGetCookieSecrets)
+func (p *Provider) GetCookieSecrets() [][]byte {
+	secrets := p.p.Strings(KeyGetCookieSecrets)
 	if len(secrets) == 0 {
 		return [][]byte{p.GetSystemSecret()}
 	}
@@ -371,8 +370,8 @@ func (p *ViperProvider) GetCookieSecrets() [][]byte {
 	return bs
 }
 
-func (p *ViperProvider) GetRotatedSystemSecrets() [][]byte {
-	secrets := p.p.Strings(ViperKeyGetSystemSecret)
+func (p *Provider) GetRotatedSystemSecrets() [][]byte {
+	secrets := p.p.Strings(KeyGetSystemSecret)
 
 	if len(secrets) < 2 {
 		return nil
@@ -386,8 +385,8 @@ func (p *ViperProvider) GetRotatedSystemSecrets() [][]byte {
 	return rotated
 }
 
-func (p *ViperProvider) GetSystemSecret() []byte {
-	secrets := p.p.Strings(ViperKeyGetSystemSecret)
+func (p *Provider) GetSystemSecret() []byte {
+	secrets := p.p.Strings(KeyGetSystemSecret)
 
 	if len(secrets) == 0 {
 		if p.generatedSecret != nil {
@@ -414,16 +413,16 @@ func (p *ViperProvider) GetSystemSecret() []byte {
 	return nil
 }
 
-func (p *ViperProvider) LogoutRedirectURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(ViperKeyLogoutRedirectURL, p.publicFallbackURL("oauth2/fallbacks/logout/callback")))
+func (p *Provider) LogoutRedirectURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyLogoutRedirectURL, p.publicFallbackURL("oauth2/fallbacks/logout/callback")))
 }
 
-func (p *ViperProvider) adminFallbackURL(path string) *url.URL {
+func (p *Provider) adminFallbackURL(path string) *url.URL {
 	return p.fallbackURL(path, p.adminHost(), p.adminPort())
 
 }
 
-func (p *ViperProvider) publicFallbackURL(path string) *url.URL {
+func (p *Provider) publicFallbackURL(path string) *url.URL {
 	if len(p.IssuerURL().String()) > 0 {
 		return urlx.AppendPaths(p.IssuerURL(), path)
 	}
@@ -431,7 +430,7 @@ func (p *ViperProvider) publicFallbackURL(path string) *url.URL {
 	return p.fallbackURL(path, p.publicHost(), p.publicPort())
 }
 
-func (p *ViperProvider) fallbackURL(path string, host string, port int) *url.URL {
+func (p *Provider) fallbackURL(path string, host string, port int) *url.URL {
 	var u url.URL
 	u.Scheme = "https"
 	if !p.ServesHTTPS() {
@@ -444,102 +443,102 @@ func (p *ViperProvider) fallbackURL(path string, host string, port int) *url.URL
 	return &u
 }
 
-func (p *ViperProvider) LoginURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(ViperKeyLoginURL, p.publicFallbackURL("oauth2/fallbacks/login")))
+func (p *Provider) LoginURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyLoginURL, p.publicFallbackURL("oauth2/fallbacks/login")))
 }
 
-func (p *ViperProvider) LogoutURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(ViperKeyLogoutURL, p.publicFallbackURL("oauth2/fallbacks/logout")))
+func (p *Provider) LogoutURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyLogoutURL, p.publicFallbackURL("oauth2/fallbacks/logout")))
 }
 
-func (p *ViperProvider) ConsentURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(ViperKeyConsentURL, p.publicFallbackURL("oauth2/fallbacks/consent")))
+func (p *Provider) ConsentURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyConsentURL, p.publicFallbackURL("oauth2/fallbacks/consent")))
 }
 
-func (p *ViperProvider) ErrorURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(ViperKeyErrorURL, p.publicFallbackURL("oauth2/fallbacks/error")))
+func (p *Provider) ErrorURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyErrorURL, p.publicFallbackURL("oauth2/fallbacks/error")))
 }
 
-func (p *ViperProvider) PublicURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(ViperKeyPublicURL, p.publicFallbackURL("/")))
+func (p *Provider) PublicURL() *url.URL {
+	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.publicFallbackURL("/")))
 }
 
-func (p *ViperProvider) IssuerURL() *url.URL {
-	issuerURL := p.p.RequestURIF(ViperKeyIssuerURL, p.fallbackURL("/", p.publicHost(), p.publicPort()))
+func (p *Provider) IssuerURL() *url.URL {
+	issuerURL := p.p.RequestURIF(KeyIssuerURL, p.fallbackURL("/", p.publicHost(), p.publicPort()))
 	issuerURL.Path = strings.TrimRight(issuerURL.Path, "/") + "/"
 	return urlRoot(issuerURL)
 }
 
-func (p *ViperProvider) OAuth2ClientRegistrationURL() *url.URL {
-	return p.p.RequestURIF(ViperKeyOAuth2ClientRegistrationURL, new(url.URL))
+func (p *Provider) OAuth2ClientRegistrationURL() *url.URL {
+	return p.p.RequestURIF(KeyOAuth2ClientRegistrationURL, new(url.URL))
 }
 
-func (p *ViperProvider) OAuth2TokenURL() *url.URL {
-	return p.p.RequestURIF(ViperKLeyOAuth2TokenURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/token"))
+func (p *Provider) OAuth2TokenURL() *url.URL {
+	return p.p.RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/token"))
 }
 
-func (p *ViperProvider) OAuth2AuthURL() *url.URL {
-	return p.p.RequestURIF(ViperKLeyOAuth2AuthURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/auth"))
+func (p *Provider) OAuth2AuthURL() *url.URL {
+	return p.p.RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/auth"))
 }
 
-func (p *ViperProvider) JWKSURL() *url.URL {
-	return p.p.RequestURIF(ViperKeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
+func (p *Provider) JWKSURL() *url.URL {
+	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
 }
 
-func (p *ViperProvider) AllowTLSTerminationFrom() []string {
-	return p.p.Strings(ViperKeyAllowTLSTerminationFrom)
+func (p *Provider) AllowTLSTerminationFrom() []string {
+	return p.p.Strings(KeyAllowTLSTerminationFrom)
 }
 
-func (p *ViperProvider) AccessTokenStrategy() string {
-	return strings.ToLower(p.p.StringF(ViperKeyAccessTokenStrategy, "opaque"))
+func (p *Provider) AccessTokenStrategy() string {
+	return strings.ToLower(p.p.StringF(KeyAccessTokenStrategy, "opaque"))
 }
 
-func (p *ViperProvider) SubjectIdentifierAlgorithmSalt() string {
-	return p.p.String(ViperKeySubjectIdentifierAlgorithmSalt)
+func (p *Provider) SubjectIdentifierAlgorithmSalt() string {
+	return p.p.String(KeySubjectIdentifierAlgorithmSalt)
 }
 
-func (p *ViperProvider) OIDCDiscoverySupportedClaims() []string {
+func (p *Provider) OIDCDiscoverySupportedClaims() []string {
 	return stringslice.Unique(
 		append(
 			[]string{"sub"},
-			p.p.Strings(ViperKeyOIDCDiscoverySupportedClaims)...,
+			p.p.Strings(KeyOIDCDiscoverySupportedClaims)...,
 		),
 	)
 }
 
-func (p *ViperProvider) OIDCDiscoverySupportedScope() []string {
+func (p *Provider) OIDCDiscoverySupportedScope() []string {
 	return stringslice.Unique(
 		append(
 			[]string{"offline_access", "offline", "openid"},
-			p.p.Strings(ViperKeyOIDCDiscoverySupportedScope)...,
+			p.p.Strings(KeyOIDCDiscoverySupportedScope)...,
 		),
 	)
 }
 
-func (p *ViperProvider) OIDCDiscoveryUserinfoEndpoint() *url.URL {
-	return p.p.RequestURIF(ViperKeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(p.PublicURL(), "/userinfo"))
+func (p *Provider) OIDCDiscoveryUserinfoEndpoint() *url.URL {
+	return p.p.RequestURIF(KeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(p.PublicURL(), "/userinfo"))
 }
 
-func (p *ViperProvider) ShareOAuth2Debug() bool {
-	return p.p.Bool(ViperKeyExposeOAuth2Debug)
+func (p *Provider) ShareOAuth2Debug() bool {
+	return p.p.Bool(KeyExposeOAuth2Debug)
 }
 
-func (p *ViperProvider) OAuth2LegacyErrors() bool {
-	return p.p.Bool(ViperKeyOAuth2LegacyErrors)
+func (p *Provider) OAuth2LegacyErrors() bool {
+	return p.p.Bool(KeyOAuth2LegacyErrors)
 }
 
-func (p *ViperProvider) PKCEEnforced() bool {
-	return p.p.Bool(ViperKeyPKCEEnforced)
+func (p *Provider) PKCEEnforced() bool {
+	return p.p.Bool(KeyPKCEEnforced)
 }
 
-func (p *ViperProvider) EnforcePKCEForPublicClients() bool {
-	return p.p.Bool(ViperKeyPKCEEnforcedForPublicClients)
+func (p *Provider) EnforcePKCEForPublicClients() bool {
+	return p.p.Bool(KeyPKCEEnforcedForPublicClients)
 }
 
-func (p *ViperProvider) CGroupsV1AutoMaxProcsEnabled() bool {
-	return p.p.Bool(ViperKeyCGroupsV1AutoMaxProcsEnabled)
+func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
+	return p.p.Bool(KeyCGroupsV1AutoMaxProcsEnabled)
 }
 
-func (p *ViperProvider) GrantAllClientCredentialsScopesPerDefault() bool {
-	return p.p.Bool(ViperKeyGrantAllClientCredentialsScopesPerDefault)
+func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
+	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
 }

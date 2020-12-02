@@ -55,14 +55,14 @@ func (p *UnixPermission) SetPermission(file string) error {
 	return nil
 }
 
-func MustValidate(l *logrusx.Logger, p *ViperProvider) {
+func MustValidate(l *logrusx.Logger, p *Provider) {
 	if p.ServesHTTPS() {
 		if p.IssuerURL().String() == "" {
-			l.Fatalf(`Configuration key "%s" must be set unless flag "--dangerous-force-http" is set. To find out more, use "hydra help serve".`, ViperKeyIssuerURL)
+			l.Fatalf(`Configuration key "%s" must be set unless flag "--dangerous-force-http" is set. To find out more, use "hydra help serve".`, KeyIssuerURL)
 		}
 
 		if p.IssuerURL().Scheme != "https" {
-			l.Fatalf(`Scheme from configuration key "%s" must be "https" unless --dangerous-force-http is passed but got scheme in value "%s" is "%s". To find out more, use "hydra help serve".`, ViperKeyIssuerURL, p.IssuerURL().String(), p.IssuerURL().Scheme)
+			l.Fatalf(`Scheme from configuration key "%s" must be "https" unless --dangerous-force-http is passed but got scheme in value "%s" is "%s". To find out more, use "hydra help serve".`, KeyIssuerURL, p.IssuerURL().String(), p.IssuerURL().Scheme)
 		}
 
 		if len(p.InsecureRedirects()) > 0 {

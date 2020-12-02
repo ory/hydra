@@ -41,7 +41,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 			return
 		}
-		d = driver.New(cmd.Flags(), driver.ForceConfigValue(config.ViperKeyDSN, args[0]), driver.DisableValidation(),
+		d = driver.New(cmd.Flags(), driver.ForceConfigValue(config.KeyDSN, args[0]), driver.DisableValidation(),
 			driver.DisablePreloading())
 	}
 

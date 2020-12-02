@@ -38,7 +38,7 @@ import (
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
-	C            *config.ViperProvider
+	C            *config.Provider
 	ch           *client.Handler
 	fh           fosite.Hasher
 	kh           *jwk.Handler
@@ -116,7 +116,7 @@ func (m *RegistryBase) BuildHash() string {
 	return m.buildHash
 }
 
-func (m *RegistryBase) WithConfig(c *config.ViperProvider) Registry {
+func (m *RegistryBase) WithConfig(c *config.Provider) Registry {
 	m.C = c
 	return m.r
 }
@@ -417,7 +417,7 @@ func (m *RegistryBase) Persister() persistence.Persister {
 	return m.persister
 }
 
-func (m *RegistryBase) Config() *config.ViperProvider {
+func (m *RegistryBase) Config() *config.Provider {
 	return m.C
 }
 

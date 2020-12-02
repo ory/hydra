@@ -120,7 +120,7 @@ func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ 
 		Description: r.URL.Query().Get("error_description"),
 		Hint:        r.URL.Query().Get("error_hint"),
 		Debug:       r.URL.Query().Get("error_debug"),
-		Key:         config.ViperKeyErrorURL,
+		Key:         config.KeyErrorURL,
 	}); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

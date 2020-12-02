@@ -26,7 +26,7 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-func newProvider() *ViperProvider {
+func newProvider() *Provider {
 	return MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
 }
 
@@ -56,7 +56,7 @@ func TestSubjectTypesSupported(t *testing.T) {
 		{
 			d: "Load legacy environment variable in legacy format",
 			env: setupEnv(map[string]string{
-				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)):            "public,pairwise",
+				strings.ToUpper(strings.Replace(KeySubjectTypesSupported, ".", "_", -1)):                 "public,pairwise",
 				strings.ToUpper(strings.Replace("oidc.subject_identifiers.pairwise.salt", ".", "_", -1)): "some-salt",
 			}),
 			e: []string{"public", "pairwise"},
@@ -64,9 +64,9 @@ func TestSubjectTypesSupported(t *testing.T) {
 		{
 			d: "Load legacy environment variable in legacy format",
 			env: setupEnv(map[string]string{
-				strings.ToUpper(strings.Replace(ViperKeySubjectTypesSupported, ".", "_", -1)):            "public,pairwise",
+				strings.ToUpper(strings.Replace(KeySubjectTypesSupported, ".", "_", -1)):                 "public,pairwise",
 				strings.ToUpper(strings.Replace("oidc.subject_identifiers.pairwise.salt", ".", "_", -1)): "some-salt",
-				strings.ToUpper(strings.Replace(ViperKeyAccessTokenStrategy, ".", "_", -1)):              "jwt",
+				strings.ToUpper(strings.Replace(KeyAccessTokenStrategy, ".", "_", -1)):                   "jwt",
 			}),
 			e: []string{"public"},
 		},
@@ -75,7 +75,7 @@ func TestSubjectTypesSupported(t *testing.T) {
 			setup, clean := tc.env(t)
 			setup()
 			p := newProvider()
-			p.Set(ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
+			p.Set(KeySubjectIdentifierAlgorithmSalt, "00000000")
 			assert.EqualValues(t, tc.e, p.SubjectTypesSupported())
 			clean()
 		})
@@ -106,7 +106,7 @@ func TestCORSOptions(t *testing.T) {
 	}, conf)
 }
 
-func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
+func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
@@ -115,13 +115,13 @@ func TestViperProvider_AdminDisableHealthAccessLog(t *testing.T) {
 	value := p.AdminDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	p.Set(ViperKeyAdminDisableHealthAccessLog, "true")
+	p.Set(KeyAdminDisableHealthAccessLog, "true")
 
 	value = p.AdminDisableHealthAccessLog()
 	assert.Equal(t, true, value)
 }
 
-func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
+func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
@@ -130,40 +130,40 @@ func TestViperProvider_PublicDisableHealthAccessLog(t *testing.T) {
 	value := p.PublicDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	p.Set(ViperKeyPublicDisableHealthAccessLog, "true")
+	p.Set(KeyPublicDisableHealthAccessLog, "true")
 
 	value = p.PublicDisableHealthAccessLog()
 	assert.Equal(t, true, value)
 }
 
-func TestViperProvider_IssuerURL(t *testing.T) {
+func TestProviderIssuerURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
-	p.Set(ViperKeyIssuerURL, "http://hydra.localhost")
+	p.Set(KeyIssuerURL, "http://hydra.localhost")
 	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
 
 	p2 := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
-	p2.Set(ViperKeyIssuerURL, "http://hydra.localhost/")
+	p2.Set(KeyIssuerURL, "http://hydra.localhost/")
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 }
 
-func TestViperProvider_CookieSameSiteMode(t *testing.T) {
+func TestProviderCookieSameSiteMode(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
 	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
 	p.Set("dangerous-force-http", false)
-	p.Set(ViperKeyCookieSameSiteMode, "")
+	p.Set(KeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
 
-	p.Set(ViperKeyCookieSameSiteMode, "none")
+	p.Set(KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
 
 	p = MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
 	p.Set("dangerous-force-http", true)
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
-	p.Set(ViperKeyCookieSameSiteMode, "none")
+	p.Set(KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
 }
 
@@ -175,7 +175,7 @@ func TestViperProviderValidates(t *testing.T) {
 	c := MustNew(flags, l)
 
 	// log
-	assert.Equal(t, "debug", c.Source().String(ViperKeyLogLevel))
+	assert.Equal(t, "debug", c.Source().String(KeyLogLevel))
 	assert.Equal(t, "json", c.Source().String("log.format"))
 
 	// serve

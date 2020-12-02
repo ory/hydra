@@ -39,7 +39,7 @@ import (
 )
 
 func Middleware(reg interface {
-	Config() *config.ViperProvider
+	Config() *config.Provider
 	x.RegistryLogger
 	oauth2.Registry
 	client.Registry

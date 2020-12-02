@@ -111,7 +111,7 @@ func acceptRequest(apiClient *hydra.OryHydra, consent *models.AcceptConsentReque
 func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) http.CookieJar {
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
-	secrets := reg.Config().Source().Strings(config.ViperKeyGetCookieSecrets)
+	secrets := reg.Config().Source().Strings(config.KeyGetCookieSecrets)
 	bs := make([][]byte, len(secrets))
 	for k, s := range secrets {
 		bs[k] = []byte(s)
@@ -223,9 +223,9 @@ func runLogout(t *testing.T, method string) {
 	logoutServer := httptest.NewServer(logoutRouter)
 	defer logoutServer.Close()
 
-	conf.Set(config.ViperKeyIssuerURL, logoutServer.URL)
-	conf.Set(config.ViperKeyLogoutURL, logoutProviderServer.URL)
-	conf.Set(config.ViperKeyLogoutRedirectURL, defaultRedirServer.URL)
+	conf.Set(config.KeyIssuerURL, logoutServer.URL)
+	conf.Set(config.KeyLogoutURL, logoutProviderServer.URL)
+	conf.Set(config.KeyLogoutRedirectURL, defaultRedirServer.URL)
 
 	defaultClient := &client.Client{OutfacingID: uuid.New(), PostLogoutRedirectURIs: []string{defaultRedirServer.URL + "/custom"}}
 	require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), defaultClient))
@@ -560,8 +560,8 @@ func TestStrategyLogoutPost(t *testing.T) {
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	reg.Config().Set(config.ViperKeyAccessTokenStrategy, "opaque")
-	reg.Config().Set(config.ViperKeyConsentRequestMaxAge, time.Hour)
+	reg.Config().Set(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().Set(config.KeyConsentRequestMaxAge, time.Hour)
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 	t.Logf("Public URL: %s", publicTS.URL)
 	t.Logf("Admin URL: %s", adminTS.URL)
@@ -1610,13 +1610,13 @@ func TestStrategyLoginConsent(t *testing.T) {
 
 	strategy := reg.ConsentStrategy()
 
-	conf.Set(config.ViperKeyLoginURL, lp.URL)
-	conf.Set(config.ViperKeyConsentURL, cp.URL)
-	conf.Set(config.ViperKeyIssuerURL, ap.URL)
-	conf.Set(config.ViperKeyConsentRequestMaxAge, time.Hour)
-	conf.Set(config.ViperKeyScopeStrategy, "exact")
-	conf.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
-	conf.Set(config.ViperKeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	conf.Set(config.KeyLoginURL, lp.URL)
+	conf.Set(config.KeyConsentURL, cp.URL)
+	conf.Set(config.KeyIssuerURL, ap.URL)
+	conf.Set(config.KeyConsentRequestMaxAge, time.Hour)
+	conf.Set(config.KeyScopeStrategy, "exact")
+	conf.Set(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	conf.Set(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 
 	apiClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(api.URL).Host})
 

@@ -71,10 +71,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.ViperProvider
+	c *config.Provider
 }
 
-func NewHandler(r InternalRegistry, c *config.ViperProvider) *Handler {
+func NewHandler(r InternalRegistry, c *config.Provider) *Handler {
 	return &Handler{r: r, c: c}
 }
 
@@ -87,14 +87,14 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.GET(LogoutPath, h.LogoutHandler)
 	public.POST(LogoutPath, h.LogoutHandler)
 
-	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.ViperKeyLoginURL))
-	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.ViperKeyConsentURL))
-	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, config.ViperKeyLogoutURL))
+	public.GET(DefaultLoginPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLoginURL))
+	public.GET(DefaultConsentPath, h.fallbackHandler("", "", http.StatusOK, config.KeyConsentURL))
+	public.GET(DefaultLogoutPath, h.fallbackHandler("", "", http.StatusOK, config.KeyLogoutURL))
 	public.GET(DefaultPostLogoutPath, h.fallbackHandler(
 		"You logged out successfully!",
 		"The Default Post Logout URL is not set which is why you are seeing this fallback page. Your log out request however succeeded.",
 		http.StatusOK,
-		config.ViperKeyLogoutRedirectURL,
+		config.KeyLogoutRedirectURL,
 	))
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 

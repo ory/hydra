@@ -19,29 +19,29 @@ import (
 	"github.com/ory/x/logrusx"
 )
 
-func resetConfig(p *config.ViperProvider) {
-	p.Set(config.ViperKeyBCryptCost, "4")
-	p.Set(config.ViperKeySubjectIdentifierAlgorithmSalt, "00000000")
-	p.Set(config.ViperKeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
-	p.Set(config.ViperKeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
-	p.Set(config.ViperKeyLogLevel, "trace")
+func resetConfig(p *config.Provider) {
+	p.Set(config.KeyBCryptCost, "4")
+	p.Set(config.KeySubjectIdentifierAlgorithmSalt, "00000000")
+	p.Set(config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
+	p.Set(config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
+	p.Set(config.KeyLogLevel, "trace")
 }
 
-func NewConfigurationWithDefaults() *config.ViperProvider {
+func NewConfigurationWithDefaults() *config.Provider {
 	p := config.MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
 	resetConfig(p)
 	p.Set("dangerous-force-http", true)
 	return p
 }
 
-func NewConfigurationWithDefaultsAndHTTPS() *config.ViperProvider {
+func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
 	p := config.MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
 	resetConfig(p)
 	p.Set("dangerous-force-http", false)
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.ViperProvider) driver.Registry {
+func NewRegistryMemory(t *testing.T, c *config.Provider) driver.Registry {
 	return newRegistryDefault(t, "memory", c)
 }
 
@@ -53,9 +53,9 @@ func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {
 	return newRegistryDefault(t, url, NewConfigurationWithDefaults())
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.ViperProvider) driver.Registry {
-	c.Set(config.ViperKeyLogLevel, "trace")
-	c.Set(config.ViperKeyDSN, url)
+func newRegistryDefault(t *testing.T, url string, c *config.Provider) driver.Registry {
+	c.Set(config.KeyLogLevel, "trace")
+	c.Set(config.KeyDSN, url)
 
 	r, err := driver.NewRegistryFromDSN(c, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)

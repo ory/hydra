@@ -45,10 +45,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.ViperProvider
+	c *config.Provider
 }
 
-func NewHandler(r InternalRegistry, c *config.ViperProvider) *Handler {
+func NewHandler(r InternalRegistry, c *config.Provider) *Handler {
 	return &Handler{r: r, c: c}
 }
 

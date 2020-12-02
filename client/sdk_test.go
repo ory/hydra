@@ -77,8 +77,8 @@ func createTestClient(prefix string) *models.OAuth2Client {
 
 func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.ViperKeySubjectTypesSupported, []string{"public"})
-	conf.Set(config.ViperKeyDefaultClientScope, []string{"foo", "bar"})
+	conf.Set(config.KeySubjectTypesSupported, []string{"public"})
+	conf.Set(config.KeyDefaultClientScope, []string{"foo", "bar"})
 	r := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterAdmin()

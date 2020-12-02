@@ -28,7 +28,7 @@ source ./circle-ci.env.bash
 case "$1" in
         memory)
             DSN=memory \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
@@ -36,14 +36,14 @@ case "$1" in
             DSN=memory \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=true
             ;;
 
         postgres)
             ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_POSTGRESQL \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
@@ -52,14 +52,14 @@ case "$1" in
             DSN=$TEST_DATABASE_POSTGRESQL \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=true
             ;;
 
         mysql)
             ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_MYSQL \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
@@ -68,14 +68,14 @@ case "$1" in
             DSN=$TEST_DATABASE_MYSQL \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=true
             ;;
 
         cockroach)
             ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
             DSN=$TEST_DATABASE_COCKROACHDB \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
@@ -84,7 +84,7 @@ case "$1" in
             DSN=$TEST_DATABASE_COCKROACHDB \
                 OAUTH2_ACCESS_TOKEN_STRATEGY=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --disable-telemetry > ./hydra.e2e.log 2>&1 &
+                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=true
             ;;
 

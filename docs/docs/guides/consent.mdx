@@ -37,12 +37,10 @@ to ORY Hydra's Admin Endpoint!
   ]}>
 <TabItem value="ui">
 
-
 ![OAuth2 Consent UI Screen](../images/consent-endpoint.png)
 
 </TabItem>
 <TabItem value="node">
-
 
 :::note
 
@@ -125,7 +123,6 @@ router.get('/get', csrfProtection, (req, res, next) => {
 </TabItem>
 <TabItem value="html">
 
-
 ```html
 <form action="/consent" method="POST">
   <input type="hidden" name="challenge" value="#{ challenge }" />
@@ -163,7 +160,6 @@ router.get('/get', csrfProtection, (req, res, next) => {
 </TabItem>
 </Tabs>
 
-
 ## Accepting the Consent Request
 
 <Tabs
@@ -172,7 +168,6 @@ router.get('/get', csrfProtection, (req, res, next) => {
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
-
 
 :::note
 
@@ -221,7 +216,6 @@ hydraAdmin
 </TabItem>
 </Tabs>
 
-
 ## Rejecting the Consent Request
 
 <Tabs
@@ -230,7 +224,6 @@ hydraAdmin
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
-
 
 :::note
 
@@ -257,7 +250,6 @@ hydraAdmin
 </TabItem>
 </Tabs>
 
-
 ## Complete Endpoint
 
 <Tabs
@@ -266,7 +258,6 @@ hydraAdmin
     {label: 'NodeJS', value: 'node'},
   ]}>
 <TabItem value="node">
-
 
 :::note
 
@@ -356,4 +347,3 @@ router.post('/consent', csrfProtection, (req, res, next) => {
 
 </TabItem>
 </Tabs>
-

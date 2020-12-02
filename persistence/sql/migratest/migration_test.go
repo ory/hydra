@@ -59,7 +59,12 @@ func TestMigrations(t *testing.T) {
 				url = "mysql://" + url
 			}
 
-			d := driver.New(pflag.NewFlagSet("", pflag.ContinueOnError), driver.ForceConfigValue(config.KeyDSN, url))
+			d := driver.New(
+				pflag.NewFlagSet("", pflag.ContinueOnError),
+				driver.ForceConfigValue(config.KeyDSN, url),
+				driver.DisablePreloading(),
+				driver.DisableValidation(),
+			)
 			var dbx *sqlx.DB
 			require.NoError(t,
 				dbal.Connect(url, logrusx.New("", ""), func() error {

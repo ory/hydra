@@ -29,8 +29,6 @@ import (
 	"github.com/ory/hydra/cmd/cli"
 )
 
-var cfgFile string
-
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "hydra",

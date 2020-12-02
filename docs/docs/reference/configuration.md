@@ -33,327 +33,14 @@ section.
 ## ORY Hydra Configuration
 #
 
-## log ##
-#
-# Configures the logger
-#
-log:
-  ## level ##
-  #
-  # Sets the log level.
-  #
-  # Default value: info
-  #
-  # One of:
-  # - panic
-  # - fatal
-  # - error
-  # - warn
-  # - info
-  # - debug
-  # - trace
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export LOG_LEVEL=<value>
-  # - Windows Command Line (CMD):
-  #    > set LOG_LEVEL=<value>
-  #
-  level: panic
-
-  ## leak_sensitive_values ##
-  #
-  # Logs sensitive values such as cookie and URL parameter.
-  #
-  # Default value: false
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export LOG_LEAK_SENSITIVE_VALUES=<value>
-  # - Windows Command Line (CMD):
-  #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
-  #
-  leak_sensitive_values: false
-
-  ## format ##
-  #
-  # Sets the log format.
-  #
-  # Default value: text
-  #
-  # One of:
-  # - json
-  # - json_pretty
-  # - text
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export LOG_FORMAT=<value>
-  # - Windows Command Line (CMD):
-  #    > set LOG_FORMAT=<value>
-  #
-  format: json
-
 ## serve ##
 #
 # Controls the configuration for the http(s) daemon(s).
 #
 serve:
-  ## public ##
-  #
-  # Controls the public daemon serving public API endpoints like /oauth2/auth, /oauth2/token, /.well-known/jwks.json
-  #
-  public:
-    ## port ##
-    #
-    # Default value: 4444
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export SERVE_PUBLIC_PORT=<value>
-    # - Windows Command Line (CMD):
-    #    > set SERVE_PUBLIC_PORT=<value>
-    #
-    port: 1
-
-    ## host ##
-    #
-    # The interface or unix socket ORY Hydra should listen and handle public API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
-    #
-    # Examples:
-    # - localhost
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export SERVE_PUBLIC_HOST=<value>
-    # - Windows Command Line (CMD):
-    #    > set SERVE_PUBLIC_HOST=<value>
-    #
-    host: localhost
-
-    ## cors ##
-    #
-    # Configures Cross Origin Resource Sharing for public endpoints.
-    #
-    cors:
-      ## enabled ##
-      #
-      # Sets whether CORS is enabled.
-      #
-      # Default value: false
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_ENABLED=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
-      #
-      enabled: false
-
-      ## allowed_origins ##
-      #
-      # A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.
-      #
-      # Default value: *
-      #
-      # Examples:
-      # - - https://example.com
-      #   - https://*.example.com
-      #   - https://*.foo.example.com
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
-      #
-      allowed_origins:
-        - https://example.com
-        - https://*.example.com
-        - https://*.foo.example.com
-
-      ## allowed_methods ##
-      #
-      # A list of HTTP methods the user agent is allowed to use with cross-domain requests.
-      #
-      # Default value: POST,GET,PUT,PATCH,DELETE
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
-      #
-      allowed_methods:
-        - POST
-
-      ## allowed_headers ##
-      #
-      # A list of non simple headers the client is allowed to use with cross-domain requests.
-      #
-      # Default value: Authorization,Content-Type
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
-      #
-      allowed_headers:
-        - ''
-
-      ## exposed_headers ##
-      #
-      # Sets which headers are safe to expose to the API of a CORS API specification.
-      #
-      # Default value: Content-Type
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
-      #
-      exposed_headers:
-        - ''
-
-      ## allow_credentials ##
-      #
-      # Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.
-      #
-      # Default value: true
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
-      #
-      allow_credentials: false
-
-      ## options_passthrough ##
-      #
-      # TODO
-      #
-      # Default value: false
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
-      #
-      options_passthrough: false
-
-      ## max_age ##
-      #
-      # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.
-      #
-      # Minimum value: 0
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_MAX_AGE=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
-      #
-      max_age: 0
-
-      ## debug ##
-      #
-      # Adds additional log output to debug server side CORS issues.
-      #
-      # Default value: false
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_CORS_DEBUG=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
-      #
-      debug: false
-
-    ## socket ##
-    #
-    # Sets the permissions of the unix socket
-    #
-    socket:
-      ## owner ##
-      #
-      # Owner of unix socket. If empty, the owner will be the user running hydra.
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_SOCKET_OWNER=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
-      #
-      owner: ''
-
-      ## group ##
-      #
-      # Group of unix socket. If empty, the group will be the primary group of the user running hydra.
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_SOCKET_GROUP=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
-      #
-      group: ''
-
-      ## mode ##
-      #
-      # Mode of unix socket in numeric form
-      #
-      # Default value: 493
-      #
-      # Minimum value: 0
-      #
-      # Maximum value: 511
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_SOCKET_MODE=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
-      #
-      mode: 0
-
-    ## access_log ##
-    #
-    # Access Log configuration for public server.
-    #
-    access_log:
-      ## disable_for_health ##
-      #
-      # Disable access log for health endpoints.
-      #
-      # Default value: false
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
-      #
-      disable_for_health: false
-
   ## admin ##
   #
   admin:
-    ## port ##
-    #
-    # Default value: 4445
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export SERVE_ADMIN_PORT=<value>
-    # - Windows Command Line (CMD):
-    #    > set SERVE_ADMIN_PORT=<value>
-    #
-    port: 1
-
     ## host ##
     #
     # The interface or unix socket ORY Hydra should listen and handle administrative API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
@@ -374,20 +61,6 @@ serve:
     # Configures Cross Origin Resource Sharing for public endpoints.
     #
     cors:
-      ## enabled ##
-      #
-      # Sets whether CORS is enabled.
-      #
-      # Default value: false
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_ADMIN_CORS_ENABLED=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_ADMIN_CORS_ENABLED=<value>
-      #
-      enabled: false
-
       ## allowed_origins ##
       #
       # A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.
@@ -511,23 +184,25 @@ serve:
       #
       debug: false
 
+      ## enabled ##
+      #
+      # Sets whether CORS is enabled.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_CORS_ENABLED=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_CORS_ENABLED=<value>
+      #
+      enabled: false
+
     ## socket ##
     #
     # Sets the permissions of the unix socket
     #
     socket:
-      ## owner ##
-      #
-      # Owner of unix socket. If empty, the owner will be the user running hydra.
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_ADMIN_SOCKET_OWNER=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
-      #
-      owner: ''
-
       ## group ##
       #
       # Group of unix socket. If empty, the group will be the primary group of the user running hydra.
@@ -558,6 +233,18 @@ serve:
       #
       mode: 0
 
+      ## owner ##
+      #
+      # Owner of unix socket. If empty, the owner will be the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_SOCKET_OWNER=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_SOCKET_OWNER=<value>
+      #
+      owner: ''
+
     ## access_log ##
     #
     # Access Log configuration for admin server.
@@ -577,26 +264,23 @@ serve:
       #
       disable_for_health: false
 
+    ## port ##
+    #
+    # Default value: 4445
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export SERVE_ADMIN_PORT=<value>
+    # - Windows Command Line (CMD):
+    #    > set SERVE_ADMIN_PORT=<value>
+    #
+    port: 1
+
   ## tls ##
   #
   # Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.
   #
   tls:
-    ## key ##
-    #
-    # Configures the private key (pem encoded).
-    #
-    key:
-      ## path ##
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export SERVE_TLS_KEY_PATH=<value>
-      # - Windows Command Line (CMD):
-      #    > set SERVE_TLS_KEY_PATH=<value>
-      #
-      path: /path/to/file.pem
-
     ## cert ##
     #
     # Configures the private key (pem encoded).
@@ -625,9 +309,41 @@ serve:
     allow_termination_from:
       - 127.0.0.1/32
 
+    ## key ##
+    #
+    # Configures the private key (pem encoded).
+    #
+    key:
+      ## path ##
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_TLS_KEY_PATH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_TLS_KEY_PATH=<value>
+      #
+      path: /path/to/file.pem
+
   ## cookies ##
   #
   cookies:
+    ## same_site_legacy_workaround ##
+    #
+    # Some older browser versions don’t work with SameSite=None. This option enables the workaround defined in https://web.dev/samesite-cookie-recipes/ which essentially stores a second cookie without SameSite as a fallback.
+    #
+    # Default value: false
+    #
+    # Examples:
+    # - true
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
+    # - Windows Command Line (CMD):
+    #    > set SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
+    #
+    same_site_legacy_workaround: true
+
     ## same_site_mode ##
     #
     # Specify the SameSite mode that cookies should be sent with.
@@ -647,22 +363,245 @@ serve:
     #
     same_site_mode: Strict
 
-    ## same_site_legacy_workaround ##
+  ## public ##
+  #
+  # Controls the public daemon serving public API endpoints like /oauth2/auth, /oauth2/token, /.well-known/jwks.json
+  #
+  public:
+    ## host ##
     #
-    # Some older browser versions don’t work with SameSite=None. This option enables the workaround defined in https://web.dev/samesite-cookie-recipes/ which essentially stores a second cookie without SameSite as a fallback.
-    #
-    # Default value: false
+    # The interface or unix socket ORY Hydra should listen and handle public API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     #
     # Examples:
-    # - true
+    # - localhost
     #
     # Set this value using environment variables on
     # - Linux/macOS:
-    #    $ export SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
+    #    $ export SERVE_PUBLIC_HOST=<value>
     # - Windows Command Line (CMD):
-    #    > set SERVE_COOKIES_SAME_SITE_LEGACY_WORKAROUND=<value>
+    #    > set SERVE_PUBLIC_HOST=<value>
     #
-    same_site_legacy_workaround: true
+    host: localhost
+
+    ## cors ##
+    #
+    # Configures Cross Origin Resource Sharing for public endpoints.
+    #
+    cors:
+      ## allowed_origins ##
+      #
+      # A list of origins a cross-domain request can be executed from. If the special * value is present in the list, all origins will be allowed. An origin may contain a wildcard (*) to replace 0 or more characters (i.e.: http://*.domain.com). Only one wildcard can be used per origin.
+      #
+      # Default value: *
+      #
+      # Examples:
+      # - - https://example.com
+      #   - https://*.example.com
+      #   - https://*.foo.example.com
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_ALLOWED_ORIGINS=<value>
+      #
+      allowed_origins:
+        - https://example.com
+        - https://*.example.com
+        - https://*.foo.example.com
+
+      ## allowed_methods ##
+      #
+      # A list of HTTP methods the user agent is allowed to use with cross-domain requests.
+      #
+      # Default value: POST,GET,PUT,PATCH,DELETE
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_ALLOWED_METHODS=<value>
+      #
+      allowed_methods:
+        - POST
+
+      ## allowed_headers ##
+      #
+      # A list of non simple headers the client is allowed to use with cross-domain requests.
+      #
+      # Default value: Authorization,Content-Type
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_ALLOWED_HEADERS=<value>
+      #
+      allowed_headers:
+        - ''
+
+      ## exposed_headers ##
+      #
+      # Sets which headers are safe to expose to the API of a CORS API specification.
+      #
+      # Default value: Content-Type
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_EXPOSED_HEADERS=<value>
+      #
+      exposed_headers:
+        - ''
+
+      ## allow_credentials ##
+      #
+      # Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.
+      #
+      # Default value: true
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_ALLOW_CREDENTIALS=<value>
+      #
+      allow_credentials: false
+
+      ## options_passthrough ##
+      #
+      # TODO
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_OPTIONS_PASSTHROUGH=<value>
+      #
+      options_passthrough: false
+
+      ## max_age ##
+      #
+      # Sets how long (in seconds) the results of a preflight request can be cached. If set to 0, every request is preceded by a preflight request.
+      #
+      # Minimum value: 0
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_MAX_AGE=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_MAX_AGE=<value>
+      #
+      max_age: 0
+
+      ## debug ##
+      #
+      # Adds additional log output to debug server side CORS issues.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_DEBUG=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_DEBUG=<value>
+      #
+      debug: false
+
+      ## enabled ##
+      #
+      # Sets whether CORS is enabled.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_CORS_ENABLED=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_CORS_ENABLED=<value>
+      #
+      enabled: false
+
+    ## socket ##
+    #
+    # Sets the permissions of the unix socket
+    #
+    socket:
+      ## group ##
+      #
+      # Group of unix socket. If empty, the group will be the primary group of the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_SOCKET_GROUP=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_SOCKET_GROUP=<value>
+      #
+      group: ''
+
+      ## mode ##
+      #
+      # Mode of unix socket in numeric form
+      #
+      # Default value: 493
+      #
+      # Minimum value: 0
+      #
+      # Maximum value: 511
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_SOCKET_MODE=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_SOCKET_MODE=<value>
+      #
+      mode: 0
+
+      ## owner ##
+      #
+      # Owner of unix socket. If empty, the owner will be the user running hydra.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_SOCKET_OWNER=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_SOCKET_OWNER=<value>
+      #
+      owner: ''
+
+    ## access_log ##
+    #
+    # Access Log configuration for public server.
+    #
+    access_log:
+      ## disable_for_health ##
+      #
+      # Disable access log for health endpoints.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
+      #
+      disable_for_health: false
+
+    ## port ##
+    #
+    # Default value: 4444
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export SERVE_PUBLIC_PORT=<value>
+    # - Windows Command Line (CMD):
+    #    > set SERVE_PUBLIC_PORT=<value>
+    #
+    port: 1
 
 ## dsn ##
 #
@@ -681,48 +620,11 @@ dsn: ''
 # Configures ./well-known/ settings.
 #
 webfinger:
-  ## jwks ##
-  #
-  # Configures the /.well-known/jwks.json endpoint.
-  #
-  jwks:
-    ## broadcast_keys ##
-    #
-    # A list of JSON Web Keys that should be exposed at that endpoint. This is usually the public key for verifying OpenID Connect ID Tokens. However, you might want to add additional keys here as well.
-    #
-    # Default value: hydra.openid.id-token
-    #
-    # Examples:
-    # - hydra.jwt.access-token
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export WEBFINGER_JWKS_BROADCAST_KEYS=<value>
-    # - Windows Command Line (CMD):
-    #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
-    #
-    broadcast_keys: hydra.jwt.access-token
-
   ## oidc_discovery ##
   #
   # Configures OpenID Connect Discovery (/.well-known/openid-configuration).
   #
   oidc_discovery:
-    ## jwks_url ##
-    #
-    # Overwrites the JWKS URL
-    #
-    # Examples:
-    # - https://my-service.com/.well-known/jwks.json
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
-    # - Windows Command Line (CMD):
-    #    > set WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
-    #
-    jwks_url: https://my-service.com/.well-known/jwks.json
-
     ## token_url ##
     #
     # Overwrites the OAuth2 Token URL
@@ -821,11 +723,73 @@ webfinger:
     #
     userinfo_url: https://example.org/my-custom-userinfo-endpoint
 
+    ## jwks_url ##
+    #
+    # Overwrites the JWKS URL
+    #
+    # Examples:
+    # - https://my-service.com/.well-known/jwks.json
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
+    # - Windows Command Line (CMD):
+    #    > set WEBFINGER_OIDC_DISCOVERY_JWKS_URL=<value>
+    #
+    jwks_url: https://my-service.com/.well-known/jwks.json
+
+  ## jwks ##
+  #
+  # Configures the /.well-known/jwks.json endpoint.
+  #
+  jwks:
+    ## broadcast_keys ##
+    #
+    # A list of JSON Web Keys that should be exposed at that endpoint. This is usually the public key for verifying OpenID Connect ID Tokens. However, you might want to add additional keys here as well.
+    #
+    # Default value: hydra.openid.id-token
+    #
+    # Examples:
+    # - hydra.jwt.access-token
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export WEBFINGER_JWKS_BROADCAST_KEYS=<value>
+    # - Windows Command Line (CMD):
+    #    > set WEBFINGER_JWKS_BROADCAST_KEYS=<value>
+    #
+    broadcast_keys: hydra.jwt.access-token
+
 ## oidc ##
 #
 # Configures OpenID Connect features.
 #
 oidc:
+  ## dynamic_client_registration ##
+  #
+  # Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).
+  #
+  dynamic_client_registration:
+    ## default_scope ##
+    #
+    # The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the "scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
+    #
+    # Examples:
+    # - - openid
+    #   - offline
+    #   - offline_access
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=<value>
+    # - Windows Command Line (CMD):
+    #    > set OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=<value>
+    #
+    default_scope:
+      - openid
+      - offline
+      - offline_access
+
   ## subject_identifiers ##
   #
   # Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
@@ -839,8 +803,6 @@ oidc:
   #
   subject_identifiers:
     ## enabled ##
-    #
-    # A list of algorithms to enable.
     #
     # Set this value using environment variables on
     # - Linux/macOS:
@@ -867,67 +829,9 @@ oidc:
       #
       salt: some-random-salt
 
-  ## dynamic_client_registration ##
-  #
-  # Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).
-  #
-  dynamic_client_registration:
-    ## default_scope ##
-    #
-    # The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the "scope" key in the registration payload, effectively disabling the concept of whitelisted scopes.
-    #
-    # Examples:
-    # - - openid
-    #   - offline
-    #   - offline_access
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=<value>
-    # - Windows Command Line (CMD):
-    #    > set OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=<value>
-    #
-    default_scope:
-      - openid
-      - offline
-      - offline_access
-
 ## urls ##
 #
 urls:
-  ## self ##
-  #
-  self:
-    ## issuer ##
-    #
-    # This value will be used as the "issuer" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal to the public value.
-    #
-    # Examples:
-    # - https://localhost:4444/
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export URLS_SELF_ISSUER=<value>
-    # - Windows Command Line (CMD):
-    #    > set URLS_SELF_ISSUER=<value>
-    #
-    issuer: https://localhost:4444/
-
-    ## public ##
-    #
-    # This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.
-    #
-    # Examples:
-    # - https://localhost:4444/
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export URLS_SELF_PUBLIC=<value>
-    # - Windows Command Line (CMD):
-    #    > set URLS_SELF_PUBLIC=<value>
-    #
-    public: https://localhost:4444/
-
   ## login ##
   #
   # Sets the login endpoint of the User Login & Consent flow. Defaults to an internal fallback URL showing an error.
@@ -1003,9 +907,60 @@ urls:
   #
   post_logout_redirect: https://my-example.app/logout-successful
 
+  ## self ##
+  #
+  self:
+    ## public ##
+    #
+    # This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.
+    #
+    # Examples:
+    # - https://localhost:4444/
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export URLS_SELF_PUBLIC=<value>
+    # - Windows Command Line (CMD):
+    #    > set URLS_SELF_PUBLIC=<value>
+    #
+    public: https://localhost:4444/
+
+    ## issuer ##
+    #
+    # This value will be used as the "issuer" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal to the public value.
+    #
+    # Examples:
+    # - https://localhost:4444/
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export URLS_SELF_ISSUER=<value>
+    # - Windows Command Line (CMD):
+    #    > set URLS_SELF_ISSUER=<value>
+    #
+    issuer: https://localhost:4444/
+
 ## strategies ##
 #
 strategies:
+  ## access_token ##
+  #
+  # Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens
+  #
+  # Default value: opaque
+  #
+  # One of:
+  # - opaque
+  # - jwt
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export STRATEGIES_ACCESS_TOKEN=<value>
+  # - Windows Command Line (CMD):
+  #    > set STRATEGIES_ACCESS_TOKEN=<value>
+  #
+  access_token: opaque
+
   ## scope ##
   #
   # Defines how scopes are matched. For more details have a look at https://github.com/ory/fosite#scopes
@@ -1025,41 +980,11 @@ strategies:
   #
   scope: exact
 
-  ## access_token ##
-  #
-  # Defines access token type. jwt is a bad idea, see https://www.ory.sh/docs/hydra/advanced#json-web-tokens
-  #
-  # One of:
-  # - opaque
-  # - jwt
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export STRATEGIES_ACCESS_TOKEN=<value>
-  # - Windows Command Line (CMD):
-  #    > set STRATEGIES_ACCESS_TOKEN=<value>
-  #
-  access_token: opaque
-
 ## ttl ##
 #
 # Configures time to live.
 #
 ttl:
-  ## login_consent_request ##
-  #
-  # Configures how long a user login and consent flow may take.
-  #
-  # Default value: 1h
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export TTL_LOGIN_CONSENT_REQUEST=<value>
-  # - Windows Command Line (CMD):
-  #    > set TTL_LOGIN_CONSENT_REQUEST=<value>
-  #
-  login_consent_request: 1h
-
   ## access_token ##
   #
   # Configures how long access tokens are valid.
@@ -1116,26 +1041,23 @@ ttl:
   #
   auth_code: 1h
 
-## oauth2 ##
-#
-oauth2:
-  ## expose_internal_errors ##
+  ## login_consent_request ##
   #
-  # Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.
+  # Configures how long a user login and consent flow may take.
   #
-  # Default value: false
-  #
-  # Examples:
-  # - true
+  # Default value: 1h
   #
   # Set this value using environment variables on
   # - Linux/macOS:
-  #    $ export OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
+  #    $ export TTL_LOGIN_CONSENT_REQUEST=<value>
   # - Windows Command Line (CMD):
-  #    > set OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
+  #    > set TTL_LOGIN_CONSENT_REQUEST=<value>
   #
-  expose_internal_errors: true
+  login_consent_request: 1h
 
+## oauth2 ##
+#
+oauth2:
   ## session ##
   #
   session:
@@ -1201,21 +1123,6 @@ oauth2:
   ## pkce ##
   #
   pkce:
-    ## enforced ##
-    #
-    # Sets whether PKCE should be enforced for all clients.
-    #
-    # Examples:
-    # - true
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export OAUTH2_PKCE_ENFORCED=<value>
-    # - Windows Command Line (CMD):
-    #    > set OAUTH2_PKCE_ENFORCED=<value>
-    #
-    enforced: true
-
     ## enforced_for_public_clients ##
     #
     # Sets whether PKCE should be enforced for public clients.
@@ -1230,6 +1137,21 @@ oauth2:
     #    > set OAUTH2_PKCE_ENFORCED_FOR_PUBLIC_CLIENTS=<value>
     #
     enforced_for_public_clients: true
+
+    ## enforced ##
+    #
+    # Sets whether PKCE should be enforced for all clients.
+    #
+    # Examples:
+    # - true
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OAUTH2_PKCE_ENFORCED=<value>
+    # - Windows Command Line (CMD):
+    #    > set OAUTH2_PKCE_ENFORCED=<value>
+    #
+    enforced: true
 
   ## client_credentials ##
   #
@@ -1249,31 +1171,28 @@ oauth2:
     #
     default_grant_allowed_scope: false
 
+  ## expose_internal_errors ##
+  #
+  # Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.
+  #
+  # Default value: false
+  #
+  # Examples:
+  # - true
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_EXPOSE_INTERNAL_ERRORS=<value>
+  #
+  expose_internal_errors: true
+
 ## secrets ##
 #
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys
 #
 secrets:
-  ## system ##
-  #
-  # The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.
-  #
-  # Examples:
-  # - - this-is-the-primary-secret
-  #   - this-is-an-old-secret
-  #   - this-is-another-old-secret
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export SECRETS_SYSTEM=<value>
-  # - Windows Command Line (CMD):
-  #    > set SECRETS_SYSTEM=<value>
-  #
-  system:
-    - this-is-the-primary-secret
-    - this-is-an-old-secret
-    - this-is-another-old-secret
-
   ## cookie ##
   #
   # A secret that is used to encrypt cookie sessions. Defaults to secrets.system. It is recommended to use a separate secret in production. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.
@@ -1290,6 +1209,26 @@ secrets:
   #    > set SECRETS_COOKIE=<value>
   #
   cookie:
+    - this-is-the-primary-secret
+    - this-is-an-old-secret
+    - this-is-another-old-secret
+
+  ## system ##
+  #
+  # The system secret must be at least 16 characters long. If none is provided, one will be generated. They key is used to encrypt sensitive data using AES-GCM (256 bit) and validate HMAC signatures. The first item in the list is used for signing and encryption. The whole list is used for verifying signatures and decryption.
+  #
+  # Examples:
+  # - - this-is-the-primary-secret
+  #   - this-is-an-old-secret
+  #   - this-is-another-old-secret
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export SECRETS_SYSTEM=<value>
+  # - Windows Command Line (CMD):
+  #    > set SECRETS_SYSTEM=<value>
+  #
+  system:
     - this-is-the-primary-secret
     - this-is-an-old-secret
     - this-is-another-old-secret
@@ -1318,27 +1257,6 @@ profiling: cpu
 # ORY Hydra supports distributed tracing.
 #
 tracing:
-  ## provider ##
-  #
-  # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
-  #
-  # One of:
-  # - jaeger
-  # - zipkin
-  # - datadog
-  # - elastic-apm
-  #
-  # Examples:
-  # - jaeger
-  #
-  # Set this value using environment variables on
-  # - Linux/macOS:
-  #    $ export TRACING_PROVIDER=<value>
-  # - Windows Command Line (CMD):
-  #    > set TRACING_PROVIDER=<value>
-  #
-  provider: jaeger
-
   ## service_name ##
   #
   # Specifies the service name to use on the tracer.
@@ -1357,26 +1275,31 @@ tracing:
   ## providers ##
   #
   providers:
+    ## zipkin ##
+    #
+    # Configures the zipkin tracing backend.
+    #
+    # Examples:
+    # - server_url: http://localhost:9411/api/v2/spans
+    #
+    zipkin:
+      ## server_url ##
+      #
+      # The address of Zipkin server where spans should be sent to.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
+      # - Windows Command Line (CMD):
+      #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
+      #
+      server_url: http://localhost:9411/api/v2/spans
+
     ## jaeger ##
     #
     # Configures the jaeger tracing backend.
     #
     jaeger:
-      ## local_agent_address ##
-      #
-      # The address of the jaeger-agent where spans should be sent to.
-      #
-      # Examples:
-      # - 127.0.0.1:6831
-      #
-      # Set this value using environment variables on
-      # - Linux/macOS:
-      #    $ export TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
-      # - Windows Command Line (CMD):
-      #    > set TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
-      #
-      local_agent_address: 127.0.0.1:6831
-
       ## propagation ##
       #
       # The tracing header format
@@ -1430,25 +1353,41 @@ tracing:
         #
         server_url: http://localhost:5778/sampling
 
-    ## zipkin ##
-    #
-    # Configures the zipkin tracing backend.
-    #
-    # Examples:
-    # - server_url: http://localhost:9411/api/v2/spans
-    #
-    zipkin:
-      ## server_url ##
+      ## local_agent_address ##
       #
-      # The address of Zipkin server where spans should be sent to.
+      # The address of the jaeger-agent where spans should be sent to.
+      #
+      # Examples:
+      # - 127.0.0.1:6831
       #
       # Set this value using environment variables on
       # - Linux/macOS:
-      #    $ export TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
+      #    $ export TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
       # - Windows Command Line (CMD):
-      #    > set TRACING_PROVIDERS_ZIPKIN_SERVER_URL=<value>
+      #    > set TRACING_PROVIDERS_JAEGER_LOCAL_AGENT_ADDRESS=<value>
       #
-      server_url: http://localhost:9411/api/v2/spans
+      local_agent_address: 127.0.0.1:6831
+
+  ## provider ##
+  #
+  # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
+  #
+  # One of:
+  # - jaeger
+  # - zipkin
+  # - datadog
+  # - elastic-apm
+  #
+  # Examples:
+  # - jaeger
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export TRACING_PROVIDER=<value>
+  # - Windows Command Line (CMD):
+  #    > set TRACING_PROVIDER=<value>
+  #
+  provider: jaeger
 
 ## The Hydra version this config is written for. ##
 #
@@ -1488,4 +1427,65 @@ cgroups:
     #    > set CGROUPS_V1_AUTO_MAX_PROCS_ENABLED=<value>
     #
     auto_max_procs_enabled: true
+
+## log ##
+#
+# Configures the logger
+#
+log:
+  ## leak_sensitive_values ##
+  #
+  # Logs sensitive values such as cookie and URL parameter.
+  #
+  # Default value: false
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export LOG_LEAK_SENSITIVE_VALUES=<value>
+  # - Windows Command Line (CMD):
+  #    > set LOG_LEAK_SENSITIVE_VALUES=<value>
+  #
+  leak_sensitive_values: false
+
+  ## format ##
+  #
+  # Sets the log format.
+  #
+  # Default value: text
+  #
+  # One of:
+  # - json
+  # - json_pretty
+  # - text
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export LOG_FORMAT=<value>
+  # - Windows Command Line (CMD):
+  #    > set LOG_FORMAT=<value>
+  #
+  format: json
+
+  ## level ##
+  #
+  # Sets the log level.
+  #
+  # Default value: info
+  #
+  # One of:
+  # - panic
+  # - fatal
+  # - error
+  # - warn
+  # - info
+  # - debug
+  # - trace
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export LOG_LEVEL=<value>
+  # - Windows Command Line (CMD):
+  #    > set LOG_LEVEL=<value>
+  #
+  level: panic
 ```

@@ -37,8 +37,7 @@ ORY Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 
-> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/configuration.md
-> > <<
+> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md <<
 
 ```
 hydra serve all [flags]
@@ -53,10 +52,9 @@ hydra serve all [flags]
 ### Options inherited from parent commands
 
 ```
-  -c, --config string                                    Config file (default is $HOME/hydra.yaml)
+  -c, --config strings                                   Path to one or more .json, .yaml, .yml, .toml config files. Values are loaded in the order provided, meaning that the last config file overwrites values from the previous config file.
       --dangerous-allow-insecure-redirect-urls strings   DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs
       --dangerous-force-http                             DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead
-      --disable-telemetry                                Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa
       --sqa-opt-out                                      Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa
 ```
 

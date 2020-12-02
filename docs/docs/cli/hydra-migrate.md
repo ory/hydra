@@ -21,8 +21,8 @@ Various migration helpers
 ### Options
 
 ```
-  -c, --config string   Config file (default is $HOME/hydra.yaml)
-  -h, --help            help for migrate
+  -c, --config strings   Path to one or more .json, .yaml, .yml, .toml config files. Values are loaded in the order provided, meaning that the last config file overwrites values from the previous config file.
+  -h, --help             help for migrate
 ```
 
 ### SEE ALSO

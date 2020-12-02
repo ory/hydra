@@ -38,7 +38,7 @@ type (
 		conn   *pop.Connection
 		mb     pop.MigrationBox
 		r      Dependencies
-		config *config.ViperProvider
+		config *config.Provider
 		l      *logrusx.Logger
 	}
 	Dependencies interface {
@@ -85,7 +85,7 @@ func (p *Persister) Rollback(ctx context.Context) error {
 	return c.TX.Rollback()
 }
 
-func NewPersister(c *pop.Connection, r Dependencies, config *config.ViperProvider, l *logrusx.Logger) (*Persister, error) {
+func NewPersister(c *pop.Connection, r Dependencies, config *config.Provider, l *logrusx.Logger) (*Persister, error) {
 	mb, err := pop.NewMigrationBox(migrations, c)
 	if err != nil {
 		return nil, errorsx.WithStack(err)

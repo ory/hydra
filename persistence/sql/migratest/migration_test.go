@@ -59,7 +59,7 @@ func TestMigrations(t *testing.T) {
 				url = "mysql://" + url
 			}
 
-			d := driver.New(pflag.NewFlagSet("", pflag.ContinueOnError), driver.ForceConfigValue(config.ViperKeyDSN, url))
+			d := driver.New(pflag.NewFlagSet("", pflag.ContinueOnError), driver.ForceConfigValue(config.KeyDSN, url))
 			var dbx *sqlx.DB
 			require.NoError(t,
 				dbal.Connect(url, logrusx.New("", ""), func() error {

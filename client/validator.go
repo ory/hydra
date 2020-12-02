@@ -53,17 +53,17 @@ var (
 
 type Validator struct {
 	c    *http.Client
-	conf *config.ViperProvider
+	conf *config.Provider
 }
 
-func NewValidator(conf *config.ViperProvider) *Validator {
+func NewValidator(conf *config.Provider) *Validator {
 	return &Validator{
 		c:    http.DefaultClient,
 		conf: conf,
 	}
 }
 
-func NewValidatorWithClient(conf *config.ViperProvider, client *http.Client) *Validator {
+func NewValidatorWithClient(conf *config.Provider, client *http.Client) *Validator {
 	return &Validator{
 		c:    client,
 		conf: conf,

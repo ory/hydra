@@ -32,10 +32,10 @@ import (
 )
 
 type AEAD struct {
-	c *config.ViperProvider
+	c *config.Provider
 }
 
-func NewAEAD(c *config.ViperProvider) *AEAD {
+func NewAEAD(c *config.Provider) *AEAD {
 	return &AEAD{c: c}
 }
 

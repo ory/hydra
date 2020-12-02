@@ -66,13 +66,13 @@ const (
 )
 
 type DefaultStrategy struct {
-	c *config.ViperProvider
+	c *config.Provider
 	r InternalRegistry
 }
 
 func NewStrategy(
 	r InternalRegistry,
-	c *config.ViperProvider,
+	c *config.Provider,
 ) *DefaultStrategy {
 	return &DefaultStrategy{
 		c: c,

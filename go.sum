@@ -604,8 +604,8 @@ github.com/golangci/misspell v0.0.0-20180809174111-950f5d19e770/go.mod h1:dEbvlS
 github.com/golangci/prealloc v0.0.0-20180630174525-215b22d4de21/go.mod h1:tf5+bzsHdTM0bsB7+8mt0GUMvjCgwLpTapNZHU8AajI=
 github.com/golangci/revgrep v0.0.0-20180526074752-d9c87f5ffaf0/go.mod h1:qOQCunEYvmd/TLamH+7LlVccLvUH5kZNhbCgTHoBbp4=
 github.com/golangci/unconvert v0.0.0-20180507085042-28b1c447d1f4/go.mod h1:Izgrg8RkN3rCIMLGE9CyYmU9pY2Jer6DgANEnZ/L/cQ=
-github.com/gomarkdown/markdown v0.0.0-20200609195525-3f9352745725 h1:X6sZdr+t2E2jwajTy/FfXbmAKPFTYxEq9hiFgzMiuPQ=
-github.com/gomarkdown/markdown v0.0.0-20200609195525-3f9352745725/go.mod h1:aii0r/K0ZnHv7G0KF7xy1v0A7s2Ljrb5byB7MO5p6TU=
+github.com/gomarkdown/markdown v0.0.0-20201113031856-722100d81a8e h1:/Y3B7hM9H3TOWPhe8eWGBGS4r09pjvS5Z0uoPADyjmU=
+github.com/gomarkdown/markdown v0.0.0-20201113031856-722100d81a8e/go.mod h1:aii0r/K0ZnHv7G0KF7xy1v0A7s2Ljrb5byB7MO5p6TU=
 github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
 github.com/google/btree v1.0.0 h1:0udJVsspx3VBr5FwtLhQQtuAsVc79tTq0ocGIPAU6qo=
 github.com/google/btree v1.0.0/go.mod h1:lNA+9X1NB3Zf8V7Ke586lFgjr2dZNuvo3lPJSGZ5JPQ=
@@ -996,8 +996,8 @@ github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/ory/analytics-go/v4 v4.0.0/go.mod h1:FMx9cLRD9xN+XevPvZ5FDMfignpmcqPP6FUKnJ9/MmE=
 github.com/ory/analytics-go/v4 v4.0.1 h1:kKB2Mk8W0N23ZQCBHZ4wB6NQB6RxlxqzZB9LmSQ3Mho=
 github.com/ory/analytics-go/v4 v4.0.1/go.mod h1:FMx9cLRD9xN+XevPvZ5FDMfignpmcqPP6FUKnJ9/MmE=
-github.com/ory/cli v0.0.34 h1:i2hj2ic0PYSfl0eiWKWADlYnECPDAXB+0CsAyVthLns=
-github.com/ory/cli v0.0.34/go.mod h1:P+V95MEaUYbKTaEMd30vhmdu1GhNcJ/wsgHC8d9xGPU=
+github.com/ory/cli v0.0.35 h1:aAmkVq1lOlfdB/LKexFelIkajVe3RwC/IHEyFUAxbPw=
+github.com/ory/cli v0.0.35/go.mod h1:8iyLto6q8TiVgxbm4/D64Mt+Tavk1k18g786ZDM298Q=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
 github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/ory/dockertest/v3 v3.5.4 h1:rYijlJuraj8D4OgC1DpYpCV8SGXrkviT3RVrjFy7OFc=

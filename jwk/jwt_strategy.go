@@ -45,7 +45,7 @@ type RS256JWTStrategy struct {
 
 	RS256JWTStrategy *jwt.RS256JWTStrategy
 	r                InternalRegistry
-	c                *config.ViperProvider
+	c                *config.Provider
 	rs               func() string
 
 	publicKey    *rsa.PublicKey

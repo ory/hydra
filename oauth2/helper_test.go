@@ -8,7 +8,7 @@ import (
 	"github.com/ory/hydra/driver/config"
 )
 
-func Tokens(c *config.ViperProvider, length int) (res [][]string) {
+func Tokens(c *config.Provider, length int) (res [][]string) {
 	s := &oauth2.HMACSHAStrategy{
 		Enigma: &hmac.HMACStrategy{
 			GlobalSecret: c.GetSystemSecret(),

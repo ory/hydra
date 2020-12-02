@@ -41,7 +41,7 @@ import (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.ViperProvider
+	c *config.Provider
 }
 
 const (
@@ -53,7 +53,7 @@ const (
 
 func NewHandler(
 	r InternalRegistry,
-	c *config.ViperProvider,
+	c *config.Provider,
 ) *Handler {
 	return &Handler{
 		c: c,

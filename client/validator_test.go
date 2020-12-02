@@ -38,8 +38,8 @@ import (
 
 func TestValidate(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
-	c.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
-	c.Set(config.ViperKeyDefaultClientScope, []string{"openid"})
+	c.Set(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.Set(config.KeyDefaultClientScope, []string{"openid"})
 
 	v := NewValidator(c)
 	for k, tc := range []struct {
@@ -110,7 +110,7 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			v: func(t *testing.T) *Validator {
-				c.Set(config.ViperKeySubjectTypesSupported, []string{"pairwise"})
+				c.Set(config.KeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(c)
 			},
 			in: &Client{OutfacingID: "foo"},

@@ -32,10 +32,10 @@ type Registry interface {
 
 	Init() error
 
-	WithConfig(c *config.ViperProvider) Registry
+	WithConfig(c *config.Provider) Registry
 	WithLogger(l *logrusx.Logger) Registry
 
-	Config() *config.ViperProvider
+	Config() *config.Provider
 	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
@@ -59,7 +59,7 @@ type Registry interface {
 	WithConsentStrategy(c consent.Strategy)
 }
 
-func NewRegistryFromDSN(c *config.ViperProvider, l *logrusx.Logger) (Registry, error) {
+func NewRegistryFromDSN(c *config.Provider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)

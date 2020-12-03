@@ -45,14 +45,14 @@ Something is not working.
       ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [ ] Client allowed_cors_origins not working
       ([hydra#1754](https://github.com/ory/hydra/issues/1754))
-- [ ] CORS error with v1.9 on localhost
-      ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
-      [@hackerman](https://github.com/aeneasr)
 - [x] Slow consent revocation request
       ([hydra#1997](https://github.com/ory/hydra/issues/1997))
 - [x] Client update changes it's PK to 0
       ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
       [@Patrik](https://github.com/zepatrik)
+- [x] CORS error with v1.9 on localhost
+      ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
+      [@hackerman](https://github.com/aeneasr)
 
 #### Pull Requests
 
@@ -124,12 +124,12 @@ Blocks milestones or other issues or pulls.
 
 #### Issues
 
-- [ ] CORS error with v1.9 on localhost
-      ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
-      [@hackerman](https://github.com/aeneasr)
 - [x] Client update changes it's PK to 0
       ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
       [@Patrik](https://github.com/zepatrik)
+- [x] CORS error with v1.9 on localhost
+      ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
+      [@hackerman](https://github.com/aeneasr)
 
 #### Pull Requests
 

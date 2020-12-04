@@ -45,8 +45,8 @@ module.exports = {
   url: `https://www.ory.sh/`,
   baseUrl,
   favicon: 'img/favico.png',
-  onBrokenLinks: 'error',
-  onBrokenMarkdownLinks: 'error',
+  onBrokenLinks: 'warn',
+  onBrokenMarkdownLinks: 'warn',
   organizationName: 'ory', // Usually your GitHub org/user name.
   projectName: config.projectSlug, // Usually your repo name.
   themeConfig: {
@@ -131,7 +131,7 @@ module.exports = {
       }
     ],
     '@docusaurus/plugin-content-pages',
-    require.resolve('./src/plugins/analytics'),
+    require.resolve('./src/plugins/docusaurus-plugin-matamo'),
     '@docusaurus/plugin-sitemap'
   ],
   themes: [

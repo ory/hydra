@@ -15,7 +15,7 @@ secrets:
 
 oidc:
   subject_identifiers:
-    supported_types:
+    enabled:
       - pairwise
       - public
     pairwise:

@@ -18,7 +18,7 @@ module.exports = function (context) {
     injectHtmlTags() {
       return {
         postBodyTags: [
-          `<noscript><p><img src="//sqa-web.ory.sh/np.php?idsite=1&amp;rec=1" style="border:0;" alt="" /></p></noscript>`
+          `<noscript><p><img src="//sqa-web.ory.sh/np.php?idsite=2&amp;rec=1" style="border:0;" alt="" /></p></noscript>`
         ],
         headTags: [
           {
@@ -34,9 +34,9 @@ _paq.push(['enableLinkTracking']);
 (function() {
   var u="//sqa-web.ory.sh/";
   _paq.push(['setTrackerUrl', u+'np.php']);
-  _paq.push(['setSiteId', '1']);
+  _paq.push(['setSiteId', '2']);
   var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-  g.type='text/javascript'; g.async=true; g.src=u+'np.js'; s.parentNode.insertBefore(g,s);
+  g.type='text/javascript'; g.async=true; g.src=u+'js/np.js'; s.parentNode.insertBefore(g,s);
 })();
 `
           }

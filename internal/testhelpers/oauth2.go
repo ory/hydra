@@ -9,6 +9,9 @@ import (
 	"testing"
 	"time"
 
+	djwt "github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ory/fosite/token/jwt"
 
 	"github.com/julienschmidt/httprouter"
@@ -28,6 +31,10 @@ import (
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
+	return NewIDTokenWithExpiry(t, reg, subject, time.Hour)
+}
+
+func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp time.Duration) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(time.Hour),
@@ -60,6 +67,17 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 
 	reg.RegisterRoutes(admin, public)
 	return publicTS, adminTS
+}
+
+func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
+	idt, ok := token.Extra("id_token").(string)
+	require.True(t, ok)
+	assert.NotEmpty(t, idt)
+
+	body, err := djwt.DecodeSegment(strings.Split(idt, ".")[1])
+	require.NoError(t, err)
+
+	return gjson.ParseBytes(body)
 }
 
 func IntrospectToken(t *testing.T, conf *oauth2.Config, token *oauth2.Token, adminTS *httptest.Server) gjson.Result {

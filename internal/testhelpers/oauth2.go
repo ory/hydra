@@ -37,9 +37,15 @@ func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
 func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp time.Duration) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   subject,
-		ExpiresAt: time.Now().Add(time.Hour),
+		ExpiresAt: time.Now().Add(exp),
 		IssuedAt:  time.Now(),
 	}.ToMapClaims(), jwt.NewHeaders())
+	require.NoError(t, err)
+	return token
+}
+
+func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClaims) string {
+	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), claims, jwt.NewHeaders())
 	require.NoError(t, err)
 	return token
 }
@@ -117,7 +123,7 @@ func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
 	}
 }
 
-func NewUI(t *testing.T, c *config.Provider, login, consent http.HandlerFunc) {
+func NewLoginConsentUI(t *testing.T, c *config.Provider, login, consent http.HandlerFunc) {
 	if login == nil {
 		login = HTTPServerNotImplementedHandler
 	}

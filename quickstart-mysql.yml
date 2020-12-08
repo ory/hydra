@@ -15,12 +15,12 @@ version: '3.7'
 services:
 
   hydra-migrate:
-    image: oryd/hydra:v1.9.0-alpha.3.pre.1
+    image: oryd/hydra:v1.9.0-alpha.3.pre.2
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
 
   hydra:
-    image: oryd/hydra:v1.9.0-alpha.3.pre.1
+    image: oryd/hydra:v1.9.0-alpha.3.pre.2
     environment:
       - DSN=mysql://root:secret@tcp(mysqld:3306)/mysql?max_conns=20&max_idle_conns=4
 

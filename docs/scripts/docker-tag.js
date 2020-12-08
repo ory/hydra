@@ -30,11 +30,13 @@ const replace = (path, replacer) =>
         return reject(err)
       }
 
-      fs.writeFile(path, replacer(data), 'utf8', (err) => {
-        if (err) {
-          return reject(err)
-        }
-        resolve()
+      fs.truncate(path, 0, () => {
+        fs.writeFile(path, replacer(data), 'utf8', (err) => {
+          if (err) {
+            return reject(err)
+          }
+          resolve()
+        })
       })
     })
   })

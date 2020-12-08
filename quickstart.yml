@@ -75,6 +75,3 @@ networks:
 
 volumes:
   hydra-sqlite:
-
-ra-sqlite:
-

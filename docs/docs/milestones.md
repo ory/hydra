@@ -56,6 +56,9 @@ Something is not working.
 
 #### Pull Requests
 
+- [ ] test: completely refactor consent tests and resolve logout issue
+      ([hydra#2227](https://github.com/ory/hydra/pull/2227)) -
+      [@hackerman](https://github.com/aeneasr)
 - [x] Deprecate client flags in introspect
       ([hydra#2011](https://github.com/ory/hydra/pull/2011)) -
       [@hackerman](https://github.com/aeneasr)

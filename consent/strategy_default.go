@@ -964,6 +964,8 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
+	_, _ = s.revokeAuthenticationCookie(w, r, s.r.CookieStore()) // Cookie removal is optional
+
 	urls, err := s.generateFrontChannelLogoutURLs(r.Context(), lr.Subject, lr.SessionID)
 	if err != nil {
 		return nil, err
@@ -973,7 +975,14 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		return nil, err
 	}
 
-	if err := s.revokeAuthenticationSession(w, r); err != nil {
+	// We delete the session after back channel log out has worked as the session is otherwise removed
+	// from the store which will break the query for finding all the channels.
+	//
+	// executeBackChannelLogout only fails on system errors so not on URL errors, so this should be fine
+	// even if an upstream URL fails!
+	if err := s.r.ConsentManager().DeleteLoginSession(r.Context(), lr.SessionID); errors.Is(err, sqlcon.ErrNoRows) {
+		// This is ok (session probably already revoked), do nothing!
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -981,6 +990,7 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		WithRequest(r).
 		WithField("subject", lr.Subject).
 		Info("User logout completed!")
+
 	return &LogoutResult{
 		RedirectTo:             lr.PostLogoutRedirectURI,
 		FrontChannelLogoutURLs: urls,

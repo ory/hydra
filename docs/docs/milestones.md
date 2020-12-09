@@ -56,9 +56,6 @@ Something is not working.
 
 #### Pull Requests
 
-- [ ] test: completely refactor consent tests and resolve logout issue
-      ([hydra#2227](https://github.com/ory/hydra/pull/2227)) -
-      [@hackerman](https://github.com/aeneasr)
 - [x] Deprecate client flags in introspect
       ([hydra#2011](https://github.com/ory/hydra/pull/2011)) -
       [@hackerman](https://github.com/aeneasr)
@@ -73,6 +70,9 @@ Something is not working.
       [@hackerman](https://github.com/aeneasr)
 - [x] test: resolve conformity test suite concurrency issues
       ([hydra#2181](https://github.com/ory/hydra/pull/2181)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] test: completely refactor consent tests and resolve logout issue
+      ([hydra#2227](https://github.com/ory/hydra/pull/2227)) -
       [@hackerman](https://github.com/aeneasr)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
@@ -194,8 +194,6 @@ New feature or request.
 
 #### Issues
 
-- [ ] consent: Improve remember for consent
-      ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [ ] [Feature] Enhance Security Middleware
       ([hydra#1029](https://github.com/ory/hydra/issues/1029))
 - [ ] Add API versioning for administrative APIs
@@ -236,6 +234,8 @@ New feature or request.
       ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 - [ ] Find out if a login/consent challenge is still valid
       ([hydra#2057](https://github.com/ory/hydra/issues/2057))
+- [x] consent: Improve remember for consent
+      ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [x] cmd: Add upsert command for client CLI
       ([hydra#1086](https://github.com/ory/hydra/issues/1086)) -
       [@hackerman](https://github.com/aeneasr)

@@ -802,15 +802,15 @@ oidc:
   #     salt: some-random-salt
   #
   subject_identifiers:
-    ## enabled ##
+    ## supported_types ##
     #
     # Set this value using environment variables on
     # - Linux/macOS:
-    #    $ export OIDC_SUBJECT_IDENTIFIERS_ENABLED=<value>
+    #    $ export OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=<value>
     # - Windows Command Line (CMD):
-    #    > set OIDC_SUBJECT_IDENTIFIERS_ENABLED=<value>
+    #    > set OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=<value>
     #
-    enabled:
+    supported_types:
       - public
       - pairwise
 

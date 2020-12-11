@@ -279,16 +279,16 @@ Let's dive into some of the arguments:
   access and refresh tokens, and OpenID Connect ID Tokens.
 - `--scope openid,offline,photos.read` allows the client to request various
   permissions:
-- `openid` allows the client to perform the OpenID Connect flow and request an
-  OpenID Connect ID Token.
-- `offline` allows the client to request a refresh token. Because we want to
-  continuously backup photos, the app must be able to refresh expired access
-  tokens. This scope allows that.
-- `photos.read` this is an imaginary scope that is not handled by ORY Hydra but
-  serves the purpose of making it clear that we could request read access to a
-  user's photos. You can obviously omit this scope or use your own scope.
-- `--callbacks http://localhost:9010/callback` allows the client to request this
-  redirect uri.
+  - `openid` allows the client to perform the OpenID Connect flow and request an
+    OpenID Connect ID Token.
+  - `offline` allows the client to request a refresh token. Because we want to
+    continuously backup photos, the app must be able to refresh expired access
+    tokens. This scope allows that.
+  - `photos.read` this is an imaginary scope that is not handled by ORY Hydra
+    but serves the purpose of making it clear that we could request read access
+    to a user's photos. You can obviously omit this scope or use your own scope.
+  - `--callbacks http://localhost:9010/callback` allows the client to request
+    this redirect uri.
 
 Perfect, let's perform an exemplary OAuth 2.0 Authorize Code Flow! To make this
 easy, the ORY Hydra CLI provides a helper command called `hydra token user`.

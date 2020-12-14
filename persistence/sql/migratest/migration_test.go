@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/spf13/pflag"
+	"github.com/ory/x/configx"
 
 	"github.com/ory/hydra/persistence/sql"
 
@@ -60,8 +60,7 @@ func TestMigrations(t *testing.T) {
 			}
 
 			d := driver.New(
-				pflag.NewFlagSet("", pflag.ContinueOnError),
-				driver.ForceConfigValue(config.KeyDSN, url),
+				driver.WithOptions(configx.WithValue(config.KeyDSN, url)),
 				driver.DisablePreloading(),
 				driver.DisableValidation(),
 			)

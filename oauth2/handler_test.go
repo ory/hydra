@@ -91,7 +91,7 @@ var flushRequests = []*fosite.Request{
 
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	cm := reg.ClientManager()
@@ -130,8 +130,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 
 func TestHandlerFlushHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.Set(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	cl := reg.ClientManager()
@@ -187,9 +187,9 @@ func TestHandlerFlushHandler(t *testing.T) {
 
 func TestUserinfo(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeyScopeStrategy, "")
-	conf.Set(config.KeyAuthCodeLifespan, lifespan)
-	conf.Set(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyScopeStrategy, "")
+	conf.MustSet(config.KeyAuthCodeLifespan, lifespan)
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
 	reg := internal.NewRegistryMemory(t, conf)
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
@@ -425,12 +425,12 @@ func TestUserinfo(t *testing.T) {
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.Set(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.Set(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	conf.Set(config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
-	conf.Set(config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
-	conf.Set(config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	conf.MustSet(config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
+	conf.MustSet(config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+	conf.MustSet(config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	h := oauth2.NewHandler(reg, conf)

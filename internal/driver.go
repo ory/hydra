@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/spf13/pflag"
+	"github.com/ory/x/configx"
 
 	"github.com/stretchr/testify/require"
 
@@ -20,24 +20,24 @@ import (
 )
 
 func resetConfig(p *config.Provider) {
-	p.Set(config.KeyBCryptCost, "4")
-	p.Set(config.KeySubjectIdentifierAlgorithmSalt, "00000000")
-	p.Set(config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
-	p.Set(config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
-	p.Set(config.KeyLogLevel, "trace")
+	p.MustSet(config.KeyBCryptCost, "4")
+	p.MustSet(config.KeySubjectIdentifierAlgorithmSalt, "00000000")
+	p.MustSet(config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
+	p.MustSet(config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
+	p.MustSet(config.KeyLogLevel, "trace")
 }
 
 func NewConfigurationWithDefaults() *config.Provider {
-	p := config.MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
+	p := config.MustNew(logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.Set("dangerous-force-http", true)
+	p.MustSet("dangerous-force-http", true)
 	return p
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
-	p := config.MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
+	p := config.MustNew(logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.Set("dangerous-force-http", false)
+	p.MustSet("dangerous-force-http", false)
 	return p
 }
 
@@ -54,8 +54,8 @@ func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {
 }
 
 func newRegistryDefault(t *testing.T, url string, c *config.Provider) driver.Registry {
-	c.Set(config.KeyLogLevel, "trace")
-	c.Set(config.KeyDSN, url)
+	c.MustSet(config.KeyLogLevel, "trace")
+	c.MustSet(config.KeyDSN, url)
 
 	r, err := driver.NewRegistryFromDSN(c, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)

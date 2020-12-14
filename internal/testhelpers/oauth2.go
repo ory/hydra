@@ -52,10 +52,10 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClai
 
 func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
-	reg.Config().Set(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-	reg.Config().Set(config.KeyAccessTokenLifespan, time.Second*2)
-	reg.Config().Set(config.KeyRefreshTokenLifespan, time.Second*3)
-	reg.Config().Set(config.KeyScopeStrategy, "exact")
+	reg.Config().MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg.Config().MustSet(config.KeyAccessTokenLifespan, time.Second*2)
+	reg.Config().MustSet(config.KeyRefreshTokenLifespan, time.Second*3)
+	reg.Config().MustSet(config.KeyScopeStrategy, "exact")
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()
 
@@ -65,7 +65,7 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 	adminTS = httptest.NewServer(admin)
 	t.Cleanup(adminTS.Close)
 
-	reg.Config().Set(config.KeyIssuerURL, publicTS.URL)
+	reg.Config().MustSet(config.KeyIssuerURL, publicTS.URL)
 	// SendDebugMessagesToClients: true,
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
@@ -138,8 +138,8 @@ func NewLoginConsentUI(t *testing.T, c *config.Provider, login, consent http.Han
 	t.Cleanup(lt.Close)
 	t.Cleanup(ct.Close)
 
-	c.Set(config.KeyLoginURL, lt.URL)
-	c.Set(config.KeyConsentURL, ct.URL)
+	c.MustSet(config.KeyLoginURL, lt.URL)
+	c.MustSet(config.KeyConsentURL, ct.URL)
 }
 
 func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {

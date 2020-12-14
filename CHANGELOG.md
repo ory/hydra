@@ -494,11 +494,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0-alpha.3...2172f25ee599e2df016daffa6692f92e5f5ee277) (2020-12-14)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0-alpha.3...766e8f1a6dd6fbf73a055ff9d49cf1b271a1cfd4) (2020-12-14)
 
 
 ### Documentation
 
+* Add note about mounting the config file when using docker ([#2235](https://github.com/ory/hydra/issues/2235)) ([766e8f1](https://github.com/ory/hydra/commit/766e8f1a6dd6fbf73a055ff9d49cf1b271a1cfd4)), closes [#2231](https://github.com/ory/hydra/issues/2231)
 * Oidc.subject_identifiers config key change ([#2232](https://github.com/ory/hydra/issues/2232)) ([2172f25](https://github.com/ory/hydra/commit/2172f25ee599e2df016daffa6692f92e5f5ee277)):
 
     > oidc.subject_identifiers.enabled is now oidc.subject_identifiers.supported_types. Docs should get updated.

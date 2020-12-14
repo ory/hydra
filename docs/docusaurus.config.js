@@ -23,8 +23,8 @@ const links = [
     position: 'left'
   },
   {
-    href: 'https://community.ory.sh',
-    label: 'Forum',
+    href: 'https://github.com/ory/${githubRepoName}/discussions',
+    label: 'Discussions',
     position: 'left'
   },
   {

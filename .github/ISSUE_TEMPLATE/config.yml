@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: ORY Community
-    url: https://community.ory.sh/
-    about: Please ask and answer questions here.
+    url: https://www.github.com/Hydra/discussions
+    about: Please ask and answer questions here, show your implementations and discuss ideas.
   - name: ORY Chat
     url: https://www.ory.sh/chat
     about: Hang out with other ORY community members and ask and answer questions.

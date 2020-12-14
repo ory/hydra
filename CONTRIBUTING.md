@@ -49,8 +49,9 @@ contributions, and don't want a wall of rules to get in the way of that.
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
 won't clash or be obviated by ORY Hydra's normal direction. A great way to
-do this is via the [ORY Community](https://community.ory.sh/) or join the
-[ORY Chat](https://www.ory.sh/chat).
+do this is via
+[ORY Hydra Discussions](https://github.com/ory/Hydra/discussions) or
+the [ORY Chat](https://www.ory.sh/chat).
 
 ## FAQ
 
@@ -110,8 +111,10 @@ a few things you can do to help out:
 We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of ORY, etc.
 
-We have a [forum](https://community.ory.sh/). This is a great place for in-depth
-discussions and lots of code examples, logs and similar data.
+Check out
+[ORY Hydra Discussions](https://github.com/ory/Hydra/discussions).
+This is a great place for in-depth discussions and lots of code examples, logs
+and similar data.
 
 You can also join our community hangout, if you want to speak to the ORY team
 directly or ask some questions. You can find more info on the hangouts in

@@ -7,7 +7,7 @@ with a maintainer, please mention her/him using the `@` syntax (e.g. `@aeneasr`)
 If this change neither resolves an existing issue nor has sign-off from one of the maintainers, there is a
 chance substantial changes will be requested or that the changes will be rejected.
 
-You can discuss changes with maintainers either in the [ORY Community Forums](https://community.ory.sh/) or
+You can discuss changes with maintainers either in the Github Discusssions in this repository or
 join the [ORY Chat](https://www.ory.sh/chat).
 -->
 

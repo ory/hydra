@@ -51,7 +51,7 @@ $ docker run \
   -d postgres:9.6
 ```
 
-This command wil start a postgres instance with name
+This command will start a postgres instance with name
 `ory-hydra-example--postgres`, set up a database called `hydra` and create a
 user `hydra` with password `secret`.
 
@@ -71,7 +71,7 @@ $ export SECRETS_SYSTEM=$(export LC_CTYPE=C; cat /dev/urandom | tr -dc 'a-zA-Z0-
 # Alternatively you can obviously just set a secret:
 # $ export SECRETS_SYSTEM=this_needs_to_be_the_same_always_and_also_very_$3cuR3-._
 
-# The database url points us at the postgres instance. This could also be an ephermal in-memory database (`export DSN=memory`)
+# The database url points us at the postgres instance. This could also be an ephemeral in-memory database (`export DSN=memory`)
 # or a MySQL URI.
 $ export DSN=postgres://hydra:secret@ory-hydra-example--postgres:5432/hydra?sslmode=disable
 
@@ -138,7 +138,9 @@ Let's dive into the various settings:
   provider **(required)**. We will set up the service that handles requests at
   that URL in the next sections.
 
-Note: In this example we did not define a value for the optional setting
+:::note
+
+In this example we did not define a value for the optional setting
 `OAUTH2_ERROR_URL`. This URL can be used to provide an endpoint which will
 receive error messages from ORY Hydra that should be displayed to the end user.
 The URL receives `error` and `error_description` parameters. If this value is
@@ -146,9 +148,25 @@ not set, Hydra uses the fallback endpoint `/oauth2/fallbacks/error` and displays
 a default error message. In order to obtain a uniform UI, you might want to
 include such an endpoint in your login or consent provider.
 
+:::
+
+:::note
+
+We only used environmental variables to configure ORY Hydra in this example. If
+you use a [configuration file](reference/configuration) instead, remember to
+mount it in the container. For example:
+
+```shell
+$ docker run -d \
+  -v $(pwd)/hydra.yaml:/hydra.yaml \
+  oryd/hydra:v1.9.0-alpha.3 serve all --config /hydra.yaml
+```
+
+:::
+
 To confirm that the instance is running properly,
 [open the health check](https://localhost:9001/health/ready). If asked, accept
-the self signed certificate in your browser. You should simply see `ok`.
+the self-signed certificate in your browser. You should simply see `ok`.
 
 On start up, ORY Hydra is initializing some values. Let's take a look at the
 logs:
@@ -269,8 +287,8 @@ Let's dive into some of the arguments:
   - `photos.read` this is an imaginary scope that is not handled by ORY Hydra
     but serves the purpose of making it clear that we could request read access
     to a user's photos. You can obviously omit this scope or use your own scope.
-- `--callbacks http://localhost:9010/callback` allows the client to request this
-  redirect uri.
+  - `--callbacks http://localhost:9010/callback` allows the client to request
+    this redirect uri.
 
 Perfect, let's perform an exemplary OAuth 2.0 Authorize Code Flow! To make this
 easy, the ORY Hydra CLI provides a helper command called `hydra token user`.

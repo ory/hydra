@@ -45,7 +45,7 @@ import (
 
 func TestClientCredentials(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	reg.Config().Set(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
 	public, admin := testhelpers.NewOAuth2Server(t, reg)
 
 	var newClient = func(t *testing.T) (*hc.Client, clientcredentials.Config) {
@@ -140,7 +140,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass with audience", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().Set(config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				getAndInspectToken(t, cl, conf, strategy)
@@ -154,7 +154,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass without audience", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().Set(config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				conf.EndpointParams = url.Values{}
@@ -169,7 +169,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass without scope", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().Set(config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				conf.Scopes = []string{}
@@ -182,11 +182,11 @@ func TestClientCredentials(t *testing.T) {
 	})
 
 	t.Run("case=should grant default scopes if configured to do ", func(t *testing.T) {
-		reg.Config().Set(config.KeyGrantAllClientCredentialsScopesPerDefault, true)
+		reg.Config().MustSet(config.KeyGrantAllClientCredentialsScopesPerDefault, true)
 
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().Set(config.KeyAccessTokenStrategy, strategy)
+				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				defaultScope := conf.Scopes

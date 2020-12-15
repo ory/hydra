@@ -77,8 +77,8 @@ func createTestClient(prefix string) *models.OAuth2Client {
 
 func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeySubjectTypesSupported, []string{"public"})
-	conf.Set(config.KeyDefaultClientScope, []string{"foo", "bar"})
+	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
+	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
 	r := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterAdmin()

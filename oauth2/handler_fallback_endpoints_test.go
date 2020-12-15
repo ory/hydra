@@ -37,7 +37,7 @@ import (
 
 func TestHandlerConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	reg := internal.NewRegistryMemory(t, conf)
 
 	h := reg.OAuth2Handler()

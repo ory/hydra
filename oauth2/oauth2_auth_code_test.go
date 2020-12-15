@@ -82,7 +82,7 @@ type clientCreator interface {
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	reg.Config().Set(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {
@@ -324,12 +324,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 
 		t.Run("strategy=jwt", func(t *testing.T) {
-			reg.Config().Set(config.KeyAccessTokenStrategy, "jwt")
+			reg.Config().MustSet(config.KeyAccessTokenStrategy, "jwt")
 			run(t, "jwt")
 		})
 
 		t.Run("strategy=opaque", func(t *testing.T) {
-			reg.Config().Set(config.KeyAccessTokenStrategy, "opaque")
+			reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
 			run(t, "opaque")
 		})
 	})
@@ -583,9 +583,9 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
 			conf := internal.NewConfigurationWithDefaults()
-			conf.Set(config.KeyAccessTokenLifespan, time.Second*2)
-			conf.Set(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-			conf.Set(config.KeyAccessTokenStrategy, strat.d)
+			conf.MustSet(config.KeyAccessTokenLifespan, time.Second*2)
+			conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+			conf.MustSet(config.KeyAccessTokenStrategy, strat.d)
 			reg := internal.NewRegistryMemory(t, conf)
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)

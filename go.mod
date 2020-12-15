@@ -43,7 +43,7 @@ require (
 	github.com/ory/go-acc v0.2.5
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.1
-	github.com/ory/x v0.0.166
+	github.com/ory/x v0.0.170
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
 	github.com/pkg/errors v0.9.1
@@ -54,7 +54,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
-	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.0
 	github.com/tidwall/pretty v1.0.1 // indirect

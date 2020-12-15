@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/ory/x/configx"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/cmdx"
@@ -26,7 +28,11 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
-		d = driver.New(cmd.Flags(), driver.DisableValidation(),
+		d = driver.New(
+			driver.WithOptions(
+				configx.SkipValidation(),
+				configx.WithFlags(cmd.Flags())),
+			driver.DisableValidation(),
 			driver.DisablePreloading())
 		if len(d.Config().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
@@ -41,7 +47,13 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 			return
 		}
-		d = driver.New(cmd.Flags(), driver.ForceConfigValue(config.KeyDSN, args[0]), driver.DisableValidation(),
+		d = driver.New(
+			driver.WithOptions(
+				configx.WithFlags(cmd.Flags()),
+				configx.SkipValidation(),
+				configx.WithValue(config.KeyDSN, args[0]),
+			),
+			driver.DisableValidation(),
 			driver.DisablePreloading())
 	}
 

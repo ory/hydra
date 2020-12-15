@@ -19,7 +19,7 @@ import (
 
 func TestManagers(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.Set(config.KeyAccessTokenLifespan, time.Hour)
+	conf.MustSet(config.KeyAccessTokenLifespan, time.Hour)
 	registries := map[string]driver.Registry{
 		"memory": internal.NewRegistryMemory(t, conf),
 	}

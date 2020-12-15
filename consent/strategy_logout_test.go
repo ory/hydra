@@ -30,8 +30,8 @@ import (
 
 func TestLogoutFlows(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	reg.Config().Set(config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().Set(config.KeyConsentRequestMaxAge, time.Hour)
+	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)
 
 	defaultRedirectedMessage := "redirected to default server"
 	postLogoutCallback := func(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +40,7 @@ func TestLogoutFlows(t *testing.T) {
 	}
 	defaultLogoutURL := testhelpers.NewCallbackURL(t, "logged-out", postLogoutCallback)
 	customPostLogoutURL := testhelpers.NewCallbackURL(t, "logged-out/custom", postLogoutCallback)
-	reg.Config().Set(config.KeyLogoutRedirectURL, defaultLogoutURL)
+	reg.Config().MustSet(config.KeyLogoutRedirectURL, defaultLogoutURL)
 
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 	adminApi := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
@@ -143,7 +143,7 @@ func TestLogoutFlows(t *testing.T) {
 
 		t.Cleanup(server.Close)
 
-		reg.Config().Set(config.KeyLogoutURL, server.URL)
+		reg.Config().MustSet(config.KeyLogoutURL, server.URL)
 	}
 
 	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {

@@ -36,12 +36,12 @@ import (
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
-	reg.Config().Set(config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().Set(config.KeyConsentRequestMaxAge, time.Hour)
-	reg.Config().Set(config.KeyConsentRequestMaxAge, time.Hour)
-	reg.Config().Set(config.KeyScopeStrategy, "exact")
-	reg.Config().Set(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	reg.Config().Set(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)
+	reg.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)
+	reg.Config().MustSet(config.KeyScopeStrategy, "exact")
+	reg.Config().MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	reg.Config().MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 
 	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
 	adminClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})

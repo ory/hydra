@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-12-14)](#unreleased-2020-12-14)
+- [Unreleased (2020-12-15)](#unreleased-2020-12-15)
     - [Documentation](#documentation)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
     - [Bug Fixes](#bug-fixes)
@@ -494,7 +494,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0-alpha.3...766e8f1a6dd6fbf73a055ff9d49cf1b271a1cfd4) (2020-12-14)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0-alpha.3...766e8f1a6dd6fbf73a055ff9d49cf1b271a1cfd4) (2020-12-15)
 
 
 ### Documentation

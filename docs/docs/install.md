@@ -3,8 +3,7 @@ id: install
 title: Installation
 ---
 
-Installing ORY Hydra on any system is straight forward. We prov1.9.0-alpha.3
-pre-built binaries, Docker Images and support v1.9.0-alpha.3 package managers.
+Installing ORY Hydra on any system is straight forward. We provide pre-built binaries, Docker Images and support various package managers.
 
 ## Docker
 
@@ -35,7 +34,7 @@ $ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.3/install
 $ ./hydra help
 ```
 
-You may want to mov1.9.0-alpha.3 ORY Hydra to your `$PATH`:
+You may want to move ORY Hydra to your `$PATH`:
 
 ```shell
 $ sudo mv ./hydra /usr/local/bin/
@@ -54,15 +53,14 @@ You can install ORY Hydra using [scoop](https://scoop.sh) on Windows:
 
 ## Kubernetes
 
-Please head ov1.9.0-alpha.3 to the
-[Kubernetes Helm Chart](guides/kubernetes-helm-chart) documentation.
+Please head over to the [Kubernetes Helm Chart](guides/kubernetes-helm-chart) documentation.
 
 ## Download Binaries
 
-You can download the client and serv1.9.0-alpha.3 binaries on our
+You can download the client and server binaries on our
 [Github releases](https://github.com/ory/hydra/releases) page. There is
-currently no installer av1.9.0-alpha.3 You hav1.9.0-alpha.3 to add the Hydra
-binary to the PATH in your env1.9.0-alpha.3 yourself, for example by putting it
+currently no installer available. You have to add the Hydra
+binary to the PATH in your environment yourself, for example by putting it
 into `/usr/local/bin` or something comparable.
 
 Once installed, you should be able to run:
@@ -77,7 +75,7 @@ If you wish to compile ORY Hydra yourself, you need to install and set up
 [Go 1.12+](https://golang.org/) and add `$GOPATH/bin` to your `$PATH`.
 
 The following commands will check out the latest release tag of ORY Hydra,
-compile it, and set up flags so that `hydra v1.9.0-alpha.3` works as expected.
+compile it, and set up flags so that `hydra version` works as expected.
 Please note that this will only work in a Bash-like shell.
 
 ```shell

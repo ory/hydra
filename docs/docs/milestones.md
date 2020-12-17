@@ -100,8 +100,10 @@ Affects documentation.
 
 #### Issues
 
-- [ ] Docs: reference configuration provides invalid bcrypt cost and some other
-      outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) -
+- [ ] URLS_ERROR and OAUTH2_ERROR_URL might be redundant and OAUTH2_ERROR_URL
+      not properly documented
+      ([hydra#2254](https://github.com/ory/hydra/issues/2254)) -
+      [@Kim Neunert](https://github.com/k9ert),
       [@Vincent](https://github.com/vinckr)
 - [x] docs: Hydra supports two concepts of authorization
       ([hydra#1992](https://github.com/ory/hydra/issues/1992)) -
@@ -109,6 +111,9 @@ Affects documentation.
 - [x] Document GitLab setup with ORY Hydra as the OpenID Connect Provider
       ([hydra#2007](https://github.com/ory/hydra/issues/2007)) -
       [@Kim Neunert](https://github.com/k9ert)
+- [x] Docs: reference configuration provides invalid bcrypt cost and some other
+      outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) -
+      [@Vincent](https://github.com/vinckr)
 - [x] Configuration is not recognized by certain docker containers
       ([hydra#2164](https://github.com/ory/hydra/issues/2164)) -
       [@hackerman](https://github.com/aeneasr)

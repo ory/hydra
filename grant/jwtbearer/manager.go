@@ -27,5 +27,5 @@ type SQLData struct {
 }
 
 func (SQLData) TableName() string {
-	return "hydra_grant_jwk"
+	return "hydra_oauth2_grant_jwk"
 }

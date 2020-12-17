@@ -64,6 +64,10 @@ const (
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
+	KeyOAuth2GrantJWTClientAuthOptional          = "oauth2.grant.jwt.client_auth_optional"
+	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.id_optional"
+	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.issued_date_optional"
+	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_duration"
 )
 
 const DSNMemory = "memory"
@@ -422,4 +426,20 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
+}
+
+func (p *Provider) GrantJWTClientAuthOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTClientAuthOptional)
+}
+
+func (p *Provider) GrantJWTIDOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTIDOptional)
+}
+
+func (p *Provider) GrantJWTIssuedDateOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTIssuedDateOptional)
+}
+
+func (p *Provider) GrantJWTMaxDuration() time.Duration {
+	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
 }

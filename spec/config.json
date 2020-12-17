@@ -245,6 +245,37 @@
           }
         }
       }
+    },
+    "grantJWT": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Authorization Grants using JWT configuration",
+      "properties": {
+        "client_auth_optional": {
+          "type": "boolean",
+          "description": "If false, client authentication is required to get access token.",
+          "default": false
+        },
+        "id_optional": {
+          "type": "boolean",
+          "description": "If false, JTI claim must be present in JWT assertion.",
+          "default": false
+        },
+        "issued_date_optional": {
+          "type": "boolean",
+          "description": "If false, IAT claim must be present in JWT assertion.",
+          "default": false
+        },
+        "max_duration": {
+          "description": "Configures how long JWT assertion is considered valid, since being issued.",
+          "default": "720h",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        }
+      }
     }
   },
   "properties": {
@@ -851,6 +882,15 @@
               "examples": [
                 false
               ]
+            }
+          }
+        },
+        "grant": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "jwt": {
+              "$ref": "#/definitions/grantJWT"
             }
           }
         }

@@ -35,6 +35,7 @@ type FositeStorer interface {
 	oauth2.CoreStorage
 	openid.OpenIDConnectRequestStorage
 	pkce.PKCERequestStorage
+	oauth2.JWTAuthGrantStorage
 
 	RevokeRefreshToken(ctx context.Context, requestID string) error
 

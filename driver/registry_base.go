@@ -12,6 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/hydra/grant/jwtbearer"
 	"github.com/ory/hydra/x/oauth2cors"
 
 	"github.com/ory/hydra/persistence"
@@ -46,6 +47,8 @@ type RegistryBase struct {
 	C            *config.Provider
 	ch           *client.Handler
 	fh           fosite.Hasher
+	jwtGrantH    *jwtbearer.Handler
+	jwtGrantV    *jwtbearer.GrantValidator
 	kh           *jwk.Handler
 	cv           *client.Validator
 	hh           *healthx.Handler
@@ -107,6 +110,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.ClientHandler().SetRoutes(admin)
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.JWTGrantHandler().SetRoutes(admin)
 }
 
 func (m *RegistryBase) BuildVersion() string {
@@ -184,6 +188,20 @@ func (m *RegistryBase) KeyHandler() *jwk.Handler {
 		m.kh = jwk.NewHandler(m.r, m.C)
 	}
 	return m.kh
+}
+
+func (m *RegistryBase) JWTGrantHandler() *jwtbearer.Handler {
+	if m.jwtGrantH == nil {
+		m.jwtGrantH = jwtbearer.NewHandler(m.r)
+	}
+	return m.jwtGrantH
+}
+
+func (m *RegistryBase) GrantValidator() *jwtbearer.GrantValidator {
+	if m.jwtGrantV == nil {
+		m.jwtGrantV = jwtbearer.NewGrantValidator()
+	}
+	return m.jwtGrantV
 }
 
 func (m *RegistryBase) HealthHandler() *healthx.Handler {
@@ -269,6 +287,10 @@ func (m *RegistryBase) oAuth2Config() *compose.Config {
 		EnablePKCEPlainChallengeMethod: false,
 		TokenURL:                       urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
 		RedirectSecureChecker:          x.IsRedirectURISecure(m.C),
+		JWTSkipClientAuth:              m.C.GrantJWTClientAuthOptional(),
+		JWTIDOptional:                  m.C.GrantJWTIDOptional(),
+		JWTIssuedDateOptional:          m.C.GrantJWTIssuedDateOptional(),
+		JWTMaxDuration:                 m.C.GrantJWTMaxDuration(),
 	}
 }
 
@@ -323,6 +345,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			compose.OAuth2TokenRevocationFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2PKCEFactory,
+			compose.OAuth2AuthorizeJWTGrantFactory,
 		)
 	}
 	return m.fop

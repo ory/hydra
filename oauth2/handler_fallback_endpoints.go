@@ -76,7 +76,7 @@ func (h *Handler) fallbackHandler(title, heading string, sc int, configKey strin
 }
 
 func (h *Handler) DefaultErrorHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	h.r.Logger().WithRequest(r).Error("A client requested the default error URL, environment variable OAUTH2_ERROR_URL is probably not set.")
+	h.r.Logger().WithRequest(r).Error("A client requested the default error URL, environment variable URLS_ERROR is probably not set.")
 
 	t, err := template.New("consent").Parse(`
 <html>

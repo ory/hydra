@@ -105,6 +105,8 @@ Affects documentation.
       ([hydra#2254](https://github.com/ory/hydra/issues/2254)) -
       [@Kim Neunert](https://github.com/k9ert),
       [@Vincent](https://github.com/vinckr)
+- [ ] /clients?limit=1000 endpoint caps number of returned clients to 500
+      instances ([hydra#2267](https://github.com/ory/hydra/issues/2267))
 - [x] docs: Hydra supports two concepts of authorization
       ([hydra#1992](https://github.com/ory/hydra/issues/1992)) -
       [@hackerman](https://github.com/aeneasr)

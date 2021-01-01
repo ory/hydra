@@ -107,6 +107,8 @@ Affects documentation.
       [@Vincent](https://github.com/vinckr)
 - [ ] /clients?limit=1000 endpoint caps number of returned clients to 500
       instances ([hydra#2267](https://github.com/ory/hydra/issues/2267))
+- [ ] Unable to start hydra due to bad configuration schema
+      ([hydra#2270](https://github.com/ory/hydra/issues/2270))
 - [x] docs: Hydra supports two concepts of authorization
       ([hydra#1992](https://github.com/ory/hydra/issues/1992)) -
       [@hackerman](https://github.com/aeneasr)

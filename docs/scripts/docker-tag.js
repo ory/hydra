@@ -23,21 +23,12 @@ if (process.argv.length !== 4) {
 const config = require(path.resolve(process.argv[2]))
 const next = process.argv[3]
 
-const replace = (path, replacer) =>
-  new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf8', (err, data) => {
-      if (err) {
-        return reject(err)
-      }
-
-      fs.writeFile(path, replacer(data), 'utf8', (err) => {
-        if (err) {
-          return reject(err)
-        }
-        resolve()
-      })
-    })
-  })
+const replace = (path, replacer) => {
+  const content = fs.readFileSync(path, 'utf8')
+  const updated = replacer(content)
+  fs.unlinkSync(path)
+  fs.writeFileSync(path, updated, 'utf8')
+}
 
 config.updateTags.forEach(({ files, image, replacer }) => {
   files.forEach((loc) => {
@@ -51,16 +42,10 @@ config.updateTags.forEach(({ files, image, replacer }) => {
       }
 
       return content.replace(
-        new RegExp(`${image}:v[0-9a-zA-Z\\.\\+\\_\\-]+`, 'g'),
+        new RegExp(`${image}:v[0-9a-zA-Z.+_-]+`, 'gi'),
         `${image}:${next}`
       )
     })
-      .then(() => {
-        console.log('Done!')
-      })
-      .catch((err) => {
-        console.error(err)
-        process.exit(1)
-      })
+    console.log('Processed file:', loc)
   })
 })

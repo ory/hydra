@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/pflag"
-
 	"github.com/ory/x/dbal"
 
 	"github.com/markbates/pkger"
@@ -91,15 +89,15 @@ type Provider struct {
 	p               *configx.Provider
 }
 
-func MustNew(flags *pflag.FlagSet, l *logrusx.Logger) *Provider {
-	p, err := New(flags, l)
+func MustNew(l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
+	p, err := New(l, opts...)
 	if err != nil {
 		l.WithError(err).Fatalf("Unable to load config.")
 	}
 	return p
 }
 
-func New(flags *pflag.FlagSet, l *logrusx.Logger) (*Provider, error) {
+func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 	f, err := pkger.Open("/.schema/config.schema.json")
 	if err != nil {
 		return nil, err
@@ -110,23 +108,30 @@ func New(flags *pflag.FlagSet, l *logrusx.Logger) (*Provider, error) {
 		return nil, err
 	}
 
-	p, err := configx.New(
-		schema,
-		flags,
+	opts = append([]configx.OptionModifier{
 		configx.WithStderrValidationReporter(),
-		configx.OmitKeysFromTracing([]string{"dsn", "secrets.system", "secrets.cookie"}),
-		configx.WithImmutables([]string{"log", "serve", "dsn", "profiling"}),
+		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
+		configx.WithImmutables("log", "serve", "dsn", "profiling"),
 		configx.WithLogrusWatcher(l),
-	)
+	}, opts...)
+
+	p, err := configx.New(schema, opts...)
 	if err != nil {
 		return nil, err
 	}
 
+	l.UseConfig(p)
 	return &Provider{l: l, p: p}, nil
 }
 
-func (p *Provider) Set(key string, value interface{}) {
-	p.p.Set(key, value)
+func (p *Provider) Set(key string, value interface{}) error {
+	return p.p.Set(key, value)
+}
+
+func (p *Provider) MustSet(key string, value interface{}) {
+	if err := p.Set(key, value); err != nil {
+		p.l.WithError(err).Fatalf("Unable to set \"%s\" to \"%s\".", key, value)
+	}
 }
 
 func (p *Provider) Source() *configx.Provider {

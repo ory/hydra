@@ -26,7 +26,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	r := internal.NewRegistryMemory(t, c)
 
 	t.Run("case=tls-termination-disabled", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, "")
+		c.MustSet(config.KeyAllowTLSTerminationFrom, "")
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{}, URL: new(url.URL)}, panicHandler)
@@ -35,7 +35,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 
 	// change: x-forwarded-proto is checked after cidr, therefor it will never actually test header
 	t.Run("case=missing-x-forwarded-proto", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -49,7 +49,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 
 	// change: x-forwarded-proto is checked after cidr, therefor it will never actually test header with "http"
 	t.Run("case=x-forwarded-proto-is-http", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -63,7 +63,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	})
 
 	t.Run("case=missing-x-forwarded-for", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{Header: http.Header{"X-Forwarded-Proto": []string{"https"}}, URL: new(url.URL)}, panicHandler)
@@ -71,7 +71,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	})
 
 	t.Run("case=remote-not-in-cidr", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -83,7 +83,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	})
 
 	t.Run("case=remote-and-forwarded-not-in-cidr", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -98,7 +98,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	})
 
 	t.Run("case=remote-matches-cidr", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -113,7 +113,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 
 	// change: cidr and x-forwarded-proto headers are irrelevant for this test
 	t.Run("case=passes-because-health-alive-endpoint", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -128,7 +128,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 
 	// change: cidr and x-forwarded-proto headers are irrelevant for this test
 	t.Run("case=passes-because-health-ready-endpoint", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -142,7 +142,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	})
 
 	t.Run("case=forwarded-matches-cidr", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -157,7 +157,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 	})
 
 	t.Run("case=forwarded-matches-cidr-without-spaces", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{
@@ -181,7 +181,7 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 
 	// test: prometheus endpoint should accept request
 	t.Run("case=passes-because-metrics-prometheus-endpoint", func(t *testing.T) {
-		c.Set(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
+		c.MustSet(config.KeyAllowTLSTerminationFrom, []string{"126.0.0.1/24", "127.0.0.1/24"})
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c)(res, &http.Request{

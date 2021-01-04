@@ -9,6 +9,9 @@ import (
 	"testing"
 	"time"
 
+	djwt "github.com/dgrijalva/jwt-go"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/ory/fosite/token/jwt"
 
 	"github.com/julienschmidt/httprouter"
@@ -28,21 +31,31 @@ import (
 )
 
 func NewIDToken(t *testing.T, reg driver.Registry, subject string) string {
+	return NewIDTokenWithExpiry(t, reg, subject, time.Hour)
+}
+
+func NewIDTokenWithExpiry(t *testing.T, reg driver.Registry, subject string, exp time.Duration) string {
 	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), jwt.IDTokenClaims{
 		Subject:   subject,
-		ExpiresAt: time.Now().Add(time.Hour),
+		ExpiresAt: time.Now().Add(exp),
 		IssuedAt:  time.Now(),
 	}.ToMapClaims(), jwt.NewHeaders())
 	require.NoError(t, err)
 	return token
 }
 
+func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClaims) string {
+	token, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), claims, jwt.NewHeaders())
+	require.NoError(t, err)
+	return token
+}
+
 func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
-	reg.Config().Set(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-	reg.Config().Set(config.KeyAccessTokenLifespan, time.Second*2)
-	reg.Config().Set(config.KeyRefreshTokenLifespan, time.Second*3)
-	reg.Config().Set(config.KeyScopeStrategy, "exact")
+	reg.Config().MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg.Config().MustSet(config.KeyAccessTokenLifespan, time.Second*2)
+	reg.Config().MustSet(config.KeyRefreshTokenLifespan, time.Second*3)
+	reg.Config().MustSet(config.KeyScopeStrategy, "exact")
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()
 
@@ -52,7 +65,7 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 	adminTS = httptest.NewServer(admin)
 	t.Cleanup(adminTS.Close)
 
-	reg.Config().Set(config.KeyIssuerURL, publicTS.URL)
+	reg.Config().MustSet(config.KeyIssuerURL, publicTS.URL)
 	// SendDebugMessagesToClients: true,
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
@@ -60,6 +73,17 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 
 	reg.RegisterRoutes(admin, public)
 	return publicTS, adminTS
+}
+
+func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
+	idt, ok := token.Extra("id_token").(string)
+	require.True(t, ok)
+	assert.NotEmpty(t, idt)
+
+	body, err := djwt.DecodeSegment(strings.Split(idt, ".")[1])
+	require.NoError(t, err)
+
+	return gjson.ParseBytes(body)
 }
 
 func IntrospectToken(t *testing.T, conf *oauth2.Config, token *oauth2.Token, adminTS *httptest.Server) gjson.Result {
@@ -99,7 +123,7 @@ func HTTPServerNoExpectedCallHandler(t *testing.T) http.HandlerFunc {
 	}
 }
 
-func NewUI(t *testing.T, c *config.Provider, login, consent http.HandlerFunc) {
+func NewLoginConsentUI(t *testing.T, c *config.Provider, login, consent http.HandlerFunc) {
 	if login == nil {
 		login = HTTPServerNotImplementedHandler
 	}
@@ -114,8 +138,8 @@ func NewUI(t *testing.T, c *config.Provider, login, consent http.HandlerFunc) {
 	t.Cleanup(lt.Close)
 	t.Cleanup(ct.Close)
 
-	c.Set(config.KeyLoginURL, lt.URL)
-	c.Set(config.KeyConsentURL, ct.URL)
+	c.MustSet(config.KeyLoginURL, lt.URL)
+	c.MustSet(config.KeyConsentURL, ct.URL)
 }
 
 func NewCallbackURL(t *testing.T, prefix string, h http.HandlerFunc) string {

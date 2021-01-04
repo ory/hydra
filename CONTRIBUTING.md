@@ -48,14 +48,16 @@ contributions, and don't want a wall of rules to get in the way of that.
 
 That said, if you want to ensure that a pull request is likely to be merged,
 talk to us! You can find out our thoughts and ensure that your contribution
-won't clash or be obviated by ORY Hydra's normal direction. A great way to
-do this is via the [ORY Community](https://community.ory.sh/) or join the
-[ORY Chat](https://www.ory.sh/chat).
+won't clash or be obviated by ORY
+Hydra's normal direction. A great way to
+do this is via
+[ORY Hydra Discussions](https://github.com/ory/hydra/discussions)
+or the [ORY Chat](https://www.ory.sh/chat).
 
 ## FAQ
 
 - I am new to the community. Where can I find the
-  [ORY Community Code of Conduct?](https://github.com/ory/Hydra/blob/master/CODE_OF_CONDUCT.md)
+  [ORY Community Code of Conduct?](https://github.com/ory/hydra/blob/master/CODE_OF_CONDUCT.md)
 
 - I have a question. Where can I get
   [answers to questions regarding ORY Hydra?](#communication)
@@ -77,14 +79,14 @@ do this is via the [ORY Community](https://community.ory.sh/) or join the
 ## How can I contribute?
 
 If you want to start contributing code right away, we have a
-[list of good first issues](https://github.com/ory/Hydra/labels/good%20first%20issue).
+[list of good first issues](https://github.com/ory/hydra/labels/good%20first%20issue).
 
 There are many other ways you can contribute without writing any code. Here are
 a few things you can do to help out:
 
 - **Give us a star.** It may not seem like much, but it really makes a
-  difference. This is something that everyone can do to help out ORY
-  Hydra. Github stars help the project gain visibility and stand out.
+  difference. This is something that everyone can do to help out ORY Hydra.
+  Github stars help the project gain visibility and stand out.
 
 - **Join the community.** Sometimes helping people can be as easy as listening
   to their problems and offering a different perspective. Join our Slack, have a
@@ -110,8 +112,10 @@ a few things you can do to help out:
 We use [Slack](https://www.ory.sh/chat). You are welcome to drop in and ask
 questions, discuss bugs and feature requests, talk to other users of ORY, etc.
 
-We have a [forum](https://community.ory.sh/). This is a great place for in-depth
-discussions and lots of code examples, logs and similar data.
+Check out
+[ORY Hydra Discussions](https://github.com/ory/hydra/discussions). This
+is a great place for in-depth discussions and lots of code examples, logs and
+similar data.
 
 You can also join our community hangout, if you want to speak to the ORY team
 directly or ask some questions. You can find more info on the hangouts in
@@ -158,11 +162,11 @@ should be merged by the submitter after review.
 
 Please provide documentation when changing, removing, or adding features.
 Documentation resides in the project's
-[docs](https://github.com/ory/Hydra/tree/master/docs) folder. Generate API
+[docs](https://github.com/ory/hydra/tree/master/docs) folder. Generate API
 and configuration reference documentation using `cd docs; npm run gen`.
 
 For further instructions please head over to
-[docs/README.md](https://github.com/ory/Hydra/blob/master/README.md).
+[docs/README.md](https://github.com/ory/hydra/blob/master/README.md).
 
 ## Disclosing vulnerabilities
 

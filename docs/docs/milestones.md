@@ -71,6 +71,9 @@ Something is not working.
 - [x] test: resolve conformity test suite concurrency issues
       ([hydra#2181](https://github.com/ory/hydra/pull/2181)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] test: completely refactor consent tests and resolve logout issue
+      ([hydra#2227](https://github.com/ory/hydra/pull/2227)) -
+      [@hackerman](https://github.com/aeneasr)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -97,15 +100,24 @@ Affects documentation.
 
 #### Issues
 
-- [ ] Docs: reference configuration provides invalid bcrypt cost and some other
-      outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) -
+- [ ] URLS_ERROR and OAUTH2_ERROR_URL might be redundant and OAUTH2_ERROR_URL
+      not properly documented
+      ([hydra#2254](https://github.com/ory/hydra/issues/2254)) -
+      [@Kim Neunert](https://github.com/k9ert),
       [@Vincent](https://github.com/vinckr)
+- [ ] /clients?limit=1000 endpoint caps number of returned clients to 500
+      instances ([hydra#2267](https://github.com/ory/hydra/issues/2267))
+- [ ] Unable to start hydra due to bad configuration schema
+      ([hydra#2270](https://github.com/ory/hydra/issues/2270))
 - [x] docs: Hydra supports two concepts of authorization
       ([hydra#1992](https://github.com/ory/hydra/issues/1992)) -
       [@hackerman](https://github.com/aeneasr)
 - [x] Document GitLab setup with ORY Hydra as the OpenID Connect Provider
       ([hydra#2007](https://github.com/ory/hydra/issues/2007)) -
       [@Kim Neunert](https://github.com/k9ert)
+- [x] Docs: reference configuration provides invalid bcrypt cost and some other
+      outdated values ([hydra#2077](https://github.com/ory/hydra/issues/2077)) -
+      [@Vincent](https://github.com/vinckr)
 - [x] Configuration is not recognized by certain docker containers
       ([hydra#2164](https://github.com/ory/hydra/issues/2164)) -
       [@hackerman](https://github.com/aeneasr)
@@ -191,8 +203,6 @@ New feature or request.
 
 #### Issues
 
-- [ ] consent: Improve remember for consent
-      ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [ ] [Feature] Enhance Security Middleware
       ([hydra#1029](https://github.com/ory/hydra/issues/1029))
 - [ ] Add API versioning for administrative APIs
@@ -233,6 +243,8 @@ New feature or request.
       ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 - [ ] Find out if a login/consent challenge is still valid
       ([hydra#2057](https://github.com/ory/hydra/issues/2057))
+- [x] consent: Improve remember for consent
+      ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [x] cmd: Add upsert command for client CLI
       ([hydra#1086](https://github.com/ory/hydra/issues/1086)) -
       [@hackerman](https://github.com/aeneasr)

@@ -29,6 +29,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/x/configx"
+
 	analytics "github.com/ory/analytics-go/v4"
 
 	"github.com/ory/x/reqlog"
@@ -86,7 +88,7 @@ func isDSNAllowed(r driver.Registry) {
 }
 
 func RunServeAdmin(cmd *cobra.Command, args []string) {
-	d := driver.New(cmd.Flags())
+	d := driver.New(driver.WithOptions(configx.WithFlags(cmd.Flags())))
 	isDSNAllowed(d)
 
 	admin, _, adminmw, _ := setup(d, cmd)
@@ -104,7 +106,7 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 }
 
 func RunServePublic(cmd *cobra.Command, args []string) {
-	d := driver.New(cmd.Flags())
+	d := driver.New(driver.WithOptions(configx.WithFlags(cmd.Flags())))
 	isDSNAllowed(d)
 
 	_, public, _, publicmw := setup(d, cmd)
@@ -122,7 +124,7 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 }
 
 func RunServeAll(cmd *cobra.Command, args []string) {
-	d := driver.New(cmd.Flags())
+	d := driver.New(driver.WithOptions(configx.WithFlags(cmd.Flags())))
 
 	admin, public, adminmw, publicmw := setup(d, cmd)
 	cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.

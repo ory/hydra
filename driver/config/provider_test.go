@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/pflag"
-
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
 
@@ -27,7 +25,7 @@ import (
 )
 
 func newProvider() *Provider {
-	return MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), logrusx.New("", ""))
+	return MustNew(logrusx.New("", ""))
 }
 
 func setupEnv(env map[string]string) func(t *testing.T) (func(), func()) {
@@ -75,7 +73,7 @@ func TestSubjectTypesSupported(t *testing.T) {
 			setup, clean := tc.env(t)
 			setup()
 			p := newProvider()
-			p.Set(KeySubjectIdentifierAlgorithmSalt, "00000000")
+			p.MustSet(KeySubjectIdentifierAlgorithmSalt, "00000000")
 			assert.EqualValues(t, tc.e, p.SubjectTypesSupported())
 			clean()
 		})
@@ -89,7 +87,7 @@ func TestWellKnownKeysUnique(t *testing.T) {
 
 func TestCORSOptions(t *testing.T) {
 	p := newProvider()
-	p.Set("serve.public.cors.enabled", true)
+	p.MustSet("serve.public.cors.enabled", true)
 
 	conf, enabled := p.PublicCORS()
 	assert.True(t, enabled)
@@ -110,12 +108,12 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
+	p := MustNew(l)
 
 	value := p.AdminDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	p.Set(KeyAdminDisableHealthAccessLog, "true")
+	p.MustSet(KeyAdminDisableHealthAccessLog, "true")
 
 	value = p.AdminDisableHealthAccessLog()
 	assert.Equal(t, true, value)
@@ -125,12 +123,12 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
+	p := MustNew(l)
 
 	value := p.PublicDisableHealthAccessLog()
 	assert.Equal(t, false, value)
 
-	p.Set(KeyPublicDisableHealthAccessLog, "true")
+	p.MustSet(KeyPublicDisableHealthAccessLog, "true")
 
 	value = p.PublicDisableHealthAccessLog()
 	assert.Equal(t, true, value)
@@ -139,12 +137,12 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 func TestProviderIssuerURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
-	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
-	p.Set(KeyIssuerURL, "http://hydra.localhost")
+	p := MustNew(l)
+	p.MustSet(KeyIssuerURL, "http://hydra.localhost")
 	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
 
-	p2 := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
-	p2.Set(KeyIssuerURL, "http://hydra.localhost/")
+	p2 := MustNew(l)
+	p2.MustSet(KeyIssuerURL, "http://hydra.localhost/")
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 }
 
@@ -152,27 +150,24 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
-	p.Set("dangerous-force-http", false)
-	p.Set(KeyCookieSameSiteMode, "")
+	p := MustNew(l, configx.SkipValidation())
+	p.MustSet("dangerous-force-http", false)
+	p.MustSet(KeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
 
-	p.Set(KeyCookieSameSiteMode, "none")
+	p.MustSet(KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
 
-	p = MustNew(pflag.NewFlagSet("config", pflag.ContinueOnError), l)
-	p.Set("dangerous-force-http", true)
+	p = MustNew(l, configx.SkipValidation())
+	p.MustSet("dangerous-force-http", true)
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
-	p.Set(KeyCookieSameSiteMode, "none")
+	p.MustSet(KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
 }
 
 func TestViperProviderValidates(t *testing.T) {
 	l := logrusx.New("", "")
-	flags := pflag.NewFlagSet("config", pflag.ContinueOnError)
-	configx.RegisterFlags(flags)
-	require.NoError(t, flags.Parse([]string{"--config", "../../internal/.hydra.yaml"}))
-	c := MustNew(flags, l)
+	c := MustNew(l, configx.WithConfigFiles("../../internal/.hydra.yaml"))
 
 	// log
 	assert.Equal(t, "debug", c.Source().String(KeyLogLevel))

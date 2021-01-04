@@ -3,7 +3,7 @@ package driver
 import (
 	"context"
 
-	"github.com/spf13/pflag"
+	"github.com/ory/x/configx"
 
 	"github.com/ory/x/logrusx"
 
@@ -14,22 +14,22 @@ type options struct {
 	forcedValues map[string]interface{}
 	preload      bool
 	validate     bool
+	opts         []configx.OptionModifier
 }
 
 func newOptions() *options {
 	return &options{
-		forcedValues: make(map[string]interface{}),
-		validate:     true,
-		preload:      true,
+		validate: true,
+		preload:  true,
+		opts:     []configx.OptionModifier{},
 	}
 }
 
 type OptionsModifier func(*options)
 
-// ForceConfigValue overrides any config values set by one of the providers.
-func ForceConfigValue(key string, value interface{}) OptionsModifier {
+func WithOptions(opts ...configx.OptionModifier) OptionsModifier {
 	return func(o *options) {
-		o.forcedValues[key] = value
+		o.opts = append(o.opts, opts...)
 	}
 }
 
@@ -51,21 +51,16 @@ func DisablePreloading() OptionsModifier {
 	}
 }
 
-func New(flags *pflag.FlagSet, opts ...OptionsModifier) Registry {
+func New(opts ...OptionsModifier) Registry {
 	o := newOptions()
 	for _, f := range opts {
 		f(o)
 	}
 
 	l := logrusx.New("ORY Hydra", config.Version)
-	c, err := config.New(flags, l)
+	c, err := config.New(l, o.opts...)
 	if err != nil {
-		l.WithError(err).Fatal("Unable to instantiate service registry.")
-	}
-	l.UseConfig(c.Source())
-
-	for k, v := range o.forcedValues {
-		c.Set(k, v)
+		l.WithError(err).Fatal("Unable to instantiate configuration.")
 	}
 
 	if o.validate {
@@ -74,7 +69,7 @@ func New(flags *pflag.FlagSet, opts ...OptionsModifier) Registry {
 
 	r, err := NewRegistryFromDSN(c, l)
 	if err != nil {
-		l.WithError(err).Fatal("Unable to instantiate service registry.")
+		l.WithError(err).Fatal("Unable to create service registry.")
 	}
 
 	if err = r.Init(); err != nil {

@@ -12,14 +12,14 @@ module.exports = {
     },
     {
       replacer: ({ content, next }) =>
-        content.replace(/v[0-9a-zA-Z\.\+\_-]+/gi, `${next}`),
+        content.replace(/v[0-9a-zA-Z.+_-]+/gi, `${next}`),
       image: 'oryd/hydra',
       files: ['docs/docs/install.md']
     },
     {
       replacer: ({ content, next }) =>
         content.replace(
-          /oryd\/hydra:v[0-9a-zA-Z\.\+\_-]+/g,
+          /oryd\/hydra:v[0-9a-zA-Z.+_-]+/gi,
           `oryd/hydra:${next}-sqlite`
         ),
       files: ['quickstart.yml']

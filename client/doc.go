@@ -49,7 +49,7 @@ type swaggerUpdateClientPayload struct {
 
 // swagger:parameters listOAuth2Clients
 type swaggerListClientsParameter struct {
-	// The maximum amount of policies returned.
+	// The maximum amount of policies returned, upper bound is 500 policies
 	// in: query
 	Limit int `json:"limit"`
 

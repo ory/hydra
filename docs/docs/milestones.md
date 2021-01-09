@@ -100,13 +100,6 @@ Affects documentation.
 
 #### Issues
 
-- [ ] URLS_ERROR and OAUTH2_ERROR_URL might be redundant and OAUTH2_ERROR_URL
-      not properly documented
-      ([hydra#2254](https://github.com/ory/hydra/issues/2254)) -
-      [@Kim Neunert](https://github.com/k9ert),
-      [@Vincent](https://github.com/vinckr)
-- [ ] /clients?limit=1000 endpoint caps number of returned clients to 500
-      instances ([hydra#2267](https://github.com/ory/hydra/issues/2267))
 - [ ] Unable to start hydra due to bad configuration schema
       ([hydra#2270](https://github.com/ory/hydra/issues/2270))
 - [x] docs: Hydra supports two concepts of authorization
@@ -121,6 +114,13 @@ Affects documentation.
 - [x] Configuration is not recognized by certain docker containers
       ([hydra#2164](https://github.com/ory/hydra/issues/2164)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] URLS_ERROR and OAUTH2_ERROR_URL might be redundant and OAUTH2_ERROR_URL
+      not properly documented
+      ([hydra#2254](https://github.com/ory/hydra/issues/2254)) -
+      [@Kim Neunert](https://github.com/k9ert),
+      [@Vincent](https://github.com/vinckr)
+- [x] /clients?limit=1000 endpoint caps number of returned clients to 500
+      instances ([hydra#2267](https://github.com/ory/hydra/issues/2267))
 
 #### Pull Requests
 

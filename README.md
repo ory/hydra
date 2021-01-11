@@ -101,14 +101,14 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 The ORY community stands on the shoulders of individuals, companies, and
 maintainers. We thank everyone involved - from submitting bug reports and
 feature requests, to contributing patches, to sponsoring our work. Our community
-is 1000+ strong and growing rapidly. The ORY stack protects 1.200.000.000+ API
-requests every month with over 15.000+ active service nodes. We would have never
-been able to achieve this without each and everyone of you!
+is 1000+ strong and growing rapidly. The ORY stack protects 16.000.000.000+ API
+requests every month with over 250.000+ active service nodes. We would have
+never been able to achieve this without each and everyone of you!
 
 The following list represents companies that have accompanied us along the way
 and that have made outstanding contributions to our ecosystem. _If you think
 that your company deserves a spot here, reach out to
-<a href="mailto:office@ory.sh">office@ory.sh</a> now_!
+<a href="mailto:office-muc@ory.sh">office-muc@ory.sh</a> now_!
 
 **Please consider giving back by becoming a sponsor of our open source work on
 <a href="https://www.patreon.com/_ory">Patreon</a> or

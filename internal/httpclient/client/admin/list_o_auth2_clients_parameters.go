@@ -62,7 +62,7 @@ for the list o auth2 clients operation typically these are written to a http.Req
 type ListOAuth2ClientsParams struct {
 
 	/*Limit
-	  The maximum amount of policies returned.
+	  The maximum amount of policies returned, upper bound is 500 policies
 
 	*/
 	Limit *int64

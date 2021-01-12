@@ -549,6 +549,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //     Responses:
 //       200: oauth2TokenResponse
 //       401: genericError
+//       400: genericError
 //       500: genericError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSession("")

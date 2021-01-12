@@ -29,6 +29,12 @@ func (o *Oauth2TokenReader) ReadResponse(response runtime.ClientResponse, consum
 			return nil, err
 		}
 		return result, nil
+	case 400:
+		result := NewOauth2TokenBadRequest()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 401:
 		result := NewOauth2TokenUnauthorized()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -43,7 +49,7 @@ func (o *Oauth2TokenReader) ReadResponse(response runtime.ClientResponse, consum
 		return nil, result
 
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -71,6 +77,39 @@ func (o *Oauth2TokenOK) GetPayload() *models.Oauth2TokenResponse {
 func (o *Oauth2TokenOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.Oauth2TokenResponse)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewOauth2TokenBadRequest creates a Oauth2TokenBadRequest with default headers values
+func NewOauth2TokenBadRequest() *Oauth2TokenBadRequest {
+	return &Oauth2TokenBadRequest{}
+}
+
+/*Oauth2TokenBadRequest handles this case with default header values.
+
+genericError
+*/
+type Oauth2TokenBadRequest struct {
+	Payload *models.GenericError
+}
+
+func (o *Oauth2TokenBadRequest) Error() string {
+	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenBadRequest  %+v", 400, o.Payload)
+}
+
+func (o *Oauth2TokenBadRequest) GetPayload() *models.GenericError {
+	return o.Payload
+}
+
+func (o *Oauth2TokenBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.GenericError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

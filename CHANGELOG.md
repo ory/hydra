@@ -4,7 +4,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2020-12-15)](#unreleased-2020-12-15)
+- [Unreleased (2021-01-12)](#unreleased-2021-01-12)
+- [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
@@ -495,20 +496,36 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0-alpha.3...4937a00b9a09e6cbc6706978cc6aad74f80d4c75) (2020-12-15)
+# Unreleased (2021-01-12)
+
+No significant changes have been made for this release.
+
+
+# [1.9.0-alpha.4.pre.0](https://github.com/ory/hydra/compare/v1.9.0-alpha.3...v1.9.0-alpha.4.pre.0) (2021-01-12)
 
 
 ### Bug Fixes
 
+* Add 400 as possible reply to /oauth2/token ([24daede](https://github.com/ory/hydra/commit/24daede2a63ec94e6f556e220f316e854a186422)), closes [#2260](https://github.com/ory/hydra/issues/2260)
 * Bump ory/x and update config usage ([#2248](https://github.com/ory/hydra/issues/2248)) ([4937a00](https://github.com/ory/hydra/commit/4937a00b9a09e6cbc6706978cc6aad74f80d4c75))
+* Do not require unset pairwise ([4136aaf](https://github.com/ory/hydra/commit/4136aaf3da40d5fa548de23ae92cdb4c01c837fd))
+* Improve version regex ([17d9599](https://github.com/ory/hydra/commit/17d9599559b0f9b6578c85054b12d12ac98d0c0b)), closes [#2255](https://github.com/ory/hydra/issues/2255)
+* Update schema reference for subject_identifiers.supported_types ([0e14a08](https://github.com/ory/hydra/commit/0e14a08d338eaf9966fe2d15e15bfd2c4077929c)), closes [#2270](https://github.com/ory/hydra/issues/2270)
 
 
 ### Documentation
 
 * Add note about mounting the config file when using docker ([#2235](https://github.com/ory/hydra/issues/2235)) ([766e8f1](https://github.com/ory/hydra/commit/766e8f1a6dd6fbf73a055ff9d49cf1b271a1cfd4)), closes [#2231](https://github.com/ory/hydra/issues/2231)
+* Change deprecated fallback url ([#2275](https://github.com/ory/hydra/issues/2275)) ([0bf61aa](https://github.com/ory/hydra/commit/0bf61aa5e1c2f42108ad2cab47ca492c6ac6d64a)), closes [#2254](https://github.com/ory/hydra/issues/2254)
+* Client api upper bound on limit parameter ([#2277](https://github.com/ory/hydra/issues/2277)) ([bc2bbd2](https://github.com/ory/hydra/commit/bc2bbd2f6253ca4ec76e6701ec2a9459dbf64c24)), closes [#2267](https://github.com/ory/hydra/issues/2267)
+* Corrected a link within the docs ([#2257](https://github.com/ory/hydra/issues/2257)) ([0dd4e64](https://github.com/ory/hydra/commit/0dd4e64db8a5dccef96e2482b822ac08ee736bec))
+* Fix incorrect version replacements ([70a6b8f](https://github.com/ory/hydra/commit/70a6b8fd520b361645312990433ad21548b76856))
+* Fix typo ([#2264](https://github.com/ory/hydra/issues/2264)) ([82ba2df](https://github.com/ory/hydra/commit/82ba2dfdadfdd8e9530d7312aca3bab7d077d4ce))
+* OAUTH2_ERROR_URL -> URLS_ERROR ([#2263](https://github.com/ory/hydra/issues/2263)) ([f9b8205](https://github.com/ory/hydra/commit/f9b820521b7aad121e2c746f276711e54ffdb910))
 * Oidc.subject_identifiers config key change ([#2232](https://github.com/ory/hydra/issues/2232)) ([2172f25](https://github.com/ory/hydra/commit/2172f25ee599e2df016daffa6692f92e5f5ee277)):
 
     > oidc.subject_identifiers.enabled is now oidc.subject_identifiers.supported_types. Docs should get updated.
+* Update install from source instructions ([bcfd9b7](https://github.com/ory/hydra/commit/bcfd9b72c68c6c9d2550a9ec511543363fc99d72))
 
 
 

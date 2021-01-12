@@ -74,16 +74,15 @@ $ hydra help
 ## Building from Source
 
 If you wish to compile ORY Hydra yourself, you need to install and set up
-[Go 1.12+](https://golang.org/) and add `$GOPATH/bin` to your `$PATH`.
+[Go 1.15+](https://golang.org/) and add `$GOPATH/bin` to your `$PATH`.
 
 The following commands will check out the latest release tag of ORY Hydra,
 compile it, and set up flags so that `hydra version` works as expected. Please
 note that this will only work in a Bash-like shell.
 
 ```shell
-$ go get -d -u github.com/ory/hydra
-$ go install github.com/gobuffalo/packr/v2/packr2
-$ cd $(go env GOPATH)/src/github.com/ory/hydra
+$ git clone https://github.com/ory/hydra.git
+$ cd hydra
 $ GO111MODULE=on make install-stable
 $ $(go env GOPATH)/bin/hydra help
 ```

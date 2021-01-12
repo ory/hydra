@@ -537,7 +537,7 @@
           },
           "if": {
             "properties": {
-              "enabled": {
+              "supported_types": {
                 "contains": {
                   "const": "pairwise"
                 }
@@ -559,7 +559,7 @@
           },
           "examples": [
             {
-              "enabled": [
+              "supported_types": [
                 "public",
                 "pairwise"
               ],

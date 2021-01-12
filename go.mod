@@ -7,7 +7,7 @@ require (
 	github.com/Microsoft/go-winio v0.4.11
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5
 	github.com/asaskevich/govalidator v0.0.0-20170425121227-4918b99a7cb9
-	github.com/aws/aws-sdk-go v1.26.5 // indirect
+	github.com/aws/aws-sdk-go v1.27.3
 	github.com/cenkalti/backoff v2.0.0+incompatible
 	github.com/containerd/continuity v0.0.0-20180921161001-7f53d412b9eb
 	github.com/coupa/foundation-go v1.2.2
@@ -18,21 +18,21 @@ require (
 	github.com/fsnotify/fsnotify v1.4.3-0.20170329110642-4da3e2cfbabc
 	github.com/go-sql-driver/mysql v1.3.0
 	github.com/golang/protobuf v0.0.0-20170920220647-130e6b02ab05
-	github.com/gorilla/context v0.0.0-20160226214623-1ea25387ff6f
+	github.com/google/uuid v1.1.1
+	github.com/gorilla/context v1.1.1
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v0.0.0-20160922145804-ca9ada445741
 	github.com/hashicorp/golang-lru v0.5.0
 	github.com/hashicorp/hcl v0.0.0-20171009174708-42e33e2d55a0
 	github.com/imdario/mergo v0.0.0-20160216103600-3e95a51e0639
 	github.com/inconshreveable/mousetrap v1.0.0
-	github.com/jehiah/go-strftime v0.0.0-20140929120216-834e15c05a45
+	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
+	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/jmoiron/sqlx v0.0.0-20180614180643-0dae4fefe7c0
 	github.com/julienschmidt/httprouter v1.1.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.1
-	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lib/pq v0.0.0-20171010183604-30d59eaf0152
 	github.com/magiconair/properties v1.7.4-0.20170902060319-8d7837e64d3c
-	github.com/mattn/go-sqlite3 v2.0.2+incompatible // indirect
 	github.com/meatballhat/negroni-logrus v0.0.0-20170801195057-31067281800f
 	github.com/mitchellh/mapstructure v0.0.0-20170523030023-d0303fe80992
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -64,6 +64,7 @@ require (
 	github.com/spf13/viper v1.0.1-0.20170929210642-d9cca5ef3303
 	github.com/square/go-jose v2.1.3+incompatible
 	github.com/stretchr/testify v1.2.2
+	github.com/subosito/gotenv v1.2.0
 	github.com/toqueteos/webbrowser v1.0.0
 	github.com/urfave/negroni v0.2.0
 	github.com/xtgo/uuid v0.0.0-20140804021211-a0b114877d4c
@@ -75,8 +76,8 @@ require (
 	google.golang.org/appengine v1.0.1-0.20171010223110-07f075729064
 	gopkg.in/airbrake/gobrake.v2 v2.0.8
 	gopkg.in/alexcesaro/statsd.v2 v2.0.0
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/gorp.v1 v1.7.1
+	gopkg.in/ini.v1 v1.51.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.0.0-20170812160011-eb3733d160e7
 )

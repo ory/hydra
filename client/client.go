@@ -13,6 +13,9 @@ type Client struct {
 	// ID is the id for this client.
 	ID string `json:"id" gorethink:"id"`
 
+	// ClientID is the client id for this client.
+	ClientID string `json:"client_id" gorethink:"client_id"`
+
 	// Name is the human-readable string name of the client to be presented to the
 	// end-user during authorization.
 	Name string `json:"client_name" gorethink:"client_name"`

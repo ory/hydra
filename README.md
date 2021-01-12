@@ -1,3 +1,9 @@
+Sand server v2 is hosted on the "release" branch of this repo: https://github.com/coupa/hydra-sand/tree/release
+
+The "master" branch is the Sand CLI program.
+
+---
+
 <h1 align="center"><img src="https://storage.googleapis.com/ory.am/github-banner/ory_01-hydra-altb.png" alt="ORY Hydra - Open Source OAuth 2 and OpenID Connect server"></h1>
 
 <h4 align="center">

@@ -609,12 +609,11 @@ https://tools.ietf.org/html/rfc6749
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 302            | [Found](https://tools.ietf.org/html/rfc7231#section-6.4.3)                 | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 302    | [Found](https://tools.ietf.org/html/rfc7231#section-6.4.3)                 | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -793,12 +792,11 @@ token: string
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 200            | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -969,10 +967,9 @@ https://openid.net/specs/openid-connect-backchannel-1_0.html
 
 ##### Overview
 
-| Status         | Meaning                                                    | Description                                                                                                    | Schema |
-| -------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------ |
-| 302            | [Found](https://tools.ietf.org/html/rfc7231#section-6.4.3) | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                       |
+| Status | Meaning                                                    | Description                                                                                                                   | Schema |
+| ------ | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 302    | [Found](https://tools.ietf.org/html/rfc7231#section-6.4.3) | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None   |
 
 <aside class="success">This operation does not require authentication</aside>
 
@@ -2595,12 +2592,11 @@ and only callable by first-party components.
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 404            | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -3612,13 +3608,12 @@ user-defined keys as well.
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 403            | [Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)             | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 403    | [Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -4227,13 +4222,12 @@ user-defined keys as well.
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 403            | [Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)             | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 403    | [Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -4401,10 +4395,9 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 
 ##### Overview
 
-| Status         | Meaning                                                 | Description                                                                                                    | Schema |
-| -------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------ |
-| 200            | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1) | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                    |
+| Status | Meaning                                                 | Description                                                                                                                   | Schema |
+| ------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1) | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None   |
 
 <aside class="success">This operation does not require authentication</aside>
 
@@ -6251,12 +6244,11 @@ status_code: 0
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 404            | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -6750,13 +6742,12 @@ This endpoint revokes a subject's granted consent sessions for a specific OAuth
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 400            | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 404            | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -6936,13 +6927,12 @@ invalidates-a-subject's-authentication-session-responses"
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 400            | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 404            | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -7123,12 +7113,11 @@ deleted automatically when performing the refresh flow.
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 
@@ -7515,12 +7504,11 @@ This endpoint deletes OAuth2 access tokens issued for a client from the database
 
 ##### Overview
 
-| Status         | Meaning                                                                    | Description                                                                                                    | Schema                              |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 204            | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is |
-| typically 201. | None                                                                       |
-| 401            | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                   | [genericError](#schemagenericerror) |
-| 500            | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                   | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description                                                                                                                   | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
+| 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError                                                                                                                  | [genericError](#schemagenericerror) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
 

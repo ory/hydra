@@ -115,6 +115,20 @@
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0-rc.0/.schema/config.schema.json"
                 }
             ]
+        },
+        {
+            "allOf": [
+                {
+                    "properties": {
+                        "version": {
+                            "const": "v1.9.0"
+                        }
+                    }
+                },
+                {
+                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0/.schema/config.schema.json"
+                }
+            ]
         }
     ]
 }

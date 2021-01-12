@@ -5,6 +5,7 @@
 **Table of Contents**
 
 - [Unreleased (2021-01-12)](#unreleased-2021-01-12)
+- [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
 - [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
@@ -497,6 +498,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Unreleased (2021-01-12)
+
+No significant changes have been made for this release.
+
+
+# [1.9.0-rc.0](https://github.com/ory/hydra/compare/v1.9.0-alpha.4.pre.0...v1.9.0-rc.0) (2021-01-12)
 
 No significant changes have been made for this release.
 

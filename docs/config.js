@@ -11,8 +11,14 @@ module.exports = {
       files: ['docs/docs/install.md', 'docs/docs/configure-deploy.mdx']
     },
     {
+      // replace the docker tags
+      image: 'oryd/hydra',
+      files: ['docs/docs/install.md']
+    },
+    {
+      // replace the bash curl tag
       replacer: ({ content, next }) =>
-        content.replace(/v[0-9a-zA-Z.+_-]+/gi, `${next}`),
+        content.replace(/v[0-9].[0-9].[0-9][0-9a-zA-Z.+_-]+/gi, `${next}`),
       image: 'oryd/hydra',
       files: ['docs/docs/install.md']
     },

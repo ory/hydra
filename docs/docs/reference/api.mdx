@@ -1137,6 +1137,7 @@ client_id: string
 | Status | Meaning                                                                    | Description         | Schema                                            |
 | ------ | -------------------------------------------------------------------------- | ------------------- | ------------------------------------------------- |
 | 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | oauth2TokenResponse | [oauth2TokenResponse](#schemaoauth2tokenresponse) |
+| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError        | [genericError](#schemagenericerror)               |
 | 401    | [Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)            | genericError        | [genericError](#schemagenericerror)               |
 | 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError        | [genericError](#schemagenericerror)               |
 
@@ -1498,7 +1499,9 @@ Accept: application/json
 ```
 
 This endpoint lists all clients in the database, and never returns client
-secrets.
+secrets. As a default it lists the first 100 clients. The `limit` parameter can
+be used to retrieve more clients, but it has an upper bound at 500 objects.
+Pagination should be used to retrieve more than 500 objects.
 
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
 Usually, OAuth 2.0 clients are generated for applications which want to consume
@@ -1516,10 +1519,10 @@ separated by a comma.
 
 #### Parameters
 
-| Parameter | In    | Type           | Required | Description                              |
-| --------- | ----- | -------------- | -------- | ---------------------------------------- |
-| limit     | query | integer(int64) | false    | The maximum amount of policies returned. |
-| offset    | query | integer(int64) | false    | The offset from where to start looking.  |
+| Parameter | In    | Type           | Required | Description                                                          |
+| --------- | ----- | -------------- | -------- | -------------------------------------------------------------------- |
+| limit     | query | integer(int64) | false    | The maximum amount of policies returned, upper bound is 500 policies |
+| offset    | query | integer(int64) | false    | The offset from where to start looking.                              |
 
 #### Responses
 

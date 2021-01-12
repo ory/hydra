@@ -795,7 +795,7 @@ oidc:
   # Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
   #
   # Examples:
-  # - enabled:
+  # - supported_types:
   #     - public
   #     - pairwise
   #   pairwise:
@@ -803,6 +803,8 @@ oidc:
   #
   subject_identifiers:
     ## supported_types ##
+    #
+    # A list of algorithms to enable.
     #
     # Set this value using environment variables on
     # - Linux/macOS:

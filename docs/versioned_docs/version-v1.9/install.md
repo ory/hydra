@@ -11,8 +11,8 @@ binaries, Docker Images and support various package managers.
 We recommend using Docker to run ORY Hydra:
 
 ```shell
-$ docker pull oryd/hydra:v1.9.0-alpha.1
-$ docker run --rm -it oryd/hydra:v1.9.0-alpha.1 help
+$ docker pull oryd/hydra:v1.9.0-alpha.4.pre.0
+$ docker run --rm -it oryd/hydra:v1.9.0-alpha.4.pre.0 help
 ```
 
 ## macOS
@@ -31,7 +31,7 @@ On linux, you can use `bash <(curl ...)` to fetch the latest stable binary
 using:
 
 ```shell
-$ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.1/install.sh) -b . v1.9.0-alpha.1
+$ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.4.pre.0/install.sh) -b . v1.9.0-alpha.4.pre.0
 $ ./hydra help
 ```
 
@@ -74,18 +74,15 @@ $ hydra help
 ## Building from Source
 
 If you wish to compile ORY Hydra yourself, you need to install and set up
-[Go 1.12+](https://golang.org/) and add `$GOPATH/bin` to your `$PATH`.
+[Go 1.15+](https://golang.org/) and add `$GOPATH/bin` to your `$PATH`.
 
 The following commands will check out the latest release tag of ORY Hydra,
 compile it, and set up flags so that `hydra version` works as expected. Please
 note that this will only work in a Bash-like shell.
 
 ```shell
-$ go get -d -u github.com/ory/hydra
-$ go install github.com/gobuffalo/packr/v2/packr2
-$ cd $(go env GOPATH)/src/github.com/ory/hydra
+$ git clone https://github.com/ory/hydra.git
+$ cd hydra
 $ GO111MODULE=on make install-stable
 $ $(go env GOPATH)/bin/hydra help
-```
-p
 ```

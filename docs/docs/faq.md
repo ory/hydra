@@ -252,3 +252,20 @@ for more information: https://www.ory.sh/docs/ecosystem/cloud-native. There is
 also some information on collecting statistics in the section on
 [prometheus](https://github.com/prometheus) in the
 [five minute tutorial](./5min-tutorial).
+
+
+## Is it possible to disable/enable certain flows in Hydra?
+
+>Is it possible to leave only OpenID authorization code grant flow, while disabling all the rest of the flows in Hydra? Is it configurable that way?
+
+Yes - you can configure that in your client. It has things like grant_types etc - there you can basically whitelist the flows you need.
+
+
+## How can i test if my 4445 is running properly?
+
+>I am using ory hydra for authentication.   
+I get a 404 when im trying to create a client on my private EC2 hydra task.  
+Is there a way to test if my 4445 is running properly?  
+
+You can check /health/alive, to see if it's alive. and /health/ready, to see if it's also in ready state (meaning db connectivity works).
+

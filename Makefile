@@ -7,10 +7,30 @@ BUILD_ROOT ?= $(SRCROOT)
 SRCROOT_D = /go/src/github.com/ory/hydra
 BUILD_ROOT_D = $(SRCROOT_D)/tmp/dist
 
-REVISION = $$(git rev-parse --short HEAD)
-VERSION = $$(git name-rev --tags --name-only $(REVISION))
+MAJOR_VERSION = 0
+MINOR_VERSION = 9
+PATCH_VERSION = 16
+
+REVISION ?= $$(git rev-parse --short HEAD)
+VERSION ?= $(MAJOR_VERSION).$(MINOR_VERSION).$(PATCH_VERSION)
+
+BUILD_NUMBER ?= x
+BUILD_IDENTIFIER = _${BUILD_NUMBER}
 
 LD_FLAGS ?= -ldflags "-X github.com/ory/hydra/cmd.GitHash=$(REVISION) -X github.com/ory/hydra/cmd.Version=$(VERSION)"
+
+build-cli:
+	go build $(LD_FLAGS) -o $(BUILD_ROOT)/sand
+
+docker.build.cli: clean
+	docker build -f Dockerfile-cli \
+		-t sand$(BUILD_IDENTIFIER) \
+		--build-arg VERSION=$(VERSION) \
+		--build-arg REVISION=$(REVISION) .
+	docker create -it --name tocopy-sand$(BUILD_IDENTIFIER) sand$(BUILD_IDENTIFIER) bash
+	docker cp tocopy-sand$(BUILD_IDENTIFIER):$(BUILD_ROOT_D)/sand $(SRCROOT)/
+	docker rm -f tocopy-sand$(BUILD_IDENTIFIER)
+	docker rmi -f sand$(BUILD_IDENTIFIER)
 
 default: build
 
@@ -33,6 +53,7 @@ build-linux:
 distbuild: clean build build-osx build-linux
 
 clean:
+	rm -f sand
 	if [ -d $(BUILD_ROOT_D) ]; then rm -rf $(BUILD_ROOT_D); fi
 	if [ -d $(SRCROOT)/vendor ]; then rm -rf $(SRCROOT)/vendor; fi
 

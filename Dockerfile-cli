@@ -1,0 +1,12 @@
+FROM golang:1.14-stretch
+
+ENV BUILD_ROOT=/go/src/github.com/ory/hydra/tmp/dist
+ARG REVISION=unset
+ARG VERSION=unset
+
+RUN mkdir -p /go/src/github.com/ory/hydra
+
+COPY . /go/src/github.com/ory/hydra
+
+WORKDIR /go/src/github.com/ory/hydra
+RUN REVISION=${REVISION} VERSION=${VERSION} make build-cli

@@ -28,7 +28,7 @@ func (m *HTTPManager) GetConcreteClient(id string) (*Client, error) {
 	if err := r.Get(&c); err != nil {
 		return nil, errors.WithStack(err)
 	}
-
+	c.ID = c.ClientID
 	return &c, nil
 }
 
@@ -41,6 +41,7 @@ func (m *HTTPManager) UpdateClient(c *Client) error {
 	r.Client = m.Client
 	r.Dry = m.Dry
 	r.FakeTLSTermination = m.FakeTLSTermination
+	c.ClientID = c.ID
 	return r.Update(c)
 }
 
@@ -49,6 +50,7 @@ func (m *HTTPManager) CreateClient(c *Client) error {
 	r.Client = m.Client
 	r.Dry = m.Dry
 	r.FakeTLSTermination = m.FakeTLSTermination
+	c.ClientID = c.ID
 	return r.Create(c)
 }
 

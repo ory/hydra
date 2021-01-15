@@ -6,7 +6,7 @@ title: JavaScript
 To install the JavaScript SDK, run:
 
 ```
-npm install --save @oryd/hydra-client
+npm install --save @ory/hydra-client
 ```
 
 ### Configuration
@@ -14,7 +14,7 @@ npm install --save @oryd/hydra-client
 #### Basic configuration
 
 ```js
-import { AdminApi } from '@oryd/hydra-client'
+import { AdminApi } from '@ory/hydra-client'
 
 // Set this to Hydra's URL
 const hydraAdmin = new AdminApi('http://localhost:4445')

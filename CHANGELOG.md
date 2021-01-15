@@ -499,7 +499,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0...d2ee4f6cd308a2b61fd4ef7f8fcebb2901190a58) (2021-01-15)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0...d05d82e926a726fd4fe0179363a140ca59e40c10) (2021-01-15)
 
 
 ### Documentation
@@ -508,6 +508,9 @@
 
     > Added two items to the FAQ that were sitting in meta/tmp.
 * Update before oauth2.mdx ([#2299](https://github.com/ory/hydra/issues/2299)) ([d2ee4f6](https://github.com/ory/hydra/commit/d2ee4f6cd308a2b61fd4ef7f8fcebb2901190a58)), closes [#2295](https://github.com/ory/hydra/issues/2295)
+* Update npm package name ([#2302](https://github.com/ory/hydra/issues/2302)) ([d05d82e](https://github.com/ory/hydra/commit/d05d82e926a726fd4fe0179363a140ca59e40c10)):
+
+    > Changed npm client package from @oryd/hydra-client to @ory/hydra-client
 
 
 

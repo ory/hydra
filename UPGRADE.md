@@ -169,7 +169,7 @@ languages and published them on their respective package repositories:
 - [Python](https://pypi.org/project/ory-hydra-client/)
 - [PHP](https://packagist.org/packages/ory/hydra-client)
 - [Go](https://github.com/ory/hydra-client-go)
-- [NodeJS](https://www.npmjs.com/package/@ory/hydra-client) (with TypeScript)
+- [NodeJS](https://www.npmjs.com/package/@oryd/hydra-client) (with TypeScript)
 - [Java](https://search.maven.org/artifact/sh.ory.hydra/hydra-client)
 - [Ruby](https://rubygems.org/gems/ory-hydra-client)
 

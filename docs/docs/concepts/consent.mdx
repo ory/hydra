@@ -28,7 +28,7 @@ includes both login and consent.
 
 :::info
 
-Please read [Login Flow](./login) first, as the Login Flow happens before the
+Please read [Login Flow](./login.mdx) first, as the Login Flow happens before the
 consent flow.
 
 :::
@@ -94,7 +94,7 @@ A consent has four distinctive attributes:
 - The requested scope
   (`/oauth2/auth?...&...&scope=email+profile+offline_access`);
 - The OAuth2 Client (`/oauth2/auth?client_id=abcd`);
-- The End-User (this is the `subject` set in the [Login Flow](./login));
+- The End-User (this is the `subject` set in the [Login Flow](./login.mdx));
 - Whether or not a previous consent exists, the previous consent has
   `remember: true`, and the scope granted by the user (did the user accept all
   of `email`, `profile`, `offline_access`?)
@@ -140,7 +140,7 @@ information about the consent request. The body contains a `skip` value. If the
 value is `false`, the user interface must be shown. If `skip` is true, you
 should not show the user interface but instead just accept or reject the consent
 request! For more details about the implementation check the
-["Implementing the Consent Endpoint" Guide](../guides/login).
+["Implementing the Consent Endpoint" Guide](../guides/login.mdx).
 
 <Tabs
   defaultValue="ui"
@@ -161,7 +161,7 @@ $ curl \
   "http://127.0.0.1:4445/oauth2/auth/requests/consent?consent_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2"
 ```
 
-Check the ["Implementing the Consent Endpoint" Guide](../guides/consent) for
+Check the ["Implementing the Consent Endpoint" Guide](../guides/consent.mdx) for
 examples using the ORY Hydra SDK in different languages.
 
 </TabItem>
@@ -228,7 +228,7 @@ most cases, you will show an HTML form similar to:
 
 To accept the Consent Challenge, make an HTTP PUT request with
 `Content-Type: application/json` and a JSON payload (see
-[Accept Consent Request HTTP API Reference](../reference/api#schemaacceptconsentrequest))
+[Accept Consent Request HTTP API Reference](../reference/api.mdx#schemaacceptconsentrequest))
 
 ```json
 {
@@ -280,14 +280,14 @@ The server responds with JSON
 
 which is the URL your application must the End-User's browser to.
 
-Check the ["Implementing the Consent Endpoint" Guide](../guides/consent) for
+Check the ["Implementing the Consent Endpoint" Guide](../guides/consent.mdx) for
 examples using the ORY Hydra SDK in different languages.
 
 ### Rejecting the Consent Flow
 
 To reject the Login Challenge, make a HTTP PUT request with
 `Content-Type: application/json` and a JSON payload (see
-[Reject Consent Request HTTP API Reference](../reference/api#schemarejectrequest))
+[Reject Consent Request HTTP API Reference](../reference/api.mdx#schemarejectrequest))
 
 ```json
 {
@@ -335,7 +335,7 @@ The server responds with JSON
 
 which is the URL your application must the End-User's browser to.
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
 examples using the ORY Hydra SDK in different languages.
 
 ## Revoking Consent

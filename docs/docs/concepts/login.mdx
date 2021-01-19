@@ -59,7 +59,7 @@ that URL.
 
 :::note
 
-This guide uses URLs from the [5 Minute Tutorial](../5min-tutorial):
+This guide uses URLs from the [5 Minute Tutorial](../5min-tutorial.mdx):
 
 - ORY Hydra Public Endpoint: http://127.0.0.1:4444
 - ORY Hydra Admin Endpoint: http://127.0.0.1:4445
@@ -154,7 +154,7 @@ ORY Hydra supports the following OpenID Connect query parameters:
     Login HTML Form in the Login Endpoint.
   - `prompt=consent` instructs ORY Hydra to force the End-User to re-authorize
     (give consent) the OAuth2 Client using the
-    [Consent HTML Form in the Consent Endpoint](./consent).
+    [Consent HTML Form in the Consent Endpoint](./consent.mdx).
   - `prompt=select_account` is currently not supported in ORY Hydra, see [#].
 - `max_age` (optional) specifies the allowable elapsed time in seconds since the
   last time the End-User was actively authenticated by ORY Hydra. If the elapsed
@@ -191,7 +191,7 @@ about the login request. The body contains a `skip` value. If the value is
 `false`, the user interface must be shown. If `skip` is true, you should not
 show the user interface but instead just accept or reject the login request! For
 more details about the implementation check the
-["Implementing the Login Endpoint" Guide](../guides/login).
+["Implementing the Login Endpoint" Guide](../guides/login.mdx).
 
 <Tabs
   defaultValue="ui"
@@ -211,7 +211,7 @@ more details about the implementation check the
 curl "http://127.0.0.1:4445/oauth2/auth/requests/login?login_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2"
 ```
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
 examples using the ORY Hydra SDK in different languages.
 
 </TabItem>
@@ -281,7 +281,7 @@ flows) the login challenge.
 
 To accept the Login Challenge, make a HTTP PUT request with
 `Content-Type: application/json` and a JSON payload (see
-[Accept Login Request HTTP API Reference](../reference/api#schemaacceptloginrequest))
+[Accept Login Request HTTP API Reference](../reference/api.mdx#schemaacceptloginrequest))
 
 :::warning
 
@@ -351,14 +351,14 @@ The server responds with JSON
 
 which is the URL your application must redirect the End-User's browser to.
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
 examples using the ORY Hydra SDK in different languages.
 
 ### Rejecting the Login Flow
 
 To reject the Login Challenge, make a HTTP PUT request with
 `Content-Type: application/json` and a JSON payload (see
-[Reject Login Request HTTP API Reference](../reference/api#schemarejectrequest))
+[Reject Login Request HTTP API Reference](../reference/api.mdx#schemarejectrequest))
 
 ```json
 {
@@ -406,12 +406,12 @@ The server responds with JSON
 
 which is the URL your application must the End-User's browser to.
 
-Check the ["Implementing the Login Endpoint" Guide](../guides/login) for
+Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
 examples using the ORY Hydra SDK in different languages.
 
 ## Redirection to the Consent Endpoint
 
-Please head over to [Consent Flow](./consent)!
+Please head over to [Consent Flow](./consent.mdx)!
 
 ## Revoking ORY Hydra Login Sessions
 
@@ -429,7 +429,7 @@ If you log out of GitHub, you will not be logged out of CircleCI/TravisCI.
 
 Revoking the login sessions of a user is as easy as sending `DELETE` to
 `/oauth2/auth/sessions/login?subject={subject}` (see
-[full API documentation](../reference/api#opIdrevokeAuthenticationSession)).
+[full API documentation](../reference/api.mdx#opIdrevokeAuthenticationSession)).
 
 This endpoint is not compatible with OpenID Connect Front-/Backchannel logout
 and does not revoke any tokens.

@@ -171,7 +171,7 @@ Or by specifying the following flags:
 
 ## Is there an HTTP API Documentation?
 
-[Yes](https://www.ory.sh/docs/api/hydra).
+[Yes](https://www.ory.sh/docs/hydra/reference/api.mdx). bro
 
 ## How can I disable HTTPS for testing?
 
@@ -251,7 +251,7 @@ the same config. Please check the documentation section for 12 factor principles
 for more information: https://www.ory.sh/docs/ecosystem/cloud-native. There is
 also some information on collecting statistics in the section on
 [prometheus](https://github.com/prometheus) in the
-[five minute tutorial](./5min-tutorial).
+[five minute tutorial](./5min-tutorial.mdx).
 
 ## Is it possible to disable/enable certain flows in Hydra?
 

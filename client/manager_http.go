@@ -28,7 +28,11 @@ func (m *HTTPManager) GetConcreteClient(id string) (*Client, error) {
 	if err := r.Get(&c); err != nil {
 		return nil, errors.WithStack(err)
 	}
-	c.ID = c.ClientID
+	if c.ID == "" {
+		c.ID = c.ClientID
+	} else if c.ClientID == "" {
+		c.ClientID = c.ID
+	}
 	return &c, nil
 }
 

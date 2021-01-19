@@ -43,7 +43,12 @@ func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (jwtbearer.
 }
 
 func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
-	return sqlcon.HandleError(p.Connection(ctx).Destroy(&jwtbearer.SQLData{ID: id}))
+	grant, err := p.GetConcreteGrant(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return sqlcon.HandleError(p.Connection(ctx).Destroy(&jwtbearer.SQLData{ID: grant.ID}))
 }
 
 func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]jwtbearer.Grant, error) {

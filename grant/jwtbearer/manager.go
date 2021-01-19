@@ -19,7 +19,7 @@ type SQLData struct {
 	ID        string    `db:"id"`
 	Issuer    string    `db:"issuer"`
 	Subject   string    `db:"subject"`
-	Scope     string  `db:"scope"`
+	Scope     string    `db:"scope"`
 	KeySet    string    `db:"key_set"`
 	KeyID     string    `db:"key_id"`
 	CreatedAt time.Time `db:"created_at"`

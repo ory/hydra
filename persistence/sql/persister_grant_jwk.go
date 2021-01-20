@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/hydra/grant/jwtbearer"
 	"github.com/ory/x/errorsx"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/x/sqlcon"
 )

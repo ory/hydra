@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/ory/hydra/grant/jwtbearer"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/errorsx"

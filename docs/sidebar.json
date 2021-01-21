@@ -90,14 +90,14 @@
     "debug/csrf", 
     "debug/config", 
     "debug/token-endpoint-auth-method", 
-    "debug/logout"
+    "debug/logout", 
+    "faq"
   ],
   "SDKs": ["sdk", "sdk/go", "sdk/js", "sdk/php"],
   "Development": ["milestones"],
   "Further Reading": [
     "case-study", 
     "benchmark", 
-    "security-architecture", 
-    "faq"
+    "security-architecture"
   ]
 }

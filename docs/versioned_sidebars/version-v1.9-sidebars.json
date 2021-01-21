@@ -332,6 +332,10 @@
         {
           "type": "doc",
           "id": "version-v1.9/debug/logout"
+        },
+        {
+          "type": "doc",
+          "id": "version-v1.9/faq"
         }
       ]
     },
@@ -385,10 +389,6 @@
         {
           "type": "doc",
           "id": "version-v1.9/security-architecture"
-        },
-        {
-          "type": "doc",
-          "id": "version-v1.9/faq"
         }
       ]
     },

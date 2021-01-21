@@ -172,7 +172,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	var optionalIssuer = ps.ByName("issuer")
+	var optionalIssuer = r.URL.Query().Get("issuer")
 
 	grants, err := h.registry.GrantManager().GetGrants(r.Context(), limit, offset, optionalIssuer)
 	if err != nil {

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2021-01-15)](#unreleased-2021-01-15)
+- [Unreleased (2021-01-21)](#unreleased-2021-01-21)
     - [Documentation](#documentation)
 - [1.9.0 (2021-01-12)](#190-2021-01-12)
 - [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
@@ -499,7 +499,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0...d05d82e926a726fd4fe0179363a140ca59e40c10) (2021-01-15)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.9.0...341f3ede500bff4b0d07e7e8b8d264f2291f2baa) (2021-01-21)
 
 
 ### Documentation
@@ -507,6 +507,8 @@
 * Add faq items ([8d31cb3](https://github.com/ory/hydra/commit/8d31cb34a23b2224cd8858ba51089ba5f3b155c5)):
 
     > Added two items to the FAQ that were sitting in meta/tmp.
+* Add link endings. ([#2313](https://github.com/ory/hydra/issues/2313)) ([1316cc0](https://github.com/ory/hydra/commit/1316cc00439c1b256b780f7de6878a7dc6cda19a)), closes [#38](https://github.com/ory/hydra/issues/38)
+* Fix npm links ([#2303](https://github.com/ory/hydra/issues/2303)) ([341f3ed](https://github.com/ory/hydra/commit/341f3ede500bff4b0d07e7e8b8d264f2291f2baa))
 * Update before oauth2.mdx ([#2299](https://github.com/ory/hydra/issues/2299)) ([d2ee4f6](https://github.com/ory/hydra/commit/d2ee4f6cd308a2b61fd4ef7f8fcebb2901190a58)), closes [#2295](https://github.com/ory/hydra/issues/2295)
 * Update npm package name ([#2302](https://github.com/ory/hydra/issues/2302)) ([d05d82e](https://github.com/ory/hydra/commit/d05d82e926a726fd4fe0179363a140ca59e40c10)):
 

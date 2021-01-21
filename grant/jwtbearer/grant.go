@@ -27,7 +27,7 @@ type Grant struct {
 }
 
 type PublicKey struct {
-	// Set is basically a name for a group(set) of keys.
+	// Set is basically a name for a group(set) of keys. Will be the same as Issuer in grant.
 	Set string `json:"set"`
 
 	// KeyID is key unique identifier (same as kid header in jws/jwt).

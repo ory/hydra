@@ -36,8 +36,28 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.DELETE(grantJWTBearerPath+"/:id", h.Delete)
 }
 
+// swagger:route POST /grants/jwt-bearer admin createJWTBearerGrant
+//
+// Create a new jwt-bearer Grant.
+//
+// This endpoint is capable of creating a new jwt-bearer Grant, by doing this, we are granting permission for client to
+// act on behalf of some resource owner.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       201: JWTBearerGrant
+//       400: genericError
+//       409: genericError
+//       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var grantRequest grantRequest
+	var grantRequest createGrantRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&grantRequest); err != nil {
 		h.registry.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -70,6 +90,25 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID, &grant)
 }
 
+// swagger:route GET /grants/jwt-bearer/{id} admin getJWTBearerGrant
+//
+// Fetch jwt-bearer grant information.
+//
+// This endpoint returns jwt-bearer grant, identified by grant ID. Grant represents resource owner (RO) permission
+// for client to act on behalf of the RO. In this case client uses jwt to request access token to act as RO.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: JWTBearerGrant
+//       404: genericError
+//       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -82,6 +121,26 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.registry.Writer().Write(w, r, grant)
 }
 
+// swagger:route DELETE /grants/jwt-bearer/{id} admin deleteJWTBearerGrant
+//
+// Delete jwt-bearer grant.
+//
+// This endpoint will delete jwt-bearer grant, identified by grant ID, so client won't be able to represent
+// resource owner (which granted permission), using this grant anymore. All associated public keys with grant
+// will also be deleted.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       404: genericError
+//       500: genericError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -93,6 +152,24 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// swagger:route GET /grants/jwt-bearer admin getJWTBearerGrantList
+//
+// Fetch all jwt-bearer grants.
+//
+// This endpoint returns list of jwt-bearer grants. Grant represents resource owner (RO) permission
+// for client to act on behalf of the RO. In this case client uses jwt to request access token to act as RO.
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       200: JWTBearerGrantList
+//       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 	var optionalIssuer = ps.ByName("issuer")

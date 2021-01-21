@@ -11,7 +11,7 @@ func NewGrantValidator() *GrantValidator {
 	return &GrantValidator{}
 }
 
-func (v *GrantValidator) Validate(request grantRequest) error {
+func (v *GrantValidator) Validate(request createGrantRequest) error {
 	if request.Issuer == "" {
 		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Field 'issuer' is required."))
 	}

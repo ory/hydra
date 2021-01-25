@@ -95,9 +95,5 @@
   ],
   "SDKs": ["sdk", "sdk/go", "sdk/js", "sdk/php"],
   "Development": ["milestones"],
-  "Further Reading": [
-    "case-study", 
-    "benchmark", 
-    "security-architecture"
-  ]
+  "Further Reading": ["case-study", "benchmark", "security-architecture"]
 }

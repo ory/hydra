@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/pborman/uuid"
+
+	"github.com/ory/hydra/grant/jwtbearer"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal/testhelpers"
@@ -58,6 +61,11 @@ func TestManagers(t *testing.T) {
 
 				jwk.TestHelperManagerKeySet(m.KeyManager(), ks, uuid.New())
 			})
+		})
+
+		t.Run("package=grant/jwtbearer/manager="+k, func(t *testing.T) {
+			t.Run("case=create-get-delete", jwtbearer.TestHelperGrantManagerCreateGetDeleteGrant(m.GrantManager()))
+			t.Run("case=errors", jwtbearer.TestHelperGrantManagerErrors(m.GrantManager()))
 		})
 	}
 }

@@ -2,6 +2,7 @@ package prometheus
 
 import (
 	"net/http"
+	"time"
 )
 
 type MetricsManager struct {

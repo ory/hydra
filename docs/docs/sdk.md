@@ -23,12 +23,14 @@ each REST endpoint.
 We publish our SDKs for popular languages in their respective package
 repositories:
 
-- [Python](https://pypi.org/project/ory-hydra-client/)
-- [PHP](https://packagist.org/packages/ory/hydra-client)
+- [Dart](https://pub.dev/packages/ory_hydra_client)
 - [Go](https://github.com/ory/hydra-client-go)
-- [NodeJS](https://www.npmjs.com/package/@ory/hydra-client) (with TypeScript)
 - [Java](https://search.maven.org/artifact/sh.ory.hydra/hydra-client)
+- [JavaScript](https://www.npmjs.com/package/@ory/hydra-client) with TypeScript definitions and compatible with: NodeJS, ReactJS, AnuglarJS, Vue.js, and many more.
+- [PHP](https://packagist.org/packages/ory/hydra-client)
+- [Python](https://pypi.org/project/ory-hydra-client/)
 - [Ruby](https://rubygems.org/gems/ory-hydra-client)
+- [Rust](https://crates.io/crates/ory-hydra-client)
 
 We also provide more info for these SDKs:
 

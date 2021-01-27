@@ -15,12 +15,12 @@ version: '3.7'
 services:
 
   hydra-migrate:
-    image: oryd/hydra:v1.9.0
+    image: oryd/hydra:v1.9.1
     environment:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
 
   hydra:
-    image: oryd/hydra:v1.9.0
+    image: oryd/hydra:v1.9.1
     environment:
       - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
 

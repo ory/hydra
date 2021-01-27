@@ -26,10 +26,10 @@ A request for comments to discuss and share ideas.
 
 #### Issues
 
-- [ ] Multi-region deployment support
-      ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 - [ ] Device Authorization Grant
       ([hydra#1553](https://github.com/ory/hydra/issues/1553))
+- [x] Multi-region deployment support
+      ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 
 ## [v1.9.1](https://github.com/ory/hydra/milestone/40)
 
@@ -100,8 +100,6 @@ Affects documentation.
 
 #### Issues
 
-- [ ] Unable to start hydra due to bad configuration schema
-      ([hydra#2270](https://github.com/ory/hydra/issues/2270))
 - [x] docs: Hydra supports two concepts of authorization
       ([hydra#1992](https://github.com/ory/hydra/issues/1992)) -
       [@hackerman](https://github.com/aeneasr)
@@ -121,6 +119,8 @@ Affects documentation.
       [@Vincent](https://github.com/vinckr)
 - [x] /clients?limit=1000 endpoint caps number of returned clients to 500
       instances ([hydra#2267](https://github.com/ory/hydra/issues/2267))
+- [x] Unable to start hydra due to bad configuration schema
+      ([hydra#2270](https://github.com/ory/hydra/issues/2270))
 
 #### Pull Requests
 
@@ -180,22 +180,22 @@ Something is not working.
 - [ ] Make cookies with SameSite=None secure by default or using the
       configuration flag
       ([hydra#1844](https://github.com/ory/hydra/issues/1844))
-- [ ] RSA key generation is slow on ARM
-      ([hydra#1989](https://github.com/ory/hydra/issues/1989))
-- [ ] `loginRequest.requested_access_token_audience` should not be `null`
-      ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 - [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens
       ([hydra#2042](https://github.com/ory/hydra/issues/2042))
-- [ ] Docs: rendering issue (?) on reference REST API
-      ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
-      [@Vincent](https://github.com/vinckr)
 - [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
       response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
       [@hackerman](https://github.com/aeneasr)
 - [x] Introspection Response: `access_token` and `refresh_token` are not valid
       `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
+- [x] RSA key generation is slow on ARM
+      ([hydra#1989](https://github.com/ory/hydra/issues/1989))
+- [x] `loginRequest.requested_access_token_audience` should not be `null`
+      ([hydra#2039](https://github.com/ory/hydra/issues/2039))
 - [x] Redirect URI should be able to contain plus (+) character
       ([hydra#2055](https://github.com/ory/hydra/issues/2055))
+- [x] Docs: rendering issue (?) on reference REST API
+      ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
+      [@Vincent](https://github.com/vinckr)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -203,8 +203,6 @@ New feature or request.
 
 #### Issues
 
-- [ ] [Feature] Enhance Security Middleware
-      ([hydra#1029](https://github.com/ory/hydra/issues/1029))
 - [ ] Add API versioning for administrative APIs
       ([hydra#1050](https://github.com/ory/hydra/issues/1050))
 - [ ] consent: Allow removing tokens without revoking consent
@@ -245,6 +243,8 @@ New feature or request.
       ([hydra#2057](https://github.com/ory/hydra/issues/2057))
 - [x] consent: Improve remember for consent
       ([hydra#1006](https://github.com/ory/hydra/issues/1006))
+- [x] [Feature] Enhance Security Middleware
+      ([hydra#1029](https://github.com/ory/hydra/issues/1029))
 - [x] cmd: Add upsert command for client CLI
       ([hydra#1086](https://github.com/ory/hydra/issues/1086)) -
       [@hackerman](https://github.com/aeneasr)
@@ -271,11 +271,11 @@ Affects documentation.
 
 #### Issues
 
-- [ ] Docs: rendering issue (?) on reference REST API
-      ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
-      [@Vincent](https://github.com/vinckr)
 - [ ] Add list of possible errors to REST API documentation
       ([hydra#2166](https://github.com/ory/hydra/issues/2166))
+- [x] Docs: rendering issue (?) on reference REST API
+      ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
+      [@Vincent](https://github.com/vinckr)
 - [x] 'make deps' Not work
       ([hydra#2154](https://github.com/ory/hydra/issues/2154)) -
       [@hackerman](https://github.com/aeneasr)

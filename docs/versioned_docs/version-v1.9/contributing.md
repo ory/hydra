@@ -211,10 +211,10 @@ please include a note in your commit message explaining why.
 
 ```
 # First you clone the original repository
-git clone git@github.com:ory/Hydra.git
+git clone git@github.com:ory/ory/hydra.git
 
 # Next you add a git remote that is your fork:
-git remote add fork git@github.com:<YOUR-GITHUB-USERNAME-HERE>/Hydra.git
+git remote add fork git@github.com:<YOUR-GITHUB-USERNAME-HERE>/ory/hydra.git
 
 # Next you fetch the latest changes from origin for master:
 git fetch origin

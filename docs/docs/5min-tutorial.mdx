@@ -182,7 +182,6 @@ $ docker-compose -f quickstart.yml kill
 $ docker-compose -f quickstart.yml rm -f -v
 ```
 
-
 ### Quickstart Configuration
 
 In this tutorial we use a simplified configuration.  
@@ -193,32 +192,31 @@ The configuration gets loaded in docker-compose as specified in the
 ```yml
 serve:
 cookies:
-    same_site_mode: Lax
-    # cookies are only set when the domain in the URL of the browser matches the domain of the cookie
+  same_site_mode: Lax
+  # cookies are only set when the domain in the URL of the browser matches the domain of the cookie
 
 urls:
 self:
-    issuer: http://127.0.0.1:4444
+  issuer: http://127.0.0.1:4444
 consent: http://127.0.0.1:3000/consent
 login: http://127.0.0.1:3000/login
 logout: http://127.0.0.1:3000/logout
 
 secrets:
 system:
-    - youReallyNeedToChangeThis
+  - youReallyNeedToChangeThis
 
 oidc:
 # Configures OpenID Connect features.
 subject_identifiers:
-    # A list of algorithms to enable.
-    supported_types:
+  # A list of algorithms to enable.
+  supported_types:
     - pairwise
     - public
-    pairwise:
-    # Configures the pairwise algorithm.
-    salt: youReallyNeedToChangeThis
+  pairwise:
+  # Configures the pairwise algorithm.
+  salt: youReallyNeedToChangeThis
 ```
 
 Have a look at the [reference configuration](./reference/configuration.md) for
 further information.
-

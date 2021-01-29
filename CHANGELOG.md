@@ -4,7 +4,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2021-01-28)](#unreleased-2021-01-28)
+- [Unreleased (2021-01-29)](#unreleased-2021-01-29)
+  - [1.9.2 (2021-01-29)](#192-2021-01-29)
     - [Features](#features)
   - [1.9.1 (2021-01-27)](#191-2021-01-27)
     - [Documentation](#documentation)
@@ -501,7 +502,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.1...c1f1ba5c9ed80fc27b1d4cad60dc843827587572) (2021-01-28)
+# Unreleased (2021-01-29)
+
+No significant changes have been made for this release.
+
+
+## [1.9.2](https://github.com/ory/hydra/compare/v1.9.1...v1.9.2) (2021-01-29)
 
 
 ### Features

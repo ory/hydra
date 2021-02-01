@@ -3,6 +3,8 @@ id: 5min-tutorial
 title: 5 Minute Tutorial
 ---
 
+import CodeFromRemote from '@theme/CodeFromRemote'
+
 This tutorial walks you through a quick setup of ORY Hydra, a PostgreSQL
 instance and an exemplary User Login & Consent App based on Docker Compose. You
 need to have the latest [Docker](https://www.docker.com) and
@@ -190,34 +192,12 @@ You can find it in
 The configuration gets loaded in docker-compose as specified in the
 [`quickstart.yml`](https://github.com/ory/hydra/blob/master/quickstart.yml).
 
-```yml title="contrib/quickstart/5-min/hydra.yml"
-serve:
-cookies:
-  same_site_mode: Lax
-  # cookies are only set when the domain in the URL of the browser matches the domain of the cookie
 
-urls:
-self:
-  issuer: http://127.0.0.1:4444
-consent: http://127.0.0.1:3000/consent
-login: http://127.0.0.1:3000/login
-logout: http://127.0.0.1:3000/logout
 
-secrets:
-system:
-  - youReallyNeedToChangeThis
+<CodeFromRemote
+  src="https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml"
+/>
 
-oidc:
-# Configures OpenID Connect features.
-subject_identifiers:
-  # A list of algorithms to enable.
-  supported_types:
-    - pairwise
-    - public
-  pairwise:
-  # Configures the pairwise algorithm.
-  salt: youReallyNeedToChangeThis
-```
 
 Have a look at the [reference configuration](./reference/configuration.md) for
 further information on all possible configuration options.

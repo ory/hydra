@@ -11,6 +11,29 @@ find an outdated section, please create a PR which removes or updates it!**
 
 <!-- toc -->
 
+## How can I store custom data ?
+
+From [Github](https://github.com/ory/hydra/issues/2333)
+
+> How can I store custom data in the client that can be retrieved along with the
+> login request (using the challenge code)?  
+> I would like send in some metadata to the /oauth2/auth endpoint that can be
+> retrievable by the "challenge code" that Hydra creates.
+
+You can do this using the
+[`request url`](https://github.com/ory/hydra/blob/27dc147a37c1cb98b7beb5428c389545958dd122/consent/types.go#L505).
+
+Both Login and Consent Requests have a
+[`request url`](https://github.com/ory/hydra/blob/27dc147a37c1cb98b7beb5428c389545958dd122/consent/types.go#L505)
+which contains the original OAuth2 Authorize URL (e.g.
+`/oauth2/auth?client_id=...&your_custom_param=....`)
+
+```
+RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client.
+It is the URL which initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow.
+This URL is typically not needed, but might come in handy if you want to deal with additional request parameters.
+```
+
 ## How can I control SQL connection limits?
 
 You can configure SQL connection limits by appending parameters `max_conns`,

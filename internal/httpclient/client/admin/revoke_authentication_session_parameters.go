@@ -16,56 +16,70 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewRevokeAuthenticationSessionParams creates a new RevokeAuthenticationSessionParams object
-// with the default values initialized.
+// NewRevokeAuthenticationSessionParams creates a new RevokeAuthenticationSessionParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewRevokeAuthenticationSessionParams() *RevokeAuthenticationSessionParams {
-	var ()
 	return &RevokeAuthenticationSessionParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewRevokeAuthenticationSessionParamsWithTimeout creates a new RevokeAuthenticationSessionParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewRevokeAuthenticationSessionParamsWithTimeout(timeout time.Duration) *RevokeAuthenticationSessionParams {
-	var ()
 	return &RevokeAuthenticationSessionParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewRevokeAuthenticationSessionParamsWithContext creates a new RevokeAuthenticationSessionParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewRevokeAuthenticationSessionParamsWithContext(ctx context.Context) *RevokeAuthenticationSessionParams {
-	var ()
 	return &RevokeAuthenticationSessionParams{
-
 		Context: ctx,
 	}
 }
 
 // NewRevokeAuthenticationSessionParamsWithHTTPClient creates a new RevokeAuthenticationSessionParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewRevokeAuthenticationSessionParamsWithHTTPClient(client *http.Client) *RevokeAuthenticationSessionParams {
-	var ()
 	return &RevokeAuthenticationSessionParams{
 		HTTPClient: client,
 	}
 }
 
-/*RevokeAuthenticationSessionParams contains all the parameters to send to the API endpoint
-for the revoke authentication session operation typically these are written to a http.Request
+/* RevokeAuthenticationSessionParams contains all the parameters to send to the API endpoint
+   for the revoke authentication session operation.
+
+   Typically these are written to a http.Request.
 */
 type RevokeAuthenticationSessionParams struct {
 
-	/*Subject*/
+	// Subject.
 	Subject string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the revoke authentication session params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RevokeAuthenticationSessionParams) WithDefaults() *RevokeAuthenticationSessionParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the revoke authentication session params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RevokeAuthenticationSessionParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the revoke authentication session params
@@ -124,6 +138,7 @@ func (o *RevokeAuthenticationSessionParams) WriteToRequest(r runtime.ClientReque
 	qrSubject := o.Subject
 	qSubject := qrSubject
 	if qSubject != "" {
+
 		if err := r.SetQueryParam("subject", qSubject); err != nil {
 			return err
 		}

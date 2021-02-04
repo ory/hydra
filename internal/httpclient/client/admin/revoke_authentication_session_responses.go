@@ -47,7 +47,6 @@ func (o *RevokeAuthenticationSessionReader) ReadResponse(response runtime.Client
 			return nil, err
 		}
 		return nil, result
-
 	default:
 		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
@@ -58,9 +57,9 @@ func NewRevokeAuthenticationSessionNoContent() *RevokeAuthenticationSessionNoCon
 	return &RevokeAuthenticationSessionNoContent{}
 }
 
-/*RevokeAuthenticationSessionNoContent handles this case with default header values.
+/* RevokeAuthenticationSessionNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type RevokeAuthenticationSessionNoContent struct {
@@ -80,7 +79,7 @@ func NewRevokeAuthenticationSessionBadRequest() *RevokeAuthenticationSessionBadR
 	return &RevokeAuthenticationSessionBadRequest{}
 }
 
-/*RevokeAuthenticationSessionBadRequest handles this case with default header values.
+/* RevokeAuthenticationSessionBadRequest describes a response with status code 400, with default header values.
 
 genericError
 */
@@ -91,7 +90,6 @@ type RevokeAuthenticationSessionBadRequest struct {
 func (o *RevokeAuthenticationSessionBadRequest) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionBadRequest  %+v", 400, o.Payload)
 }
-
 func (o *RevokeAuthenticationSessionBadRequest) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -113,7 +111,7 @@ func NewRevokeAuthenticationSessionNotFound() *RevokeAuthenticationSessionNotFou
 	return &RevokeAuthenticationSessionNotFound{}
 }
 
-/*RevokeAuthenticationSessionNotFound handles this case with default header values.
+/* RevokeAuthenticationSessionNotFound describes a response with status code 404, with default header values.
 
 genericError
 */
@@ -124,7 +122,6 @@ type RevokeAuthenticationSessionNotFound struct {
 func (o *RevokeAuthenticationSessionNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionNotFound  %+v", 404, o.Payload)
 }
-
 func (o *RevokeAuthenticationSessionNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -146,7 +143,7 @@ func NewRevokeAuthenticationSessionInternalServerError() *RevokeAuthenticationSe
 	return &RevokeAuthenticationSessionInternalServerError{}
 }
 
-/*RevokeAuthenticationSessionInternalServerError handles this case with default header values.
+/* RevokeAuthenticationSessionInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -157,7 +154,6 @@ type RevokeAuthenticationSessionInternalServerError struct {
 func (o *RevokeAuthenticationSessionInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/login][%d] revokeAuthenticationSessionInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *RevokeAuthenticationSessionInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

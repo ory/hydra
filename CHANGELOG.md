@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2021-02-02)](#unreleased-2021-02-02)
+- [Unreleased (2021-02-05)](#unreleased-2021-02-05)
     - [Documentation](#documentation)
   - [1.9.2 (2021-01-29)](#192-2021-01-29)
     - [Features](#features)
@@ -503,12 +503,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.2...471e85d282e1a8fc731bdaaa1c9375d2fb964b87) (2021-02-02)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.9.2...f20f645998cadd066a3d027ceb78002b340442b9) (2021-02-05)
 
 
 ### Documentation
 
 * Faq custom data ([#2334](https://github.com/ory/hydra/issues/2334)) ([471e85d](https://github.com/ory/hydra/commit/471e85d282e1a8fc731bdaaa1c9375d2fb964b87))
+* Quickstart config ([#2328](https://github.com/ory/hydra/issues/2328)) ([f20f645](https://github.com/ory/hydra/commit/f20f645998cadd066a3d027ceb78002b340442b9))
 
 
 

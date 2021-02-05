@@ -3,6 +3,8 @@ id: 5min-tutorial
 title: 5 Minute Tutorial
 ---
 
+import CodeFromRemote from '@theme/CodeFromRemote'
+
 This tutorial walks you through a quick setup of ORY Hydra, a PostgreSQL
 instance and an exemplary User Login & Consent App based on Docker Compose. You
 need to have the latest [Docker](https://www.docker.com) and
@@ -181,3 +183,21 @@ order to avoid conflicts with other tutorials from this guide:
 $ docker-compose -f quickstart.yml kill
 $ docker-compose -f quickstart.yml rm -f -v
 ```
+
+### Quickstart Configuration
+
+In this tutorial we use a simplified configuration.  
+You can find it in
+[`contrib/quickstart/5-min/hydra.yml`](https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml).  
+The configuration gets loaded in docker-compose as specified in the
+[`quickstart.yml`](https://github.com/ory/hydra/blob/master/quickstart.yml).
+
+
+
+<CodeFromRemote
+  src="https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml"
+/>
+
+
+Have a look at the [reference configuration](./reference/configuration.md) for
+further information on all possible configuration options.

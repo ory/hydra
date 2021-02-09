@@ -219,11 +219,11 @@ serve:
       #
       # Mode of unix socket in numeric form
       #
-      # Default value: 755
+      # Default value: 493
       #
       # Minimum value: 0
       #
-      # Maximum value: 777
+      # Maximum value: 511
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -546,11 +546,11 @@ serve:
       #
       # Mode of unix socket in numeric form
       #
-      # Default value: 755
+      # Default value: 493
       #
       # Minimum value: 0
       #
-      # Maximum value: 777
+      # Maximum value: 511
       #
       # Set this value using environment variables on
       # - Linux/macOS:

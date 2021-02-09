@@ -219,11 +219,11 @@ serve:
       #
       # Mode of unix socket in numeric form
       #
-      # Default value: 493
+      # Default value: 755
       #
       # Minimum value: 0
       #
-      # Maximum value: 511
+      # Maximum value: 777
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -546,11 +546,11 @@ serve:
       #
       # Mode of unix socket in numeric form
       #
-      # Default value: 493
+      # Default value: 755
       #
       # Minimum value: 0
       #
-      # Maximum value: 511
+      # Maximum value: 777
       #
       # Set this value using environment variables on
       # - Linux/macOS:
@@ -1047,7 +1047,7 @@ ttl:
   #
   # Configures how long a user login and consent flow may take.
   #
-  # Default value: 1h
+  # Default value: 30m
   #
   # Set this value using environment variables on
   # - Linux/macOS:

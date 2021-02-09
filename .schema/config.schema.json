@@ -41,9 +41,9 @@
         "mode": {
           "type": "integer",
           "description": "Mode of unix socket in numeric form",
-          "default": 755,
+          "default": 493,
           "minimum": 0,
-          "maximum": 777
+          "maximum": 511
         }
       }
     },

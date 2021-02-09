@@ -41,9 +41,9 @@
         "mode": {
           "type": "integer",
           "description": "Mode of unix socket in numeric form",
-          "default": 493,
+          "default": 755,
           "minimum": 0,
-          "maximum": 511
+          "maximum": 777
         }
       }
     },
@@ -684,7 +684,7 @@
       "properties": {
         "login_consent_request": {
           "description": "Configures how long a user login and consent flow may take.",
-          "default": "1h",
+          "default": "30m",
           "allOf": [
             {
               "$ref": "#/definitions/duration"

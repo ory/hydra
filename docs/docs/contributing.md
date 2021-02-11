@@ -74,7 +74,7 @@ the [ORY Chat](https://www.ory.sh/chat).
 
 - I would like to know what I am agreeing to when I contribute to ORY Hydra.
   Does ORY have
-  [a Contributors License Agreement?](https://cla-assistant.io/ory/)
+  [a Contributors License Agreement?](https://cla-assistant.io/ory/hydra)
 
 - I would like updates about new versions of ORY Hydra.
   [How are new releases announced?](https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53)
@@ -148,7 +148,7 @@ At least one review from a maintainer is required for all patches (even patches
 from maintainers).
 
 Before your contributions can be merged you need to sign our
-[Contributor License Agreement](https://cla-assistant.io/ory/).
+[Contributor License Agreement](https://cla-assistant.io/ory/hydra).
 
 This agreement defines the terms under which your code is contributed to ORY.
 More specifically it declares that you have the right to, and actually do, grant

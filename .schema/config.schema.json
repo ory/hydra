@@ -1025,6 +1025,26 @@
         }
       }
     },
+    "sqa": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Software Quality Assurance telemetry configuration section",
+      "properties": {
+        "opt_out" : {
+          "type": "boolean",
+          "description": "Disables anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa",
+          "default": false,
+          "examples": [
+            true
+          ]
+        }
+      },
+      "examples": [
+        {
+          "opt_out": true
+        }
+      ]
+    },
     "version": {
       "type": "string",
       "title": "The Hydra version this config is written for.",

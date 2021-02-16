@@ -1391,6 +1391,31 @@ tracing:
   #
   provider: jaeger
 
+## sqa ##
+#
+# Software Quality Assurance telemetry configuration section
+#
+# Examples:
+# - opt_out: true
+#
+sqa:
+  ## opt_out ##
+  #
+  # Disables anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa
+  #
+  # Default value: false
+  #
+  # Examples:
+  # - true
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export SQA_OPT_OUT=<value>
+  # - Windows Command Line (CMD):
+  #    > set SQA_OPT_OUT=<value>
+  #
+  opt_out: true
+
 ## The Hydra version this config is written for. ##
 #
 # SemVer according to https://semver.org/ prefixed with `v` as in our releases.

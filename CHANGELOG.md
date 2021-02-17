@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Unreleased (2021-02-05)](#unreleased-2021-02-05)
+- [Unreleased (2021-02-17)](#unreleased-2021-02-17)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
   - [1.9.2 (2021-01-29)](#192-2021-01-29)
@@ -504,18 +504,29 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [Unreleased](https://github.com/ory/hydra/compare/v1.9.2...e9bd06421a8b3843280c6ef5aa41ba34eaab7d1d) (2021-02-05)
+# [Unreleased](https://github.com/ory/hydra/compare/v1.9.2...89df8d7b3e295115fc930b6aabe4ec4148dd42f2) (2021-02-17)
 
 
 ### Bug Fixes
 
+* Adds sqa section to config.schema.json ([#2360](https://github.com/ory/hydra/issues/2360)) ([89df8d7](https://github.com/ory/hydra/commit/89df8d7b3e295115fc930b6aabe4ec4148dd42f2)), closes [#2358](https://github.com/ory/hydra/issues/2358):
+
+    > Move from viper to koanf caused env vars without corresponding
+    > paths in config.schema.json to be ignored. This commit adds
+    > missing sqa section, so the SQA_OPT_OUT env var has effect again.
 * Increase conformance test timeout ([e9bd064](https://github.com/ory/hydra/commit/e9bd06421a8b3843280c6ef5aa41ba34eaab7d1d))
+* Revert mode default and maximum values ([#2349](https://github.com/ory/hydra/issues/2349)) ([b20fc48](https://github.com/ory/hydra/commit/b20fc48db6b494b1fb20d1745b748ae90aa325ba)):
+
+    > I made a mistake in previous pull request, these socket mode values are in decimal, not octal format. Sorry.
 
 
 ### Documentation
 
 * Faq custom data ([#2334](https://github.com/ory/hydra/issues/2334)) ([471e85d](https://github.com/ory/hydra/commit/471e85d282e1a8fc731bdaaa1c9375d2fb964b87))
 * Quickstart config ([#2328](https://github.com/ory/hydra/issues/2328)) ([f20f645](https://github.com/ory/hydra/commit/f20f645998cadd066a3d027ceb78002b340442b9))
+* Update config.schema.json default values ([#2348](https://github.com/ory/hydra/issues/2348)) ([8494822](https://github.com/ory/hydra/commit/849482209b6f270dfd7965a1f3d6de39feb3cd58)):
+
+    > Updated wrong config schema values
 
 
 

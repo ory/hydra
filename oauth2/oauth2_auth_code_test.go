@@ -232,10 +232,10 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		return i
 	}
 
-	assertJWTAccessToken := func(t *testing.T, strat string, conf *oauth2.Config, token *oauth2.Token, expectedSubject string) gjson.Result {
+	assertJWTAccessToken := func(t *testing.T, strategy string, conf *oauth2.Config, token *oauth2.Token, expectedSubject string) gjson.Result {
 		require.NotEmpty(t, token.AccessToken)
 		parts := strings.Split(token.AccessToken, ".")
-		if strat != "jwt" {
+		if strategy != "jwt" {
 			require.Len(t, parts, 2)
 			return gjson.Parse("null")
 		}
@@ -580,12 +580,12 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
 func TestAuthCodeWithMockStrategy(t *testing.T) {
-	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
-		t.Run("strategy="+strat.d, func(t *testing.T) {
+	for _, strategy := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
+		t.Run("strategy="+strategy.d, func(t *testing.T) {
 			conf := internal.NewConfigurationWithDefaults()
 			conf.MustSet(config.KeyAccessTokenLifespan, time.Second*2)
 			conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-			conf.MustSet(config.KeyAccessTokenStrategy, strat.d)
+			conf.MustSet(config.KeyAccessTokenStrategy, strategy.d)
 			reg := internal.NewRegistryMemory(t, conf)
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
@@ -654,7 +654,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}
 					},
 					assertAccessToken: func(t *testing.T, token string) {
-						if strat.d != "jwt" {
+						if strategy.d != "jwt" {
 							return
 						}
 
@@ -863,7 +863,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					}
 
 					t.Run("the tokens should be different", func(t *testing.T) {
-						if strat.d != "jwt" {
+						if strategy.d != "jwt" {
 							t.Skip()
 						}
 

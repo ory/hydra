@@ -144,12 +144,10 @@ running Kubernetes locally, please adjust the hostnames accordingly.
 Let's install the Login and Consent App first
 
 ```bash
-$ helm install \
+$ helm install hydra-example-idp ory/example-idp \
     --set 'hydraAdminUrl=http://hydra-example-admin:4445/' \
     --set 'hydraPublicUrl=http://public.hydra.localhost/' \
-    --set 'ingress.enabled=true' \
-    --name hydra-example-idp \
-    ory/example-idp
+    --set 'ingress.enabled=true'
 ```
 
 with hostnames
@@ -166,7 +164,7 @@ outside of `localhost` and only for testing and demonstration purposes. Install
 the ORY Hydra Helm Chart
 
 ```bash
-$ helm install \
+$ helm install hydra-example ory/hydra \
     --set 'hydra.config.secrets.system=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | base64 | head -c 32)' \
     --set 'hydra.config.dsn=memory' \
     --set 'hydra.config.urls.self.issuer=http://public.hydra.localhost/' \
@@ -175,9 +173,7 @@ $ helm install \
     --set 'hydra.config.urls.logout=http://example-idp.localhost/logout' \
     --set 'ingress.public.enabled=true' \
     --set 'ingress.admin.enabled=true' \
-    --set 'hydra.dangerousForceHttp=true' \
-    --name hydra-example \
-    ory/hydra
+    --set 'hydra.dangerousForceHttp=true'
 ```
 
 with hostnames

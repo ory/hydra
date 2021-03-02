@@ -362,6 +362,18 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 	return sqlcon.HandleError(err)
 }
 
+func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error {
+	err := p.Connection(ctx).RawQuery(
+		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
+		time.Now().Add(-p.config.RefreshTokenLifespan()),
+		notAfter,
+	).Exec()
+	if err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	}
+	return sqlcon.HandleError(err)
+}
+
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) error {
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(

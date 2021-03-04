@@ -273,24 +273,24 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 
 func (m *RegistryBase) oAuth2Config() *compose.Config {
 	return &compose.Config{
-		AccessTokenLifespan:            m.C.AccessTokenLifespan(),
-		RefreshTokenLifespan:           m.C.RefreshTokenLifespan(),
-		AuthorizeCodeLifespan:          m.C.AuthCodeLifespan(),
-		IDTokenLifespan:                m.C.IDTokenLifespan(),
-		IDTokenIssuer:                  m.C.IssuerURL().String(),
-		HashCost:                       m.C.BCryptCost(),
-		ScopeStrategy:                  m.ScopeStrategy(),
-		SendDebugMessagesToClients:     m.C.ShareOAuth2Debug(),
-		UseLegacyErrorFormat:           m.C.OAuth2LegacyErrors(),
-		EnforcePKCE:                    m.C.PKCEEnforced(),
-		EnforcePKCEForPublicClients:    m.C.EnforcePKCEForPublicClients(),
-		EnablePKCEPlainChallengeMethod: false,
-		TokenURL:                       urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
-		RedirectSecureChecker:          x.IsRedirectURISecure(m.C),
-		JWTSkipClientAuth:              m.C.GrantJWTClientAuthOptional(),
-		JWTIDOptional:                  m.C.GrantJWTIDOptional(),
-		JWTIssuedDateOptional:          m.C.GrantJWTIssuedDateOptional(),
-		JWTMaxDuration:                 m.C.GrantJWTMaxDuration(),
+		AccessTokenLifespan:                  m.C.AccessTokenLifespan(),
+		RefreshTokenLifespan:                 m.C.RefreshTokenLifespan(),
+		AuthorizeCodeLifespan:                m.C.AuthCodeLifespan(),
+		IDTokenLifespan:                      m.C.IDTokenLifespan(),
+		IDTokenIssuer:                        m.C.IssuerURL().String(),
+		HashCost:                             m.C.BCryptCost(),
+		ScopeStrategy:                        m.ScopeStrategy(),
+		SendDebugMessagesToClients:           m.C.ShareOAuth2Debug(),
+		UseLegacyErrorFormat:                 m.C.OAuth2LegacyErrors(),
+		EnforcePKCE:                          m.C.PKCEEnforced(),
+		EnforcePKCEForPublicClients:          m.C.EnforcePKCEForPublicClients(),
+		EnablePKCEPlainChallengeMethod:       false,
+		TokenURL:                             urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
+		RedirectSecureChecker:                x.IsRedirectURISecure(m.C),
+		GrantTypeJWTBearerCanSkipClientAuth:  m.C.GrantTypeJWTBearerClientAuthOptional(),
+		GrantTypeJWTBearerIDOptional:         m.C.GrantTypeJWTBearerIDOptional(),
+		GrantTypeJWTBearerIssuedDateOptional: m.C.GrantTypeJWTBearerIssuedDateOptional(),
+		GrantTypeJWTBearerMaxDuration:        m.C.GrantTypeJWTBearerMaxDuration(),
 	}
 }
 
@@ -345,7 +345,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			compose.OAuth2TokenRevocationFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2PKCEFactory,
-			compose.OAuth2AuthorizeJWTGrantFactory,
+			compose.RFC7523AssertionGrantFactory,
 		)
 	}
 	return m.fop

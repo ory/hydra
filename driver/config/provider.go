@@ -428,18 +428,18 @@ func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
 }
 
-func (p *Provider) GrantJWTClientAuthOptional() bool {
+func (p *Provider) GrantTypeJWTBearerClientAuthOptional() bool {
 	return p.p.Bool(KeyOAuth2GrantJWTClientAuthOptional)
 }
 
-func (p *Provider) GrantJWTIDOptional() bool {
+func (p *Provider) GrantTypeJWTBearerIDOptional() bool {
 	return p.p.Bool(KeyOAuth2GrantJWTIDOptional)
 }
 
-func (p *Provider) GrantJWTIssuedDateOptional() bool {
+func (p *Provider) GrantTypeJWTBearerIssuedDateOptional() bool {
 	return p.p.Bool(KeyOAuth2GrantJWTIssuedDateOptional)
 }
 
-func (p *Provider) GrantJWTMaxDuration() time.Duration {
+func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
 	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
 }

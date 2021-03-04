@@ -29,9 +29,9 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/fosite/handler/rfc7523"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/hydra/grant/jwtbearer"
 
 	"github.com/ory/hydra/x"
@@ -703,7 +703,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		keyGenerators := x.KeyGenerators()
 		keyGenerator, ok := keyGenerators[string(jose.RS256)]
 		require.True(t, ok)
-		grantStorage := x.OAuth2Storage().(oauth2.JWTAuthGrantStorage)
+		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
 
 		t.Run("case=associated key added with grant", func(t *testing.T) {
 			keySet, err := keyGenerator.Generate("token-service-key", "sig")

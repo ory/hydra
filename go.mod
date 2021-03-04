@@ -65,7 +65,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0
@@ -74,11 +73,8 @@ require (
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/tools v0.1.0
-	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1
 	gopkg.in/square/go-jose.v2 v2.5.1
 )
 
 replace github.com/gobuffalo/pop/v5 => github.com/gobuffalo/pop/v5 v5.3.2-0.20201029132236-f36afb546df1
-
-replace github.com/ory/fosite => github.com/TinkoffCreditSystems/fosite v0.36.1-0.20201216164135-6cf3d51701e5

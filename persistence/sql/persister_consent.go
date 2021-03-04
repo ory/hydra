@@ -438,3 +438,17 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 		return nil
 	})
 }
+
+func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error {
+	var lr consent.LoginRequest
+	err := p.Connection(ctx).RawQuery(
+		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", (&lr).TableName()),
+		time.Now().Add(-p.config.ConsentRequestMaxAge()),
+		notAfter,
+	).Exec()
+
+	if err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	}
+	return sqlcon.HandleError(err)
+}

@@ -49,6 +49,7 @@ const (
 	ConsentPath  = "/oauth2/auth/requests/consent"
 	LogoutPath   = "/oauth2/auth/requests/logout"
 	SessionsPath = "/oauth2/auth/sessions"
+	FlushPath    = "/oath2/auth/flush"
 )
 
 func NewHandler(
@@ -77,6 +78,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.GET(LogoutPath, h.GetLogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.AcceptLogoutRequest)
 	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
+
+	admin.POST(FlushPath, h.FlushHandler)
 }
 
 // swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
@@ -772,4 +775,35 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	h.r.Writer().Write(w, r, c)
+}
+
+// swagger:route POST /oauth2/auth/flush admin flushInactiveLoginConsentRequests
+//
+// Flush Inactive Login and Consent Requests
+//
+// Use this endpoint to flush the login and consent entries from the database when clients use the Login and Consent flows.
+// You can set a time after which no entry will be
+// not be touched, in case you want to keep recent records for auditing.
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       404: genericError
+//       500: genericError
+func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var fr FlushLoginConsentRequest
+	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	if fr.NotAfter.IsZero() {
+		fr.NotAfter = time.Now()
+	}
+
+	// Do something here to flush the Login-Consent entries
 }

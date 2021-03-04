@@ -42,5 +42,9 @@ type FositeStorer interface {
 
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
 
+	// flush the consent/login requests from the database.
+	// this will address the database long-term growth issues.
+	FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error
+
 	DeleteAccessTokens(ctx context.Context, clientID string) error
 }

@@ -187,7 +187,7 @@ func TestHelperGrantManagerErrors(m GrantManager) func(t *testing.T) {
 
 		grant.ID = uuid.New().String()
 		err = m.CreateGrant(context.TODO(), grant, pubKey1)
-		require.Error(t, err)
+		require.Error(t, err, "error expected, because combination of issuer + subject + key_id must be unique")
 
 		grant2 := grant
 		grant2.PublicKey = PublicKey{
@@ -199,9 +199,9 @@ func TestHelperGrantManagerErrors(m GrantManager) func(t *testing.T) {
 
 		nonExistingGrantID := uuid.New().String()
 		err = m.DeleteGrant(context.TODO(), nonExistingGrantID)
-		require.Error(t, err)
+		require.Error(t, err, "expect error, when deleting non-existing grant")
 
 		_, err = m.GetConcreteGrant(context.TODO(), nonExistingGrantID)
-		require.Error(t, err)
+		require.Error(t, err, "expect error, when fetching non-existing grant")
 	}
 }

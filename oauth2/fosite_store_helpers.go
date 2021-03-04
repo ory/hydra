@@ -716,7 +716,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 				ID:        uuid.New(),
 				Issuer:    issuer,
 				Subject:   subject,
-				Scope:     []string{"openid"},
+				Scope:     []string{"openid", "offline"},
 				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
 				CreatedAt: time.Now().UTC().Round(time.Second),
 				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
@@ -738,6 +738,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			assert.Equal(t, publicKey.KeyID, storedKey.KeyID)
 			assert.Equal(t, publicKey.Use, storedKey.Use)
 			assert.Equal(t, publicKey.Key, storedKey.Key)
+
+			storedScopes, err := grantStorage.GetPublicKeyScopes(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+			assert.Equal(t, grant.Scope, storedScopes)
 
 			storedKeySet, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
 			require.NoError(t, err)
@@ -782,6 +786,9 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			storedKeySet, err = grantStorage.GetPublicKeys(context.TODO(), issuer, "non-existing-subject")
 			require.NoError(t, err)
 			assert.Len(t, storedKeySet.Keys, 0)
+
+			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "non-existing-subject", publicKey.KeyID)
+			require.Error(t, err)
 		})
 
 	}

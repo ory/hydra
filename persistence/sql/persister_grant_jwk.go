@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v5"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/grant/jwtbearer"
@@ -49,7 +50,13 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 		return err
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Destroy(&jwtbearer.SQLData{ID: grant.ID}))
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.Connection(ctx).Destroy(&jwtbearer.SQLData{ID: grant.ID}); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		return p.DeleteKey(ctx, grant.PublicKey.Set, grant.PublicKey.KeyID)
+	})
 }
 
 func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]jwtbearer.Grant, error) {

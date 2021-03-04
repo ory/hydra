@@ -791,6 +791,77 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			require.Error(t, err)
 		})
 
+		t.Run("case=associated key is deleted, when granted is deleted", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("hackerman-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "aeneas"
+			subject := "aeneas@example.com"
+			grant := jwtbearer.Grant{
+				ID:        uuid.New(),
+				Issuer:    issuer,
+				Subject:   subject,
+				Scope:     []string{"openid", "offline"},
+				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt: time.Now().UTC().Round(time.Second),
+				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, grant.PublicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+
+			err = grantManager.DeleteGrant(context.TODO(), grant.ID)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			assert.Error(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			assert.Error(t, err)
+		})
+
+		t.Run("case=associated grant is deleted, when key is deleted", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("vladimir-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "vladimir"
+			subject := "vladimir@example.com"
+			grant := jwtbearer.Grant{
+				ID:        uuid.New(),
+				Issuer:    issuer,
+				Subject:   subject,
+				Scope:     []string{"openid", "offline"},
+				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt: time.Now().UTC().Round(time.Second),
+				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+
+			err = keyManager.DeleteKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			assert.Error(t, err)
+
+			_, err = grantManager.GetConcreteGrant(context.TODO(), grant.ID)
+			assert.Error(t, err)
+		})
 	}
 }
 

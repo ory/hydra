@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -184,4 +185,12 @@ func (p *Persister) jwtGrantFromSQlData(data jwtbearer.SQLData) jwtbearer.Grant 
 		CreatedAt: data.CreatedAt,
 		ExpiresAt: data.ExpiresAt,
 	}
+}
+
+func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time) error {
+	return sqlcon.HandleError(p.Connection(ctx).RawQuery(
+		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ? AND expires_at < ?", jwtbearer.SQLData{}.TableName()),
+		time.Now().UTC(),
+		notAfter,
+	).Exec())
 }

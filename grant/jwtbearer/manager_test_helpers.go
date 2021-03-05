@@ -98,7 +98,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 				KeyID: "public:tokenServicePubKey2",
 			},
 			CreatedAt: createdAt.Add(time.Minute * 5),
-			ExpiresAt: expiresAt,
+			ExpiresAt: createdAt.Add(-time.Minute * 5),
 		}
 		err = m.CreateGrant(context.TODO(), grant2, tokenServicePubKey2)
 		require.NoError(t, err)
@@ -113,7 +113,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 				KeyID: "public:mikePubKey",
 			},
 			CreatedAt: createdAt.Add(time.Hour),
-			ExpiresAt: expiresAt,
+			ExpiresAt: createdAt.Add(-time.Hour * 24),
 		}
 		err = m.CreateGrant(context.TODO(), grant3, mikePubKey)
 		require.NoError(t, err)
@@ -141,16 +141,25 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 		assert.Equal(t, grant.ID, storedGrants[0].ID)
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
 
-		err = m.DeleteGrant(context.TODO(), grant2.ID)
+		err = m.DeleteGrant(context.TODO(), grant.ID)
 		require.NoError(t, err)
 
-		_, err = m.GetConcreteGrant(context.TODO(), grant2.ID)
+		_, err = m.GetConcreteGrant(context.TODO(), grant.ID)
 		require.Error(t, err)
 
 		count, err = m.CountGrants(context.TODO())
 		require.NoError(t, err)
 		assert.Equal(t, 2, count)
 
+		err = m.FlushInactiveGrants(context.TODO(), grant2.ExpiresAt)
+		require.NoError(t, err)
+
+		count, err = m.CountGrants(context.TODO())
+		require.NoError(t, err)
+		assert.Equal(t, 1, count)
+
+		_, err = m.GetConcreteGrant(context.TODO(), grant2.ID)
+		assert.NoError(t, err)
 	}
 }
 

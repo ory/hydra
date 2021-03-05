@@ -446,9 +446,6 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		time.Now().Add(-p.config.ConsentRequestMaxAge()),
 		notAfter,
 	).Exec()
-
-	if err == sql.ErrNoRows {
-		return errors.Wrap(fosite.ErrNotFound, "")
-	}
+	
 	return sqlcon.HandleError(err)
 }

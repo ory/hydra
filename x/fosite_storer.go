@@ -43,7 +43,7 @@ type FositeStorer interface {
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
 
 	// flush the consent/login requests from the database.
-	// this will address the database long-term growth issues.
+	// this will address the database long-term growth issues discussed in https://github.com/ory/hydra/issues/1574.
 	FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error
 
 	DeleteAccessTokens(ctx context.Context, clientID string) error

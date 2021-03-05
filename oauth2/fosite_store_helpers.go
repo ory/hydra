@@ -284,11 +284,13 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		err = m.RevokeRefreshToken(ctx, reqIdTwo)
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
-		assert.NotNil(t, err)
+		req, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
+		assert.NotNil(t, req)
+		assert.EqualError(t, err, fosite.ErrInactiveToken.Error())
 
-		_, err = m.GetRefreshTokenSession(ctx, "1122", &Session{})
-		assert.NotNil(t, err)
+		req, err = m.GetRefreshTokenSession(ctx, "1122", &Session{})
+		assert.NotNil(t, req)
+		assert.EqualError(t, err, fosite.ErrInactiveToken.Error())
 
 	}
 }

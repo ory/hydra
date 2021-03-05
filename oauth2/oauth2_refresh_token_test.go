@@ -131,10 +131,10 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 						// change logic below when the refresh handler starts returning 'fosite.ErrInvalidRequest' for other reasons.
 						// as of now, this error is only returned due to concurrent transactions competing to refresh using the same token.
 
-						case fosite.ErrInvalidRequest.ErrorField:
+						case fosite.ErrInvalidRequest.ErrorField, fosite.ErrServerError.ErrorField:
 							// the error description copy is defined by RFC 6749 and should not be different regardless of
 							// the underlying transactional aware storage backend used by hydra
-							assert.Equal(t, fosite.ErrInvalidRequest.DescriptionField, e.DescriptionField)
+							assert.Contains(t, []string{fosite.ErrInvalidRequest.DescriptionField, fosite.ErrServerError.DescriptionField}, e.DescriptionField)
 							// the database error debug copy will be different depending on the underlying database used
 							switch dbName {
 							case dbal.DriverMySQL:
@@ -155,6 +155,10 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									"deadlock detected",
 									// postgres: pq: could not serialize access due to concurrent update: Unable to serialize access due to a concurrent update in another session: The request could not be completed due to concurrent access
 									"concurrent update",
+									// cockroach: this happens when there is an error with the storage
+									"RETRY_WRITE_TOO_OLD",
+									// refresh token reuse detection
+									"token_inactive",
 								} {
 									if strings.Contains(e.DebugField, errSubstr) {
 										matched = true
@@ -162,13 +166,14 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									}
 								}
 
-								assert.True(t, matched, "received an unexpected kind of `fosite.ErrInvalidRequest`\n"+
+								assert.True(t, matched, "received an unexpected kind of `%s`\n"+
 									"DB version: %s\n"+
 									"Error description: %s\n"+
 									"Error debug: %s\n"+
 									"Error hint: %s\n"+
 									"Raw error: %T %+v\n"+
 									"Raw cause: %T %+v",
+									e.ErrorField,
 									storageVersion,
 									e.DescriptionField,
 									e.DebugField,
@@ -176,12 +181,6 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 									err, err,
 									e, e)
 							}
-						case fosite.ErrServerError.ErrorField:
-							// this happens when there is an error with the storage
-							if dbName == dbal.DriverCockroachDB && strings.Contains(e.DebugField, "RETRY_WRITE_TOO_OLD") {
-								break
-							}
-							fallthrough
 						default:
 							// unfortunately, MySQL does not offer the same behaviour under the "REPEATABLE_READ" isolation
 							// level so we have to relax this assertion just for MySQL for the time being as server_errors
@@ -235,7 +234,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			}
 
 			// reset state for the next test iteration
-			assert.NoError(t, dbRegistry.OAuth2Storage().RevokeRefreshToken(ctx, request.ID))
+			assert.NoError(t, dbRegistry.OAuth2Storage().DeleteRefreshTokenSession(ctx, tokenSignature))
 			assert.NoError(t, dbRegistry.OAuth2Storage().CreateRefreshTokenSession(ctx, tokenSignature, request))
 		}
 	}

@@ -295,7 +295,7 @@ func init() {
 	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
 	tokenUserCmd.Flags().StringSlice("prompt", []string{}, "Set the OpenID Connect prompt parameter")
 	tokenUserCmd.Flags().Int("max-age", 0, "Set the OpenID Connect max_age parameter")
-	tokenUserCmd.Flags().Bool("no-shutdown", false, "Do not terminate on success. State and nonce will be regenerated when auth is successful.")
+	tokenUserCmd.Flags().Bool("no-shutdown", false, "Do not terminate on success. State and nonce will be regenerated when auth flow has completed (either due to an error or success).")
 
 	tokenUserCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")

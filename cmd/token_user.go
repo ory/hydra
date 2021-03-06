@@ -81,6 +81,7 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
     <li>Expires in: <code>{{ .Expiry }}</code></li>
     <li>ID Token: <code>{{ .IDToken }}</code></li>
 </ul>
+<a href="{{ .URL }}">Back to Welcome Page</a>
 </body>
 </html>`))
 
@@ -92,7 +93,7 @@ var tokenUserCmd = &cobra.Command{
 This command will help you to see if ORY Hydra has been configured properly.
 
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
-and success.`,
+and success, unless if the --no-shutdown flag is provided.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		/* #nosec G402 - we want to support dev environments, hence tls trickery */
 		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
@@ -108,6 +109,7 @@ and success.`,
 		backend := flagx.MustGetString(cmd, "token-url")
 		frontend := flagx.MustGetString(cmd, "auth-url")
 		audience := flagx.MustGetStringSlice(cmd, "audience")
+		noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
 
 		clientID := flagx.MustGetString(cmd, "client-id")
 		clientSecret := flagx.MustGetString(cmd, "client-secret")
@@ -145,19 +147,23 @@ and success.`,
 			Scopes:      scopes,
 		}
 
-		state, err := randx.RuneSequence(24, randx.AlphaLower)
-		cmdx.Must(err, "Could not generate random state: %s", err)
+		var generateAuthCodeURL = func() (string, []rune) {
+			state, err := randx.RuneSequence(24, randx.AlphaLower)
+			cmdx.Must(err, "Could not generate random state: %s", err)
 
-		nonce, err := randx.RuneSequence(24, randx.AlphaLower)
-		cmdx.Must(err, "Could not generate random state: %s", err)
+			nonce, err := randx.RuneSequence(24, randx.AlphaLower)
+			cmdx.Must(err, "Could not generate random state: %s", err)
 
-		authCodeURL := conf.AuthCodeURL(
-			string(state),
-			oauth2.SetAuthURLParam("audience", strings.Join(audience, "+")),
-			oauth2.SetAuthURLParam("nonce", string(nonce)),
-			oauth2.SetAuthURLParam("prompt", strings.Join(prompt, "+")),
-			oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)),
-		)
+			authCodeURL := conf.AuthCodeURL(
+				string(state),
+				oauth2.SetAuthURLParam("audience", strings.Join(audience, "+")),
+				oauth2.SetAuthURLParam("nonce", string(nonce)),
+				oauth2.SetAuthURLParam("prompt", strings.Join(prompt, "+")),
+				oauth2.SetAuthURLParam("max_age", strconv.Itoa(maxAge)),
+			)
+			return authCodeURL, state
+		}
+		authCodeURL, state := generateAuthCodeURL()
 
 		if !flagx.MustGetBool(cmd, "no-open") {
 			_ = webbrowser.Open(serverLocation) // ignore errors
@@ -186,6 +192,14 @@ and success.`,
 			defer cancel()
 			_ = server.Shutdown(ctx)
 		}
+		var onDone = func() {
+			if !noShutdown {
+				go shutdown()
+			} else {
+				// regenerate because we don't want to shutdown and we don't want to reuse nonce & state
+				authCodeURL, state = generateAuthCodeURL()
+			}
+		}
 
 		r.GET("/", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 			_ = tokenUserWelcome.Execute(w, &struct{ URL string }{URL: authCodeURL})
@@ -210,7 +224,7 @@ and success.`,
 					Debug:       r.URL.Query().Get("error_debug"),
 				})
 
-				go shutdown()
+				onDone()
 				return
 			}
 
@@ -222,7 +236,7 @@ and success.`,
 					Name:        "States do not match",
 					Description: "Expected state " + string(state) + " but got " + r.URL.Query().Get("state"),
 				})
-				go shutdown()
+				onDone()
 				return
 			}
 
@@ -235,7 +249,7 @@ and success.`,
 				_ = tokenUserError.Execute(w, &ed{
 					Name: err.Error(),
 				})
-				go shutdown()
+				onDone()
 				return
 			}
 
@@ -250,16 +264,17 @@ and success.`,
 				RefreshToken string
 				Expiry       string
 				IDToken      string
+				URL          string
 			}{
 				AccessToken:  token.AccessToken,
 				RefreshToken: token.RefreshToken,
 				Expiry:       token.Expiry.Format(time.RFC1123),
 				IDToken:      fmt.Sprintf("%v", idt),
+				URL:          serverLocation,
 			})
-
-			go shutdown()
+			onDone()
 		})
-
+		var err error
 		if isSSL {
 			err = server.ListenAndServeTLS("", "")
 		} else {
@@ -276,6 +291,7 @@ func init() {
 	tokenUserCmd.Flags().StringSlice("scope", []string{"offline", "openid"}, "Request OAuth2 scope")
 	tokenUserCmd.Flags().StringSlice("prompt", []string{}, "Set the OpenID Connect prompt parameter")
 	tokenUserCmd.Flags().Int("max-age", 0, "Set the OpenID Connect max_age parameter")
+	tokenUserCmd.Flags().Bool("no-shutdown", false, "Do not terminate on success. State and nonce will be regenerated when auth is successful.")
 
 	tokenUserCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	tokenUserCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")

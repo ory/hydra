@@ -81,7 +81,9 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
     <li>Expires in: <code>{{ .Expiry }}</code></li>
     <li>ID Token: <code>{{ .IDToken }}</code></li>
 </ul>
-<a href="{{ .URL }}">Back to Welcome Page</a>
+{{ if .DisplayBackButton }}
+<a href="{{ .BackURL }}">Back to Welcome Page</a>
+{{ end }}
 </body>
 </html>`))
 
@@ -260,17 +262,19 @@ and success, unless if the --no-shutdown flag is provided.`,
 			fmt.Printf("ID Token:\n\t%v\n\n", idt)
 
 			_ = tokenUserResult.Execute(w, struct {
-				AccessToken  string
-				RefreshToken string
-				Expiry       string
-				IDToken      string
-				URL          string
+				AccessToken       string
+				RefreshToken      string
+				Expiry            string
+				IDToken           string
+				BackURL           string
+				DisplayBackButton bool
 			}{
-				AccessToken:  token.AccessToken,
-				RefreshToken: token.RefreshToken,
-				Expiry:       token.Expiry.Format(time.RFC1123),
-				IDToken:      fmt.Sprintf("%v", idt),
-				URL:          serverLocation,
+				AccessToken:       token.AccessToken,
+				RefreshToken:      token.RefreshToken,
+				Expiry:            token.Expiry.Format(time.RFC1123),
+				IDToken:           fmt.Sprintf("%v", idt),
+				BackURL:           serverLocation,
+				DisplayBackButton: noShutdown,
 			})
 			onDone()
 		})

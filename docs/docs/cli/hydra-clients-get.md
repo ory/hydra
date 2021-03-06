@@ -9,7 +9,6 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
-
 ## hydra clients get
 
 Get an OAuth 2.0 Client
@@ -18,7 +17,8 @@ Get an OAuth 2.0 Client
 
 This command retrieves an OAuth 2.0 Clients by its ID.
 
-Example: hydra clients get client-1
+Example:
+  hydra clients get client-1
 
 ```
 hydra clients get <id> [flags]
@@ -42,4 +42,5 @@ hydra clients get <id> [flags]
 
 ### SEE ALSO
 
-- [hydra clients](hydra-clients) - Manage OAuth 2.0 Clients
+* [hydra clients](hydra-clients)	 - Manage OAuth 2.0 Clients
+

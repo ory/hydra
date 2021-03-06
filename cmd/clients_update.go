@@ -41,6 +41,14 @@ func init() {
 	clientsUpdateCmd.Flags().StringP("name", "n", "", "The client's name")
 	clientsUpdateCmd.Flags().StringSlice("post-logout-callbacks", []string{}, "List of allowed URLs to be redirected to after a logout")
 
+	// back-channel logout options
+	clientsUpdateCmd.Flags().Bool("backchannel-logout-session-required", false, "Boolean flag specifying whether the client requires that a sid (session ID) Claim be included in the Logout Token to identify the client session with the OP when the backchannel-logout-callback is used. If omitted, the default value is false.")
+	clientsUpdateCmd.Flags().String("backchannel-logout-callback", "", "Client URL that will cause the client to log itself out when sent a Logout Token by Hydra.")
+
+	// front-channel logout options
+	clientsUpdateCmd.Flags().Bool("frontchannel-logout-session-required", false, "Boolean flag specifying whether the client requires that a sid (session ID) Claim be included in the Logout Token to identify the client session with the OP when the frontchannel-logout-callback is used. If omitted, the default value is false.")
+	clientsUpdateCmd.Flags().String("frontchannel-logout-callback", "", "Client URL that will cause the client to log itself out when rendered in an iframe by Hydra.")
+
 	// encrypt client secret options
 	clientsUpdateCmd.Flags().String("pgp-key", "", "Base64 encoded PGP encryption key for encrypting client secret")
 	clientsUpdateCmd.Flags().String("pgp-key-url", "", "PGP encryption key URL for encrypting client secret")

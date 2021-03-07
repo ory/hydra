@@ -9,24 +9,25 @@ This file is auto-generated.
 
 To improve this file please make your change against the appropriate "./cmd/*.go" file.
 -->
+
 ## hydra clients create
 
 Create a new OAuth 2.0 Client
 
 ### Synopsis
 
-This command creates an OAuth 2.0 Client which can be used to perform various OAuth 2.0 Flows like
-the Authorize Code, Implicit, Refresh flow.
+This command creates an OAuth 2.0 Client which can be used to perform various
+OAuth 2.0 Flows like the Authorize Code, Implicit, Refresh flow.
 
-ORY Hydra implements the OpenID Connect Dynamic Client registration specification. Most flags are supported by this command
-as well.
+ORY Hydra implements the OpenID Connect Dynamic Client registration
+specification. Most flags are supported by this command as well.
 
-Example:
-  hydra clients create -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
+Example: hydra clients create -n "my app" -c http://localhost/cb -g
+authorization_code -r code -a core,foobar
 
-To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
-  hydra clients create -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
-
+To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
+"--keybase" flag, for example: hydra clients create -n "my app" -g
+client_credentials -r token -a core,foobar --keybase keybase_username
 
 ```
 hydra clients create [flags]
@@ -74,5 +75,4 @@ hydra clients create [flags]
 
 ### SEE ALSO
 
-* [hydra clients](hydra-clients)	 - Manage OAuth 2.0 Clients
-
+- [hydra clients](hydra-clients) - Manage OAuth 2.0 Clients

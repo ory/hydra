@@ -80,8 +80,8 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: cockroachdb/cockroach:v2.1.6
-        command: start --insecure
+      - image: cockroachdb/cockroach:v20.2.5
+        command: start-single-node --insecure
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test

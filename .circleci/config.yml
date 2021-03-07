@@ -48,9 +48,9 @@ jobs:
       - prettier/install
       - prettier/check
       - prettier/install:
-          dir: docs
+          dir: docs/
       - prettier/check:
-          dir: docs
+          dir: docs/
       - goreleaser/install
       - goreleaser/check
       - golangci/install

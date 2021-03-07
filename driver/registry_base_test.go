@@ -4,12 +4,13 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/x/configx"
-	"github.com/ory/x/logrusx"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/logrusx"
 )
 
 func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {

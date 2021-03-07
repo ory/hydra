@@ -98,11 +98,10 @@ jobs:
       - run: cd test/e2e/oauth2-client; npm ci
       - save_cache:
           key: v2-deps-{{ checksum "package-lock.json" }}-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
           paths:
-            - ~/.npm
             - test/e2e/oauth2-client/node_modules
             - node_modules
+            - ~/.cache # cypress
 
       - go/load-cache
       - go/mod-download
@@ -110,6 +109,14 @@ jobs:
 
       - run: ./test/e2e/circle-ci.bash << parameters.flavor >>
       - run: ./test/e2e/circle-ci.bash << parameters.flavor >>-jwt
+      - run: ./test/e2e/circle-ci.bash memory
+      - run: ./test/e2e/circle-ci.bash memory-jwt
+      - run: ./test/e2e/circle-ci.bash postgres
+      - run: ./test/e2e/circle-ci.bash postgres-jwt
+      - run: ./test/e2e/circle-ci.bash cockroach
+      - run: ./test/e2e/circle-ci.bash cockroach-jwt
+      - run: ./test/e2e/circle-ci.bash mysql
+      - run: ./test/e2e/circle-ci.bash mysql-jwt
 
 workflows:
   bdt:
@@ -145,41 +152,13 @@ workflows:
             tags:
               only: /.*/
       - test-e2e:
-          name: test-e2e-memory
-          flavor: memory
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-postgres
-          requires:
-            - test-e2e-memory
-          flavor: postgres
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-mysql
-          requires:
-            - test-e2e-memory
-          flavor: mysql
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-cockroach
-          requires:
-            - test-e2e-memory
-          flavor: cockroach
           filters:
             tags:
               only: /.*/
       - changelog/generate:
           requires:
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
             - docs/build
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
@@ -193,9 +172,7 @@ workflows:
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -230,9 +207,7 @@ workflows:
       - goreleaser/release:
           requires:
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
             - changelog/generate
   #            - test-legacy-migrations-mysql
   #            - test-legacy-migrations-cockroach

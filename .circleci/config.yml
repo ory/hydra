@@ -229,19 +229,19 @@ workflows:
       ## goreleaser
       -
         goreleaser/release:
-            - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
-            - changelog/generate
+          - test
+          - test-e2e-postgres
+          - test-e2e-mysql
+          - test-e2e-cockroach
+          - changelog/generate
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
-            - docs/build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /.*/
+          - docs/build
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /.*/
       -
         goreleaser/render-version-schema:
           requires:

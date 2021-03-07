@@ -148,8 +148,6 @@ workflows:
             tags:
               only: /.*/
       - test-e2e:
-          requires:
-            - test
           filters:
             tags:
               only: /.*/

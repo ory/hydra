@@ -52,7 +52,7 @@ jobs:
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
       #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
-      - run: goreleaser/test
+      - goreleaser/test
 
   test-e2e:
     parameters:

@@ -8,6 +8,7 @@ env:
 before:
   hooks:
     - go mod download
+    - git checkout -- go.sum
     - make pack
 
 builds:
@@ -196,10 +197,8 @@ checksum:
 
 dockers:
   - dockerfile: .docker/Dockerfile-sqlite
-    builds:
+    ids:
       - hydra-sqlite-linux-libmusl
-    binaries:
-      - hydra
     image_templates:
       - "oryd/hydra:v{{ .Major }}-sqlite"
       - "oryd/hydra:v{{ .Major }}.{{ .Minor }}-sqlite"
@@ -207,9 +206,7 @@ dockers:
       - "oryd/hydra:{{ .Tag }}-sqlite"
       - "oryd/hydra:latest-sqlite"
   - dockerfile: .docker/Dockerfile-scratch
-    builds:
-      - hydra
-    binaries:
+    ids:
       - hydra
     image_templates:
       - "oryd/hydra:v{{ .Major }}"
@@ -218,9 +215,7 @@ dockers:
       - "oryd/hydra:{{ .Tag }}"
       - "oryd/hydra:latest"
   - dockerfile: .docker/Dockerfile-alpine
-    builds:
-      - hydra
-    binaries:
+    ids:
       - hydra
     image_templates:
       - "oryd/hydra:v{{ .Major }}-alpine"

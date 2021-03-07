@@ -278,7 +278,7 @@ func TestCreateCsrfSession(t *testing.T) {
 				"csrf_default": {
 					httpOnly: true,
 					secure:   true,
-					sameSite: http.SameSiteDefaultMode,
+					sameSite: 0, // see https://golang.org/doc/go1.16#net/http
 				},
 			},
 		},

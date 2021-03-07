@@ -105,8 +105,6 @@ jobs:
       - go/mod-download
       - go/save-cache
 
-      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>
-      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>-jwt
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt
       - run: ./test/e2e/circle-ci.bash postgres

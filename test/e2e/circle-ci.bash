@@ -4,6 +4,13 @@ set -euxo pipefail
 
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+function catch {
+  cat ./oauth2-client.e2e.log
+  cat ./login-consent-logout.e2e.log
+  cat ./hydra.e2e.log
+}
+trap catch ERR
+
 killall hydra || true
 killall node || true
 
@@ -29,7 +36,23 @@ fi
 # Install consent app
 (cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run consent > ../login-consent-logout.e2e.log 2>&1 &)
 
-source ./circle-ci.env.bash
+export URLS_SELF_ISSUER=http://127.0.0.1:5000
+export URLS_CONSENT=http://127.0.0.1:5002/consent
+export URLS_LOGIN=http://127.0.0.1:5002/login
+export URLS_LOGOUT=http://127.0.0.1:5002/logout
+export SECRETS_SYSTEM=youReallyNeedToChangeThis
+export OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
+export OIDC_SUBJECT_IDENTIFIERS_PAIRWISE_SALT=youReallyNeedToChangeThis
+export SERVE_PUBLIC_CORS_ENABLED=true
+export SERVE_PUBLIC_CORS_ALLOWED_METHODS=POST,GET,PUT,DELETE
+export SERVE_ADMIN_CORS_ENABLED=true
+export SERVE_ADMIN_CORS_ALLOWED_METHODS=POST,GET,PUT,DELETE
+export LOG_LEVEL=trace
+export LOG_FORMAT=json
+export OAUTH2_EXPOSE_INTERNAL_ERRORS=1
+export SERVE_PUBLIC_PORT=5000
+export SERVE_ADMIN_PORT=5001
+export LOG_LEAK_SENSITIVE_VALUES=true
 
 case "$1" in
         memory)
@@ -99,7 +122,7 @@ case "$1" in
             exit 1
 esac
 
-npm run wait-on -- -t 6000000 http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
+npm run wait-on -- -l -t 300000 http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
 
 WATCH=no
 
@@ -125,10 +148,6 @@ fi
 kill %1 || true # This is oauth2-client
 kill %2 || true # This is the login-consent-logout
 kill %3 || true # This is the hydra
-
-cat ./oauth2-client.e2e.log
-cat ./login-consent-logout.e2e.log
-cat ./hydra.e2e.log
 
 rm ./oauth2-client.e2e.log
 rm ./login-consent-logout.e2e.log

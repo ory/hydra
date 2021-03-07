@@ -10,6 +10,7 @@ orbs:
   golangci: ory/golangci@0.0.18
   go: circleci/go@1.5.0
   prettier: ory/prettier@0.0.11
+  node: circleci/node@4.2.0
 
 jobs:
 #  test-legacy-migrations:
@@ -67,9 +68,6 @@ jobs:
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
   test-e2e:
-    parameters:
-      flavor:
-        type: string
     docker:
       - image: oryd/e2e-env:latest
         environment:

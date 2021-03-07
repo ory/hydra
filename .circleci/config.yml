@@ -8,6 +8,7 @@ orbs:
   nancy: ory/nancy@0.0.13
   docs: ory/docs@0.0.8
   golangci: ory/golangci@0.0.9
+  go: circleci/go@1.5.0
 
 jobs:
 #  test-legacy-migrations:
@@ -43,16 +44,9 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          keys:
-            - hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
-      - run: go mod download
-      - run: make .bin/go-acc
-      - save_cache:
-          key: hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
-          paths:
-            - "/go/pkg/mod"
-            - ".bin"
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
       #      - run: go test -race -short $(go list ./... | grep -v cmd)
@@ -82,42 +76,23 @@ jobs:
           - MYSQL_ROOT_PASSWORD=test
     steps:
       - checkout
-      # core node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-            - v1-deps
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
-
+-
       # oauth2_client node_modules cache
       - restore_cache:
           keys:
-            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-            - v1-deps
+            - v2-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+      - run: npm ci
       - run: cd test/e2e/oauth2-client; npm ci
       - save_cache:
-          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          key: v1-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
           # cache NPM modules and the folder with the Cypress binary
           paths:
             - ~/.npm
-            - ~/.cache
-            - /test/e2e/oauth2-client/node_modules
+            - test/e2e/oauth2-client/node_modules
 
-      # go modules cache
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go install .
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
 
       - run: ./test/e2e/circle-ci.bash << parameters.flavor >>
       - run: ./test/e2e/circle-ci.bash << parameters.flavor >>-jwt
@@ -125,7 +100,6 @@ jobs:
   validate:
     docker:
       - image: cimg/go:1.16
-    working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
       - golangci/lint

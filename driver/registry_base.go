@@ -197,7 +197,7 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 				}
 
 				if status.HasPending() {
-					return errors.WithStack(herodot.ErrInternalServerError.WithReasonf("Migrations have not yet been applied."))
+					return errors.Errorf("migrations have not yet been fully applied: %+v", status)
 				}
 
 				return nil

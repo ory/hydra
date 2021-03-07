@@ -229,7 +229,6 @@ workflows:
       ## goreleaser
       -
         goreleaser/release:
-          requires:1
             - test
             - test-e2e-postgres
             - test-e2e-mysql

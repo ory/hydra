@@ -7,7 +7,7 @@ orbs:
   changelog: ory/changelog@0.1.5
   nancy: ory/nancy@0.0.14
   docs: ory/docs@0.0.10
-  golangci: ory/golangci@0.0.13
+  golangci: ory/golangci@0.0.14
   go: circleci/go@1.5.0
 
 jobs:
@@ -47,6 +47,7 @@ jobs:
       - go/load-cache
       - go/mod-download
       - go/save-cache
+      - run: make .bin/go-acc
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
       #      - run: go test -race -short $(go list ./... | grep -v cmd)

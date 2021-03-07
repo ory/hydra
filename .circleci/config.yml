@@ -26,7 +26,7 @@ jobs:
 
   test:
     docker:
-      - image: cimg/go:1.16
+      - image: cimg/go:1.16-node
         environment:
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
           - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true
@@ -101,7 +101,7 @@ jobs:
 
   validate:
     docker:
-      - image: cimg/go:1.16
+      - image: cimg/go:1.16-node
     steps:
       - checkout
       - golangci/lint

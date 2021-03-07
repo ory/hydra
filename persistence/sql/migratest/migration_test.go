@@ -9,7 +9,6 @@ import (
 
 	"github.com/ory/hydra/persistence/sql"
 
-	"github.com/ory/x/logrusx"
 	"github.com/ory/x/popx"
 
 	"github.com/ory/x/sqlcon/dockertest"
@@ -19,8 +18,6 @@ import (
 	"github.com/gobuffalo/pop/v5"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/x/dbal"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -60,22 +57,15 @@ func TestMigrations(t *testing.T) {
 			}
 
 			d := driver.New(
+				context.Background(),
 				driver.WithOptions(configx.WithValue(config.KeyDSN, url)),
 				driver.DisablePreloading(),
 				driver.DisableValidation(),
 			)
 			var dbx *sqlx.DB
-			require.NoError(t,
-				dbal.Connect(url, logrusx.New("", ""), func() error {
-					return nil
-				}, func(db *sqlx.DB) error {
-					dbx = db
-					return nil
-				}),
-			)
 
-			tm := popx.NewTestMigrator(t, c, "../migrations", "./testdata")
-			require.NoError(t, tm.Up())
+			tm := popx.NewTestMigrator(t, c, "../migrations", "./testdata", d.Logger())
+			require.NoError(t, tm.Up(context.Background()))
 
 			var lastClient *client.Client
 			for i := 1; i <= 14; i++ {

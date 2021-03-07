@@ -29,6 +29,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
 		d = driver.New(
+			cmd.Context(),
 			driver.WithOptions(
 				configx.SkipValidation(),
 				configx.WithFlags(cmd.Flags())),
@@ -48,6 +49,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			return
 		}
 		d = driver.New(
+			cmd.Context(),
 			driver.WithOptions(
 				configx.WithFlags(cmd.Flags()),
 				configx.SkipValidation(),
@@ -83,11 +85,14 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	// print migration status
 	fmt.Println("The following migration is planned:")
 	fmt.Println("")
-	if err := p.MigrationStatus(context.Background(), os.Stdout); err != nil {
+
+	status, err := p.MigrationStatus(context.Background())
+	if err != nil {
 		fmt.Printf("Could not get the migration status:\n%+v\n", errorsx.WithStack(err))
 		os.Exit(1)
 		return
 	}
+	_ = status.Write(os.Stdout)
 
 	if !flagx.MustGetBool(cmd, "yes") {
 		fmt.Println("")

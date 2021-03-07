@@ -252,14 +252,8 @@ workflows:
                only: master
       ## goreleaser
       -
-        goreleaser/test:
-          filters:
-            tags:
-              only: /.*/
-      -
         goreleaser/release:
           requires:
-            - goreleaser/test
             - nancy/test
             - test
             - test-e2e-postgres

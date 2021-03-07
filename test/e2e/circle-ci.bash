@@ -7,6 +7,9 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 killall hydra || true
 killall node || true
 
+# Check if any ports that we need are open already
+((curl http://localhost:5000/health/ready && curl http://://localhost:5001/health/ready && curl http://localhost:5002/ && curl http://localhost:5003/oauth2/callback) || if [ $? > 1 ]; then exit 0; else exit 1; fi)
+
 # Install ORY Hydra
 export GO111MODULE=on
 if [[ ! -d "../../node_modules/" ]]; then

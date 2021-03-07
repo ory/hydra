@@ -25,9 +25,8 @@ jobs:
 
   test:
     docker:
-      - image: circleci/golang:1.14-node
+      - image: cimg/go:1.16
         environment:
-          - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
           - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
@@ -41,7 +40,6 @@ jobs:
           - MYSQL_ROOT_PASSWORD=test
       - image: cockroachdb/cockroach:v2.1.6
         command: start --insecure
-    working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
       - setup_remote_docker
@@ -82,7 +80,6 @@ jobs:
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
-    working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
       # core node_modules cache
@@ -127,9 +124,7 @@ jobs:
 
   validate:
     docker:
-      - image: circleci/golang:1.15-node
-        environment:
-          GO111MODULE: 'on'
+      - image: cimg/go:1.16
     working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout

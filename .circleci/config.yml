@@ -109,9 +109,8 @@ jobs:
           keys:
             - v2-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
       - run: npm ci
-
       - save_cache:
-          key: v1-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          key: v2-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
           # cache NPM modules and the folder with the Cypress binary
           paths:
             - ~/.npm

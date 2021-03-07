@@ -8,7 +8,10 @@ killall hydra || true
 killall node || true
 
 # Check if any ports that we need are open already
-((curl http://localhost:5000/health/ready && curl http://://localhost:5001/health/ready && curl http://localhost:5002/ && curl http://localhost:5003/oauth2/callback) || if [ $? > 1 ]; then exit 0; else exit 1; fi)
+! nc -zv 127.0.0.1 5000
+! nc -zv 127.0.0.1 5001
+! nc -zv 127.0.0.1 5002
+! nc -zv 127.0.0.1 5003
 
 # Install ORY Hydra
 export GO111MODULE=on

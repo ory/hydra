@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"context"
 	"io/ioutil"
 	"testing"
 
@@ -27,7 +28,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	c := config.MustNew(l, configx.WithConfigFiles("../internal/.hydra.yaml"))
 	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 
-	registry, err := NewRegistryFromDSN(c, l)
+	registry, err := NewRegistryFromDSN(context.Background(), c, l)
 	if err != nil {
 		t.Error("failed to create registry: ", err)
 		return

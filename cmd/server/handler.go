@@ -88,7 +88,7 @@ func isDSNAllowed(r driver.Registry) {
 }
 
 func RunServeAdmin(cmd *cobra.Command, args []string) {
-	d := driver.New(driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 	isDSNAllowed(d)
 
 	admin, _, adminmw, _ := setup(d, cmd)
@@ -106,7 +106,7 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 }
 
 func RunServePublic(cmd *cobra.Command, args []string) {
-	d := driver.New(driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 	isDSNAllowed(d)
 
 	_, public, _, publicmw := setup(d, cmd)
@@ -124,7 +124,7 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 }
 
 func RunServeAll(cmd *cobra.Command, args []string) {
-	d := driver.New(driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 
 	admin, public, adminmw, publicmw := setup(d, cmd)
 	cert := GetOrCreateTLSCertificate(cmd, d) // we do not want to run this concurrently.
@@ -162,7 +162,7 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 	admin = x.NewRouterAdmin()
 	public = x.NewRouterPublic()
 
-	if tracer := d.Tracer(); tracer.IsLoaded() {
+	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
 		adminmw.Use(tracer)
 		publicmw.Use(tracer)
 	}
@@ -274,8 +274,8 @@ func serve(d driver.Registry, cmd *cobra.Command, wg *sync.WaitGroup, handler ht
 		},
 	})
 
-	if d.Tracer().IsLoaded() {
-		srv.RegisterOnShutdown(d.Tracer().Close)
+	if d.Tracer(cmd.Context()).IsLoaded() {
+		srv.RegisterOnShutdown(d.Tracer(cmd.Context()).Close)
 	}
 
 	if err := graceful.Graceful(func() error {

@@ -9,7 +9,6 @@ before:
   hooks:
     - go mod download
     - git checkout -- go.sum
-    - make pack
 
 builds:
   -

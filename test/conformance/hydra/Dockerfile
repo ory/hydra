@@ -15,7 +15,7 @@ RUN go mod download
 
 ADD . .
 
-RUN make pack && go build -tags sqlite -o /usr/bin/hydra
+RUN go build -tags sqlite -o /usr/bin/hydra
 
 VOLUME /var/lib/sqlite
 

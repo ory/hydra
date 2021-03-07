@@ -1,29 +1,24 @@
 module github.com/ory/hydra
 
-go 1.15
-
-// See https://github.com/markbates/pkger/pull/112
-replace github.com/markbates/pkger => github.com/falafeljan/pkger v0.17.1-0.20200722132747-95726f5b9b9b
+go 1.16
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.0.0 // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
-	github.com/go-openapi/errors v0.19.3
-	github.com/go-openapi/runtime v0.19.11
-	github.com/go-openapi/strfmt v0.19.4
-	github.com/go-openapi/swag v0.19.7
-	github.com/go-openapi/validate v0.19.6
+	github.com/go-openapi/errors v0.20.0
+	github.com/go-openapi/runtime v0.19.26
+	github.com/go-openapi/strfmt v0.19.5
+	github.com/go-openapi/swag v0.19.9
+	github.com/go-openapi/validate v0.19.10
 	github.com/go-swagger/go-swagger v0.22.1-0.20200306221957-4aad3a5f78b8
-	github.com/gobuffalo/httptest v1.0.2
 	github.com/gobuffalo/packr v1.24.0 // indirect
-	github.com/gobuffalo/packr/v2 v2.8.0
-	github.com/gobuffalo/pop/v5 v5.3.1
+	github.com/gobuffalo/pop/v5 v5.3.3
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.4.3
-	github.com/google/uuid v1.1.1
+	github.com/google/uuid v1.1.2
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.0
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
@@ -32,7 +27,6 @@ require (
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20201103091713-40d03108b6f4
-	github.com/markbates/pkger v0.17.1
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.0
@@ -42,10 +36,10 @@ require (
 	github.com/ory/fosite v0.36.0
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
-	github.com/ory/herodot v0.9.1
-	github.com/ory/x v0.0.170
+	github.com/ory/herodot v0.9.2
+	github.com/ory/x v0.0.199
 	github.com/pborman/uuid v1.2.0
-	github.com/phayes/freeport v0.0.0-20171002181615-b8543db493a5
+	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
 	github.com/prometheus/client_golang v1.4.0
@@ -54,7 +48,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.7
 	github.com/toqueteos/webbrowser v1.2.0

@@ -1,4 +1,4 @@
-FROM golang:1.15-buster AS builder
+FROM golang:1.16-buster AS builder
 
 RUN apt-get update && \
   apt-get install -y git gcc bash ssl-cert ca-certificates

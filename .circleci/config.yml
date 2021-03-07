@@ -10,6 +10,7 @@ orbs:
   golangci: ory/golangci@0.0.18
   go: circleci/go@1.5.0
   prettier: ory/prettier@0.0.11
+  node: circleci/node@4.2.0
 
 jobs:
 #  test-legacy-migrations:
@@ -67,9 +68,6 @@ jobs:
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
 
   test-e2e:
-    parameters:
-      flavor:
-        type: string
     docker:
       - image: oryd/e2e-env:latest
         environment:
@@ -82,8 +80,8 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: cockroachdb/cockroach:v2.1.6
-        command: start --insecure
+      - image: cockroachdb/cockroach:v20.2.5
+        command: start-single-node --insecure
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
@@ -98,18 +96,23 @@ jobs:
       - run: cd test/e2e/oauth2-client; npm ci
       - save_cache:
           key: v2-deps-{{ checksum "package-lock.json" }}-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
           paths:
-            - ~/.npm
             - test/e2e/oauth2-client/node_modules
             - node_modules
+            - ~/.cache # cypress
 
       - go/load-cache
       - go/mod-download
       - go/save-cache
 
-      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>
-      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>-jwt
+      - run: ./test/e2e/circle-ci.bash memory
+      - run: ./test/e2e/circle-ci.bash memory-jwt
+      - run: ./test/e2e/circle-ci.bash postgres
+      - run: ./test/e2e/circle-ci.bash postgres-jwt
+      - run: ./test/e2e/circle-ci.bash cockroach
+      - run: ./test/e2e/circle-ci.bash cockroach-jwt
+      - run: ./test/e2e/circle-ci.bash mysql
+      - run: ./test/e2e/circle-ci.bash mysql-jwt
 
 workflows:
   bdt:
@@ -145,41 +148,13 @@ workflows:
             tags:
               only: /.*/
       - test-e2e:
-          name: test-e2e-memory
-          flavor: memory
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-postgres
-          requires:
-            - test-e2e-memory
-          flavor: postgres
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-mysql
-          requires:
-            - test-e2e-memory
-          flavor: mysql
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-cockroach
-          requires:
-            - test-e2e-memory
-          flavor: cockroach
           filters:
             tags:
               only: /.*/
       - changelog/generate:
           requires:
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
             - docs/build
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
@@ -193,9 +168,7 @@ workflows:
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -230,9 +203,7 @@ workflows:
       - goreleaser/release:
           requires:
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
             - changelog/generate
   #            - test-legacy-migrations-mysql
   #            - test-legacy-migrations-cockroach

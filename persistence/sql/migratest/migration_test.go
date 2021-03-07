@@ -16,7 +16,6 @@ import (
 	"github.com/ory/hydra/driver/config"
 
 	"github.com/gobuffalo/pop/v5"
-	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
@@ -62,7 +61,6 @@ func TestMigrations(t *testing.T) {
 				driver.DisablePreloading(),
 				driver.DisableValidation(),
 			)
-			var dbx *sqlx.DB
 
 			tm := popx.NewTestMigrator(t, c, "../migrations", "./testdata", d.Logger())
 			require.NoError(t, tm.Up(context.Background()))
@@ -131,7 +129,8 @@ func TestMigrations(t *testing.T) {
 
 					if elor != nil {
 						alor := &consent.LogoutRequest{}
-						require.NoError(t, dbx.Get(alor, dbx.Rebind("select * from hydra_oauth2_logout_request where challenge = ?"), elor.ID))
+						require.NoError(t, d.Persister().Connection(context.Background()).RawQuery("select * from hydra_oauth2_logout_request where challenge = ?", elor.ID).First(alor))
+						alor.Client = nil
 						assertEqualLogoutRequests(t, elor, alor)
 					}
 				})
@@ -152,7 +151,7 @@ func TestMigrations(t *testing.T) {
 				ed, ebjti := expectedOauth2(i)
 				ad := &sql.OAuth2RequestSQL{}
 				for _, table := range tables {
-					require.NoError(t, dbx.Get(ad, dbx.Rebind(fmt.Sprintf("select * from %s where signature = ?", table)), ed.ID), "table: %s\n%+v", table, ed)
+					require.NoError(t, d.Persister().Connection(context.Background()).RawQuery(fmt.Sprintf("select * from %s where signature = ?", table), ed.ID).First(ad))
 					assertEqualOauth2Data(t, ed, ad)
 				}
 

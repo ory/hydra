@@ -76,19 +76,20 @@ jobs:
           - MYSQL_ROOT_PASSWORD=test
     steps:
       - checkout
--
+
       # oauth2_client node_modules cache
       - restore_cache:
           keys:
-            - v2-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+            - v2-deps-{{ checksum "package-lock.json" }}-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
       - run: npm ci
       - run: cd test/e2e/oauth2-client; npm ci
       - save_cache:
-          key: v1-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          key: v2-deps-{{ checksum "package-lock.json" }}-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
           # cache NPM modules and the folder with the Cypress binary
           paths:
             - ~/.npm
             - test/e2e/oauth2-client/node_modules
+            - node_modules
 
       - go/load-cache
       - go/mod-download
@@ -103,6 +104,19 @@ jobs:
     steps:
       - checkout
       - golangci/lint
+
+      - restore_cache:
+          keys:
+            - v2-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+      - run: npm ci
+
+      - save_cache:
+          key: v1-deps-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+          # cache NPM modules and the folder with the Cypress binary
+          paths:
+            - ~/.npm
+            - node_modules
+
       - docs/check-format
       - run: |
           bash <(curl -s https://raw.githubusercontent.com/ory/ci/master/src/scripts/install/prettier.sh)

@@ -33,9 +33,9 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
           expect(error_description).to.equal(
             'The resource owner denied the request'
           )
-          expect(access_token).to.be.empty
-          expect(id_token).to.be.empty
-          expect(refresh_token).to.be.empty
+          expect(access_token).to.be.undefined
+          expect(id_token).to.be.undefined
+          expect(refresh_token).to.be.undefined
         })
     })
 
@@ -58,9 +58,9 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
           expect(error_description).to.equal(
             'The resource owner denied the request'
           )
-          expect(access_token).to.be.empty
-          expect(id_token).to.be.empty
-          expect(refresh_token).to.be.empty
+          expect(access_token).to.be.undefined
+          expect(id_token).to.be.undefined
+          expect(refresh_token).to.be.undefined
         })
     })
   })

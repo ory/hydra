@@ -42,7 +42,8 @@ type Volume struct {
 	// Required: true
 	Options map[string]string `json:"Options"`
 
-	// The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.
+	// The level at which the volume exists. Either `global` for cluster-wide,
+	// or `local` for machine level.
 	// Required: true
 	Scope *string `json:"Scope"`
 

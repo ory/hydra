@@ -363,6 +363,7 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 }
 
 func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error {
+	/* #nosec G201 table is static */
 	err := p.Connection(ctx).RawQuery(
 		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
 		time.Now().Add(-p.config.RefreshTokenLifespan()),

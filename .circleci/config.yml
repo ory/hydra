@@ -1,13 +1,16 @@
 version: 2.1
 
 orbs:
-  goreleaser: ory/goreleaser@0.1.20
+  goreleaser: ory/goreleaser@0.1.28
   slack: circleci/slack@3.4.2
-  sdk: ory/sdk@0.1.38
-  changelog: ory/changelog@0.1.4
-  nancy: ory/nancy@0.0.13
-  docs: ory/docs@0.0.8
-  golangci: ory/golangci@0.0.9
+  sdk: ory/sdk@0.1.40
+  changelog: ory/changelog@0.1.8
+  nancy: ory/nancy@0.0.17
+  docs: ory/docs@0.0.10
+  golangci: ory/golangci@0.0.18
+  go: circleci/go@1.5.0
+  prettier: ory/prettier@0.0.11
+  node: circleci/node@4.2.0
 
 jobs:
 #  test-legacy-migrations:
@@ -25,9 +28,8 @@ jobs:
 
   test:
     docker:
-      - image: circleci/golang:1.14-node
+      - image: cimg/go:1.16-node
         environment:
-          - GO111MODULE=on
           - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
           - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true
           - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
@@ -39,32 +41,33 @@ jobs:
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
-      - image: cockroachdb/cockroach:v2.1.6
-        command: start --insecure
-    working_directory: /go/src/github.com/ory/hydra
+      - image: cockroachdb/cockroach:v20.2.5
+        command: start-single-node --insecure
     steps:
       - checkout
       - setup_remote_docker
-      - restore_cache:
-          keys:
-            - hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
-      - run: go mod download
+      - nancy/install
+      - nancy/check
+      - prettier/install
+      - prettier/check
+      - prettier/install:
+          dir: docs/
+      - prettier/check:
+          dir: docs/
+      - goreleaser/install
+      - goreleaser/check
+      - golangci/install
+      - golangci/lint
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
       - run: make .bin/go-acc
-      - save_cache:
-          key: hydra-v1-{{ checksum "go.sum" }}-{{ checksum "Makefile" }}
-          paths:
-            - "/go/pkg/mod"
-            - ".bin"
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
       #      - run: go test -race -short $(go list ./... | grep -v cmd)
       - run: test -z "$CIRCLE_PR_NUMBER" && goveralls -service=circle-ci -coverprofile=coverage.txt -repotoken=$COVERALLS_REPO_TOKEN || echo "forks are not allowed to push to coveralls"
-      - run: make docker
 
   test-e2e:
-    parameters:
-      flavor:
-        type: string
     docker:
       - image: oryd/e2e-env:latest
         environment:
@@ -77,67 +80,39 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: cockroachdb/cockroach:v2.1.6
-        command: start --insecure
+      - image: cockroachdb/cockroach:v20.2.5
+        command: start-single-node --insecure
       - image: mysql:5.7
         environment:
           - MYSQL_ROOT_PASSWORD=test
-    working_directory: /go/src/github.com/ory/hydra
     steps:
       - checkout
-      # core node_modules cache
-      - restore_cache:
-          keys:
-            - v1-deps-{{ checksum "package-lock.json" }}
-            - v1-deps
-      - run: npm ci
-      - save_cache:
-          key: v1-deps-{{ checksum "package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
-          paths:
-            - ~/.npm
-            - ~/.cache
 
       # oauth2_client node_modules cache
       - restore_cache:
           keys:
-            - v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-            - v1-deps
+            - v2-deps-{{ checksum "package-lock.json" }}-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
+      - run: npm ci
       - run: cd test/e2e/oauth2-client; npm ci
       - save_cache:
-          key: v1-deps-oauth2-client-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
-          # cache NPM modules and the folder with the Cypress binary
+          key: v2-deps-{{ checksum "package-lock.json" }}-{{ checksum "test/e2e/oauth2-client/package-lock.json" }}
           paths:
-            - ~/.npm
-            - ~/.cache
-            - /test/e2e/oauth2-client/node_modules
+            - test/e2e/oauth2-client/node_modules
+            - node_modules
+            - ~/.cache # cypress
 
-      # go modules cache
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-      - run: go install .
-      - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
+      - go/load-cache
+      - go/mod-download
+      - go/save-cache
 
-      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>
-      - run: ./test/e2e/circle-ci.bash << parameters.flavor >>-jwt
-
-  validate:
-    docker:
-      - image: circleci/golang:1.15-node
-        environment:
-          GO111MODULE: 'on'
-    working_directory: /go/src/github.com/ory/hydra
-    steps:
-      - checkout
-      - golangci/lint
-      - docs/check-format
-      - run: |
-          bash <(curl -s https://raw.githubusercontent.com/ory/ci/master/src/scripts/install/prettier.sh)
-          npm run format:check
+      - run: ./test/e2e/circle-ci.bash memory
+      - run: ./test/e2e/circle-ci.bash memory-jwt
+      - run: ./test/e2e/circle-ci.bash postgres
+      - run: ./test/e2e/circle-ci.bash postgres-jwt
+      - run: ./test/e2e/circle-ci.bash cockroach
+      - run: ./test/e2e/circle-ci.bash cockroach-jwt
+      - run: ./test/e2e/circle-ci.bash mysql
+      - run: ./test/e2e/circle-ci.bash mysql-jwt
 
 workflows:
   bdt:
@@ -168,55 +143,18 @@ workflows:
 #              only: /.*/
       # END - Test legacy migrations
 
-      - validate:
-          filters:
-            tags:
-              only: /.*/
-      - nancy/test:
-          filters:
-            tags:
-              only: /.*/
       - test:
           filters:
             tags:
               only: /.*/
       - test-e2e:
-          name: test-e2e-memory
-          flavor: memory
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-postgres
-          requires:
-            - test-e2e-memory
-          flavor: postgres
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-mysql
-          requires:
-            - test-e2e-memory
-          flavor: mysql
-          filters:
-            tags:
-              only: /.*/
-      - test-e2e:
-          name: test-e2e-cockroach
-          requires:
-            - test-e2e-memory
-          flavor: cockroach
           filters:
             tags:
               only: /.*/
       - changelog/generate:
           requires:
-            - nancy/test
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
             - docs/build
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
@@ -229,11 +167,8 @@ workflows:
           appname: Ory_Hydra
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
-            - nancy/test
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
           filters:
@@ -244,7 +179,6 @@ workflows:
       - sdk/release:
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
-            - nancy/test
             - test
             - sdk/generate
             - goreleaser/release
@@ -256,11 +190,9 @@ workflows:
               ignore: /.*/
       - docs/cli:
           requires:
-            - nancy/test
             - test
       - docs/build:
           requires:
-            - nancy/test
             - test
           filters:
             tags:
@@ -268,23 +200,13 @@ workflows:
             branches:
                only: master
       ## goreleaser
-      -
-        goreleaser/test:
-          filters:
-            tags:
-              only: /.*/
-      -
-        goreleaser/release:
+      - goreleaser/release:
           requires:
-            - goreleaser/test
-            - nancy/test
             - test
-            - test-e2e-postgres
-            - test-e2e-mysql
-            - test-e2e-cockroach
+            - test-e2e
             - changelog/generate
-#            - test-legacy-migrations-mysql
-#            - test-legacy-migrations-cockroach
+  #            - test-legacy-migrations-mysql
+  #            - test-legacy-migrations-cockroach
             - docs/build
           filters:
             branches:

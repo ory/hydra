@@ -9,5 +9,9 @@
     "jwt_enabled": false
   },
   "chromeWebSecurity": false,
-  "video": false
+  "video": false,
+  "retries": {
+    "runMode": 3,
+    "openMode": 1
+  }
 }

@@ -47,4 +47,6 @@ type FositeStorer interface {
 	FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error
 
 	DeleteAccessTokens(ctx context.Context, clientID string) error
+
+	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error
 }

@@ -40,7 +40,7 @@ require (
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/cli v0.0.35
 	github.com/ory/fosite v0.36.0
-	github.com/ory/go-acc v0.2.5
+	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.1
 	github.com/ory/x v0.0.170
@@ -54,6 +54,7 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
+	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.7
 	github.com/toqueteos/webbrowser v1.2.0

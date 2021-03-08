@@ -522,6 +522,11 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		return
 	}
 
+	if err := h.r.OAuth2Storage().FlushInactiveRefreshTokens(r.Context(), fr.NotAfter); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
 	w.WriteHeader(http.StatusNoContent)
 }
 

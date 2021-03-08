@@ -435,18 +435,48 @@ There are three types of tests you can run:
 - Regular tests (do require PostgreSQL, MySQL, CockroachDB)
 - End to end tests (do require databases and will use a test browser)
 
+All of the above tests can be run using the makefile. See the commands below.
+
+**Makefile commands**
+
+```shell
+# quick tests
+make quicktest
+
+# regular tests
+make test
+test-resetdb
+
+# end-to-end tests
+make e2e
+```
+
 ##### Short Tests
+
+It is recommended to use the make file to run your tests using `make quicktest`
+, however, you can still use the `go test` command.
+
+**Please note**:
+
+All tests run against a sqlite in-memory database,
+thus it is required to use the `-tags sqlite` build tag.
 
 Short tests run fairly quickly. You can either test all of the code at once:
 
 ```shell script
-go test -short ./...
+go test -v -failfast -short -tags sqlite ./...
 ```
 
 or test just a specific module:
 
 ```shell script
-cd client; go test -short .
+go test -v -failfast -short -tags sqlite ./client
+```
+
+or a specific test:
+
+```shell script
+go test -v -failfast -short -tags sqlite -run ^TestName$ ./...
 ```
 
 ##### Regular Tests

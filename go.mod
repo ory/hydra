@@ -50,6 +50,7 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
+	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/gjson v1.6.7
 	github.com/toqueteos/webbrowser v1.2.0

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/hydra/spec"
-
 	"github.com/ory/x/dbal"
+
+	"github.com/ory/hydra/spec"
 
 	"github.com/ory/x/configx"
 
@@ -222,7 +222,7 @@ func (p *Provider) DSN() string {
 	dsn := p.p.String(KeyDSN)
 
 	if dsn == DSNMemory {
-		return dbal.InMemoryDSN
+		return dbal.SQLiteInMemory
 	}
 
 	if len(dsn) > 0 {

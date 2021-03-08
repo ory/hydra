@@ -2,6 +2,8 @@ module github.com/ory/hydra
 
 go 1.16
 
+replace github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.6
+
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.0.0 // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
@@ -37,7 +39,7 @@ require (
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.2
-	github.com/ory/x v0.0.201
+	github.com/ory/x v0.0.204
 	github.com/pborman/uuid v1.2.0
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1

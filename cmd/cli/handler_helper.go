@@ -23,13 +23,9 @@ package cli
 import (
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
-	"time"
-
-	"github.com/ory/x/httpx"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/sawadashota/encrypta"
@@ -54,25 +50,10 @@ type transport struct {
 func newTransport(cmd *cobra.Command) *transport {
 	return &transport{
 		cmd: cmd,
-		Transport: httpx.NewResilientRoundTripper(
-			/* #nosec G402 - we want to support dev environments, hence tls trickery */
-			&http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
-			},
-			time.Second,
-			flagx.MustGetDuration(cmd, "fail-after"),
-		).WithShouldRetry(
-			func(res *http.Response, err error) bool {
-				if err != nil {
-					fmt.Printf("Unable to connect: %s\n", err)
-					return true
-				} else if res.StatusCode == 0 || res.StatusCode >= 500 {
-					fmt.Printf(`Unable to connect to "%s", unexpected HTTP error status code: %d\n`, res.Request.URL.String(), res.StatusCode)
-					return true
-				}
-				return false
-			},
-		),
+		/* #nosec G402 - we want to support dev environments, hence tls trickery */
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+		},
 	}
 }
 

@@ -5,9 +5,9 @@ set -euxo pipefail
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 function catch {
-  cat ./oauth2-client.e2e.log
-  cat ./login-consent-logout.e2e.log
-  cat ./hydra.e2e.log
+  cat ./oauth2-client.e2e.log || true
+  cat ./login-consent-logout.e2e.log || true
+  cat ./hydra.e2e.log || true
 }
 trap catch ERR
 
@@ -53,16 +53,19 @@ export OAUTH2_EXPOSE_INTERNAL_ERRORS=1
 export SERVE_PUBLIC_PORT=5000
 export SERVE_ADMIN_PORT=5001
 export LOG_LEAK_SENSITIVE_VALUES=true
+export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_fk=true"
 
 case "$1" in
         memory)
-            DSN=memory \
+           ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
+            DSN=$TEST_DATABASE_SQLITE \
                 ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
             export CYPRESS_jwt_enabled=false
             ;;
 
         memory-jwt)
-            DSN=memory \
+            ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
+            DSN=$TEST_DATABASE_SQLITE \
                 STRATEGIES_ACCESS_TOKEN=jwt \
                 OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
                 ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &

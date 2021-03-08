@@ -58,9 +58,7 @@ jobs:
       - goreleaser/check
       - golangci/install
       - golangci/lint
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
+      - go/mod-download-cached
       - run: make .bin/go-acc
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
@@ -101,9 +99,7 @@ jobs:
             - node_modules
             - ~/.cache # cypress
 
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
+      - go/mod-download-cached
 
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt

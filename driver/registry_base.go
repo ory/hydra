@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
@@ -197,7 +198,9 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 				}
 
 				if status.HasPending() {
-					return errors.Errorf("migrations have not yet been fully applied: %+v", status)
+					err := errors.Errorf("migrations have not yet been fully applied: %+v", status)
+					m.Logger().WithField("status", fmt.Sprintf("%+v", status)).WithError(err).Warn("Instance is not yet ready because migrations have not yet been fully applied.")
+					return err
 				}
 
 				return nil

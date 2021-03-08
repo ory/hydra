@@ -122,7 +122,9 @@ case "$1" in
             exit 1
 esac
 
-npm run wait-on -- -l -t 300000 http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
+npm run wait-on -- -l -t 300000 \
+  --interval 1000 -s 1 -d 1000 \
+  http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
 
 WATCH=no
 

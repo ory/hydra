@@ -439,16 +439,17 @@ All of the above tests can be run using the makefile. See the commands below.
 
 **Makefile commands**
 
-    # quick tests
-    make quicktest
+```shell
+# quick tests
+make quicktest
 
-    # regular tests
-    make test
-    test-resetdb
+# regular tests
+make test
+test-resetdb
 
-    # end-to-end tests
-    make e2e
-
+# end-to-end tests
+make e2e
+```
 
 ##### Short Tests
 
@@ -457,8 +458,8 @@ It is recommended to use the make file to run your tests using `make quicktest`
 
 **Please note**:
 
-Running quick tests will use the sqlite database
-thus add `-tags sqlite` when building the binary.
+All tests run against a sqlite in-memory database,
+thus it is required to use the `-tags sqlite` build tag.
 
 Short tests run fairly quickly. You can either test all of the code at once:
 
@@ -469,7 +470,7 @@ go test -v -failfast -short -tags sqlite ./...
 or test just a specific module:
 
 ```shell script
-cd client; go test -v -failfast -short -tags sqlite .
+go test -v -failfast -short -tags sqlite ./client
 ```
 
 or a specific test:

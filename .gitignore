@@ -25,3 +25,4 @@ hydra-login-consent-node
 *-packr.go
 packrd/
 persistence/sql/migrations/schema.sql
+cypress/videos

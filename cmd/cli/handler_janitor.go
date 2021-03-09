@@ -23,6 +23,7 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
 		d = driver.New(
+			cmd.Context(),
 			driver.WithOptions(
 				configx.SkipValidation(),
 				configx.WithFlags(cmd.Flags()),

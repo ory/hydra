@@ -480,5 +480,27 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		notAfter,
 	).Exec()
 
+	if err != nil {
+		return sqlcon.HandleError(err)
+	}
+
+	// This query is needed due to the fact that the first query will fail if there is a valid login
+	// which is needed for the consent flow to even be initialised.
+	// This cleans up the consent requests if requests have timed out or been rejected.
+	err = p.Connection(ctx).RawQuery(
+		fmt.Sprintf(`DELETE
+		FROM %s a
+		WHERE a.challenge NOT IN (
+    		SELECT b.challenge
+    		FROM %s b
+    		WHERE b.error = '{}'
+    	)
+		AND requested_at < ?
+		AND requested_at < ?`,
+			(&cr).TableName(),
+			(&crh).TableName()),
+		time.Now().Add(-p.config.ConsentRequestMaxAge()),
+		notAfter).Exec()
+
 	return sqlcon.HandleError(err)
 }

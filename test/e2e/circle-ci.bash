@@ -55,81 +55,9 @@ export SERVE_ADMIN_PORT=5001
 export LOG_LEAK_SENSITIVE_VALUES=true
 export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_fk=true"
 
-case "$1" in
-        memory)
-           ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_SQLITE \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=false
-            ;;
-
-        memory-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_SQLITE \
-                STRATEGIES_ACCESS_TOKEN=jwt \
-                OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=true
-            ;;
-
-        postgres)
-            ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_POSTGRESQL \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=false
-            ;;
-
-        postgres-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_POSTGRESQL \
-                STRATEGIES_ACCESS_TOKEN=jwt \
-                OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=true
-            ;;
-
-        mysql)
-            ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_MYSQL \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=false
-            ;;
-
-        mysql-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_MYSQL \
-                STRATEGIES_ACCESS_TOKEN=jwt \
-                OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=true
-            ;;
-
-        cockroach)
-            ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_COCKROACHDB \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=false
-            ;;
-
-        cockroach-jwt)
-            ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
-            DSN=$TEST_DATABASE_COCKROACHDB \
-                STRATEGIES_ACCESS_TOKEN=jwt \
-                OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
-                ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
-            export CYPRESS_jwt_enabled=true
-            ;;
-
-        *)
-            echo $"Usage: $0 {memory|postgres|mysql|cockroach|memory-jwt|postgres-jwt|mysql-jwt|cockroach-jwt} [--watch]"
-            exit 1
-esac
-
-npm run wait-on -- -l -t 300000 \
-  --interval 1000 -s 1 -d 1000 \
-  http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
 
 WATCH=no
+RECORD=no
 
 for i in "$@"
 do
@@ -138,16 +66,95 @@ case $i in
     WATCH=yes
     shift # past argument=value
     ;;
+    --record)
+    RECORD=yes
+    shift # past argument=value
+    ;;
     *)
-          # unknown option
+
+    case "$i" in
+            memory)
+               ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_SQLITE \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=false
+                ;;
+
+            memory-jwt)
+                ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_SQLITE \
+                    STRATEGIES_ACCESS_TOKEN=jwt \
+                    OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=true
+                ;;
+
+            postgres)
+                ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_POSTGRESQL \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=false
+                ;;
+
+            postgres-jwt)
+                ./hydra migrate sql --yes $TEST_DATABASE_POSTGRESQL > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_POSTGRESQL \
+                    STRATEGIES_ACCESS_TOKEN=jwt \
+                    OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=true
+                ;;
+
+            mysql)
+                ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_MYSQL \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=false
+                ;;
+
+            mysql-jwt)
+                ./hydra migrate sql --yes $TEST_DATABASE_MYSQL > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_MYSQL \
+                    STRATEGIES_ACCESS_TOKEN=jwt \
+                    OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=true
+                ;;
+
+            cockroach)
+                ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_COCKROACHDB \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=false
+                ;;
+
+            cockroach-jwt)
+                ./hydra migrate sql --yes $TEST_DATABASE_COCKROACHDB > ./hydra-migrate.e2e.log 2>&1
+                DSN=$TEST_DATABASE_COCKROACHDB \
+                    STRATEGIES_ACCESS_TOKEN=jwt \
+                    OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public \
+                    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+                export CYPRESS_jwt_enabled=true
+                ;;
+
+            *)
+                echo $"Usage: $0 {memory|postgres|mysql|cockroach|memory-jwt|postgres-jwt|mysql-jwt|cockroach-jwt} [--watch]"
+                exit 1
+    esac
     ;;
 esac
 done
 
+npm run wait-on -- -l -t 300000 \
+  --interval 1000 -s 1 -d 1000 \
+  http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
+
 if [[ $WATCH = "yes" ]]; then
     (cd ../..; npm run test:watch)
 else
-    (cd ../..; npm run test)
+    if [[ $RECORD = "yes" ]]; then
+      (cd ../..; npm run test -- record )
+    fi
 fi
 
 kill %1 || true # This is oauth2-client

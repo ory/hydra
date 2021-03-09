@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/flagx"
@@ -37,19 +38,37 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 			return
 		}
+	} else {
+		if len(args) != 1 {
+			fmt.Println(cmd.UsageString())
+			os.Exit(1)
+			return
+		}
+		d = driver.New(
+			cmd.Context(),
+			driver.WithOptions(
+				configx.WithFlags(cmd.Flags()),
+				configx.SkipValidation(),
+				configx.WithValue(config.KeyDSN, args[0]),
+			),
+			driver.DisableValidation(),
+			driver.DisablePreloading())
 	}
 
 	p := d.Persister()
 
 	var notAfter time.Time
 
-	if keepYounger := flagx.MustGetString(cmd, ""); keepYounger != "" {
+	keepYounger := flagx.MustGetDuration(cmd, "keep-if-younger")
+	notAfter = time.Now().Add(-keepYounger)
+
+	/*if  {
 		// TODO: get configx/provider DurationF here to verify string to time.Time parse.
 		d, _ := time.ParseDuration(keepYounger)
-		notAfter = time.Now().Add(-d)
+
 	} else {
 		notAfter = time.Now()
-	}
+	}*/
 
 	conn := p.Connection(context.Background())
 

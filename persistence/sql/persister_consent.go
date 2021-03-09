@@ -440,12 +440,61 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 }
 
 func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error {
+	/* #nosec G201 table is static */
+
+	/*
+			The query will look something like this
+			---
+			DELETE
+		FROM hydra_oauth2_authentication_request a
+		WHERE a.challenge NOT IN (
+		    SELECT b.challenge
+		    FROM hydra_oauth2_authentication_request_handled b
+		)
+		  AND a.challenge NOT IN (
+		    SELECT c.login_challenge
+		    FROM hydra_oauth2_consent_request c
+		    INNER JOIN hydra_oauth2_consent_request_handled d
+		    ON c.challenge = d.challenge
+		)
+		  AND requested_at < '2021-03-09 11:01:00'
+		  AND requested_at < CURRENT_TIMESTAMP
+	*/
 	var lr consent.LoginRequest
+	var lrh consent.HandledLoginRequest
+
+	var cr consent.ConsentRequest
+	var crh consent.HandledConsentRequest
+
+	// Delete all entries (and their FK)
+	// where hydra_oauth2_authentication_request does not have any entries in
+	// - hydra_oauth2_authentication_request_handled
+	// - hydra_oauth2_consent_request_handled
+	// AND
+	// hydra_oauth2_authentication_request.requested_at
 	err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", (&lr).TableName()),
+		fmt.Sprintf(`
+		DELETE
+		FROM %s a
+		WHERE a.challenge NOT IN (
+    		SELECT b.challenge
+    		FROM %s b
+		)
+  		AND a.challenge NOT IN (
+			SELECT c.login_challenge
+			FROM %s c
+			INNER JOIN %s d
+    		ON c.challenge = d.challenge
+		)
+  		AND requested_at < ?
+  		AND requested_at < ?`,
+			(&lr).TableName(),
+			(&lrh).TableName(),
+			(&cr).TableName(),
+			(&crh).TableName()),
 		time.Now().Add(-p.config.ConsentRequestMaxAge()),
 		notAfter,
 	).Exec()
-	
+
 	return sqlcon.HandleError(err)
 }

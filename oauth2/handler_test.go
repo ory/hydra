@@ -189,10 +189,13 @@ func TestHandlerFlushHandler(t *testing.T) {
 	cl := reg.ClientManager()
 	store := reg.OAuth2Storage()
 
+	// initialise the login/consent requests here
+
 	h := oauth2.NewHandler(reg, conf)
 	for _, r := range flushRequests {
 		_ = cl.CreateClient(context.Background(), r.Client.(*client.Client))
 		require.NoError(t, store.CreateAccessTokenSession(context.Background(), r.ID, r))
+		// == Create here the login/register requests ==
 	}
 	for _, fr := range flushRefreshRequests {
 		_ = cl.CreateClient(context.Background(), fr.Client.(*client.Client))
@@ -203,6 +206,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})
+
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
@@ -227,6 +231,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
 	require.NoError(t, err)
 
+	// == Add a check here to see if the data has been changed.==
+
 	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(lifespan + time.Hour/2)))}))
 	require.NoError(t, err)
 
@@ -244,6 +250,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
 	require.Error(t, err)
 
+	// == Add a check here to see if the data has been changed.==
+
 	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now())}))
 	require.NoError(t, err)
 
@@ -260,6 +268,8 @@ func TestHandlerFlushHandler(t *testing.T) {
 	require.Error(t, err)
 	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
 	require.Error(t, err)
+
+	// == Add a check here to see if the data has been changed.==
 }
 
 func TestUserinfo(t *testing.T) {

@@ -55,9 +55,7 @@ export SERVE_ADMIN_PORT=5001
 export LOG_LEAK_SENSITIVE_VALUES=true
 export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_fk=true"
 
-
 WATCH=no
-RECORD=no
 
 for i in "$@"
 do
@@ -153,7 +151,7 @@ if [[ $WATCH = "yes" ]]; then
     (cd ../..; npm run test:watch)
 else
     if [[ $RECORD = "yes" ]]; then
-      (cd ../..; npm run test -- record )
+      (cd ../..; npm run test -- --record )
     fi
 fi
 

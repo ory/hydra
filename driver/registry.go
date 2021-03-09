@@ -1,6 +1,8 @@
 package driver
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/errorsx"
@@ -11,8 +13,6 @@ import (
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/persistence"
-
-	"github.com/ory/x/tracing"
 
 	"github.com/ory/hydra/metrics/prometheus"
 
@@ -30,7 +30,7 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init() error
+	Init(ctx context.Context) error
 
 	WithConfig(c *config.Provider) Registry
 	WithLogger(l *logrusx.Logger) Registry
@@ -45,7 +45,7 @@ type Registry interface {
 	jwk.Registry
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
-	Tracer() *tracing.Tracer
+	x.TracingProvider
 
 	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
@@ -59,7 +59,7 @@ type Registry interface {
 	WithConsentStrategy(c consent.Strategy)
 }
 
-func NewRegistryFromDSN(c *config.Provider, l *logrusx.Logger) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)
@@ -72,14 +72,14 @@ func NewRegistryFromDSN(c *config.Provider, l *logrusx.Logger) (Registry, error)
 
 	registry = registry.WithLogger(l).WithConfig(c)
 
-	if err := registry.Init(); err != nil {
+	if err := registry.Init(ctx); err != nil {
 		return nil, err
 	}
 
 	return registry, nil
 }
 
-func CallRegistry(r Registry) {
+func CallRegistry(ctx context.Context, r Registry) {
 	r.ClientValidator()
 	r.ClientManager()
 	r.ClientHasher()
@@ -97,5 +97,5 @@ func CallRegistry(r Registry) {
 	r.OpenIDJWTStrategy()
 	r.OpenIDConnectRequestValidator()
 	r.PrometheusManager()
-	r.Tracer()
+	r.Tracer(ctx)
 }

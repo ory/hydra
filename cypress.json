@@ -9,9 +9,13 @@
     "jwt_enabled": false
   },
   "chromeWebSecurity": false,
-  "video": false,
   "retries": {
     "runMode": 3,
     "openMode": 1
-  }
+  },
+  "timeouts": {
+    "defaultCommandTimeout": 10000,
+    "requestTimeout": 10000
+  },
+  "projectId": "jrwjzp"
 }

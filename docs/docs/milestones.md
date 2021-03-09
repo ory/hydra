@@ -216,7 +216,8 @@ New feature or request.
       ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
 - [ ] Remove "not before" claim "nbf" from JWT access token
-      ([hydra#1542](https://github.com/ory/hydra/issues/1542))
+      ([hydra#1542](https://github.com/ory/hydra/issues/1542)) -
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [ ] No way to handle 409 GetLoginRequestConflict.
       ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
       [@Patrik](https://github.com/zepatrik)
@@ -272,7 +273,8 @@ Affects documentation.
 #### Issues
 
 - [ ] Add list of possible errors to REST API documentation
-      ([hydra#2166](https://github.com/ory/hydra/issues/2166))
+      ([hydra#2166](https://github.com/ory/hydra/issues/2166)) -
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [x] Docs: rendering issue (?) on reference REST API
       ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
       [@Vincent](https://github.com/vinckr)

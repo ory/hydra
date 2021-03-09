@@ -38,7 +38,7 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: mysql:5.7
+      - image: mysql:8.0
         environment:
           - MYSQL_ROOT_PASSWORD=test
       - image: cockroachdb/cockroach:v20.2.5
@@ -58,9 +58,7 @@ jobs:
       - goreleaser/check
       - golangci/install
       - golangci/lint
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
+      - go/mod-download-cached
       - run: make .bin/go-acc
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
@@ -82,7 +80,7 @@ jobs:
           - POSTGRES_DB=postgres
       - image: cockroachdb/cockroach:v20.2.5
         command: start-single-node --insecure
-      - image: mysql:5.7
+      - image: mysql:8.0
         environment:
           - MYSQL_ROOT_PASSWORD=test
     steps:
@@ -101,18 +99,16 @@ jobs:
             - node_modules
             - ~/.cache # cypress
 
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
+      - go/mod-download-cached
 
-      - run: ./test/e2e/circle-ci.bash memory
-      - run: ./test/e2e/circle-ci.bash memory-jwt
-      - run: ./test/e2e/circle-ci.bash postgres
-      - run: ./test/e2e/circle-ci.bash postgres-jwt
-      - run: ./test/e2e/circle-ci.bash cockroach
-      - run: ./test/e2e/circle-ci.bash cockroach-jwt
-      - run: ./test/e2e/circle-ci.bash mysql
-      - run: ./test/e2e/circle-ci.bash mysql-jwt
+      - run: ./test/e2e/circle-ci.bash memory  --record
+      - run: ./test/e2e/circle-ci.bash memory-jwt  --record
+      - run: ./test/e2e/circle-ci.bash postgres  --record
+      - run: ./test/e2e/circle-ci.bash postgres-jwt  --record
+      - run: ./test/e2e/circle-ci.bash cockroach  --record
+      - run: ./test/e2e/circle-ci.bash cockroach-jwt  --record
+      - run: ./test/e2e/circle-ci.bash mysql  --record
+      - run: ./test/e2e/circle-ci.bash mysql-jwt  --record
 
 workflows:
   bdt:
@@ -165,6 +161,7 @@ workflows:
               only: master
       - sdk/generate:
           appname: Ory_Hydra
+          swagpath: spec/api.json
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
           requires:
             - test
@@ -178,6 +175,7 @@ workflows:
               ignore: /master/
       - sdk/release:
           specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
+          swagpath: spec/api.json
           requires:
             - test
             - sdk/generate
@@ -192,6 +190,7 @@ workflows:
           requires:
             - test
       - docs/build:
+          swag-spec-location: spec/api.json
           requires:
             - test
           filters:

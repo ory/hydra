@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/errorsx"
 	"github.com/ory/x/flagx"
 	"github.com/spf13/cobra"
 	"os"
@@ -67,10 +68,22 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 
 	if err := p.FlushInactiveAccessTokens(ctx, notAfter); err != nil {
+		fmt.Printf("Could not flush inactive access tokens:\n%+v\n", errorsx.WithStack(err))
+		os.Exit(1)
+		return
+	}
 
+	if err := p.FlushInactiveRefreshTokens(ctx, notAfter); err != nil {
+		fmt.Printf("Could not flush inactive refresh tokens:\n%+v\n", errorsx.WithStack(err))
+		os.Exit(1)
+		return
 	}
 
 	if err := p.FlushInactiveLoginConsentRequests(ctx, notAfter); err != nil {
-
+		fmt.Printf("Could not flush inactive login/consent requests:\n%+v\n", errorsx.WithStack(err))
+		os.Exit(1)
+		return
 	}
+
+	fmt.Println("Successfully completed Janitor!")
 }

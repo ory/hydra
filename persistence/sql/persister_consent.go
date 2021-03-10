@@ -454,47 +454,57 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// AND
 	// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
 	// - hydra_oauth2_authentication_request.requested_at < notAfter
-	err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf(`
-		DELETE
-		FROM %s a
-		WHERE a.challenge NOT IN (
-    		SELECT b.challenge
-    		FROM %s b
-			WHERE b.error = '{}'
+
+	// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
+	// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
+	// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
+	err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
+	DELETE
+	FROM %s a
+	WHERE NOT EXISTS
+		(
+		SELECT NULL
+		FROM %s b
+		WHERE a.challenge = b.challenge AND b.error = '{}'
 		)
-  		AND a.challenge NOT IN (
-			SELECT c.login_challenge
-			FROM %s c
-			INNER JOIN %s d
-    		ON c.challenge = d.challenge
-			WHERE d.error = '{}'
+	AND NOT EXISTS
+		(
+		SELECT NULL
+		FROM %s c
+		INNER JOIN %s d
+		ON c.challenge = d.challenge
+		WHERE a.challenge = c.login_challenge AND d.error = '{}'
 		)
-  		AND requested_at < ?
-  		AND requested_at < ?`,
-			(&lr).TableName(),
-			(&lrh).TableName(),
-			(&cr).TableName(),
-			(&crh).TableName()),
+	AND requested_at < ?
+	AND requested_at < ?
+	`,
+		(&lr).TableName(),
+		(&lrh).TableName(),
+		(&cr).TableName(),
+		(&crh).TableName()),
 		time.Now().Add(-p.config.ConsentRequestMaxAge()),
-		notAfter,
-	).Exec()
+		notAfter).Exec()
 
 	if err != nil {
 		return sqlcon.HandleError(err)
 	}
 
-	// This query is needed due to the fact that the first query will fail if there is a valid login
-	// which is needed for the consent flow to even be initialised.
+	// This query is needed due to the fact that the first query will not delete cascade to the consent tables
 	// This cleans up the consent requests if requests have timed out or been rejected.
+
+	// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
+	// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
+	// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
 	err = p.Connection(ctx).RawQuery(
-		fmt.Sprintf(`DELETE
+		fmt.Sprintf(`
+		DELETE
 		FROM %s a
-		WHERE a.challenge NOT IN (
-    		SELECT b.challenge
-    		FROM %s b
-    		WHERE b.error = '{}'
-    	)
+		WHERE NOT EXISTS
+			(
+			SELECT NULL
+			FROM %s b
+			WHERE a.challenge = b.challenge AND b.error = '{}'
+			)
 		AND requested_at < ?
 		AND requested_at < ?`,
 			(&cr).TableName(),

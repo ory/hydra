@@ -458,28 +458,37 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
 	// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
 	// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
+	// Cannot use table aliasing in MYSQL, will work in Postgresql though...
 	err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
 	DELETE
-	FROM %s a
+	FROM %s
 	WHERE NOT EXISTS
 		(
 		SELECT NULL
-		FROM %s b
-		WHERE a.challenge = b.challenge AND b.error = '{}'
+		FROM %s
+		WHERE %s.challenge = %s.challenge AND %s.error = '{}'
 		)
 	AND NOT EXISTS
 		(
 		SELECT NULL
-		FROM %s c
-		INNER JOIN %s d
-		ON c.challenge = d.challenge
-		WHERE a.challenge = c.login_challenge AND d.error = '{}'
+		FROM %s
+		INNER JOIN %s
+		ON %s.challenge = %s.challenge
+		WHERE %s.challenge = %s.login_challenge AND %s.error = '{}'
 		)
 	AND requested_at < ?
 	AND requested_at < ?
 	`,
 		(&lr).TableName(),
 		(&lrh).TableName(),
+		(&lr).TableName(),
+		(&lrh).TableName(),
+		(&lrh).TableName(),
+		(&cr).TableName(),
+		(&crh).TableName(),
+		(&cr).TableName(),
+		(&crh).TableName(),
+		(&lr).TableName(),
 		(&cr).TableName(),
 		(&crh).TableName()),
 		time.Now().Add(-p.config.ConsentRequestMaxAge()),
@@ -495,19 +504,23 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
 	// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
 	// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
+	// Cannot use table aliasing in MYSQL, will work in Postgresql though...
 	err = p.Connection(ctx).RawQuery(
 		fmt.Sprintf(`
 		DELETE
-		FROM %s a
+		FROM %s
 		WHERE NOT EXISTS
 			(
 			SELECT NULL
-			FROM %s b
-			WHERE a.challenge = b.challenge AND b.error = '{}'
+			FROM %s
+			WHERE %s.challenge = %s.challenge AND %s.error = '{}'
 			)
 		AND requested_at < ?
 		AND requested_at < ?`,
 			(&cr).TableName(),
+			(&crh).TableName(),
+			(&cr).TableName(),
+			(&crh).TableName(),
 			(&crh).TableName()),
 		time.Now().Add(-p.config.ConsentRequestMaxAge()),
 		notAfter).Exec()

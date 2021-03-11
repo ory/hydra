@@ -214,10 +214,6 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	// Create login clients and requests
 	for _, r := range flushLoginRequests {
 		require.NoError(t, cl.CreateClient(ctx, r.Client))
-		require.NoError(t, cm.CreateLoginSession(ctx, &consent.LoginSession{
-			ID:      string(r.SessionID),
-			Subject: r.Client.OutfacingID,
-		}))
 		require.NoError(t, cm.CreateLoginRequest(ctx, r))
 	}
 
@@ -374,11 +370,7 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 
 	// Create login requests
 	for _, r := range flushLoginRequests {
-		_ = cl.CreateClient(context.Background(), r.Client)
-		/*require.NoError(t, cm.CreateLoginSession(ctx, &consent.LoginSession{
-			ID:      string(r.SessionID),
-			Subject: r.Client.OutfacingID,
-		}))*/
+		require.NoError(t, cl.CreateClient(ctx, r.Client))
 		require.NoError(t, cm.CreateLoginRequest(ctx, r))
 	}
 
@@ -393,22 +385,24 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 				RequestedAt:     r.RequestedAt,
 				WasUsed:         true,
 			})
-
 			require.NoError(t, err)
 			continue
 		}
 
 		// TODO: problem: not rejecting the request thus not being purged!
 		// reject flush-login-2 and 3
-		var p consent.RequestDeniedError
-		p.SetDefaults("login request denied")
-		p.Name = "login request denied"
-		p.Code = 403
 		_, err := cm.HandleLoginRequest(ctx, r.ID, &consent.HandledLoginRequest{
-			ID:              r.ID,
-			Error:           &p,
+			ID: r.ID,
+			Error: &consent.RequestDeniedError{
+				Name:        "login request denied",
+				Description: "denied",
+				Hint:        "",
+				Code:        403,
+				Debug:       "",
+			},
 			AuthenticatedAt: r.AuthenticatedAt,
 			RequestedAt:     r.RequestedAt,
+			WasUsed:         true,
 		})
 		require.NoError(t, err)
 	}

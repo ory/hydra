@@ -81,7 +81,7 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		}
 
 		// if dsn is memory we have to run the migrations on every start
-		if m.C.DSN() == dbal.SQLiteInMemory {
+		if m.C.DSN() == dbal.SQLiteInMemory || m.C.DSN() == dbal.SQLiteSharedInMemory {
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
 			if err := m.persister.MigrateUp(context.Background()); err != nil {

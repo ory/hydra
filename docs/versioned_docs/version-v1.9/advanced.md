@@ -282,7 +282,7 @@ layout:
 ```yaml
 oidc:
   subject_identifiers:
-    enabled:
+    supported_types:
       - public
       - pairwise
 ```
@@ -294,7 +294,7 @@ When `pairwise` is enabled, you must also set
 ```yaml
 oidc:
   subject_identifiers:
-    enabled:
+    supported_types:
       - public
       - pairwise
     pairwise:

@@ -3,6 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"testing"
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/client"
@@ -13,11 +20,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/x/logrusx"
 	"github.com/ory/x/sqlxx"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/require"
-	"net/url"
-	"testing"
-	"time"
 )
 
 var (

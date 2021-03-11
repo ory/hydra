@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/ory/x/configx"
 	"github.com/spf13/cobra"
+
+	"github.com/ory/x/configx"
 )
 
 var janitorCmd = &cobra.Command{

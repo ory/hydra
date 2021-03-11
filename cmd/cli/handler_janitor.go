@@ -2,13 +2,15 @@ package cli
 
 import (
 	"fmt"
+	"os"
+	"time"
+
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/errorsx"
-	"github.com/spf13/cobra"
-	"os"
-	"time"
 )
 
 type JanitorHandler struct{}
@@ -26,8 +28,8 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 	}
 
 	keys := map[string]string{
-		"access-lifespan":        config.KeyAccessTokenLifespan,
-		"refresh-lifespan":       config.KeyRefreshTokenLifespan,
+		"access-lifespan":          config.KeyAccessTokenLifespan,
+		"refresh-lifespan":         config.KeyRefreshTokenLifespan,
 		"consent-request-lifespan": config.KeyConsentRequestMaxAge,
 	}
 
@@ -65,8 +67,8 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 	d = driver.New(cmd.Context(), do...)
 
 	if len(d.Config().DSN()) == 0 {
-		fmt.Println(fmt.Sprintf("%s\n%s", cmd.UsageString(),
-			"When using flag -e, environment variable DSN must be set"))
+		fmt.Printf("%s\n%s\n", cmd.UsageString(),
+			"When using flag -e, environment variable DSN must be set")
 		os.Exit(1)
 		return
 	}
@@ -76,8 +78,8 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 	conn := p.Connection(cmd.Context())
 
 	if conn == nil {
-		fmt.Println(fmt.Sprintf("%s\n%s\n", cmd.UsageString(),
-			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source."))
+		fmt.Printf("%s\n%s\n", cmd.UsageString(),
+			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
 		os.Exit(1)
 		return
 	}
@@ -106,5 +108,5 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println("Successfully completed Janitor!")
+	fmt.Print("Successfully completed Janitor!\n")
 }

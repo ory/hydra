@@ -1,8 +1,9 @@
 package consent
 
 import (
-	"github.com/ory/x/sqlxx"
 	"time"
+
+	"github.com/ory/x/sqlxx"
 )
 
 type JanitorLoginConsentTest struct{}

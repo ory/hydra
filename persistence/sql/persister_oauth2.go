@@ -237,9 +237,9 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 				return err
 			} else if table == sqlTableCode {
 				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
-			} else if table == sqlTableRefresh {
-				return errorsx.WithStack(fosite.ErrInactiveToken)
 			}
+
+			return errorsx.WithStack(fosite.ErrInactiveToken)
 		}
 
 		fr, err = r.toRequest(ctx, session, p)

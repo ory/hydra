@@ -192,7 +192,7 @@ func init() {
 	janitorCmd.Flags().StringP("keep-if-younger", "k", "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().StringP("access-lifespan", "a", "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().StringP("refresh-lifespan", "r", "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().StringP("consent-request-lifespan", "c", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
+	janitorCmd.Flags().StringP("consent-request-lifespan", "l", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 }
 
@@ -244,7 +244,7 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	janitorCmd.SetArgs([]string{
 		fmt.Sprintf("-k=%s", (time.Hour * 24).String()),
 		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
-		fmt.Sprintf("-c=%s", conf.ConsentRequestMaxAge().String()),
+		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
 		reg.Config().DSN(),
 	})
 	require.NoError(t, janitorCmd.Execute())
@@ -277,7 +277,7 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	janitorCmd.SetArgs([]string{
 		fmt.Sprintf("-k=%s", (lifespan + time.Hour/2).String()),
 		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
-		fmt.Sprintf("-c=%s", conf.ConsentRequestMaxAge().String()),
+		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
 		reg.Config().DSN(),
 	})
 	require.NoError(t, janitorCmd.Execute())
@@ -326,7 +326,7 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	janitorCmd.SetArgs([]string{
 		fmt.Sprintf("-k=%s", ""), // just keep this here to clear the previous keep-if-younger value...
 		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
-		fmt.Sprintf("-c=%s", conf.ConsentRequestMaxAge().String()),
+		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
 		reg.Config().DSN(),
 	})
 	require.NoError(t, janitorCmd.Execute())

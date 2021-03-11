@@ -20,6 +20,9 @@ var janitorCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(janitorCmd)
 	janitorCmd.Flags().StringP("keep-if-younger", "k", "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().StringP("access-lifespan", "a", "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().StringP("refresh-lifespan", "r", "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().StringP("consent-request-lifespan", "c", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	configx.RegisterFlags(janitorCmd.PersistentFlags())
 }

@@ -7,14 +7,6 @@ import (
 
 type JanitorLoginConsentTest struct{}
 
-type OptionsJanitorTest interface {
-	apply(*options)
-}
-
-type options struct {
-	error bool
-}
-
 func (j *JanitorLoginConsentTest) NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *HandledLoginRequest {
 	var deniedErr *RequestDeniedError
 	if hasError {

@@ -447,7 +447,6 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	var cr consent.ConsentRequest
 	var crh consent.HandledConsentRequest
 
-
 	// Delete all entries (and their FK)
 	// where hydra_oauth2_authentication_request were timed-out or rejected
 	// - hydra_oauth2_authentication_request_handled

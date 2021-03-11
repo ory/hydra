@@ -188,6 +188,9 @@ var flushConsentRequests = []*consent.ConsentRequest{
 
 func init() {
 	janitorCmd.Flags().StringP("keep-if-younger", "k", "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().StringP("access-lifespan", "a", "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().StringP("refresh-lifespan", "r", "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().StringP("consent-request-lifespan", "c", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 }
 
@@ -197,29 +200,29 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyRefreshTokenLifespan, time.Hour*1)
-	conf.MustSet(config.KeyConsentRequestMaxAge, time.Hour*1)
+	conf.MustSet(config.KeyRefreshTokenLifespan, lifespan)
+	conf.MustSet(config.KeyConsentRequestMaxAge, lifespan)
 
 	conf.MustSet(config.KeyLogLevel, "trace")
-	conf.MustSet(config.KeyDSN, "sqlite://file::memory:?_fk=true&cache=shared")
+	conf.MustSet(config.KeyDSN, "sqlite://file:purgenotafter?mode=memory&_fk=true&cache=shared")
 
 	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)
 
-	//cm := reg.ConsentManager()
+	cm := reg.ConsentManager()
 	cl := reg.ClientManager()
 	store := reg.OAuth2Storage()
 
 	// Create login clients and requests
-	/*for _, r := range flushLoginRequests {
+	for _, r := range flushLoginRequests {
 		require.NoError(t, cl.CreateClient(ctx, r.Client))
 		require.NoError(t, cm.CreateLoginRequest(ctx, r))
-	}*/
+	}
 
 	// Create consent requests, the clients have already been created in login
-	/*for _, r := range flushConsentRequests {
+	for _, r := range flushConsentRequests {
 		require.NoError(t, cm.CreateConsentRequest(ctx, r))
-	}*/
+	}
 
 	// Create access token clients and session
 	for _, r := range flushAccessRequests {
@@ -236,63 +239,69 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	ds := new(oauth2.Session)
 
 	// == Test Cycle 1: do not remove anything that is not older than 24 hours ==
-	janitorCmd.SetArgs([]string{fmt.Sprintf("-k=%s", (time.Hour * 24).String()), reg.Config().DSN()})
+	janitorCmd.SetArgs([]string{
+		fmt.Sprintf("-k=%s", (time.Hour * 24).String()),
+		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
+		fmt.Sprintf("-c=%s", conf.ConsentRequestMaxAge().String()),
+		reg.Config().DSN(),
+	})
 	require.NoError(t, janitorCmd.Execute())
 
-	/*_, err = cm.GetLoginRequest(ctx, "flush-login-1")
-	require.NoError(t, err)
+	for _, r := range flushLoginRequests {
+		t.Logf("login flush check: %s", r.ID)
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		require.NoError(t, err)
+	}
 
-	_, err = cm.GetLoginRequest(ctx, "flush-login-2")
-	require.NoError(t, err)
-
-	_, err = cm.GetLoginRequest(ctx, "flush-login-3")
-	require.NoError(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-1")
-	require.NoError(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-2")
-	require.NoError(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-3")
-	require.NoError(t, err)*/
+	for _, r := range flushConsentRequests {
+		t.Logf("consent flush check: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		require.NoError(t, err)
+	}
 
 	for _, r := range flushAccessRequests {
-		t.Logf("access flush: %s", r.ID)
+		t.Logf("access flush check: %s", r.ID)
 		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
 		require.NoError(t, err)
 	}
 
 	for _, r := range flushRefreshRequests {
-		t.Logf("refresh flush: %s", r.ID)
+		t.Logf("refresh flush check: %s", r.ID)
 		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
 		require.NoError(t, err)
 	}
 
 	// == Test Cycle 2: do not remove anything that is older than 1h30min ==
-	janitorCmd.SetArgs([]string{fmt.Sprintf("-k=%s", (lifespan + time.Hour/2).String()), reg.Config().DSN()})
+	janitorCmd.SetArgs([]string{
+		fmt.Sprintf("-k=%s", (lifespan + time.Hour/2).String()),
+		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
+		fmt.Sprintf("-c=%s", conf.ConsentRequestMaxAge().String()),
+		reg.Config().DSN(),
+	})
 	require.NoError(t, janitorCmd.Execute())
 
-	/*_, err = cm.GetLoginRequest(ctx, "flush-login-1")
-	require.NoError(t, err)
+	for _, r := range flushLoginRequests {
+		t.Logf("login flush check: %s", r.ID)
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		if r.ID == flushLoginRequests[2].ID {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
 
-	_, err = cm.GetLoginRequest(ctx, "flush-login-2")
-	require.NoError(t, err)
-
-	_, err = cm.GetLoginRequest(ctx, "flush-login-3")
-	require.Error(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-1")
-	require.NoError(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-2")
-	require.NoError(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-3")
-	require.Error(t, err)*/
+	for _, r := range flushConsentRequests {
+		t.Logf("consent flush check: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		if r.ID == flushConsentRequests[2].ID {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
 
 	for _, r := range flushAccessRequests {
-		t.Logf("access flush: %s", r.ID)
+		t.Logf("access flush check: %s", r.ID)
 		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
 		if r.ID == flushAccessRequests[2].ID {
 			require.Error(t, err)
@@ -302,9 +311,9 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	}
 
 	for _, r := range flushRefreshRequests {
-		t.Logf("refresh flush: %s", r.ID)
-		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
-		if r.ID == flushRefreshRequests[2].ID {
+		t.Logf("refresh flush check: %s", r.Request.ID)
+		_, err = store.GetRefreshTokenSession(ctx, r.Request.ID, ds)
+		if r.ID == flushRefreshRequests[2].Request.ID {
 			require.Error(t, err)
 		} else {
 			require.NoError(t, err)
@@ -312,29 +321,36 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	}
 
 	// == Test Cycle 3: remove anything that is older than now ==
-	janitorCmd.SetArgs([]string{reg.Config().DSN()})
+	janitorCmd.SetArgs([]string{
+		fmt.Sprintf("-k=%s", ""), // just keep this here to clear the previous keep-if-younger value...
+		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
+		fmt.Sprintf("-c=%s", conf.ConsentRequestMaxAge().String()),
+		reg.Config().DSN(),
+	})
 	require.NoError(t, janitorCmd.Execute())
 
-	/*_, err = cm.GetLoginRequest(ctx, "flush-login-1")
-	require.NoError(t, err)
+	for _, r := range flushLoginRequests {
+		t.Logf("login flush check: %s", r.ID)
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		if r.ID == flushLoginRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
 
-	_, err = cm.GetLoginRequest(ctx, "flush-login-2")
-	require.Error(t, err)
-
-	_, err = cm.GetLoginRequest(ctx, "flush-login-3")
-	require.Error(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-1")
-	require.NoError(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-2")
-	require.Error(t, err)
-
-	_, err = cm.GetConsentRequest(ctx, "flush-consent-3")
-	require.Error(t, err)*/
+	for _, r := range flushConsentRequests {
+		t.Logf("consent flush check: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		if r.ID == flushConsentRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
 
 	for _, r := range flushAccessRequests {
-		t.Logf("access flush: %s", r.ID)
+		t.Logf("access flush check: %s", r.ID)
 		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
 		if r.ID == flushAccessRequests[0].ID {
 			require.NoError(t, err)
@@ -344,7 +360,7 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 	}
 
 	for _, r := range flushRefreshRequests {
-		t.Logf("refresh flush: %s", r.ID)
+		t.Logf("refresh flush check: %s", r.ID)
 		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
 		if r.ID == flushRefreshRequests[0].ID {
 			require.NoError(t, err)
@@ -352,6 +368,8 @@ func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
 			require.Error(t, err)
 		}
 	}
+
+	require.NoError(t, reg.Persister().Connection(ctx).Close())
 }
 
 func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
@@ -371,7 +389,7 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 	conf.MustSet(config.KeyLoginURL, "http://redirect")
 
 	conf.MustSet(config.KeyLogLevel, "trace")
-	conf.MustSet(config.KeyDSN, "sqlite://file::memory:?_fk=true&cache=shared")
+	conf.MustSet(config.KeyDSN, "sqlite://file:purgerejection?mode=memory&_fk=true&cache=shared")
 
 	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)
@@ -398,7 +416,6 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 			continue
 		}
 
-		// TODO: problem: not rejecting the request thus not being purged!
 		// reject flush-login-2 and 3
 		_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
 			r.ID, true, r.RequestedAt, r.AuthenticatedAt))
@@ -469,6 +486,8 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 			require.Error(t, err)
 		}
 	}
+
+	require.NoError(t, reg.Persister().Connection(ctx).Close())
 }
 
 func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
@@ -491,10 +510,11 @@ func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
 	conf.MustSet(config.KeyLoginURL, "http://redirect")
 
 	conf.MustSet(config.KeyLogLevel, "trace")
-	conf.MustSet(config.KeyDSN, "sqlite://file::memory:?_fk=true&cache=shared")
+	conf.MustSet(config.KeyDSN, "sqlite://file:purgetimeout?mode=memory&_fk=true&cache=shared")
 
 	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
 	require.NoError(t, err)
+	defer reg.Persister().Connection(ctx).Close()
 
 	cm := reg.ConsentManager()
 	cl := reg.ClientManager()
@@ -568,4 +588,5 @@ func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
 		}
 	}
 
+	require.NoError(t, reg.Persister().Connection(ctx).Close())
 }

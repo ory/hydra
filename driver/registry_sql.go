@@ -81,7 +81,13 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		}
 
 		// if dsn is memory we have to run the migrations on every start
-		if m.C.DSN() == dbal.SQLiteInMemory || m.C.DSN() == dbal.SQLiteSharedInMemory {
+		// TODO: might need something better for this since sqlite in-memory can be written in different styles depending on the
+		// use case - such as
+		// - just in memory
+		// - shared connection
+		// - shared but unique in the same process
+		// see: https://sqlite.org/inmemorydb.html
+		if m.C.DSN() == dbal.SQLiteInMemory || m.C.DSN() == dbal.SQLiteSharedInMemory || strings.Contains(m.C.DSN(), "mode=memory"){
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
 			if err := m.persister.MigrateUp(context.Background()); err != nil {

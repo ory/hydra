@@ -189,8 +189,6 @@ func TestHandlerFlushHandler(t *testing.T) {
 	cl := reg.ClientManager()
 	store := reg.OAuth2Storage()
 
-	// initialise the login/consent requests here
-
 	h := oauth2.NewHandler(reg, conf)
 	for _, r := range flushRequests {
 		_ = cl.CreateClient(context.Background(), r.Client.(*client.Client))

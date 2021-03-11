@@ -59,18 +59,28 @@ describe('The OAuth 2.0 Refresh Token Grant', function () {
       consent: { scope: ['offline_access'] }
     }).then((originalResponse) => {
       expect(originalResponse.status).to.eq(200)
+      expect(originalResponse.body.refresh_token).to.not.be.empty
 
       const originalToken = originalResponse.body.refresh_token
 
       cy.refreshTokenBrowser(client, originalToken).then(
         (refreshedResponse) => {
+          expect(refreshedResponse.status).to.eq(200)
+          expect(refreshedResponse.body.refresh_token).to.not.be.empty
+
           const refreshedToken = refreshedResponse.body.refresh_token
 
           return cy
             .refreshTokenBrowser(client, originalToken)
-            .then((response) => expect(response.status).to.eq(401))
+            .then((response) => {
+              expect(response.status).to.eq(401)
+              expect(response.body.error).to.eq('token_inactive')
+            })
             .then(() => cy.refreshTokenBrowser(client, refreshedToken))
-            .then((response) => expect(response.status).to.eq(401))
+            .then((response) => {
+              expect(response.status).to.eq(401)
+              expect(response.body.error).to.eq('token_inactive')
+            })
         }
       )
     })

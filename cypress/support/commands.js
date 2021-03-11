@@ -173,7 +173,7 @@ Cypress.Commands.add(
       const callbackParams = new URLSearchParams(search)
       const code = callbackParams.get('code')
 
-      expect(code).to.exist
+      expect(code).to.not.be.empty
 
       return cy.request({
         url: `${Cypress.env('public_url')}/oauth2/token`,

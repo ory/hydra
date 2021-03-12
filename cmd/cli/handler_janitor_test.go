@@ -3,7 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
+	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
 	"net/url"
+	"sync"
 	"testing"
 	"time"
 
@@ -165,6 +169,7 @@ var flushConsentRequests = []*consent.ConsentRequest{
 		RequestURL:           "http://redirect",
 		LoginChallenge:       "flush-login-1",
 		RequestedAt:          time.Now().Round(time.Second),
+		Verifier:             "flush-consent-1",
 	},
 	{
 		ID:                   "flush-consent-2",
@@ -175,6 +180,7 @@ var flushConsentRequests = []*consent.ConsentRequest{
 		RequestURL:           "http://redirect",
 		LoginChallenge:       "flush-login-2",
 		RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+		Verifier:             "flush-consent-2",
 	},
 	{
 		ID:                   "flush-consent-3",
@@ -185,6 +191,7 @@ var flushConsentRequests = []*consent.ConsentRequest{
 		RequestURL:           "http://redirect",
 		LoginChallenge:       "flush-login-3",
 		RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+		Verifier:             "flush-consent-3",
 	},
 }
 
@@ -194,6 +201,234 @@ func init() {
 	janitorCmd.Flags().StringP("refresh-lifespan", "r", "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().StringP("consent-request-lifespan", "l", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
+}
+
+func connectPostgres(t *testing.T) (*pop.Connection, string) {
+	c := dockertest.ConnectToTestPostgreSQLPop(t)
+	return c, c.URL()
+}
+
+func connectMySQL(t *testing.T) (*pop.Connection, string) {
+	c := dockertest.ConnectToTestMySQLPop(t)
+	return c, fmt.Sprintf("mysql://%s", c.URL())
+}
+
+func connectCockroach(t *testing.T) (*pop.Connection, string) {
+	c := dockertest.ConnectToTestCockroachDBPop(t)
+	return c, c.URL()
+}
+
+var dbConnections = map[string]func(*testing.T) (*pop.Connection, string){
+	"postgres": connectPostgres,
+	"mysql":    connectMySQL,
+	//"cockroach": connectCockroach,
+}
+
+func loginConsentRejectionRun(t *testing.T, ctx context.Context, dsn string) {
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyConsentRequestMaxAge, time.Hour*1)
+
+	conf.MustSet(config.KeyConsentURL, "http://redirect")
+	conf.MustSet(config.KeyLoginURL, "http://redirect")
+
+	conf.MustSet(config.KeyLogLevel, "trace")
+	conf.MustSet(config.KeyDSN, dsn)
+
+	// Connect to sqlite db
+	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
+	require.NoError(t, err)
+
+	require.NoError(t, reg.Persister().MigrateUp(ctx))
+
+	cm := reg.ConsentManager()
+	cl := reg.ClientManager()
+
+	jt := consent.JanitorLoginConsentTest{}
+
+	// Create login requests
+	for _, r := range flushLoginRequests {
+		require.NoError(t, cl.CreateClient(ctx, r.Client))
+		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+	}
+
+	// Explicit rejection
+	for _, r := range flushLoginRequests {
+		if r.ID == "flush-login-1" {
+			// accept this one
+			_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
+				r.ID, false, r.RequestedAt, r.AuthenticatedAt))
+
+			require.NoError(t, err)
+			continue
+		}
+
+		// reject flush-login-2 and 3
+		_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
+			r.ID, true, r.RequestedAt, r.AuthenticatedAt))
+		require.NoError(t, err)
+	}
+
+	janitorCmd.SetArgs([]string{reg.Config().DSN()})
+	require.NoError(t, janitorCmd.Execute())
+
+	// flush-login-2 and 3 should be cleared now
+	for _, r := range flushLoginRequests {
+		t.Logf("check login: %s", r.ID)
+		_, err := cm.GetLoginRequest(ctx, r.ID)
+		if r.ID == "flush-login-1" {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	// Cleanup rejected logins and recreate them to test the consent
+	// since consent is dependant on login's acceptance.
+	x.CleanSQLPop(t, reg.Persister().Connection(ctx))
+	require.NoError(t, reg.Persister().MigrateUp(ctx))
+
+	for _, r := range flushLoginRequests {
+		/*if r.ID == "flush-login-1" {
+			// this one is already accepted so no need to recreate it
+			continue
+		}
+		require.NoError(t, cl.DeleteClient(ctx, r.Client.OutfacingID))*/
+		require.NoError(t, cl.CreateClient(ctx, r.Client))
+		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+
+		// accept flush-login-2 and 3
+		_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
+			r.ID, false, r.RequestedAt, r.AuthenticatedAt))
+	}
+
+	// Create consent requests
+	for _, r := range flushConsentRequests {
+		require.NoError(t, cm.CreateConsentRequest(ctx, r))
+	}
+
+	//Reject the consents
+	for _, r := range flushConsentRequests {
+		if r.ID == "flush-consent-1" {
+			// accept this one
+			_, err = cm.HandleConsentRequest(ctx, r.ID, jt.NewHandledConsentRequest(
+				r.ID, false, r.RequestedAt, r.AuthenticatedAt))
+			require.NoError(t, err)
+			continue
+		}
+		_, err = cm.HandleConsentRequest(ctx, r.ID, jt.NewHandledConsentRequest(
+			r.ID, true, r.RequestedAt, r.AuthenticatedAt))
+		require.NoError(t, err)
+	}
+
+	janitorCmd.SetArgs([]string{reg.Config().DSN()})
+	require.NoError(t, janitorCmd.Execute())
+
+	for _, r := range flushConsentRequests {
+		t.Logf("check consent: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		if r.ID == "flush-consent-1" {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	require.NoError(t, reg.Persister().Connection(ctx).Close())
+}
+
+func loginConsentTimeout(t *testing.T, ctx context.Context, dsn string) {
+	var err error
+
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyConsentRequestMaxAge, time.Hour*1)
+
+	conf.MustSet(config.KeyConsentURL, "http://redirect")
+	conf.MustSet(config.KeyLoginURL, "http://redirect")
+
+	conf.MustSet(config.KeyLogLevel, "trace")
+	conf.MustSet(config.KeyDSN, dsn)
+
+	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
+	require.NoError(t, err)
+	require.NoError(t, reg.Persister().MigrateUp(ctx))
+
+	cm := reg.ConsentManager()
+	cl := reg.ClientManager()
+
+	// Create login requests
+	for _, r := range flushLoginRequests {
+		require.NoError(t, cl.CreateClient(ctx, r.Client))
+		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+	}
+
+	// Creating at least 1 that has not timed out
+	_, err = cm.HandleLoginRequest(ctx, flushLoginRequests[0].ID, &consent.HandledLoginRequest{
+		ID:              flushLoginRequests[0].ID,
+		RequestedAt:     flushLoginRequests[0].RequestedAt,
+		AuthenticatedAt: flushLoginRequests[0].AuthenticatedAt,
+		WasUsed:         true,
+	})
+
+	require.NoError(t, err)
+
+	// First check if the login's can be purged when they have timed out
+	janitorCmd.SetArgs([]string{reg.Config().DSN()})
+	require.NoError(t, janitorCmd.Execute())
+
+	for _, r := range flushLoginRequests {
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		if r.ID == flushLoginRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	// Let's reset and accept all login requests to test the consent requests
+	for _, r := range flushLoginRequests {
+		require.NoError(t, cl.DeleteClient(ctx, r.Client.OutfacingID))
+		require.NoError(t, cl.CreateClient(ctx, r.Client))
+		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+		_, err = cm.HandleLoginRequest(ctx, r.ID, &consent.HandledLoginRequest{
+			ID:              r.ID,
+			AuthenticatedAt: r.AuthenticatedAt,
+			RequestedAt:     r.RequestedAt,
+			WasUsed:         true,
+		})
+		require.NoError(t, err)
+	}
+
+	// Create consent requests
+	for _, r := range flushConsentRequests {
+		require.NoError(t, cm.CreateConsentRequest(ctx, r))
+	}
+
+	// Create at least 1 consent request that has been accepted
+	_, err = cm.HandleConsentRequest(ctx, flushConsentRequests[0].ID, &consent.HandledConsentRequest{
+		ID:              flushConsentRequests[0].ID,
+		WasUsed:         true,
+		RequestedAt:     flushConsentRequests[0].RequestedAt,
+		AuthenticatedAt: flushConsentRequests[0].AuthenticatedAt,
+	})
+
+	// Explicit timeout test
+	janitorCmd.SetArgs([]string{reg.Config().DSN()})
+	require.NoError(t, janitorCmd.Execute())
+
+	for _, r := range flushConsentRequests {
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		if r.ID == flushConsentRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	require.NoError(t, reg.Persister().Connection(ctx).Close())
 }
 
 func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
@@ -380,116 +615,34 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 		- when a login/consent request was never completed (timed out)
 		- when a login/consent request was rejected
 	*/
-	var err error
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyConsentRequestMaxAge, time.Hour*1)
 
-	conf.MustSet(config.KeyConsentURL, "http://redirect")
-	conf.MustSet(config.KeyLoginURL, "http://redirect")
+	wg := &sync.WaitGroup{}
 
-	conf.MustSet(config.KeyLogLevel, "trace")
-	conf.MustSet(config.KeyDSN, "sqlite://file:purgerejection?mode=memory&_fk=true&cache=shared")
-
-	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
-	require.NoError(t, err)
-
-	cm := reg.ConsentManager()
-	cl := reg.ClientManager()
-
-	jt := consent.JanitorLoginConsentTest{}
-
-	// Create login requests
-	for _, r := range flushLoginRequests {
-		require.NoError(t, cl.CreateClient(ctx, r.Client))
-		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+	for db, connect := range dbConnections {
+		wg.Add(1)
+		go func(d string, y func(t *testing.T) (*pop.Connection, string)) {
+			t.Run("db="+d, func(t *testing.T) {
+				defer wg.Done()
+				c, dsn := y(t)
+				t.Logf("Using dsn: %s\n", dsn)
+				x.CleanSQLPop(t, c)
+				loginConsentRejectionRun(t, ctx, dsn)
+			})
+		}(db, connect)
 	}
 
-	// Explicit rejection
-	for _, r := range flushLoginRequests {
-		if r.ID == "flush-login-1" {
-			// accept this one
-			_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
-				r.ID, false, r.RequestedAt, r.AuthenticatedAt))
+	// sqlite tests
+	wg.Add(1)
+	go func() {
+		t.Run("db=sqlite", func(t *testing.T) {
+			defer wg.Done()
+			// Setup config
+			loginConsentRejectionRun(t, ctx, "sqlite://file:purgerejection?mode=memory&_fk=true&cache=shared")
+		})
+	}()
 
-			require.NoError(t, err)
-			continue
-		}
-
-		// reject flush-login-2 and 3
-		_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
-			r.ID, true, r.RequestedAt, r.AuthenticatedAt))
-		require.NoError(t, err)
-	}
-
-	t.Logf("dsn: %s", reg.Config().DSN())
-
-	janitorCmd.SetArgs([]string{reg.Config().DSN()})
-	require.NoError(t, janitorCmd.Execute())
-
-	// flush-login-2 and 3 should be cleared now
-	for _, r := range flushLoginRequests {
-		t.Logf("check login: %s", r.ID)
-		_, err := cm.GetLoginRequest(ctx, r.ID)
-		if r.ID == "flush-login-1" {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	// Cleanup rejected logins and recreate them to test the consent
-	// since consent is dependant on login's acceptance.
-
-	for _, r := range flushLoginRequests {
-		if r.ID == "flush-login-1" {
-			// this one is already accepted so no need to recreate it
-			continue
-		}
-		require.NoError(t, cl.DeleteClient(ctx, r.Client.OutfacingID))
-		require.NoError(t, cl.CreateClient(ctx, r.Client))
-		require.NoError(t, cm.CreateLoginRequest(ctx, r))
-
-		// accept flush-login-2 and 3
-		_, err = cm.HandleLoginRequest(ctx, r.ID, jt.NewHandledLoginRequest(
-			r.ID, false, r.RequestedAt, r.AuthenticatedAt))
-	}
-
-	// Create consent requests
-	for _, r := range flushConsentRequests {
-		require.NoError(t, cm.CreateConsentRequest(ctx, r))
-	}
-
-	//Reject the consents
-	for _, r := range flushConsentRequests {
-		if r.ID == "flush-consent-1" {
-			// accept this one
-			_, err = cm.HandleConsentRequest(ctx, r.ID, jt.NewHandledConsentRequest(
-				r.ID, false, r.RequestedAt, r.AuthenticatedAt))
-			require.NoError(t, err)
-			continue
-		}
-		_, err = cm.HandleConsentRequest(ctx, r.ID, jt.NewHandledConsentRequest(
-			r.ID, true, r.RequestedAt, r.AuthenticatedAt))
-		require.NoError(t, err)
-	}
-
-	janitorCmd.SetArgs([]string{reg.Config().DSN()})
-	require.NoError(t, janitorCmd.Execute())
-
-	for _, r := range flushConsentRequests {
-		t.Logf("check consent: %s", r.ID)
-		_, err = cm.GetConsentRequest(ctx, r.ID)
-		if r.ID == "flush-consent-1" {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	require.NoError(t, reg.Persister().Connection(ctx).Close())
+	wg.Wait()
 }
 
 func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
@@ -501,94 +654,32 @@ func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
 		The request is timeout when there are no entries inside the *_handled tables.
 
 	*/
-	var err error
 	ctx := context.Background()
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyConsentRequestMaxAge, time.Hour*1)
 
-	conf.MustSet(config.KeyConsentURL, "http://redirect")
-	conf.MustSet(config.KeyLoginURL, "http://redirect")
+	wg := &sync.WaitGroup{}
 
-	conf.MustSet(config.KeyLogLevel, "trace")
-	conf.MustSet(config.KeyDSN, "sqlite://file:purgetimeout?mode=memory&_fk=true&cache=shared")
-
-	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
-	require.NoError(t, err)
-	defer reg.Persister().Connection(ctx).Close()
-
-	cm := reg.ConsentManager()
-	cl := reg.ClientManager()
-
-	// Create login requests
-	for _, r := range flushLoginRequests {
-		require.NoError(t, cl.CreateClient(ctx, r.Client))
-		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+	for db, connect := range dbConnections {
+		wg.Add(1)
+		go func(d string, y func(t *testing.T) (*pop.Connection, string)) {
+			t.Run("db="+d, func(t *testing.T) {
+				defer wg.Done()
+				c, dsn := y(t)
+				t.Logf("Using dsn: %s\n", dsn)
+				x.CleanSQLPop(t, c)
+				loginConsentTimeout(t, ctx, dsn)
+			})
+		}(db, connect)
 	}
 
-	// Creating at least 1 that has not timed out
-	_, err = cm.HandleLoginRequest(ctx, flushLoginRequests[0].ID, &consent.HandledLoginRequest{
-		ID:              flushLoginRequests[0].ID,
-		RequestedAt:     flushLoginRequests[0].RequestedAt,
-		AuthenticatedAt: flushLoginRequests[0].AuthenticatedAt,
-		WasUsed:         true,
-	})
-
-	require.NoError(t, err)
-
-	// First check if the login's can be purged when they have timed out
-	janitorCmd.SetArgs([]string{reg.Config().DSN()})
-	require.NoError(t, janitorCmd.Execute())
-
-	for _, r := range flushLoginRequests {
-		_, err = cm.GetLoginRequest(ctx, r.ID)
-		if r.ID == flushLoginRequests[0].ID {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	// Let's reset and accept all login requests to test the consent requests
-	for _, r := range flushLoginRequests {
-		require.NoError(t, cl.DeleteClient(ctx, r.Client.OutfacingID))
-		require.NoError(t, cl.CreateClient(ctx, r.Client))
-		require.NoError(t, cm.CreateLoginRequest(ctx, r))
-		_, err = cm.HandleLoginRequest(ctx, r.ID, &consent.HandledLoginRequest{
-			ID:              r.ID,
-			AuthenticatedAt: r.AuthenticatedAt,
-			RequestedAt:     r.RequestedAt,
-			WasUsed:         true,
+	// sqlite tests
+	wg.Add(1)
+	go func() {
+		t.Run("db=sqlite", func(t *testing.T) {
+			defer wg.Done()
+			// Setup config
+			loginConsentTimeout(t, ctx, "sqlite://file:purgetimeout?mode=memory&_fk=true&cache=shared")
 		})
-		require.NoError(t, err)
-	}
+	}()
 
-	// Create consent requests
-	for _, r := range flushConsentRequests {
-		require.NoError(t, cm.CreateConsentRequest(ctx, r))
-	}
-
-	// Create at least 1 consent request that has been accepted
-	_, err = cm.HandleConsentRequest(ctx, flushConsentRequests[0].ID, &consent.HandledConsentRequest{
-		ID:              flushConsentRequests[0].ID,
-		WasUsed:         true,
-		RequestedAt:     flushConsentRequests[0].RequestedAt,
-		AuthenticatedAt: flushConsentRequests[0].AuthenticatedAt,
-	})
-
-	// Explicit timeout test
-	janitorCmd.SetArgs([]string{reg.Config().DSN()})
-	require.NoError(t, janitorCmd.Execute())
-
-	for _, r := range flushConsentRequests {
-		_, err = cm.GetConsentRequest(ctx, r.ID)
-		if r.ID == flushConsentRequests[0].ID {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	require.NoError(t, reg.Persister().Connection(ctx).Close())
+	wg.Wait()
 }

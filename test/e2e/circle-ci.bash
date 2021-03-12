@@ -56,7 +56,6 @@ export LOG_LEAK_SENSITIVE_VALUES=true
 export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_fk=true"
 
 WATCH=no
-
 for i in "$@"
 do
 case $i in
@@ -64,12 +63,7 @@ case $i in
     WATCH=yes
     shift # past argument=value
     ;;
-    --record)
-    RECORD=yes
-    shift # past argument=value
-    ;;
     *)
-
     case "$i" in
             memory)
                ./hydra migrate sql --yes $TEST_DATABASE_SQLITE > ./hydra-migrate.e2e.log 2>&1
@@ -150,9 +144,7 @@ npm run wait-on -- -l -t 300000 \
 if [[ $WATCH = "yes" ]]; then
     (cd ../..; npm run test:watch)
 else
-    if [[ $RECORD = "yes" ]]; then
-      (cd ../..; npm run test -- --record )
-    fi
+    (cd ../..; npm run test)
 fi
 
 kill %1 || true # This is oauth2-client

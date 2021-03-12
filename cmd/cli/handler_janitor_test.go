@@ -3,13 +3,16 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/gobuffalo/pop/v5"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/sqlcon/dockertest"
+	"github.com/ory/x/configx"
 	"net/url"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/gobuffalo/pop/v5"
+
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
@@ -29,8 +32,8 @@ import (
 var (
 	janitor    = newJanitorHandler()
 	janitorCmd = &cobra.Command{
-		Use: "janitor",
-		Run: janitor.Purge,
+		Use:  "janitor",
+		RunE: janitor.Purge,
 	}
 )
 
@@ -201,6 +204,7 @@ func init() {
 	janitorCmd.Flags().StringP("refresh-lifespan", "r", "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().StringP("consent-request-lifespan", "l", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
+	configx.RegisterFlags(janitorCmd.PersistentFlags())
 }
 
 func connectPostgres(t *testing.T) (*pop.Connection, string) {

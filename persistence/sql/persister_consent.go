@@ -447,83 +447,75 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	var cr consent.ConsentRequest
 	var crh consent.HandledConsentRequest
 
-	// Delete all entries (and their FK)
-	// where hydra_oauth2_authentication_request were timed-out or rejected
-	// - hydra_oauth2_authentication_request_handled
-	// - hydra_oauth2_consent_request_handled
-	// AND
-	// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
-	// - hydra_oauth2_authentication_request.requested_at < notAfter
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 
-	// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
-	// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
-	// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
-	// Cannot use table aliasing in MYSQL, will work in Postgresql though...
-	err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
-	DELETE
-	FROM %s
-	WHERE NOT EXISTS
-		(
-		SELECT NULL
-		FROM %s
-		WHERE %s.challenge = %s.challenge AND %s.error = '{}'
-		)
-	AND NOT EXISTS
-		(
-		SELECT NULL
-		FROM %s
-		INNER JOIN %s
-		ON %s.challenge = %s.challenge
-		WHERE %s.challenge = %s.login_challenge AND %s.error = '{}'
-		)
-	AND requested_at < ?
-	AND requested_at < ?
-	`,
-		(&lr).TableName(),
-		(&lrh).TableName(),
-		(&lr).TableName(),
-		(&lrh).TableName(),
-		(&lrh).TableName(),
-		(&cr).TableName(),
-		(&crh).TableName(),
-		(&cr).TableName(),
-		(&crh).TableName(),
-		(&lr).TableName(),
-		(&cr).TableName(),
-		(&crh).TableName()),
-		time.Now().Add(-p.config.ConsentRequestMaxAge()),
-		notAfter).Exec()
+		// Delete all entries (and their FK)
+		// where hydra_oauth2_authentication_request were timed-out or rejected
+		// - hydra_oauth2_authentication_request_handled
+		// - hydra_oauth2_consent_request_handled
+		// AND
+		// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
+		// - hydra_oauth2_authentication_request.requested_at < notAfter
 
-	if err != nil {
-		return sqlcon.HandleError(err)
-	}
-
-	// This query is needed due to the fact that the first query will not delete cascade to the consent tables
-	// This cleans up the consent requests if requests have timed out or been rejected.
-
-	// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
-	// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
-	// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
-	// Cannot use table aliasing in MYSQL, will work in Postgresql though...
-	err = p.Connection(ctx).RawQuery(
-		fmt.Sprintf(`
-		DELETE
-		FROM %s
-		WHERE NOT EXISTS
-			(
-			SELECT NULL
-			FROM %s
-			WHERE %s.challenge = %s.challenge AND %s.error = '{}'
-			)
-		AND requested_at < ?
-		AND requested_at < ?`,
+		// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
+		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
+		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
+		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
+		err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
+			DELETE
+			FROM %[1]s
+			WHERE NOT EXISTS
+				(
+				SELECT NULL
+				FROM %[2]s
+				WHERE %[1]s.challenge = %[2]s.challenge AND %[2]s.error = '{}'
+				)
+			AND NOT EXISTS
+				(
+				SELECT NULL
+				FROM %[3]s
+				INNER JOIN %[4]s
+				ON %[3]s.challenge = %[4]s.challenge
+				WHERE %[1]s.challenge = %[3]s.login_challenge AND %[4]s.error = '{}'
+				)
+			AND requested_at < ?
+			AND requested_at < ?
+			`,
+			(&lr).TableName(),
+			(&lrh).TableName(),
 			(&cr).TableName(),
-			(&crh).TableName(),
-			(&cr).TableName(),
-			(&crh).TableName(),
 			(&crh).TableName()),
-		time.Now().Add(-p.config.ConsentRequestMaxAge()),
-		notAfter).Exec()
+			time.Now().Add(-p.config.ConsentRequestMaxAge()),
+			notAfter).Exec()
 
-	return sqlcon.HandleError(err)
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		// This query is needed due to the fact that the first query will not delete cascade to the consent tables
+		// This cleans up the consent requests if requests have timed out or been rejected.
+
+		// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
+		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
+		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
+		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
+		err = p.Connection(ctx).RawQuery(
+			fmt.Sprintf(`
+			DELETE
+			FROM %[1]s
+			WHERE NOT EXISTS
+				(
+				SELECT NULL
+				FROM %[2]s
+				WHERE %[1]s.challenge = %[2]s.challenge AND %[2]s.error = '{}'
+				)
+			AND requested_at < ?
+			AND requested_at < ?`,
+				(&cr).TableName(),
+				(&crh).TableName()),
+			time.Now().Add(-p.config.ConsentRequestMaxAge()),
+			notAfter).Exec()
+
+		return sqlcon.HandleError(err)
+	})
 }

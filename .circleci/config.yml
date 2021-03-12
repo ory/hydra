@@ -101,14 +101,14 @@ jobs:
 
       - go/mod-download-cached
 
-      - run: ./test/e2e/circle-ci.bash memory  --record
-      - run: ./test/e2e/circle-ci.bash memory-jwt  --record
-      - run: ./test/e2e/circle-ci.bash postgres  --record
-      - run: ./test/e2e/circle-ci.bash postgres-jwt  --record
-      - run: ./test/e2e/circle-ci.bash cockroach  --record
-      - run: ./test/e2e/circle-ci.bash cockroach-jwt  --record
-      - run: ./test/e2e/circle-ci.bash mysql  --record
-      - run: ./test/e2e/circle-ci.bash mysql-jwt  --record
+      - run: ./test/e2e/circle-ci.bash memory
+      - run: ./test/e2e/circle-ci.bash memory-jwt
+      - run: ./test/e2e/circle-ci.bash postgres
+      - run: ./test/e2e/circle-ci.bash postgres-jwt
+      - run: ./test/e2e/circle-ci.bash cockroach
+      - run: ./test/e2e/circle-ci.bash cockroach-jwt
+      - run: ./test/e2e/circle-ci.bash mysql
+      - run: ./test/e2e/circle-ci.bash mysql-jwt
 
 workflows:
   bdt:

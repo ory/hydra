@@ -198,6 +198,8 @@ var flushConsentRequests = []*consent.ConsentRequest{
 	},
 }
 
+type janitorTest = func(*testing.T, context.Context, string)
+
 func init() {
 	janitorCmd.Flags().StringP("keep-if-younger", "k", "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().StringP("access-lifespan", "a", "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
@@ -226,6 +228,217 @@ var dbConnections = map[string]func(*testing.T) (*pop.Connection, string){
 	"postgres": connectPostgres,
 	"mysql":    connectMySQL,
 	//"cockroach": connectCockroach,
+}
+
+func janitorRunner(t *testing.T, name string, test janitorTest) {
+	ctx := context.Background()
+
+	wg := &sync.WaitGroup{}
+
+	for db, connect := range dbConnections {
+		wg.Add(1)
+
+		go func(d string, y func(t *testing.T) (*pop.Connection, string)) {
+			t.Run("db="+d, func(t *testing.T) {
+				defer wg.Done()
+				c, dsn := y(t)
+				t.Logf("Using dsn: %s\n", dsn)
+				x.CleanSQLPop(t, c)
+				test(t, ctx, dsn)
+			})
+		}(db, connect)
+	}
+
+	// sqlite tests
+	wg.Add(1)
+	go func() {
+		t.Run("db=sqlite", func(t *testing.T) {
+			defer wg.Done()
+			// Setup config
+			test(t, ctx, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", name))
+		})
+	}()
+
+	wg.Wait()
+}
+
+func allNotAfter(t *testing.T, ctx context.Context, dsn string) {
+	var err error
+	conf := internal.NewConfigurationWithDefaults()
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyRefreshTokenLifespan, lifespan)
+	conf.MustSet(config.KeyConsentRequestMaxAge, lifespan)
+
+	conf.MustSet(config.KeyLogLevel, "trace")
+	conf.MustSet(config.KeyDSN, dsn)
+
+	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
+	require.NoError(t, err)
+
+	require.NoError(t, reg.Persister().MigrateUp(ctx))
+
+	cm := reg.ConsentManager()
+	cl := reg.ClientManager()
+	store := reg.OAuth2Storage()
+
+	// Create login clients and requests
+	for _, r := range flushLoginRequests {
+		require.NoError(t, cl.CreateClient(ctx, r.Client))
+		require.NoError(t, cm.CreateLoginRequest(ctx, r))
+	}
+
+	// Create consent requests, the clients have already been created in login
+	for _, r := range flushConsentRequests {
+		require.NoError(t, cm.CreateConsentRequest(ctx, r))
+	}
+
+	// Create access token clients and session
+	for _, r := range flushAccessRequests {
+		require.NoError(t, cl.CreateClient(ctx, r.Client.(*client.Client)))
+		require.NoError(t, store.CreateAccessTokenSession(ctx, r.ID, r))
+	}
+
+	// Create refresh token clients and session
+	for _, fr := range flushRefreshRequests {
+		require.NoError(t, cl.CreateClient(ctx, fr.Client.(*client.Client)))
+		require.NoError(t, store.CreateRefreshTokenSession(ctx, fr.ID, fr))
+	}
+
+	ds := new(oauth2.Session)
+
+	// == Test Cycle 1: do not remove anything that is not older than 24 hours ==
+	janitorCmd.SetArgs([]string{
+		fmt.Sprintf("-k=%s", (time.Hour * 24).String()),
+		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
+		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
+		reg.Config().DSN(),
+	})
+	require.NoError(t, janitorCmd.Execute())
+
+	for _, r := range flushLoginRequests {
+		t.Logf("login flush check: %s", r.ID)
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		require.NoError(t, err)
+	}
+
+	for _, r := range flushConsentRequests {
+		t.Logf("consent flush check: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		require.NoError(t, err)
+	}
+
+	for _, r := range flushAccessRequests {
+		t.Logf("access flush check: %s", r.ID)
+		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
+		require.NoError(t, err)
+	}
+
+	for _, r := range flushRefreshRequests {
+		t.Logf("refresh flush check: %s", r.ID)
+		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
+		require.NoError(t, err)
+	}
+
+	// == Test Cycle 2: do not remove anything that is older than 1h30min ==
+	janitorCmd.SetArgs([]string{
+		fmt.Sprintf("-k=%s", (lifespan + time.Hour/2).String()),
+		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
+		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
+		reg.Config().DSN(),
+	})
+	require.NoError(t, janitorCmd.Execute())
+
+	for _, r := range flushLoginRequests {
+		t.Logf("login flush check: %s", r.ID)
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		if r.ID == flushLoginRequests[2].ID {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+
+	for _, r := range flushConsentRequests {
+		t.Logf("consent flush check: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		if r.ID == flushConsentRequests[2].ID {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+
+	for _, r := range flushAccessRequests {
+		t.Logf("access flush check: %s", r.ID)
+		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
+		if r.ID == flushAccessRequests[2].ID {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+
+	for _, r := range flushRefreshRequests {
+		t.Logf("refresh flush check: %s", r.Request.ID)
+		_, err = store.GetRefreshTokenSession(ctx, r.Request.ID, ds)
+		if r.ID == flushRefreshRequests[2].Request.ID {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
+	}
+
+	// == Test Cycle 3: remove anything that is older than now ==
+	janitorCmd.SetArgs([]string{
+		fmt.Sprintf("-k=%s", ""), // just keep this here to clear the previous keep-if-younger value...
+		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
+		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
+		reg.Config().DSN(),
+	})
+	require.NoError(t, janitorCmd.Execute())
+
+	for _, r := range flushLoginRequests {
+		t.Logf("login flush check: %s", r.ID)
+		_, err = cm.GetLoginRequest(ctx, r.ID)
+		if r.ID == flushLoginRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	for _, r := range flushConsentRequests {
+		t.Logf("consent flush check: %s", r.ID)
+		_, err = cm.GetConsentRequest(ctx, r.ID)
+		if r.ID == flushConsentRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	for _, r := range flushAccessRequests {
+		t.Logf("access flush check: %s", r.ID)
+		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
+		if r.ID == flushAccessRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	for _, r := range flushRefreshRequests {
+		t.Logf("refresh flush check: %s", r.ID)
+		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
+		if r.ID == flushRefreshRequests[0].ID {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+		}
+	}
+
+	require.NoError(t, reg.Persister().Connection(ctx).Close())
 }
 
 func loginConsentRejectionRun(t *testing.T, ctx context.Context, dsn string) {
@@ -436,181 +649,7 @@ func loginConsentTimeout(t *testing.T, ctx context.Context, dsn string) {
 }
 
 func TestJanitorHandler_PurgeNotAfter(t *testing.T) {
-	ctx := context.Background()
-	var err error
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyRefreshTokenLifespan, lifespan)
-	conf.MustSet(config.KeyConsentRequestMaxAge, lifespan)
-
-	conf.MustSet(config.KeyLogLevel, "trace")
-	conf.MustSet(config.KeyDSN, "sqlite://file:purgenotafter?mode=memory&_fk=true&cache=shared")
-
-	reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
-	require.NoError(t, err)
-
-	cm := reg.ConsentManager()
-	cl := reg.ClientManager()
-	store := reg.OAuth2Storage()
-
-	// Create login clients and requests
-	for _, r := range flushLoginRequests {
-		require.NoError(t, cl.CreateClient(ctx, r.Client))
-		require.NoError(t, cm.CreateLoginRequest(ctx, r))
-	}
-
-	// Create consent requests, the clients have already been created in login
-	for _, r := range flushConsentRequests {
-		require.NoError(t, cm.CreateConsentRequest(ctx, r))
-	}
-
-	// Create access token clients and session
-	for _, r := range flushAccessRequests {
-		require.NoError(t, cl.CreateClient(ctx, r.Client.(*client.Client)))
-		require.NoError(t, store.CreateAccessTokenSession(ctx, r.ID, r))
-	}
-
-	// Create refresh token clients and session
-	for _, fr := range flushRefreshRequests {
-		require.NoError(t, cl.CreateClient(ctx, fr.Client.(*client.Client)))
-		require.NoError(t, store.CreateRefreshTokenSession(ctx, fr.ID, fr))
-	}
-
-	ds := new(oauth2.Session)
-
-	// == Test Cycle 1: do not remove anything that is not older than 24 hours ==
-	janitorCmd.SetArgs([]string{
-		fmt.Sprintf("-k=%s", (time.Hour * 24).String()),
-		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
-		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
-		reg.Config().DSN(),
-	})
-	require.NoError(t, janitorCmd.Execute())
-
-	for _, r := range flushLoginRequests {
-		t.Logf("login flush check: %s", r.ID)
-		_, err = cm.GetLoginRequest(ctx, r.ID)
-		require.NoError(t, err)
-	}
-
-	for _, r := range flushConsentRequests {
-		t.Logf("consent flush check: %s", r.ID)
-		_, err = cm.GetConsentRequest(ctx, r.ID)
-		require.NoError(t, err)
-	}
-
-	for _, r := range flushAccessRequests {
-		t.Logf("access flush check: %s", r.ID)
-		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
-		require.NoError(t, err)
-	}
-
-	for _, r := range flushRefreshRequests {
-		t.Logf("refresh flush check: %s", r.ID)
-		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
-		require.NoError(t, err)
-	}
-
-	// == Test Cycle 2: do not remove anything that is older than 1h30min ==
-	janitorCmd.SetArgs([]string{
-		fmt.Sprintf("-k=%s", (lifespan + time.Hour/2).String()),
-		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
-		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
-		reg.Config().DSN(),
-	})
-	require.NoError(t, janitorCmd.Execute())
-
-	for _, r := range flushLoginRequests {
-		t.Logf("login flush check: %s", r.ID)
-		_, err = cm.GetLoginRequest(ctx, r.ID)
-		if r.ID == flushLoginRequests[2].ID {
-			require.Error(t, err)
-		} else {
-			require.NoError(t, err)
-		}
-	}
-
-	for _, r := range flushConsentRequests {
-		t.Logf("consent flush check: %s", r.ID)
-		_, err = cm.GetConsentRequest(ctx, r.ID)
-		if r.ID == flushConsentRequests[2].ID {
-			require.Error(t, err)
-		} else {
-			require.NoError(t, err)
-		}
-	}
-
-	for _, r := range flushAccessRequests {
-		t.Logf("access flush check: %s", r.ID)
-		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
-		if r.ID == flushAccessRequests[2].ID {
-			require.Error(t, err)
-		} else {
-			require.NoError(t, err)
-		}
-	}
-
-	for _, r := range flushRefreshRequests {
-		t.Logf("refresh flush check: %s", r.Request.ID)
-		_, err = store.GetRefreshTokenSession(ctx, r.Request.ID, ds)
-		if r.ID == flushRefreshRequests[2].Request.ID {
-			require.Error(t, err)
-		} else {
-			require.NoError(t, err)
-		}
-	}
-
-	// == Test Cycle 3: remove anything that is older than now ==
-	janitorCmd.SetArgs([]string{
-		fmt.Sprintf("-k=%s", ""), // just keep this here to clear the previous keep-if-younger value...
-		fmt.Sprintf("-r=%s", conf.RefreshTokenLifespan().String()),
-		fmt.Sprintf("-l=%s", conf.ConsentRequestMaxAge().String()),
-		reg.Config().DSN(),
-	})
-	require.NoError(t, janitorCmd.Execute())
-
-	for _, r := range flushLoginRequests {
-		t.Logf("login flush check: %s", r.ID)
-		_, err = cm.GetLoginRequest(ctx, r.ID)
-		if r.ID == flushLoginRequests[0].ID {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	for _, r := range flushConsentRequests {
-		t.Logf("consent flush check: %s", r.ID)
-		_, err = cm.GetConsentRequest(ctx, r.ID)
-		if r.ID == flushConsentRequests[0].ID {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	for _, r := range flushAccessRequests {
-		t.Logf("access flush check: %s", r.ID)
-		_, err = store.GetAccessTokenSession(ctx, r.ID, ds)
-		if r.ID == flushAccessRequests[0].ID {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	for _, r := range flushRefreshRequests {
-		t.Logf("refresh flush check: %s", r.ID)
-		_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
-		if r.ID == flushRefreshRequests[0].ID {
-			require.NoError(t, err)
-		} else {
-			require.Error(t, err)
-		}
-	}
-
-	require.NoError(t, reg.Persister().Connection(ctx).Close())
+	janitorRunner(t, "purgenotafter", allNotAfter)
 }
 
 func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
@@ -619,34 +658,7 @@ func TestJanitorHandler_PurgeLoginConsentRejection(t *testing.T) {
 		- when a login/consent request was never completed (timed out)
 		- when a login/consent request was rejected
 	*/
-	ctx := context.Background()
-
-	wg := &sync.WaitGroup{}
-
-	for db, connect := range dbConnections {
-		wg.Add(1)
-		go func(d string, y func(t *testing.T) (*pop.Connection, string)) {
-			t.Run("db="+d, func(t *testing.T) {
-				defer wg.Done()
-				c, dsn := y(t)
-				t.Logf("Using dsn: %s\n", dsn)
-				x.CleanSQLPop(t, c)
-				loginConsentRejectionRun(t, ctx, dsn)
-			})
-		}(db, connect)
-	}
-
-	// sqlite tests
-	wg.Add(1)
-	go func() {
-		t.Run("db=sqlite", func(t *testing.T) {
-			defer wg.Done()
-			// Setup config
-			loginConsentRejectionRun(t, ctx, "sqlite://file:purgerejection?mode=memory&_fk=true&cache=shared")
-		})
-	}()
-
-	wg.Wait()
+	janitorRunner(t, "purgerejection", loginConsentRejectionRun)
 }
 
 func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
@@ -658,32 +670,5 @@ func TestJanitorHandler_PurgeLoginConsentTimeout(t *testing.T) {
 		The request is timeout when there are no entries inside the *_handled tables.
 
 	*/
-	ctx := context.Background()
-
-	wg := &sync.WaitGroup{}
-
-	for db, connect := range dbConnections {
-		wg.Add(1)
-		go func(d string, y func(t *testing.T) (*pop.Connection, string)) {
-			t.Run("db="+d, func(t *testing.T) {
-				defer wg.Done()
-				c, dsn := y(t)
-				t.Logf("Using dsn: %s\n", dsn)
-				x.CleanSQLPop(t, c)
-				loginConsentTimeout(t, ctx, dsn)
-			})
-		}(db, connect)
-	}
-
-	// sqlite tests
-	wg.Add(1)
-	go func() {
-		t.Run("db=sqlite", func(t *testing.T) {
-			defer wg.Done()
-			// Setup config
-			loginConsentTimeout(t, ctx, "sqlite://file:purgetimeout?mode=memory&_fk=true&cache=shared")
-		})
-	}()
-
-	wg.Wait()
+	janitorRunner(t, "purgetimeout", loginConsentTimeout)
 }

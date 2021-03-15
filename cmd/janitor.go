@@ -29,8 +29,6 @@ janitor -c /path/to/conf.yml
 4. Extra *optional* parameters can also be added such as
 janitor <database-url> --keep-if-younger=23h --access-lifespan=1h --refresh-lifespan=2h --consent-request-lifespan=10m
 
-Each flag also has a shorthand flag which can be used. To see all options run janitor -h
-
 ### Warning ###
 
 This is a destructive command and will purge data directly from the database.
@@ -54,10 +52,16 @@ Please use this command with caution if you need to keep historic data for any r
 
 func init() {
 	RootCmd.AddCommand(janitorCmd)
-	janitorCmd.Flags().StringP("keep-if-younger", "k", "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().StringP("access-lifespan", "a", "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().StringP("refresh-lifespan", "r", "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().StringP("consent-request-lifespan", "l", "", "Set the login-consent request lifespan e.g. 1s, 1m, 1h")
+	const keepIfYounger = "keep-if-younger"
+	const accessLifespan = "access-lifespan"
+	const refreshLifespan = "refresh-lifespan"
+	const consentRequestLifespan = "consent-request-lifespan"
+
+	janitorCmd.Flags().String(keepIfYounger, "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().String(accessLifespan, "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().String(refreshLifespan, "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
+	janitorCmd.Flags().String(consentRequestLifespan, "", "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
+
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	configx.RegisterFlags(janitorCmd.PersistentFlags())
 }

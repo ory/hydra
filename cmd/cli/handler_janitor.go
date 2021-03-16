@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -17,6 +18,20 @@ import (
 )
 
 type JanitorHandler struct{}
+
+type cleanupRoutine func(ctx context.Context, notAfter time.Time) error
+
+type cleanupTypes int
+
+const (
+	ACCESS_TOKEN = iota
+	REFRESH_TOKEN
+	LOGIN_CONSENT_REQUESTS
+)
+
+func (c cleanupTypes) String() string {
+	return []string{"access token", "refresh token", "login-consent request"}[c]
+}
 
 func newJanitorHandler() *JanitorHandler {
 	return &JanitorHandler{}
@@ -83,18 +98,49 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) error {
 		return errors.Wrap(errorsx.WithStack(err), "Could not open the database connection")
 	}
 
-	if err := p.FlushInactiveAccessTokens(cmd.Context(), notAfter); err != nil {
-		return errors.Wrap(errorsx.WithStack(err), "Could not flush inactive access tokens")
+	cleanup := map[cleanupTypes]cleanupRoutine{
+		ACCESS_TOKEN:           p.FlushInactiveAccessTokens,
+		REFRESH_TOKEN:          p.FlushInactiveRefreshTokens,
+		LOGIN_CONSENT_REQUESTS: p.FlushInactiveLoginConsentRequests,
 	}
 
-	if err := p.FlushInactiveRefreshTokens(cmd.Context(), notAfter); err != nil {
-		return errors.Wrap(errorsx.WithStack(err), "Could not flush inactive refresh tokens")
+	onlyTokens := flagx.MustGetBool(cmd, "only-tokens")
+	onlyRequests := flagx.MustGetBool(cmd, "only-requests")
+
+	if onlyTokens && !onlyRequests {
+		delete(cleanup, LOGIN_CONSENT_REQUESTS)
+		if err := cleanupRun(cmd.Context(), notAfter, cleanup); err != nil {
+			return err
+		}
+
+		fmt.Print("Successfully completed Janitor on only access and refresh tokens!\n")
+		return nil
 	}
 
-	if err := p.FlushInactiveLoginConsentRequests(cmd.Context(), notAfter); err != nil {
-		return errors.Wrap(errorsx.WithStack(err), "Could not flush inactive login/consent requests")
+	if onlyRequests && !onlyTokens {
+		delete(cleanup, REFRESH_TOKEN)
+		delete(cleanup, ACCESS_TOKEN)
+		if err := cleanupRun(cmd.Context(), notAfter, cleanup); err != nil {
+			return err
+		}
+
+		fmt.Print("Successfully completed Janitor on only login-consent requests!\n")
+		return nil
+	}
+
+	if err := cleanupRun(cmd.Context(), notAfter, cleanup); err != nil {
+		return err
 	}
 
 	fmt.Print("Successfully completed Janitor!\n")
+	return nil
+}
+
+func cleanupRun(ctx context.Context, notAfter time.Time, routines map[cleanupTypes]cleanupRoutine) error {
+	for k, v := range routines {
+		if err := v(ctx, notAfter); err != nil {
+			return errors.Wrap(errorsx.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", k.String()))
+		}
+	}
 	return nil
 }

@@ -461,6 +461,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
 		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
 		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
+
 		err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
 			DELETE
 			FROM %[1]s

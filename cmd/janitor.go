@@ -29,6 +29,13 @@ janitor -c /path/to/conf.yml
 4. Extra *optional* parameters can also be added such as
 janitor <database-url> --keep-if-younger=23h --access-lifespan=1h --refresh-lifespan=2h --consent-request-lifespan=10m
 
+5. Running only a certain cleanup
+janitor <database-url> --only-tokens
+
+or
+
+janitor <database-url> --only-requests
+
 ### Warning ###
 
 This is a destructive command and will purge data directly from the database.
@@ -56,11 +63,15 @@ func init() {
 	const accessLifespan = "access-lifespan"
 	const refreshLifespan = "refresh-lifespan"
 	const consentRequestLifespan = "consent-request-lifespan"
+	const onlyTokens = "only-tokens"
+	const onlyRequests = "only-requests"
 
 	janitorCmd.Flags().String(keepIfYounger, "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().String(accessLifespan, "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().String(refreshLifespan, "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
 	janitorCmd.Flags().String(consentRequestLifespan, "", "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
+	janitorCmd.Flags().Bool(onlyRequests, false, "This will only run the cleanup on requests and will skip token cleanup.")
+	janitorCmd.Flags().Bool(onlyTokens, false, "This will only run the cleanup on tokens and will skip requests cleanup.")
 
 	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	configx.RegisterFlags(janitorCmd.PersistentFlags())

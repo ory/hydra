@@ -18,10 +18,8 @@ import (
 )
 
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyAccessTokenLifespan, time.Hour)
 	registries := map[string]driver.Registry{
-		"memory": internal.NewRegistryMemory(t, conf),
+		"memory": internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults()),
 	}
 
 	if !testing.Short() {
@@ -29,6 +27,10 @@ func TestManagers(t *testing.T) {
 	}
 
 	for k, m := range registries {
+		m.Config().MustSet(config.KeyAccessTokenLifespan, time.Hour)
+		m.Config().MustSet(config.KeyRefreshTokenLifespan, time.Hour)
+		m.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)
+
 		t.Run("package=client/manager="+k, func(t *testing.T) {
 			t.Run("case=create-get-update-delete", client.TestHelperCreateGetUpdateDeleteClient(k, m.ClientManager()))
 
@@ -40,6 +42,8 @@ func TestManagers(t *testing.T) {
 		})
 
 		t.Run("package=consent/manager="+k, consent.ManagerTests(m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
+
+		t.Run("package=consent/janitor="+k, consent.JanitorTests(m.Config(), m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
 
 		t.Run("package=jwk/manager="+k, func(t *testing.T) {
 			var testGenerator = &jwk.RS256Generator{}

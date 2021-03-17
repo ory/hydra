@@ -3,20 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/configx"
 	"testing"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/x/logrusx"
 )
 
 var (
@@ -48,82 +41,67 @@ func init() {
 
 func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 	ctx := context.Background()
-	jt := oauth2.NewOauthJanitorTestHelper("")
-
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyRefreshTokenLifespan, jt.Lifespan)
-	conf.MustSet(config.KeyAccessTokenLifespan, jt.Lifespan)
-
-	conf.MustSet(config.KeyLogLevel, "trace")
-
-	testCycles := map[string]time.Time{
-		"notAfter24h":   time.Now().Round(time.Second).Add(-(jt.Lifespan * 24)),
-		"notAfter1h30m": time.Now().Round(time.Second).Add(-(jt.Lifespan + time.Hour/2)),
-		"notAfterNow":   time.Now().Round(time.Second),
-	}
+	jt := testhelpers.NewConsentJanitorTestHelper("token_not_after")
+	testCycles := jt.GetNotAfterTestCycles()
 
 	for k, v := range testCycles {
-		conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:access_%s?mode=memory&_fk=true&cache=shared", k))
-		reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
-		require.NoError(t, err)
-		janitorCmd.SetArgs([]string{
-			fmt.Sprintf("--%s=%s", keepIfYounger, v.String()),
-			fmt.Sprintf("--%s=%s", accessLifespan, conf.AccessTokenLifespan().String()),
-			fmt.Sprintf("--%s", onlyTokens),
-			conf.DSN(),
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+
+			reg, err := jt.GetRegistry(ctx, k)
+			require.NoError(t, err)
+
+			// setup test
+			t.Run("step=setup_access", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
+			t.Run("step=setup_refresh", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
+
+			// run the cleanup routine
+			t.Run("step=cleanup", func(t *testing.T) {
+				janitorCmd.SetArgs([]string{
+					fmt.Sprintf("--%s=%s", keepIfYounger, v.String()),
+					fmt.Sprintf("--%s=%s", accessLifespan, jt.GetAccessTokenLifespan().String()),
+					fmt.Sprintf("--%s=%s", refreshLifespan, jt.GetRefreshTokenLifespan().String()),
+					fmt.Sprintf("--%s", onlyTokens),
+					jt.GetDSN(),
+				})
+				require.NoError(t, janitorCmd.Execute())
+			})
+
+			// validate test
+			notAfter := time.Now().Round(time.Second).Add(-v)
+			t.Run("step=validate_access", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
+			t.Run("step=validate_refresh", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
 		})
-
-		t.Run(fmt.Sprintf("case=access_%s", k),
-			oauth2.NewOauthJanitorTestHelper(k).AccessTokenNotAfter(v, conf.AccessTokenLifespan(), janitorCmd.Execute, reg.ClientManager(), reg.OAuth2Storage()))
-	}
-
-	for k, v := range testCycles {
-		conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:refresh_%s?mode=memory&_fk=true&cache=shared", k))
-		reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
-		require.NoError(t, err)
-		janitorCmd.SetArgs([]string{
-			fmt.Sprintf("--%s=%s", keepIfYounger, v.String()),
-			fmt.Sprintf("--%s=%s", refreshLifespan, conf.RefreshTokenLifespan().String()),
-			fmt.Sprintf("--%s", onlyTokens),
-			conf.DSN(),
-		})
-
-		t.Run(fmt.Sprintf("case=refresh_%s", k),
-			oauth2.NewOauthJanitorTestHelper(k).RefreshTokenNotAfter(v, conf.RefreshTokenLifespan(), janitorCmd.Execute, reg.ClientManager(), reg.OAuth2Storage()))
 	}
 }
 
 func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 	ctx := context.Background()
-	jt := consent.NewConsentJanitorTestHelper("")
 
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyConsentRequestMaxAge, jt.Lifespan)
-	conf.MustSet(config.KeyLogLevel, "trace")
-
-	testCycles := map[string]time.Duration{
-		"notAfter24h":   jt.Lifespan * 24,
-		"notAfter1h30m": jt.Lifespan + time.Hour/2,
-		"notAfterNow":   0,
-	}
+	jt := testhelpers.NewConsentJanitorTestHelper("login_consent_not_after")
+	testCycles := jt.GetNotAfterTestCycles()
 
 	for k, v := range testCycles {
-		conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", k))
-		reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
+		reg, err := jt.GetRegistry(ctx, k)
 		require.NoError(t, err)
-		janitorCmd.SetArgs([]string{
-			fmt.Sprintf("--%s=%s", keepIfYounger, v.String()),
-			fmt.Sprintf("--%s=%s", consentRequestLifespan, conf.ConsentRequestMaxAge().String()),
-			fmt.Sprintf("--%s", onlyRequests),
-			conf.DSN(),
-		})
 
-		t.Run(fmt.Sprintf("case=%s", k),
-			consent.NewConsentJanitorTestHelper(k).LoginConsentNotAfter(time.Now().Round(time.Second).Add(-v), conf.ConsentRequestMaxAge(), janitorCmd.Execute, reg.ConsentManager(), reg.ClientManager()))
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			// Setup the test
+			t.Run("step=setup", jt.LoginConsentNotAfterSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
+			// Run the cleanup routine
+			t.Run("step=cleanup", func(t *testing.T) {
+				janitorCmd.SetArgs([]string{
+					fmt.Sprintf("--%s=%s", keepIfYounger, v.String()),
+					fmt.Sprintf("--%s=%s", consentRequestLifespan, jt.GetConsentRequestLifespan().String()),
+					fmt.Sprintf("--%s", onlyRequests),
+					jt.GetDSN(),
+				})
+				require.NoError(t, janitorCmd.Execute())
+			})
+
+			notAfter := time.Now().Round(time.Second).Add(-v)
+			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
+			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg.ConsentManager()))
+		})
 	}
 
 }
@@ -134,33 +112,65 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 		- when a login/consent request was never completed (timed out)
 		- when a login/consent request was rejected
 	*/
-	ctx := context.Background()
-	jt := consent.NewConsentJanitorTestHelper("")
 
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyRefreshTokenLifespan, jt.Lifespan)
-	conf.MustSet(config.KeyConsentRequestMaxAge, jt.Lifespan)
-	conf.MustSet(config.KeyLogLevel, "trace")
+	t.Run("case=login_consent_timeout", func(t *testing.T) {
+		ctx := context.Background()
+		jt := testhelpers.NewConsentJanitorTestHelper("login_consent_timeout")
+		loginConsentTimeoutSetup := jt.GetLoginConsentTimeoutSetup()
+		loginConsentTimeoutValidate := jt.GetLoginConsentTimeoutValidate()
 
-	type loginConsentTest = func(func() error, consent.Manager, client.Manager) func(t *testing.T)
+		for k, _ := range loginConsentTimeoutSetup {
+			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+				jt := testhelpers.NewConsentJanitorTestHelper(k)
+				reg, err := jt.GetRegistry(ctx, k)
+				require.NoError(t, err)
 
-	testCycles := map[string]loginConsentTest{
-		"loginRejection":   consent.NewConsentJanitorTestHelper("loginRejection").LoginRejection,
-		"loginTimeout":     consent.NewConsentJanitorTestHelper("loginTimeout").LoginTimeout,
-		"consentRejection": consent.NewConsentJanitorTestHelper("consentRejection").ConsentRejection,
-		"consentTimeout":   consent.NewConsentJanitorTestHelper("consentTimeout").ConsentTimeout,
-	}
+				// setup
+				t.Run("step=setup", loginConsentTimeoutSetup[k](ctx, reg.ConsentManager(), reg.ClientManager()))
 
-	for k, v := range testCycles {
-		conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", k))
-		janitorCmd.SetArgs([]string{
-			fmt.Sprintf("--%s", onlyRequests),
-			conf.DSN(),
-		})
-		reg, err := driver.NewRegistryFromDSN(ctx, conf, logrusx.New("test_hydra", "master"))
-		require.NoError(t, err)
-		t.Run(fmt.Sprintf("case=%s", k), v(janitorCmd.Execute, reg.ConsentManager(), reg.ClientManager()))
-	}
+				// run cleanup
+				t.Run("step=cleanup", func(t *testing.T) {
+					janitorCmd.SetArgs([]string{
+						fmt.Sprintf("--%s", onlyRequests),
+						jt.GetDSN(),
+					})
+					require.NoError(t, janitorCmd.Execute())
+				})
+
+				t.Run("step=validate", loginConsentTimeoutValidate[k](ctx, reg.ConsentManager()))
+			})
+		}
+	})
+
+	t.Run("case=login_consent_rejection", func(t *testing.T) {
+		ctx := context.Background()
+		jt := testhelpers.NewConsentJanitorTestHelper("login_consent_rejection")
+		loginConsentRejectionSetup := jt.GetLoginConsentRejectionSetup()
+		loginConsentRejectionValidate := jt.GetLoginConsentRejectionValidate()
+
+		for k, _ := range loginConsentRejectionSetup {
+			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+				jt := testhelpers.NewConsentJanitorTestHelper(k)
+				reg, err := jt.GetRegistry(ctx, k)
+				require.NoError(t, err)
+
+				// setup
+				t.Run("step=setup", loginConsentRejectionSetup[k](ctx, reg.ConsentManager(), reg.ClientManager()))
+
+				// cleanup
+				t.Run("step=cleanup", func(t *testing.T) {
+					janitorCmd.SetArgs([]string{
+						fmt.Sprintf("--%s", onlyRequests),
+						jt.GetDSN(),
+					})
+					require.NoError(t, janitorCmd.Execute())
+				})
+
+				// validate
+				t.Run("step=validate", loginConsentRejectionValidate[k](ctx, reg.ConsentManager()))
+			})
+		}
+
+	})
+
 }

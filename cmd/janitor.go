@@ -9,7 +9,7 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-var janitorCmd = &cobra.Command{
+var JanitorCmd = &cobra.Command{
 	Use:   "janitor <database-url>",
 	Short: "Clean the database of old tokens and login/consent requests",
 	Long: `This command will cleanup any expired oauth2 tokens as well as login/consent requests.
@@ -57,22 +57,24 @@ Please use this command with caution if you need to keep historic data for any r
 	},
 }
 
+var (
+	keepIfYounger          = "keep-if-younger"
+	accessLifespan         = "access-lifespan"
+	refreshLifespan        = "refresh-lifespan"
+	consentRequestLifespan = "consent-request-lifespan"
+	onlyTokens             = "only-tokens"
+	onlyRequests           = "only-requests"
+)
+
 func init() {
-	RootCmd.AddCommand(janitorCmd)
-	const keepIfYounger = "keep-if-younger"
-	const accessLifespan = "access-lifespan"
-	const refreshLifespan = "refresh-lifespan"
-	const consentRequestLifespan = "consent-request-lifespan"
-	const onlyTokens = "only-tokens"
-	const onlyRequests = "only-requests"
+	RootCmd.AddCommand(JanitorCmd)
+	JanitorCmd.Flags().String(keepIfYounger, "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
+	JanitorCmd.Flags().String(accessLifespan, "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
+	JanitorCmd.Flags().String(refreshLifespan, "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
+	JanitorCmd.Flags().String(consentRequestLifespan, "", "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
+	JanitorCmd.Flags().Bool(onlyRequests, false, "This will only run the cleanup on requests and will skip token cleanup.")
+	JanitorCmd.Flags().Bool(onlyTokens, false, "This will only run the cleanup on tokens and will skip requests cleanup.")
 
-	janitorCmd.Flags().String(keepIfYounger, "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().String(accessLifespan, "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().String(refreshLifespan, "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
-	janitorCmd.Flags().String(consentRequestLifespan, "", "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
-	janitorCmd.Flags().Bool(onlyRequests, false, "This will only run the cleanup on requests and will skip token cleanup.")
-	janitorCmd.Flags().Bool(onlyTokens, false, "This will only run the cleanup on tokens and will skip requests cleanup.")
-
-	janitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
-	configx.RegisterFlags(janitorCmd.PersistentFlags())
+	JanitorCmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
+	configx.RegisterFlags(JanitorCmd.PersistentFlags())
 }

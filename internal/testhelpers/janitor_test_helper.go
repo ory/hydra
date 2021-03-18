@@ -21,12 +21,6 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-type cleanupRoutine = func() error
-
-type loginConsentSetup = func(context.Context, consent.Manager, client.Manager) func(*testing.T)
-
-type loginConsentValidate = func(context.Context, consent.Manager) func(*testing.T)
-
 type JanitorConsentTestHelper struct {
 	uniqueName           string
 	flushLoginRequests   []*consent.LoginRequest
@@ -360,34 +354,6 @@ func (j *JanitorConsentTestHelper) LoginConsentNotAfterValidate(ctx context.Cont
 	}
 }
 
-func (j *JanitorConsentTestHelper) GetLoginConsentTimeoutSetup() map[string]loginConsentSetup {
-	return map[string]loginConsentSetup{
-		"loginTimeout":   j.LoginTimeoutSetup,
-		"consentTimeout": j.ConsentTimeoutSetup,
-	}
-}
-
-func (j *JanitorConsentTestHelper) GetLoginConsentRejectionSetup() map[string]loginConsentSetup {
-	return map[string]loginConsentSetup{
-		"loginRejection":   j.LoginRejectionSetup,
-		"consentRejection": j.ConsentRejectionSetup,
-	}
-}
-
-func (j *JanitorConsentTestHelper) GetLoginConsentTimeoutValidate() map[string]loginConsentValidate {
-	return map[string]loginConsentValidate{
-		"loginTimeout":   j.LoginTimeoutValidate,
-		"consentTimeout": j.ConsentTimeoutValidate,
-	}
-}
-
-func (j *JanitorConsentTestHelper) GetLoginConsentRejectionValidate() map[string]loginConsentValidate {
-	return map[string]loginConsentValidate{
-		"loginRejection":   j.LoginRejectionValidate,
-		"consentRejection": j.ConsentRejectionValidate,
-	}
-}
-
 func (j *JanitorConsentTestHelper) GetConsentRequestLifespan() time.Duration {
 	return j.conf.ConsentRequestMaxAge()
 }
@@ -486,10 +452,10 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		t.Run("case=flush-consent-request-timeout", func(t *testing.T) {
 			jt := NewConsentJanitorTestHelper("loginTimeout")
 
-			t.Run(fmt.Sprintf("case=%s", "loginTimeout"), func(t *testing.T) {
+			t.Run(fmt.Sprintf("case=%s", "login-timeout"), func(t *testing.T) {
 
 				// setup
-				t.Run("step=step", jt.LoginTimeoutSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.LoginTimeoutSetup(ctx, consentManager, clientManager))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
@@ -503,10 +469,10 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 			jt = NewConsentJanitorTestHelper("consentTimeout")
 
-			t.Run(fmt.Sprintf("case=%s", "consentTimeout"), func(t *testing.T) {
+			t.Run(fmt.Sprintf("case=%s", "consent-timeout"), func(t *testing.T) {
 
 				// setup
-				t.Run("step=step", jt.ConsentTimeoutSetup(ctx, consentManager, clientManager))
+				t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, consentManager, clientManager))
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {

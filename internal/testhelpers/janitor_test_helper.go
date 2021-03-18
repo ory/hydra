@@ -56,6 +56,10 @@ func (j *JanitorConsentTestHelper) GetDSN() string {
 	return j.conf.DSN()
 }
 
+func (j *JanitorConsentTestHelper) GetConfig() *config.Provider {
+	return j.conf
+}
+
 func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Duration {
 	return map[string]time.Duration{
 		"notAfter24h":   j.Lifespan * 24,

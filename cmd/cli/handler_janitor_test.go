@@ -51,8 +51,8 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 			require.NoError(t, err)
 
 			// setup test
-			t.Run("step=setup_access", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
-			t.Run("step=setup_refresh", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
+			t.Run("step=setup-access", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
+			t.Run("step=setup-refresh", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
 
 			// run the cleanup routine
 			t.Run("step=cleanup", func(t *testing.T) {
@@ -67,8 +67,8 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 
 			// validate test
 			notAfter := time.Now().Round(time.Second).Add(-v)
-			t.Run("step=validate_access", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
-			t.Run("step=validate_refresh", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
+			t.Run("step=validate-access", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
+			t.Run("step=validate-refresh", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
 		})
 	}
 }
@@ -156,7 +156,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 
 	})
 
-	t.Run("case=login_consent_rejection", func(t *testing.T) {
+	t.Run("case=login-consent-rejection", func(t *testing.T) {
 		ctx := context.Background()
 
 		t.Run("case=login-rejection", func(t *testing.T) {

@@ -57,7 +57,10 @@ module.exports = {
     },
     announcementBar: {
       id: 'supportus',
-      content: `Sign up for <a href="${config.newsletter}">important security announcements</a> and if you like ${config.projectName} give it a ⭐️ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/ory/${githubRepoName}">GitHub</a>!`
+      content:
+        config.projectSlug === 'docs'
+          ? `Sign up for <a href="${config.newsletter}">important security announcements</a> and if you like the ${config.projectName} give us some ⭐️ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/ory">GitHub</a>!`
+          : `Sign up for <a href="${config.newsletter}">important security announcements</a> and if you like ${config.projectName} give it a ⭐️ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/ory/${githubRepoName}">GitHub</a>!`
     },
     algolia: {
       apiKey: '8463c6ece843b377565726bb4ed325b0',
@@ -73,7 +76,10 @@ module.exports = {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
         srcDark: `img/logo-${config.projectSlug}.svg`,
-        href: `https://www.ory.sh/${config.projectSlug}`
+        href:
+          config.projectSlug === 'docs'
+            ? `https://www.ory.sh`
+            : `https://www.ory.sh/${config.projectSlug}`
       },
       items: [
         ...links,

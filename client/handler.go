@@ -28,6 +28,7 @@ import (
 	"time"
 
 	jsonpatch "github.com/evanphx/json-patch"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/herodot"
@@ -60,8 +61,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.POST(ClientsHandlerPath, h.Create)
 	admin.GET(ClientsHandlerPath+"/:id", h.Get)
 	admin.PUT(ClientsHandlerPath+"/:id", h.Update)
-	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 	admin.PATCH(ClientsHandlerPath+"/:id", h.Patch)
+	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 }
 
 // swagger:route POST /clients admin createOAuth2Client
@@ -161,7 +162,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 // swagger:route PATCH /clients/{id} admin updateOAuth2Client
 //
-// Patches an OAuth 2.0 Client
+// Patch an OAuth 2.0 Client
 //
 // Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //

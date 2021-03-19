@@ -53,6 +53,12 @@ Please use this command with caution if you need to keep historic data for any r
 				"- Using the environment variable with flag -e, --read-from-env",
 				"- Using the config file with flag -c, --config")
 		}
+
+		if (!flagx.MustGetBool(cmd, onlyTokens) && !flagx.MustGetBool(cmd, onlyRequests)) || (flagx.MustGetBool(cmd, onlyTokens) && flagx.MustGetBool(cmd, onlyRequests)) {
+			return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
+				"Janitor requires either --tokens or --requests to be set")
+		}
+
 		return nil
 	},
 }
@@ -62,8 +68,8 @@ var (
 	accessLifespan         = "access-lifespan"
 	refreshLifespan        = "refresh-lifespan"
 	consentRequestLifespan = "consent-request-lifespan"
-	onlyTokens             = "only-tokens"
-	onlyRequests           = "only-requests"
+	onlyTokens             = "tokens"
+	onlyRequests           = "requests"
 )
 
 func init() {

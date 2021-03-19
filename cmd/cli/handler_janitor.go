@@ -71,8 +71,14 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) error {
 			"When using flag -c, the dsn property should be set.")
 	}
 
+	if err := d.Init(cmd.Context()); err != nil {
+		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
+			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
+	}
+
 	p := d.Persister()
 
+	/*
 	conn := p.Connection(cmd.Context())
 
 	if conn == nil {
@@ -82,25 +88,16 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) error {
 
 	if err := conn.Open(); err != nil {
 		return errors.Wrap(errorsx.WithStack(err), "Could not open the database connection")
-	}
-
-	onlyTokens := flagx.MustGetBool(cmd, "only-tokens")
-	onlyRequests := flagx.MustGetBool(cmd, "only-requests")
+	}*/
 
 	var routines []cleanupRoutine
 
-	if (!onlyTokens && !onlyRequests) || (onlyTokens && onlyRequests) {
-		routines = append(routines, cleanup(p.FlushInactiveAccessTokens, "access tokens"))
-		routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
-		routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
-	}
-
-	if onlyTokens && !onlyRequests {
+	if flagx.MustGetBool(cmd, "tokens") {
 		routines = append(routines, cleanup(p.FlushInactiveAccessTokens, "access tokens"))
 		routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
 	}
 
-	if onlyRequests && !onlyTokens {
+	if flagx.MustGetBool(cmd, "requests") {
 		routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
 	}
 

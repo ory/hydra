@@ -6,6 +6,7 @@ import (
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/flagx"
 	"github.com/spf13/cobra"
 	"testing"
 	"time"
@@ -18,8 +19,8 @@ var (
 	accessLifespan         = "access-lifespan"
 	refreshLifespan        = "refresh-lifespan"
 	consentRequestLifespan = "consent-request-lifespan"
-	onlyTokens             = "only-tokens"
-	onlyRequests           = "only-requests"
+	onlyTokens             = "tokens"
+	onlyRequests           = "requests"
 )
 
 func newJanitorCmd() *cobra.Command {
@@ -27,6 +28,25 @@ func newJanitorCmd() *cobra.Command {
 	JanitorCmd := &cobra.Command{
 		Use:  "janitor",
 		RunE: janitor.Purge,
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) == 0 &&
+				!flagx.MustGetBool(cmd, "read-from-env") &&
+				len(flagx.MustGetStringSlice(cmd, "config")) == 0 {
+
+				fmt.Printf("%s\n", cmd.UsageString())
+				return fmt.Errorf("%s\n%s\n%s\n",
+					"A DSN is required as a positional argument when not passing any of the following flags:",
+					"- Using the environment variable with flag -e, --read-from-env",
+					"- Using the config file with flag -c, --config")
+			}
+
+			if (!flagx.MustGetBool(cmd, onlyTokens) && !flagx.MustGetBool(cmd, onlyRequests)) || (flagx.MustGetBool(cmd, onlyTokens) && flagx.MustGetBool(cmd, onlyRequests)) {
+				return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
+					"Janitor requires either --tokens or --requests to be set")
+			}
+
+			return nil
+		},
 	}
 	JanitorCmd.Flags().String(keepIfYounger, "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
 	JanitorCmd.Flags().String(accessLifespan, "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
@@ -202,3 +222,24 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 	})
 
 }
+
+/*
+// TODO: this throws a panic like error instead of a pass on an expected error
+func TestJanitorHandler_Arguments(t *testing.T) {
+	cmdx.ExecNoErr(t, newJanitorCmd(),
+		fmt.Sprintf("--%s", onlyRequests),
+		"memory",
+	)
+	cmdx.ExecNoErr(t, newJanitorCmd(),
+		fmt.Sprintf("--%s", onlyTokens),
+		"memory",
+	)
+	cmdx.ExecExpectedErr(t, newJanitorCmd(),
+		fmt.Sprintf("--%s", onlyRequests),
+		fmt.Sprintf("--%s", onlyTokens),
+		"memory",
+	)
+	cmdx.ExecExpectedErr(t, newJanitorCmd(),
+		"memory",
+	)
+}*/

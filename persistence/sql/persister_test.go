@@ -24,9 +24,6 @@ func TestManagers(t *testing.T) {
 	}
 
 	for k, m := range registries {
-		/*m.Config().MustSet(config.KeyAccessTokenLifespan, time.Hour)
-		m.Config().MustSet(config.KeyRefreshTokenLifespan, time.Hour)
-		m.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)*/
 
 		t.Run("package=client/manager="+k, func(t *testing.T) {
 			t.Run("case=create-get-update-delete", client.TestHelperCreateGetUpdateDeleteClient(k, m.ClientManager()))

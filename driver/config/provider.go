@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,7 +10,7 @@ import (
 
 	"github.com/ory/x/dbal"
 
-	"github.com/markbates/pkger"
+	"github.com/ory/hydra/spec"
 
 	"github.com/ory/x/configx"
 
@@ -98,16 +97,6 @@ func MustNew(l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
 }
 
 func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
-	f, err := pkger.Open("/.schema/config.schema.json")
-	if err != nil {
-		return nil, err
-	}
-
-	schema, err := ioutil.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-
 	opts = append([]configx.OptionModifier{
 		configx.WithStderrValidationReporter(),
 		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
@@ -115,7 +104,7 @@ func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 		configx.WithLogrusWatcher(l),
 	}, opts...)
 
-	p, err := configx.New(schema, opts...)
+	p, err := configx.New(spec.ConfigValidationSchema, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +222,7 @@ func (p *Provider) DSN() string {
 	dsn := p.p.String(KeyDSN)
 
 	if dsn == DSNMemory {
-		return dbal.InMemoryDSN
+		return dbal.SQLiteInMemory
 	}
 
 	if len(dsn) > 0 {

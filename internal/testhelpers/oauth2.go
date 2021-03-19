@@ -22,7 +22,7 @@ import (
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/ioutilx"
 
-	"github.com/gobuffalo/httptest"
+	"net/http/httptest"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"

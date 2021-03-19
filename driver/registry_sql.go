@@ -49,10 +49,10 @@ func NewRegistrySQL() *RegistrySQL {
 	return r
 }
 
-func (m *RegistrySQL) Init() error {
+func (m *RegistrySQL) Init(ctx context.Context) error {
 	if m.persister == nil {
 		var opts []instrumentedsql.Opt
-		if m.Tracer().IsLoaded() {
+		if m.Tracer(ctx).IsLoaded() {
 			opts = []instrumentedsql.Opt{
 				instrumentedsql.WithTracer(opentracing.NewTracer(true)),
 				instrumentedsql.WithOmitArgs(),
@@ -66,7 +66,7 @@ func (m *RegistrySQL) Init() error {
 			IdlePool:                  idlePool,
 			ConnMaxLifetime:           connMaxLifetime,
 			Pool:                      pool,
-			UseInstrumentedDriver:     m.Tracer().IsLoaded(),
+			UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
 			InstrumentedDriverOptions: opts,
 		})
 		if err != nil {
@@ -75,13 +75,13 @@ func (m *RegistrySQL) Init() error {
 		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
 			return errorsx.WithStack(err)
 		}
-		m.persister, err = sql.NewPersister(c, m, m.C, m.l)
+		m.persister, err = sql.NewPersister(ctx, c, m, m.C, m.l)
 		if err != nil {
 			return err
 		}
 
 		// if dsn is memory we have to run the migrations on every start
-		if m.C.DSN() == dbal.InMemoryDSN {
+		if m.C.DSN() == dbal.SQLiteInMemory {
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
 			if err := m.persister.MigrateUp(context.Background()); err != nil {

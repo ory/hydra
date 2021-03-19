@@ -7,9 +7,9 @@
     "prettierTarget": "{docs/**,docs,scripts,static,contrib,src,src/**}/*.{md,mdx,json,js,css,html}|*.{js,md}"
   },
   "scripts": {
-    "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js",
+    "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js && node ./docs/scripts/gen-faq.js",
     "docusaurus": "docusaurus",
-    "widdershins": "widdershins -u .widdershins/templates -e .widdershins/config.json ../.schema/api.swagger.json -o ./docs/reference/api.mdx",
+    "widdershins": "widdershins -u .widdershins/templates -e .widdershins/config.json ../spec/api.json -o ./docs/reference/api.mdx",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
@@ -55,6 +55,7 @@
     "ramda": "0.27.1",
     "raw-loader": "4.0.2",
     "remark-admonitions": "1.2.1",
+    "remarkable": "2.0.1",
     "widdershins": "4.0.1",
     "yaml": "1.8.3"
   }

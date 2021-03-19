@@ -701,10 +701,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 	}
 
 	var wg sync.WaitGroup
-	hc := http.Client{
-		Timeout:   time.Second * 5,
-		Transport: httpx.NewDefaultResilientRoundTripper(time.Second, time.Second*5),
-	}
+	hc := httpx.NewResilientClient()
 	wg.Add(len(tasks))
 
 	var execute = func(t task) {

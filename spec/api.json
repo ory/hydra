@@ -2117,6 +2117,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2414,6 +2418,62 @@
       "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
       "items": {
         "type": "string"
+      }
+    },
+    "Volume": {
+      "description": "Volume volume",
+      "type": "object",
+      "required": [
+        "Driver",
+        "Labels",
+        "Mountpoint",
+        "Name",
+        "Options",
+        "Scope"
+      ],
+      "properties": {
+        "CreatedAt": {
+          "description": "Date/Time the volume was created.",
+          "type": "string"
+        },
+        "Driver": {
+          "description": "Name of the volume driver used by the volume.",
+          "type": "string"
+        },
+        "Labels": {
+          "description": "User-defined key/value metadata.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "Mountpoint": {
+          "description": "Mount path of the volume on the host.",
+          "type": "string"
+        },
+        "Name": {
+          "description": "Name of the volume.",
+          "type": "string"
+        },
+        "Options": {
+          "description": "The driver specific options used when creating the volume.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "Scope": {
+          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "type": "string"
+        },
+        "Status": {
+          "description": "Low-level details about the volume, provided by the volume driver.\nDetails are returned as a map with key/value pairs:\n`{\"key\":\"value\",\"key2\":\"value2\"}`.\n\nThe `Status` field is optional, and is omitted if the volume driver\ndoes not support this feature.",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "UsageData": {
+          "$ref": "#/definitions/VolumeUsageData"
+        }
       }
     },
     "VolumeUsageData": {

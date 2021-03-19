@@ -88,6 +88,57 @@ var flushRequests = []*fosite.Request{
 		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
 	},
 }
+var tokenSignature = "4c7c7e8b3a77ad0c3ec846a21653c48b45dbfa31"
+var flushRefreshRequests = []*fosite.AccessRequest{
+	{
+		GrantTypes: []string{
+			"refresh_token",
+		},
+		Request: fosite.Request{
+			RequestedAt:    time.Now().Round(time.Second),
+			ID:             "flush-refresh-1",
+			Client:         &client.Client{OutfacingID: "foobar"},
+			RequestedScope: []string{"offline"},
+			GrantedScope:   []string{"offline"},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+			Form: url.Values{
+				"refresh_token": []string{fmt.Sprintf("%s.%s", "flush-refresh-1", tokenSignature)},
+			},
+		},
+	},
+	{
+		GrantTypes: []string{
+			"refresh_token",
+		},
+		Request: fosite.Request{
+			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+			ID:             "flush-refresh-2",
+			Client:         &client.Client{OutfacingID: "foobar"},
+			RequestedScope: []string{"offline"},
+			GrantedScope:   []string{"offline"},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+			Form: url.Values{
+				"refresh_token": []string{fmt.Sprintf("%s.%s", "flush-refresh-2", tokenSignature)},
+			},
+		},
+	},
+	{
+		GrantTypes: []string{
+			"refresh_token",
+		},
+		Request: fosite.Request{
+			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+			ID:             "flush-refresh-3",
+			Client:         &client.Client{OutfacingID: "foobar"},
+			RequestedScope: []string{"offline"},
+			GrantedScope:   []string{"offline"},
+			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
+			Form: url.Values{
+				"refresh_token": []string{fmt.Sprintf("%s.%s", "flush-refresh-3", tokenSignature)},
+			},
+		},
+	},
+}
 
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
@@ -132,6 +183,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(config.KeyRefreshTokenLifespan, time.Hour*1)
 	reg := internal.NewRegistryMemory(t, conf)
 
 	cl := reg.ClientManager()
@@ -141,6 +193,10 @@ func TestHandlerFlushHandler(t *testing.T) {
 	for _, r := range flushRequests {
 		_ = cl.CreateClient(context.Background(), r.Client.(*client.Client))
 		require.NoError(t, store.CreateAccessTokenSession(context.Background(), r.ID, r))
+	}
+	for _, fr := range flushRefreshRequests {
+		_ = cl.CreateClient(context.Background(), fr.Client.(*client.Client))
+		require.NoError(t, store.CreateRefreshTokenSession(context.Background(), fr.ID, fr))
 	}
 
 	r := x.NewRouterAdmin()
@@ -164,6 +220,13 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
 	require.NoError(t, err)
 
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-1", ds)
+	require.NoError(t, err)
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-2", ds)
+	require.NoError(t, err)
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
+	require.NoError(t, err)
+
 	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(lifespan + time.Hour/2)))}))
 	require.NoError(t, err)
 
@@ -174,6 +237,13 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
 	require.Error(t, err)
 
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-1", ds)
+	require.NoError(t, err)
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-2", ds)
+	require.NoError(t, err)
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
+	require.Error(t, err)
+
 	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now())}))
 	require.NoError(t, err)
 
@@ -182,6 +252,13 @@ func TestHandlerFlushHandler(t *testing.T) {
 	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
 	require.Error(t, err)
 	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
+	require.Error(t, err)
+
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-1", ds)
+	require.NoError(t, err)
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-2", ds)
+	require.Error(t, err)
+	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
 	require.Error(t, err)
 }
 

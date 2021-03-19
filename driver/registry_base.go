@@ -2,11 +2,13 @@ package driver
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/x/oauth2cors"
 
@@ -153,7 +155,7 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		if m.Tracer().IsLoaded() {
+		if m.Tracer(context.TODO()).IsLoaded() {
 			m.fh = &tracing.TracedBCrypt{WorkFactor: m.C.BCryptCost()}
 		} else {
 			m.fh = x.NewBCrypt(m.C)
@@ -182,10 +184,27 @@ func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	}
 	return m.kh
 }
+
 func (m *RegistryBase) HealthHandler() *healthx.Handler {
 	if m.hh == nil {
 		m.hh = healthx.NewHandler(m.Writer(), m.buildVersion, healthx.ReadyCheckers{
-			"database": m.r.Ping,
+			"database": func(_ *http.Request) error {
+				return m.r.Ping()
+			},
+			"migrations": func(r *http.Request) error {
+				status, err := m.r.Persister().MigrationStatus(r.Context())
+				if err != nil {
+					return err
+				}
+
+				if status.HasPending() {
+					err := errors.Errorf("migrations have not yet been fully applied: %+v", status)
+					m.Logger().WithField("status", fmt.Sprintf("%+v", status)).WithError(err).Warn("Instance is not yet ready because migrations have not yet been fully applied.")
+					return err
+				}
+
+				return nil
+			},
 		})
 	}
 
@@ -402,7 +421,7 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectId
 	return m.sia
 }
 
-func (m *RegistryBase) Tracer() *tracing.Tracer {
+func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 	if m.trc == nil {
 		t, err := tracing.New(m.l, m.C.Tracing())
 		if err != nil {

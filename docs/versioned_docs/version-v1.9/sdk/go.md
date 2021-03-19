@@ -19,12 +19,12 @@ import "github.com/ory/hydra-client-go/client"
 
 func main() {
     adminURL := url.Parse("https://hydra.localhost:4445")
-    admin := hydra.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{adminURL.Scheme}, Host: adminURL.Host, BasePath: adminURL.Path})
+    hydraAdmin := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{adminURL.Scheme}, Host: adminURL.Host, BasePath: adminURL.Path})
 
     // admin.Admin.CreateOAuth2Client(...
 
     publicURL := url.Parse("https://hydra.localhost:4444")
-    public := hydra.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{publicURL.Scheme}, Host: publicURL.Host, BasePath: publicURL.Path})
+    hydraPublic := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{publicURL.Scheme}, Host: publicURL.Host, BasePath: publicURL.Path})
 
     // public.Public.RevokeOAuth2Token(...
 }
@@ -39,15 +39,19 @@ func main() {
 Making requests is straight forward:
 
 ```go
-import "github.com/ory/hydra-client-go/client"
+import (
+  "github.com/ory/hydra-client-go/client"
+  "github.com/ory/hydra-client-go/client/admin"
+  "github.com/ory/hydra-client-go/models"
+)
 
 func main() {
     adminURL := url.Parse("https://hydra.localhost:4445")
-    admin := hydra.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{adminURL.Scheme}, Host: adminURL.Host, BasePath: adminURL.Path})
+    hydraAdmin := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{adminURL.Scheme}, Host: adminURL.Host, BasePath: adminURL.Path})
 
     // It is important to create the parameters using `New...`, otherwise requests will fail!
-    result, err := c.Admin.CreateOAuth2Client(
-        admin.NewCreateOAuth2ClientParams().WithBody(&models.Client{
+    result, err := hydraAdmin.Admin.CreateOAuth2Client(
+        admin.NewCreateOAuth2ClientParams().WithBody(&models.OAuth2Client{
         ClientID: "scoped",
     }))
     if err != nil {
@@ -69,14 +73,17 @@ func main() {
 Some endpoints require e.g. Basic Authorization:
 
 ```go
-import "github.com/ory/hydra-client-go/client"
-import httptransport "github.com/go-openapi/runtime/client"
+import (
+  "github.com/ory/hydra-client-go/client"
+  "github.com/ory/hydra-client-go/client/public"
+  httptransport "github.com/go-openapi/runtime/client"
+)
 
 func main() {
     publicURL := url.Parse("https://hydra.localhost:4444")
-    public := hydra.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{publicURL.Scheme}, Host: publicURL.Host, BasePath: publicURL.Path})
+    hydraPublic := hydra.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{publicURL.Scheme}, Host: publicURL.Host, BasePath: publicURL.Path})
 
-    _, err := client.Public.RevokeOAuth2Token(
+    _, err := hydraPublic.Public.RevokeOAuth2Token(
         public.NewRevokeOAuth2TokenParams().WithToken(c.token),
         httptransport.BasicAuth("my-client", "foobar"),
     )

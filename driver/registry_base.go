@@ -96,6 +96,7 @@ func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler
 
 func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
+	m.HealthHandler().SetVersionRoutes(admin.Router)
 
 	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
 	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))

@@ -6746,7 +6746,6 @@ This endpoint revokes a subject's granted consent sessions for a specific OAuth
 | ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
 | 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                                                                                                                  | [genericError](#schemagenericerror) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 | 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples
@@ -6755,10 +6754,8 @@ This endpoint revokes a subject's granted consent sessions for a specific OAuth
 
 ```json
 {
-  "debug": "The database adapter was unable to find the element",
-  "error": "The requested resource could not be found",
-  "error_description": "Object with ID 12345 does not exist",
-  "status_code": 404
+  "error": "invalid_request",
+  "error_description": "The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Query parameter 'subject' is not defined but should have been."
 }
 ```
 
@@ -6931,7 +6928,6 @@ invalidates-a-subject's-authentication-session-responses"
 | ------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | 204    | [No Content](https://tools.ietf.org/html/rfc7231#section-6.3.5)            | Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is typically 201. | None                                |
 | 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError                                                                                                                  | [genericError](#schemagenericerror) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 | 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError                                                                                                                  | [genericError](#schemagenericerror) |
 
 ##### Examples

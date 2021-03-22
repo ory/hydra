@@ -220,7 +220,7 @@ New feature or request.
       [@Alano Terblanche](https://github.com/Benehiko)
 - [ ] No way to handle 409 GetLoginRequestConflict.
       ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
-      [@Patrik](https://github.com/zepatrik)
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY

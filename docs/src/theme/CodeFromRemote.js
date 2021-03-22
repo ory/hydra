@@ -70,7 +70,7 @@ const transform = ({ startAt, endAt }) => (content) => {
 }
 
 const CodeFromRemote = (props) => {
-  const { src } = props
+  const { src, title } = props
   const [content, setContent] = useState('')
 
   useEffect(() => {
@@ -86,11 +86,11 @@ const CodeFromRemote = (props) => {
   }, [])
 
   const lang = `language-${detectLanguage(src)}`
-  const title = `title="${findPath(src)}"`
+  const metaString = `title="${title || findPath(src)}"`
 
   return (
     <div className={styles.container}>
-      <CodeBlock metastring={title} className={lang} children={content} />
+      <CodeBlock metastring={metaString} className={lang} children={content} />
     </div>
   )
 }

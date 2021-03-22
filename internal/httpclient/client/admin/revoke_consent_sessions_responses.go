@@ -35,12 +35,6 @@ func (o *RevokeConsentSessionsReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return nil, result
-	case 404:
-		result := NewRevokeConsentSessionsNotFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	case 500:
 		result := NewRevokeConsentSessionsInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -95,38 +89,6 @@ func (o *RevokeConsentSessionsBadRequest) GetPayload() *models.GenericError {
 }
 
 func (o *RevokeConsentSessionsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.GenericError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewRevokeConsentSessionsNotFound creates a RevokeConsentSessionsNotFound with default headers values
-func NewRevokeConsentSessionsNotFound() *RevokeConsentSessionsNotFound {
-	return &RevokeConsentSessionsNotFound{}
-}
-
-/* RevokeConsentSessionsNotFound describes a response with status code 404, with default header values.
-
-genericError
-*/
-type RevokeConsentSessionsNotFound struct {
-	Payload *models.GenericError
-}
-
-func (o *RevokeConsentSessionsNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsNotFound  %+v", 404, o.Payload)
-}
-func (o *RevokeConsentSessionsNotFound) GetPayload() *models.GenericError {
-	return o.Payload
-}
-
-func (o *RevokeConsentSessionsNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
 

@@ -1,8 +1,9 @@
 package consent
 
 import (
-	"github.com/ory/x/sqlxx"
 	"time"
+
+	"github.com/ory/x/sqlxx"
 )
 
 func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Time, authenticatedAt sqlxx.NullTime) *HandledLoginRequest {

@@ -3,13 +3,15 @@ package cli
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/flagx"
-	"github.com/spf13/cobra"
-	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 )

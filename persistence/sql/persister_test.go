@@ -1,10 +1,12 @@
 package sql_test
 
 import (
-	"github.com/ory/hydra/internal/testhelpers"
+	"testing"
+
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/require"
-	"testing"
+
+	"github.com/ory/hydra/internal/testhelpers"
 
 	"github.com/ory/hydra/jwk"
 

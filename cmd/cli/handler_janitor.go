@@ -78,18 +78,6 @@ func (j *JanitorHandler) Purge(cmd *cobra.Command, args []string) error {
 
 	p := d.Persister()
 
-	/*
-	conn := p.Connection(cmd.Context())
-
-	if conn == nil {
-		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
-			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
-	}
-
-	if err := conn.Open(); err != nil {
-		return errors.Wrap(errorsx.WithStack(err), "Could not open the database connection")
-	}*/
-
 	var routines []cleanupRoutine
 
 	if flagx.MustGetBool(cmd, "tokens") {

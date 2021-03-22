@@ -24,7 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/hydra/internal/testhelpers"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -32,6 +31,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/internal/testhelpers"
 
 	"github.com/go-openapi/strfmt"
 

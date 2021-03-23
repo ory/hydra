@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Delete a new JSON Web Key Set
 
-### Synopsis
-
-Delete a new JSON Web Key Set
-
 ```
 hydra keys delete <set> [flags]
 ```

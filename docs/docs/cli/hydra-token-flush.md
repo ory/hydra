@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Removes inactive access tokens from the database
 
-### Synopsis
-
-Removes inactive access tokens from the database
-
 ```
 hydra token flush [flags]
 ```

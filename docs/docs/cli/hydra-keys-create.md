@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Create a new JSON Web Key Set
 
-### Synopsis
-
-Create a new JSON Web Key Set
-
 ```
 hydra keys create <set> <key> [flags]
 ```

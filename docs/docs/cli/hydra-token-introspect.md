@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Introspect an access or refresh token
 
-### Synopsis
-
-Introspect an access or refresh token
-
 ```
 hydra token introspect <token> [flags]
 ```

@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -104,7 +105,16 @@ var (
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
 	config, _  = ioutil.ReadFile("./config.json")
-	httpClient = httpx.NewResilientClient(httpx.ResilientClientWithMinxRetryWait(time.Second*5), httpx.ResilientClientWithClient(&http.Client{Timeout: time.Second * 5}))
+	httpClient = httpx.NewResilientClient(
+		httpx.ResilientClientWithMinxRetryWait(time.Second*5),
+		httpx.ResilientClientWithClient(&http.Client{
+			Timeout: time.Second * 5,
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			},
+		}))
 
 	workdir string
 
@@ -122,11 +132,15 @@ func waitForServices(t *testing.T) {
 	var conformOk, hydraOk bool
 	start := time.Now()
 	for {
-		res, err := httpClient.Get(server.String())
+		server := server.String()
+		res, err := httpClient.Get(server)
 		conformOk = err == nil && res.StatusCode == 200
+		t.Logf("Checking %s (%v): %s (%+v)", server, conformOk, err, res)
 
-		res, err = httpClient.Get("https://127.0.0.1:4444/health/ready")
+		server = "https://127.0.0.1:4444/health/ready"
+		res, err = httpClient.Get(server)
 		hydraOk = err == nil && res.StatusCode == 200
+		t.Logf("Checking %s (%v): %s (%+v)", server, hydraOk, err, res)
 
 		if conformOk && hydraOk {
 			break

@@ -456,6 +456,11 @@ app.get('/openid/session/check', async (req, res) => {
   })
 })
 
+app.get('/empty', (req, res) => {
+  res.setHeader('Content-Type', 'text/html')
+  res.send(Buffer.from('<div>Nothing to see here.</div>'))
+})
+
 app.listen(config.port, function () {
   console.log(`Listening on port ${config.port}!`)
 })

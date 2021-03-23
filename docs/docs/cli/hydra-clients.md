@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Manage OAuth 2.0 Clients
 
-### Synopsis
-
-Manage OAuth 2.0 Clients
-
 ### Options
 
 ```

@@ -899,16 +899,26 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						assert.EqualValues(t, http.StatusUnauthorized, res.StatusCode)
 					})
 
-					t.Run("refreshing old token should no longer work", func(t *testing.T) {
-						res, err := testRefresh(t, token, ts.URL, false)
-						require.NoError(t, err)
-						assert.Equal(t, http.StatusBadRequest, res.StatusCode)
-					})
-
 					t.Run("refreshing new refresh token should work", func(t *testing.T) {
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
+
+						body, err := ioutil.ReadAll(res.Body)
+						require.NoError(t, err)
+						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+					})
+
+					t.Run("refreshing old token should no longer work", func(t *testing.T) {
+						res, err := testRefresh(t, token, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+					})
+
+					t.Run("attempt to refresh old token should revoke new token", func(t *testing.T) {
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 					})
 
 					t.Run("duplicate code exchange fails", func(t *testing.T) {

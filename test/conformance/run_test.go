@@ -105,13 +105,16 @@ var (
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
 	config, _  = ioutil.ReadFile("./config.json")
-	httpClient = &http.Client{
-		Transport: httpx.NewResilientRoundTripper(&http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
+	httpClient = httpx.NewResilientClient(
+		httpx.ResilientClientWithMinxRetryWait(time.Second*5),
+		httpx.ResilientClientWithClient(&http.Client{
+			Timeout: time.Second * 5,
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
 			},
-		}, time.Second*5, time.Second*15),
-	}
+		}))
 
 	workdir string
 
@@ -129,11 +132,15 @@ func waitForServices(t *testing.T) {
 	var conformOk, hydraOk bool
 	start := time.Now()
 	for {
-		res, err := httpClient.Get(server.String())
+		server := server.String()
+		res, err := httpClient.Get(server)
 		conformOk = err == nil && res.StatusCode == 200
+		t.Logf("Checking %s (%v): %s (%+v)", server, conformOk, err, res)
 
-		res, err = httpClient.Get("https://127.0.0.1:4444/health/ready")
+		server = "https://127.0.0.1:4444/health/ready"
+		res, err = httpClient.Get(server)
 		hydraOk = err == nil && res.StatusCode == 200
+		t.Logf("Checking %s (%v): %s (%+v)", server, hydraOk, err, res)
 
 		if conformOk && hydraOk {
 			break
@@ -269,7 +276,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 								bo := conf.NextBackOff()
 								require.NotEqual(t, backoff.Stop, bo, "%+v", err)
 
-								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
+								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient.StandardClient()).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
 									Alg: pointerx.String("RS256"),
 								}))
 								if err == nil {

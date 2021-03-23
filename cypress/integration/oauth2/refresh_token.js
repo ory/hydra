@@ -1,6 +1,6 @@
 import { prng } from '../../helpers'
 
-describe('OAuth 2.0 JSON Web Token Access Tokens', function () {
+describe('The OAuth 2.0 Refresh Token Grant', function () {
   const nc = () => ({
     client_id: prng(),
     client_secret: prng(),
@@ -38,5 +38,51 @@ describe('OAuth 2.0 JSON Web Token Access Tokens', function () {
         expect(token.id_token).to.not.be.empty
         expect(token.refresh_token).to.not.be.empty
       })
+  })
+
+  it('should revoke Refresh Token on reuse', function () {
+    const referrer = `${Cypress.env('client_url')}/empty`
+    cy.visit(referrer, {
+      failOnStatusCode: false
+    })
+
+    const client = {
+      client_id: prng(),
+      scope: 'offline_access',
+      redirect_uris: [referrer],
+      grant_types: ['authorization_code', 'refresh_token'],
+      response_types: ['code'],
+      token_endpoint_auth_method: 'none'
+    }
+
+    cy.authCodeFlowBrowser(client, {
+      consent: { scope: ['offline_access'] }
+    }).then((originalResponse) => {
+      expect(originalResponse.status).to.eq(200)
+      expect(originalResponse.body.refresh_token).to.not.be.empty
+
+      const originalToken = originalResponse.body.refresh_token
+
+      cy.refreshTokenBrowser(client, originalToken).then(
+        (refreshedResponse) => {
+          expect(refreshedResponse.status).to.eq(200)
+          expect(refreshedResponse.body.refresh_token).to.not.be.empty
+
+          const refreshedToken = refreshedResponse.body.refresh_token
+
+          return cy
+            .refreshTokenBrowser(client, originalToken)
+            .then((response) => {
+              expect(response.status).to.eq(401)
+              expect(response.body.error).to.eq('token_inactive')
+            })
+            .then(() => cy.refreshTokenBrowser(client, refreshedToken))
+            .then((response) => {
+              expect(response.status).to.eq(401)
+              expect(response.body.error).to.eq('token_inactive')
+            })
+        }
+      )
+    })
   })
 })

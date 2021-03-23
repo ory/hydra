@@ -4,7 +4,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -105,13 +104,7 @@ var (
 	}
 	server     = urlx.ParseOrPanic("https://127.0.0.1:8443")
 	config, _  = ioutil.ReadFile("./config.json")
-	httpClient = &http.Client{
-		Transport: httpx.NewResilientRoundTripper(&http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true,
-			},
-		}, time.Second*5, time.Second*15),
-	}
+	httpClient = httpx.NewResilientClient(httpx.ResilientClientWithMinxRetryWait(time.Second*5), httpx.ResilientClientWithClient(&http.Client{Timeout: time.Second * 5}))
 
 	workdir string
 
@@ -269,7 +262,7 @@ func createPlan(t *testing.T, extra url.Values, isParallel bool) {
 								bo := conf.NextBackOff()
 								require.NotEqual(t, backoff.Stop, bo, "%+v", err)
 
-								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
+								_, err = hydra.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithHTTPClient(httpClient.StandardClient()).WithSet("hydra.openid.id-token").WithBody(&models.JSONWebKeySetGeneratorRequest{
 									Alg: pointerx.String("RS256"),
 								}))
 								if err == nil {

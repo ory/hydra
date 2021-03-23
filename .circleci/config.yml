@@ -78,7 +78,7 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: cockroachdb/cockroach:v20.2.5
+      - image: cockroachdb/cockroach:v20.2.6
         command: start-single-node --insecure
       - image: mysql:8.0
         environment:

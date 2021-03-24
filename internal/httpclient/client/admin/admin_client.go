@@ -72,6 +72,8 @@ type ClientService interface {
 
 	ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams, opts ...ClientOption) (*ListSubjectConsentSessionsOK, error)
 
+	PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...ClientOption) (*PatchOAuth2ClientOK, error)
+
 	Prometheus(params *PrometheusParams, opts ...ClientOption) (*PrometheusOK, error)
 
 	RejectConsentRequest(params *RejectConsentRequestParams, opts ...ClientOption) (*RejectConsentRequestOK, error)
@@ -1015,6 +1017,48 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listSubjectConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  PatchOAuth2Client patches an o auth 2 0 client
+
+  Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+*/
+func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...ClientOption) (*PatchOAuth2ClientOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPatchOAuth2ClientParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "patchOAuth2Client",
+		Method:             "PATCH",
+		PathPattern:        "/clients/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &PatchOAuth2ClientReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*PatchOAuth2ClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for patchOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

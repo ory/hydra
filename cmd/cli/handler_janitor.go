@@ -19,7 +19,7 @@ import (
 	"github.com/ory/x/errorsx"
 )
 
-var (
+const (
 	KeepIfYounger          = "keep-if-younger"
 	AccessLifespan         = "access-lifespan"
 	RefreshLifespan        = "refresh-lifespan"
@@ -39,7 +39,7 @@ func newJanitorHandler() *JanitorHandler {
 func (j *JanitorHandler) Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "janitor <database-url>",
-		Short: "Clean the database of old tokens and login/consent requests",
+		Short: "BETA - Clean the database of old tokens and login/consent requests",
 		Long: `This command will cleanup any expired oauth2 tokens as well as login/consent requests.
 
 Janitor can be used in several ways.
@@ -55,7 +55,7 @@ Pass the database url (dsn) as an argument to janitor. E.g. janitor <database-ur
 janitor -c /path/to/conf.yml
 
 4. Extra *optional* parameters can also be added such as
-janitor <database-url> --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 2d --consent-request-lifespan 10m
+janitor <database-url> --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m
 
 5. Running only a certain cleanup
 janitor <database-url> --tokens
@@ -94,10 +94,10 @@ Please use this command with caution if you need to keep historic data for any r
 			return nil
 		},
 	}
-	cmd.Flags().String(KeepIfYounger, "", "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
-	cmd.Flags().String(AccessLifespan, "", "Set the access token lifespan e.g. 1s, 1m, 1h.")
-	cmd.Flags().String(RefreshLifespan, "", "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
-	cmd.Flags().String(ConsentRequestLifespan, "", "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
+	cmd.Flags().Duration(KeepIfYounger, 0, "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
+	cmd.Flags().Duration(AccessLifespan, 0, "Set the access token lifespan e.g. 1s, 1m, 1h.")
+	cmd.Flags().Duration(RefreshLifespan, 0, "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
+	cmd.Flags().Duration(ConsentRequestLifespan, 0, "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
 	cmd.Flags().Bool(OnlyRequests, false, "This will only run the cleanup on requests and will skip token cleanup.")
 	cmd.Flags().Bool(OnlyTokens, false, "This will only run the cleanup on tokens and will skip requests cleanup.")
 	cmd.Flags().BoolP(ReadFromEnv, "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
@@ -120,19 +120,15 @@ func purge(cmd *cobra.Command, args []string) error {
 	}
 
 	for k, v := range keys {
-		if x := flagx.MustGetString(cmd, k); x != "" {
-			if xp, err := time.ParseDuration(x); err == nil {
-				co = append(co, configx.WithValue(v, xp))
-			}
+		if x := flagx.MustGetDuration(cmd, k); x > 0 {
+			co = append(co, configx.WithValue(v, x))
 		}
 	}
 
 	notAfter := time.Now()
 
-	if keepYounger := flagx.MustGetString(cmd, KeepIfYounger); keepYounger != "" {
-		if keepYoungerDuration, err := time.ParseDuration(keepYounger); err == nil {
-			notAfter = notAfter.Add(-keepYoungerDuration)
-		}
+	if keepYounger := flagx.MustGetDuration(cmd, KeepIfYounger); keepYounger > 0 {
+		notAfter = notAfter.Add(-keepYounger)
 	}
 
 	if !flagx.MustGetBool(cmd, ReadFromEnv) && len(flagx.MustGetStringSlice(cmd, Config)) == 0 {
@@ -200,6 +196,10 @@ func cleanup(cr cleanupRoutine, routineName string) cleanupRoutine {
 }
 
 func cleanupRun(ctx context.Context, notAfter time.Time, routines ...cleanupRoutine) error {
+	if len(routines) == 0 {
+		return errors.New("clean up run received 0 routines")
+	}
+
 	for _, r := range routines {
 		if err := r(ctx, notAfter); err != nil {
 			return err

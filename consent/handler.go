@@ -153,13 +153,19 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 //       500: genericError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
-	if subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
+	allSubjects := r.URL.Query().Get("all") == "true"
+	limit, offset := pagination.Parse(r, 100, 0, 500)
+	var s []HandledConsentRequest
+	var err error
+	switch {
+	case len(subject) > 0:
+		s, err = h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, limit, offset)
+	case allSubjects:
+		s, err = h.r.ConsentManager().FindGrantedConsentRequests(r.Context(), limit, offset)
+	default:
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter both 'subject' and 'all' is not defined but one of them should have been.`)))
 		return
 	}
-
-	limit, offset := pagination.Parse(r, 100, 0, 500)
-	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, limit, offset)
 	if errors.Is(err, ErrNoPreviousConsentFound) {
 		h.r.Writer().Write(w, r, []PreviousConsentSession{})
 		return

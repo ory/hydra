@@ -638,7 +638,14 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-					consents, err := m.FindSubjectsGrantedConsentRequests(context.Background(), tc.subject, 100, 0)
+					var consents []HandledConsentRequest
+					var err error
+					switch {
+					case tc.subject == "":
+						consents, err = m.FindGrantedConsentRequests(context.Background(), 100, 0)
+					default:
+						consents, err = m.FindSubjectsGrantedConsentRequests(context.Background(), tc.subject, 100, 0)
+					}
 					assert.Equal(t, len(tc.challenges), len(consents))
 
 					if len(tc.challenges) == 0 {
@@ -650,8 +657,13 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 							assert.Contains(t, tc.clients, consent.ConsentRequest.Client.OutfacingID)
 						}
 					}
-
-					n, err := m.CountSubjectsGrantedConsentRequests(context.Background(), tc.subject)
+					var n int
+					switch {
+					case tc.subject == "":
+						n, err = m.CountGrantedConsentRequests(context.Background())
+					default:
+						n, err = m.CountSubjectsGrantedConsentRequests(context.Background(), tc.subject)
+					}
 					require.NoError(t, err)
 					assert.Equal(t, n, len(tc.challenges))
 

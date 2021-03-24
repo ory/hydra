@@ -324,11 +324,41 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 	return p.resolveHandledConsentRequests(ctx, rs)
 }
 
+func (p *Persister) FindGrantedConsentRequests(ctx context.Context, limit, offset int) ([]consent.HandledConsentRequest, error) {
+	var rs []consent.HandledConsentRequest
+	c := p.Connection(ctx)
+	tn := consent.HandledConsentRequest{}.TableName()
+
+	if err := c.
+		Where(fmt.Sprintf("r.skip=FALSE AND %s.error='{}'", tn)).
+		Join("hydra_oauth2_consent_request AS r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+		Order(fmt.Sprintf("%s.requested_at DESC", tn)).
+		Paginate(offset/limit+1, limit).
+		All(&rs); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errorsx.WithStack(consent.ErrNoPreviousConsentFound)
+		}
+		return nil, sqlcon.HandleError(err)
+	}
+
+	return p.resolveHandledConsentRequests(ctx, rs)
+}
+
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
 	tn := consent.HandledConsentRequest{}.TableName()
 
 	n, err := p.Connection(ctx).
 		Where(fmt.Sprintf("r.subject = ? AND r.skip=FALSE AND %s.error='{}'", tn), subject).
+		Join("hydra_oauth2_consent_request as r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
+		Count(&consent.HandledConsentRequest{})
+	return n, sqlcon.HandleError(err)
+}
+
+func (p *Persister) CountGrantedConsentRequests(ctx context.Context) (int, error) {
+	tn := consent.HandledConsentRequest{}.TableName()
+
+	n, err := p.Connection(ctx).
+		Where(fmt.Sprintf("r.skip=FALSE AND %s.error='{}'", tn)).
 		Join("hydra_oauth2_consent_request as r", fmt.Sprintf("%s.challenge = r.challenge", tn)).
 		Count(&consent.HandledConsentRequest{})
 	return n, sqlcon.HandleError(err)

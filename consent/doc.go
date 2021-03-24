@@ -62,9 +62,15 @@ type swaggerRevokeConsentSessions struct {
 
 // swagger:parameters listSubjectConsentSessions
 type swaggerListSubjectConsentSessionsPayload struct {
+	// If set, lists only those consent sessions by the Subject that have been granted
+	//
 	// in: query
-	// required: true
 	Subject string `json:"subject"`
+
+	// If set to `?all=true`, lists consent sessions by all subjects that have been granted.
+	//
+	// in: query
+	All bool `json:"all"`
 }
 
 // swagger:parameters revokeAuthenticationSession

@@ -149,15 +149,19 @@ func TestSDK(t *testing.T) {
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge2"))
 	require.Error(t, err)
 
-	csGot, err := sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject3"))
+	csGot, err := sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject(pointerx.String("subject3")))
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot.Payload))
 	cs := csGot.Payload[0]
 	assert.Equal(t, "challenge3", *cs.ConsentRequest.Challenge)
 
-	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject2"))
+	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject(pointerx.String("subject2")))
 	require.NoError(t, err)
 	assert.Equal(t, 0, len(csGot.Payload))
+
+	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithAll(pointerx.Bool(true)))
+	require.NoError(t, err)
+	assert.Equal(t, 1, len(csGot.Payload))
 
 	luGot, err := sdk.Admin.GetLogoutRequest(admin.NewGetLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
 	require.NoError(t, err)

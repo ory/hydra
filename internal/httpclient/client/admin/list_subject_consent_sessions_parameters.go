@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewListSubjectConsentSessionsParams creates a new ListSubjectConsentSessionsParams object,
@@ -59,8 +60,17 @@ func NewListSubjectConsentSessionsParamsWithHTTPClient(client *http.Client) *Lis
 */
 type ListSubjectConsentSessionsParams struct {
 
-	// Subject.
-	Subject string
+	/* All.
+
+	   If set to `?all=true`, lists consent sessions by all subjects that have been granted.
+	*/
+	All *bool
+
+	/* Subject.
+
+	   If set, lists only those consent sessions by the Subject that have been granted
+	*/
+	Subject *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -115,14 +125,25 @@ func (o *ListSubjectConsentSessionsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithAll adds the all to the list subject consent sessions params
+func (o *ListSubjectConsentSessionsParams) WithAll(all *bool) *ListSubjectConsentSessionsParams {
+	o.SetAll(all)
+	return o
+}
+
+// SetAll adds the all to the list subject consent sessions params
+func (o *ListSubjectConsentSessionsParams) SetAll(all *bool) {
+	o.All = all
+}
+
 // WithSubject adds the subject to the list subject consent sessions params
-func (o *ListSubjectConsentSessionsParams) WithSubject(subject string) *ListSubjectConsentSessionsParams {
+func (o *ListSubjectConsentSessionsParams) WithSubject(subject *string) *ListSubjectConsentSessionsParams {
 	o.SetSubject(subject)
 	return o
 }
 
 // SetSubject adds the subject to the list subject consent sessions params
-func (o *ListSubjectConsentSessionsParams) SetSubject(subject string) {
+func (o *ListSubjectConsentSessionsParams) SetSubject(subject *string) {
 	o.Subject = subject
 }
 
@@ -134,13 +155,37 @@ func (o *ListSubjectConsentSessionsParams) WriteToRequest(r runtime.ClientReques
 	}
 	var res []error
 
-	// query param subject
-	qrSubject := o.Subject
-	qSubject := qrSubject
-	if qSubject != "" {
+	if o.All != nil {
 
-		if err := r.SetQueryParam("subject", qSubject); err != nil {
-			return err
+		// query param all
+		var qrAll bool
+
+		if o.All != nil {
+			qrAll = *o.All
+		}
+		qAll := swag.FormatBool(qrAll)
+		if qAll != "" {
+
+			if err := r.SetQueryParam("all", qAll); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.Subject != nil {
+
+		// query param subject
+		var qrSubject string
+
+		if o.Subject != nil {
+			qrSubject = *o.Subject
+		}
+		qSubject := qrSubject
+		if qSubject != "" {
+
+			if err := r.SetQueryParam("subject", qSubject); err != nil {
+				return err
+			}
 		}
 	}
 

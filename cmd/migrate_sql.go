@@ -20,7 +20,11 @@
 
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/cli"
+)
 
 // migrateSqlCmd represents the sql command
 var migrateSqlCmd = &cobra.Command{
@@ -40,7 +44,7 @@ You can read in the database URL using the -e flag, for example:
 
 Before running this command on an existing database, create a back up!
 `,
-	Run: cmdHandler.Migration.MigrateSQL,
+	Run: cli.NewHandler().Migration.MigrateSQL,
 }
 
 func init() {

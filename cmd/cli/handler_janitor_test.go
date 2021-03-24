@@ -1,4 +1,4 @@
-package cli
+package cli_test
 
 import (
 	"context"
@@ -6,16 +6,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/cmd"
+
 	"github.com/spf13/cobra"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/cmdx"
 )
 
 func newJanitorCmd() *cobra.Command {
-	return newJanitorHandler().Command()
+	return cmd.NewRootCmd()
 }
 
 func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
@@ -35,10 +38,11 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 			// run the cleanup routine
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
-					fmt.Sprintf("--%s=%s", KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", AccessLifespan, jt.GetAccessTokenLifespan().String()),
-					fmt.Sprintf("--%s=%s", RefreshLifespan, jt.GetRefreshTokenLifespan().String()),
-					fmt.Sprintf("--%s", OnlyTokens),
+					"janitor",
+					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
+					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan().String()),
+					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan().String()),
+					fmt.Sprintf("--%s", cli.OnlyTokens),
 					jt.GetDSN(),
 				)
 			})
@@ -67,9 +71,10 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 			// Run the cleanup routine
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
-					fmt.Sprintf("--%s=%s", KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", ConsentRequestLifespan, jt.GetConsentRequestLifespan().String()),
-					fmt.Sprintf("--%s", OnlyRequests),
+					"janitor",
+					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
+					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan().String()),
+					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
 			})
@@ -102,7 +107,8 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
-					fmt.Sprintf("--%s", OnlyRequests),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
 			})
@@ -123,7 +129,8 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			// run cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
-					fmt.Sprintf("--%s", OnlyRequests),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
 			})
@@ -148,7 +155,8 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
-					fmt.Sprintf("--%s", OnlyRequests),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
 			})
@@ -168,7 +176,8 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 			// cleanup
 			t.Run("step=cleanup", func(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
-					fmt.Sprintf("--%s", OnlyRequests),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyRequests),
 					jt.GetDSN(),
 				)
 			})
@@ -181,23 +190,21 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 
 }
 
-/*
-// TODO: this throws a panic like error instead of a pass on an expected error
 func TestJanitorHandler_Arguments(t *testing.T) {
-	cmdx.ExecNoErr(t, newJanitorCmd(),
-		fmt.Sprintf("--%s", OnlyRequests),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
 		"memory",
 	)
-	cmdx.ExecNoErr(t, newJanitorCmd(),
-		fmt.Sprintf("--%s", OnlyTokens),
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyTokens),
 		"memory",
 	)
-	cmdx.ExecExpectedErr(t, newJanitorCmd(),
-		fmt.Sprintf("--%s", OnlyRequests),
-		fmt.Sprintf("--%s", OnlyTokens),
-		"memory",
-	)
-	cmdx.ExecExpectedErr(t, newJanitorCmd(),
-		"memory",
-	)
-}*/
+
+	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+		"janitor",
+		"memory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Janitor requires either --tokens or --requests or both to be set")
+}

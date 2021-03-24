@@ -23,6 +23,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/ory/hydra/cmd/cli"
+
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +32,7 @@ import (
 var tokenIntrospectCmd = &cobra.Command{
 	Use:   "introspect <token>",
 	Short: "Introspect an access or refresh token",
-	Run:   cmdHandler.Introspection.Introspect,
+	Run:   cli.NewHandler().Introspection.Introspect,
 }
 
 func init() {

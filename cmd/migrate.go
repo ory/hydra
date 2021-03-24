@@ -33,6 +33,6 @@ var migrateCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(migrateCmd)
+	NewRootCmd().AddCommand(migrateCmd)
 	configx.RegisterFlags(migrateCmd.PersistentFlags())
 }

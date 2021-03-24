@@ -56,7 +56,7 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0
-	github.com/tidwall/gjson v1.6.7
+	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0

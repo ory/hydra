@@ -90,7 +90,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       grant_types: ['authorization_code']
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${
@@ -115,7 +115,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       response_types: ['token'] // disallows Authorization Code Grant
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${
@@ -134,7 +134,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       grant_types: ['client_credentials']
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${
@@ -158,7 +158,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: ['http://some-other-domain/not-callback'],
       grant_types: ['client_credentials']
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${

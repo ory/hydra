@@ -365,7 +365,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object"
+              "$ref": "#/definitions/patchRequest"
             }
           }
         ],
@@ -2499,7 +2499,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -3087,6 +3087,41 @@
             "type": "string"
           }
         }
+      }
+    },
+    "patchDocument": {
+      "description": "A JSONPatch document as defined by RFC 6902",
+      "type": "object",
+      "required": [
+        "op",
+        "path"
+      ],
+      "properties": {
+        "from": {
+          "description": "A JSON-pointer",
+          "type": "string"
+        },
+        "op": {
+          "description": "The operation to be performed",
+          "type": "string",
+          "example": "\"replace\""
+        },
+        "path": {
+          "description": "A JSON-pointer",
+          "type": "string",
+          "example": "\"/name\""
+        },
+        "value": {
+          "description": "The value to be used within the operations",
+          "type": "object"
+        }
+      }
+    },
+    "patchRequest": {
+      "description": "A JSONPatch request",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/patchDocument"
       }
     },
     "rejectRequest": {

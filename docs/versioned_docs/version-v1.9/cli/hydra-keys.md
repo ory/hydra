@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Manage JSON Web Keys
 
-### Synopsis
-
-Manage JSON Web Keys
-
 ### Options
 
 ```

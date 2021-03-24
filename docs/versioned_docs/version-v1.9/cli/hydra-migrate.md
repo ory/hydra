@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Various migration helpers
 
-### Synopsis
-
-Various migration helpers
-
 ### Options
 
 ```

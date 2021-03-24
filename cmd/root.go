@@ -69,7 +69,6 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	serveCmd.AddCommand(NewServePublicCmd())
 	serveCmd.AddCommand(NewServeAllCmd())
 
-
 	tokenCmd := NewTokenCmd()
 	parent.AddCommand(tokenCmd)
 	tokenCmd.AddCommand(NewTokenClientCmd())

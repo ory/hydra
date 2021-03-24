@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Deletes access tokens of a client
 
-### Synopsis
-
-Deletes access tokens of a client
-
 ```
 hydra token delete [flags]
 ```

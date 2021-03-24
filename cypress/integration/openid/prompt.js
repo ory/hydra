@@ -12,7 +12,7 @@ describe('OpenID Connect Prompt', () => {
 
   it('should fail prompt=none when no session exists', function () {
     const client = nc()
-    cy.wrap(createClient(client))
+    createClient(client)
 
     cy.visit(
       `${Cypress.env('client_url')}/openid/code?client_id=${

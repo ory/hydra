@@ -50,7 +50,7 @@ Cypress.Commands.add(
     path = 'oauth2'
   ) => {
     if (doCreateClient) {
-      cy.wrap(createClient(client))
+      createClient(client)
     }
 
     cy.visit(
@@ -117,7 +117,7 @@ Cypress.Commands.add(
     } = {}
   ) => {
     if (doCreateClient) {
-      cy.wrap(createClient(client))
+      createClient(client)
     }
 
     const codeChallenge = 'QeNVR-BHuB6I2d0HycQzp2qUNNKi_-5QoR4fQSifLH0'

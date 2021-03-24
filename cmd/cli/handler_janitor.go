@@ -42,6 +42,16 @@ func (j *JanitorHandler) Command() *cobra.Command {
 		Short: "BETA - Clean the database of old tokens and login/consent requests",
 		Long: `This command will cleanup any expired oauth2 tokens as well as login/consent requests.
 
+### Warning ###
+
+This command is in beta. Proceed with caution!
+
+This is a destructive command and will purge data directly from the database.
+Please use this command with caution if you need to keep historic data for any reason.
+
+###############
+
+
 Janitor can be used in several ways.
 
 1. By passing the database connection string (DSN) as an argument
@@ -67,11 +77,6 @@ janitor <database-url> --requests
 or both
 
 janitor <database-url> --tokens --requests
-
-### Warning ###
-
-This is a destructive command and will purge data directly from the database.
-Please use this command with caution if you need to keep historic data for any reason.
 `,
 		RunE: purge,
 		Args: func(cmd *cobra.Command, args []string) error {

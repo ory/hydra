@@ -29,6 +29,8 @@
 
 package client
 
+import "encoding/json"
+
 // swagger:parameters createOAuth2Client
 type swaggerCreateClientPayload struct {
 	// in: body
@@ -45,6 +47,17 @@ type swaggerUpdateClientPayload struct {
 	// in: body
 	// required: true
 	Body Client
+}
+
+// swagger:parameters patchOAuth2Client
+type swaggerPatchClientPayload struct {
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	// required: true
+	Body json.RawMessage
 }
 
 // swagger:parameters listOAuth2Clients

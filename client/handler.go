@@ -158,7 +158,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.r.Writer().Write(w, r, &c)
 }
 
-// swagger:route PATCH /clients/{id} admin updateOAuth2Client
+// swagger:route PATCH /clients/{id} admin patchOAuth2Client
 //
 // Patch an OAuth 2.0 Client
 //

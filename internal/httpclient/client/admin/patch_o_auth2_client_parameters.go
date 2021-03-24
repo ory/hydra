@@ -14,8 +14,6 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
-
-	"github.com/ory/hydra/internal/httpclient/models"
 )
 
 // NewPatchOAuth2ClientParams creates a new PatchOAuth2ClientParams object,
@@ -62,7 +60,7 @@ func NewPatchOAuth2ClientParamsWithHTTPClient(client *http.Client) *PatchOAuth2C
 type PatchOAuth2ClientParams struct {
 
 	// Body.
-	Body models.PatchRequest
+	Body interface{}
 
 	// ID.
 	ID string
@@ -121,13 +119,13 @@ func (o *PatchOAuth2ClientParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the patch o auth2 client params
-func (o *PatchOAuth2ClientParams) WithBody(body models.PatchRequest) *PatchOAuth2ClientParams {
+func (o *PatchOAuth2ClientParams) WithBody(body interface{}) *PatchOAuth2ClientParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the patch o auth2 client params
-func (o *PatchOAuth2ClientParams) SetBody(body models.PatchRequest) {
+func (o *PatchOAuth2ClientParams) SetBody(body interface{}) {
 	o.Body = body
 }
 

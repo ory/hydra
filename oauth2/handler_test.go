@@ -132,9 +132,7 @@ func TestHandlerFlushHandler(t *testing.T) {
 				jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
 
 				notAfter := time.Now().Round(time.Second).Add(-v)
-				consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
 
-				t.Run("step=setup-login-consent", jt.LoginConsentNotAfterSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
 				t.Run("step=setup-access-token", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
 				t.Run("step=setup-refresh-token", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
 
@@ -143,142 +141,10 @@ func TestHandlerFlushHandler(t *testing.T) {
 					require.NoError(t, err)
 				})
 
-				t.Run("step=validate-login-consent", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentRequestLifespan, reg.ConsentManager()))
 				t.Run("step=validate-access-token", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
 				t.Run("step=validate-refresh-token", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
 			})
 		}
-
-	})
-
-	t.Run("case=login-consent-timeout", func(t *testing.T) {
-		t.Run("case=login-timeout", func(t *testing.T) {
-			ctx := context.Background()
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-			reg, err := jt.GetRegistry(ctx, t.Name())
-			require.NoError(t, err)
-
-			// Setup rest server
-			h := oauth2.NewHandler(reg, jt.GetConfig())
-
-			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-				return h
-			})
-
-			ts := httptest.NewServer(r)
-			defer ts.Close()
-			c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-			// setup
-			t.Run("step=setup", jt.LoginTimeoutSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
-
-			// cleanup
-			t.Run("step=cleanup", func(t *testing.T) {
-				_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{}))
-				require.NoError(t, err)
-			})
-
-			// validate
-			t.Run("step=validate", jt.LoginTimeoutValidate(ctx, reg.ConsentManager()))
-
-		})
-
-		t.Run("case=consent-timeout", func(t *testing.T) {
-			ctx := context.Background()
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-			reg, err := jt.GetRegistry(ctx, t.Name())
-			require.NoError(t, err)
-
-			// Setup rest server
-			h := oauth2.NewHandler(reg, jt.GetConfig())
-
-			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-				return h
-			})
-
-			ts := httptest.NewServer(r)
-			defer ts.Close()
-			c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-			// setup
-			t.Run("step=setup", jt.ConsentTimeoutSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
-
-			// run cleanup
-			t.Run("step=cleanup", func(t *testing.T) {
-				_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{}))
-				require.NoError(t, err)
-			})
-
-			// validate
-			t.Run("step=validate", jt.ConsentTimeoutValidate(ctx, reg.ConsentManager()))
-		})
-
-	})
-
-	t.Run("case=login-consent-rejection", func(t *testing.T) {
-		ctx := context.Background()
-
-		t.Run("case=login-rejection", func(t *testing.T) {
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-			reg, err := jt.GetRegistry(ctx, t.Name())
-			require.NoError(t, err)
-
-			// Setup rest server
-			h := oauth2.NewHandler(reg, jt.GetConfig())
-
-			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-				return h
-			})
-
-			ts := httptest.NewServer(r)
-			defer ts.Close()
-			c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-			// setup
-			t.Run("step=setup", jt.LoginRejectionSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
-
-			// cleanup
-			t.Run("step=cleanup", func(t *testing.T) {
-				_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{}))
-				require.NoError(t, err)
-			})
-
-			// validate
-			t.Run("step=validate", jt.LoginRejectionValidate(ctx, reg.ConsentManager()))
-		})
-
-		t.Run("case=consent-rejection", func(t *testing.T) {
-			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-			reg, err := jt.GetRegistry(ctx, t.Name())
-			require.NoError(t, err)
-
-			// Setup rest server
-			h := oauth2.NewHandler(reg, jt.GetConfig())
-
-			r := x.NewRouterAdmin()
-			h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-				return h
-			})
-
-			ts := httptest.NewServer(r)
-			defer ts.Close()
-			c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-			// setup
-			t.Run("step=setup", jt.ConsentRejectionSetup(ctx, reg.ConsentManager(), reg.ClientManager()))
-
-			// cleanup
-			t.Run("step=cleanup", func(t *testing.T) {
-				_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{}))
-				require.NoError(t, err)
-			})
-
-			// validate
-			t.Run("step=validate", jt.ConsentRejectionValidate(ctx, reg.ConsentManager()))
-		})
 
 	})
 }

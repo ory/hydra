@@ -59,7 +59,7 @@ All sub-commands share command line flags and configuration options.
 }
 
 func init() {
-	RootCmd.AddCommand(serveCmd)
+	NewRootCmd().AddCommand(serveCmd)
 
 	configx.RegisterFlags(serveCmd.PersistentFlags())
 	serveCmd.PersistentFlags().Bool("dangerous-force-http", false, "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead")

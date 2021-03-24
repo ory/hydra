@@ -22,13 +22,15 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/cli"
 )
 
 // createCmd represents the create command
 var keysCreateCmd = &cobra.Command{
 	Use:   "create <set> <key>",
 	Short: "Create a new JSON Web Key Set",
-	Run:   cmdHandler.Keys.CreateKeys,
+	Run:   cli.NewHandler().Keys.CreateKeys,
 }
 
 func init() {

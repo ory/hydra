@@ -24,6 +24,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/ory/hydra/cmd/cli"
+
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +33,7 @@ import (
 var tokenFlushCmd = &cobra.Command{
 	Use:   "flush",
 	Short: "Removes inactive access tokens from the database",
-	Run:   cmdHandler.Token.FlushTokens,
+	Run:   cli.NewHandler().Token.FlushTokens,
 }
 
 func init() {

@@ -23,6 +23,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/ory/hydra/cmd/cli"
+
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +32,7 @@ import (
 var tokenDeleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Deletes access tokens of a client",
-	Run:   cmdHandler.Token.DeleteToken,
+	Run:   cli.NewHandler().Token.DeleteToken,
 }
 
 func init() {

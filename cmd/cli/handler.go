@@ -64,6 +64,6 @@ func NewHandler() *Handler {
 		Introspection: newIntrospectionHandler(),
 		Token:         newTokenHandler(),
 		Migration:     newMigrateHandler(),
-		Janitor:       newJanitorHandler(),
+		Janitor:       NewJanitorHandler(),
 	}
 }

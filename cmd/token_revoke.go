@@ -23,6 +23,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/ory/hydra/cmd/cli"
+
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +32,7 @@ import (
 var tokenRevokeCmd = &cobra.Command{
 	Use:   "revoke <token>",
 	Short: "Revoke an access or refresh token",
-	Run:   cmdHandler.Token.RevokeToken,
+	Run:   cli.NewHandler().Token.RevokeToken,
 }
 
 func init() {

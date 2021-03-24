@@ -27,12 +27,10 @@ import (
 )
 
 // deleteCmd represents the delete command
-var keysDeleteCmd = &cobra.Command{
-	Use:   "delete <set>",
-	Short: "Delete a new JSON Web Key Set",
-	Run:   cli.NewHandler().Keys.DeleteKeys,
-}
-
-func init() {
-	keysCmd.AddCommand(keysDeleteCmd)
+func NewKeysDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete <set>",
+		Short: "Delete a new JSON Web Key Set",
+		Run:   cli.NewHandler().Keys.DeleteKeys,
+	}
 }

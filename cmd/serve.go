@@ -36,10 +36,11 @@ on configuration options, open the configuration documentation:
 `
 
 // serveCmd represents the host command
-var serveCmd = &cobra.Command{
-	Use:   "serve",
-	Short: "Parent command for starting public and administrative HTTP/2 APIs",
-	Long: `ORY Hydra exposes two ports, a public and an administrative port. The public port is responsible
+func NewServeCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "serve",
+		Short: "Parent command for starting public and administrative HTTP/2 APIs",
+		Long: `ORY Hydra exposes two ports, a public and an administrative port. The public port is responsible
 for handling requests from the public internet, such as the OAuth 2.0 Authorize and Token URLs. The administrative
 port handles administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys, and managing User Login
 and Consent sessions.
@@ -56,13 +57,12 @@ To learn more about each individual command, run:
 All sub-commands share command line flags and configuration options.
 
 ` + serveControls,
-}
+	}
 
-func init() {
-	NewRootCmd().AddCommand(serveCmd)
+	configx.RegisterFlags(cmd.PersistentFlags())
+	cmd.PersistentFlags().Bool("dangerous-force-http", false, "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead")
+	cmd.PersistentFlags().StringSlice("dangerous-allow-insecure-redirect-urls", []string{}, "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs")
+	cmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
 
-	configx.RegisterFlags(serveCmd.PersistentFlags())
-	serveCmd.PersistentFlags().Bool("dangerous-force-http", false, "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead")
-	serveCmd.PersistentFlags().StringSlice("dangerous-allow-insecure-redirect-urls", []string{}, "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs")
-	serveCmd.PersistentFlags().Bool("sqa-opt-out", false, "Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa")
+	return cmd
 }

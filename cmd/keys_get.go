@@ -27,12 +27,10 @@ import (
 )
 
 // getCmd represents the get command
-var keysGetCmd = &cobra.Command{
-	Use:   "get <set>",
-	Short: "Get a new JSON Web Key Set",
-	Run:   cli.NewHandler().Keys.GetKeys,
-}
-
-func init() {
-	keysCmd.AddCommand(keysGetCmd)
+func NewKeysGetCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "get <set>",
+		Short: "Get a new JSON Web Key Set",
+		Run:   cli.NewHandler().Keys.GetKeys,
+	}
 }

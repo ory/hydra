@@ -27,15 +27,13 @@ import (
 )
 
 // createCmd represents the create command
-var keysCreateCmd = &cobra.Command{
-	Use:   "create <set> <key>",
-	Short: "Create a new JSON Web Key Set",
-	Run:   cli.NewHandler().Keys.CreateKeys,
-}
-
-func init() {
-	keysCmd.AddCommand(keysCreateCmd)
-	keysCreateCmd.Flags().StringP("alg", "a", "RS256", "The algorithm to be used to generated they key. Supports: RS256, ES512, HS256")
-	keysCreateCmd.Flags().StringP("use", "u", "sig", "The intended use of this key")
-
+func NewKeysCreateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create <set> <key>",
+		Short: "Create a new JSON Web Key Set",
+		Run:   cli.NewHandler().Keys.CreateKeys,
+	}
+	cmd.Flags().StringP("alg", "a", "RS256", "The algorithm to be used to generated they key. Supports: RS256, ES512, HS256")
+	cmd.Flags().StringP("use", "u", "sig", "The intended use of this key")
+	return cmd
 }

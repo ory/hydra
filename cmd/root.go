@@ -53,6 +53,33 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 
 	parent.AddCommand(NewJanitorCmd())
 
+	keyCmd := NewKeysCmd()
+	parent.AddCommand(keyCmd)
+	keyCmd.AddCommand(NewKeysCreateCmd())
+	keyCmd.AddCommand(NewKeysDeleteCmd())
+	keyCmd.AddCommand(NewKeysGetCmd())
+
+	migrateCmd := NewMigrateCmd()
+	parent.AddCommand(migrateCmd)
+	migrateCmd.AddCommand(NewMigrateSqlCmd())
+
+	serveCmd := NewServeCmd()
+	parent.AddCommand(serveCmd)
+	serveCmd.AddCommand(NewServeAdminCmd())
+	serveCmd.AddCommand(NewServePublicCmd())
+	serveCmd.AddCommand(NewServeAllCmd())
+
+
+	tokenCmd := NewTokenCmd()
+	parent.AddCommand(tokenCmd)
+	tokenCmd.AddCommand(NewTokenClientCmd())
+	tokenCmd.AddCommand(NewTokenDeleteCmd())
+	tokenCmd.AddCommand(NewTokenFlushCmd())
+	tokenCmd.AddCommand(NewTokenIntrospectCmd())
+	tokenCmd.AddCommand(NewTokenRevokeCmd())
+	tokenCmd.AddCommand(NewTokenUserCmd())
+
+	parent.AddCommand(NewVersionCmd())
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.

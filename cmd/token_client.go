@@ -53,64 +53,61 @@ func (t *transporter) RoundTrip(req *http.Request) (*http.Response, error) {
 	return t.Transport.RoundTrip(req)
 }
 
-// tokenClientCmd represents the self command
-var tokenClientCmd = &cobra.Command{
-	Use:   "client",
-	Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow",
-	Long: `Performs the OAuth 2.0 Client Credentials Flow. This command will help you to see if ORY Hydra has
+func NewTokenClientCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "client",
+		Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow",
+		Long: `Performs the OAuth 2.0 Client Credentials Flow. This command will help you to see if ORY Hydra has
 been configured properly.
 
 This command should not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		/* #nosec G402 - we want to support dev environments, hence tls trickery */
-		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
-			Transport: &transporter{
-				FakeTLSTermination: flagx.MustGetBool(cmd, "fake-tls-termination"),
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+		Run: func(cmd *cobra.Command, args []string) {
+			/* #nosec G402 - we want to support dev environments, hence tls trickery */
+			ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{
+				Transport: &transporter{
+					FakeTLSTermination: flagx.MustGetBool(cmd, "fake-tls-termination"),
+					Transport: &http.Transport{
+						TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+					},
 				},
-			},
-		})
+			})
 
-		scopes := flagx.MustGetStringSlice(cmd, "scope")
-		audience := flagx.MustGetStringSlice(cmd, "audience")
-		cu := cli.RemoteURI(cmd)
+			scopes := flagx.MustGetStringSlice(cmd, "scope")
+			audience := flagx.MustGetStringSlice(cmd, "audience")
+			cu := cli.RemoteURI(cmd)
 
-		clientID := flagx.MustGetString(cmd, "client-id")
-		clientSecret := flagx.MustGetString(cmd, "client-secret")
-		if clientID == "" || clientSecret == "" {
-			fmt.Print(cmd.UsageString())
-			fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
-			return
-		}
+			clientID := flagx.MustGetString(cmd, "client-id")
+			clientSecret := flagx.MustGetString(cmd, "client-secret")
+			if clientID == "" || clientSecret == "" {
+				fmt.Print(cmd.UsageString())
+				fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+				return
+			}
 
-		oauthConfig := clientcredentials.Config{
-			ClientID:       clientID,
-			ClientSecret:   clientSecret,
-			TokenURL:       urlx.AppendPaths(cu, "/oauth2/token").String(),
-			Scopes:         scopes,
-			EndpointParams: url.Values{"audience": {strings.Join(audience, " ")}},
-		}
+			oauthConfig := clientcredentials.Config{
+				ClientID:       clientID,
+				ClientSecret:   clientSecret,
+				TokenURL:       urlx.AppendPaths(cu, "/oauth2/token").String(),
+				Scopes:         scopes,
+				EndpointParams: url.Values{"audience": {strings.Join(audience, " ")}},
+			}
 
-		t, err := oauthConfig.Token(ctx)
-		cmdx.Must(err, "Could not retrieve access token because: %s", err)
+			t, err := oauthConfig.Token(ctx)
+			cmdx.Must(err, "Could not retrieve access token because: %s", err)
 
-		if flagx.MustGetBool(cmd, "verbose") {
-			fmt.Printf("%+v\n", t)
-		} else {
-			fmt.Printf("%s\n", t.AccessToken)
-		}
-	},
-}
-
-func init() {
-	tokenCmd.AddCommand(tokenClientCmd)
-
-	tokenClientCmd.Flags().StringSlice("scope", []string{}, "OAuth2 scope to request")
-	tokenClientCmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
-	tokenClientCmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
-	tokenClientCmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
-	tokenClientCmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
-	tokenClientCmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+			if flagx.MustGetBool(cmd, "verbose") {
+				fmt.Printf("%+v\n", t)
+			} else {
+				fmt.Printf("%s\n", t.AccessToken)
+			}
+		},
+	}
+	cmd.Flags().StringSlice("scope", []string{}, "OAuth2 scope to request")
+	cmd.Flags().BoolP("verbose", "v", false, "Toggle verbose output mode")
+	cmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
+	cmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
+	cmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
+	cmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+	return cmd
 }

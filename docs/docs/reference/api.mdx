@@ -6754,8 +6754,10 @@ This endpoint revokes a subject's granted consent sessions for a specific OAuth
 
 ```json
 {
-  "error": "invalid_request",
-  "error_description": "The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed. Query parameter 'subject' is not defined but should have been."
+  "debug": "The database adapter was unable to find the element",
+  "error": "The requested resource could not be found",
+  "error_description": "Object with ID 12345 does not exist",
+  "status_code": 404
 }
 ```
 
@@ -8003,6 +8005,7 @@ _NullTime implements sql.NullTime functionality._
     }
   ],
   "Interface": {
+    "ProtocolScheme": "string",
     "Socket": "string",
     "Types": [
       {
@@ -8110,6 +8113,7 @@ _PluginConfigArgs plugin config args_
 
 ```json
 {
+  "ProtocolScheme": "string",
   "Socket": "string",
   "Types": [
     {
@@ -8125,10 +8129,11 @@ _PluginConfigInterface The interface between Docker and the plugin_
 
 #### Properties
 
-| Name   | Type                                                | Required | Restrictions | Description |
-| ------ | --------------------------------------------------- | -------- | ------------ | ----------- |
-| Socket | string                                              | true     | none         | socket      |
-| Types  | [[PluginInterfaceType](#schemaplugininterfacetype)] | true     | none         | types       |
+| Name           | Type                                                | Required | Restrictions | Description                                           |
+| -------------- | --------------------------------------------------- | -------- | ------------ | ----------------------------------------------------- |
+| ProtocolScheme | string                                              | false    | none         | Protocol to use for clients connecting to the plugin. |
+| Socket         | string                                              | true     | none         | socket                                                |
+| Types          | [[PluginInterfaceType](#schemaplugininterfacetype)] | true     | none         | types                                                 |
 
 <a id="tocSpluginconfiglinux"></a>
 
@@ -8482,6 +8487,53 @@ _StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string._
 | Name                                                                       | Type     | Required | Restrictions | Description |
 | -------------------------------------------------------------------------- | -------- | -------- | ------------ | ----------- |
 | StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string. | [string] | false    | none         | none        |
+
+<a id="tocSvolume"></a>
+
+#### Volume
+
+<a id="schemavolume"></a>
+
+```json
+{
+  "CreatedAt": "string",
+  "Driver": "string",
+  "Labels": {
+    "property1": "string",
+    "property2": "string"
+  },
+  "Mountpoint": "string",
+  "Name": "string",
+  "Options": {
+    "property1": "string",
+    "property2": "string"
+  },
+  "Scope": "string",
+  "Status": {},
+  "UsageData": {
+    "RefCount": 0,
+    "Size": 0
+  }
+}
+```
+
+_Volume volume_
+
+#### Properties
+
+| Name                       | Type                                      | Required | Restrictions | Description                                                                                                                                                                                                                                                                       |
+| -------------------------- | ----------------------------------------- | -------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CreatedAt                  | string                                    | false    | none         | Date/Time the volume was created.                                                                                                                                                                                                                                                 |
+| Driver                     | string                                    | true     | none         | Name of the volume driver used by the volume.                                                                                                                                                                                                                                     |
+| Labels                     | object                                    | true     | none         | User-defined key/value metadata.                                                                                                                                                                                                                                                  |
+| » **additionalProperties** | string                                    | false    | none         | none                                                                                                                                                                                                                                                                              |
+| Mountpoint                 | string                                    | true     | none         | Mount path of the volume on the host.                                                                                                                                                                                                                                             |
+| Name                       | string                                    | true     | none         | Name of the volume.                                                                                                                                                                                                                                                               |
+| Options                    | object                                    | true     | none         | The driver specific options used when creating the volume.                                                                                                                                                                                                                        |
+| » **additionalProperties** | string                                    | false    | none         | none                                                                                                                                                                                                                                                                              |
+| Scope                      | string                                    | true     | none         | The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.                                                                                                                                                                             |
+| Status                     | object                                    | false    | none         | Low-level details about the volume, provided by the volume driver.<br/>Details are returned as a map with key/value pairs:<br/>`{"key":"value","key2":"value2"}`.<br/><br/>The `Status` field is optional, and is omitted if the volume driver<br/>does not support this feature. |
+| UsageData                  | [VolumeUsageData](#schemavolumeusagedata) | false    | none         | VolumeUsageData Usage details about the volume. This information is used by the<br/>`GET /system/df` endpoint, and omitted in other endpoints.                                                                                                                                    |
 
 <a id="tocSvolumeusagedata"></a>
 

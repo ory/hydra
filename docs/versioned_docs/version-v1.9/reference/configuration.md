@@ -1047,7 +1047,7 @@ ttl:
   #
   # Configures how long a user login and consent flow may take.
   #
-  # Default value: 1h
+  # Default value: 30m
   #
   # Set this value using environment variables on
   # - Linux/macOS:
@@ -1390,6 +1390,31 @@ tracing:
   #    > set TRACING_PROVIDER=<value>
   #
   provider: jaeger
+
+## sqa ##
+#
+# Software Quality Assurance telemetry configuration section
+#
+# Examples:
+# - opt_out: true
+#
+sqa:
+  ## opt_out ##
+  #
+  # Disables anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa
+  #
+  # Default value: false
+  #
+  # Examples:
+  # - true
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export SQA_OPT_OUT=<value>
+  # - Windows Command Line (CMD):
+  #    > set SQA_OPT_OUT=<value>
+  #
+  opt_out: true
 
 ## The Hydra version this config is written for. ##
 #

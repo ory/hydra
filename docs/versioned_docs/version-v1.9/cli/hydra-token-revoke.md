@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Revoke an access or refresh token
 
-### Synopsis
-
-Revoke an access or refresh token
-
 ```
 hydra token revoke <token> [flags]
 ```

@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Issue and Manage OAuth2 tokens
 
-### Synopsis
-
-Issue and Manage OAuth2 tokens
-
 ### Options
 
 ```

@@ -10,7 +10,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
   it('should return an Access Token but not Refresh or ID Token for client_credentials flow', function () {
     const client = nc()
-    cy.wrap(createClient(client))
+    createClient(client)
 
     cy.request(
       `${Cypress.env('client_url')}/oauth2/cc?client_id=${

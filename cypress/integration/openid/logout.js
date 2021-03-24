@@ -10,8 +10,12 @@ const nc = () => ({
 })
 
 describe('OpenID Connect Logout', () => {
+  before(() => {
+    cy.clearCookies({ domain: null })
+  })
+
   after(() => {
-    cy.wrap(deleteClients())
+    deleteClients()
   })
 
   describe('logout without id_token_hint', () => {
@@ -24,7 +28,7 @@ describe('OpenID Connect Logout', () => {
     })
 
     before(() => {
-      cy.wrap(deleteClients())
+      deleteClients()
     })
 
     const client = {
@@ -91,7 +95,7 @@ describe('OpenID Connect Logout', () => {
     })
 
     before(() => {
-      cy.wrap(deleteClients())
+      deleteClients()
     })
 
     const client = {
@@ -151,7 +155,7 @@ describe('OpenID Connect Logout', () => {
     })
 
     before(() => {
-      cy.wrap(deleteClients())
+      deleteClients()
     })
 
     const client = {

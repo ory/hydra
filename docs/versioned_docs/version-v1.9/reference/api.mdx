@@ -8005,7 +8005,6 @@ _NullTime implements sql.NullTime functionality._
     }
   ],
   "Interface": {
-    "ProtocolScheme": "string",
     "Socket": "string",
     "Types": [
       {
@@ -8113,7 +8112,6 @@ _PluginConfigArgs plugin config args_
 
 ```json
 {
-  "ProtocolScheme": "string",
   "Socket": "string",
   "Types": [
     {
@@ -8129,11 +8127,10 @@ _PluginConfigInterface The interface between Docker and the plugin_
 
 #### Properties
 
-| Name           | Type                                                | Required | Restrictions | Description                                           |
-| -------------- | --------------------------------------------------- | -------- | ------------ | ----------------------------------------------------- |
-| ProtocolScheme | string                                              | false    | none         | Protocol to use for clients connecting to the plugin. |
-| Socket         | string                                              | true     | none         | socket                                                |
-| Types          | [[PluginInterfaceType](#schemaplugininterfacetype)] | true     | none         | types                                                 |
+| Name   | Type                                                | Required | Restrictions | Description |
+| ------ | --------------------------------------------------- | -------- | ------------ | ----------- |
+| Socket | string                                              | true     | none         | socket      |
+| Types  | [[PluginInterfaceType](#schemaplugininterfacetype)] | true     | none         | types       |
 
 <a id="tocSpluginconfiglinux"></a>
 

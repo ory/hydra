@@ -246,28 +246,28 @@
         }
       }
     },
-    "grantJWT": {
+    "grantJwt": {
       "type": "object",
       "additionalProperties": false,
       "description": "Authorization Grants using JWT configuration",
       "properties": {
         "client_auth_optional": {
           "type": "boolean",
-          "description": "If false, client authentication is required to get access token.",
+          "description": "If false, client authentication is required to get access token. If true client authentication is not required.",
           "default": false
         },
-        "id_optional": {
+        "jti_optional": {
           "type": "boolean",
           "description": "If false, JTI claim must be present in JWT assertion.",
           "default": false
         },
-        "issued_date_optional": {
+        "iat_optional": {
           "type": "boolean",
           "description": "If false, IAT claim must be present in JWT assertion.",
           "default": false
         },
-        "max_duration": {
-          "description": "Configures how long JWT assertion is considered valid, since being issued.",
+        "max_ttl": {
+          "description": "Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.",
           "default": "720h",
           "allOf": [
             {
@@ -890,7 +890,7 @@
           "additionalProperties": false,
           "properties": {
             "jwt": {
-              "$ref": "#/definitions/grantJWT"
+              "$ref": "#/definitions/grantJwt"
             }
           }
         }

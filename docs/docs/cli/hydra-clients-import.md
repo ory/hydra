@@ -2,7 +2,8 @@
 id: hydra-clients-import
 title: hydra clients import
 description:
-  hydra clients import Import OAuth 2.0 Clients from one or more JSON files
+  hydra clients import Imports cryptographic keys of any format to the JSON Web
+  Key Store
 ---
 
 <!--
@@ -13,38 +14,31 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 ## hydra clients import
 
-Import OAuth 2.0 Clients from one or more JSON files
+Imports cryptographic keys of any format to the JSON Web Key Store
 
 ### Synopsis
 
-This command reads in each listed JSON file and imports their contents as OAuth
-2.0 Clients.
+This command allows you to import cryptographic keys to the JSON Web Key Store.
 
-The format for the JSON file is:
+Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If
+the JSON Web Key Set exists already, the imported keys will be added to that
+set. Otherwise, a new set will be created.
 
-{ "client_id": "...", "client_secret": "...", // ... all other fields of the
-OAuth 2.0 Client model are allowed here }
+Please be aware that importing a private key does not automatically import its
+public key as well.
 
-Please be aware that this command does not update existing clients. If the
-client exists already, this command will fail.
-
-Example: hydra clients import client-1.json
-
-To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or
-"--keybase" flag, for example: hydra clients import client-1.json --keybase
-keybase_username
+Examples: hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json hydra
+keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
 
 ```
-hydra clients import <path/to/file.json> [<path/to/other/file.json>...] [flags]
+hydra clients import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for import
-      --keybase string       Keybase username for encrypting client secret
-      --pgp-key string       Base64 encoded PGP encryption key for encrypting client secret
-      --pgp-key-url string   PGP encryption key URL for encrypting client secret
+  -h, --help         help for import
+      --use string   Sets the "use" value of the JSON Web Key if not "use" value was defined by the key itself (default "sig")
 ```
 
 ### Options inherited from parent commands

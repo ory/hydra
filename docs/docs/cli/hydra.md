@@ -23,6 +23,8 @@ Run and manage ORY Hydra
 ### SEE ALSO
 
 - [hydra clients](hydra-clients) - Manage OAuth 2.0 Clients
+- [hydra janitor](hydra-janitor) - Clean the database of old tokens and
+  login/consent requests
 - [hydra keys](hydra-keys) - Manage JSON Web Keys
 - [hydra migrate](hydra-migrate) - Various migration helpers
 - [hydra serve](hydra-serve) - Parent command for starting public and

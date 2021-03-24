@@ -22,6 +22,8 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 	ctx := context.Background()
 	testCycles := testhelpers.NewConsentJanitorTestHelper("").GetNotAfterTestCycles()
 
+	require.True(t, len(testCycles) > 0)
+
 	for k, v := range testCycles {
 		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())

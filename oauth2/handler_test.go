@@ -32,6 +32,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/internal/testhelpers"
+
 	"github.com/go-openapi/strfmt"
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
@@ -59,86 +61,6 @@ import (
 )
 
 var lifespan = time.Hour
-var flushRequests = []*fosite.Request{
-	{
-		ID:             "flush-1",
-		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{OutfacingID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	},
-	{
-		ID:             "flush-2",
-		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{OutfacingID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	},
-	{
-		ID:             "flush-3",
-		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{OutfacingID: "foobar"},
-		RequestedScope: fosite.Arguments{"fa", "ba"},
-		GrantedScope:   fosite.Arguments{"fa", "ba"},
-		Form:           url.Values{"foo": []string{"bar", "baz"}},
-		Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-	},
-}
-var tokenSignature = "4c7c7e8b3a77ad0c3ec846a21653c48b45dbfa31"
-var flushRefreshRequests = []*fosite.AccessRequest{
-	{
-		GrantTypes: []string{
-			"refresh_token",
-		},
-		Request: fosite.Request{
-			RequestedAt:    time.Now().Round(time.Second),
-			ID:             "flush-refresh-1",
-			Client:         &client.Client{OutfacingID: "foobar"},
-			RequestedScope: []string{"offline"},
-			GrantedScope:   []string{"offline"},
-			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-			Form: url.Values{
-				"refresh_token": []string{fmt.Sprintf("%s.%s", "flush-refresh-1", tokenSignature)},
-			},
-		},
-	},
-	{
-		GrantTypes: []string{
-			"refresh_token",
-		},
-		Request: fosite.Request{
-			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-			ID:             "flush-refresh-2",
-			Client:         &client.Client{OutfacingID: "foobar"},
-			RequestedScope: []string{"offline"},
-			GrantedScope:   []string{"offline"},
-			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-			Form: url.Values{
-				"refresh_token": []string{fmt.Sprintf("%s.%s", "flush-refresh-2", tokenSignature)},
-			},
-		},
-	},
-	{
-		GrantTypes: []string{
-			"refresh_token",
-		},
-		Request: fosite.Request{
-			RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-			ID:             "flush-refresh-3",
-			Client:         &client.Client{OutfacingID: "foobar"},
-			RequestedScope: []string{"offline"},
-			GrantedScope:   []string{"offline"},
-			Session:        &oauth2.Session{DefaultSession: &openid.DefaultSession{Subject: "bar"}},
-			Form: url.Values{
-				"refresh_token": []string{fmt.Sprintf("%s.%s", "flush-refresh-3", tokenSignature)},
-			},
-		},
-	},
-}
 
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
@@ -180,86 +102,51 @@ func TestHandlerDeleteHandler(t *testing.T) {
 }
 
 func TestHandlerFlushHandler(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyRefreshTokenLifespan, time.Hour*1)
-	reg := internal.NewRegistryMemory(t, conf)
 
-	cl := reg.ClientManager()
-	store := reg.OAuth2Storage()
+	t.Run("case=not-after", func(t *testing.T) {
+		ctx := context.Background()
 
-	h := oauth2.NewHandler(reg, conf)
-	for _, r := range flushRequests {
-		_ = cl.CreateClient(context.Background(), r.Client.(*client.Client))
-		require.NoError(t, store.CreateAccessTokenSession(context.Background(), r.ID, r))
-	}
-	for _, fr := range flushRefreshRequests {
-		_ = cl.CreateClient(context.Background(), fr.Client.(*client.Client))
-		require.NoError(t, store.CreateRefreshTokenSession(context.Background(), fr.ID, fr))
-	}
+		// Setup database and tests
+		jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+		reg, err := jt.GetRegistry(ctx, t.Name())
+		require.NoError(t, err)
 
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-		return h
+		// Setup rest server
+		h := oauth2.NewHandler(reg, jt.GetConfig())
+
+		r := x.NewRouterAdmin()
+		h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+			return h
+		})
+
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
+
+		// Get the notAfter test cycles
+		notAfterTests := testhelpers.NewConsentJanitorTestHelper(t.Name()).GetNotAfterTestCycles()
+
+		for k, v := range notAfterTests {
+			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+				ctx := context.Background()
+				jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+
+				notAfter := time.Now().Round(time.Second).Add(-v)
+
+				t.Run("step=setup-access-token", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
+				t.Run("step=setup-refresh-token", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
+
+				t.Run("step=cleanup", func(t *testing.T) {
+					_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(notAfter)}))
+					require.NoError(t, err)
+				})
+
+				t.Run("step=validate-access-token", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
+				t.Run("step=validate-refresh-token", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
+			})
+		}
+
 	})
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-	ds := new(oauth2.Session)
-	ctx := context.Background()
-
-	_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-time.Hour * 24))}))
-	require.NoError(t, err)
-
-	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
-	require.NoError(t, err)
-
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-2", ds)
-	require.NoError(t, err)
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
-	require.NoError(t, err)
-
-	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now().Add(-(lifespan + time.Hour/2)))}))
-	require.NoError(t, err)
-
-	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
-	require.Error(t, err)
-
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-2", ds)
-	require.NoError(t, err)
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
-	require.Error(t, err)
-
-	_, err = c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(time.Now())}))
-	require.NoError(t, err)
-
-	_, err = store.GetAccessTokenSession(ctx, "flush-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-2", ds)
-	require.Error(t, err)
-	_, err = store.GetAccessTokenSession(ctx, "flush-3", ds)
-	require.Error(t, err)
-
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-1", ds)
-	require.NoError(t, err)
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-2", ds)
-	require.Error(t, err)
-	_, err = store.GetRefreshTokenSession(ctx, "flush-refresh-3", ds)
-	require.Error(t, err)
 }
 
 func TestUserinfo(t *testing.T) {

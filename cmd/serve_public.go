@@ -21,10 +21,11 @@ import (
 )
 
 // servePublicCmd represents the public command
-var servePublicCmd = &cobra.Command{
-	Use:   "public",
-	Short: "Serves Public HTTP/2 APIs",
-	Long: `This command opens one port and listens to HTTP/2 API requests. The exposed API handles requests coming from
+func NewServePublicCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "public",
+		Short: "Serves Public HTTP/2 APIs",
+		Long: `This command opens one port and listens to HTTP/2 API requests. The exposed API handles requests coming from
 the public internet, like OAuth 2.0 Authorization and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation,
 and OpenID Connect Discovery.
 
@@ -37,9 +38,6 @@ This command does not work with the "memory" database. Both services (privileged
 connection to be able to synchronize.
 
 ` + serveControls,
-	Run: server.RunServePublic,
-}
-
-func init() {
-	serveCmd.AddCommand(servePublicCmd)
+		Run: server.RunServePublic,
+	}
 }

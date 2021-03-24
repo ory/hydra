@@ -2,26 +2,23 @@ package sql_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/pborman/uuid"
-
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/internal/testhelpers"
 
 	"github.com/ory/hydra/jwk"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 )
 
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyAccessTokenLifespan, time.Hour)
 	registries := map[string]driver.Registry{
-		"memory": internal.NewRegistryMemory(t, conf),
+		"memory": internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults()),
 	}
 
 	if !testing.Short() {
@@ -29,6 +26,7 @@ func TestManagers(t *testing.T) {
 	}
 
 	for k, m := range registries {
+
 		t.Run("package=client/manager="+k, func(t *testing.T) {
 			t.Run("case=create-get-update-delete", client.TestHelperCreateGetUpdateDeleteClient(k, m.ClientManager()))
 
@@ -40,6 +38,8 @@ func TestManagers(t *testing.T) {
 		})
 
 		t.Run("package=consent/manager="+k, consent.ManagerTests(m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
+
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(m.Config(), m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
 
 		t.Run("package=jwk/manager="+k, func(t *testing.T) {
 			var testGenerator = &jwk.RS256Generator{}

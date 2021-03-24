@@ -16,13 +16,16 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/cli"
 )
 
 // keysImportCmd represents the import command
-var keysImportCmd = &cobra.Command{
-	Use:   "import <set> <file-1> [<file-2> [<file-3 [<...>]]]",
-	Short: "Imports cryptographic keys of any format to the JSON Web Key Store",
-	Long: `This command allows you to import cryptographic keys to the JSON Web Key Store.
+func NewKeysImportCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "import <set> <file-1> [<file-2> [<file-3 [<...>]]]",
+		Short: "Imports cryptographic keys of any format to the JSON Web Key Store",
+		Long: `This command allows you to import cryptographic keys to the JSON Web Key Store.
 
 Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If the JSON Web Key Set exists already,
 the imported keys will be added to that set. Otherwise, a new set will be created.
@@ -33,10 +36,8 @@ Examples:
 	hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json
 	hydra keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
 `,
-	Run: cmdHandler.Keys.ImportKeys,
-}
-
-func init() {
-	keysCmd.AddCommand(keysImportCmd)
-	keysImportCmd.Flags().String("use", "sig", "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
+		Run: cli.NewHandler().Keys.ImportKeys,
+	}
+	cmd.Flags().String("use", "sig", "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
+	return cmd
 }

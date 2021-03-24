@@ -384,6 +384,7 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 	if err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
+
 	return sqlcon.HandleError(err)
 }
 

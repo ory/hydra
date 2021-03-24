@@ -97,6 +97,7 @@ func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler
 func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
+
 	m.HealthHandler().SetHealthRoutes(public.Router, false)
 
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())

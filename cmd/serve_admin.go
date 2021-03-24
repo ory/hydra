@@ -21,10 +21,11 @@ import (
 )
 
 // adminCmd represents the admin command
-var adminCmd = &cobra.Command{
-	Use:   "admin",
-	Short: "Serves Administrative HTTP/2 APIs",
-	Long: `This command opens one port and listens to HTTP/2 API requests. The exposed API handles administrative
+func NewServeAdminCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "admin",
+		Short: "Serves Administrative HTTP/2 APIs",
+		Long: `This command opens one port and listens to HTTP/2 API requests. The exposed API handles administrative
 requests like managing OAuth 2.0 Clients, JSON Web Keys, login and consent sessions, and others.
 
 This command is configurable using the same options available to "serve public" and "serve all".
@@ -36,9 +37,6 @@ This command does not work with the "memory" database. Both services (administra
 connection to be able to synchronize.
 
 ` + serveControls,
-	Run: server.RunServeAdmin,
-}
-
-func init() {
-	serveCmd.AddCommand(adminCmd)
+		Run: server.RunServeAdmin,
+	}
 }

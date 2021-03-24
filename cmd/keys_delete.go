@@ -22,15 +22,15 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/cli"
 )
 
 // deleteCmd represents the delete command
-var keysDeleteCmd = &cobra.Command{
-	Use:   "delete <set>",
-	Short: "Delete a new JSON Web Key Set",
-	Run:   cmdHandler.Keys.DeleteKeys,
-}
-
-func init() {
-	keysCmd.AddCommand(keysDeleteCmd)
+func NewKeysDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete <set>",
+		Short: "Delete a new JSON Web Key Set",
+		Run:   cli.NewHandler().Keys.DeleteKeys,
+	}
 }

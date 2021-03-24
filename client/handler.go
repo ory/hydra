@@ -27,8 +27,6 @@ import (
 	"net/http"
 	"time"
 
-	jsonpatch "github.com/evanphx/json-patch"
-
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/herodot"
@@ -186,12 +184,6 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
-	patch, err := jsonpatch.DecodePatch(patchJSON)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
-		return
-	}
-
 	id := ps.ByName("id")
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
@@ -199,17 +191,7 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
-	original, err := json.Marshal(c)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	modified, err := patch.Apply(original)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	if err := json.Unmarshal(modified, c); err != nil {
+	if err := x.ApplyJSONPatch(patchJSON, c); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

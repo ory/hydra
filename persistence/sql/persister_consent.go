@@ -477,7 +477,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 				FROM %[3]s
 				INNER JOIN %[4]s
 				ON %[3]s.challenge = %[4]s.challenge
-				WHERE %[1]s.challenge = %[3]s.login_challenge AND %[4]s.error = '{}'
+				WHERE %[1]s.challenge = %[3]s.login_challenge AND (%[4]s.error = '{}' OR %[4]s.error is NULL)
 				)
 			AND requested_at < ?
 			AND requested_at < ?
@@ -508,7 +508,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 				(
 				SELECT NULL
 				FROM %[2]s
-				WHERE %[1]s.challenge = %[2]s.challenge AND %[2]s.error = '{}'
+				WHERE %[1]s.challenge = %[2]s.challenge AND (%[2]s.error = '{}' OR %[2]s.error is NULL)
 				)
 			AND requested_at < ?
 			AND requested_at < ?`,

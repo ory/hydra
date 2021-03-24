@@ -8,6 +8,8 @@ replace github.com/ory/kratos/corp => github.com/ory/kratos/corp v0.0.0-20210118
 
 replace github.com/ory/kratos-client-go => github.com/ory/kratos-client-go v0.5.4-alpha.1.0.20210210170256-960b093d8bf9
 
+replace github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
+
 require (
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible

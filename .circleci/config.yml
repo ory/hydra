@@ -162,7 +162,7 @@ workflows:
       - sdk/generate:
           appname: Ory_Hydra
           swagpath: spec/api.json
-          specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
+          specignorepgks: internal/httpclient gopkg.in/square/go-jose.v2
           requires:
             - test
             - test-e2e

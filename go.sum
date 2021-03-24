@@ -1305,9 +1305,6 @@ github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdh
 github.com/sawadashota/encrypta v0.0.2 h1:R46/RxYmYdxI3VOt63B637OVBHzu+fazPyLo5CqK6QE=
 github.com/sawadashota/encrypta v0.0.2/go.mod h1:pcPebEvF012kXmZXvfVzwFEr/GUE/ZntaR805jk0nsE=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
-github.com/seatgeek/logrus-gelf-formatter v0.0.0-20180829220724-ce23ecb3f367/go.mod h1:/THDZYi7F/BsVEcYzYPqdcWFQ+1C2InkawTKfLOAnzg=
-github.com/seatgeek/logrus-gelf-formatter v0.0.0-20210219220335-367fa274be2c h1:jwWrlqKHQeSRjTskQaHBtCOWbaMsd54NBAnofYbEHGs=
-github.com/seatgeek/logrus-gelf-formatter v0.0.0-20210219220335-367fa274be2c/go.mod h1:/THDZYi7F/BsVEcYzYPqdcWFQ+1C2InkawTKfLOAnzg=
 github.com/segmentio/analytics-go v3.0.1+incompatible/go.mod h1:C7CYBtQWk4vRk2RyLu0qOcbHJ18E3F1HV2C/8JvKN48=
 github.com/segmentio/analytics-go v3.1.0+incompatible/go.mod h1:C7CYBtQWk4vRk2RyLu0qOcbHJ18E3F1HV2C/8JvKN48=
 github.com/segmentio/backo-go v0.0.0-20160424052352-204274ad699c/go.mod h1:kJ9mm9YmoWSkk+oQ+5Cj8DEoRCX2JT6As4kEtIIOp1M=
@@ -1472,6 +1469,8 @@ github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9de
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
+github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10 h1:LEDqWCSheba8QLCISBZ2JDYHNN4kl6DNwTIpebE9bEQ=
+github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10/go.mod h1:g03kJ+ioXqOLNEIRHCsX1OoCnINQpWp0sYD61zovSbA=
 github.com/ziutek/mymysql v1.5.4 h1:GB0qdRGsTwQSBVYuVShFBKaXSnSnYYC2d9knnE1LHFs=
 github.com/ziutek/mymysql v1.5.4/go.mod h1:LMSpPZ6DbqWFxNCHW77HeMg9I646SAhApZ/wKdgO/C0=
 go.elastic.co/apm v1.8.0 h1:AWEKpHwRal0yCMd4K8Oxy1HAa7xid+xq1yy+XjgoVU0=

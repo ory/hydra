@@ -174,7 +174,7 @@ workflows:
             branches:
               ignore: /master/
       - sdk/release:
-          specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
+          specignorepgks: internal/httpclient gopkg.in/square/go-jose.v2
           swagpath: spec/api.json
           requires:
             - test

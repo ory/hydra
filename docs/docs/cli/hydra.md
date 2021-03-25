@@ -30,5 +30,5 @@ Run and manage ORY Hydra
 - [hydra serve](hydra-serve) - Parent command for starting public and
   administrative HTTP/2 APIs
 - [hydra token](hydra-token) - Issue and Manage OAuth2 tokens
-- [hydra version](hydra-version) - Display this binary's version, build time and
-  git hash of this build
+- [hydra version](hydra-version) - Display this binary&#39;s version, build time
+  and git hash of this build

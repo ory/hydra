@@ -14,7 +14,7 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 ## hydra version
 
-Display this binary's version, build time and git hash of this build
+Display this binary&#39;s version, build time and git hash of this build
 
 ```
 hydra version [flags]

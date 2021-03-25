@@ -21,14 +21,14 @@ handles requests coming from the public internet, like OAuth 2.0 Authorization
 and Token requests, OpenID Connect UserInfo, OAuth 2.0 Token Revokation, and
 OpenID Connect Discovery.
 
-This command is configurable using the same options available to "serve admin"
-and "serve all".
+This command is configurable using the same options available to &#34;serve
+admin&#34; and &#34;serve all&#34;.
 
 It is generally recommended to use this command only if you require granular
 control over the privileged and public APIs. For example, you might want to run
 different TLS certificates or CORS settings on the public and privileged API.
 
-This command does not work with the "memory" database. Both services
+This command does not work with the &#34;memory&#34; database. Both services
 (privileged, public) MUST use the same database connection to be able to
 synchronize.
 
@@ -38,7 +38,9 @@ ORY Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 
-> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md <<
+&gt;&gt;
+https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md
+&lt;&lt;
 
 ```
 hydra serve public [flags]

@@ -20,13 +20,13 @@ Starts a process which listens on two ports for public and administrative HTTP/2
 API requests.
 
 If you want more granular control (e.g. different TLS settings) over each API
-group (administrative, public) you can run "serve admin" and "serve public"
-separately.
+group (administrative, public) you can run &#34;serve admin&#34; and &#34;serve
+public&#34; separately.
 
 This command exposes a variety of controls via environment variables. You can
-set environments using "export KEY=VALUE" (Linux/macOS) or "set KEY=VALUE"
-(Windows). On Linux, you can also set environments by prepending key value
-pairs: "KEY=VALUE KEY2=VALUE2 hydra"
+set environments using &#34;export KEY=VALUE&#34; (Linux/macOS) or &#34;set
+KEY=VALUE&#34; (Windows). On Linux, you can also set environments by prepending
+key value pairs: &#34;KEY=VALUE KEY2=VALUE2 hydra&#34;
 
 All possible controls are listed below. This command exposes exposes command
 line flags, which are listed below the controls section.
@@ -37,7 +37,9 @@ ORY Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 
-> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md <<
+&gt;&gt;
+https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md
+&lt;&lt;
 
 ```
 hydra serve all [flags]

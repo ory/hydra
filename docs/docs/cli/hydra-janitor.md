@@ -32,30 +32,34 @@ reason.
 
 Janitor can be used in several ways.
 
-1. By passing the database connection string (DSN) as an argument Pass the
-   database url (dsn) as an argument to janitor. E.g. janitor <database-url>
+1.  By passing the database connection string (DSN) as an argument Pass the
+    database url (dsn) as an argument to janitor. E.g. janitor
+    &lt;database-url&gt;
+2.  By passing the DSN as an environment variable
 
-2. By passing the DSN as an environment variable export DSN=... janitor -e
+        export DSN=...
+        janitor -e
 
-3. By passing a configuration file containing the DSN janitor -c
-   /path/to/conf.yml
+3.  By passing a configuration file containing the DSN janitor -c
+    /path/to/conf.yml
+4.  Extra _optional_ parameters can also be added such as
 
-4. Extra _optional_ parameters can also be added such as janitor <database-url>
-   --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h
-   --consent-request-lifespan 10m
+        janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m &lt;database-url&gt;
 
-5. Running only a certain cleanup janitor <database-url> --tokens
+5.  Running only a certain cleanup
 
-or
+        janitor --tokens &lt;database-url&gt;
 
-janitor <database-url> --requests
+    or
 
-or both
+        janitor --requests &lt;database-url&gt;
 
-janitor <database-url> --tokens --requests
+    or both
+
+        janitor --tokens --requests &lt;database-url&gt;
 
 ```
-hydra janitor <database-url> [flags]
+hydra janitor [&lt;database-url&gt;] [flags]
 ```
 
 ### Options

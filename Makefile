@@ -28,7 +28,7 @@ node_modules: package.json
 docs/node_modules: docs/package.json
 		cd docs; npm ci
 
-.bin/clidoc:
+.bin/clidoc: go.mod
 		go build -o .bin/clidoc ./cmd/clidoc/.
 
 docs/cli: .bin/clidoc

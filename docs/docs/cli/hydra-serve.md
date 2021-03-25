@@ -23,9 +23,9 @@ OAuth 2.0 Authorize and Token URLs. The administrative port handles
 administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys,
 and managing User Login and Consent sessions.
 
-It is recommended to run "hydra serve all". If you need granular control over
-CORS settings or similar, you may want to run "hydra serve admin" and "hydra
-serve public" separately.
+It is recommended to run &#34;hydra serve all&#34;. If you need granular control
+over CORS settings or similar, you may want to run &#34;hydra serve admin&#34;
+and &#34;hydra serve public&#34; separately.
 
 To learn more about each individual command, run:
 
@@ -41,7 +41,9 @@ ORY Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 
-> > https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md <<
+&gt;&gt;
+https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md
+&lt;&lt;
 
 ### Options
 

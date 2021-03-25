@@ -35,19 +35,19 @@ Janitor can be used in several ways.
    janitor -c /path/to/conf.yml
 4. Extra *optional* parameters can also be added such as
 
-		janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m ...
+		janitor --keep-if-younger 23h --access-lifespan 1h --refresh-lifespan 40h --consent-request-lifespan 10m <database-url>
 
 5. Running only a certain cleanup
 
-		janitor --tokens ...
+		janitor --tokens <database-url>
 
    or
 
-		janitor --requests ...
+		janitor --requests <database-url>
 
    or both
 
-		janitor --tokens --requests ...
+		janitor --tokens --requests <database-url>
 `,
 		RunE: cli.NewHandler().Janitor.RunE,
 		Args: cli.NewHandler().Janitor.Args,

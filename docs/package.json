@@ -19,20 +19,20 @@
     "format:check": "prettier --check ${npm_package_config_prettierTarget}"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.415a7973f",
-    "@docusaurus/plugin-content-docs": "2.0.0-alpha.415a7973f",
-    "@docusaurus/plugin-content-pages": "2.0.0-alpha.415a7973f",
-    "@docusaurus/plugin-sitemap": "2.0.0-alpha.415a7973f",
-    "@docusaurus/theme-classic": "2.0.0-alpha.415a7973f",
-    "@docusaurus/theme-search-algolia": "2.0.0-alpha.415a7973f",
+    "@docusaurus/core": "2.0.0-alpha.72",
+    "@docusaurus/plugin-content-docs": "2.0.0-alpha.72",
+    "@docusaurus/plugin-content-pages": "2.0.0-alpha.72",
+    "@docusaurus/plugin-sitemap": "2.0.0-alpha.72",
+    "@docusaurus/theme-classic": "2.0.0-alpha.72",
+    "@docusaurus/theme-search-algolia": "2.0.0-alpha.72",
     "classnames": "2.2.6",
     "file-loader": "^6.1.0",
-    "mermaid": "8.6.4",
+    "mermaid": "8.9.2",
     "node-fetch": "^2.6.1",
     "prism-react-renderer": "^1.1.1",
     "prismjs": "^1.22.0",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "url-loader": "^4.1.0"
   },
   "browserslist": {
@@ -48,7 +48,7 @@
     ]
   },
   "devDependencies": {
-    "json-schema-faker": "0.5.0-rcv.32",
+    "json-schema-faker": "0.5.0-rcv.34",
     "json-schema-ref-parser": "8.0.0",
     "ory-prettier-styles": "^1.1.1",
     "prettier": "2.2.1",
@@ -57,6 +57,6 @@
     "remark-admonitions": "1.2.1",
     "remarkable": "2.0.1",
     "widdershins": "4.0.1",
-    "yaml": "1.8.3"
+    "yaml": "1.10.2"
   }
 }

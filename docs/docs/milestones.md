@@ -31,7 +31,7 @@ A request for comments to discuss and share ideas.
 - [x] Multi-region deployment support
       ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 
-## [v1.9.1](https://github.com/ory/hydra/milestone/40)
+## [v1.10](https://github.com/ory/hydra/milestone/40)
 
 _This milestone does not have a description._
 
@@ -164,7 +164,7 @@ Affects Continuous Integration (CI).
       ([hydra#2181](https://github.com/ory/hydra/pull/2181)) -
       [@hackerman](https://github.com/aeneasr)
 
-## [v1.10.0](https://github.com/ory/hydra/milestone/39)
+## [v1.11](https://github.com/ory/hydra/milestone/39)
 
 _This milestone does not have a description._
 

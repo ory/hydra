@@ -24,6 +24,7 @@ We publish our SDKs for popular languages in their respective package
 repositories:
 
 - [Dart](https://pub.dev/packages/ory_hydra_client)
+- [.NET](https://github.com/ory/sdk/tree/master/clients/hydra/dotnet)
 - [Go](https://github.com/ory/hydra-client-go)
 - [Java](https://search.maven.org/artifact/sh.ory.hydra/hydra-client)
 - [JavaScript](https://www.npmjs.com/package/@ory/hydra-client) with TypeScript

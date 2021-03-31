@@ -4,12 +4,10 @@ const fs = require('fs')
 
 const p = path.join(__dirname, '../versions.json')
 
-fs.writeFile(
-  p,
-  JSON.stringify(require(p).filter((v) => v !== name)),
-  function (err) {
-    if (err) {
-      return console.error(err)
-    }
+fs.writeFile(p, JSON.stringify(require(p).filter((v) => v !== name)), function (
+  err
+) {
+  if (err) {
+    return console.error(err)
   }
-)
+})

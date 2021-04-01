@@ -40,7 +40,8 @@ We also provide more info for these SDKs:
 - [Golang](sdk/go)
 - [JavaScript](sdk/js)
 
-Take a look at the source: [Generated SDKs for Ory Hydra](https://github.com/ory/sdk/tree/master/clients/hydra/)
+Take a look at the source:
+[Generated SDKs for Ory Hydra](https://github.com/ory/sdk/tree/master/clients/hydra/)
 
 Missing your programming language?
 [Create an issue](https://github.com/ory/hydra/issues) and help us build, test

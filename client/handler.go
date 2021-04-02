@@ -191,10 +191,13 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
+	innerId := c.ID
 	if err := x.ApplyJSONPatch(patchJSON, c); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	// ignore any misguided attempts to change the inner id
+	c.ID = innerId
 
 	if err := h.updateClient(r.Context(), c); err != nil {
 		h.r.Writer().WriteError(w, r, err)

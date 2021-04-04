@@ -1094,6 +1094,23 @@ oauth2:
   #
   include_legacy_error_fields: true
 
+  ## exclude_not_before_claim ##
+  #
+  # Set to true if you want to exclude claim `nbf (not before)` part of access token.
+  #
+  # Default value: false
+  #
+  # Examples:
+  # - true
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_EXCLUDE_NOT_BEFORE_CLAIM=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_EXCLUDE_NOT_BEFORE_CLAIM=<value>
+  #
+  exclude_not_before_claim: true
+
   ## hashers ##
   #
   # Configures hashing algorithms. Supports only BCrypt at the moment.

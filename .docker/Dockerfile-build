@@ -16,7 +16,7 @@ ADD . .
 
 RUN go build -tags sqlite -o /usr/bin/hydra
 
-FROM alpine:3.12
+FROM alpine:3.13.4
 
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \

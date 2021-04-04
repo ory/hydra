@@ -422,8 +422,8 @@ func (p *Provider) adminFallbackURL(path string) *url.URL {
 }
 
 func (p *Provider) publicFallbackURL(path string) *url.URL {
-	if len(p.IssuerURL().String()) > 0 {
-		return urlx.AppendPaths(p.IssuerURL(), path)
+	if len(p.PublicURL().String()) > 0 {
+		return urlx.AppendPaths(p.PublicURL(), path)
 	}
 
 	return p.fallbackURL(path, p.publicHost(), p.publicPort())
@@ -459,7 +459,7 @@ func (p *Provider) ErrorURL() *url.URL {
 }
 
 func (p *Provider) PublicURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.publicFallbackURL("/")))
+	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.IssuerURL()))
 }
 
 func (p *Provider) IssuerURL() *url.URL {
@@ -473,11 +473,11 @@ func (p *Provider) OAuth2ClientRegistrationURL() *url.URL {
 }
 
 func (p *Provider) OAuth2TokenURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/token"))
+	return p.p.RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.PublicURL(), "/oauth2/token"))
 }
 
 func (p *Provider) OAuth2AuthURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/auth"))
+	return p.p.RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.PublicURL(), "/oauth2/auth"))
 }
 
 func (p *Provider) JWKSURL() *url.URL {

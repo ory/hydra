@@ -29,6 +29,7 @@
           "dependencies-environment",
           "production",
           "guides/tracing",
+          "guides/oauth2-grant-type-jwt-bearer",
           "guides/secrets-key-rotation",
           "guides/kubernetes-helm-chart",
           "guides/ssl-https-tls",

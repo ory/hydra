@@ -28,6 +28,7 @@ import (
 	"testing"
 
 	"github.com/go-openapi/strfmt"
+	"github.com/mohae/deepcopy"
 
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
@@ -229,5 +230,40 @@ func TestClientSDK(t *testing.T) {
 				assert.EqualValues(t, id, gresult.Payload.ClientID)
 			})
 		}
+	})
+	t.Run("case=patch client legally", func(t *testing.T) {
+		op := "add"
+		path := "/redirect_uris/-"
+		value := "http://foo.bar"
+
+		client := createTestClient("")
+		client.ClientID = "patch1_client"
+		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
+		require.NoError(t, err)
+
+		expected := deepcopy.Copy(client).(*models.OAuth2Client)
+		expected.RedirectUris = append(expected.RedirectUris, value)
+
+		result, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		require.NoError(t, err)
+		expected.CreatedAt = result.Payload.CreatedAt
+		expected.UpdatedAt = result.Payload.UpdatedAt
+		expected.ClientSecret = result.Payload.ClientSecret
+		expected.ClientSecretExpiresAt = result.Payload.ClientSecretExpiresAt
+		require.Equal(t, expected, result.Payload)
+	})
+
+	t.Run("case=patch client illegally", func(t *testing.T) {
+		op := "replace"
+		path := "/id"
+		value := "foo"
+
+		client := createTestClient("")
+		client.ClientID = "patch2_client"
+		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
+		require.NoError(t, err)
+
+		_, err = c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		require.Error(t, err)
 	})
 }

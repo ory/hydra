@@ -102,7 +102,7 @@ func TestApplyJSONPatch(t *testing.T) {
 	t.Run("case=patch denied path", func(t *testing.T) {
 		rawPatch := []byte(`[{"op": "replace", "path": "/Field1", "value": "bar"}]`)
 		obj := deepcopy.Copy(object).(TestType)
-		require.Error(t, ApplyJSONPatch(rawPatch, obj, "/Field1"))
+		require.Error(t, ApplyJSONPatch(rawPatch, &obj, "/Field1"))
 		require.Equal(t, object, obj)
 	})
 	t.Run("case=patch allowed path", func(t *testing.T) {
@@ -110,7 +110,7 @@ func TestApplyJSONPatch(t *testing.T) {
 		expected := deepcopy.Copy(object).(TestType)
 		expected.Field2 = append(expected.Field2, "bar")
 		obj := deepcopy.Copy(object).(TestType)
-		require.NoError(t, ApplyJSONPatch(rawPatch, obj, "/Field1"))
+		require.NoError(t, ApplyJSONPatch(rawPatch, &obj, "/Field1"))
 		require.Equal(t, expected, obj)
 	})
 }

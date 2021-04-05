@@ -724,10 +724,11 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			}},
 			Subject: session.ConsentRequest.Subject,
 		},
-		Extra:            session.Session.AccessToken,
-		KID:              accessTokenKeyID,
-		ClientID:         authorizeRequest.GetClient().GetID(),
-		ConsentChallenge: session.ID,
+		Extra:                 session.Session.AccessToken,
+		KID:                   accessTokenKeyID,
+		ClientID:              authorizeRequest.GetClient().GetID(),
+		ConsentChallenge:      session.ID,
+		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(),
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())

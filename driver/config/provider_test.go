@@ -146,6 +146,36 @@ func TestProviderIssuerURL(t *testing.T) {
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 }
 
+func TestProviderIssuerPublicURL(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	p := MustNew(l)
+	p.MustSet(KeyIssuerURL, "http://hydra.localhost")
+	p.MustSet(KeyPublicURL, "http://hydra.example")
+
+	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
+	assert.Equal(t, "http://hydra.example/", p.PublicURL().String())
+	assert.Equal(t, "http://hydra.localhost/.well-known/jwks.json", p.JWKSURL().String())
+	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/consent", p.ConsentURL().String())
+	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/login", p.LoginURL().String())
+	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/logout", p.LogoutURL().String())
+	assert.Equal(t, "http://hydra.example/oauth2/token", p.OAuth2TokenURL().String())
+	assert.Equal(t, "http://hydra.example/oauth2/auth", p.OAuth2AuthURL().String())
+	assert.Equal(t, "http://hydra.example/userinfo", p.OIDCDiscoveryUserinfoEndpoint().String())
+
+	p2 := MustNew(l)
+	p2.MustSet(KeyIssuerURL, "http://hydra.localhost")
+	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
+	assert.Equal(t, "http://hydra.localhost/", p2.PublicURL().String())
+	assert.Equal(t, "http://hydra.localhost/.well-known/jwks.json", p2.JWKSURL().String())
+	assert.Equal(t, "http://hydra.localhost/oauth2/fallbacks/consent", p2.ConsentURL().String())
+	assert.Equal(t, "http://hydra.localhost/oauth2/fallbacks/login", p2.LoginURL().String())
+	assert.Equal(t, "http://hydra.localhost/oauth2/fallbacks/logout", p2.LogoutURL().String())
+	assert.Equal(t, "http://hydra.localhost/oauth2/token", p2.OAuth2TokenURL().String())
+	assert.Equal(t, "http://hydra.localhost/oauth2/auth", p2.OAuth2AuthURL().String())
+	assert.Equal(t, "http://hydra.localhost/userinfo", p2.OIDCDiscoveryUserinfoEndpoint().String())
+}
+
 func TestProviderCookieSameSiteMode(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)

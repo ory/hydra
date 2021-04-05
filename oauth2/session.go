@@ -36,6 +36,7 @@ type Session struct {
 	KID                    string
 	ClientID               string
 	ConsentChallenge       string
+	ExcludeNotBeforeClaim  bool
 }
 
 func NewSession(subject string) *Session {
@@ -56,7 +57,6 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 		Extra:     map[string]interface{}{"ext": s.Extra},
 		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		IssuedAt:  time.Now(),
-		NotBefore: time.Now(),
 
 		// No need to set the audience because that's being done by fosite automatically.
 		// Audience:  s.Audience,
@@ -70,6 +70,9 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 		// Setting these here will cause the token to have the same iat/nbf values always
 		// IssuedAt:  s.DefaultSession.Claims.IssuedAt,
 		// NotBefore: s.DefaultSession.Claims.IssuedAt,
+	}
+	if !s.ExcludeNotBeforeClaim {
+		claims.NotBefore = claims.IssuedAt
 	}
 
 	if claims.Extra == nil {

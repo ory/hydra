@@ -236,7 +236,8 @@ func TestClientSDK(t *testing.T) {
 		path := "/redirect_uris/-"
 		value := "http://foo.bar"
 
-		client := createTestClient("patch1_")
+		client := createTestClient("")
+		client.ClientID = "patch1_client"
 		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
 		require.NoError(t, err)
 
@@ -245,7 +246,10 @@ func TestClientSDK(t *testing.T) {
 
 		result, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
 		require.NoError(t, err)
-		result.Payload.UpdatedAt = expected.UpdatedAt
+		expected.CreatedAt = result.Payload.CreatedAt
+		expected.UpdatedAt = result.Payload.UpdatedAt
+		expected.ClientSecret = result.Payload.ClientSecret
+		expected.ClientSecretExpiresAt = result.Payload.ClientSecretExpiresAt
 		require.Equal(t, expected, result.Payload)
 	})
 
@@ -254,7 +258,8 @@ func TestClientSDK(t *testing.T) {
 		path := "/id"
 		value := "foo"
 
-		client := createTestClient("patch2_")
+		client := createTestClient("")
+		client.ClientID = "patch2_client"
 		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
 		require.NoError(t, err)
 

@@ -25,14 +25,14 @@
         "production",
         "guides/tracing",
         "guides/secrets-key-rotation",
-        "guides/merge-multiple-db-secrets",
         "guides/kubernetes-helm-chart",
         "guides/ssl-https-tls",
         "guides/cookies",
         "guides/scaling-hydra",
         "guides/cors",
         "guides/gitlab",
-        "guides/migrating-from-MITREid"
+        "guides/migrating-from-MITREid",        
+        "guides/merge-multiple-db-secrets"
       ]
     },
     {

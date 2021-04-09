@@ -96,13 +96,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
-
-		keys, err = FindKeysByPrefix(keys, "public")
-		if err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-
+		keys = ExcludeKeysByPrefix(keys, "private")
 		jwks.Keys = append(jwks.Keys, keys.Keys...)
 	}
 

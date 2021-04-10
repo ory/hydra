@@ -308,9 +308,22 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	delete(interim, "sid")
 	delete(interim, "jti")
 
-	if aud, ok := interim["aud"].([]string); !ok || len(aud) == 0 {
-		interim["aud"] = []string{c.GetID()}
+	aud, ok := interim["aud"].([]string)
+	if !ok || len(aud) == 0 {
+		aud = []string{c.GetID()}
+	} else {
+		found := false
+		for _, a := range aud {
+			if a == c.GetID() {
+				found = true
+				break
+			}
+		}
+		if !found {
+			aud = append(aud, c.GetID())
+		}
 	}
+	interim["aud"] = aud
 
 	if c.UserinfoSignedResponseAlg == "RS256" {
 		interim["jti"] = uuid.New()

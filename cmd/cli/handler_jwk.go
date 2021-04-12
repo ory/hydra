@@ -123,8 +123,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		cmdx.Fatalf("Expected status code 200 or 404 but got %d while fetching data from %s", response.StatusCode, u)
 	}
 
-	var set jose.JSONWebKeySet
-	err = json.NewDecoder(response.Body).Decode(&set)
+	set := jose.JSONWebKeySet{}
 	cmdx.Must(err, "Unable to decode payload to JSON: %s", err)
 
 	for _, path := range args[1:] {

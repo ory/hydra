@@ -27,7 +27,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"strings"
 
 	"github.com/ory/x/errorsx"
 
@@ -47,13 +46,6 @@ func AsymmetricKeypair(ctx context.Context, r InternalRegistry, g KeyGenerator, 
 	priv, err := GetOrCreateKey(ctx, r, g, set, "private")
 	if err != nil {
 		return nil, nil, err
-	}
-	keys, err := r.KeyManager().GetKeySet(ctx, set)
-	if err == nil {
-		pub, err := FindPublicKey(keys)
-		if err == nil {
-			return pub, priv, nil
-		}
 	}
 
 	pub, err := GetOrCreateKey(ctx, r, g, set, "public")
@@ -126,27 +118,6 @@ func FindKeyByPrefix(set *jose.JSONWebKeySet, prefix string) (key *jose.JSONWebK
 	}
 
 	return First(keys.Keys), nil
-}
-
-func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
-	keys := ExcludeKeysByPrefix(set, "private")
-	if len(keys.Keys) == 0 {
-		return nil, errors.New("key not found")
-	}
-
-	return First(keys.Keys), nil
-}
-
-func ExcludeKeysByPrefix(set *jose.JSONWebKeySet, prefix string) *jose.JSONWebKeySet {
-	keys := new(jose.JSONWebKeySet)
-
-	for _, k := range set.Keys {
-		if !strings.HasPrefix(k.KeyID, prefix+":") {
-			keys.Keys = append(keys.Keys, k)
-		}
-	}
-
-	return keys
 }
 
 func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeySet, error) {

@@ -23,6 +23,7 @@ package jwk
 import (
 	"context"
 	"crypto/rsa"
+	"strings"
 	"sync"
 
 	"github.com/ory/hydra/driver/config"
@@ -112,7 +113,7 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 		return err
 	}
 
-	public, err := FindPublicKey(keys)
+	public, err := FindKeyByPrefix(keys, "public")
 	if err != nil {
 		return err
 	}
@@ -120,6 +121,10 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 	private, err := FindKeyByPrefix(keys, "private")
 	if err != nil {
 		return err
+	}
+
+	if strings.Replace(public.KeyID, "public:", "", 1) != strings.Replace(private.KeyID, "private:", "", 1) {
+		return errors.New("public and private key pair kids do not match")
 	}
 
 	if k, ok := private.Key.(*rsa.PrivateKey); !ok {

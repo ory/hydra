@@ -27,12 +27,11 @@ import (
 )
 
 // migrateCmd represents the migrate command
-var migrateCmd = &cobra.Command{
-	Use:   "migrate",
-	Short: "Various migration helpers",
-}
-
-func init() {
-	RootCmd.AddCommand(migrateCmd)
-	configx.RegisterFlags(migrateCmd.PersistentFlags())
+func NewMigrateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "Various migration helpers",
+	}
+	configx.RegisterFlags(cmd.PersistentFlags())
+	return cmd
 }

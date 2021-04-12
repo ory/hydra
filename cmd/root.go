@@ -25,21 +25,65 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-
-	"github.com/ory/hydra/cmd/cli"
 )
 
 // This represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
-	Use:   "hydra",
-	Short: "Run and manage ORY Hydra",
+func NewRootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "hydra",
+		Short: "Run and manage ORY Hydra",
+	}
+	RegisterCommandRecursive(cmd)
+	return cmd
 }
 
-var cmdHandler = cli.NewHandler()
+func RegisterCommandRecursive(parent *cobra.Command) {
+	// Clients
+	clientCmd := NewClientsCmd()
+	parent.AddCommand(clientCmd)
+	clientCmd.AddCommand(NewClientsCreateCmd())
+	clientCmd.AddCommand(NewClientsDeleteCmd())
+	clientCmd.AddCommand(NewClientsGetCmd())
+	clientCmd.AddCommand(NewClientsImportCmd())
+	clientCmd.AddCommand(NewClientsImportCmd())
+	clientCmd.AddCommand(NewClientsImportCmd())
+	clientCmd.AddCommand(NewClientsListCmd())
+	clientCmd.AddCommand(NewKeysImportCmd())
+	clientCmd.AddCommand(NewClientsUpdateCmd())
+
+	parent.AddCommand(NewJanitorCmd())
+
+	keyCmd := NewKeysCmd()
+	parent.AddCommand(keyCmd)
+	keyCmd.AddCommand(NewKeysCreateCmd())
+	keyCmd.AddCommand(NewKeysDeleteCmd())
+	keyCmd.AddCommand(NewKeysGetCmd())
+
+	migrateCmd := NewMigrateCmd()
+	parent.AddCommand(migrateCmd)
+	migrateCmd.AddCommand(NewMigrateSqlCmd())
+
+	serveCmd := NewServeCmd()
+	parent.AddCommand(serveCmd)
+	serveCmd.AddCommand(NewServeAdminCmd())
+	serveCmd.AddCommand(NewServePublicCmd())
+	serveCmd.AddCommand(NewServeAllCmd())
+
+	tokenCmd := NewTokenCmd()
+	parent.AddCommand(tokenCmd)
+	tokenCmd.AddCommand(NewTokenClientCmd())
+	tokenCmd.AddCommand(NewTokenDeleteCmd())
+	tokenCmd.AddCommand(NewTokenFlushCmd())
+	tokenCmd.AddCommand(NewTokenIntrospectCmd())
+	tokenCmd.AddCommand(NewTokenRevokeCmd())
+	tokenCmd.AddCommand(NewTokenUserCmd())
+
+	parent.AddCommand(NewVersionCmd())
+}
 
 // Execute adds all child commands to the root command sets flags appropriately.
 func Execute() {
-	if err := RootCmd.Execute(); err != nil {
+	if err := NewRootCmd().Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}

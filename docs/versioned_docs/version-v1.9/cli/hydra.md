@@ -14,10 +14,6 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 Run and manage ORY Hydra
 
-### Synopsis
-
-Run and manage ORY Hydra
-
 ### Options
 
 ```

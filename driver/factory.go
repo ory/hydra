@@ -51,7 +51,7 @@ func DisablePreloading() OptionsModifier {
 	}
 }
 
-func New(opts ...OptionsModifier) Registry {
+func New(ctx context.Context, opts ...OptionsModifier) Registry {
 	o := newOptions()
 	for _, f := range opts {
 		f(o)
@@ -67,21 +67,21 @@ func New(opts ...OptionsModifier) Registry {
 		config.MustValidate(l, c)
 	}
 
-	r, err := NewRegistryFromDSN(c, l)
+	r, err := NewRegistryFromDSN(ctx, c, l)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to create service registry.")
 	}
 
-	if err = r.Init(); err != nil {
+	if err = r.Init(ctx); err != nil {
 		l.WithError(err).Fatal("Unable to initialize service registry.")
 	}
 
 	// Avoid cold cache issues on boot:
 	if o.preload {
-		CallRegistry(r)
+		CallRegistry(ctx, r)
 	}
 
-	c.Source().SetTracer(context.Background(), r.Tracer())
+	c.Source().SetTracer(context.Background(), r.Tracer(ctx))
 
 	return r
 }

@@ -2,11 +2,13 @@ package sql
 
 import (
 	"context"
+	"embed"
 	"fmt"
-	"io"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ory/x/popx"
 
 	"github.com/ory/x/errorsx"
 
@@ -15,26 +17,34 @@ import (
 	"github.com/ory/x/sqlcon"
 )
 
-func (p *Persister) MigrationStatus(_ context.Context, w io.Writer) error {
-	return errorsx.WithStack(p.mb.Status(w))
+//go:embed migrations/*.sql
+var migrations embed.FS
+
+func (p *Persister) MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error) {
+	status, err := p.mb.Status(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return status, nil
 }
 
-func (p *Persister) MigrateDown(_ context.Context, steps int) error {
-	return errorsx.WithStack(p.mb.Down(steps))
+func (p *Persister) MigrateDown(ctx context.Context, steps int) error {
+	return errorsx.WithStack(p.mb.Down(ctx, steps))
 }
 
-func (p *Persister) MigrateUp(_ context.Context) error {
+func (p *Persister) MigrateUp(ctx context.Context) error {
 	if err := p.migrateOldMigrationTables(); err != nil {
 		return err
 	}
-	return errorsx.WithStack(p.mb.Up())
+	return errorsx.WithStack(p.mb.Up(ctx))
 }
 
-func (p *Persister) MigrateUpTo(_ context.Context, steps int) (int, error) {
+func (p *Persister) MigrateUpTo(ctx context.Context, steps int) (int, error) {
 	if err := p.migrateOldMigrationTables(); err != nil {
 		return 0, err
 	}
-	n, err := p.mb.UpTo(steps)
+	n, err := p.mb.UpTo(ctx, steps)
 	return n, errorsx.WithStack(err)
 }
 

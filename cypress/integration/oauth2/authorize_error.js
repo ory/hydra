@@ -33,9 +33,9 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
           expect(error_description).to.equal(
             'The resource owner denied the request'
           )
-          expect(access_token).to.be.empty
-          expect(id_token).to.be.empty
-          expect(refresh_token).to.be.empty
+          expect(access_token).to.be.undefined
+          expect(id_token).to.be.undefined
+          expect(refresh_token).to.be.undefined
         })
     })
 
@@ -58,9 +58,9 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
           expect(error_description).to.equal(
             'The resource owner denied the request'
           )
-          expect(access_token).to.be.empty
-          expect(id_token).to.be.empty
-          expect(refresh_token).to.be.empty
+          expect(access_token).to.be.undefined
+          expect(id_token).to.be.undefined
+          expect(refresh_token).to.be.undefined
         })
     })
   })
@@ -90,7 +90,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       grant_types: ['authorization_code']
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${
@@ -115,7 +115,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       response_types: ['token'] // disallows Authorization Code Grant
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${
@@ -134,7 +134,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       grant_types: ['client_credentials']
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${
@@ -158,7 +158,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       redirect_uris: ['http://some-other-domain/not-callback'],
       grant_types: ['client_credentials']
     }
-    cy.wrap(createClient(c))
+    createClient(c)
 
     cy.visit(
       `${Cypress.env('client_url')}/oauth2/code?client_id=${

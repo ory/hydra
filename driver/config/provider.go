@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,7 +10,7 @@ import (
 
 	"github.com/ory/x/dbal"
 
-	"github.com/markbates/pkger"
+	"github.com/ory/hydra/spec"
 
 	"github.com/ory/x/configx"
 
@@ -79,6 +78,7 @@ const (
 	KeyGrantAllClientCredentialsScopesPerDefault = "oauth2.client_credentials.default_grant_allowed_scope"
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
+	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 )
 
 const DSNMemory = "memory"
@@ -98,16 +98,6 @@ func MustNew(l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
 }
 
 func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
-	f, err := pkger.Open("/.schema/config.schema.json")
-	if err != nil {
-		return nil, err
-	}
-
-	schema, err := ioutil.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-
 	opts = append([]configx.OptionModifier{
 		configx.WithStderrValidationReporter(),
 		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
@@ -115,7 +105,7 @@ func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 		configx.WithLogrusWatcher(l),
 	}, opts...)
 
-	p, err := configx.New(schema, opts...)
+	p, err := configx.New(spec.ConfigValidationSchema, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +223,7 @@ func (p *Provider) DSN() string {
 	dsn := p.p.String(KeyDSN)
 
 	if dsn == DSNMemory {
-		return dbal.InMemoryDSN
+		return dbal.SQLiteInMemory
 	}
 
 	if len(dsn) > 0 {
@@ -246,6 +236,10 @@ func (p *Provider) DSN() string {
 
 func (p *Provider) EncryptSessionData() bool {
 	return p.p.BoolF(KeyEncryptSessionData, true)
+}
+
+func (p *Provider) ExcludeNotBeforeClaim() bool {
+	return p.p.BoolF(KeyExcludeNotBeforeClaim, false)
 }
 
 func (p *Provider) DataSourcePlugin() string {
@@ -428,8 +422,8 @@ func (p *Provider) adminFallbackURL(path string) *url.URL {
 }
 
 func (p *Provider) publicFallbackURL(path string) *url.URL {
-	if len(p.IssuerURL().String()) > 0 {
-		return urlx.AppendPaths(p.IssuerURL(), path)
+	if len(p.PublicURL().String()) > 0 {
+		return urlx.AppendPaths(p.PublicURL(), path)
 	}
 
 	return p.fallbackURL(path, p.publicHost(), p.publicPort())
@@ -465,7 +459,7 @@ func (p *Provider) ErrorURL() *url.URL {
 }
 
 func (p *Provider) PublicURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.publicFallbackURL("/")))
+	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.IssuerURL()))
 }
 
 func (p *Provider) IssuerURL() *url.URL {
@@ -479,11 +473,11 @@ func (p *Provider) OAuth2ClientRegistrationURL() *url.URL {
 }
 
 func (p *Provider) OAuth2TokenURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/token"))
+	return p.p.RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.PublicURL(), "/oauth2/token"))
 }
 
 func (p *Provider) OAuth2AuthURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.IssuerURL(), "/oauth2/auth"))
+	return p.p.RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.PublicURL(), "/oauth2/auth"))
 }
 
 func (p *Provider) JWKSURL() *url.URL {

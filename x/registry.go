@@ -1,7 +1,11 @@
 package x
 
 import (
+	"context"
+
 	"github.com/gorilla/sessions"
+
+	"github.com/ory/x/tracing"
 
 	"github.com/ory/herodot"
 	"github.com/ory/x/logrusx"
@@ -18,4 +22,8 @@ type RegistryWriter interface {
 
 type RegistryCookieStore interface {
 	CookieStore() sessions.Store
+}
+
+type TracingProvider interface {
+	Tracer(ctx context.Context) *tracing.Tracer
 }

@@ -98,7 +98,6 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //     Responses:
 //       204: emptyResponse
 //       400: genericError
-//       404: genericError
 //       500: genericError
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
@@ -111,12 +110,12 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 
 	switch {
 	case len(client) > 0:
-		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil {
+		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 	case allClients:
-		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil {
+		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
@@ -211,7 +210,6 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       204: emptyResponse
 //       400: genericError
-//       404: genericError
 //       500: genericError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
@@ -220,7 +218,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil {
+	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -703,7 +701,7 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.IssuerURL(), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
 

@@ -1,4 +1,4 @@
-FROM golang:1.15-buster AS builder
+FROM golang:1.16-buster AS builder
 
 RUN apt-get update && \
   apt-get install -y git gcc bash ssl-cert ca-certificates
@@ -15,7 +15,7 @@ RUN go mod download
 
 ADD . .
 
-RUN make pack && go build -tags sqlite -o /usr/bin/hydra
+RUN go build -tags sqlite -o /usr/bin/hydra
 
 VOLUME /var/lib/sqlite
 

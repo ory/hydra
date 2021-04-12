@@ -14,6 +14,9 @@ jobs:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
           fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16.1'
       - name: Start service
         run: ./test/conformance/start.sh
       - name: Run tests

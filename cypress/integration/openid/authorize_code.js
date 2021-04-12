@@ -27,7 +27,7 @@ describe('OpenID Connect Authorize Code Grant', () => {
         expect(result).to.equal('success')
         expect(access_token).to.not.be.empty
         expect(id_token).to.not.be.empty
-        expect(refresh_token).to.be.empty
+        expect(refresh_token).to.be.undefined
 
         expect(sub).to.eq('foo@bar.com')
         expect(sid).to.not.be.empty

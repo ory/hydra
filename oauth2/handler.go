@@ -281,14 +281,14 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		rfcerr := fosite.ErrorToRFC6749Error(err)
 		if rfcerr.StatusCode() == http.StatusUnauthorized {
-			w.Header().Set("WWW-Authenticate", fmt.Sprintf("error=%s,error_description=%s,error_hint=%s", rfcerr.ErrorField, rfcerr.DescriptionField, rfcerr.HintField))
+			w.Header().Set("WWW-Authenticate", fmt.Sprintf("error=%s,error_description=%s", rfcerr.ErrorField, rfcerr.GetDescription()))
 		}
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	if tokenType != fosite.AccessToken {
-		errorDescription := "Only access tokens are allowed in the authorization header"
+		errorDescription := "Only access tokens are allowed in the authorization header."
 		w.Header().Set("WWW-Authenticate", fmt.Sprintf("error_description=\"%s\"", errorDescription))
 		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, errors.New(errorDescription))
 		return
@@ -724,10 +724,11 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 			}},
 			Subject: session.ConsentRequest.Subject,
 		},
-		Extra:            session.Session.AccessToken,
-		KID:              accessTokenKeyID,
-		ClientID:         authorizeRequest.GetClient().GetID(),
-		ConsentChallenge: session.ID,
+		Extra:                 session.Session.AccessToken,
+		KID:                   accessTokenKeyID,
+		ClientID:              authorizeRequest.GetClient().GetID(),
+		ConsentChallenge:      session.ID,
+		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(),
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())

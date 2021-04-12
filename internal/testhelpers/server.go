@@ -2,9 +2,8 @@ package testhelpers
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
-
-	"github.com/gobuffalo/httptest"
 )
 
 func FlexibleServer(t *testing.T, h *http.HandlerFunc) string {

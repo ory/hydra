@@ -1,6 +1,6 @@
 import { prng } from '../../helpers'
 
-describe('The OAuth 2.0 Refresh Token Grant', () => {
+describe('OAuth 2.0 JSON Web Token Access Tokens', () => {
   before(function () {
     // this must be a function otherwise this.skip() fails because the context is wrong
     if (

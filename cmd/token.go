@@ -27,15 +27,14 @@ import (
 )
 
 // tokenCmd represents the token command
-var tokenCmd = &cobra.Command{
-	Use:   "token",
-	Short: "Issue and Manage OAuth2 tokens",
-}
-
-func init() {
-	RootCmd.AddCommand(tokenCmd)
+func NewTokenCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "token",
+		Short: "Issue and Manage OAuth2 tokens",
+	}
 	//tokenCmd.PersistentFlags().Bool("dry", false, "do not execute the command but show the corresponding curl command instead")
-	tokenCmd.PersistentFlags().Duration("fail-after", time.Minute, `Stop retrying after the specified duration`)
-	tokenCmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
-	tokenCmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unknown certificate authorities")
+	cmd.PersistentFlags().Duration("fail-after", time.Minute, `Stop retrying after the specified duration`)
+	cmd.PersistentFlags().Bool("fake-tls-termination", false, `fake tls termination by adding "X-Forwarded-Proto: https" to http headers`)
+	cmd.PersistentFlags().Bool("skip-tls-verify", false, "Foolishly accept TLS certificates signed by unknown certificate authorities")
+	return cmd
 }

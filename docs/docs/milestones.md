@@ -13,12 +13,12 @@ New feature or request.
 
 #### Issues
 
-- [ ] Reuse Detection in Refresh Token Rotation
-      ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 - [ ] Device Authorization Grant
       ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 - [ ] Support AWS X-Ray as distributed trace
       ([hydra#2130](https://github.com/ory/hydra/issues/2130))
+- [x] Reuse Detection in Refresh Token Rotation
+      ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 
@@ -31,7 +31,7 @@ A request for comments to discuss and share ideas.
 - [x] Multi-region deployment support
       ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 
-## [v1.9.1](https://github.com/ory/hydra/milestone/40)
+## [v1.10](https://github.com/ory/hydra/milestone/40)
 
 _This milestone does not have a description._
 
@@ -164,7 +164,7 @@ Affects Continuous Integration (CI).
       ([hydra#2181](https://github.com/ory/hydra/pull/2181)) -
       [@hackerman](https://github.com/aeneasr)
 
-## [v1.10.0](https://github.com/ory/hydra/milestone/39)
+## [v1.11](https://github.com/ory/hydra/milestone/39)
 
 _This milestone does not have a description._
 
@@ -215,11 +215,9 @@ New feature or request.
 - [ ] Add a way to filter/sort the list of clients
       ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
-- [ ] Remove "not before" claim "nbf" from JWT access token
-      ([hydra#1542](https://github.com/ory/hydra/issues/1542))
 - [ ] No way to handle 409 GetLoginRequestConflict.
       ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
-      [@Patrik](https://github.com/zepatrik)
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
@@ -251,6 +249,8 @@ New feature or request.
 - [x] oauth2: Make cleaning up refresh and authz codes possible
       ([hydra#1130](https://github.com/ory/hydra/issues/1130)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] Remove "not before" claim "nbf" from JWT access token
+      ([hydra#1542](https://github.com/ory/hydra/issues/1542))
 - [x] Add endpoint to Admin API to revoke access tokens
       ([hydra#1728](https://github.com/ory/hydra/issues/1728))
 - [x] Migrate to gobuffalo/pop
@@ -272,7 +272,8 @@ Affects documentation.
 #### Issues
 
 - [ ] Add list of possible errors to REST API documentation
-      ([hydra#2166](https://github.com/ory/hydra/issues/2166))
+      ([hydra#2166](https://github.com/ory/hydra/issues/2166)) -
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [x] Docs: rendering issue (?) on reference REST API
       ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
       [@Vincent](https://github.com/vinckr)

@@ -9,8 +9,6 @@ GO_DEPENDENCIES = github.com/ory/go-acc \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
 				  github.com/ory/cli \
-				  github.com/gobuffalo/packr/v2/packr2 \
-				  github.com/markbates/pkger/cmd/pkger \
 				  github.com/go-bindata/go-bindata/go-bindata
 
 define make-go-dependency
@@ -27,7 +25,10 @@ $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 node_modules: package.json
 		npm ci
 
-.bin/clidoc:
+docs/node_modules: docs/package.json
+		cd docs; npm ci
+
+.bin/clidoc: go.mod
 		go build -o .bin/clidoc ./cmd/clidoc/.
 
 docs/cli: .bin/clidoc
@@ -69,7 +70,7 @@ test-resetdb: node_modules
 		docker rm -f hydra_test_database_cockroach || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:9.6
-		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
+		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v20.2.6 start-single-node --insecure
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
@@ -108,33 +109,25 @@ mocks: .bin/mockgen
 # Generates the SDKs
 .PHONY: sdk
 sdk: .bin/cli
-		swagger generate spec -m -o ./.schema/api.swagger.json -x internal/httpclient -x gopkg.in/square/go-jose.v2
-		cli dev swagger sanitize ./.schema/api.swagger.json
-		swagger flatten --with-flatten=remove-unused -o ./.schema/api.swagger.json ./.schema/api.swagger.json
-		swagger validate ./.schema/api.swagger.json
+		swagger generate spec -m -o ./spec/api.json -x internal/httpclient -x gopkg.in/square/go-jose.v2
+		cli dev swagger sanitize ./spec/api.json
+		swagger flatten --with-flatten=remove-unused -o ./spec/api.json ./spec/api.json
+		swagger validate ./spec/api.json
 		rm -rf internal/httpclient
 		mkdir -p internal/httpclient
-		swagger generate client -f ./.schema/api.swagger.json -t internal/httpclient -A Ory_Hydra
+		swagger generate client -f ./spec/api.json -t internal/httpclient -A Ory_Hydra
 		make format
 
 .PHONY: install-stable
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 		git checkout $$HYDRA_LATEST
-		make pack
 		GO111MODULE=on go install \
 				-tags sqlite \
 				-ldflags "-X github.com/ory/hydra/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/driver/config.Commit=`git rev-parse HEAD`" \
 				.
-		packr2 clean
 		git checkout master
 
 .PHONY: install
-install: pack
+install:
 		GO111MODULE=on go install -tags sqlite .
-		packr2 clean
-
-.PHONY: pack
-pack: .bin/packr2 .bin/pkger
-		packr2
-		pkger -exclude node_modules -exclude docs -exclude .git -exclude .github -exclude .bin -exclude test -exclude script -exclude contrib

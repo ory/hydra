@@ -2,7 +2,7 @@
 
 <h4 align="center">
     <a href="https://www.ory.sh/chat">Chat</a> |
-    <a href="https://community.ory.sh/">Forums</a> |
+    <a href="https://github.com/ory/hydra/discussions">Discussions</a> |
     <a href="http://eepurl.com/di390P">Newsletter</a><br/><br/>
     <a href="https://www.ory.sh/hydra/docs/index">Guide</a> |
     <a href="https://www.ory.sh/hydra/docs/reference/api">API Docs</a> |
@@ -183,6 +183,12 @@ that your company deserves a spot here, reach out to
             <td>DataDetect</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/datadetect.svg" alt="Datadetect"></td>
             <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
+        </tr>        
+        <tr>
+            <td>Adopter *</td>
+            <td>Sainsbury's</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/sainsburys.svg" alt="Sainsbury's"></td>
+            <td><a href="https://www.sainsburys.co.uk/">sainsburys.co.uk</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>

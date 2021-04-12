@@ -46,7 +46,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
         expect(result).to.equal('success')
         expect(access_token).to.not.be.empty
-        expect(id_token).to.be.empty
+        expect(id_token).to.be.undefined
         expect(refresh_token).to.not.be.empty
       })
   })
@@ -66,7 +66,7 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
         expect(result).to.equal('success')
         expect(access_token).to.not.be.empty
         expect(id_token).to.not.be.empty
-        expect(refresh_token).to.be.empty
+        expect(refresh_token).to.be.undefined
       })
   })
 
@@ -84,8 +84,8 @@ describe('The OAuth 2.0 Authorization Code Grant', function () {
 
         expect(result).to.equal('success')
         expect(access_token).to.not.be.empty
-        expect(id_token).to.be.empty
-        expect(refresh_token).to.be.empty
+        expect(id_token).to.be.undefined
+        expect(refresh_token).to.be.undefined
       })
   })
 })

@@ -1,12 +1,12 @@
 version: 2.1
 
 orbs:
-  goreleaser: ory/goreleaser@0.1.28
+  goreleaser: ory/goreleaser@0.1.31
   slack: circleci/slack@3.4.2
-  sdk: ory/sdk@0.1.40
-  changelog: ory/changelog@0.1.8
-  nancy: ory/nancy@0.0.17
-  docs: ory/docs@0.0.10
+  sdk: ory/sdk@0.1.41
+  changelog: ory/changelog@0.1.10
+  nancy: ory/nancy@0.0.18
+  docs: ory/docs@0.0.11
   golangci: ory/golangci@0.0.18
   go: circleci/go@1.5.0
   prettier: ory/prettier@0.0.11
@@ -38,7 +38,7 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: mysql:5.7
+      - image: mysql:8.0
         environment:
           - MYSQL_ROOT_PASSWORD=test
       - image: cockroachdb/cockroach:v20.2.5
@@ -58,9 +58,7 @@ jobs:
       - goreleaser/check
       - golangci/install
       - golangci/lint
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
+      - go/mod-download-cached
       - run: make .bin/go-acc
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
@@ -80,9 +78,9 @@ jobs:
           - POSTGRES_USER=test
           - POSTGRES_PASSWORD=test
           - POSTGRES_DB=postgres
-      - image: cockroachdb/cockroach:v20.2.5
+      - image: cockroachdb/cockroach:v20.2.6
         command: start-single-node --insecure
-      - image: mysql:5.7
+      - image: mysql:8.0
         environment:
           - MYSQL_ROOT_PASSWORD=test
     steps:
@@ -101,18 +99,16 @@ jobs:
             - node_modules
             - ~/.cache # cypress
 
-      - go/load-cache
-      - go/mod-download
-      - go/save-cache
+      - go/mod-download-cached
 
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt
-      - run: ./test/e2e/circle-ci.bash postgres
-      - run: ./test/e2e/circle-ci.bash postgres-jwt
       - run: ./test/e2e/circle-ci.bash cockroach
       - run: ./test/e2e/circle-ci.bash cockroach-jwt
       - run: ./test/e2e/circle-ci.bash mysql
       - run: ./test/e2e/circle-ci.bash mysql-jwt
+      - run: ./test/e2e/circle-ci.bash postgres
+      - run: ./test/e2e/circle-ci.bash postgres-jwt
 
 workflows:
   bdt:
@@ -165,7 +161,8 @@ workflows:
               only: master
       - sdk/generate:
           appname: Ory_Hydra
-          specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
+          swagpath: spec/api.json
+          specignorepgks: internal/httpclient gopkg.in/square/go-jose.v2
           requires:
             - test
             - test-e2e
@@ -177,7 +174,8 @@ workflows:
             branches:
               ignore: /master/
       - sdk/release:
-          specignorepgks: internal/httpclient -x gopkg.in/square/go-jose.v2
+          specignorepgks: internal/httpclient gopkg.in/square/go-jose.v2
+          swagpath: spec/api.json
           requires:
             - test
             - sdk/generate
@@ -192,6 +190,7 @@ workflows:
           requires:
             - test
       - docs/build:
+          swag-spec-location: spec/api.json
           requires:
             - test
           filters:
@@ -215,6 +214,7 @@ workflows:
               only: /.*/
       -
         goreleaser/render-version-schema:
+          schema-path: spec/config.json
           requires:
             - goreleaser/release
           filters:

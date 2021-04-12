@@ -178,6 +178,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testFositeStoreSetClientAssertionJWT/db=%s", k), testFositeStoreSetClientAssertionJWT(store))
 	t.Run(fmt.Sprintf("case=testFositeStoreClientAssertionJWTValid/db=%s", k), testFositeStoreClientAssertionJWTValid(store))
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
+	t.Run(fmt.Sprintf("case=testHelperRevokeAccessToken/db=%s", k), testHelperRevokeAccessToken(store))
 }
 
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
@@ -284,11 +285,13 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		err = m.RevokeRefreshToken(ctx, reqIdTwo)
 		require.NoError(t, err)
 
-		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
-		assert.NotNil(t, err)
+		req, err := m.GetRefreshTokenSession(ctx, "1111", &Session{})
+		assert.NotNil(t, req)
+		assert.EqualError(t, err, fosite.ErrInactiveToken.Error())
 
-		_, err = m.GetRefreshTokenSession(ctx, "1122", &Session{})
-		assert.NotNil(t, err)
+		req, err = m.GetRefreshTokenSession(ctx, "1122", &Session{})
+		assert.NotNil(t, req)
+		assert.EqualError(t, err, fosite.ErrInactiveToken.Error())
 
 	}
 }
@@ -378,8 +381,29 @@ func testHelperDeleteAccessTokens(x InternalRegistry) func(t *testing.T) {
 		err = m.DeleteAccessTokens(ctx, defaultRequest.Client.GetID())
 		require.NoError(t, err)
 
+		req, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
+		assert.Nil(t, req)
+		assert.EqualError(t, err, fosite.ErrNotFound.Error())
+	}
+}
+
+func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		m := x.OAuth2Storage()
+		ctx := context.Background()
+
+		err := m.CreateAccessTokenSession(ctx, "4321", &defaultRequest)
+		require.NoError(t, err)
+
 		_, err = m.GetAccessTokenSession(ctx, "4321", &Session{})
-		assert.Error(t, err)
+		require.NoError(t, err)
+
+		err = m.RevokeAccessToken(ctx, defaultRequest.GetID())
+		require.NoError(t, err)
+
+		req, err := m.GetAccessTokenSession(ctx, "4321", &Session{})
+		assert.Nil(t, req)
+		assert.EqualError(t, err, fosite.ErrNotFound.Error())
 	}
 }
 

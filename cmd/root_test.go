@@ -74,6 +74,8 @@ func TestExecute(t *testing.T) {
 	frontend := fmt.Sprintf("https://localhost:%d/", frontendPort)
 	backend := fmt.Sprintf("https://localhost:%d/", backendPort)
 
+	rootCmd := NewRootCmd()
+
 	for _, c := range []struct {
 		args      []string
 		wait      func() bool
@@ -127,12 +129,12 @@ func TestExecute(t *testing.T) {
 		{args: []string{"version"}},
 		{args: []string{"token", "flush", "--skip-tls-verify", "--endpoint", backend}},
 	} {
-		RootCmd.SetArgs(c.args)
+		rootCmd.SetArgs(c.args)
 
 		t.Run(fmt.Sprintf("command=%v", c.args), func(t *testing.T) {
 			if c.wait != nil {
 				go func() {
-					assert.Nil(t, RootCmd.Execute())
+					assert.Nil(t, rootCmd.Execute())
 				}()
 			}
 
@@ -147,7 +149,7 @@ func TestExecute(t *testing.T) {
 					time.Sleep(time.Second)
 				}
 			} else {
-				err := RootCmd.Execute()
+				err := rootCmd.Execute()
 				if c.expectErr {
 					assert.Error(t, err)
 				} else {

@@ -23,7 +23,7 @@ const links = [
     position: 'left'
   },
   {
-    href: 'https://github.com/ory/${githubRepoName}/discussions',
+    href: `https://github.com/ory/${githubRepoName}/discussions`,
     label: 'Discussions',
     position: 'left'
   },

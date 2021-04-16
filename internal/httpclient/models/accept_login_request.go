@@ -57,6 +57,9 @@ type AcceptLoginRequest struct {
 	// Subject is the user ID of the end-user that authenticated.
 	// Required: true
 	Subject *string `json:"subject"`
+
+	// Implies that the request has already been handled.
+	WasHandled bool `json:"was_handled,omitempty"`
 }
 
 // Validate validates this accept login request

@@ -28,6 +28,9 @@ type LogoutRequest struct {
 
 	// Subject is the user for whom the logout was request.
 	Subject string `json:"subject,omitempty"`
+
+	// Implies that the request has already been handled.
+	WasHandled bool `json:"was_handled,omitempty"`
 }
 
 // Validate validates this logout request

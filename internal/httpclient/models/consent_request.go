@@ -66,6 +66,9 @@ type ConsentRequest struct {
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client.
 	Subject string `json:"subject,omitempty"`
+
+	// Implies that the request has already been handled.
+	WasHandled bool `json:"was_handled,omitempty"`
 }
 
 // Validate validates this consent request

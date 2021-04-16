@@ -39,13 +39,13 @@ import (
 
 func TestGetLogoutRequest(t *testing.T) {
 	for k, tc := range []struct {
-		exists bool
-		used   bool
-		status int
+		exists  bool
+		handled bool
+		status  int
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusOK},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
@@ -58,9 +58,9 @@ func TestGetLogoutRequest(t *testing.T) {
 				cl := &client.Client{OutfacingID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
-					Client:  cl,
-					ID:      challenge,
-					WasUsed: tc.used,
+					Client:     cl,
+					ID:         challenge,
+					WasHandled: tc.handled,
 				}))
 			}
 
@@ -86,7 +86,7 @@ func TestGetLoginRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusOK},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
@@ -104,7 +104,7 @@ func TestGetLoginRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasUsed: true})
+					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasHandled: true})
 					require.NoError(t, err)
 				}
 			}
@@ -131,7 +131,7 @@ func TestGetConsentRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusOK},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
@@ -150,8 +150,8 @@ func TestGetConsentRequest(t *testing.T) {
 
 				if tc.handled {
 					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
-						ID:      challenge,
-						WasUsed: true,
+						ID:         challenge,
+						WasHandled: true,
 					})
 					require.NoError(t, err)
 				}

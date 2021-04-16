@@ -935,12 +935,6 @@
               "$ref": "#/definitions/genericError"
             }
           },
-          "409": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
           "500": {
             "description": "genericError",
             "schema": {
@@ -1100,12 +1094,6 @@
             }
           },
           "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "409": {
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
@@ -2153,6 +2141,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2442,6 +2434,10 @@
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
+        },
+        "was_handled": {
+          "description": "Implies that the request has already been handled.",
+          "type": "boolean"
         }
       }
     },
@@ -2552,6 +2548,10 @@
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
+        },
+        "was_handled": {
+          "description": "Implies that the request has already been handled.",
+          "type": "boolean"
         }
       }
     },
@@ -2585,6 +2585,10 @@
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated.",
           "type": "string"
+        },
+        "was_handled": {
+          "description": "Implies that the request has already been handled.",
+          "type": "boolean"
         }
       }
     },
@@ -2650,6 +2654,10 @@
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope\nrequested by the OAuth 2.0 client.",
           "type": "string"
+        },
+        "was_handled": {
+          "description": "Implies that the request has already been handled.",
+          "type": "boolean"
         }
       }
     },
@@ -2797,6 +2805,10 @@
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope\nrequested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type\nwhen accepting the login request, or the request will fail.",
           "type": "string"
+        },
+        "was_handled": {
+          "description": "Implies that the request has already been handled.",
+          "type": "boolean"
         }
       }
     },
@@ -2819,6 +2831,10 @@
         "subject": {
           "description": "Subject is the user for whom the logout was request.",
           "type": "string"
+        },
+        "was_handled": {
+          "description": "Implies that the request has already been handled.",
+          "type": "boolean"
         }
       }
     },

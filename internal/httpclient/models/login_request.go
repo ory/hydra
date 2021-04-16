@@ -63,6 +63,9 @@ type LoginRequest struct {
 	// when accepting the login request, or the request will fail.
 	// Required: true
 	Subject *string `json:"subject"`
+
+	// Implies that the request has already been handled.
+	WasHandled bool `json:"was_handled,omitempty"`
 }
 
 // Validate validates this login request

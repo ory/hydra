@@ -38,6 +38,9 @@ type AcceptConsentRequest struct {
 
 	// session
 	Session *ConsentRequestSession `json:"session,omitempty"`
+
+	// Implies that the request has already been handled.
+	WasHandled bool `json:"was_handled,omitempty"`
 }
 
 // Validate validates this accept consent request

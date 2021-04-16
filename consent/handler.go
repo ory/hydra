@@ -251,7 +251,6 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       200: loginRequest
 //       400: genericError
 //       404: genericError
-//       409: genericError
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -267,11 +266,6 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 	request, err := h.r.ConsentManager().GetLoginRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if request.WasHandled {
-		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Login request has been used already"))
 		return
 	}
 
@@ -476,7 +470,6 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: consentRequest
 //       404: genericError
-//       409: genericError
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -491,10 +484,6 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 	request, err := h.r.ConsentManager().GetConsentRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	if request.WasHandled {
-		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Consent request has been used already"))
 		return
 	}
 
@@ -761,11 +750,6 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 	c, err := h.r.ConsentManager().GetLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if c.WasUsed {
-		h.r.Writer().WriteError(w, r, x.ErrConflict.WithDebug("Logout request has been used already"))
 		return
 	}
 

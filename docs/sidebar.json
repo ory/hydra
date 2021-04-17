@@ -20,6 +20,7 @@
     ]
   },
   {
+  {
     "Guides": [
       {
         "type": "category",
@@ -45,7 +46,7 @@
           "guides/scaling-hydra",
           "guides/cors",
           "guides/gitlab",
-          "guides/migrating-from-MITREid",
+          "guides/migrating-from-mitreid",
           "guides/merge-multiple-db-secrets"
         ]
       },

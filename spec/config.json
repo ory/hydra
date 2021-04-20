@@ -766,6 +766,14 @@
             true
           ]
         },
+        "exclude_not_before_claim": {
+          "type": "boolean",
+          "description": "Set to true if you want to exclude claim `nbf (not before)` part of access token.",
+          "default": false,
+          "examples": [
+            true
+          ]
+        },
         "hashers": {
           "type": "object",
           "additionalProperties": false,

@@ -31,7 +31,8 @@
         "guides/scaling-hydra",
         "guides/cors",
         "guides/gitlab",
-        "guides/migrating-from-MITREid"
+        "guides/migrating-from-MITREid",
+        "guides/merge-multiple-db-secrets"
       ]
     },
     {

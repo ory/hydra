@@ -47,6 +47,45 @@ type swaggerUpdateClientPayload struct {
 	Body Client
 }
 
+// swagger:parameters patchOAuth2Client
+type swaggerPatchClientPayload struct {
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	// required: true
+	Body patchRequest
+}
+
+// A JSONPatch request
+//
+// swagger:model patchRequest
+type patchRequest []patchDocument
+
+// A JSONPatch document as defined by RFC 6902
+//
+// swagger:model patchDocument
+type patchDocument struct {
+	// The operation to be performed
+	//
+	// required: true
+	// example: "replace"
+	Op string `json:"op"`
+
+	// A JSON-pointer
+	//
+	// required: true
+	// example: "/name"
+	Path string `json:"path"`
+
+	// The value to be used within the operations
+	Value interface{} `json:"value"`
+
+	// A JSON-pointer
+	From string `json:"from"`
+}
+
 // swagger:parameters listOAuth2Clients
 type swaggerListClientsParameter struct {
 	// The maximum amount of policies returned, upper bound is 500 policies

@@ -26,6 +26,9 @@ type LogoutRequest struct {
 
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
 	RpInitiated bool `json:"rp_initiated,omitempty"`
+	
+	// client, only set if rp_initiated
+	Client *OAuth2Client `json:"client,omitempty"`
 
 	// SessionID is the login session ID that was requested to log out.
 	Sid string `json:"sid,omitempty"`

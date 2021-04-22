@@ -251,6 +251,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       200: loginRequest
 //       400: genericError
 //       404: genericError
+//       409: requestWasHandledResponse
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -267,6 +268,11 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
+	}
+	if request.WasHandled {
+		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
+			RedirectTo: request.RequestURL,
+		})
 	}
 
 	request.Client = sanitizeClient(request.Client)
@@ -470,6 +476,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: consentRequest
 //       404: genericError
+//       409: requestWasHandledResponse
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -485,6 +492,11 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
+	}
+	if request.WasHandled {
+		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
+			RedirectTo: request.RequestURL,
+		})
 	}
 
 	if request.RequestedScope == nil {
@@ -740,6 +752,7 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //     Responses:
 //       200: logoutRequest
 //       404: genericError
+//       409: requestWasHandledResponse
 //       500: genericError
 func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -747,11 +760,16 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 		r.URL.Query().Get("challenge"),
 	)
 
-	c, err := h.r.ConsentManager().GetLogoutRequest(r.Context(), challenge)
+	request, err := h.r.ConsentManager().GetLogoutRequest(r.Context(), challenge)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	if request.WasHandled {
+		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
+			RedirectTo: request.RequestURL,
+		})
+	}
 
-	h.r.Writer().Write(w, r, c)
+	h.r.Writer().Write(w, r, request)
 }

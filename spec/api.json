@@ -935,6 +935,12 @@
               "$ref": "#/definitions/genericError"
             }
           },
+          "409": {
+            "description": "requestWasHandledResponse",
+            "schema": {
+              "$ref": "#/definitions/requestWasHandledResponse"
+            }
+          },
           "500": {
             "description": "genericError",
             "schema": {
@@ -1097,6 +1103,12 @@
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
+            }
+          },
+          "409": {
+            "description": "requestWasHandledResponse",
+            "schema": {
+              "$ref": "#/definitions/requestWasHandledResponse"
             }
           },
           "500": {
@@ -1276,6 +1288,12 @@
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
+            }
+          },
+          "409": {
+            "description": "requestWasHandledResponse",
+            "schema": {
+              "$ref": "#/definitions/requestWasHandledResponse"
             }
           },
           "500": {
@@ -2430,10 +2448,6 @@
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
-        },
-        "was_handled": {
-          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
-          "type": "boolean"
         }
       }
     },
@@ -2487,7 +2501,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -2544,10 +2558,6 @@
         },
         "session": {
           "$ref": "#/definitions/consentRequestSession"
-        },
-        "was_handled": {
-          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
-          "type": "boolean"
         }
       }
     },
@@ -2581,10 +2591,6 @@
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated.",
           "type": "string"
-        },
-        "was_handled": {
-          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
-          "type": "boolean"
         }
       }
     },
@@ -2650,10 +2656,6 @@
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope\nrequested by the OAuth 2.0 client.",
           "type": "string"
-        },
-        "was_handled": {
-          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
-          "type": "boolean"
         }
       }
     },
@@ -2801,10 +2803,6 @@
         "subject": {
           "description": "Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope\nrequested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type\nwhen accepting the login request, or the request will fail.",
           "type": "string"
-        },
-        "was_handled": {
-          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
-          "type": "boolean"
         }
       }
     },
@@ -2827,10 +2825,6 @@
         "subject": {
           "description": "Subject is the user for whom the logout was request.",
           "type": "string"
-        },
-        "was_handled": {
-          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
-          "type": "boolean"
         }
       }
     },
@@ -3156,6 +3150,19 @@
           "description": "Represents the HTTP status code of the error (e.g. 401 or 403)\n\nDefaults to 400",
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "requestWasHandledResponse": {
+      "type": "object",
+      "title": "The response payload sent when there is an attempt to access already handled request.",
+      "required": [
+        "redirect_to"
+      ],
+      "properties": {
+        "redirect_to": {
+          "description": "Original request URL to which you should redirect the user if request was already handled.",
+          "type": "string"
         }
       }
     },

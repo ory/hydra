@@ -28,12 +28,6 @@ type LogoutRequest struct {
 
 	// Subject is the user for whom the logout was request.
 	Subject string `json:"subject,omitempty"`
-
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"was_handled,omitempty"`
 }
 
 // Validate validates this logout request

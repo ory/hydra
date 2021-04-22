@@ -35,6 +35,12 @@ func (o *GetConsentRequestReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
+	case 409:
+		result := NewGetConsentRequestConflict()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewGetConsentRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -101,6 +107,38 @@ func (o *GetConsentRequestNotFound) GetPayload() *models.GenericError {
 func (o *GetConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetConsentRequestConflict creates a GetConsentRequestConflict with default headers values
+func NewGetConsentRequestConflict() *GetConsentRequestConflict {
+	return &GetConsentRequestConflict{}
+}
+
+/* GetConsentRequestConflict describes a response with status code 409, with default header values.
+
+requestWasHandledResponse
+*/
+type GetConsentRequestConflict struct {
+	Payload *models.RequestWasHandledResponse
+}
+
+func (o *GetConsentRequestConflict) Error() string {
+	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestConflict  %+v", 409, o.Payload)
+}
+func (o *GetConsentRequestConflict) GetPayload() *models.RequestWasHandledResponse {
+	return o.Payload
+}
+
+func (o *GetConsentRequestConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.RequestWasHandledResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

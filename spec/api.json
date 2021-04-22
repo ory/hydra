@@ -2141,10 +2141,6 @@
         "Types"
       ],
       "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2436,7 +2432,7 @@
           "$ref": "#/definitions/consentRequestSession"
         },
         "was_handled": {
-          "description": "Implies that the request has already been handled.",
+          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
           "type": "boolean"
         }
       }
@@ -2550,7 +2546,7 @@
           "$ref": "#/definitions/consentRequestSession"
         },
         "was_handled": {
-          "description": "Implies that the request has already been handled.",
+          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
           "type": "boolean"
         }
       }
@@ -2587,7 +2583,7 @@
           "type": "string"
         },
         "was_handled": {
-          "description": "Implies that the request has already been handled.",
+          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
           "type": "boolean"
         }
       }
@@ -2656,7 +2652,7 @@
           "type": "string"
         },
         "was_handled": {
-          "description": "Implies that the request has already been handled.",
+          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
           "type": "boolean"
         }
       }
@@ -2807,7 +2803,7 @@
           "type": "string"
         },
         "was_handled": {
-          "description": "Implies that the request has already been handled.",
+          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
           "type": "boolean"
         }
       }
@@ -2833,7 +2829,7 @@
           "type": "string"
         },
         "was_handled": {
-          "description": "Implies that the request has already been handled.",
+          "description": "If set to true means that the request was already handled. This\ncan happen on form double-submit or other errors. If this is set\nwe recommend redirecting the user to `request_url` to re-initiate\nthe flow.",
           "type": "boolean"
         }
       }

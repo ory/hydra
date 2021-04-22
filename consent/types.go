@@ -178,7 +178,10 @@ type HandledConsentRequest struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled" db:"was_used"`
 
 	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
@@ -252,7 +255,10 @@ type PreviousConsentSession struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled" db:"was_used"`
 
 	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
@@ -313,7 +319,10 @@ type HandledLoginRequest struct {
 	// data.
 	Context sqlxx.JSONRawMessage `json:"context" db:"context"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled" db:"was_used"`
 
 	LoginRequest    *LoginRequest       `json:"-" db:"-"`
@@ -418,7 +427,10 @@ type LogoutRequest struct {
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
 	RPInitiated bool `json:"rp_initiated" db:"rp_initiated"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled" db:"was_used"`
 
 	Verifier              string         `json:"-" db:"verifier"`
@@ -518,7 +530,10 @@ type LoginRequest struct {
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	SessionID sqlxx.NullString `json:"session_id" db:"login_session_id"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled" db:"was_handled,r"`
 
 	ForceSubjectIdentifier string `json:"-" db:"-"` // this is here but has no meaning apart from sql_helper working properly.
@@ -606,7 +621,10 @@ type ConsentRequest struct {
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
 	Context sqlxx.JSONRawMessage `json:"context,omitempty" db:"context"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled" db:"was_handled,r"`
 
 	// ForceSubjectIdentifier is the value from authentication (if set).

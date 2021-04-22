@@ -67,7 +67,10 @@ type ConsentRequest struct {
 	// requested by the OAuth 2.0 client.
 	Subject string `json:"subject,omitempty"`
 
-	// Implies that the request has already been handled.
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
 	WasHandled bool `json:"was_handled,omitempty"`
 }
 

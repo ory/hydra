@@ -433,6 +433,8 @@ tracing:
       local_agent_address: 127.0.0.1:6831
       # The tracing header format
       propagation: jaeger
+      # The maximum length of jaeger tag value
+      max_tag_value_length: 1024
       sampling:
         # The type of the sampler you want to use. Supports:
         # - const

@@ -239,7 +239,10 @@ func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 
 func (m *RegistryBase) CookieStore() sessions.Store {
 	if m.cs == nil {
-		m.cs = sessions.NewCookieStore(m.C.GetCookieSecrets()...)
+		cs := sessions.NewCookieStore(m.C.GetCookieSecrets()...)
+		cs.MaxAge(0)
+
+		m.cs = cs
 		m.csPrev = m.C.GetCookieSecrets()
 	}
 	return m.cs

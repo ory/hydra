@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"github.com/julienschmidt/httprouter"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
@@ -83,14 +82,6 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 		return h
 	})
 	testServer := httptest.NewServer(router)
-	w := httptest.NewRecorder()
-	r, _ := http.NewRequest(http.MethodPut, "https://127.0.0.1:4445/keys/setName", nil)
-	param := httprouter.Param{
-		Key:   "set",
-		Value: "KeyId",
-	}
-	params := httprouter.Params{param}
-	h.UpdateKey(w, r, params)
 
 	cmd := cobra.Command{
 		Use: "key",
@@ -101,8 +92,11 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 	cmd.Flags().String("endpoint", "", "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
 	cmd.Flags().Bool("skip-tls-verify", true, "Foolishly accept TLS certificates signed by unknown certificate authorities")
 	os.Setenv("HYDRA_URL", testServer.URL)
+	t.Run("tt.name", func(t *testing.T) {
+		NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
+		//running again to make sure the row in storage is not deleted
+		NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
 
-	NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
-	//running again to make sure the row in storage is not deleted
-	NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
+	})
+
 }

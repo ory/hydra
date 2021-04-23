@@ -35,6 +35,12 @@ func (o *GetLogoutRequestReader) ReadResponse(response runtime.ClientResponse, c
 			return nil, err
 		}
 		return nil, result
+	case 410:
+		result := NewGetLogoutRequestGone()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 500:
 		result := NewGetLogoutRequestInternalServerError()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -101,6 +107,38 @@ func (o *GetLogoutRequestNotFound) GetPayload() *models.GenericError {
 func (o *GetLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.GenericError)
+
+	// response payload
+	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewGetLogoutRequestGone creates a GetLogoutRequestGone with default headers values
+func NewGetLogoutRequestGone() *GetLogoutRequestGone {
+	return &GetLogoutRequestGone{}
+}
+
+/* GetLogoutRequestGone describes a response with status code 410, with default header values.
+
+requestWasHandledResponse
+*/
+type GetLogoutRequestGone struct {
+	Payload *models.RequestWasHandledResponse
+}
+
+func (o *GetLogoutRequestGone) Error() string {
+	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestGone  %+v", 410, o.Payload)
+}
+func (o *GetLogoutRequestGone) GetPayload() *models.RequestWasHandledResponse {
+	return o.Payload
+}
+
+func (o *GetLogoutRequestGone) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	o.Payload = new(models.RequestWasHandledResponse)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

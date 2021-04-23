@@ -1334,6 +1334,20 @@ tracing:
       #
       propagation: jaeger
 
+      ## max_tag_value_length ##
+      #
+      # The value passed to the max tag value length that has been configured.
+      #
+      # Minimum value: 0
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export TRACING_PROVIDERS_JAEGER_MAX_TAG_VALUE_LENGTH=<value>
+      # - Windows Command Line (CMD):
+      #    > set TRACING_PROVIDERS_JAEGER_MAX_TAG_VALUE_LENGTH=<value>
+      #
+      max_tag_value_length: 0
+
       ## sampling ##
       #
       # Examples:

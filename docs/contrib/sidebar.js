@@ -38,12 +38,12 @@ const toHref = (slug, node) => {
 
   let res = request(
     'GET',
-    `https://raw.githubusercontent.com/ory/${slug}/new-doc-nav/docs/docs/${node}.mdx`
+    `https://raw.githubusercontent.com/ory/${slug}/master/docs/docs/${node}.mdx`
   )
   if (res.statusCode === 404) {
     res = request(
       'GET',
-      `https://raw.githubusercontent.com/ory/${slug}/new-doc-nav/docs/docs/${node}.md`
+      `https://raw.githubusercontent.com/ory/${slug}/master/docs/docs/${node}.md`
     )
   }
 
@@ -66,7 +66,7 @@ const resolveRefs = (node) => {
 
       const res = request(
         'GET',
-        `https://raw.githubusercontent.com/ory/${slug}/new-doc-nav/docs/sidebar.json`
+        `https://raw.githubusercontent.com/ory/${slug}/master/docs/sidebar.json`
       )
       const items = JSON.parse(res.getBody().toString())
 

@@ -3,11 +3,10 @@ package cli
 import (
 	"context"
 	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/josex"
 	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -72,12 +71,9 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
 	router := x.NewRouterPublic()
-	var testGenerator = &jwk.RS256Generator{}
-	IDKS, _ := testGenerator.Generate("test-id", "sig")
 
 	h := reg.KeyHandler()
-	require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
-
+	m := reg.KeyManager()
 	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 		return h
 	})
@@ -92,11 +88,12 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 	cmd.Flags().String("endpoint", "", "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
 	cmd.Flags().Bool("skip-tls-verify", true, "Foolishly accept TLS certificates signed by unknown certificate authorities")
 	os.Setenv("HYDRA_URL", testServer.URL)
-	t.Run("tt.name", func(t *testing.T) {
+	t.Run("Test_ImportKeys/Run_multiple_time_With_same_Values", func(t *testing.T) {
 		NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
-		//running again to make sure the row in storage is not deleted
+		//running again to make sure the row in storage is not deleted issue: #2436
 		NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
-
+		v, _ := m.GetKeySet(context.TODO(), "setName")
+		assert.NotEmpty(t, v.Keys[0])
 	})
 
 }

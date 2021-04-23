@@ -35,8 +35,8 @@ func (o *GetLogoutRequestReader) ReadResponse(response runtime.ClientResponse, c
 			return nil, err
 		}
 		return nil, result
-	case 409:
-		result := NewGetLogoutRequestConflict()
+	case 410:
+		result := NewGetLogoutRequestGone()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -116,27 +116,27 @@ func (o *GetLogoutRequestNotFound) readResponse(response runtime.ClientResponse,
 	return nil
 }
 
-// NewGetLogoutRequestConflict creates a GetLogoutRequestConflict with default headers values
-func NewGetLogoutRequestConflict() *GetLogoutRequestConflict {
-	return &GetLogoutRequestConflict{}
+// NewGetLogoutRequestGone creates a GetLogoutRequestGone with default headers values
+func NewGetLogoutRequestGone() *GetLogoutRequestGone {
+	return &GetLogoutRequestGone{}
 }
 
-/* GetLogoutRequestConflict describes a response with status code 409, with default header values.
+/* GetLogoutRequestGone describes a response with status code 410, with default header values.
 
 requestWasHandledResponse
 */
-type GetLogoutRequestConflict struct {
+type GetLogoutRequestGone struct {
 	Payload *models.RequestWasHandledResponse
 }
 
-func (o *GetLogoutRequestConflict) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestConflict  %+v", 409, o.Payload)
+func (o *GetLogoutRequestGone) Error() string {
+	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestGone  %+v", 410, o.Payload)
 }
-func (o *GetLogoutRequestConflict) GetPayload() *models.RequestWasHandledResponse {
+func (o *GetLogoutRequestGone) GetPayload() *models.RequestWasHandledResponse {
 	return o.Payload
 }
 
-func (o *GetLogoutRequestConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *GetLogoutRequestGone) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.RequestWasHandledResponse)
 

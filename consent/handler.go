@@ -251,7 +251,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //       200: loginRequest
 //       400: genericError
 //       404: genericError
-//       409: requestWasHandledResponse
+//       410: requestWasHandledResponse
 //       500: genericError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -270,7 +270,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{
 			RedirectTo: request.RequestURL,
 		})
 	}
@@ -476,7 +476,7 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: consentRequest
 //       404: genericError
-//       409: requestWasHandledResponse
+//       410: requestWasHandledResponse
 //       500: genericError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -494,7 +494,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{
 			RedirectTo: request.RequestURL,
 		})
 	}
@@ -752,7 +752,7 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //     Responses:
 //       200: logoutRequest
 //       404: genericError
-//       409: requestWasHandledResponse
+//       410: requestWasHandledResponse
 //       500: genericError
 func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
@@ -766,7 +766,7 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 		return
 	}
 	if request.WasHandled {
-		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
+		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{
 			RedirectTo: request.RequestURL,
 		})
 	}

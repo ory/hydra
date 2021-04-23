@@ -45,7 +45,7 @@ func TestGetLogoutRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
@@ -86,7 +86,7 @@ func TestGetLoginRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
@@ -131,7 +131,7 @@ func TestGetConsentRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)

@@ -35,8 +35,8 @@ func (o *GetConsentRequestReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
-	case 409:
-		result := NewGetConsentRequestConflict()
+	case 410:
+		result := NewGetConsentRequestGone()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
@@ -116,27 +116,27 @@ func (o *GetConsentRequestNotFound) readResponse(response runtime.ClientResponse
 	return nil
 }
 
-// NewGetConsentRequestConflict creates a GetConsentRequestConflict with default headers values
-func NewGetConsentRequestConflict() *GetConsentRequestConflict {
-	return &GetConsentRequestConflict{}
+// NewGetConsentRequestGone creates a GetConsentRequestGone with default headers values
+func NewGetConsentRequestGone() *GetConsentRequestGone {
+	return &GetConsentRequestGone{}
 }
 
-/* GetConsentRequestConflict describes a response with status code 409, with default header values.
+/* GetConsentRequestGone describes a response with status code 410, with default header values.
 
 requestWasHandledResponse
 */
-type GetConsentRequestConflict struct {
+type GetConsentRequestGone struct {
 	Payload *models.RequestWasHandledResponse
 }
 
-func (o *GetConsentRequestConflict) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestConflict  %+v", 409, o.Payload)
+func (o *GetConsentRequestGone) Error() string {
+	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestGone  %+v", 410, o.Payload)
 }
-func (o *GetConsentRequestConflict) GetPayload() *models.RequestWasHandledResponse {
+func (o *GetConsentRequestGone) GetPayload() *models.RequestWasHandledResponse {
 	return o.Payload
 }
 
-func (o *GetConsentRequestConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *GetConsentRequestGone) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.RequestWasHandledResponse)
 

@@ -1,9 +1,18 @@
 package cli
 
 import (
-	"testing"
-
+	"context"
+	"github.com/julienschmidt/httprouter"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/josex"
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/require"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"testing"
 )
 
 func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
@@ -20,7 +29,7 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 		-----BEGIN PUBLIC KEY-----
 		MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPf64dykufSkwnvUiBAwd5Si0K6t4m5i
 		qJD8TmLJCmFjKaOUa6nszcFt/FkAuORfdlrD9mEZLPrPx74RSluyTBMCAwEAAQ==
-		-----END PUBLIC KEY-----		
+		-----END PUBLIC KEY-----
 	`)
 
 	type args struct {
@@ -60,4 +69,40 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 			}
 		})
 	}
+
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistryMemory(t, conf)
+	router := x.NewRouterPublic()
+	var testGenerator = &jwk.RS256Generator{}
+	IDKS, _ := testGenerator.Generate("test-id", "sig")
+
+	h := reg.KeyHandler()
+	require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
+
+	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+		return h
+	})
+	testServer := httptest.NewServer(router)
+	w := httptest.NewRecorder()
+	r, _ := http.NewRequest(http.MethodPut, "https://127.0.0.1:4445/keys/setName", nil)
+	param := httprouter.Param{
+		Key:   "set",
+		Value: "KeyId",
+	}
+	params := httprouter.Params{param}
+	h.UpdateKey(w, r, params)
+
+	cmd := cobra.Command{
+		Use: "key",
+	}
+	cmd.Flags().String("use", "sig", "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
+	cmd.Flags().Bool("fake-tls-termination", false, "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
+	cmd.Flags().String("access-token", "", "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
+	cmd.Flags().String("endpoint", "", "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
+	cmd.Flags().Bool("skip-tls-verify", true, "Foolishly accept TLS certificates signed by unknown certificate authorities")
+	os.Setenv("HYDRA_URL", testServer.URL)
+
+	NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
+	//running again to make sure the row in storage is not deleted
+	NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
 }

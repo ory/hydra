@@ -48,14 +48,14 @@ type tlsRegistry interface {
 }
 
 type tlsConfig interface {
-	AllowTLSTerminationFrom() []string
-	ServesHTTPS() bool
+	Strict() bool
+	AllowTerminationFrom() []string
 }
 
 func RejectInsecureRequests(reg tlsRegistry, c tlsConfig) negroni.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		if r.TLS != nil ||
-			!c.ServesHTTPS() ||
+			!c.Strict() ||
 			r.URL.Path == healthx.AliveCheckPath ||
 			r.URL.Path == healthx.ReadyCheckPath ||
 			r.URL.Path == prometheus.MetricsPrometheusPath {
@@ -63,13 +63,13 @@ func RejectInsecureRequests(reg tlsRegistry, c tlsConfig) negroni.HandlerFunc {
 			return
 		}
 
-		if len(c.AllowTLSTerminationFrom()) == 0 {
+		if len(c.AllowTerminationFrom()) == 0 {
 			reg.Logger().WithRequest(r).WithError(errors.New("TLS termination is not enabled")).Error("Could not serve http connection")
 			reg.Writer().WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("can not serve request over insecure http"))
 			return
 		}
 
-		ranges := c.AllowTLSTerminationFrom()
+		ranges := c.AllowTerminationFrom()
 		if err := MatchesRange(r, ranges); err != nil {
 			reg.Logger().WithRequest(r).WithError(err).Warnln("Could not serve http connection")
 			reg.Writer().WriteErrorCode(rw, r, http.StatusBadGateway, errors.New("can not serve request over insecure http"))

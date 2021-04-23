@@ -158,6 +158,21 @@
         }
       }
     },
+    "cidr": {
+      "description": "CIDR address range.",
+      "type": "string",
+      "oneOf": [
+        {
+          "pattern": "^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$"
+        },
+        {
+          "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[1-2][0-9]|3[0-2])$"
+        }
+      ],
+      "examples": [
+        "127.0.0.1/32"
+      ]
+    },
     "pem_file": {
       "type": "object",
       "oneOf": [
@@ -201,6 +216,41 @@
       "examples": [
         "1h"
       ]
+    },
+    "tls_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
+      "properties": {
+        "strict": {
+          "type": "boolean",
+          "description": "Disallow any plaintext (HTTP) traffic and force HTTPS.",
+          "default": true
+        },
+        "key": {
+          "description": "Configures the private key (pem encoded).",
+          "allOf": [
+            {
+              "$ref": "#/definitions/pem_file"
+            }
+          ]
+        },
+        "cert": {
+          "description": "Configures the private key (pem encoded).",
+          "allOf": [
+            {
+              "$ref": "#/definitions/pem_file"
+            }
+          ]
+        },
+        "allow_termination_from": {
+          "type": "array",
+          "description": "Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections. Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but your proxy / gateway / load balancer. Supports ipv4 and ipv6. Hydra serves http instead of https when this option is set.",
+          "items": {
+            "$ref": "#/definitions/cidr"
+          }
+        }
+      }
     }
   },
   "properties": {
@@ -284,6 +334,9 @@
                   "default": false
                 }
               }
+            },
+            "tls": {
+              "$ref": "#/definitions/tls_config"
             }
           }
         },
@@ -325,49 +378,20 @@
                   "default": false
                 }
               }
+            },
+            "tls": {
+              "$ref": "#/definitions/tls_config",
+              "properties": {
+                "strict": {
+                  "type": "boolean",
+                  "default": false
+                }
+              }
             }
           }
         },
         "tls": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
-          "properties": {
-            "key": {
-              "description": "Configures the private key (pem encoded).",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/pem_file"
-                }
-              ]
-            },
-            "cert": {
-              "description": "Configures the private key (pem encoded).",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/pem_file"
-                }
-              ]
-            },
-            "allow_termination_from": {
-              "type": "array",
-              "description": "Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections. Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but your proxy / gateway / load balancer. Supports ipv4 and ipv6. Hydra serves http instead of https when this option is set.",
-              "items": {
-                "type": "string",
-                "oneOf": [
-                  {
-                    "pattern": "^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$"
-                  },
-                  {
-                    "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[1-2][0-9]|3[0-2])$"
-                  }
-                ],
-                "examples": [
-                  "127.0.0.1/32"
-                ]
-              }
-            }
-          }
+          "$ref": "#/definitions/tls_config"
         },
         "cookies": {
           "type": "object",
@@ -1043,7 +1067,7 @@
       "additionalProperties": true,
       "description": "Software Quality Assurance telemetry configuration section",
       "properties": {
-        "opt_out" : {
+        "opt_out": {
           "type": "boolean",
           "description": "Disables anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa",
           "default": false,

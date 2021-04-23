@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -13,8 +12,6 @@ import (
 	"github.com/ory/hydra/spec"
 
 	"github.com/ory/x/configx"
-
-	"github.com/rs/cors"
 
 	"github.com/ory/x/logrusx"
 
@@ -26,6 +23,7 @@ import (
 )
 
 const (
+	KeyRoot                                      = ""
 	KeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
 	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
@@ -39,18 +37,6 @@ const (
 	KeyDSN                                       = "dsn"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
 	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
-	KeyAdminListenOnHost                         = "serve.admin.host"
-	KeyAdminListenOnPort                         = "serve.admin.port"
-	KeyAdminSocketOwner                          = "serve.admin.socket.owner"
-	KeyAdminSocketGroup                          = "serve.admin.socket.group"
-	KeyAdminSocketMode                           = "serve.admin.socket.mode"
-	KeyAdminDisableHealthAccessLog               = "serve.admin.access_log.disable_for_health"
-	KeyPublicListenOnHost                        = "serve.public.host"
-	KeyPublicListenOnPort                        = "serve.public.port"
-	KeyPublicSocketOwner                         = "serve.public.socket.owner"
-	KeyPublicSocketGroup                         = "serve.public.socket.group"
-	KeyPublicSocketMode                          = "serve.public.socket.mode"
-	KeyPublicDisableHealthAccessLog              = "serve.public.access_log.disable_for_health"
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
@@ -68,7 +54,6 @@ const (
 	KeyErrorURL                                  = "urls.error"
 	KeyPublicURL                                 = "urls.self.public"
 	KeyIssuerURL                                 = "urls.self.issuer"
-	KeyAllowTLSTerminationFrom                   = "serve.tls.allow_termination_from"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
@@ -128,41 +113,6 @@ func (p *Provider) Source() *configx.Provider {
 	return p.p
 }
 
-func (p *Provider) cors(prefix string) (cors.Options, bool) {
-	return p.p.CORS(prefix, cors.Options{
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		ExposedHeaders:   []string{"Content-Type"},
-		AllowCredentials: true,
-	})
-}
-
-func (p *Provider) CORS(iface string) (cors.Options, bool) {
-	switch iface {
-	case "admin":
-		return p.AdminCORS()
-	case "public":
-		return p.PublicCORS()
-	default:
-		panic(fmt.Sprintf("Received unexpected CORS interface: %s", iface))
-	}
-}
-
-func (p *Provider) PublicCORS() (cors.Options, bool) {
-	return p.cors("serve.public")
-}
-
-func (p *Provider) AdminCORS() (cors.Options, bool) {
-	return p.cors("serve.admin")
-}
-
-func (p *Provider) getAddress(address string, port int) string {
-	if strings.HasPrefix(address, "unix:") {
-		return address
-	}
-	return fmt.Sprintf("%s:%d", address, port)
-}
-
 func (p *Provider) InsecureRedirects() []string {
 	return p.p.Strings("dangerous-allow-insecure-redirect-urls")
 }
@@ -174,10 +124,6 @@ func (p *Provider) WellKnownKeys(include ...string) []string {
 
 	include = append(include, x.OpenIDConnectKeyName)
 	return stringslice.Unique(append(p.p.Strings(KeyWellKnownKeys), include...))
-}
-
-func (p *Provider) ServesHTTPS() bool {
-	return !p.forcedHTTP()
 }
 
 func (p *Provider) IsUsingJWTAsAccessTokens() bool {
@@ -250,60 +196,6 @@ func (p *Provider) BCryptCost() int {
 	return p.p.IntF(KeyBCryptCost, 10)
 }
 
-func (p *Provider) AdminListenOn() string {
-	host := p.p.String(KeyAdminListenOnHost)
-	port := p.p.IntF(KeyAdminListenOnPort, 4445)
-	return p.getAddress(host, port)
-}
-
-func (p *Provider) AdminDisableHealthAccessLog() bool {
-	return p.p.Bool(KeyAdminDisableHealthAccessLog)
-}
-
-func (p *Provider) PublicListenOn() string {
-	return p.getAddress(p.publicHost(), p.publicPort())
-}
-
-func (p *Provider) PublicDisableHealthAccessLog() bool {
-	return p.p.Bool(KeyPublicDisableHealthAccessLog)
-}
-
-func (p *Provider) publicHost() string {
-	return p.p.String(KeyPublicListenOnHost)
-}
-
-func (p *Provider) publicPort() int {
-	return p.p.IntF(KeyPublicListenOnPort, 4444)
-}
-
-func (p *Provider) PublicSocketPermission() *UnixPermission {
-	return &UnixPermission{
-		Owner: p.p.String(KeyPublicSocketOwner),
-		Group: p.p.String(KeyPublicSocketGroup),
-		Mode:  os.FileMode(p.p.IntF(KeyPublicSocketMode, 0755)),
-	}
-}
-
-func (p *Provider) adminHost() string {
-	return p.p.String(KeyAdminListenOnHost)
-}
-
-func (p *Provider) adminPort() int {
-	return p.p.IntF(KeyAdminListenOnPort, 4445)
-}
-
-func (p *Provider) AdminSocketPermission() *UnixPermission {
-	return &UnixPermission{
-		Owner: p.p.String(KeyAdminSocketOwner),
-		Group: p.p.String(KeyAdminSocketGroup),
-		Mode:  os.FileMode(p.p.IntF(KeyAdminSocketMode, 0755)),
-	}
-}
-
-func (p *Provider) forcedHTTP() bool {
-	return p.p.Bool("dangerous-force-http")
-}
-
 func (p *Provider) CookieSameSiteMode() http.SameSite {
 	sameSiteModeStr := p.p.String(KeyCookieSameSiteMode)
 	switch strings.ToLower(sameSiteModeStr) {
@@ -312,12 +204,12 @@ func (p *Provider) CookieSameSiteMode() http.SameSite {
 	case "strict":
 		return http.SameSiteStrictMode
 	case "none":
-		if p.forcedHTTP() {
+		if tls := p.TLS(PublicInterface); !tls.Strict() {
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteNoneMode
 	default:
-		if p.forcedHTTP() {
+		if tls := p.TLS(PublicInterface); !tls.Strict() {
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteDefaultMode
@@ -416,24 +308,18 @@ func (p *Provider) LogoutRedirectURL() *url.URL {
 	return urlRoot(p.p.RequestURIF(KeyLogoutRedirectURL, p.publicFallbackURL("oauth2/fallbacks/logout/callback")))
 }
 
-func (p *Provider) adminFallbackURL(path string) *url.URL {
-	return p.fallbackURL(path, p.adminHost(), p.adminPort())
-
-}
-
 func (p *Provider) publicFallbackURL(path string) *url.URL {
 	if len(p.PublicURL().String()) > 0 {
 		return urlx.AppendPaths(p.PublicURL(), path)
 	}
-
-	return p.fallbackURL(path, p.publicHost(), p.publicPort())
+	return p.fallbackURL(path, p.host(PublicInterface), p.port(PublicInterface))
 }
 
 func (p *Provider) fallbackURL(path string, host string, port int) *url.URL {
 	var u url.URL
-	u.Scheme = "https"
-	if !p.ServesHTTPS() {
-		u.Scheme = "http"
+	u.Scheme = "http"
+	if tls := p.TLS(PublicInterface); tls.Strict() {
+		u.Scheme = "https"
 	}
 	if host == "" {
 		u.Host = fmt.Sprintf("%s:%d", "localhost", port)
@@ -463,7 +349,7 @@ func (p *Provider) PublicURL() *url.URL {
 }
 
 func (p *Provider) IssuerURL() *url.URL {
-	issuerURL := p.p.RequestURIF(KeyIssuerURL, p.fallbackURL("/", p.publicHost(), p.publicPort()))
+	issuerURL := p.p.RequestURIF(KeyIssuerURL, p.fallbackURL("/", p.host(PublicInterface), p.port(PublicInterface)))
 	issuerURL.Path = strings.TrimRight(issuerURL.Path, "/") + "/"
 	return urlRoot(issuerURL)
 }
@@ -482,10 +368,6 @@ func (p *Provider) OAuth2AuthURL() *url.URL {
 
 func (p *Provider) JWKSURL() *url.URL {
 	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
-}
-
-func (p *Provider) AllowTLSTerminationFrom() []string {
-	return p.p.Strings(KeyAllowTLSTerminationFrom)
 }
 
 func (p *Provider) AccessTokenStrategy() string {

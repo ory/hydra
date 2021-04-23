@@ -110,7 +110,7 @@ func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) ht
 	}
 
 	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.Config().ServesHTTPS(), CookieAuthenticationName))
+	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.Config().TLS(config.PublicInterface).Strict(), CookieAuthenticationName))
 
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	cookie.Options.HttpOnly = true

@@ -115,12 +115,12 @@ and success, unless if the --no-shutdown flag is provided.`,
 			noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
 
 			clientID := flagx.MustGetString(cmd, "client-id")
-			clientSecret := flagx.MustGetString(cmd, "client-secret")
-			if clientID == "" || clientSecret == "" {
+			if clientID == "" {
 				fmt.Print(cmd.UsageString())
-				fmt.Println("Please provide a Client ID and Client Secret using flags --client-id and --client-secret, or environment variables OAUTH2_CLIENT_ID and OAUTH2_CLIENT_SECRET.")
+				fmt.Println("Please provide a Client ID using --client-id flag, or OAUTH2_CLIENT_ID environment variable.")
 				return
 			}
+			clientSecret := flagx.MustGetString(cmd, "client-secret")
 
 			proto := "http"
 			if isSSL {

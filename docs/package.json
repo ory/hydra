@@ -19,21 +19,23 @@
     "format:check": "prettier --check ${npm_package_config_prettierTarget}"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-alpha.72",
-    "@docusaurus/plugin-content-docs": "2.0.0-alpha.72",
-    "@docusaurus/plugin-content-pages": "2.0.0-alpha.72",
-    "@docusaurus/plugin-sitemap": "2.0.0-alpha.72",
-    "@docusaurus/theme-classic": "2.0.0-alpha.72",
-    "@docusaurus/theme-search-algolia": "2.0.0-alpha.72",
-    "classnames": "2.2.6",
-    "file-loader": "^6.1.0",
+    "@docusaurus/core": "2.0.0-alpha.73",
+    "@docusaurus/plugin-content-docs": "2.0.0-alpha.73",
+    "@docusaurus/plugin-content-pages": "2.0.0-alpha.73",
+    "@docusaurus/plugin-sitemap": "2.0.0-alpha.73",
+    "@docusaurus/theme-classic": "2.0.0-alpha.73",
+    "@docusaurus/theme-search-algolia": "2.0.0-alpha.73",
+    "classnames": "2.3.1",
+    "file-loader": "6.2.0",
     "mermaid": "8.9.2",
-    "node-fetch": "^2.6.1",
-    "prism-react-renderer": "^1.1.1",
-    "prismjs": "^1.22.0",
+    "node-fetch": "2.6.1",
+    "parser-front-matter": "1.6.4",
+    "prism-react-renderer": "1.2.0",
+    "prismjs": "1.23.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "url-loader": "^4.1.0"
+    "sync-request": "6.1.0",
+    "url-loader": "4.1.1"
   },
   "browserslist": {
     "production": [
@@ -50,7 +52,7 @@
   "devDependencies": {
     "json-schema-faker": "0.5.0-rcv.34",
     "json-schema-ref-parser": "8.0.0",
-    "ory-prettier-styles": "^1.1.1",
+    "ory-prettier-styles": "1.1.2",
     "prettier": "2.2.1",
     "ramda": "0.27.1",
     "raw-loader": "4.0.2",

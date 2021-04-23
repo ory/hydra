@@ -46,12 +46,12 @@ require (
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/cli v0.0.48
+	github.com/ory/cli v0.0.49
 	github.com/ory/fosite v0.39.0
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.3
-	github.com/ory/x v0.0.212
+	github.com/ory/x v0.0.219
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1

@@ -308,6 +308,7 @@ func TestViperProviderValidates(t *testing.T) {
 			SamplerValue:       1,
 			SamplerServerURL:   "http://sampling",
 			Propagation:        "jaeger",
+			MaxTagValueLength:  1024,
 		},
 		Zipkin: &tracing.ZipkinConfig{
 			ServerURL: "http://zipkin/api/v2/spans",

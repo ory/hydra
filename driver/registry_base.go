@@ -240,6 +240,10 @@ func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 func (m *RegistryBase) CookieStore() sessions.Store {
 	if m.cs == nil {
 		cs := sessions.NewCookieStore(m.C.GetCookieSecrets()...)
+		// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.
+		// MaxAge(0) disables internal MaxAge check by SecureCookie, see:
+		//
+		// https://github.com/ory/hydra/pull/2488#discussion_r618992698
 		cs.MaxAge(0)
 
 		m.cs = cs

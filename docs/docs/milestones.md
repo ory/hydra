@@ -215,9 +215,6 @@ New feature or request.
 - [ ] Add a way to filter/sort the list of clients
       ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
-- [ ] No way to handle 409 GetLoginRequestConflict.
-      ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
-      [@Alano Terblanche](https://github.com/Benehiko)
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
@@ -251,6 +248,9 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [x] Remove "not before" claim "nbf" from JWT access token
       ([hydra#1542](https://github.com/ory/hydra/issues/1542))
+- [x] No way to handle 409 GetLoginRequestConflict.
+      ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [x] Add endpoint to Admin API to revoke access tokens
       ([hydra#1728](https://github.com/ory/hydra/issues/1728))
 - [x] Migrate to gobuffalo/pop

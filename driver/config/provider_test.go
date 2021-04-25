@@ -207,12 +207,12 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "localhost:1", c.PublicListenOn())
 	assert.Equal(t, "localhost:2", c.AdminListenOn())
 
-	expectedPublicPermission := &UnixPermission{
+	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-public-api",
 		Mode:  0775,
 	}
-	expectedAdminPermission := &UnixPermission{
+	expectedAdminPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-admin-api",
 		Mode:  0770,
@@ -314,26 +314,4 @@ func TestViperProviderValidates(t *testing.T) {
 			ServerURL: "http://zipkin/api/v2/spans",
 		},
 	}, c.Tracing())
-}
-
-func TestSetPerm(t *testing.T) {
-	f, e := ioutil.TempFile("", "test")
-	require.NoError(t, e)
-	path := f.Name()
-
-	// We cannot test setting owner and group, because we don't know what the
-	// tester has access to.
-	_ = (&UnixPermission{
-		Owner: "",
-		Group: "",
-		Mode:  0654,
-	}).SetPermission(path)
-
-	stat, err := f.Stat()
-	require.NoError(t, err)
-
-	assert.Equal(t, os.FileMode(0654), stat.Mode())
-
-	require.NoError(t, f.Close())
-	require.NoError(t, os.Remove(path))
 }

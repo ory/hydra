@@ -52,7 +52,9 @@ const toHref = (slug, node) => {
   return {
     label: fm.data.title,
     type: 'link',
-    href: `https://www.ory.sh/${slug}/docs/next/${fm.data.slug || node}`
+    href: `https://www.ory.sh/${slug}/docs/${slug !== 'docs' ? 'next/' : ''}${
+      fm.data.slug || node
+    }`
   }
 }
 

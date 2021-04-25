@@ -1,11 +1,6 @@
 [
   {
-    "Introduction": [
-      "index",
-      "5min-tutorial",
-      "install",
-      "contributing"
-    ]
+    "Introduction": ["index", "5min-tutorial", "install", "contributing"]
   },
   {
     "Concepts": [
@@ -24,11 +19,7 @@
       {
         "type": "category",
         "label": "Implementing the User Interface",
-        "items": [
-          "guides/login",
-          "guides/consent",
-          "guides/logout"
-        ]
+        "items": ["guides/login", "guides/consent", "guides/logout"]
       },
       {
         "type": "category",
@@ -115,23 +106,12 @@
     ]
   },
   {
-    "SDKs": [
-      "sdk",
-      "sdk/go",
-      "sdk/js",
-      "sdk/php"
-    ]
+    "SDKs": ["sdk", "sdk/go", "sdk/js", "sdk/php"]
   },
   {
-    "Development": [
-      "milestones"
-    ]
+    "Development": ["milestones"]
   },
   {
-    "Further Reading": [
-      "case-study",
-      "benchmark",
-      "security-architecture"
-    ]
+    "Further Reading": ["case-study", "benchmark", "security-architecture"]
   }
 ]

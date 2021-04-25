@@ -114,7 +114,7 @@ func MockLogoutRequest(key string, withClient bool) (c *LogoutRequest) {
 		RPInitiated:           true,
 		RequestURL:            "http://request-me/",
 		PostLogoutRedirectURI: "http://redirect-me/",
-		WasUsed:               false,
+		WasHandled:            false,
 		Accepted:              false,
 		Client:                cl,
 	}
@@ -164,7 +164,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Subject:                c.Subject,
 		ACR:                    "acr",
 		ForceSubjectIdentifier: "forced-subject",
-		WasUsed:                false,
+		WasHandled:             false,
 	}
 
 	return c, h
@@ -193,7 +193,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		GrantedScope:    []string{"scopea", "scopeb"},
 		GrantedAudience: []string{"auda", "audb"},
 		Error:           rde,
-		WasUsed:         false,
+		WasHandled:      false,
 		HandledAt:       sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
@@ -798,7 +798,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 						got2, err := m.GetLogoutRequest(context.Background(), "challenge"+tc.key)
 						require.NoError(t, err)
-						assert.False(t, got2.WasUsed)
+						assert.False(t, got2.WasHandled)
 						assert.False(t, got2.Accepted)
 						compareLogoutRequest(t, c, got2)
 
@@ -811,7 +811,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 							got3, err := m.VerifyAndInvalidateLogoutRequest(context.Background(), "verifier"+tc.key)
 							require.NoError(t, err)
 							assert.True(t, got3.Accepted)
-							assert.True(t, got3.WasUsed)
+							assert.True(t, got3.WasHandled)
 							compareLogoutRequest(t, c, got3)
 
 							_, err = m.VerifyAndInvalidateLogoutRequest(context.Background(), "verifier"+tc.key)
@@ -820,7 +820,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 							got2, err = m.GetLogoutRequest(context.Background(), "challenge"+tc.key)
 							require.NoError(t, err)
 							compareLogoutRequest(t, got3, got2)
-							assert.True(t, got2.WasUsed)
+							assert.True(t, got2.WasHandled)
 						} else {
 							require.NoError(t, m.RejectLogoutRequest(context.Background(), "challenge"+tc.key))
 							_, err = m.GetLogoutRequest(context.Background(), "challenge"+tc.key)

@@ -4781,12 +4781,12 @@ the subject accepted or rejected the request.
 
 ##### Overview
 
-| Status | Meaning                                                                    | Description    | Schema                                  |
-| ------ | -------------------------------------------------------------------------- | -------------- | --------------------------------------- |
-| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | consentRequest | [consentRequest](#schemaconsentrequest) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError   | [genericError](#schemagenericerror)     |
-| 409    | [Conflict](https://tools.ietf.org/html/rfc7231#section-6.5.8)              | genericError   | [genericError](#schemagenericerror)     |
-| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError   | [genericError](#schemagenericerror)     |
+| Status | Meaning                                                                    | Description               | Schema                                                        |
+| ------ | -------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | consentRequest            | [consentRequest](#schemaconsentrequest)                       |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError              | [genericError](#schemagenericerror)                           |
+| 410    | [Gone](https://tools.ietf.org/html/rfc7231#section-6.5.9)                  | requestWasHandledResponse | [requestWasHandledResponse](#schemarequestwashandledresponse) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError              | [genericError](#schemagenericerror)                           |
 
 ##### Examples
 
@@ -5456,13 +5456,13 @@ the requested authentication process.
 
 ##### Overview
 
-| Status | Meaning                                                                    | Description  | Schema                              |
-| ------ | -------------------------------------------------------------------------- | ------------ | ----------------------------------- |
-| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | loginRequest | [loginRequest](#schemaloginrequest) |
-| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError | [genericError](#schemagenericerror) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError | [genericError](#schemagenericerror) |
-| 409    | [Conflict](https://tools.ietf.org/html/rfc7231#section-6.5.8)              | genericError | [genericError](#schemagenericerror) |
-| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description               | Schema                                                        |
+| ------ | -------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | loginRequest              | [loginRequest](#schemaloginrequest)                           |
+| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError              | [genericError](#schemagenericerror)                           |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError              | [genericError](#schemagenericerror)                           |
+| 410    | [Gone](https://tools.ietf.org/html/rfc7231#section-6.5.9)                  | requestWasHandledResponse | [requestWasHandledResponse](#schemarequestwashandledresponse) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError              | [genericError](#schemagenericerror)                           |
 
 ##### Examples
 
@@ -6104,11 +6104,12 @@ Use this endpoint to fetch a logout request.
 
 ##### Overview
 
-| Status | Meaning                                                                    | Description   | Schema                                |
-| ------ | -------------------------------------------------------------------------- | ------------- | ------------------------------------- |
-| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | logoutRequest | [logoutRequest](#schemalogoutrequest) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError  | [genericError](#schemagenericerror)   |
-| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError  | [genericError](#schemagenericerror)   |
+| Status | Meaning                                                                    | Description               | Schema                                                        |
+| ------ | -------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | logoutRequest             | [logoutRequest](#schemalogoutrequest)                         |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError              | [genericError](#schemagenericerror)                           |
+| 410    | [Gone](https://tools.ietf.org/html/rfc7231#section-6.5.9)                  | requestWasHandledResponse | [requestWasHandledResponse](#schemarequestwashandledresponse) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError              | [genericError](#schemagenericerror)                           |
 
 ##### Examples
 
@@ -9451,6 +9452,27 @@ _The request payload used to accept a login or consent request._
 | error_description | string         | false    | none         | Description of the error in a human readable format.                                                                                      |
 | error_hint        | string         | false    | none         | Hint to help resolve the error.                                                                                                           |
 | status_code       | integer(int64) | false    | none         | Represents the HTTP status code of the error (e.g. 401 or 403)<br/><br/>Defaults to 400                                                   |
+
+<a id="tocSrequestwashandledresponse"></a>
+
+#### requestWasHandledResponse
+
+<a id="schemarequestwashandledresponse"></a>
+
+```json
+{
+  "redirect_to": "string"
+}
+```
+
+_The response payload sent when there is an attempt to access already handled
+request._
+
+#### Properties
+
+| Name        | Type   | Required | Restrictions | Description                                                                                |
+| ----------- | ------ | -------- | ------------ | ------------------------------------------------------------------------------------------ |
+| redirect_to | string | true     | none         | Original request URL to which you should redirect the user if request was already handled. |
 
 <a id="tocSuserinforesponse"></a>
 

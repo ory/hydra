@@ -28,9 +28,11 @@ type TLSConfig interface {
 }
 
 func (p *Provider) TLS(iface ServeInterface) TLSConfig {
-	enabled := !p.forcedHTTP()
-	// Support `tls.enabled` for admin interface only
-	if iface == AdminInterface {
+	enabled := true
+	if p.forcedHTTP() {
+		enabled = false
+	} else if iface == AdminInterface {
+		// Support `tls.enabled` for admin interface only
 		enabled = p.p.Bool(iface.Key(KeySuffixTLSEnabled))
 	}
 

@@ -7,7 +7,7 @@ import (
 )
 
 func MustValidate(l *logrusx.Logger, p *Provider) {
-	if p.ServesHTTPS() {
+	if publicTLS := p.TLS(PublicInterface); publicTLS.Enabled() {
 		if p.IssuerURL().String() == "" {
 			l.Fatalf(`Configuration key "%s" must be set unless flag "--dangerous-force-http" is set. To find out more, use "hydra help serve".`, KeyIssuerURL)
 		}

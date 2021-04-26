@@ -276,8 +276,8 @@ func (p *Provider) publicPort() int {
 	return p.p.IntF(KeyPublicListenOnPort, 4444)
 }
 
-func (p *Provider) PublicSocketPermission() *UnixPermission {
-	return &UnixPermission{
+func (p *Provider) PublicSocketPermission() *configx.UnixPermission {
+	return &configx.UnixPermission{
 		Owner: p.p.String(KeyPublicSocketOwner),
 		Group: p.p.String(KeyPublicSocketGroup),
 		Mode:  os.FileMode(p.p.IntF(KeyPublicSocketMode, 0755)),
@@ -292,8 +292,8 @@ func (p *Provider) adminPort() int {
 	return p.p.IntF(KeyAdminListenOnPort, 4445)
 }
 
-func (p *Provider) AdminSocketPermission() *UnixPermission {
-	return &UnixPermission{
+func (p *Provider) AdminSocketPermission() *configx.UnixPermission {
+	return &configx.UnixPermission{
 		Owner: p.p.String(KeyAdminSocketOwner),
 		Group: p.p.String(KeyAdminSocketGroup),
 		Mode:  os.FileMode(p.p.IntF(KeyAdminSocketMode, 0755)),

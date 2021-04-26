@@ -239,7 +239,7 @@ func (j *JanitorConsentTestHelper) LoginTimeoutSetup(ctx context.Context, cm con
 			ID:              j.flushLoginRequests[0].ID,
 			RequestedAt:     j.flushLoginRequests[0].RequestedAt,
 			AuthenticatedAt: j.flushLoginRequests[0].AuthenticatedAt,
-			WasUsed:         true,
+			WasHandled:      true,
 		})
 
 		require.NoError(t, err)
@@ -274,7 +274,7 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 				ID:              r.ID,
 				AuthenticatedAt: r.AuthenticatedAt,
 				RequestedAt:     r.RequestedAt,
-				WasUsed:         true,
+				WasHandled:      true,
 			})
 			require.NoError(t, err)
 		}
@@ -287,7 +287,7 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 		// Create at least 1 consent request that has been accepted
 		_, err = cm.HandleConsentRequest(ctx, j.flushConsentRequests[0].ID, &consent.HandledConsentRequest{
 			ID:              j.flushConsentRequests[0].ID,
-			WasUsed:         true,
+			WasHandled:      true,
 			RequestedAt:     j.flushConsentRequests[0].RequestedAt,
 			AuthenticatedAt: j.flushConsentRequests[0].AuthenticatedAt,
 		})

@@ -937,6 +937,11 @@
                     "jaeger"
                   ]
                 },
+                "max_tag_value_length": {
+                  "type": "integer",
+                  "description": "The value passed to the max tag value length that has been configured.",
+                  "minimum": 0
+                },
                 "sampling": {
                   "type": "object",
                   "propertyNames": {

@@ -6,3 +6,8 @@
   padding: 8px;
   margin: 32px;
 }
+
+.menu__link[href*="https://"]:after
+{
+  display: none !important;
+}

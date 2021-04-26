@@ -207,12 +207,12 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "localhost:1", c.PublicListenOn())
 	assert.Equal(t, "localhost:2", c.AdminListenOn())
 
-	expectedPublicPermission := &UnixPermission{
+	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-public-api",
 		Mode:  0775,
 	}
-	expectedAdminPermission := &UnixPermission{
+	expectedAdminPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-admin-api",
 		Mode:  0770,
@@ -308,6 +308,7 @@ func TestViperProviderValidates(t *testing.T) {
 			SamplerValue:       1,
 			SamplerServerURL:   "http://sampling",
 			Propagation:        "jaeger",
+			MaxTagValueLength:  1024,
 		},
 		Zipkin: &tracing.ZipkinConfig{
 			ServerURL: "http://zipkin/api/v2/spans",

@@ -1,25 +1,9 @@
 const config = require('./config.js')
 const fs = require('fs')
 const path = require('path')
-
-const projects = [
-  {
-    slug: 'kratos',
-    name: 'ORY Kratos'
-  },
-  {
-    slug: 'hydra',
-    name: 'ORY Hydra'
-  },
-  {
-    slug: 'oathkeeper',
-    name: 'ORY Oathkeeper'
-  },
-  {
-    slug: 'keto',
-    name: 'ORY Keto'
-  }
-].filter((item) => config.projectSlug !== item.slug)
+const request = require('sync-request')
+const parser = require('parser-front-matter')
+const base = require(path.join(__dirname, 'sidebar.json'))
 
 let sidebar = {
   Welcome: ['index']
@@ -30,26 +14,79 @@ if (fs.existsSync(cn)) {
   sidebar = require(cn)
 }
 
-projects.forEach((item) => {
-  sidebar[item.name] = [
-    {
-      type: 'link',
-      label: 'Home',
-      href: `https://www.ory.sh/${item.slug}`
-    },
-    {
-      type: 'link',
-      label: 'Docs',
-      href: `https://www.ory.sh/${item.slug}/docs`
-    },
-    {
-      type: 'link',
-      label: 'GitHub',
-      href: `https://github.com/ory/${item.slug}`
+const toHref = (slug, node) => {
+  if (node !== null && typeof node === 'object') {
+    if (node.type) {
+      if (node.type === 'category') {
+        return {
+          ...node,
+          items: node.items.map((n) => toHref(slug, n))
+        }
+      }
+      return node
     }
-  ]
-})
+
+    Object.entries(node).forEach(([key, value]) => {
+      node[key] = toHref(slug, value)
+    })
+    return node
+  } else if (Array.isArray(node)) {
+    return node.map((value) => {
+      return toHref(slug, value)
+    })
+  }
+
+  let res = request(
+    'GET',
+    `https://raw.githubusercontent.com/ory/${slug}/master/docs/docs/${node}.mdx`
+  )
+  if (res.statusCode === 404) {
+    res = request(
+      'GET',
+      `https://raw.githubusercontent.com/ory/${slug}/master/docs/docs/${node}.md`
+    )
+  }
+
+  const fm = parser.parseSync(res.getBody().toString())
+
+  return {
+    label: fm.data.title,
+    type: 'link',
+    href: `https://www.ory.sh/${slug}/docs/${slug !== 'docs' ? 'next/' : ''}${
+      fm.data.slug || node
+    }`
+  }
+}
+
+const resolveRefs = (node) => {
+  if (node !== null && typeof node == 'object') {
+    if (node['$slug']) {
+      const slug = node['$slug']
+      if (slug === config.projectSlug) {
+        return sidebar
+      }
+
+      const res = request(
+        'GET',
+        `https://raw.githubusercontent.com/ory/${slug}/master/docs/sidebar.json`
+      )
+      const items = JSON.parse(res.getBody().toString())
+
+      return toHref(slug, items)
+    }
+
+    Object.entries(node).forEach(([key, value]) => {
+      node[key] = resolveRefs(value)
+    })
+    return node
+  }
+  return node
+}
+
+const result = resolveRefs(base)
+
+console.log(JSON.stringify(result))
 
 module.exports = {
-  docs: sidebar
+  docs: resolveRefs(result)
 }

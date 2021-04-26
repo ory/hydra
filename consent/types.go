@@ -151,6 +151,16 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 	return string(value), nil
 }
 
+// The response payload sent when there is an attempt to access already handled request.
+//
+// swagger:model requestWasHandledResponse
+type RequestWasHandledResponse struct {
+	// Original request URL to which you should redirect the user if request was already handled.
+	//
+	// required: true
+	RedirectTo string `json:"redirect_to"`
+}
+
 // The request payload used to accept a consent request.
 //
 // swagger:model acceptConsentRequest
@@ -178,11 +188,16 @@ type HandledConsentRequest struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_used"`
+
 	ConsentRequest  *ConsentRequest     `json:"-" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
-	WasUsed         bool                `json:"-" db:"was_used"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
@@ -250,11 +265,16 @@ type PreviousConsentSession struct {
 	// HandledAt contains the timestamp the consent request was handled.
 	HandledAt sqlxx.NullTime `json:"handled_at" db:"handled_at"`
 
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_used"`
+
 	ConsentRequest  *ConsentRequest     `json:"consent_request" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
-	WasUsed         bool                `json:"-" db:"was_used"`
 
 	SessionIDToken     sqlxx.MapStringInterface `db:"session_id_token" json:"-"`
 	SessionAccessToken sqlxx.MapStringInterface `db:"session_access_token" json:"-"`
@@ -309,11 +329,16 @@ type HandledLoginRequest struct {
 	// data.
 	Context sqlxx.JSONRawMessage `json:"context" db:"context"`
 
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_used"`
+
 	LoginRequest    *LoginRequest       `json:"-" db:"-"`
 	Error           *RequestDeniedError `json:"-" db:"error"`
 	RequestedAt     time.Time           `json:"-" db:"requested_at"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-" db:"authenticated_at"`
-	WasUsed         bool                `json:"-" db:"was_used"`
 }
 
 func (_ HandledLoginRequest) TableName() string {
@@ -412,9 +437,14 @@ type LogoutRequest struct {
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
 	RPInitiated bool `json:"rp_initiated" db:"rp_initiated"`
 
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_used"`
+
 	Verifier              string         `json:"-" db:"verifier"`
 	PostLogoutRedirectURI string         `json:"-" db:"redir_url"`
-	WasUsed               bool           `json:"-" db:"was_used"`
 	Accepted              bool           `json:"-" db:"accepted"`
 	Rejected              bool           `db:"rejected" json:"-"`
 	ClientID              sql.NullString `json:"-" db:"client_id"`
@@ -510,13 +540,18 @@ type LoginRequest struct {
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
 	SessionID sqlxx.NullString `json:"session_id" db:"login_session_id"`
 
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_handled,r"`
+
 	ForceSubjectIdentifier string `json:"-" db:"-"` // this is here but has no meaning apart from sql_helper working properly.
 	Verifier               string `json:"-" db:"verifier"`
 	CSRF                   string `json:"-" db:"csrf"`
 
 	AuthenticatedAt sqlxx.NullTime `json:"-" db:"authenticated_at"`
 	RequestedAt     time.Time      `json:"-" db:"requested_at"`
-	WasHandled      bool           `json:"-" db:"was_handled,r"`
 }
 
 func (_ LoginRequest) TableName() string {
@@ -596,6 +631,12 @@ type ConsentRequest struct {
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
 	Context sqlxx.JSONRawMessage `json:"context,omitempty" db:"context"`
 
+	// If set to true means that the request was already handled. This
+	// can happen on form double-submit or other errors. If this is set
+	// we recommend redirecting the user to `request_url` to re-initiate
+	// the flow.
+	WasHandled bool `json:"-" db:"was_handled,r"`
+
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string         `json:"-" db:"forced_subject_identifier"`
 	SubjectIdentifier      string         `json:"-" db:"-"`
@@ -603,7 +644,6 @@ type ConsentRequest struct {
 	CSRF                   string         `json:"-" db:"csrf"`
 	AuthenticatedAt        sqlxx.NullTime `json:"-" db:"authenticated_at"`
 	RequestedAt            time.Time      `json:"-" db:"requested_at"`
-	WasHandled             bool           `json:"-" db:"was_handled,r"`
 }
 
 func (_ ConsentRequest) TableName() string {

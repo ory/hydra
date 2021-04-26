@@ -31,6 +31,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -53,13 +54,8 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.CertificateThumbprintSHA1 = sig1[:]
 }
 
-func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry) []tls.Certificate {
-	cert, err := tlsx.Certificate(
-		d.Config().Source().String("serve.tls.cert.base64"),
-		d.Config().Source().String("serve.tls.key.base64"),
-		d.Config().Source().String("serve.tls.cert.path"),
-		d.Config().Source().String("serve.tls.key.path"),
-	)
+func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
+	cert, err := d.Config().TLS(iface).Certificate()
 
 	if err == nil {
 		return cert

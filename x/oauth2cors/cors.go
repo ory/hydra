@@ -44,7 +44,7 @@ func Middleware(reg interface {
 	oauth2.Registry
 	client.Registry
 }) func(h http.Handler) http.Handler {
-	opts, enabled := reg.Config().PublicCORS()
+	opts, enabled := reg.Config().CORS(config.PublicInterface)
 	if !enabled {
 		return func(h http.Handler) http.Handler {
 			return h

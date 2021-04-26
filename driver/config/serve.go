@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ory/x/configx"
 	"github.com/rs/cors"
 )
 
@@ -49,8 +50,8 @@ func (p *Provider) ListenOn(iface ServeInterface) string {
 	return fmt.Sprintf("%s:%d", host, port)
 }
 
-func (p *Provider) SocketPermission(iface ServeInterface) *UnixPermission {
-	return &UnixPermission{
+func (p *Provider) SocketPermission(iface ServeInterface) *configx.UnixPermission {
+	return &configx.UnixPermission{
 		Owner: p.p.String(iface.Key(KeySuffixSocketOwner)),
 		Group: p.p.String(iface.Key(KeySuffixSocketGroup)),
 		Mode:  os.FileMode(p.p.IntF(iface.Key(KeySuffixSocketMode), 0755)),

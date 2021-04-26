@@ -23,7 +23,6 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
-	"net"
 	"net/http"
 	"strings"
 	"sync"
@@ -44,6 +43,7 @@ import (
 	"github.com/ory/graceful"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
+	"github.com/ory/x/networkx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -58,7 +58,7 @@ import (
 var _ = &consent.Handler{}
 
 func EnhanceMiddleware(d driver.Registry, n *negroni.Negroni, address string, router *httprouter.Router, enableCORS bool, iface config.ServeInterface) http.Handler {
-	if !x.AddressIsUnixSocket(address) {
+	if !networkx.AddressIsUnixSocket(address) {
 		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(iface)))
 	}
 	n.UseHandler(router)
@@ -292,13 +292,12 @@ func serve(
 	iface config.ServeInterface,
 	handler http.Handler,
 	address string,
-	permission *config.UnixPermission,
+	permission *configx.UnixPermission,
 	cert []tls.Certificate,
 ) {
 	defer wg.Done()
 
 	var srv = graceful.WithDefaults(&http.Server{
-		Addr:    address,
 		Handler: handler,
 		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
 		TLSConfig: &tls.Config{
@@ -311,35 +310,28 @@ func serve(
 	}
 
 	if err := graceful.Graceful(func() error {
-		var err error
 		d.Logger().Infof("Setting up http server on %s", address)
-		if x.AddressIsUnixSocket(address) {
-			addr := strings.TrimPrefix(address, "unix:")
-			unixListener, e := net.Listen("unix", addr)
-			if e != nil {
-				return e
-			}
-			e = permission.SetPermission(addr)
-			if e != nil {
-				return e
-			}
-			err = srv.Serve(unixListener)
+		listener, err := networkx.MakeListener(address, permission)
+		if err != nil {
+			return err
+		}
+
+		if networkx.AddressIsUnixSocket(address) {
+			return srv.Serve(listener)
 		} else {
 			tls := d.Config().TLS(iface)
 			if !tls.Enabled() {
 				if iface == config.PublicInterface {
-					d.Logger().Warnln("HTTPS disabled for public interface. Never do this in production.")
+					d.Logger().Warnln("HTTPS disabled. Never do this in production.")
 				}
-				err = srv.ListenAndServe()
+				return srv.Serve(listener)
 			} else if len(tls.AllowTerminationFrom()) > 0 {
 				d.Logger().Infoln("Upstream TLS termination enabled, disabling https.")
-				err = srv.ListenAndServe()
+				return srv.Serve(listener)
 			} else {
-				err = srv.ListenAndServeTLS("", "")
+				return srv.ServeTLS(listener, "", "")
 			}
 		}
-
-		return err
 	}, srv.Shutdown); err != nil {
 		d.Logger().WithError(err).Fatal("Could not gracefully run server")
 	}

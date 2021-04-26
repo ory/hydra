@@ -1,4 +1,5 @@
 const config = require('./contrib/config.js')
+const fs = require('fs')
 
 const githubRepoName =
   config.projectSlug === 'ecosystem' ? 'docs' : config.projectSlug
@@ -7,14 +8,8 @@ const baseUrl = config.baseUrl ? config.baseUrl : `/${config.projectSlug}/docs/`
 
 const links = [
   {
-    to: '/',
-    activeBasePath: baseUrl,
-    label: `Docs`,
-    position: 'left'
-  },
-  {
-    href: 'https://www.ory.sh/docs',
-    label: 'Ecosystem',
+    to: 'https://www.ory.sh/',
+    label: `Home`,
     position: 'left'
   },
   {
@@ -25,19 +20,25 @@ const links = [
   {
     href: `https://github.com/ory/${githubRepoName}/discussions`,
     label: 'Discussions',
-    position: 'left'
+    position: 'right'
   },
   {
     href: 'https://www.ory.sh/chat',
-    label: 'Chat',
-    position: 'left'
+    label: 'Slack',
+    position: 'right'
   },
   {
     href: `https://github.com/ory/${githubRepoName}`,
     label: 'GitHub',
-    position: 'left'
+    position: 'right'
   }
 ]
+
+const customCss = [require.resolve('./contrib/theme.css')]
+
+if (fs.existsSync('./src/css/theme.css')) {
+  customCss.push(require.resolve('./src/css/theme.css'))
+}
 
 module.exports = {
   title: config.projectName,
@@ -144,10 +145,7 @@ module.exports = {
     [
       '@docusaurus/theme-classic',
       {
-        customCss:
-          config.projectSlug === 'docusaurus-template'
-            ? require.resolve('./contrib/theme.css')
-            : require.resolve('./src/css/theme.css')
+        customCss
       }
     ],
     '@docusaurus/theme-search-algolia'

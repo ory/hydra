@@ -336,3 +336,21 @@ func TestSetPerm(t *testing.T) {
 	require.NoError(t, f.Close())
 	require.NoError(t, os.Remove(path))
 }
+
+func TestLoginConsentURL(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	p := MustNew(l)
+	p.MustSet(KeyLoginURL, "http://localhost:8080/oauth/login")
+	p.MustSet(KeyConsentURL, "http://localhost:8080/oauth/consent")
+
+	assert.Equal(t, "http://localhost:8080/oauth/login", p.LoginURL().String())
+	assert.Equal(t, "http://localhost:8080/oauth/consent", p.ConsentURL().String())
+
+	p2 := MustNew(l)
+	p2.MustSet(KeyLoginURL, "http://localhost:3000/#/oauth/login")
+	p2.MustSet(KeyConsentURL, "http://localhost:3000/#/oauth/consent")
+
+	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL().String())
+	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL().String())
+}

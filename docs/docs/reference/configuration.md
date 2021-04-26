@@ -264,6 +264,56 @@ serve:
       #
       disable_for_health: false
 
+    ## tls ##
+    #
+    tls:
+      ## cert ##
+      #
+      cert:
+        ## path ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export SERVE_ADMIN_TLS_CERT_PATH=<value>
+        # - Windows Command Line (CMD):
+        #    > set SERVE_ADMIN_TLS_CERT_PATH=<value>
+        #
+        path: /path/to/file.pem
+
+      ## allow_termination_from ##
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_TLS_ALLOW_TERMINATION_FROM=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_TLS_ALLOW_TERMINATION_FROM=<value>
+      #
+      allow_termination_from:
+        - 127.0.0.1/32
+
+      ## enabled ##
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_ADMIN_TLS_ENABLED=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_ADMIN_TLS_ENABLED=<value>
+      #
+      enabled: false
+
+      ## key ##
+      #
+      key:
+        ## path ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export SERVE_ADMIN_TLS_KEY_PATH=<value>
+        # - Windows Command Line (CMD):
+        #    > set SERVE_ADMIN_TLS_KEY_PATH=<value>
+        #
+        path: /path/to/file.pem
+
     ## port ##
     #
     # Default value: 4445
@@ -590,6 +640,54 @@ serve:
       #    > set SERVE_PUBLIC_ACCESS_LOG_DISABLE_FOR_HEALTH=<value>
       #
       disable_for_health: false
+
+    ## tls ##
+    #
+    # Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.
+    #
+    tls:
+      ## cert ##
+      #
+      # Configures the private key (pem encoded).
+      #
+      cert:
+        ## path ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export SERVE_PUBLIC_TLS_CERT_PATH=<value>
+        # - Windows Command Line (CMD):
+        #    > set SERVE_PUBLIC_TLS_CERT_PATH=<value>
+        #
+        path: /path/to/file.pem
+
+      ## allow_termination_from ##
+      #
+      # Whitelist one or multiple CIDR address ranges and allow them to terminate TLS connections. Be aware that the X-Forwarded-Proto header must be set and must never be modifiable by anyone but your proxy / gateway / load balancer. Supports ipv4 and ipv6. Hydra serves http instead of https when this option is set.
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export SERVE_PUBLIC_TLS_ALLOW_TERMINATION_FROM=<value>
+      # - Windows Command Line (CMD):
+      #    > set SERVE_PUBLIC_TLS_ALLOW_TERMINATION_FROM=<value>
+      #
+      allow_termination_from:
+        - 127.0.0.1/32
+
+      ## key ##
+      #
+      # Configures the private key (pem encoded).
+      #
+      key:
+        ## path ##
+        #
+        # Set this value using environment variables on
+        # - Linux/macOS:
+        #    $ export SERVE_PUBLIC_TLS_KEY_PATH=<value>
+        # - Windows Command Line (CMD):
+        #    > set SERVE_PUBLIC_TLS_KEY_PATH=<value>
+        #
+        path: /path/to/file.pem
 
     ## port ##
     #

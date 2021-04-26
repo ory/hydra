@@ -194,9 +194,9 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 		assert.EqualValues(t, http.StatusNoContent, res.Code)
 	})
 
-	// test: prometheus endpoint should accept request because TLS is non-strict
-	t.Run("case=passes-with-tls-non-strict-on-admin-endpoint", func(t *testing.T) {
-		c.MustSet(config.AdminInterface.Key(config.KeySuffixTLSStrict), false)
+	// test: prometheus endpoint should accept request because TLS is disabled
+	t.Run("case=passes-with-tls-disabled-on-admin-endpoint", func(t *testing.T) {
+		c.MustSet(config.AdminInterface.Key(config.KeySuffixTLSEnabled), false)
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c.TLS(config.AdminInterface))(res, &http.Request{
@@ -211,9 +211,9 @@ func TestDoesRequestSatisfyTermination(t *testing.T) {
 		assert.EqualValues(t, http.StatusNoContent, res.Code)
 	})
 
-	// test: prometheus endpoint should not accept request because TLS is strict
-	t.Run("case=fails-with-tls-strict-on-admin-endpoint", func(t *testing.T) {
-		c.MustSet(config.AdminInterface.Key(config.KeySuffixTLSStrict), true)
+	// test: prometheus endpoint should not accept request because TLS is enabled
+	t.Run("case=fails-with-tls-enabled-on-admin-endpoint", func(t *testing.T) {
+		c.MustSet(config.AdminInterface.Key(config.KeySuffixTLSEnabled), true)
 
 		res := httptest.NewRecorder()
 		RejectInsecureRequests(r, c.TLS(config.AdminInterface))(res, &http.Request{

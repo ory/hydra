@@ -48,14 +48,14 @@ type tlsRegistry interface {
 }
 
 type tlsConfig interface {
-	Strict() bool
+	Enabled() bool
 	AllowTerminationFrom() []string
 }
 
 func RejectInsecureRequests(reg tlsRegistry, c tlsConfig) negroni.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 		if r.TLS != nil ||
-			!c.Strict() ||
+			!c.Enabled() ||
 			r.URL.Path == healthx.AliveCheckPath ||
 			r.URL.Path == healthx.ReadyCheckPath ||
 			r.URL.Path == prometheus.MetricsPrometheusPath {

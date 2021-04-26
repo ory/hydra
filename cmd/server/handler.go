@@ -326,7 +326,7 @@ func serve(
 			err = srv.Serve(unixListener)
 		} else {
 			tls := d.Config().TLS(iface)
-			if !tls.Strict() {
+			if !tls.Enabled() {
 				if iface == config.PublicInterface {
 					d.Logger().Warnln("HTTPS disabled for public interface. Never do this in production.")
 				}

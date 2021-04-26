@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	KeySuffixTLSStrict               = "tls.strict"
+	KeySuffixTLSEnabled              = "tls.enabled"
 	KeySuffixTLSAllowTerminationFrom = "tls.allow_termination_from"
 	KeySuffixTLSCertString           = "tls.cert.base64"
 	KeySuffixTLSKeyString            = "tls.key.base64"
@@ -22,18 +22,20 @@ const (
 )
 
 type TLSConfig interface {
-	Strict() bool
+	Enabled() bool
 	AllowTerminationFrom() []string
 	Certificate() ([]tls.Certificate, error)
 }
 
 func (p *Provider) TLS(iface ServeInterface) TLSConfig {
-	strict := false
-	if !p.forcedHTTP() {
-		strict = p.p.Bool(iface.Key(KeySuffixTLSStrict))
+	enabled := !p.forcedHTTP()
+	// Support `tls.enabled` for admin interface only
+	if iface == AdminInterface {
+		enabled = p.p.Bool(iface.Key(KeySuffixTLSEnabled))
 	}
+
 	return &tlsConfig{
-		strict:               strict,
+		enabled:              enabled,
 		allowTerminationFrom: p.p.StringsF(iface.Key(KeySuffixTLSAllowTerminationFrom), p.p.Strings(KeyTLSAllowTerminationFrom)),
 
 		certString: p.p.StringF(iface.Key(KeySuffixTLSCertString), p.p.String(KeyTLSCertString)),
@@ -44,7 +46,7 @@ func (p *Provider) TLS(iface ServeInterface) TLSConfig {
 }
 
 type tlsConfig struct {
-	strict               bool
+	enabled              bool
 	allowTerminationFrom []string
 
 	certString string
@@ -53,8 +55,8 @@ type tlsConfig struct {
 	keyPath    string
 }
 
-func (c *tlsConfig) Strict() bool {
-	return c.strict
+func (c *tlsConfig) Enabled() bool {
+	return c.enabled
 }
 
 func (c *tlsConfig) AllowTerminationFrom() []string {

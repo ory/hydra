@@ -204,12 +204,12 @@ func (p *Provider) CookieSameSiteMode() http.SameSite {
 	case "strict":
 		return http.SameSiteStrictMode
 	case "none":
-		if tls := p.TLS(PublicInterface); !tls.Strict() {
+		if tls := p.TLS(PublicInterface); !tls.Enabled() {
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteNoneMode
 	default:
-		if tls := p.TLS(PublicInterface); !tls.Strict() {
+		if tls := p.TLS(PublicInterface); !tls.Enabled() {
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteDefaultMode
@@ -318,7 +318,7 @@ func (p *Provider) publicFallbackURL(path string) *url.URL {
 func (p *Provider) fallbackURL(path string, host string, port int) *url.URL {
 	var u url.URL
 	u.Scheme = "http"
-	if tls := p.TLS(PublicInterface); tls.Strict() {
+	if tls := p.TLS(PublicInterface); tls.Enabled() {
 		u.Scheme = "https"
 	}
 	if host == "" {

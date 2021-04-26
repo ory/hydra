@@ -219,14 +219,8 @@
     },
     "tls_config": {
       "type": "object",
-      "additionalProperties": false,
       "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
       "properties": {
-        "strict": {
-          "type": "boolean",
-          "description": "Disallow any plaintext (HTTP) traffic and force HTTPS.",
-          "default": true
-        },
         "key": {
           "description": "Configures the private key (pem encoded).",
           "allOf": [
@@ -380,13 +374,21 @@
               }
             },
             "tls": {
-              "$ref": "#/definitions/tls_config",
-              "properties": {
-                "strict": {
-                  "type": "boolean",
-                  "default": false
+              "allOf": [
+                {
+                  "$ref": "#/definitions/tls_config"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean",
+                      "description": "Setting enabled to false drops the TLS requirement for the admin endpoint, even if TLS is enabled on the public endpoint.",
+                      "default": true
+                    }
+                  }
                 }
-              }
+              ]
             }
           }
         },

@@ -329,7 +329,7 @@ func (p *Provider) fallbackURL(path string, host string, port int) *url.URL {
 }
 
 func (p *Provider) LoginURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyLoginURL, p.publicFallbackURL("oauth2/fallbacks/login")))
+	return urlRoot(p.p.URIF(KeyLoginURL, p.publicFallbackURL("oauth2/fallbacks/login")))
 }
 
 func (p *Provider) LogoutURL() *url.URL {
@@ -337,7 +337,7 @@ func (p *Provider) LogoutURL() *url.URL {
 }
 
 func (p *Provider) ConsentURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyConsentURL, p.publicFallbackURL("oauth2/fallbacks/consent")))
+	return urlRoot(p.p.URIF(KeyConsentURL, p.publicFallbackURL("oauth2/fallbacks/consent")))
 }
 
 func (p *Provider) ErrorURL() *url.URL {

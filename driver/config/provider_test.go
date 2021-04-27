@@ -322,7 +322,7 @@ func TestSetPerm(t *testing.T) {
 
 	// We cannot test setting owner and group, because we don't know what the
 	// tester has access to.
-	_ = (&UnixPermission{
+	_ = (&configx.UnixPermission{
 		Owner: "",
 		Group: "",
 		Mode:  0654,

@@ -227,8 +227,6 @@ New feature or request.
 - [ ] Make cookies with SameSite=None secure by default or using the
       configuration flag
       ([hydra#1844](https://github.com/ory/hydra/issues/1844))
-- [ ] Split HTTPS handling for public/admin
-      ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 - [ ] Token claims customization with Jsonnet
       ([hydra#1748](https://github.com/ory/hydra/issues/1748)) -
       [@hackerman](https://github.com/aeneasr)
@@ -256,6 +254,8 @@ New feature or request.
 - [x] Migrate to gobuffalo/pop
       ([hydra#1730](https://github.com/ory/hydra/issues/1730)) -
       [@Patrik](https://github.com/zepatrik)
+- [x] Split HTTPS handling for public/admin
+      ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 - [x] issueLogoutVerifier should allow POST requests as well
       ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 - [x] Expired token is considered an error
@@ -287,5 +287,5 @@ A request for comments to discuss and share ideas.
 
 #### Issues
 
-- [ ] Split HTTPS handling for public/admin
+- [x] Split HTTPS handling for public/admin
       ([hydra#1962](https://github.com/ory/hydra/issues/1962))

@@ -48,12 +48,13 @@ const toHref = (slug, node) => {
   }
 
   const fm = parser.parseSync(res.getBody().toString())
+  const doc = fm.data.slug || node
 
   return {
     label: fm.data.title,
     type: 'link',
-    href: `https://www.ory.sh/${slug}/docs/${slug !== 'docs' ? 'next/' : ''}${
-      fm.data.slug || node
+    href: `https://www.ory.sh/${slug}/${slug !== 'docs' ? 'docs/next/' : ''}${
+      doc === '/' ? '' : doc
     }`
   }
 }
@@ -84,8 +85,6 @@ const resolveRefs = (node) => {
 }
 
 const result = resolveRefs(base)
-
-console.log(JSON.stringify(result))
 
 module.exports = {
   docs: resolveRefs(result)

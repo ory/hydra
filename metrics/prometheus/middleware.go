@@ -1,12 +1,14 @@
 package prometheus
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"time"
 )
 
 type MetricsManager struct {
 	prometheusMetrics *Metrics
+	routers []*httprouter.Router
 }
 
 func NewMetricsManager(version, hash, buildTime string) *MetricsManager {
@@ -27,5 +29,23 @@ func (pmm *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, ne
 	start := time.Now()
 	next(rw, r)
 
-	pmm.prometheusMetrics.ResponseTime.WithLabelValues(r.URL.Path).Observe(time.Since(start).Seconds())
+	// looking for a match in one of registered routers
+	matched := false
+	for _, router := range pmm.routers {
+		handler, _, _ := router.Lookup(r.Method, r.URL.Path)
+		if handler != nil {
+			matched = true
+			break
+		}
+	}
+
+	if matched {
+		pmm.prometheusMetrics.ResponseTime.WithLabelValues(r.URL.Path).Observe(time.Since(start).Seconds())
+	} else {
+		pmm.prometheusMetrics.ResponseTime.WithLabelValues("{unmatched}").Observe(time.Since(start).Seconds())
+	}
+}
+
+func (pmm *MetricsManager) RegisterRouter(router *httprouter.Router) {
+	pmm.routers = append(pmm.routers, router)
 }

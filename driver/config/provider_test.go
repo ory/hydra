@@ -314,3 +314,43 @@ func TestViperProviderValidates(t *testing.T) {
 		},
 	}, c.Tracing())
 }
+
+func TestSetPerm(t *testing.T) {
+	f, e := ioutil.TempFile("", "test")
+	require.NoError(t, e)
+	path := f.Name()
+
+	// We cannot test setting owner and group, because we don't know what the
+	// tester has access to.
+	_ = (&configx.UnixPermission{
+		Owner: "",
+		Group: "",
+		Mode:  0654,
+	}).SetPermission(path)
+
+	stat, err := f.Stat()
+	require.NoError(t, err)
+
+	assert.Equal(t, os.FileMode(0654), stat.Mode())
+
+	require.NoError(t, f.Close())
+	require.NoError(t, os.Remove(path))
+}
+
+func TestLoginConsentURL(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	p := MustNew(l)
+	p.MustSet(KeyLoginURL, "http://localhost:8080/oauth/login")
+	p.MustSet(KeyConsentURL, "http://localhost:8080/oauth/consent")
+
+	assert.Equal(t, "http://localhost:8080/oauth/login", p.LoginURL().String())
+	assert.Equal(t, "http://localhost:8080/oauth/consent", p.ConsentURL().String())
+
+	p2 := MustNew(l)
+	p2.MustSet(KeyLoginURL, "http://localhost:3000/#/oauth/login")
+	p2.MustSet(KeyConsentURL, "http://localhost:3000/#/oauth/consent")
+
+	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL().String())
+	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL().String())
+}

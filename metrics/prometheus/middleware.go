@@ -1,15 +1,16 @@
 package prometheus
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 type MetricsManager struct {
 	prometheusMetrics *Metrics
-	routers []*httprouter.Router
+	routers           []*httprouter.Router
 }
 
 func NewMetricsManager(version, hash, buildTime string) *MetricsManager {
@@ -31,8 +32,8 @@ func (pmm *MetricsManager) ServeHTTP(rw http.ResponseWriter, r *http.Request, ne
 	next(rw, r)
 
 	pmm.prometheusMetrics.ResponseTime.WithLabelValues(
-			pmm.getLabelForPath(r),
-		).Observe(time.Since(start).Seconds())
+		pmm.getLabelForPath(r),
+	).Observe(time.Since(start).Seconds())
 }
 
 func (pmm *MetricsManager) RegisterRouter(router *httprouter.Router) {

@@ -6117,6 +6117,7 @@ Use this endpoint to fetch a logout request.
 
 ```json
 {
+  "challenge": "string",
   "request_url": "string",
   "rp_initiated": true,
   "sid": "string",
@@ -9167,6 +9168,7 @@ _Contains information on an ongoing login request._
 
 ```json
 {
+  "challenge": "string",
   "request_url": "string",
   "rp_initiated": true,
   "sid": "string",
@@ -9178,12 +9180,13 @@ _Contains information about an ongoing logout request._
 
 #### Properties
 
-| Name         | Type    | Required | Restrictions | Description                                                                                                         |
-| ------------ | ------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
-| request_url  | string  | false    | none         | RequestURL is the original Logout URL requested.                                                                    |
-| rp_initiated | boolean | false    | none         | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client. |
-| sid          | string  | false    | none         | SessionID is the login session ID that was requested to log out.                                                    |
-| subject      | string  | false    | none         | Subject is the user for whom the logout was request.                                                                |
+| Name         | Type    | Required | Restrictions | Description                                                                                                                    |
+| ------------ | ------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| challenge    | string  | false    | none         | Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to<br/>identify the session. |
+| request_url  | string  | false    | none         | RequestURL is the original Logout URL requested.                                                                               |
+| rp_initiated | boolean | false    | none         | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.            |
+| sid          | string  | false    | none         | SessionID is the login session ID that was requested to log out.                                                               |
+| subject      | string  | false    | none         | Subject is the user for whom the logout was request.                                                                           |
 
 <a id="tocSoauth2client"></a>
 

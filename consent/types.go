@@ -423,7 +423,7 @@ func (n *OpenIDConnectContext) Value() (driver.Value, error) {
 type LogoutRequest struct {
 	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
 	// identify the session.
-	ID string `json:"-" db:"challenge"`
+	ID string `json:"challenge" db:"challenge"`
 
 	// Subject is the user for whom the logout was request.
 	Subject string `json:"subject" db:"subject"`

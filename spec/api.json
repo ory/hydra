@@ -2810,6 +2810,10 @@
       "type": "object",
       "title": "Contains information about an ongoing logout request.",
       "properties": {
+        "challenge": {
+          "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
+          "type": "string"
+        },
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
           "type": "string"

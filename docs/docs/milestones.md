@@ -53,6 +53,10 @@ Something is not working.
 - [x] CORS error with v1.9 on localhost
       ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] Invalid json response with get login request
+      ([hydra#2515](https://github.com/ory/hydra/issues/2515))
+- [x] Invalid TLS config after upgrading to 1.10.2
+      ([hydra#2518](https://github.com/ory/hydra/issues/2518))
 
 #### Pull Requests
 

@@ -10,10 +10,14 @@ replace github.com/ory/kratos-client-go => github.com/ory/kratos-client-go v0.5.
 
 replace github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
 
+replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+incompatible
+
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
 require (
+	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
+	github.com/containerd/containerd v1.4.4 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/evanphx/json-patch v0.5.2
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
@@ -33,7 +37,7 @@ require (
 	github.com/gorilla/sessions v1.2.0
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/jackc/pgx/v4 v4.10.1
-	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5
+	github.com/jmoiron/sqlx v1.3.1
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20201103091713-40d03108b6f4
@@ -43,14 +47,15 @@ require (
 	github.com/oleiade/reflections v1.0.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/cli v0.0.48
+	github.com/ory/cli v0.0.49
 	github.com/ory/fosite v0.39.0
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.3
-	github.com/ory/x v0.0.212
+	github.com/ory/x v0.0.233
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
+	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.3.0 // indirect
 	github.com/prometheus/client_golang v1.9.0
@@ -66,7 +71,7 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0
-	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
+	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/tools v0.1.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1

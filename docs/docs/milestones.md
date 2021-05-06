@@ -53,6 +53,10 @@ Something is not working.
 - [x] CORS error with v1.9 on localhost
       ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] Invalid json response with get login request
+      ([hydra#2515](https://github.com/ory/hydra/issues/2515))
+- [x] Invalid TLS config after upgrading to 1.10.2
+      ([hydra#2518](https://github.com/ory/hydra/issues/2518))
 
 #### Pull Requests
 
@@ -215,9 +219,6 @@ New feature or request.
 - [ ] Add a way to filter/sort the list of clients
       ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
-- [ ] No way to handle 409 GetLoginRequestConflict.
-      ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
-      [@Alano Terblanche](https://github.com/Benehiko)
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
@@ -230,8 +231,6 @@ New feature or request.
 - [ ] Make cookies with SameSite=None secure by default or using the
       configuration flag
       ([hydra#1844](https://github.com/ory/hydra/issues/1844))
-- [ ] Split HTTPS handling for public/admin
-      ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 - [ ] Token claims customization with Jsonnet
       ([hydra#1748](https://github.com/ory/hydra/issues/1748)) -
       [@hackerman](https://github.com/aeneasr)
@@ -251,11 +250,16 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [x] Remove "not before" claim "nbf" from JWT access token
       ([hydra#1542](https://github.com/ory/hydra/issues/1542))
+- [x] No way to handle 409 GetLoginRequestConflict.
+      ([hydra#1569](https://github.com/ory/hydra/issues/1569)) -
+      [@Alano Terblanche](https://github.com/Benehiko)
 - [x] Add endpoint to Admin API to revoke access tokens
       ([hydra#1728](https://github.com/ory/hydra/issues/1728))
 - [x] Migrate to gobuffalo/pop
       ([hydra#1730](https://github.com/ory/hydra/issues/1730)) -
       [@Patrik](https://github.com/zepatrik)
+- [x] Split HTTPS handling for public/admin
+      ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 - [x] issueLogoutVerifier should allow POST requests as well
       ([hydra#1993](https://github.com/ory/hydra/issues/1993))
 - [x] Expired token is considered an error
@@ -287,5 +291,5 @@ A request for comments to discuss and share ideas.
 
 #### Issues
 
-- [ ] Split HTTPS handling for public/admin
+- [x] Split HTTPS handling for public/admin
       ([hydra#1962](https://github.com/ory/hydra/issues/1962))

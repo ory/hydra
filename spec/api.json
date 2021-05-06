@@ -935,10 +935,10 @@
               "$ref": "#/definitions/genericError"
             }
           },
-          "409": {
-            "description": "genericError",
+          "410": {
+            "description": "requestWasHandledResponse",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/requestWasHandledResponse"
             }
           },
           "500": {
@@ -1105,10 +1105,10 @@
               "$ref": "#/definitions/genericError"
             }
           },
-          "409": {
-            "description": "genericError",
+          "410": {
+            "description": "requestWasHandledResponse",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/requestWasHandledResponse"
             }
           },
           "500": {
@@ -1288,6 +1288,12 @@
             "description": "genericError",
             "schema": {
               "$ref": "#/definitions/genericError"
+            }
+          },
+          "410": {
+            "description": "requestWasHandledResponse",
+            "schema": {
+              "$ref": "#/definitions/requestWasHandledResponse"
             }
           },
           "500": {
@@ -2804,6 +2810,10 @@
       "type": "object",
       "title": "Contains information about an ongoing logout request.",
       "properties": {
+        "challenge": {
+          "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
+          "type": "string"
+        },
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
           "type": "string"
@@ -3144,6 +3154,19 @@
           "description": "Represents the HTTP status code of the error (e.g. 401 or 403)\n\nDefaults to 400",
           "type": "integer",
           "format": "int64"
+        }
+      }
+    },
+    "requestWasHandledResponse": {
+      "type": "object",
+      "title": "The response payload sent when there is an attempt to access already handled request.",
+      "required": [
+        "redirect_to"
+      ],
+      "properties": {
+        "redirect_to": {
+          "description": "Original request URL to which you should redirect the user if request was already handled.",
+          "type": "string"
         }
       }
     },

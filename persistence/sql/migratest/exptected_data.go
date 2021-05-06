@@ -138,7 +138,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		Remember:        true,
 		RememberFor:     i,
 		ID:              fmt.Sprintf("challenge-%04d", i),
-		WasUsed:         true,
+		WasHandled:      true,
 		Error:           &consent.RequestDeniedError{},
 		SessionIDToken: map[string]interface{}{
 			fmt.Sprintf("session_id_token-%04d", i): fmt.Sprintf("%04d", i),
@@ -156,7 +156,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		Context:                sqlxx.JSONRawMessage(fmt.Sprintf("{\"context\": \"%04d\"}", i)),
 		Error:                  &consent.RequestDeniedError{},
 		ID:                     fmt.Sprintf("challenge-%04d", i),
-		WasUsed:                true,
+		WasHandled:             true,
 	}
 	fols := &consent.ForcedObfuscatedLoginSession{
 		Subject:           fmt.Sprintf("subject-%04d", i),
@@ -170,7 +170,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		RPInitiated:           true,
 		Verifier:              fmt.Sprintf("verifier-%04d", i),
 		PostLogoutRedirectURI: fmt.Sprintf("http://post_logout/%04d", i),
-		WasUsed:               true,
+		WasHandled:            true,
 		Accepted:              true,
 		Rejected:              false,
 	}

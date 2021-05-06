@@ -22,7 +22,7 @@ func NewHandledLoginRequest(challenge string, hasError bool, requestedAt time.Ti
 	return &HandledLoginRequest{
 		ID:              challenge,
 		Error:           deniedErr,
-		WasUsed:         true,
+		WasHandled:      true,
 		RequestedAt:     requestedAt,
 		AuthenticatedAt: authenticatedAt,
 	}
@@ -47,6 +47,6 @@ func NewHandledConsentRequest(challenge string, hasError bool, requestedAt time.
 		Error:           deniedErr,
 		RequestedAt:     requestedAt,
 		AuthenticatedAt: authenticatedAt,
-		WasUsed:         true,
+		WasHandled:      true,
 	}
 }

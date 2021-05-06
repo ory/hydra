@@ -89,7 +89,7 @@ func TestCORSOptions(t *testing.T) {
 	p := newProvider()
 	p.MustSet("serve.public.cors.enabled", true)
 
-	conf, enabled := p.PublicCORS()
+	conf, enabled := p.CORS(PublicInterface)
 	assert.True(t, enabled)
 
 	assert.EqualValues(t, cors.Options{
@@ -110,12 +110,12 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 
 	p := MustNew(l)
 
-	value := p.AdminDisableHealthAccessLog()
+	value := p.DisableHealthAccessLog(AdminInterface)
 	assert.Equal(t, false, value)
 
-	p.MustSet(KeyAdminDisableHealthAccessLog, "true")
+	p.MustSet(AdminInterface.Key(KeySuffixDisableHealthAccessLog), "true")
 
-	value = p.AdminDisableHealthAccessLog()
+	value = p.DisableHealthAccessLog(AdminInterface)
 	assert.Equal(t, true, value)
 }
 
@@ -125,12 +125,12 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 
 	p := MustNew(l)
 
-	value := p.PublicDisableHealthAccessLog()
+	value := p.DisableHealthAccessLog(PublicInterface)
 	assert.Equal(t, false, value)
 
-	p.MustSet(KeyPublicDisableHealthAccessLog, "true")
+	p.MustSet(PublicInterface.Key(KeySuffixDisableHealthAccessLog), "true")
 
-	value = p.PublicDisableHealthAccessLog()
+	value = p.DisableHealthAccessLog(PublicInterface)
 	assert.Equal(t, true, value)
 }
 
@@ -181,7 +181,6 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	l.Logrus().SetOutput(ioutil.Discard)
 
 	p := MustNew(l, configx.SkipValidation())
-	p.MustSet("dangerous-force-http", false)
 	p.MustSet(KeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
 
@@ -204,21 +203,21 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "json", c.Source().String("log.format"))
 
 	// serve
-	assert.Equal(t, "localhost:1", c.PublicListenOn())
-	assert.Equal(t, "localhost:2", c.AdminListenOn())
+	assert.Equal(t, "localhost:1", c.ListenOn(PublicInterface))
+	assert.Equal(t, "localhost:2", c.ListenOn(AdminInterface))
 
-	expectedPublicPermission := &UnixPermission{
+	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-public-api",
 		Mode:  0775,
 	}
-	expectedAdminPermission := &UnixPermission{
+	expectedAdminPermission := &configx.UnixPermission{
 		Owner: "hydra",
 		Group: "hydra-admin-api",
 		Mode:  0770,
 	}
-	assert.Equal(t, expectedPublicPermission, c.PublicSocketPermission())
-	assert.Equal(t, expectedAdminPermission, c.AdminSocketPermission())
+	assert.Equal(t, expectedPublicPermission, c.SocketPermission(PublicInterface))
+	assert.Equal(t, expectedAdminPermission, c.SocketPermission(AdminInterface))
 
 	expectedCors := cors.Options{
 		AllowedOrigins:     []string{"https://example.com"},
@@ -231,15 +230,15 @@ func TestViperProviderValidates(t *testing.T) {
 		OptionsPassthrough: true,
 	}
 
-	gc, enabled := c.AdminCORS()
+	gc, enabled := c.CORS(AdminInterface)
 	assert.False(t, enabled)
 	assert.Equal(t, expectedCors, gc)
 
-	gc, enabled = c.PublicCORS()
+	gc, enabled = c.CORS(PublicInterface)
 	assert.False(t, enabled)
 	assert.Equal(t, expectedCors, gc)
 
-	assert.Equal(t, []string{"127.0.0.1/32"}, c.AllowTLSTerminationFrom())
+	assert.Equal(t, []string{"127.0.0.1/32"}, c.TLS(PublicInterface).AllowTerminationFrom())
 	assert.Equal(t, "/path/to/file.pem", c.Source().String("serve.tls.key.path"))
 	assert.Equal(t, "b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK", c.Source().String("serve.tls.cert.base64"))
 	assert.Equal(t, http.SameSiteLaxMode, c.CookieSameSiteMode())
@@ -308,6 +307,7 @@ func TestViperProviderValidates(t *testing.T) {
 			SamplerValue:       1,
 			SamplerServerURL:   "http://sampling",
 			Propagation:        "jaeger",
+			MaxTagValueLength:  1024,
 		},
 		Zipkin: &tracing.ZipkinConfig{
 			ServerURL: "http://zipkin/api/v2/spans",
@@ -322,7 +322,7 @@ func TestSetPerm(t *testing.T) {
 
 	// We cannot test setting owner and group, because we don't know what the
 	// tester has access to.
-	_ = (&UnixPermission{
+	_ = (&configx.UnixPermission{
 		Owner: "",
 		Group: "",
 		Mode:  0654,
@@ -335,4 +335,22 @@ func TestSetPerm(t *testing.T) {
 
 	require.NoError(t, f.Close())
 	require.NoError(t, os.Remove(path))
+}
+
+func TestLoginConsentURL(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	p := MustNew(l)
+	p.MustSet(KeyLoginURL, "http://localhost:8080/oauth/login")
+	p.MustSet(KeyConsentURL, "http://localhost:8080/oauth/consent")
+
+	assert.Equal(t, "http://localhost:8080/oauth/login", p.LoginURL().String())
+	assert.Equal(t, "http://localhost:8080/oauth/consent", p.ConsentURL().String())
+
+	p2 := MustNew(l)
+	p2.MustSet(KeyLoginURL, "http://localhost:3000/#/oauth/login")
+	p2.MustSet(KeyConsentURL, "http://localhost:3000/#/oauth/consent")
+
+	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL().String())
+	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL().String())
 }

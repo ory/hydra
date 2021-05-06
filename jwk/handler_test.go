@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/ory/hydra/jwk"
@@ -41,36 +42,58 @@ import (
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
-
-	conf.MustSet(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
-
-	router := x.NewRouterPublic()
 	var testGenerator = &jwk.RS256Generator{}
-	IDKS, _ := testGenerator.Generate("test-id", "sig")
-
+	conf.MustSet(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
+	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
-	require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
-
 	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
 		return h
 	})
 	testServer := httptest.NewServer(router)
-
 	JWKPath := "/.well-known/jwks.json"
-	res, err := http.Get(testServer.URL + JWKPath)
-	require.NoError(t, err, "problem in http request")
-	defer res.Body.Close()
 
-	var known jose.JSONWebKeySet
-	err = json.NewDecoder(res.Body).Decode(&known)
-	require.NoError(t, err, "problem in decoding response")
+	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
+		IDKS, _ := testGenerator.Generate("test-id-1", "sig")
+		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
+		res, err := http.Get(testServer.URL + JWKPath)
+		require.NoError(t, err, "problem in http request")
+		defer res.Body.Close()
 
-	require.Len(t, known.Keys, 1)
+		var known jose.JSONWebKeySet
+		err = json.NewDecoder(res.Body).Decode(&known)
+		require.NoError(t, err, "problem in decoding response")
 
-	resp := known.Key("public:test-id")
-	require.NotNil(t, resp, "Could not find key public")
+		require.Len(t, known.Keys, 1)
 
-	assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("public:test-id")))
+		resp := known.Key("public:test-id-1")
+		require.NotNil(t, resp, "Could not find key public")
+
+		assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("public:test-id-1")))
+	})
+
+	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
+		IDKS, _ := testGenerator.Generate("test-id-2", "sig")
+		if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {
+			IDKS.Keys[1].KeyID = "test-id-2"
+		} else {
+			IDKS.Keys[0].KeyID = "test-id-2"
+		}
+		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
+		res, err := http.Get(testServer.URL + JWKPath)
+		require.NoError(t, err, "problem in http request")
+		defer res.Body.Close()
+
+		var known jose.JSONWebKeySet
+		err = json.NewDecoder(res.Body).Decode(&known)
+		require.NoError(t, err, "problem in decoding response")
+
+		require.Len(t, known.Keys, 2)
+
+		resp := known.Key("test-id-2")
+		require.NotNil(t, resp, "Could not find key public")
+
+		assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("test-id-2")))
+	})
 }
 
 func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {

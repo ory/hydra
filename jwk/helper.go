@@ -27,8 +27,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"strings"
-
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/hydra/x"
@@ -129,7 +127,7 @@ func FindKeyByPrefix(set *jose.JSONWebKeySet, prefix string) (key *jose.JSONWebK
 }
 
 func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
-	keys := ExcludeKeysByPrefix(set, "private")
+	keys := ExcludePrivateKeys(set)
 	if len(keys.Keys) == 0 {
 		return nil, errors.New("key not found")
 	}
@@ -137,15 +135,13 @@ func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 	return First(keys.Keys), nil
 }
 
-func ExcludeKeysByPrefix(set *jose.JSONWebKeySet, prefix string) *jose.JSONWebKeySet {
+func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
-
 	for _, k := range set.Keys {
-		if !strings.HasPrefix(k.KeyID, prefix+":") {
+		if _, ok := k.Key.(*rsa.PrivateKey); !ok {
 			keys.Keys = append(keys.Keys, k)
 		}
 	}
-
 	return keys
 }
 

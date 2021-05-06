@@ -1,16 +1,9 @@
 package cli
 
 import (
-	"context"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/hydra/x"
-	"github.com/ory/x/josex"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"os"
 	"testing"
+
+	"github.com/ory/x/josex"
 )
 
 func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
@@ -67,33 +60,4 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 			}
 		})
 	}
-
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
-	router := x.NewRouterPublic()
-
-	h := reg.KeyHandler()
-	m := reg.KeyManager()
-	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
-		return h
-	})
-	testServer := httptest.NewServer(router)
-
-	cmd := cobra.Command{
-		Use: "key",
-	}
-	cmd.Flags().String("use", "sig", "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
-	cmd.Flags().Bool("fake-tls-termination", false, "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
-	cmd.Flags().String("access-token", "", "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
-	cmd.Flags().String("endpoint", "", "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
-	cmd.Flags().Bool("skip-tls-verify", true, "Foolishly accept TLS certificates signed by unknown certificate authorities")
-	os.Setenv("HYDRA_URL", testServer.URL)
-	t.Run("Test_ImportKeys/Run_multiple_time_With_same_Values", func(t *testing.T) {
-		NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
-		//running again to make sure the row in storage is not deleted issue: #2436
-		NewHandler().Keys.ImportKeys(&cmd, []string{"setName", "../test/private_key.json", "../test/public_key.json"})
-		v, _ := m.GetKeySet(context.TODO(), "setName")
-		assert.NotEmpty(t, v.Keys[0])
-	})
-
 }

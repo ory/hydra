@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
+	jwtgo "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"

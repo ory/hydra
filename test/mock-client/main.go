@@ -34,11 +34,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
 	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/urlx"
 )
@@ -173,7 +173,7 @@ func checkTokenResponse(token oauth2token) {
 			log.Fatalf("JWT Access Token does not seem to have three parts: %d - %+v - %v", len(parts), token, parts)
 		}
 
-		payload, err := jwt.DecodeSegment(parts[1])
+		payload, err := x.DecodeSegment(parts[1])
 		if err != nil {
 			log.Fatalf("Unable to decode id token segment: %s", err)
 		}
@@ -221,7 +221,7 @@ func checkTokenResponse(token oauth2token) {
 		log.Fatalf("ID Token does not seem to have three parts: %d - %+v - %v", len(parts), token, parts)
 	}
 
-	payload, err := jwt.DecodeSegment(parts[1])
+	payload, err := x.DecodeSegment(parts[1])
 	if err != nil {
 		log.Fatalf("Unable to decode id token segment: %s", err)
 	}

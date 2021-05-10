@@ -27,7 +27,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
+	jwtgo "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite/token/jwt"
@@ -122,7 +122,7 @@ func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) ht
 	return cj
 }
 
-func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.Claims) string {
+func genIDToken(t *testing.T, reg driver.Registry, c jwtgo.MapClaims) string {
 	r, _, err := reg.OpenIDJWTStrategy().Generate(context.TODO(), c, jwt.NewHeaders())
 	require.NoError(t, err)
 	return r

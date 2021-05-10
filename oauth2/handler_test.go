@@ -46,8 +46,8 @@ import (
 	"github.com/ory/hydra/internal"
 	"github.com/ory/x/urlx"
 
-	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/golang/mock/gomock"
+	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -373,9 +373,9 @@ func TestUserinfo(t *testing.T) {
 					return jwk.MustRSAPublic(key), nil
 				})
 				require.NoError(t, err)
-				assert.EqualValues(t, "alice", claims.Claims.(jwt2.MapClaims)["sub"])
-				assert.EqualValues(t, []interface{}{"foobar-client"}, claims.Claims.(jwt2.MapClaims)["aud"], "%#v", claims.Claims)
-				assert.NotEmpty(t, claims.Claims.(jwt2.MapClaims)["jti"])
+				assert.EqualValues(t, "alice", claims.Claims["sub"])
+				assert.EqualValues(t, []interface{}{"foobar-client"}, claims.Claims["aud"], "%#v", claims.Claims)
+				assert.NotEmpty(t, claims.Claims["jti"])
 			},
 		},
 	} {

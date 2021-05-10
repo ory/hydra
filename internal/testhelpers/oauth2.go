@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	djwt "github.com/dgrijalva/jwt-go"
+	djwt "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/fosite/token/jwt"
@@ -80,7 +80,7 @@ func DecodeIDToken(t *testing.T, token *oauth2.Token) gjson.Result {
 	require.True(t, ok)
 	assert.NotEmpty(t, idt)
 
-	body, err := djwt.DecodeSegment(strings.Split(idt, ".")[1])
+	body, err := x.DecodeSegment(strings.Split(idt, ".")[1])
 	require.NoError(t, err)
 
 	return gjson.ParseBytes(body)

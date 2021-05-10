@@ -28,7 +28,7 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 
-	jwt2 "github.com/dgrijalva/jwt-go"
+	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite/token/jwt"
@@ -75,7 +75,7 @@ func (j *RS256JWTStrategy) GetSignature(ctx context.Context, token string) (stri
 	return j.RS256JWTStrategy.GetSignature(ctx, token)
 }
 
-func (j *RS256JWTStrategy) Generate(ctx context.Context, claims jwt2.Claims, header jwt.Mapper) (string, string, error) {
+func (j *RS256JWTStrategy) Generate(ctx context.Context, claims jwt2.MapClaims, header jwt.Mapper) (string, string, error) {
 	if err := j.refresh(ctx); err != nil {
 		return "", "", err
 	}

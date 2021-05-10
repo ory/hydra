@@ -58,6 +58,7 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	keyCmd.AddCommand(NewKeysCreateCmd())
 	keyCmd.AddCommand(NewKeysDeleteCmd())
 	keyCmd.AddCommand(NewKeysGetCmd())
+	keyCmd.AddCommand(NewKeysImportCmd())
 
 	migrateCmd := NewMigrateCmd()
 	parent.AddCommand(migrateCmd)

@@ -14,6 +14,8 @@ replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+in
 
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
+replace github.com/ory/fosite => github.com/narg95/fosite v0.36.1-0.20210507190643-4f09eb743b32
+
 require (
 	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
@@ -44,7 +46,7 @@ require (
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/oleiade/reflections v1.0.0
+	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/cli v0.0.49
@@ -65,7 +67,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0

@@ -14,13 +14,12 @@ replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+in
 
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
-replace github.com/ory/fosite => github.com/narg95/fosite v0.36.1-0.20210507190643-4f09eb743b32
+replace github.com/ory/fosite => github.com/narg95/fosite v0.36.1-0.20210517115142-45a8e10bb40b
 
 require (
 	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/containerd/containerd v1.4.4 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/evanphx/json-patch v0.5.2
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.20.0

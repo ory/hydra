@@ -190,7 +190,6 @@ func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint 
 	} else if err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(err.Error()))
 	}
-
 	return token.Claims, nil
 }
 

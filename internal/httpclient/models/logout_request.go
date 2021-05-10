@@ -17,6 +17,10 @@ import (
 // swagger:model logoutRequest
 type LogoutRequest struct {
 
+	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
+	// identify the session.
+	Challenge string `json:"challenge,omitempty"`
+
 	// RequestURL is the original Logout URL requested.
 	RequestURL string `json:"request_url,omitempty"`
 

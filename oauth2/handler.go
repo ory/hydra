@@ -308,7 +308,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	delete(interim, "sid")
 	delete(interim, "jti")
 
-	if aud := interim["aud"].([]string); !ok || len(aud) == 0 {
+	if aud, ok := interim["aud"].([]string); !ok || len(aud) == 0 {
 		interim["aud"] = []string{c.GetID()}
 	}
 

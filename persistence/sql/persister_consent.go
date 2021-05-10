@@ -179,7 +179,7 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, challenge string, 
 			return nil, sqlcon.HandleError(err)
 		}
 
-		if hr.WasUsed {
+		if hr.WasHandled {
 			return nil, errorsx.WithStack(x.ErrConflict.WithHint("The consent request was already used and can no longer be changed."))
 		}
 
@@ -205,11 +205,11 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 			return sqlcon.HandleError(err)
 		}
 
-		if r.WasUsed {
+		if r.WasHandled {
 			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Consent verifier has been used already."))
 		}
 
-		r.WasUsed = true
+		r.WasHandled = true
 		return c.Update(&r)
 	})
 }
@@ -238,11 +238,11 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 			return sqlcon.HandleError(err)
 		}
 
-		if d.WasUsed {
+		if d.WasHandled {
 			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier has been used already."))
 		}
 
-		d.WasUsed = true
+		d.WasHandled = true
 		return sqlcon.HandleError(c.Update(&d))
 	})
 }

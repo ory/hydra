@@ -12,6 +12,8 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
+
+	"github.com/gorilla/sessions"
 )
 
 func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
@@ -41,4 +43,15 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	assert.Equal(t, nil, strategy)
 	assert.Equal(t, logrus.FatalLevel, hook.LastEntry().Level)
 	assert.Contains(t, hook.LastEntry().Message, "A network error occurred, see error for specific details.")
+}
+
+func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
+	// Test ensures that CookieStore MaxAge option is equal to zero after initialization
+
+	r := new(RegistryBase)
+	r.WithConfig(config.MustNew(logrusx.New("", "")))
+
+	cs := r.CookieStore().(*sessions.CookieStore)
+
+	assert.Equal(t, cs.Options.MaxAge, 0)
 }

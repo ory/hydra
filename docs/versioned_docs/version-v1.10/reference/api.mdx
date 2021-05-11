@@ -2737,6 +2737,239 @@ p JSON.parse(result)
 </TabItem>
 </Tabs>
 
+<a id="opIdpatchOAuth2Client"></a>
+
+### Patch an OAuth 2.0 Client
+
+```
+PATCH /clients/{id} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+```
+
+Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will
+be updated and returned via the API. This is the only time you will be able to
+retrieve the client secret, so write it down and keep it safe.
+
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows.
+Usually, OAuth 2.0 clients are generated for applications which want to consume
+your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will
+need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected
+and only callable by first-party components.
+
+#### Request body
+
+```json
+[
+  {
+    "from": "string",
+    "op": "\"replace\"",
+    "path": "\"/name\"",
+    "value": {}
+  }
+]
+```
+
+<a id="patch-an-oauth-2.0-client-parameters"></a>
+
+#### Parameters
+
+| Parameter | In   | Type                                | Required | Description |
+| --------- | ---- | ----------------------------------- | -------- | ----------- |
+| id        | path | string                              | true     | none        |
+| body      | body | [patchRequest](#schemapatchrequest) | true     | none        |
+
+#### Responses
+
+<a id="patch-an-oauth-2.0-client-responses"></a>
+
+##### Overview
+
+| Status | Meaning                                                                    | Description  | Schema                              |
+| ------ | -------------------------------------------------------------------------- | ------------ | ----------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | oAuth2Client | [oAuth2Client](#schemaoauth2client) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError | [genericError](#schemagenericerror) |
+
+##### Examples
+
+###### 200 response
+
+```json
+{
+  "allowed_cors_origins": ["string"],
+  "audience": ["string"],
+  "backchannel_logout_session_required": true,
+  "backchannel_logout_uri": "string",
+  "client_id": "string",
+  "client_name": "string",
+  "client_secret": "string",
+  "client_secret_expires_at": 0,
+  "client_uri": "string",
+  "contacts": ["string"],
+  "created_at": "2019-08-24T14:15:22Z",
+  "frontchannel_logout_session_required": true,
+  "frontchannel_logout_uri": "string",
+  "grant_types": ["string"],
+  "jwks": {},
+  "jwks_uri": "string",
+  "logo_uri": "string",
+  "metadata": {},
+  "owner": "string",
+  "policy_uri": "string",
+  "post_logout_redirect_uris": ["string"],
+  "redirect_uris": ["string"],
+  "request_object_signing_alg": "string",
+  "request_uris": ["string"],
+  "response_types": ["string"],
+  "scope": "string",
+  "sector_identifier_uri": "string",
+  "subject_type": "string",
+  "token_endpoint_auth_method": "string",
+  "token_endpoint_auth_signing_alg": "string",
+  "tos_uri": "string",
+  "updated_at": "2019-08-24T14:15:22Z",
+  "userinfo_signed_response_alg": "string"
+}
+```
+
+<aside class="success">This operation does not require authentication</aside>
+
+#### Code samples
+
+<Tabs groupId="code-samples" defaultValue="shell"
+  values={[{label: 'Shell', value: 'shell'}, {label: 'Go', value: 'go'}, {label: 'Node', value: 'node'},
+    {label: 'Java', value: 'java'}, {label: 'Python', value: 'python'}, {label: 'Ruby', value: 'ruby'}]}>
+<TabItem value="shell">
+
+```shell
+curl -X PATCH /clients/{id} \
+  -H 'Content-Type: application/json' \  -H 'Accept: application/json'
+```
+
+</TabItem>
+<TabItem value="go">
+
+```go
+package main
+
+import (
+    "bytes"
+    "net/http"
+)
+
+func main() {
+    headers := map[string][]string{
+        "Content-Type": []string{"application/json"},
+        "Accept": []string{"application/json"},
+    }
+
+    var body []byte
+    // body = ...
+
+    req, err := http.NewRequest("PATCH", "/clients/{id}", bytes.NewBuffer(body))
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+```
+
+</TabItem>
+<TabItem value="node">
+
+```javascript
+const fetch = require('node-fetch');
+const input = '[
+  {
+    "from": "string",
+    "op": "\"replace\"",
+    "path": "\"/name\"",
+    "value": {}
+  }
+]';
+const headers = {
+  'Content-Type': 'application/json',  'Accept': 'application/json'
+}
+
+fetch('/clients/{id}', {
+  method: 'PATCH',
+  body: input,
+  headers
+})
+.then(r => r.json())
+.then((body) => {
+    console.log(body)
+})
+```
+
+</TabItem>
+<TabItem value="java">
+
+```java
+// This sample needs improvement.
+URL obj = new URL("/clients/{id}");
+
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("PATCH");
+
+int responseCode = con.getResponseCode();
+
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream())
+);
+
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+
+System.out.println(response.toString());
+```
+
+</TabItem>
+<TabItem value="python">
+
+```python
+import requests
+
+headers = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json'
+}
+
+r = requests.patch(
+  '/clients/{id}',
+  params={},
+  headers = headers)
+
+print r.json()
+```
+
+</TabItem>
+<TabItem value="ruby">
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Content-Type' => 'application/json',
+  'Accept' => 'application/json'
+}
+
+result = RestClient.patch '/clients/{id}',
+  params: {}, headers: headers
+
+p JSON.parse(result)
+```
+
+</TabItem>
+</Tabs>
+
 <a id="opIdisInstanceAlive"></a>
 
 ### Check Alive Status
@@ -4548,12 +4781,12 @@ the subject accepted or rejected the request.
 
 ##### Overview
 
-| Status | Meaning                                                                    | Description    | Schema                                  |
-| ------ | -------------------------------------------------------------------------- | -------------- | --------------------------------------- |
-| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | consentRequest | [consentRequest](#schemaconsentrequest) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError   | [genericError](#schemagenericerror)     |
-| 409    | [Conflict](https://tools.ietf.org/html/rfc7231#section-6.5.8)              | genericError   | [genericError](#schemagenericerror)     |
-| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError   | [genericError](#schemagenericerror)     |
+| Status | Meaning                                                                    | Description               | Schema                                                        |
+| ------ | -------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | consentRequest            | [consentRequest](#schemaconsentrequest)                       |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError              | [genericError](#schemagenericerror)                           |
+| 410    | [Gone](https://tools.ietf.org/html/rfc7231#section-6.5.9)                  | requestWasHandledResponse | [requestWasHandledResponse](#schemarequestwashandledresponse) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError              | [genericError](#schemagenericerror)                           |
 
 ##### Examples
 
@@ -5223,13 +5456,13 @@ the requested authentication process.
 
 ##### Overview
 
-| Status | Meaning                                                                    | Description  | Schema                              |
-| ------ | -------------------------------------------------------------------------- | ------------ | ----------------------------------- |
-| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | loginRequest | [loginRequest](#schemaloginrequest) |
-| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError | [genericError](#schemagenericerror) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError | [genericError](#schemagenericerror) |
-| 409    | [Conflict](https://tools.ietf.org/html/rfc7231#section-6.5.8)              | genericError | [genericError](#schemagenericerror) |
-| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError | [genericError](#schemagenericerror) |
+| Status | Meaning                                                                    | Description               | Schema                                                        |
+| ------ | -------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | loginRequest              | [loginRequest](#schemaloginrequest)                           |
+| 400    | [Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)           | genericError              | [genericError](#schemagenericerror)                           |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError              | [genericError](#schemagenericerror)                           |
+| 410    | [Gone](https://tools.ietf.org/html/rfc7231#section-6.5.9)                  | requestWasHandledResponse | [requestWasHandledResponse](#schemarequestwashandledresponse) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError              | [genericError](#schemagenericerror)                           |
 
 ##### Examples
 
@@ -5871,11 +6104,12 @@ Use this endpoint to fetch a logout request.
 
 ##### Overview
 
-| Status | Meaning                                                                    | Description   | Schema                                |
-| ------ | -------------------------------------------------------------------------- | ------------- | ------------------------------------- |
-| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | logoutRequest | [logoutRequest](#schemalogoutrequest) |
-| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError  | [genericError](#schemagenericerror)   |
-| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError  | [genericError](#schemagenericerror)   |
+| Status | Meaning                                                                    | Description               | Schema                                                        |
+| ------ | -------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------- |
+| 200    | [OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)                    | logoutRequest             | [logoutRequest](#schemalogoutrequest)                         |
+| 404    | [Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)             | genericError              | [genericError](#schemagenericerror)                           |
+| 410    | [Gone](https://tools.ietf.org/html/rfc7231#section-6.5.9)                  | requestWasHandledResponse | [requestWasHandledResponse](#schemarequestwashandledresponse) |
+| 500    | [Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1) | genericError              | [genericError](#schemagenericerror)                           |
 
 ##### Examples
 
@@ -5883,6 +6117,7 @@ Use this endpoint to fetch a logout request.
 
 ```json
 {
+  "challenge": "string",
   "request_url": "string",
   "rp_initiated": true,
   "sid": "string",
@@ -8528,7 +8763,7 @@ _Volume volume_
 | Name                       | string                                    | true     | none         | Name of the volume.                                                                                                                                                                                                                                                               |
 | Options                    | object                                    | true     | none         | The driver specific options used when creating the volume.                                                                                                                                                                                                                        |
 | » **additionalProperties** | string                                    | false    | none         | none                                                                                                                                                                                                                                                                              |
-| Scope                      | string                                    | true     | none         | The level at which the volume exists. Either `global` for cluster-wide,<br/>or `local` for machine level.                                                                                                                                                                         |
+| Scope                      | string                                    | true     | none         | The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.                                                                                                                                                                             |
 | Status                     | object                                    | false    | none         | Low-level details about the volume, provided by the volume driver.<br/>Details are returned as a map with key/value pairs:<br/>`{"key":"value","key2":"value2"}`.<br/><br/>The `Status` field is optional, and is omitted if the volume driver<br/>does not support this feature. |
 | UsageData                  | [VolumeUsageData](#schemavolumeusagedata) | false    | none         | VolumeUsageData Usage details about the volume. This information is used by the<br/>`GET /system/df` endpoint, and omitted in other endpoints.                                                                                                                                    |
 
@@ -8933,6 +9168,7 @@ _Contains information on an ongoing login request._
 
 ```json
 {
+  "challenge": "string",
   "request_url": "string",
   "rp_initiated": true,
   "sid": "string",
@@ -8944,12 +9180,13 @@ _Contains information about an ongoing logout request._
 
 #### Properties
 
-| Name         | Type    | Required | Restrictions | Description                                                                                                         |
-| ------------ | ------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
-| request_url  | string  | false    | none         | RequestURL is the original Logout URL requested.                                                                    |
-| rp_initiated | boolean | false    | none         | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client. |
-| sid          | string  | false    | none         | SessionID is the login session ID that was requested to log out.                                                    |
-| subject      | string  | false    | none         | Subject is the user for whom the logout was request.                                                                |
+| Name         | Type    | Required | Restrictions | Description                                                                                                                    |
+| ------------ | ------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| challenge    | string  | false    | none         | Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to<br/>identify the session. |
+| request_url  | string  | false    | none         | RequestURL is the original Logout URL requested.                                                                               |
+| rp_initiated | boolean | false    | none         | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.            |
+| sid          | string  | false    | none         | SessionID is the login session ID that was requested to log out.                                                               |
+| subject      | string  | false    | none         | Subject is the user for whom the logout was request.                                                                           |
 
 <a id="tocSoauth2client"></a>
 
@@ -9140,6 +9377,57 @@ _Contains optional information about the OpenID Connect request._
 | login_hint           | string   | false    | none         | LoginHint hints about the login identifier the End-User might use to log in (if necessary).<br/>This hint can be used by an RP if it first asks the End-User for their e-mail address (or other identifier)<br/>and then wants to pass that value as a hint to the discovered authorization service. This value MAY also be a<br/>phone number in the format specified for the phone_number Claim. The use of this parameter is optional.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ui_locales           | [string] | false    | none         | UILocales is the End-User'id preferred languages and scripts for the user interface, represented as a<br/>space-separated list of BCP47 [RFC5646] language tag values, ordered by preference. For instance, the value<br/>"fr-CA fr en" represents a preference for French as spoken in Canada, then French (without a region designation),<br/>followed by English (without a region designation). An error SHOULD NOT result if some or all of the requested<br/>locales are not supported by the OpenID Provider.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
+<a id="tocSpatchdocument"></a>
+
+#### patchDocument
+
+<a id="schemapatchdocument"></a>
+
+```json
+{
+  "from": "string",
+  "op": "\"replace\"",
+  "path": "\"/name\"",
+  "value": {}
+}
+```
+
+_A JSONPatch document as defined by RFC 6902_
+
+#### Properties
+
+| Name  | Type   | Required | Restrictions | Description                                |
+| ----- | ------ | -------- | ------------ | ------------------------------------------ |
+| from  | string | false    | none         | A JSON-pointer                             |
+| op    | string | true     | none         | The operation to be performed              |
+| path  | string | true     | none         | A JSON-pointer                             |
+| value | object | false    | none         | The value to be used within the operations |
+
+<a id="tocSpatchrequest"></a>
+
+#### patchRequest
+
+<a id="schemapatchrequest"></a>
+
+```json
+[
+  {
+    "from": "string",
+    "op": "\"replace\"",
+    "path": "\"/name\"",
+    "value": {}
+  }
+]
+```
+
+_A JSONPatch request_
+
+#### Properties
+
+| Name        | Type                                    | Required | Restrictions | Description         |
+| ----------- | --------------------------------------- | -------- | ------------ | ------------------- |
+| _anonymous_ | [[patchDocument](#schemapatchdocument)] | false    | none         | A JSONPatch request |
+
 <a id="tocSrejectrequest"></a>
 
 #### rejectRequest
@@ -9167,6 +9455,27 @@ _The request payload used to accept a login or consent request._
 | error_description | string         | false    | none         | Description of the error in a human readable format.                                                                                      |
 | error_hint        | string         | false    | none         | Hint to help resolve the error.                                                                                                           |
 | status_code       | integer(int64) | false    | none         | Represents the HTTP status code of the error (e.g. 401 or 403)<br/><br/>Defaults to 400                                                   |
+
+<a id="tocSrequestwashandledresponse"></a>
+
+#### requestWasHandledResponse
+
+<a id="schemarequestwashandledresponse"></a>
+
+```json
+{
+  "redirect_to": "string"
+}
+```
+
+_The response payload sent when there is an attempt to access already handled
+request._
+
+#### Properties
+
+| Name        | Type   | Required | Restrictions | Description                                                                                |
+| ----------- | ------ | -------- | ------------ | ------------------------------------------------------------------------------------------ |
+| redirect_to | string | true     | none         | Original request URL to which you should redirect the user if request was already handled. |
 
 <a id="tocSuserinforesponse"></a>
 

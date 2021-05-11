@@ -27,6 +27,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/hydra/x"

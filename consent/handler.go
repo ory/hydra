@@ -769,7 +769,9 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 	}
 
 	// We do not want to share the secret so remove it.
-	request.Client.Secret = ""
+	if request.Client != nil {
+		request.Client.Secret = ""
+	}
 
 	if request.WasHandled {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{

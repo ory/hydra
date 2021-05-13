@@ -6,8 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -21,14 +20,14 @@ type LogoutRequest struct {
 	// identify the session.
 	Challenge string `json:"challenge,omitempty"`
 
+	// client
+	Client *OAuth2Client `json:"client,omitempty"`
+
 	// RequestURL is the original Logout URL requested.
 	RequestURL string `json:"request_url,omitempty"`
 
 	// RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.
 	RpInitiated bool `json:"rp_initiated,omitempty"`
-	
-	// client, only set if rp_initiated
-	Client *OAuth2Client `json:"client,omitempty"`
 
 	// SessionID is the login session ID that was requested to log out.
 	Sid string `json:"sid,omitempty"`
@@ -39,11 +38,33 @@ type LogoutRequest struct {
 
 // Validate validates this logout request
 func (m *LogoutRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateClient(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this logout request based on context it is used
-func (m *LogoutRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *LogoutRequest) validateClient(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Client) { // not required
+		return nil
+	}
+
+	if m.Client != nil {
+		if err := m.Client.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("client")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

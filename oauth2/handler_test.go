@@ -190,7 +190,7 @@ func TestUserinfo(t *testing.T) {
 					Return(fosite.RefreshToken, nil, nil)
 			},
 			checkForUnauthorized: func(t *testing.T, body []byte, headers http.Header) {
-				assert.True(t, headers.Get("WWW-Authenticate") != "", "%s", headers)
+				assert.True(t, headers.Get("WWW-Authenticate") == `Bearer error="invalid_token",error_description="Only access tokens are allowed in the authorization header."`, "%s", headers)
 			},
 			expectStatusCode: http.StatusUnauthorized,
 		},
@@ -201,7 +201,7 @@ func TestUserinfo(t *testing.T) {
 					Return(fosite.AccessToken, nil, fosite.ErrRequestUnauthorized)
 			},
 			checkForUnauthorized: func(t *testing.T, body []byte, headers http.Header) {
-				assert.True(t, headers.Get("WWW-Authenticate") != "", "%s", headers)
+				assert.True(t, headers.Get("WWW-Authenticate") == `Bearer error="request_unauthorized",error_description="The request could not be authorized. Check that you provided valid credentials in the right format."`, "%s", headers)
 			},
 			expectStatusCode: http.StatusUnauthorized,
 		},

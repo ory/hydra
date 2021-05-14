@@ -5,8 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ory/x/configx"
 	"github.com/rs/cors"
+
+	"github.com/ory/x/configx"
 )
 
 const (

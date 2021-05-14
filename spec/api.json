@@ -2159,6 +2159,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2813,6 +2817,9 @@
         "challenge": {
           "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
           "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
         },
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",

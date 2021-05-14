@@ -1308,6 +1308,11 @@ values, of the provided OAuth 2.0 Access Token.
 For more information please
 [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
 
+In the case of authentication error, a WWW-Authenticate header might be set in
+the response with more information about the error. See
+[the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3) for more
+details about header format.
+
 #### Responses
 
 <a id="openid-connect-userinfo-responses"></a>
@@ -8763,7 +8768,7 @@ _Volume volume_
 | Name                       | string                                    | true     | none         | Name of the volume.                                                                                                                                                                                                                                                               |
 | Options                    | object                                    | true     | none         | The driver specific options used when creating the volume.                                                                                                                                                                                                                        |
 | » **additionalProperties** | string                                    | false    | none         | none                                                                                                                                                                                                                                                                              |
-| Scope                      | string                                    | true     | none         | The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.                                                                                                                                                                             |
+| Scope                      | string                                    | true     | none         | The level at which the volume exists. Either `global` for cluster-wide,<br/>or `local` for machine level.                                                                                                                                                                         |
 | Status                     | object                                    | false    | none         | Low-level details about the volume, provided by the volume driver.<br/>Details are returned as a map with key/value pairs:<br/>`{"key":"value","key2":"value2"}`.<br/><br/>The `Status` field is optional, and is omitted if the volume driver<br/>does not support this feature. |
 | UsageData                  | [VolumeUsageData](#schemavolumeusagedata) | false    | none         | VolumeUsageData Usage details about the volume. This information is used by the<br/>`GET /system/df` endpoint, and omitted in other endpoints.                                                                                                                                    |
 

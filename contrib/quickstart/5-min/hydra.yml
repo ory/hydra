@@ -21,3 +21,5 @@ oidc:
     pairwise:
       salt: youReallyNeedToChangeThis
 
+
+dsn: memory

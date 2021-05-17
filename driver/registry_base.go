@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"fmt"
+	"github.com/ory/x/prometheusx"
 	"net"
 	"net/http"
 	"strings"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/logrusx"
 
 	"github.com/gorilla/sessions"
@@ -442,7 +442,7 @@ func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 
 func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate)
+		m.pmm = prometheus.NewMetricsManager("Hydra", m.buildVersion, m.buildHash, m.buildDate)
 	}
 	return m.pmm
 }

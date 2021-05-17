@@ -50,9 +50,9 @@ import (
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/prometheusx"
 )
 
 var _ = &consent.Handler{}

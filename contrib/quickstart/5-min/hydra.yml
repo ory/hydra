@@ -20,6 +20,3 @@ oidc:
       - public
     pairwise:
       salt: youReallyNeedToChangeThis
-
-
-dsn: memory

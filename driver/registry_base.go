@@ -3,11 +3,12 @@ package driver
 import (
 	"context"
 	"fmt"
-	"github.com/ory/x/prometheusx"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
 

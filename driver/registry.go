@@ -14,7 +14,7 @@ import (
 
 	"github.com/ory/hydra/persistence"
 
-	"github.com/ory/x/prometheusx"
+	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/healthx"

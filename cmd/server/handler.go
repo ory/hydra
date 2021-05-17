@@ -52,7 +52,7 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/prometheusx"
+	prometheus "github.com/ory/x/prometheusx"
 )
 
 var _ = &consent.Handler{}

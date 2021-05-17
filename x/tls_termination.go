@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/negroni"
 
 	"github.com/ory/x/healthx"
-	"github.com/ory/x/prometheusx"
+	prometheus "github.com/ory/x/prometheusx"
 	"github.com/ory/x/stringsx"
 )
 

@@ -273,6 +273,7 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{
 			RedirectTo: request.RequestURL,
 		})
+		return
 	}
 
 	request.Client = sanitizeClient(request.Client)
@@ -497,6 +498,7 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{
 			RedirectTo: request.RequestURL,
 		})
+		return
 	}
 
 	if request.RequestedScope == nil {
@@ -765,10 +767,17 @@ func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps ht
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
+	// We do not want to share the secret so remove it.
+	if request.Client != nil {
+		request.Client.Secret = ""
+	}
+
 	if request.WasHandled {
 		h.r.Writer().WriteCode(w, r, http.StatusGone, &RequestWasHandledResponse{
 			RedirectTo: request.RequestURL,
 		})
+		return
 	}
 
 	h.r.Writer().Write(w, r, request)

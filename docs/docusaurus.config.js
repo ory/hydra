@@ -40,6 +40,57 @@ if (fs.existsSync('./src/css/theme.css')) {
   customCss.push(require.resolve('./src/css/theme.css'))
 }
 
+const githubPrismTheme = require('prism-react-renderer/themes/github')
+
+const prismThemeLight = {
+  ...githubPrismTheme,
+  styles: [
+    ...githubPrismTheme.styles,
+    {
+      languages: ['keto-relation-tuples'],
+      types: ['namespace'],
+      style: {
+        color: '#666'
+      }
+    },
+    {
+      languages: ['keto-relation-tuples'],
+      types: ['object'],
+      style: {
+        color: '#939'
+      }
+    },
+    {
+      languages: ['keto-relation-tuples'],
+      types: ['relation'],
+      style: {
+        color: '#e80'
+      }
+    },
+    {
+      languages: ['keto-relation-tuples'],
+      types: ['delimiter'],
+      style: {
+        color: '#555'
+      }
+    },
+    {
+      languages: ['keto-relation-tuples'],
+      types: ['comment'],
+      style: {
+        color: '#999'
+      }
+    },
+    {
+      languages: ['keto-relation-tuples'],
+      types: ['subject'],
+      style: {
+        color: '#903'
+      }
+    }
+  ]
+}
+
 module.exports = {
   title: config.projectName,
   tagline: config.projectTagLine,
@@ -52,9 +103,9 @@ module.exports = {
   projectName: config.projectSlug, // Usually your repo name.
   themeConfig: {
     prism: {
-      theme: require('prism-react-renderer/themes/github'),
+      theme: prismThemeLight,
       darkTheme: require('prism-react-renderer/themes/dracula'),
-      additionalLanguages: ['pug']
+      additionalLanguages: ['pug', 'shell-session']
     },
     announcementBar: {
       id: 'supportus',

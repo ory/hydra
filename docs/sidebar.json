@@ -77,6 +77,7 @@
           "cli/hydra-keys-create",
           "cli/hydra-keys-delete",
           "cli/hydra-keys-get",
+          "cli/hydra-keys-import",
           "cli/hydra-migrate",
           "cli/hydra-migrate-sql",
           "cli/hydra-serve",

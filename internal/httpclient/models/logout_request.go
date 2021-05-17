@@ -6,8 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -16,6 +15,13 @@ import (
 //
 // swagger:model logoutRequest
 type LogoutRequest struct {
+
+	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
+	// identify the session.
+	Challenge string `json:"challenge,omitempty"`
+
+	// client
+	Client *OAuth2Client `json:"client,omitempty"`
 
 	// RequestURL is the original Logout URL requested.
 	RequestURL string `json:"request_url,omitempty"`
@@ -32,11 +38,33 @@ type LogoutRequest struct {
 
 // Validate validates this logout request
 func (m *LogoutRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateClient(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this logout request based on context it is used
-func (m *LogoutRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *LogoutRequest) validateClient(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Client) { // not required
+		return nil
+	}
+
+	if m.Client != nil {
+		if err := m.Client.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("client")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 

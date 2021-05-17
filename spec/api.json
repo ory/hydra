@@ -1849,7 +1849,7 @@
             "oauth2": []
           }
         ],
-        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of\nthe provided OAuth 2.0 Access Token.\n\nFor more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).",
+        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of\nthe provided OAuth 2.0 Access Token.\n\nFor more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).\n\nIn the case of authentication error, a WWW-Authenticate header might be set in the response\nwith more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)\nfor more details about header format.",
         "produces": [
           "application/json"
         ],
@@ -2159,6 +2159,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2810,6 +2814,13 @@
       "type": "object",
       "title": "Contains information about an ongoing logout request.",
       "properties": {
+        "challenge": {
+          "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
+        },
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",
           "type": "string"

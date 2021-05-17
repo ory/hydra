@@ -263,6 +263,10 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //
 // For more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
 //
+// In the case of authentication error, a WWW-Authenticate header might be set in the response
+// with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
+// for more details about header format.
+//
 //     Produces:
 //     - application/json
 //
@@ -281,7 +285,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		rfcerr := fosite.ErrorToRFC6749Error(err)
 		if rfcerr.StatusCode() == http.StatusUnauthorized {
-			w.Header().Set("WWW-Authenticate", fmt.Sprintf("error=%s,error_description=%s", rfcerr.ErrorField, rfcerr.GetDescription()))
+			w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer error="%s",error_description="%s"`, rfcerr.ErrorField, rfcerr.GetDescription()))
 		}
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -289,7 +293,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	if tokenType != fosite.AccessToken {
 		errorDescription := "Only access tokens are allowed in the authorization header."
-		w.Header().Set("WWW-Authenticate", fmt.Sprintf("error_description=\"%s\"", errorDescription))
+		w.Header().Set("WWW-Authenticate", fmt.Sprintf(`Bearer error="invalid_token",error_description="%s"`, errorDescription))
 		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, errors.New(errorDescription))
 		return
 	}
@@ -308,9 +312,22 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	delete(interim, "sid")
 	delete(interim, "jti")
 
-	if aud := interim["aud"].([]string); !ok || len(aud) == 0 {
-		interim["aud"] = []string{c.GetID()}
+	aud, ok := interim["aud"].([]string)
+	if !ok || len(aud) == 0 {
+		aud = []string{c.GetID()}
+	} else {
+		found := false
+		for _, a := range aud {
+			if a == c.GetID() {
+				found = true
+				break
+			}
+		}
+		if !found {
+			aud = append(aud, c.GetID())
+		}
 	}
+	interim["aud"] = aud
 
 	if c.UserinfoSignedResponseAlg == "RS256" {
 		interim["jti"] = uuid.New()

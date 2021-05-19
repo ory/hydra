@@ -972,19 +972,14 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth
 }
 
 /*
-  Prometheus gets snapshot metrics from the hydra service
+  Prometheus gets snapshot metrics from the hydra service if you re using k8s you can then add annotations to your deployment like so
 
-  If you're using k8s, you can then add annotations to your deployment like so:
-
-```
+  ```
 metadata:
 annotations:
-prometheus.io/port: "4445"
+prometheus.io/port: "4434"
 prometheus.io/path: "/metrics/prometheus"
 ```
-
-If the service supports TLS Edge Termination, this endpoint does not require the
-`X-Forwarded-Proto` header to be set.
 */
 func (a *Client) Prometheus(params *PrometheusParams) (*PrometheusOK, error) {
 	// TODO: Validate the params before sending

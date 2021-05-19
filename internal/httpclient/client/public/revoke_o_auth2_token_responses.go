@@ -41,8 +41,9 @@ func (o *RevokeOAuth2TokenReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -51,9 +52,9 @@ func NewRevokeOAuth2TokenOK() *RevokeOAuth2TokenOK {
 	return &RevokeOAuth2TokenOK{}
 }
 
-/* RevokeOAuth2TokenOK describes a response with status code 200, with default header values.
+/*RevokeOAuth2TokenOK handles this case with default header values.
 
- Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type RevokeOAuth2TokenOK struct {
@@ -73,7 +74,7 @@ func NewRevokeOAuth2TokenUnauthorized() *RevokeOAuth2TokenUnauthorized {
 	return &RevokeOAuth2TokenUnauthorized{}
 }
 
-/* RevokeOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
+/*RevokeOAuth2TokenUnauthorized handles this case with default header values.
 
 genericError
 */
@@ -84,6 +85,7 @@ type RevokeOAuth2TokenUnauthorized struct {
 func (o *RevokeOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/revoke][%d] revokeOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
+
 func (o *RevokeOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -105,7 +107,7 @@ func NewRevokeOAuth2TokenInternalServerError() *RevokeOAuth2TokenInternalServerE
 	return &RevokeOAuth2TokenInternalServerError{}
 }
 
-/* RevokeOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
+/*RevokeOAuth2TokenInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -116,6 +118,7 @@ type RevokeOAuth2TokenInternalServerError struct {
 func (o *RevokeOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/revoke][%d] revokeOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *RevokeOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

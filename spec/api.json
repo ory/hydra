@@ -846,14 +846,14 @@
     },
     "/metrics/prometheus": {
       "get": {
-        "description": "If you're using k8s, you can then add annotations to your deployment like so:\n\n```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
+        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4434\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
         "produces": [
           "plain/text"
         ],
         "tags": [
           "admin"
         ],
-        "summary": "Get Snapshot Metrics from the Hydra Service.",
+        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
           "200": {
@@ -1849,7 +1849,7 @@
             "oauth2": []
           }
         ],
-        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of\nthe provided OAuth 2.0 Access Token.\n\nFor more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).",
+        "description": "This endpoint returns the payload of the ID Token, including the idTokenExtra values, of\nthe provided OAuth 2.0 Access Token.\n\nFor more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).\n\nIn the case of authentication error, a WWW-Authenticate header might be set in the response\nwith more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)\nfor more details about header format.",
         "produces": [
           "application/json"
         ],
@@ -2501,7 +2501,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -2813,6 +2813,9 @@
         "challenge": {
           "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
           "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/oAuth2Client"
         },
         "request_url": {
           "description": "RequestURL is the original Logout URL requested.",

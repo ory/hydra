@@ -50,9 +50,9 @@ import (
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
+	prometheus "github.com/ory/x/prometheusx"
 )
 
 var _ = &consent.Handler{}
@@ -94,6 +94,8 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 	admin, _, adminmw, _ := setup(d, cmd)
 	cert := GetOrCreateTLSCertificate(cmd, d, config.AdminInterface) // we do not want to run this concurrently.
 
+	d.PrometheusManager().RegisterRouter(admin.Router)
+
 	var wg sync.WaitGroup
 	wg.Add(1)
 
@@ -118,6 +120,8 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 	_, public, _, publicmw := setup(d, cmd)
 	cert := GetOrCreateTLSCertificate(cmd, d, config.PublicInterface) // we do not want to run this concurrently.
 
+	d.PrometheusManager().RegisterRouter(public.Router)
+
 	var wg sync.WaitGroup
 	wg.Add(1)
 
@@ -139,6 +143,9 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 
 	admin, public, adminmw, publicmw := setup(d, cmd)
+
+	d.PrometheusManager().RegisterRouter(admin.Router)
+	d.PrometheusManager().RegisterRouter(public.Router)
 
 	var wg sync.WaitGroup
 	wg.Add(2)

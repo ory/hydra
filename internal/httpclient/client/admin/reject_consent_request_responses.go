@@ -41,8 +41,9 @@ func (o *RejectConsentRequestReader) ReadResponse(response runtime.ClientRespons
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -51,7 +52,7 @@ func NewRejectConsentRequestOK() *RejectConsentRequestOK {
 	return &RejectConsentRequestOK{}
 }
 
-/* RejectConsentRequestOK describes a response with status code 200, with default header values.
+/*RejectConsentRequestOK handles this case with default header values.
 
 completedRequest
 */
@@ -62,6 +63,7 @@ type RejectConsentRequestOK struct {
 func (o *RejectConsentRequestOK) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestOK  %+v", 200, o.Payload)
 }
+
 func (o *RejectConsentRequestOK) GetPayload() *models.CompletedRequest {
 	return o.Payload
 }
@@ -83,7 +85,7 @@ func NewRejectConsentRequestNotFound() *RejectConsentRequestNotFound {
 	return &RejectConsentRequestNotFound{}
 }
 
-/* RejectConsentRequestNotFound describes a response with status code 404, with default header values.
+/*RejectConsentRequestNotFound handles this case with default header values.
 
 genericError
 */
@@ -94,6 +96,7 @@ type RejectConsentRequestNotFound struct {
 func (o *RejectConsentRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestNotFound  %+v", 404, o.Payload)
 }
+
 func (o *RejectConsentRequestNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -115,7 +118,7 @@ func NewRejectConsentRequestInternalServerError() *RejectConsentRequestInternalS
 	return &RejectConsentRequestInternalServerError{}
 }
 
-/* RejectConsentRequestInternalServerError describes a response with status code 500, with default header values.
+/*RejectConsentRequestInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -126,6 +129,7 @@ type RejectConsentRequestInternalServerError struct {
 func (o *RejectConsentRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *RejectConsentRequestInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

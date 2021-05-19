@@ -52,6 +52,8 @@ Janitor can be used in several ways.
 		RunE: cli.NewHandler().Janitor.RunE,
 		Args: cli.NewHandler().Janitor.Args,
 	}
+	cmd.Flags().Int(cli.Limit, 10000, "Limits the number of records retrieved from database for deletion.")
+	cmd.Flags().Int(cli.BatchSize, 100, "Limits the number of records retrieved from database for deletion.")
 	cmd.Flags().Duration(cli.KeepIfYounger, 0, "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.AccessLifespan, 0, "Set the access token lifespan e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.RefreshLifespan, 0, "Set the refresh token lifespan e.g. 1s, 1m, 1h.")

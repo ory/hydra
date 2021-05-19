@@ -439,7 +439,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 	})
 }
 
-func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error {
+func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 	/* #nosec G201 table is static */
 	var lr consent.LoginRequest
 	var lrh consent.HandledLoginRequest
@@ -447,76 +447,82 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	var cr consent.ConsentRequest
 	var crh consent.HandledConsentRequest
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	// The value of notAfter should be the minimum between input parameter and request max expire based on its configured age
+	requestMaxExpire := time.Now().Add(-p.config.ConsentRequestMaxAge())
+	if requestMaxExpire.Before(notAfter) {
+		notAfter = requestMaxExpire
+	}
 
-		// Delete all entries (and their FK)
-		// where hydra_oauth2_authentication_request were timed-out or rejected
-		// - hydra_oauth2_authentication_request_handled
-		// - hydra_oauth2_consent_request_handled
-		// AND
-		// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
-		// - hydra_oauth2_authentication_request.requested_at < notAfter
+	p.r.Logger().Printf("Deleting rejected login and consent requests which are older than %s\n", notAfter)
 
-		// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
-		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
-		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
-		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
+	challenges := []string{}
 
-		err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
-			DELETE
-			FROM %[1]s
-			WHERE NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[2]s
-				WHERE %[1]s.challenge = %[2]s.challenge AND (%[2]s.error = '{}' OR %[2]s.error = '' OR %[2]s.error is NULL)
-				)
-			AND NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[3]s
-				INNER JOIN %[4]s
-				ON %[3]s.challenge = %[4]s.challenge
-				WHERE %[1]s.challenge = %[3]s.login_challenge AND (%[4]s.error = '{}' OR %[4]s.error = '' OR %[4]s.error is NULL)
-				)
-			AND requested_at < ?
-			AND requested_at < ?
-			`,
-			(&lr).TableName(),
-			(&lrh).TableName(),
-			(&cr).TableName(),
-			(&crh).TableName()),
-			time.Now().Add(-p.config.ConsentRequestMaxAge()),
-			notAfter).Exec()
+	// Select challenges from all requests that can be safely deleted with limit
+	// where hydra_oauth2_authentication_request were rejected, so either of these is true
+	// - hydra_oauth2_authentication_request_handled has valid error
+	// - hydra_oauth2_consent_request_handled has valid error
+	// AND timed-out
+	// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
+	// - hydra_oauth2_authentication_request.requested_at < notAfter
+	q := p.Connection(ctx).RawQuery(fmt.Sprintf(`
+		SELECT challenge
+		FROM %[1]s
+		JOIN %[2]s
+		ON %[1]s.challenge = %[2]s.challenge
+		JOIN %[3]s
+		ON %[1]s.challenge = %[3]s.login_challenge
+		JOIN %[4]s
+		ON %[3]s.challenge = %[4]s.challenge
+		WHERE (
+			(%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
+			OR (%[4]s.error IS NOT NULL AND %[4]s.error <> '{}' AND %[4]s.error <> '')
+		)
+		AND %[1]s.requested_at < ?
+		`,
+		(&lr).TableName(),
+		(&lrh).TableName(),
+		(&cr).TableName(),
+		(&crh).TableName()),
+		notAfter)
+	if err := q.Limit(limit).All(&challenges); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	}
+
+	p.r.Logger().Printf("Found challenges %+v\n", challenges)
+
+	// Delete requests and their references in cascade in batch
+	var err error
+	for i := 0; i < len(challenges); i += batchSize {
+		j := i + batchSize
+		if j > len(challenges) {
+			j = len(challenges)
+		}
+
+		p.r.Logger().Printf("Deleting batch %+v\n", challenges[i:j])
+		// Delete from hydra_oauth2_authentication_request
+		err = p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+			err := p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
+				challenges[i:j],
+			).Exec()
+
+			if err != nil {
+				return sqlcon.HandleError(err)
+			}
+
+			// This query is needed due to the fact that the first query will not delete cascade to the consent tables
+			err = p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE login_challenge in (?)", (&cr).TableName()),
+				challenges[i:j],
+			).Exec()
+
+			return sqlcon.HandleError(err)
+		})
 
 		if err != nil {
 			return sqlcon.HandleError(err)
 		}
+	}
 
-		// This query is needed due to the fact that the first query will not delete cascade to the consent tables
-		// This cleans up the consent requests if requests have timed out or been rejected.
-
-		// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
-		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
-		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
-		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
-		err = p.Connection(ctx).RawQuery(
-			fmt.Sprintf(`
-			DELETE
-			FROM %[1]s
-			WHERE NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[2]s
-				WHERE %[1]s.challenge = %[2]s.challenge AND (%[2]s.error = '{}' OR %[2]s.error = '' OR %[2]s.error is NULL)
-				)
-			AND requested_at < ?
-			AND requested_at < ?`,
-				(&cr).TableName(),
-				(&crh).TableName()),
-			time.Now().Add(-p.config.ConsentRequestMaxAge()),
-			notAfter).Exec()
-
-		return sqlcon.HandleError(err)
-	})
+	return sqlcon.HandleError(err)
 }

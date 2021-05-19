@@ -361,30 +361,75 @@ func (p *Persister) RevokeAccessToken(ctx context.Context, id string) error {
 	return p.deleteSessionByRequestID(ctx, id, sqlTableAccess)
 }
 
-func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error {
+func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 	/* #nosec G201 table is static */
-	err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
-		time.Now().Add(-p.config.AccessTokenLifespan()),
+	// The value of notAfter should be the minimum between input parameter and access token max expire based on its configured age
+	requestMaxExpire := time.Now().Add(-p.config.AccessTokenLifespan())
+	if requestMaxExpire.Before(notAfter) {
+		notAfter = requestMaxExpire
+	}
+
+	signatures := []string{}
+
+	// Select tokens' signatures with limit
+	q := p.Connection(ctx).RawQuery(
+		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ?",
+			OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
 		notAfter,
-	).Exec()
-	if err == sql.ErrNoRows {
+	)
+	if err := q.Limit(limit).All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
+	}
+
+	// Delete tokens in batch
+	var err error
+	for i := 0; i < len(signatures); i += batchSize {
+		j := i + batchSize
+		if j > len(signatures) {
+			j = len(signatures)
+		}
+
+		err = p.Connection(ctx).RawQuery(
+			fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
+			signatures[i:j],
+		).Exec()
 	}
 	return sqlcon.HandleError(err)
 }
 
-func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error {
+func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 	/* #nosec G201 table is static */
-	err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE requested_at < ? AND requested_at < ?", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
-		time.Now().Add(-p.config.RefreshTokenLifespan()),
+	// The value of notAfter should be the minimum between input parameter and refresh token max expire based on its configured age
+	requestMaxExpire := time.Now().Add(-p.config.RefreshTokenLifespan())
+	if requestMaxExpire.Before(notAfter) {
+		notAfter = requestMaxExpire
+	}
+
+	signatures := []string{}
+
+	// Select tokens' signatures with limit
+	q := p.Connection(ctx).RawQuery(
+		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ?",
+			OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
 		notAfter,
-	).Exec()
-	if err == sql.ErrNoRows {
+	)
+	if err := q.Limit(limit).All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
+	// Delete tokens in batch
+	var err error
+	for i := 0; i < len(signatures); i += batchSize {
+		j := i + batchSize
+		if j > len(signatures) {
+			j = len(signatures)
+		}
+
+		err = p.Connection(ctx).RawQuery(
+			fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
+			signatures[i:j],
+		).Exec()
+	}
 	return sqlcon.HandleError(err)
 }
 

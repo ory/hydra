@@ -412,7 +412,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 					// run the cleanup routine
 					t.Run("step=cleanup", func(t *testing.T) {
-						require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, notAfter))
+						require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, notAfter, 1000, 100))
 					})
 
 					// validate test
@@ -431,7 +431,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate
@@ -446,7 +446,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate
@@ -465,7 +465,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate
@@ -482,7 +482,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate

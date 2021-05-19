@@ -20,4 +20,3 @@ oidc:
       - public
     pairwise:
       salt: youReallyNeedToChangeThis
-

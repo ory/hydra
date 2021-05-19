@@ -1308,6 +1308,11 @@ values, of the provided OAuth 2.0 Access Token.
 For more information please
 [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
 
+In the case of authentication error, a WWW-Authenticate header might be set in
+the response with more information about the error. See
+[the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3) for more
+details about header format.
+
 #### Responses
 
 <a id="openid-connect-userinfo-responses"></a>
@@ -4603,28 +4608,28 @@ p JSON.parse(result)
 
 <a id="opIdprometheus"></a>
 
-### Get Snapshot Metrics from the Hydra Service.
+### Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to
+
+your deployment like so:
 
 ```
 GET /metrics/prometheus HTTP/1.1
 
 ```
 
-If you're using k8s, you can then add annotations to your deployment like so:
-
 ```
 metadata:
 annotations:
-prometheus.io/port: "4445"
+prometheus.io/port: "4434"
 prometheus.io/path: "/metrics/prometheus"
 ```
 
-If the service supports TLS Edge Termination, this endpoint does not require the
-`X-Forwarded-Proto` header to be set.
-
 #### Responses
 
-<a id="get-snapshot-metrics-from-the-hydra-service.-responses"></a>
+<a
+  id="get-snapshot-metrics-from-the-hydra-service.-if-you're-using-k8s,-you-can-then-add-annotations-to
+your-deployment-like-so:-responses"
+></a>
 
 ##### Overview
 
@@ -6118,6 +6123,41 @@ Use this endpoint to fetch a logout request.
 ```json
 {
   "challenge": "string",
+  "client": {
+    "allowed_cors_origins": ["string"],
+    "audience": ["string"],
+    "backchannel_logout_session_required": true,
+    "backchannel_logout_uri": "string",
+    "client_id": "string",
+    "client_name": "string",
+    "client_secret": "string",
+    "client_secret_expires_at": 0,
+    "client_uri": "string",
+    "contacts": ["string"],
+    "created_at": "2019-08-24T14:15:22Z",
+    "frontchannel_logout_session_required": true,
+    "frontchannel_logout_uri": "string",
+    "grant_types": ["string"],
+    "jwks": {},
+    "jwks_uri": "string",
+    "logo_uri": "string",
+    "metadata": {},
+    "owner": "string",
+    "policy_uri": "string",
+    "post_logout_redirect_uris": ["string"],
+    "redirect_uris": ["string"],
+    "request_object_signing_alg": "string",
+    "request_uris": ["string"],
+    "response_types": ["string"],
+    "scope": "string",
+    "sector_identifier_uri": "string",
+    "subject_type": "string",
+    "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
+    "tos_uri": "string",
+    "updated_at": "2019-08-24T14:15:22Z",
+    "userinfo_signed_response_alg": "string"
+  },
   "request_url": "string",
   "rp_initiated": true,
   "sid": "string",
@@ -9169,6 +9209,41 @@ _Contains information on an ongoing login request._
 ```json
 {
   "challenge": "string",
+  "client": {
+    "allowed_cors_origins": ["string"],
+    "audience": ["string"],
+    "backchannel_logout_session_required": true,
+    "backchannel_logout_uri": "string",
+    "client_id": "string",
+    "client_name": "string",
+    "client_secret": "string",
+    "client_secret_expires_at": 0,
+    "client_uri": "string",
+    "contacts": ["string"],
+    "created_at": "2019-08-24T14:15:22Z",
+    "frontchannel_logout_session_required": true,
+    "frontchannel_logout_uri": "string",
+    "grant_types": ["string"],
+    "jwks": {},
+    "jwks_uri": "string",
+    "logo_uri": "string",
+    "metadata": {},
+    "owner": "string",
+    "policy_uri": "string",
+    "post_logout_redirect_uris": ["string"],
+    "redirect_uris": ["string"],
+    "request_object_signing_alg": "string",
+    "request_uris": ["string"],
+    "response_types": ["string"],
+    "scope": "string",
+    "sector_identifier_uri": "string",
+    "subject_type": "string",
+    "token_endpoint_auth_method": "string",
+    "token_endpoint_auth_signing_alg": "string",
+    "tos_uri": "string",
+    "updated_at": "2019-08-24T14:15:22Z",
+    "userinfo_signed_response_alg": "string"
+  },
   "request_url": "string",
   "rp_initiated": true,
   "sid": "string",
@@ -9180,13 +9255,14 @@ _Contains information about an ongoing logout request._
 
 #### Properties
 
-| Name         | Type    | Required | Restrictions | Description                                                                                                                    |
-| ------------ | ------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| challenge    | string  | false    | none         | Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to<br/>identify the session. |
-| request_url  | string  | false    | none         | RequestURL is the original Logout URL requested.                                                                               |
-| rp_initiated | boolean | false    | none         | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.            |
-| sid          | string  | false    | none         | SessionID is the login session ID that was requested to log out.                                                               |
-| subject      | string  | false    | none         | Subject is the user for whom the logout was request.                                                                           |
+| Name         | Type                                | Required | Restrictions | Description                                                                                                                    |
+| ------------ | ----------------------------------- | -------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| challenge    | string                              | false    | none         | Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to<br/>identify the session. |
+| client       | [oAuth2Client](#schemaoauth2client) | false    | none         | none                                                                                                                           |
+| request_url  | string                              | false    | none         | RequestURL is the original Logout URL requested.                                                                               |
+| rp_initiated | boolean                             | false    | none         | RPInitiated is set to true if the request was initiated by a Relying Party (RP), also known as an OAuth 2.0 Client.            |
+| sid          | string                              | false    | none         | SessionID is the login session ID that was requested to log out.                                                               |
+| subject      | string                              | false    | none         | Subject is the user for whom the logout was request.                                                                           |
 
 <a id="tocSoauth2client"></a>
 

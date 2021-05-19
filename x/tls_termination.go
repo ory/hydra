@@ -10,8 +10,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/negroni"
 
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/healthx"
+	prometheus "github.com/ory/x/prometheusx"
 	"github.com/ory/x/stringsx"
 )
 

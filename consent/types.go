@@ -448,7 +448,7 @@ type LogoutRequest struct {
 	Accepted              bool           `json:"-" db:"accepted"`
 	Rejected              bool           `db:"rejected" json:"-"`
 	ClientID              sql.NullString `json:"-" db:"client_id"`
-	Client                *client.Client `json:"-" db:"-"`
+	Client                *client.Client `json:"client" db:"-"`
 }
 
 func (_ LogoutRequest) TableName() string {

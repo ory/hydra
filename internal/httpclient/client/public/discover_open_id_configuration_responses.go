@@ -41,8 +41,9 @@ func (o *DiscoverOpenIDConfigurationReader) ReadResponse(response runtime.Client
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -51,7 +52,7 @@ func NewDiscoverOpenIDConfigurationOK() *DiscoverOpenIDConfigurationOK {
 	return &DiscoverOpenIDConfigurationOK{}
 }
 
-/* DiscoverOpenIDConfigurationOK describes a response with status code 200, with default header values.
+/*DiscoverOpenIDConfigurationOK handles this case with default header values.
 
 wellKnown
 */
@@ -62,6 +63,7 @@ type DiscoverOpenIDConfigurationOK struct {
 func (o *DiscoverOpenIDConfigurationOK) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationOK  %+v", 200, o.Payload)
 }
+
 func (o *DiscoverOpenIDConfigurationOK) GetPayload() *models.WellKnown {
 	return o.Payload
 }
@@ -83,7 +85,7 @@ func NewDiscoverOpenIDConfigurationUnauthorized() *DiscoverOpenIDConfigurationUn
 	return &DiscoverOpenIDConfigurationUnauthorized{}
 }
 
-/* DiscoverOpenIDConfigurationUnauthorized describes a response with status code 401, with default header values.
+/*DiscoverOpenIDConfigurationUnauthorized handles this case with default header values.
 
 genericError
 */
@@ -94,6 +96,7 @@ type DiscoverOpenIDConfigurationUnauthorized struct {
 func (o *DiscoverOpenIDConfigurationUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationUnauthorized  %+v", 401, o.Payload)
 }
+
 func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -115,7 +118,7 @@ func NewDiscoverOpenIDConfigurationInternalServerError() *DiscoverOpenIDConfigur
 	return &DiscoverOpenIDConfigurationInternalServerError{}
 }
 
-/* DiscoverOpenIDConfigurationInternalServerError describes a response with status code 500, with default header values.
+/*DiscoverOpenIDConfigurationInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -126,6 +129,7 @@ type DiscoverOpenIDConfigurationInternalServerError struct {
 func (o *DiscoverOpenIDConfigurationInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

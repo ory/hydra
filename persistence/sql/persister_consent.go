@@ -465,16 +465,18 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
 	// - hydra_oauth2_authentication_request.requested_at < notAfter
 	q := p.Connection(ctx).RawQuery(fmt.Sprintf(`
-		SELECT challenge
+		SELECT %[1]s.challenge
 		FROM %[1]s
-		JOIN %[2]s
+		LEFT JOIN %[2]s
 		ON %[1]s.challenge = %[2]s.challenge
-		JOIN %[3]s
+		LEFT JOIN %[3]s
 		ON %[1]s.challenge = %[3]s.login_challenge
-		JOIN %[4]s
+		LEFT JOIN %[4]s
 		ON %[3]s.challenge = %[4]s.challenge
 		WHERE (
-			(%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
+			(%[2]s.challenge IS NULL)
+			OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
+			OR (%[4]s.challenge IS NULL)
 			OR (%[4]s.error IS NOT NULL AND %[4]s.error <> '{}' AND %[4]s.error <> '')
 		)
 		AND %[1]s.requested_at < ?

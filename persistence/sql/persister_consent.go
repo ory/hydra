@@ -457,43 +457,76 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 
 	challenges := []string{}
 
-	// Select challenges from all requests that can be safely deleted with limit
-	// where hydra_oauth2_authentication_request were rejected, so either of these is true
-	// - hydra_oauth2_authentication_request_handled has valid error
-	// - hydra_oauth2_consent_request_handled has valid error
+	// Select challenges from all consent requests that can be safely deleted with limit
+	// where hydra_oauth2_consent_request were unhandled or rejected, so either of these is true
+	// - hydra_oauth2_authentication_request_handled does not exist (unhandled)
+	// - hydra_oauth2_consent_request_handled has valid error (rejected)
 	// AND timed-out
-	// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
-	// - hydra_oauth2_authentication_request.requested_at < notAfter
+	// - hydra_oauth2_consent_request.requested_at < minimum between ttl.login_consent_request and notAfter
 	q := p.Connection(ctx).RawQuery(fmt.Sprintf(`
 		SELECT %[1]s.challenge
 		FROM %[1]s
-		LEFT JOIN %[2]s
-		ON %[1]s.challenge = %[2]s.challenge
-		LEFT JOIN %[3]s
-		ON %[1]s.challenge = %[3]s.login_challenge
-		LEFT JOIN %[4]s
-		ON %[3]s.challenge = %[4]s.challenge
+		LEFT JOIN %[2]s ON %[1]s.challenge = %[2]s.challenge
 		WHERE (
 			(%[2]s.challenge IS NULL)
 			OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
-			OR (%[4]s.challenge IS NULL)
-			OR (%[4]s.error IS NOT NULL AND %[4]s.error <> '{}' AND %[4]s.error <> '')
 		)
 		AND %[1]s.requested_at < ?
 		`,
-		(&lr).TableName(),
-		(&lrh).TableName(),
 		(&cr).TableName(),
 		(&crh).TableName()),
 		notAfter)
+
 	if err := q.Limit(limit).All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
-	p.r.Logger().Printf("Found challenges %+v\n", challenges)
+	p.r.Logger().Printf("Found login challenges %+v\n", challenges)
 
-	// Delete requests and their references in cascade in batch
-	var err error
+	// Delete in batch consent requests and their references in cascade
+	for i := 0; i < len(challenges); i += batchSize {
+		j := i + batchSize
+		if j > len(challenges) {
+			j = len(challenges)
+		}
+
+		q := p.Connection(ctx).RawQuery(
+			fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&cr).TableName()),
+			challenges[i:j],
+		)
+
+		if err := q.Exec(); err != nil {
+			return sqlcon.HandleError(err)
+		}
+	}
+
+	// Select challenges from all authentication requests that can be safely deleted with limit
+	// where hydra_oauth2_authentication_request were unhandled or rejected, so either of these is true
+	// - hydra_oauth2_authentication_request_handled does not exist (unhandled)
+	// - hydra_oauth2_authentication_request_handled has valid error (rejected)
+	// AND timed-out
+	// - hydra_oauth2_authentication_request.requested_at < minimum between ttl.login_consent_request and notAfter
+	q = p.Connection(ctx).RawQuery(fmt.Sprintf(`
+		SELECT %[1]s.challenge
+		FROM %[1]s
+		LEFT JOIN %[2]s ON %[1]s.challenge = %[2]s.challenge
+		WHERE (
+			(%[2]s.challenge IS NULL)
+			OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
+		)
+		AND %[1]s.requested_at < ?
+		`,
+		(&lr).TableName(),
+		(&lrh).TableName()),
+		notAfter)
+
+	if err := q.Limit(limit).All(&challenges); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	}
+
+	p.r.Logger().Printf("Found consent challenges %+v\n", challenges)
+
+	// Delete in batch authentication requests
 	for i := 0; i < len(challenges); i += batchSize {
 		j := i + batchSize
 		if j > len(challenges) {
@@ -501,30 +534,15 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		}
 
 		p.r.Logger().Printf("Deleting batch %+v\n", challenges[i:j])
-		// Delete from hydra_oauth2_authentication_request
-		err = p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-			err := p.Connection(ctx).RawQuery(
-				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
-				challenges[i:j],
-			).Exec()
+		q := p.Connection(ctx).RawQuery(
+			fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
+			challenges[i:j],
+		)
 
-			if err != nil {
-				return sqlcon.HandleError(err)
-			}
-
-			// This query is needed due to the fact that the first query will not delete cascade to the consent tables
-			err = p.Connection(ctx).RawQuery(
-				fmt.Sprintf("DELETE FROM %s WHERE login_challenge in (?)", (&cr).TableName()),
-				challenges[i:j],
-			).Exec()
-
-			return sqlcon.HandleError(err)
-		})
-
-		if err != nil {
+		if err := q.Exec(); err != nil {
 			return sqlcon.HandleError(err)
 		}
 	}
 
-	return sqlcon.HandleError(err)
+	return nil
 }

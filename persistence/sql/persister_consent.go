@@ -453,8 +453,6 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		notAfter = requestMaxExpire
 	}
 
-	p.r.Logger().Printf("Deleting rejected login and consent requests which are older than %s\n", notAfter)
-
 	challenges := []string{}
 
 	// Select challenges from all consent requests that can be safely deleted with limit
@@ -480,8 +478,6 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	if err := q.Limit(limit).All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
-
-	p.r.Logger().Printf("Found login challenges %+v\n", challenges)
 
 	// Delete in batch consent requests and their references in cascade
 	for i := 0; i < len(challenges); i += batchSize {
@@ -524,8 +520,6 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
-	p.r.Logger().Printf("Found consent challenges %+v\n", challenges)
-
 	// Delete in batch authentication requests
 	for i := 0; i < len(challenges); i += batchSize {
 		j := i + batchSize
@@ -533,7 +527,6 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 			j = len(challenges)
 		}
 
-		p.r.Logger().Printf("Deleting batch %+v\n", challenges[i:j])
 		q := p.Connection(ctx).RawQuery(
 			fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
 			challenges[i:j],

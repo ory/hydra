@@ -846,14 +846,14 @@
     },
     "/metrics/prometheus": {
       "get": {
-        "description": "If you're using k8s, you can then add annotations to your deployment like so:\n\n```\nmetadata:\nannotations:\nprometheus.io/port: \"4445\"\nprometheus.io/path: \"/metrics/prometheus\"\n```\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.",
+        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4434\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
         "produces": [
           "plain/text"
         ],
         "tags": [
           "admin"
         ],
-        "summary": "Get Snapshot Metrics from the Hydra Service.",
+        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
           "200": {
@@ -2159,10 +2159,6 @@
         "Types"
       ],
       "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2505,7 +2501,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
           "type": "string"
         },
         "Status": {

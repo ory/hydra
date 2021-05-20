@@ -285,6 +285,10 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 the provided OAuth 2.0 Access Token.
 
 For more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
+
+In the case of authentication error, a WWW-Authenticate header might be set in the response
+with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
+for more details about header format.
 */
 func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error) {
 	// TODO: Validate the params before sending

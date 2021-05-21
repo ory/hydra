@@ -12,6 +12,7 @@ func NewJanitorCmd() *cobra.Command {
 		Use:   "janitor [<database-url>]",
 		Short: "Clean the database of old tokens and login/consent requests",
 		Long: `This command will cleanup any expired oauth2 tokens as well as login/consent requests.
+This will select records to delete with a limit and delete records in batch to ensure that no table locking issues arise in big production databases.
 
 ### Warning ###
 
@@ -52,8 +53,8 @@ Janitor can be used in several ways.
 		RunE: cli.NewHandler().Janitor.RunE,
 		Args: cli.NewHandler().Janitor.Args,
 	}
-	cmd.Flags().Int(cli.Limit, 10000, "Limits the number of records retrieved from database for deletion.")
-	cmd.Flags().Int(cli.BatchSize, 100, "Limits the number of records retrieved from database for deletion.")
+	cmd.Flags().Int(cli.Limit, 10000, "Limit the number of records retrieved from database for deletion.")
+	cmd.Flags().Int(cli.BatchSize, 100, "Define how many records are deleted with each iteration.")
 	cmd.Flags().Duration(cli.KeepIfYounger, 0, "Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.AccessLifespan, 0, "Set the access token lifespan e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.RefreshLifespan, 0, "Set the refresh token lifespan e.g. 1s, 1m, 1h.")

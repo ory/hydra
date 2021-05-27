@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -105,6 +107,10 @@ func (m *Volume) validateDriver(formats strfmt.Registry) error {
 
 func (m *Volume) validateLabels(formats strfmt.Registry) error {
 
+	if err := validate.Required("Labels", "body", m.Labels); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -128,6 +134,10 @@ func (m *Volume) validateName(formats strfmt.Registry) error {
 
 func (m *Volume) validateOptions(formats strfmt.Registry) error {
 
+	if err := validate.Required("Options", "body", m.Options); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -141,13 +151,40 @@ func (m *Volume) validateScope(formats strfmt.Registry) error {
 }
 
 func (m *Volume) validateUsageData(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.UsageData) { // not required
 		return nil
 	}
 
 	if m.UsageData != nil {
 		if err := m.UsageData.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("UsageData")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this volume based on the context it is used
+func (m *Volume) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateUsageData(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Volume) contextValidateUsageData(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.UsageData != nil {
+		if err := m.UsageData.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("UsageData")
 			}

@@ -35,9 +35,8 @@ func (o *WellKnownReader) ReadResponse(response runtime.ClientResponse, consumer
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -46,7 +45,7 @@ func NewWellKnownOK() *WellKnownOK {
 	return &WellKnownOK{}
 }
 
-/*WellKnownOK handles this case with default header values.
+/* WellKnownOK describes a response with status code 200, with default header values.
 
 JSONWebKeySet
 */
@@ -57,7 +56,6 @@ type WellKnownOK struct {
 func (o *WellKnownOK) Error() string {
 	return fmt.Sprintf("[GET /.well-known/jwks.json][%d] wellKnownOK  %+v", 200, o.Payload)
 }
-
 func (o *WellKnownOK) GetPayload() *models.JSONWebKeySet {
 	return o.Payload
 }
@@ -79,7 +77,7 @@ func NewWellKnownInternalServerError() *WellKnownInternalServerError {
 	return &WellKnownInternalServerError{}
 }
 
-/*WellKnownInternalServerError handles this case with default header values.
+/* WellKnownInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -90,7 +88,6 @@ type WellKnownInternalServerError struct {
 func (o *WellKnownInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/jwks.json][%d] wellKnownInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *WellKnownInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

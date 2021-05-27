@@ -50,11 +50,68 @@ func NewSession(subject string) *Session {
 	}
 }
 
+/**
+helper function to check if a string is existent in a slice
+param: s: string-slice to be searched
+param: e: string to find
+returns: bool: true if s contains e; false otherwise
+*/
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
+	//results in import cycle
+	//conf := internal.NewConfigurationWithDefaults()
+
+	//results in nil pointer exception
+	//conf1 := config.Provider{}
+
+	//customTestClaims := conf.GetTestingCustomClaims()
+
+	//here you would need to pass the context, for which you would need to change strategy_jwt.go in fosite, so no option
+	//reg := driver.New(ctx)
+	//customTestClaims := reg.Config(ctx).GetTestingCustomClaims()
+
+	var customTestClaims []string
+
+	//a slice of claims that are reserved and should not be overridden
+	var reservedClaims = []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
+
+	var allowedClaims []string
+
+	for _, cc := range customTestClaims {
+		//check if custom claim is part of reserved claims
+		if !contains(reservedClaims, cc) {
+			//if not so, we cann allow it, so add it to allowed claims
+			allowedClaims = append(allowedClaims, cc)
+		}
+	}
+
+	//our new extra map which will be added to the jwt
+	var topLevelExtraWithMirrorExt = map[string]interface{}{}
+
+	//a copy of our original extra claims, because otherwise we run into reference errors
+	var ext = jwt.Copy(s.Extra)
+
+	//setting every allowed claim top level in jwt with respective value
+	for _, allowedClaim := range allowedClaims {
+		topLevelExtraWithMirrorExt[allowedClaim] = ext[allowedClaim]
+	}
+
+	//for every other claim that was already reserved and for mirroring, add original extra under "ext"
+	topLevelExtraWithMirrorExt["ext"] = s.Extra
+
 	claims := &jwt.JWTClaims{
-		Subject:   s.Subject,
-		Issuer:    s.DefaultSession.Claims.Issuer,
-		Extra:     map[string]interface{}{"ext": s.Extra},
+		Subject: s.Subject,
+		Issuer:  s.DefaultSession.Claims.Issuer,
+		//set our custom extra map as claims.Extra
+		Extra:     topLevelExtraWithMirrorExt,
 		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		IssuedAt:  time.Now(),
 

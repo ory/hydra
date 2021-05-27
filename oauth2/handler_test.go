@@ -436,6 +436,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		FrontChannelLogoutSessionSupported:     true,
 		EndSessionEndpoint:                     urlx.AppendPaths(conf.IssuerURL(), oauth2.LogoutPath).String(),
 		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
+		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	}
 	var wellKnownResp oauth2.WellKnown
 	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)

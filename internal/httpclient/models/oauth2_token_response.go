@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -36,6 +38,11 @@ type Oauth2TokenResponse struct {
 
 // Validate validates this oauth2 token response
 func (m *Oauth2TokenResponse) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this oauth2 token response based on context it is used
+func (m *Oauth2TokenResponse) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

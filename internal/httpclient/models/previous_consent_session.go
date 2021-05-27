@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -73,7 +75,6 @@ func (m *PreviousConsentSession) Validate(formats strfmt.Registry) error {
 }
 
 func (m *PreviousConsentSession) validateConsentRequest(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.ConsentRequest) { // not required
 		return nil
 	}
@@ -91,7 +92,6 @@ func (m *PreviousConsentSession) validateConsentRequest(formats strfmt.Registry)
 }
 
 func (m *PreviousConsentSession) validateGrantAccessTokenAudience(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.GrantAccessTokenAudience) { // not required
 		return nil
 	}
@@ -107,7 +107,6 @@ func (m *PreviousConsentSession) validateGrantAccessTokenAudience(formats strfmt
 }
 
 func (m *PreviousConsentSession) validateGrantScope(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.GrantScope) { // not required
 		return nil
 	}
@@ -123,7 +122,6 @@ func (m *PreviousConsentSession) validateGrantScope(formats strfmt.Registry) err
 }
 
 func (m *PreviousConsentSession) validateHandledAt(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.HandledAt) { // not required
 		return nil
 	}
@@ -139,13 +137,106 @@ func (m *PreviousConsentSession) validateHandledAt(formats strfmt.Registry) erro
 }
 
 func (m *PreviousConsentSession) validateSession(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Session) { // not required
 		return nil
 	}
 
 	if m.Session != nil {
 		if err := m.Session.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("session")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this previous consent session based on the context it is used
+func (m *PreviousConsentSession) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateConsentRequest(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGrantAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGrantScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateHandledAt(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSession(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateConsentRequest(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ConsentRequest != nil {
+		if err := m.ConsentRequest.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("consent_request")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateGrantAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateGrantScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantScope.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateHandledAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.HandledAt.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("handled_at")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateSession(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Session != nil {
+		if err := m.Session.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("session")
 			}

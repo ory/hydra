@@ -14,8 +14,6 @@ replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+in
 
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
-replace github.com/ory/fosite => github.com/narg95/fosite v0.36.1-0.20210517115142-45a8e10bb40b
-
 require (
 	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
@@ -49,7 +47,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/cli v0.0.49
-	github.com/ory/fosite v0.39.0
+	github.com/ory/fosite v0.40.2
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.3

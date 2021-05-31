@@ -911,7 +911,7 @@
       "properties": {
         "provider": {
           "type": "string",
-          "description": "Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).",
+          "description": "Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin DataDog, Elastic APM and Instana. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).",
           "enum": [
             "jaeger",
             "zipkin",

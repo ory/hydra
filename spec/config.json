@@ -916,7 +916,8 @@
             "jaeger",
             "zipkin",
             "datadog",
-            "elastic-apm"
+            "elastic-apm",
+            "instana"
           ],
           "examples": [
             "jaeger"

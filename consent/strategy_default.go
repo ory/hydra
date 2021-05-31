@@ -36,10 +36,11 @@ import (
 	"github.com/ory/x/sqlcon"
 
 	"github.com/gorilla/sessions"
-	jwtgo "github.com/ory/fosite/token/jwt"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	jwtgo "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/x/sqlxx"
 

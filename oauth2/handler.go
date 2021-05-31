@@ -34,8 +34,9 @@ import (
 	"github.com/ory/x/errorsx"
 
 	"github.com/julienschmidt/httprouter"
-	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
+
+	jwt2 "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"

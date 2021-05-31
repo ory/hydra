@@ -9,8 +9,9 @@ import (
 	"testing"
 	"time"
 
-	djwt "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
+
+	djwt "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
 

@@ -27,8 +27,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	jwtgo "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/require"
+
+	jwtgo "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
 	"github.com/ory/x/urlx"

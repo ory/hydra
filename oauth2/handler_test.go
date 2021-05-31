@@ -47,10 +47,11 @@ import (
 	"github.com/ory/x/urlx"
 
 	"github.com/golang/mock/gomock"
-	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	jwt2 "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"

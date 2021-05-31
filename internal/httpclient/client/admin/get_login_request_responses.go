@@ -53,8 +53,9 @@ func (o *GetLoginRequestReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -63,7 +64,7 @@ func NewGetLoginRequestOK() *GetLoginRequestOK {
 	return &GetLoginRequestOK{}
 }
 
-/* GetLoginRequestOK describes a response with status code 200, with default header values.
+/*GetLoginRequestOK handles this case with default header values.
 
 loginRequest
 */
@@ -74,6 +75,7 @@ type GetLoginRequestOK struct {
 func (o *GetLoginRequestOK) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestOK  %+v", 200, o.Payload)
 }
+
 func (o *GetLoginRequestOK) GetPayload() *models.LoginRequest {
 	return o.Payload
 }
@@ -95,7 +97,7 @@ func NewGetLoginRequestBadRequest() *GetLoginRequestBadRequest {
 	return &GetLoginRequestBadRequest{}
 }
 
-/* GetLoginRequestBadRequest describes a response with status code 400, with default header values.
+/*GetLoginRequestBadRequest handles this case with default header values.
 
 genericError
 */
@@ -106,6 +108,7 @@ type GetLoginRequestBadRequest struct {
 func (o *GetLoginRequestBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestBadRequest  %+v", 400, o.Payload)
 }
+
 func (o *GetLoginRequestBadRequest) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -127,7 +130,7 @@ func NewGetLoginRequestNotFound() *GetLoginRequestNotFound {
 	return &GetLoginRequestNotFound{}
 }
 
-/* GetLoginRequestNotFound describes a response with status code 404, with default header values.
+/*GetLoginRequestNotFound handles this case with default header values.
 
 genericError
 */
@@ -138,6 +141,7 @@ type GetLoginRequestNotFound struct {
 func (o *GetLoginRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestNotFound  %+v", 404, o.Payload)
 }
+
 func (o *GetLoginRequestNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -159,7 +163,7 @@ func NewGetLoginRequestGone() *GetLoginRequestGone {
 	return &GetLoginRequestGone{}
 }
 
-/* GetLoginRequestGone describes a response with status code 410, with default header values.
+/*GetLoginRequestGone handles this case with default header values.
 
 requestWasHandledResponse
 */
@@ -170,6 +174,7 @@ type GetLoginRequestGone struct {
 func (o *GetLoginRequestGone) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestGone  %+v", 410, o.Payload)
 }
+
 func (o *GetLoginRequestGone) GetPayload() *models.RequestWasHandledResponse {
 	return o.Payload
 }
@@ -191,7 +196,7 @@ func NewGetLoginRequestInternalServerError() *GetLoginRequestInternalServerError
 	return &GetLoginRequestInternalServerError{}
 }
 
-/* GetLoginRequestInternalServerError describes a response with status code 500, with default header values.
+/*GetLoginRequestInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -202,6 +207,7 @@ type GetLoginRequestInternalServerError struct {
 func (o *GetLoginRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *GetLoginRequestInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

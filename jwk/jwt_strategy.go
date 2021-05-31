@@ -28,8 +28,9 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 
-	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
+
+	jwt2 "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
 )

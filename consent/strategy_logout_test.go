@@ -12,10 +12,11 @@ import (
 	"testing"
 	"time"
 
-	jwtgo "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
+
+	jwtgo "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"

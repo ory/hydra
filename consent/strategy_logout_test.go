@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
+	jwtgo "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -258,7 +258,7 @@ func TestLogoutFlows(t *testing.T) {
 			acceptLoginAs(t, "aeneas-rekkas")
 			checkAndAcceptLogout(t, nil, nil)
 
-			expectedMessage := "token contains an invalid number of segments"
+			expectedMessage := "compact JWS format must have three parts"
 			browser := createBrowserWithSession(t, createSampleClient(t))
 			values := url.Values{"state": {"1234"}, "post_logout_redirect_uri": {customPostLogoutURL}, "id_token_hint": {"i am not valid"}}
 			t.Run("method=get", testExpectErrorPage(browser, http.MethodGet, values, expectedMessage))

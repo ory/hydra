@@ -33,8 +33,8 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
+	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"

@@ -18,7 +18,6 @@ require (
 	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/containerd/containerd v1.4.4 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/evanphx/json-patch v0.5.2
 	github.com/go-bindata/go-bindata v3.1.1+incompatible
 	github.com/go-openapi/errors v0.20.0
@@ -44,11 +43,11 @@ require (
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/oleiade/reflections v1.0.0
+	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
 	github.com/ory/cli v0.0.49
-	github.com/ory/fosite v0.39.0
+	github.com/ory/fosite v0.40.2
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.3
@@ -65,7 +64,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0

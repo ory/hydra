@@ -26,7 +26,7 @@ import (
 
 	"github.com/ory/hydra/internal"
 
-	jwt2 "github.com/dgrijalva/jwt-go"
+	jwt2 "github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 

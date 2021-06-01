@@ -16,9 +16,9 @@ find an outdated section, please create a PR which removes or updates it!**
 From [Github](https://github.com/ory/hydra/issues/2333)
 
 > How can I store custom data in the client that can be retrieved along with the
-> login request (using the challenge code)?
-> I would like send in some metadata to the /oauth2/auth endpoint that can be
-> retrievable by the "challenge code" that Hydra creates.
+> login request (using the challenge code)? I would like send in some metadata
+> to the /oauth2/auth endpoint that can be retrievable by the "challenge code"
+> that Hydra creates.
 
 You can do this using the
 [`request url`](https://github.com/ory/hydra/blob/27dc147a37c1cb98b7beb5428c389545958dd122/consent/types.go#L505).
@@ -286,9 +286,9 @@ etc - there you can basically whitelist the flows you need.
 
 ## How can i test if my 4445 is running properly?
 
-> I am using ory hydra for authentication.
-> I get a 404 when im trying to create a client on my private EC2 hydra task.
-> Is there a way to test if my 4445 is running properly?
+> I am using ory hydra for authentication. I get a 404 when im trying to create
+> a client on my private EC2 hydra task. Is there a way to test if my 4445 is
+> running properly?
 
 You can check /health/alive, to see if it's alive. and /health/ready, to see if
 it's also in ready state (meaning db connectivity works).

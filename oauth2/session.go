@@ -39,53 +39,36 @@ type Session struct {
 	ClientID               string
 	ConsentChallenge       string
 	ExcludeNotBeforeClaim  bool
+	AllowedTopLevelClaims  []string
 }
 
-func NewSession(subject string) *Session {
+func NewSession(subject string, allowedTopLevelClaims []string) *Session {
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims:  new(jwt.IDTokenClaims),
 			Headers: new(jwt.Headers),
 			Subject: subject,
 		},
-		Extra: map[string]interface{}{},
+		Extra:                 map[string]interface{}{},
+		AllowedTopLevelClaims: allowedTopLevelClaims,
 	}
 }
 
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
-	//results in import cycle
-	//conf := internal.NewConfigurationWithDefaults()
-
-	//allowedTopLevelClaimsConfig := conf.AllowedTopLevelClaims()
-
-	//for prototype purposes we allow all claims (that are not reserved)
-	var allowedTopLevelClaimsConfig = make([]string, 0, len(s.Extra))
-	for k := range s.Extra {
-		allowedTopLevelClaimsConfig = append(allowedTopLevelClaimsConfig, k)
-	}
-
 	//a slice of claims that are reserved and should not be overridden
 	var reservedClaims = []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
 
-	var allowedClaims []string
-
-	for _, cc := range allowedTopLevelClaimsConfig {
-		//check if custom claim is part of reserved claims
-		if !stringslice.Has(reservedClaims, cc) {
-			//if not so, we cann allow it, so add it to allowed claims
-			allowedClaims = append(allowedClaims, cc)
-		}
-	}
+	//remove any reserved claims from the custom claims
+	allowedClaimsFromConfigWithoutReserved := stringslice.Filter(s.AllowedTopLevelClaims, func(s string) bool {
+		return stringslice.Has(reservedClaims, s)
+	})
 
 	//our new extra map which will be added to the jwt
-	var topLevelExtraWithMirrorExt = jwt.Copy(s.Extra)
-
-	//a copy of our original extra claims, because otherwise we run into reference errors
-	var ext = jwt.Copy(s.Extra)
+	var topLevelExtraWithMirrorExt = map[string]interface{}{}
 
 	//setting every allowed claim top level in jwt with respective value
-	for _, allowedClaim := range allowedClaims {
-		topLevelExtraWithMirrorExt[allowedClaim] = ext[allowedClaim]
+	for _, allowedClaim := range allowedClaimsFromConfigWithoutReserved {
+		topLevelExtraWithMirrorExt[allowedClaim] = s.Extra[allowedClaim]
 	}
 
 	//for every other claim that was already reserved and for mirroring, add original extra under "ext"

@@ -132,7 +132,7 @@ func (p *Provider) IsUsingJWTAsAccessTokens() bool {
 }
 
 func (p *Provider) AllowedTopLevelClaims() []string {
-	return p.p.StringsF(KeyAllowedTopLevelClaims, []string{})
+	return stringslice.Unique(p.p.Strings(KeyAllowedTopLevelClaims))
 }
 
 func (p *Provider) SubjectTypesSupported() []string {

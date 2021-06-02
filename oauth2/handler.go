@@ -280,7 +280,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
-	session := NewSession("")
+	session := NewSession("", h.c.AllowedTopLevelClaims())
 	tokenType, ar, err := h.r.OAuth2Provider().IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
 		rfcerr := fosite.ErrorToRFC6749Error(err)
@@ -413,7 +413,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //       401: genericError
 //       500: genericError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var session = NewSession("")
+	var session = NewSession("", h.c.AllowedTopLevelClaims())
 	var ctx = r.Context()
 
 	if r.Method != "POST" {
@@ -574,7 +574,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       400: genericError
 //       500: genericError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
-	var session = NewSession("")
+	var session = NewSession("", h.c.AllowedTopLevelClaims())
 	var ctx = r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)

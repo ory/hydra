@@ -60,11 +60,12 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		}
 
 		// new db connection
-		pool, idlePool, connMaxLifetime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())
+		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())
 		c, err := pop.NewConnection(&pop.ConnectionDetails{
 			URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
 			IdlePool:                  idlePool,
 			ConnMaxLifetime:           connMaxLifetime,
+			ConnMaxIdleTime:           connMaxIdleTime,
 			Pool:                      pool,
 			UseInstrumentedDriver:     m.Tracer(ctx).IsLoaded(),
 			InstrumentedDriverOptions: opts,

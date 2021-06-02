@@ -55,6 +55,9 @@ modify these settings by appending query parameters to your DSN
 - `max_conn_lifetime` sets the maximum amount of time (`ms`, `s`, `m`, `h`) a
   connection may be reused. Defaults to 0. Example
   `postgres://user:pw@host:port/database?max_conn_lifetime=10s`.
+- `max_conn_idle_time` sets the maximum amount of time (`ms`, `s`, `m`, `h`) a
+  connection can be kept alive. Defaults to 0. Example
+  `postgres://user:pw@host:port/database?max_conn_idle_time=10s`.
 
 #### MySQL
 

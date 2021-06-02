@@ -16,7 +16,7 @@ find an outdated section, please create a PR which removes or updates it!**
 From [Github](https://github.com/ory/hydra/issues/2333)
 
 > How can I store custom data in the client that can be retrieved along with the
-> login request (using the challenge code)?  
+> login request (using the challenge code)?
 > I would like send in some metadata to the /oauth2/auth endpoint that can be
 > retrievable by the "challenge code" that Hydra creates.
 
@@ -37,7 +37,7 @@ This URL is typically not needed, but might come in handy if you want to deal wi
 ## How can I control SQL connection limits?
 
 You can configure SQL connection limits by appending parameters `max_conns`,
-`max_idle_conns`, or `max_conn_lifetime` to the DSN:
+`max_idle_conns`, `max_conn_lifetime` or `max_conn_idle_time` to the DSN:
 `postgres://foo:bar@host:port/database?max_conns=12`.
 
 ## Why is the Resource Owner Password Credentials grant not supported?
@@ -286,8 +286,8 @@ etc - there you can basically whitelist the flows you need.
 
 ## How can i test if my 4445 is running properly?
 
-> I am using ory hydra for authentication.  
-> I get a 404 when im trying to create a client on my private EC2 hydra task.  
+> I am using ory hydra for authentication.
+> I get a 404 when im trying to create a client on my private EC2 hydra task.
 > Is there a way to test if my 4445 is running properly?
 
 You can check /health/alive, to see if it's alive. and /health/ready, to see if

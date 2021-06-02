@@ -65,7 +65,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 			},
 			RequestedScope: []string{"offline"},
 			GrantedScope:   []string{"offline"},
-			Session:        oauth2.NewSession("", nil),
+			Session:        oauth2.NewSession(""),
 			Form: url.Values{
 				"refresh_token": []string{fmt.Sprintf("%s.%s", token, tokenSignature)},
 			},

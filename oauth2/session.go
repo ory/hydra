@@ -42,7 +42,11 @@ type Session struct {
 	AllowedTopLevelClaims  []string
 }
 
-func NewSession(subject string, allowedTopLevelClaims []string) *Session {
+func NewSession(subject string) *Session {
+	return NewSessionWithCustomClaims(subject, nil)
+}
+
+func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string) *Session {
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims:  new(jwt.IDTokenClaims),

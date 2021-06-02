@@ -47,8 +47,9 @@ func (o *CreateOAuth2ClientReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,7 +58,7 @@ func NewCreateOAuth2ClientCreated() *CreateOAuth2ClientCreated {
 	return &CreateOAuth2ClientCreated{}
 }
 
-/* CreateOAuth2ClientCreated describes a response with status code 201, with default header values.
+/*CreateOAuth2ClientCreated handles this case with default header values.
 
 oAuth2Client
 */
@@ -68,6 +69,7 @@ type CreateOAuth2ClientCreated struct {
 func (o *CreateOAuth2ClientCreated) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientCreated  %+v", 201, o.Payload)
 }
+
 func (o *CreateOAuth2ClientCreated) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -89,7 +91,7 @@ func NewCreateOAuth2ClientBadRequest() *CreateOAuth2ClientBadRequest {
 	return &CreateOAuth2ClientBadRequest{}
 }
 
-/* CreateOAuth2ClientBadRequest describes a response with status code 400, with default header values.
+/*CreateOAuth2ClientBadRequest handles this case with default header values.
 
 genericError
 */
@@ -100,6 +102,7 @@ type CreateOAuth2ClientBadRequest struct {
 func (o *CreateOAuth2ClientBadRequest) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientBadRequest  %+v", 400, o.Payload)
 }
+
 func (o *CreateOAuth2ClientBadRequest) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -121,7 +124,7 @@ func NewCreateOAuth2ClientConflict() *CreateOAuth2ClientConflict {
 	return &CreateOAuth2ClientConflict{}
 }
 
-/* CreateOAuth2ClientConflict describes a response with status code 409, with default header values.
+/*CreateOAuth2ClientConflict handles this case with default header values.
 
 genericError
 */
@@ -132,6 +135,7 @@ type CreateOAuth2ClientConflict struct {
 func (o *CreateOAuth2ClientConflict) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientConflict  %+v", 409, o.Payload)
 }
+
 func (o *CreateOAuth2ClientConflict) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -153,7 +157,7 @@ func NewCreateOAuth2ClientInternalServerError() *CreateOAuth2ClientInternalServe
 	return &CreateOAuth2ClientInternalServerError{}
 }
 
-/* CreateOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
+/*CreateOAuth2ClientInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -164,6 +168,7 @@ type CreateOAuth2ClientInternalServerError struct {
 func (o *CreateOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *CreateOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

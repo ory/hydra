@@ -28,6 +28,8 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+
+	"github.com/ory/x/stringslice"
 )
 
 type Session struct {
@@ -50,51 +52,33 @@ func NewSession(subject string) *Session {
 	}
 }
 
-/**
-helper function to check if a string is existent in a slice
-param: s: string-slice to be searched
-param: e: string to find
-returns: bool: true if s contains e; false otherwise
-*/
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 	//results in import cycle
 	//conf := internal.NewConfigurationWithDefaults()
 
-	//results in nil pointer exception
-	//conf1 := config.Provider{}
+	//allowedTopLevelClaimsConfig := conf.AllowedTopLevelClaims()
 
-	//customTestClaims := conf.GetTestingCustomClaims()
-
-	//here you would need to pass the context, for which you would need to change strategy_jwt.go in fosite, so no option
-	//reg := driver.New(ctx)
-	//customTestClaims := reg.Config(ctx).GetTestingCustomClaims()
-
-	var customTestClaims []string
+	//for prototype purposes we allow all claims (that are not reserved)
+	var allowedTopLevelClaimsConfig = make([]string, 0, len(s.Extra))
+	for k := range s.Extra {
+		allowedTopLevelClaimsConfig = append(allowedTopLevelClaimsConfig, k)
+	}
 
 	//a slice of claims that are reserved and should not be overridden
 	var reservedClaims = []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
 
 	var allowedClaims []string
 
-	for _, cc := range customTestClaims {
+	for _, cc := range allowedTopLevelClaimsConfig {
 		//check if custom claim is part of reserved claims
-		if !contains(reservedClaims, cc) {
+		if !stringslice.Has(reservedClaims, cc) {
 			//if not so, we cann allow it, so add it to allowed claims
 			allowedClaims = append(allowedClaims, cc)
 		}
 	}
 
 	//our new extra map which will be added to the jwt
-	var topLevelExtraWithMirrorExt = map[string]interface{}{}
+	var topLevelExtraWithMirrorExt = jwt.Copy(s.Extra)
 
 	//a copy of our original extra claims, because otherwise we run into reference errors
 	var ext = jwt.Copy(s.Extra)

@@ -64,7 +64,7 @@ const (
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
-	TestingCustomClaims                          = "test.custom.claims"
+	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 )
 
 const DSNMemory = "memory"
@@ -131,8 +131,8 @@ func (p *Provider) IsUsingJWTAsAccessTokens() bool {
 	return p.AccessTokenStrategy() != "opaque"
 }
 
-func (p *Provider) GetTestingCustomClaims() []string {
-	return p.p.StringsF(TestingCustomClaims, []string{})
+func (p *Provider) AllowedTopLevelClaims() []string {
+	return p.p.StringsF(KeyAllowedTopLevelClaims, []string{})
 }
 
 func (p *Provider) SubjectTypesSupported() []string {

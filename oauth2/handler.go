@@ -33,9 +33,10 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
+
+	jwt2 "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
@@ -251,6 +252,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		FrontChannelLogoutSessionSupported:     true,
 		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(), LogoutPath).String(),
 		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
+		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	})
 }
 

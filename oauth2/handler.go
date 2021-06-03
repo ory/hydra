@@ -748,6 +748,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		ClientID:              authorizeRequest.GetClient().GetID(),
 		ConsentChallenge:      session.ID,
 		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(),
+		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(),
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())

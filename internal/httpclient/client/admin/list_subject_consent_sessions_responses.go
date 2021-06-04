@@ -41,9 +41,8 @@ func (o *ListSubjectConsentSessionsReader) ReadResponse(response runtime.ClientR
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewListSubjectConsentSessionsOK() *ListSubjectConsentSessionsOK {
 	return &ListSubjectConsentSessionsOK{}
 }
 
-/*ListSubjectConsentSessionsOK handles this case with default header values.
+/* ListSubjectConsentSessionsOK describes a response with status code 200, with default header values.
 
 A list of used consent requests.
 */
@@ -63,7 +62,6 @@ type ListSubjectConsentSessionsOK struct {
 func (o *ListSubjectConsentSessionsOK) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listSubjectConsentSessionsOK  %+v", 200, o.Payload)
 }
-
 func (o *ListSubjectConsentSessionsOK) GetPayload() []*models.PreviousConsentSession {
 	return o.Payload
 }
@@ -83,7 +81,7 @@ func NewListSubjectConsentSessionsBadRequest() *ListSubjectConsentSessionsBadReq
 	return &ListSubjectConsentSessionsBadRequest{}
 }
 
-/*ListSubjectConsentSessionsBadRequest handles this case with default header values.
+/* ListSubjectConsentSessionsBadRequest describes a response with status code 400, with default header values.
 
 genericError
 */
@@ -94,7 +92,6 @@ type ListSubjectConsentSessionsBadRequest struct {
 func (o *ListSubjectConsentSessionsBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listSubjectConsentSessionsBadRequest  %+v", 400, o.Payload)
 }
-
 func (o *ListSubjectConsentSessionsBadRequest) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -116,7 +113,7 @@ func NewListSubjectConsentSessionsInternalServerError() *ListSubjectConsentSessi
 	return &ListSubjectConsentSessionsInternalServerError{}
 }
 
-/*ListSubjectConsentSessionsInternalServerError handles this case with default header values.
+/* ListSubjectConsentSessionsInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -127,7 +124,6 @@ type ListSubjectConsentSessionsInternalServerError struct {
 func (o *ListSubjectConsentSessionsInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/sessions/consent][%d] listSubjectConsentSessionsInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *ListSubjectConsentSessionsInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

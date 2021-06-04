@@ -47,9 +47,8 @@ func (o *Oauth2TokenReader) ReadResponse(response runtime.ClientResponse, consum
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -58,7 +57,7 @@ func NewOauth2TokenOK() *Oauth2TokenOK {
 	return &Oauth2TokenOK{}
 }
 
-/*Oauth2TokenOK handles this case with default header values.
+/* Oauth2TokenOK describes a response with status code 200, with default header values.
 
 oauth2TokenResponse
 */
@@ -69,7 +68,6 @@ type Oauth2TokenOK struct {
 func (o *Oauth2TokenOK) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenOK  %+v", 200, o.Payload)
 }
-
 func (o *Oauth2TokenOK) GetPayload() *models.Oauth2TokenResponse {
 	return o.Payload
 }
@@ -91,7 +89,7 @@ func NewOauth2TokenBadRequest() *Oauth2TokenBadRequest {
 	return &Oauth2TokenBadRequest{}
 }
 
-/*Oauth2TokenBadRequest handles this case with default header values.
+/* Oauth2TokenBadRequest describes a response with status code 400, with default header values.
 
 genericError
 */
@@ -102,7 +100,6 @@ type Oauth2TokenBadRequest struct {
 func (o *Oauth2TokenBadRequest) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenBadRequest  %+v", 400, o.Payload)
 }
-
 func (o *Oauth2TokenBadRequest) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -124,7 +121,7 @@ func NewOauth2TokenUnauthorized() *Oauth2TokenUnauthorized {
 	return &Oauth2TokenUnauthorized{}
 }
 
-/*Oauth2TokenUnauthorized handles this case with default header values.
+/* Oauth2TokenUnauthorized describes a response with status code 401, with default header values.
 
 genericError
 */
@@ -135,7 +132,6 @@ type Oauth2TokenUnauthorized struct {
 func (o *Oauth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-
 func (o *Oauth2TokenUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -157,7 +153,7 @@ func NewOauth2TokenInternalServerError() *Oauth2TokenInternalServerError {
 	return &Oauth2TokenInternalServerError{}
 }
 
-/*Oauth2TokenInternalServerError handles this case with default header values.
+/* Oauth2TokenInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -168,7 +164,6 @@ type Oauth2TokenInternalServerError struct {
 func (o *Oauth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *Oauth2TokenInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

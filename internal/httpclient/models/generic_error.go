@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -20,16 +22,20 @@ import (
 type GenericError struct {
 
 	// Debug contains debug information. This is usually not available and has to be enabled.
+	// Example: The database adapter was unable to find the element
 	Debug string `json:"debug,omitempty"`
 
 	// Name is the error name.
+	// Example: The requested resource could not be found
 	// Required: true
 	Error *string `json:"error"`
 
 	// Description contains further information on the nature of the error.
+	// Example: Object with ID 12345 does not exist
 	ErrorDescription string `json:"error_description,omitempty"`
 
 	// Code represents the error status code (404, 403, 401, ...).
+	// Example: 404
 	StatusCode int64 `json:"status_code,omitempty"`
 }
 
@@ -53,6 +59,11 @@ func (m *GenericError) validateError(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this generic error based on context it is used
+func (m *GenericError) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

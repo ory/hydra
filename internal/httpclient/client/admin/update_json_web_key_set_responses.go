@@ -47,9 +47,8 @@ func (o *UpdateJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -58,7 +57,7 @@ func NewUpdateJSONWebKeySetOK() *UpdateJSONWebKeySetOK {
 	return &UpdateJSONWebKeySetOK{}
 }
 
-/*UpdateJSONWebKeySetOK handles this case with default header values.
+/* UpdateJSONWebKeySetOK describes a response with status code 200, with default header values.
 
 JSONWebKeySet
 */
@@ -69,7 +68,6 @@ type UpdateJSONWebKeySetOK struct {
 func (o *UpdateJSONWebKeySetOK) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetOK  %+v", 200, o.Payload)
 }
-
 func (o *UpdateJSONWebKeySetOK) GetPayload() *models.JSONWebKeySet {
 	return o.Payload
 }
@@ -91,7 +89,7 @@ func NewUpdateJSONWebKeySetUnauthorized() *UpdateJSONWebKeySetUnauthorized {
 	return &UpdateJSONWebKeySetUnauthorized{}
 }
 
-/*UpdateJSONWebKeySetUnauthorized handles this case with default header values.
+/* UpdateJSONWebKeySetUnauthorized describes a response with status code 401, with default header values.
 
 genericError
 */
@@ -102,7 +100,6 @@ type UpdateJSONWebKeySetUnauthorized struct {
 func (o *UpdateJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
-
 func (o *UpdateJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -124,7 +121,7 @@ func NewUpdateJSONWebKeySetForbidden() *UpdateJSONWebKeySetForbidden {
 	return &UpdateJSONWebKeySetForbidden{}
 }
 
-/*UpdateJSONWebKeySetForbidden handles this case with default header values.
+/* UpdateJSONWebKeySetForbidden describes a response with status code 403, with default header values.
 
 genericError
 */
@@ -135,7 +132,6 @@ type UpdateJSONWebKeySetForbidden struct {
 func (o *UpdateJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
-
 func (o *UpdateJSONWebKeySetForbidden) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -157,7 +153,7 @@ func NewUpdateJSONWebKeySetInternalServerError() *UpdateJSONWebKeySetInternalSer
 	return &UpdateJSONWebKeySetInternalServerError{}
 }
 
-/*UpdateJSONWebKeySetInternalServerError handles this case with default header values.
+/* UpdateJSONWebKeySetInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -168,7 +164,6 @@ type UpdateJSONWebKeySetInternalServerError struct {
 func (o *UpdateJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *UpdateJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

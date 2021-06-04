@@ -41,9 +41,8 @@ func (o *DeleteOAuth2ClientReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,9 +51,9 @@ func NewDeleteOAuth2ClientNoContent() *DeleteOAuth2ClientNoContent {
 	return &DeleteOAuth2ClientNoContent{}
 }
 
-/*DeleteOAuth2ClientNoContent handles this case with default header values.
+/* DeleteOAuth2ClientNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteOAuth2ClientNoContent struct {
@@ -74,7 +73,7 @@ func NewDeleteOAuth2ClientNotFound() *DeleteOAuth2ClientNotFound {
 	return &DeleteOAuth2ClientNotFound{}
 }
 
-/*DeleteOAuth2ClientNotFound handles this case with default header values.
+/* DeleteOAuth2ClientNotFound describes a response with status code 404, with default header values.
 
 genericError
 */
@@ -85,7 +84,6 @@ type DeleteOAuth2ClientNotFound struct {
 func (o *DeleteOAuth2ClientNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientNotFound  %+v", 404, o.Payload)
 }
-
 func (o *DeleteOAuth2ClientNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -107,7 +105,7 @@ func NewDeleteOAuth2ClientInternalServerError() *DeleteOAuth2ClientInternalServe
 	return &DeleteOAuth2ClientInternalServerError{}
 }
 
-/*DeleteOAuth2ClientInternalServerError handles this case with default header values.
+/* DeleteOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -118,7 +116,6 @@ type DeleteOAuth2ClientInternalServerError struct {
 func (o *DeleteOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *DeleteOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

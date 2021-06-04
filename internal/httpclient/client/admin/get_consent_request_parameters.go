@@ -16,56 +16,70 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewGetConsentRequestParams creates a new GetConsentRequestParams object
-// with the default values initialized.
+// NewGetConsentRequestParams creates a new GetConsentRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetConsentRequestParams() *GetConsentRequestParams {
-	var ()
 	return &GetConsentRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetConsentRequestParamsWithTimeout creates a new GetConsentRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetConsentRequestParamsWithTimeout(timeout time.Duration) *GetConsentRequestParams {
-	var ()
 	return &GetConsentRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetConsentRequestParamsWithContext creates a new GetConsentRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetConsentRequestParamsWithContext(ctx context.Context) *GetConsentRequestParams {
-	var ()
 	return &GetConsentRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetConsentRequestParamsWithHTTPClient creates a new GetConsentRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetConsentRequestParamsWithHTTPClient(client *http.Client) *GetConsentRequestParams {
-	var ()
 	return &GetConsentRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetConsentRequestParams contains all the parameters to send to the API endpoint
-for the get consent request operation typically these are written to a http.Request
+/* GetConsentRequestParams contains all the parameters to send to the API endpoint
+   for the get consent request operation.
+
+   Typically these are written to a http.Request.
 */
 type GetConsentRequestParams struct {
 
-	/*ConsentChallenge*/
+	// ConsentChallenge.
 	ConsentChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get consent request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetConsentRequestParams) WithDefaults() *GetConsentRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get consent request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetConsentRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get consent request params
@@ -124,6 +138,7 @@ func (o *GetConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg st
 	qrConsentChallenge := o.ConsentChallenge
 	qConsentChallenge := qrConsentChallenge
 	if qConsentChallenge != "" {
+
 		if err := r.SetQueryParam("consent_challenge", qConsentChallenge); err != nil {
 			return err
 		}

@@ -124,8 +124,6 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	}
 
 	set := jose.JSONWebKeySet{}
-	cmdx.Must(err, "Unable to decode payload to JSON: %s", err)
-
 	for _, path := range args[1:] {
 		file, err := ioutil.ReadFile(path)
 		cmdx.Must(err, "Unable to read file %s", path)

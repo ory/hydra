@@ -800,6 +800,20 @@
             true
           ]
         },
+        "allowed_top_level_claims": {
+          "type": "array",
+          "description": "A list of custom claims which are allowed to be added top level to the Access Token. They cannot override reserved claims.",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            [
+              "username",
+              "email",
+              "user_uuid"
+            ]
+          ]
+        },
         "hashers": {
           "type": "object",
           "additionalProperties": false,

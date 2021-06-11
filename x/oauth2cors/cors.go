@@ -98,7 +98,7 @@ func Middleware(reg interface {
 					return false
 				}
 
-				session := oauth2.NewSession("")
+				session := oauth2.NewSessionWithCustomClaims("", reg.Config().AllowedTopLevelClaims())
 				_, ar, err := reg.OAuth2Provider().IntrospectToken(context.Background(), token, fosite.AccessToken, session)
 				if err != nil {
 					return false

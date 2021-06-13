@@ -46,6 +46,13 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+
+      - go/load-cache:
+          key: ory-hydra-go-mod-v1
+      - go/mod-download
+      - go/save-cache:
+          key: ory-hydra-go-mod-v1
+
       - nancy/install
       - nancy/check
       - prettier/install
@@ -58,13 +65,6 @@ jobs:
       - goreleaser/check
       - golangci/install
       - golangci/lint
-
-      - go/load-cache:
-          key: ory-hydra-go-mod-v1
-      - go/mod-download
-      - go/save-cache:
-          key: ory-hydra-go-mod-v1
-
       - run: make .bin/go-acc
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)

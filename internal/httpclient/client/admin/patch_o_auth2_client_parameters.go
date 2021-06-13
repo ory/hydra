@@ -18,58 +18,73 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewPatchOAuth2ClientParams creates a new PatchOAuth2ClientParams object
-// with the default values initialized.
+// NewPatchOAuth2ClientParams creates a new PatchOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewPatchOAuth2ClientParams() *PatchOAuth2ClientParams {
-	var ()
 	return &PatchOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewPatchOAuth2ClientParamsWithTimeout creates a new PatchOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewPatchOAuth2ClientParamsWithTimeout(timeout time.Duration) *PatchOAuth2ClientParams {
-	var ()
 	return &PatchOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewPatchOAuth2ClientParamsWithContext creates a new PatchOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewPatchOAuth2ClientParamsWithContext(ctx context.Context) *PatchOAuth2ClientParams {
-	var ()
 	return &PatchOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewPatchOAuth2ClientParamsWithHTTPClient creates a new PatchOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewPatchOAuth2ClientParamsWithHTTPClient(client *http.Client) *PatchOAuth2ClientParams {
-	var ()
 	return &PatchOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*PatchOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the patch o auth2 client operation typically these are written to a http.Request
+/* PatchOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the patch o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type PatchOAuth2ClientParams struct {
 
-	/*Body*/
+	// Body.
 	Body models.PatchRequest
-	/*ID*/
+
+	// ID.
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the patch o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *PatchOAuth2ClientParams) WithDefaults() *PatchOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the patch o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *PatchOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the patch o auth2 client params
@@ -134,7 +149,6 @@ func (o *PatchOAuth2ClientParams) WriteToRequest(r runtime.ClientRequest, reg st
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

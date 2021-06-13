@@ -17,69 +17,85 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewRevokeConsentSessionsParams creates a new RevokeConsentSessionsParams object
-// with the default values initialized.
+// NewRevokeConsentSessionsParams creates a new RevokeConsentSessionsParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewRevokeConsentSessionsParams() *RevokeConsentSessionsParams {
-	var ()
 	return &RevokeConsentSessionsParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewRevokeConsentSessionsParamsWithTimeout creates a new RevokeConsentSessionsParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewRevokeConsentSessionsParamsWithTimeout(timeout time.Duration) *RevokeConsentSessionsParams {
-	var ()
 	return &RevokeConsentSessionsParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewRevokeConsentSessionsParamsWithContext creates a new RevokeConsentSessionsParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewRevokeConsentSessionsParamsWithContext(ctx context.Context) *RevokeConsentSessionsParams {
-	var ()
 	return &RevokeConsentSessionsParams{
-
 		Context: ctx,
 	}
 }
 
 // NewRevokeConsentSessionsParamsWithHTTPClient creates a new RevokeConsentSessionsParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewRevokeConsentSessionsParamsWithHTTPClient(client *http.Client) *RevokeConsentSessionsParams {
-	var ()
 	return &RevokeConsentSessionsParams{
 		HTTPClient: client,
 	}
 }
 
-/*RevokeConsentSessionsParams contains all the parameters to send to the API endpoint
-for the revoke consent sessions operation typically these are written to a http.Request
+/* RevokeConsentSessionsParams contains all the parameters to send to the API endpoint
+   for the revoke consent sessions operation.
+
+   Typically these are written to a http.Request.
 */
 type RevokeConsentSessionsParams struct {
 
-	/*All
-	  If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
+	/* All.
 
+	   If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
 	*/
 	All *bool
-	/*Client
-	  If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 
+	/* Client.
+
+	   If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
 	*/
 	Client *string
-	/*Subject
-	  The subject (Subject) who's consent sessions should be deleted.
 
+	/* Subject.
+
+	   The subject (Subject) who's consent sessions should be deleted.
 	*/
 	Subject string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the revoke consent sessions params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RevokeConsentSessionsParams) WithDefaults() *RevokeConsentSessionsParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the revoke consent sessions params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RevokeConsentSessionsParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the revoke consent sessions params
@@ -160,38 +176,41 @@ func (o *RevokeConsentSessionsParams) WriteToRequest(r runtime.ClientRequest, re
 
 		// query param all
 		var qrAll bool
+
 		if o.All != nil {
 			qrAll = *o.All
 		}
 		qAll := swag.FormatBool(qrAll)
 		if qAll != "" {
+
 			if err := r.SetQueryParam("all", qAll); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	if o.Client != nil {
 
 		// query param client
 		var qrClient string
+
 		if o.Client != nil {
 			qrClient = *o.Client
 		}
 		qClient := qrClient
 		if qClient != "" {
+
 			if err := r.SetQueryParam("client", qClient); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	// query param subject
 	qrSubject := o.Subject
 	qSubject := qrSubject
 	if qSubject != "" {
+
 		if err := r.SetQueryParam("subject", qSubject); err != nil {
 			return err
 		}

@@ -35,9 +35,8 @@ func (o *ListOAuth2ClientsReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -46,7 +45,7 @@ func NewListOAuth2ClientsOK() *ListOAuth2ClientsOK {
 	return &ListOAuth2ClientsOK{}
 }
 
-/*ListOAuth2ClientsOK handles this case with default header values.
+/* ListOAuth2ClientsOK describes a response with status code 200, with default header values.
 
 A list of clients.
 */
@@ -57,7 +56,6 @@ type ListOAuth2ClientsOK struct {
 func (o *ListOAuth2ClientsOK) Error() string {
 	return fmt.Sprintf("[GET /clients][%d] listOAuth2ClientsOK  %+v", 200, o.Payload)
 }
-
 func (o *ListOAuth2ClientsOK) GetPayload() []*models.OAuth2Client {
 	return o.Payload
 }
@@ -77,7 +75,7 @@ func NewListOAuth2ClientsInternalServerError() *ListOAuth2ClientsInternalServerE
 	return &ListOAuth2ClientsInternalServerError{}
 }
 
-/*ListOAuth2ClientsInternalServerError handles this case with default header values.
+/* ListOAuth2ClientsInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -88,7 +86,6 @@ type ListOAuth2ClientsInternalServerError struct {
 func (o *ListOAuth2ClientsInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /clients][%d] listOAuth2ClientsInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *ListOAuth2ClientsInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

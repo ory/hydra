@@ -41,9 +41,8 @@ func (o *GetJSONWebKeyReader) ReadResponse(response runtime.ClientResponse, cons
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewGetJSONWebKeyOK() *GetJSONWebKeyOK {
 	return &GetJSONWebKeyOK{}
 }
 
-/*GetJSONWebKeyOK handles this case with default header values.
+/* GetJSONWebKeyOK describes a response with status code 200, with default header values.
 
 JSONWebKeySet
 */
@@ -63,7 +62,6 @@ type GetJSONWebKeyOK struct {
 func (o *GetJSONWebKeyOK) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyOK  %+v", 200, o.Payload)
 }
-
 func (o *GetJSONWebKeyOK) GetPayload() *models.JSONWebKeySet {
 	return o.Payload
 }
@@ -85,7 +83,7 @@ func NewGetJSONWebKeyNotFound() *GetJSONWebKeyNotFound {
 	return &GetJSONWebKeyNotFound{}
 }
 
-/*GetJSONWebKeyNotFound handles this case with default header values.
+/* GetJSONWebKeyNotFound describes a response with status code 404, with default header values.
 
 genericError
 */
@@ -96,7 +94,6 @@ type GetJSONWebKeyNotFound struct {
 func (o *GetJSONWebKeyNotFound) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyNotFound  %+v", 404, o.Payload)
 }
-
 func (o *GetJSONWebKeyNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -118,7 +115,7 @@ func NewGetJSONWebKeyInternalServerError() *GetJSONWebKeyInternalServerError {
 	return &GetJSONWebKeyInternalServerError{}
 }
 
-/*GetJSONWebKeyInternalServerError handles this case with default header values.
+/* GetJSONWebKeyInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -129,7 +126,6 @@ type GetJSONWebKeyInternalServerError struct {
 func (o *GetJSONWebKeyInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *GetJSONWebKeyInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

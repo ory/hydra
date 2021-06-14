@@ -37,6 +37,19 @@ const (
 	KeyDSN                                       = "dsn"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
 	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
+	KeyAdminListenOnHost                         = "serve.admin.host"
+	KeyAdminListenOnPort                         = "serve.admin.port"
+	KeyAdminSocketOwner                          = "serve.admin.socket.owner"
+	KeyAdminSocketGroup                          = "serve.admin.socket.group"
+	KeyAdminSocketMode                           = "serve.admin.socket.mode"
+	KeyAdminDisableHealthAccessLog               = "serve.admin.access_log.disable_for_health"
+	KeyPublicListenOnHost                        = "serve.public.host"
+	KeyPublicListenOnPort                        = "serve.public.port"
+	KeyPublicSocketOwner                         = "serve.public.socket.owner"
+	KeyPublicSocketGroup                         = "serve.public.socket.group"
+	KeyPublicSocketMode                          = "serve.public.socket.mode"
+	KeyPublicDisableHealthAccessLog              = "serve.public.access_log.disable_for_health"
+	KeyPublicAllowDynamicRegistration            = "serve.public.allow_dynamic_registration"
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
@@ -214,6 +227,10 @@ func (p *Provider) CookieSameSiteMode() http.SameSite {
 		}
 		return http.SameSiteDefaultMode
 	}
+}
+
+func (p *Provider) PublicAllowDynamicRegistration() bool {
+	return p.p.Bool(KeyPublicAllowDynamicRegistration)
 }
 
 func (p *Provider) CookieSameSiteLegacyWorkaround() bool {

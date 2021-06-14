@@ -689,6 +689,19 @@ serve:
         #
         path: /path/to/file.pem
 
+    ## allow_dynamic_registration ##
+    #
+    # Allow oidc dynamic client registration.
+    #
+    # Default value: false
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export SERVE_PUBLIC_ALLOW_DYNAMIC_REGISTRATION=<value>
+    # - Windows Command Line (CMD):
+    #    > set SERVE_PUBLIC_ALLOW_DYNAMIC_REGISTRATION=<value>
+    #
+    allow_dynamic_registration: false
     ## port ##
     #
     # Default value: 4444

@@ -134,6 +134,21 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	assert.Equal(t, true, value)
 }
 
+func TestPublicAllowDynamicRegistration(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+
+	p := MustNew(l)
+
+	value := p.PublicAllowDynamicRegistration()
+	assert.Equal(t, false, value)
+
+	p.MustSet(KeyPublicAllowDynamicRegistration, "true")
+
+	value = p.PublicAllowDynamicRegistration()
+	assert.Equal(t, true, value)
+}
+
 func TestProviderIssuerURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)

@@ -22,6 +22,7 @@ package client_test
 
 import (
 	"fmt"
+	"github.com/Jeffail/gabs/v2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -195,6 +196,79 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestValidateDynamicRegistration(t *testing.T) {
+	c := internal.NewConfigurationWithDefaults()
+	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
+
+	v := NewValidator(c)
+	for k, tc := range []struct {
+		in        *Client
+		check     func(t *testing.T, c *Client)
+		expectErr bool
+		v         func(t *testing.T) *Validator
+	}{
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+				Metadata:               []byte("{\"access_token_ttl\":10}"),
+			},
+			expectErr: true,
+		},
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+				Metadata:               []byte("{\"id_token_ttl\":10}"),
+			},
+			expectErr: true,
+		},
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+				Metadata:               []byte("{\"anything\":10}"),
+			},
+			check: func(t *testing.T, c *Client) {
+				jsonParsed, err := gabs.ParseJSON(c.Metadata)
+				assert.Nil(t, err)
+				val, ok := jsonParsed.Path("anything").Data().(float64)
+				assert.Equal(t, float64(10), val)
+				assert.Equal(t, true, ok)
+			},
+		},
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+			},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "foo", c.OutfacingID)
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			if tc.v == nil {
+				tc.v = func(t *testing.T) *Validator {
+					return v
+				}
+			}
+			err := tc.v(t).ValidateDynamicRegistration(tc.in)
+			if tc.expectErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				tc.check(t, tc.in)
 			}
 		})
 	}

@@ -141,6 +141,8 @@ serve:
     access_log:
       # Disable access log for health endpoints.
       disable_for_health: false
+    # Allow oidc dynamic client registration
+    allow_dynamic_registration: false
 
   # admin controls the admin daemon serving admin API endpoints like /jwk, /client, ...
   admin:

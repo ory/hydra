@@ -3,7 +3,7 @@
 #
 # !!WARNING!!
 # This configuration file is for documentation purposes only. Do not use it in production. As all configuration items
-# are enabled, it will not work out of the box either.
+# are enabled, it will not work out of the box either. 
 #
 #
 # ORY Hydra can be configured using a configuration file and passing the file location using `--config path/to/config.yaml`.

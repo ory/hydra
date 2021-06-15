@@ -479,14 +479,18 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 			return
 		}
 
-		_, ok := jsonParsed.Path("access_token_ttl").Data().(float64)
-		if ok {
-			jsonParsed.Delete("access_token_ttl")
+		if _, ok := jsonParsed.Path("access_token_ttl").Data().(float64); ok {
+			if err := jsonParsed.Delete("access_token_ttl"); err != nil {
+				h.r.Writer().WriteError(w, r, err)
+				return
+			}
 		}
 
-		_, ok = jsonParsed.Path("id_token_ttl").Data().(float64)
-		if ok {
-			jsonParsed.Delete("id_token_ttl")
+		if _, ok := jsonParsed.Path("id_token_ttl").Data().(float64); ok {
+			if err := jsonParsed.Delete("id_token_ttl"); err != nil {
+				h.r.Writer().WriteError(w, r, err)
+				return
+			}
 		}
 		c.Metadata = sqlxx.JSONRawMessage(jsonParsed.String())
 	}

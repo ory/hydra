@@ -14,6 +14,16 @@ version: '3.7'
 
 services:
 
+  hydra-migrate:
+    image: oryd/hydra:v1.10.2
+    environment:
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  hydra:
+    image: oryd/hydra:v1.10.2
+    environment:
+      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
+
   postgresd:
     image: postgres:9.6
     ports:
@@ -22,11 +32,5 @@ services:
       - POSTGRES_USER=hydra
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=hydra
-
-  hydra-migrate:
-    image: oryd/hydra:v1.9.2
-    environment:
-      - DSN=postgres://hydra:secret@postgresd:5432/hydra?sslmode=disable&max_conns=20&max_idle_conns=4
-    command:
-      migrate sql -e --yes
-    restart: on-failure
+    networks:
+      - intranet

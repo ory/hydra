@@ -49,7 +49,8 @@ type Handler struct {
 }
 
 const (
-	ClientsHandlerPath = "/clients"
+	ClientsHandlerPath    = "/clients"
+	DynClientsHandlerPath = "/dyn-clients"
 )
 
 func NewHandler(r InternalRegistry) *Handler {
@@ -67,10 +68,10 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 
 	if dynamicRegistration {
-		public.POST(ClientsHandlerPath, h.CreateDynamicRegistration)
-		public.GET(ClientsHandlerPath+"/:id", h.GetDynamicRegistration)
-		public.PUT(ClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
-		public.DELETE(ClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
+		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
+		public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
+		public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
+		public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
 	}
 }
 
@@ -133,7 +134,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route POST /clients public createOAuth2Client
+// swagger:route POST /dyn-clients public createDynOAuth2Client
 //
 // Create an OAuth 2.0 Client
 //
@@ -296,7 +297,7 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 	return nil
 }
 
-// swagger:route PUT /clients/{id} public updateOAuth2Client
+// swagger:route PUT /dyn-clients/{id} public updateDynOAuth2Client
 //
 // Update an OAuth 2.0 Client
 //
@@ -440,7 +441,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /clients/{id} public getOAuth2Client
+// swagger:route GET /dyn-clients/{id} public getDynOAuth2Client
 //
 // Get an OAuth 2.0 Client.
 //
@@ -529,7 +530,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /clients/{id} public deleteOAuth2Client
+// swagger:route DELETE /dyn-clients/{id} public deleteDynOAuth2Client
 //
 // Deletes an OAuth 2.0 Client
 //

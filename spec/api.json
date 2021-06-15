@@ -154,7 +154,7 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "public"
         ],
         "summary": "Create an OAuth 2.0 Client",
         "operationId": "createOAuth2Client",
@@ -210,7 +210,7 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "public"
         ],
         "summary": "Get an OAuth 2.0 Client.",
         "operationId": "getOAuth2Client",
@@ -257,7 +257,7 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "public"
         ],
         "summary": "Update an OAuth 2.0 Client",
         "operationId": "updateOAuth2Client",
@@ -305,7 +305,7 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "public"
         ],
         "summary": "Deletes an OAuth 2.0 Client",
         "operationId": "deleteOAuth2Client",
@@ -2154,6 +2154,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"

@@ -34,6 +34,7 @@ import (
 	"github.com/pborman/uuid"
 
 	"github.com/Jeffail/gabs/v2"
+
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 )

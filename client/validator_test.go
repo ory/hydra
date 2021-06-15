@@ -22,10 +22,11 @@ package client_test
 
 import (
 	"fmt"
-	"github.com/Jeffail/gabs/v2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/Jeffail/gabs/v2"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -8,7 +8,7 @@ If this change neither resolves an existing issue nor has sign-off from one of t
 chance substantial changes will be requested or that the changes will be rejected.
 
 You can discuss changes with maintainers either in the Github Discusssions in this repository or
-join the [ORY Chat](https://www.ory.sh/chat).
+join the [Ory Chat](https://www.ory.sh/chat).
 -->
 
 ## Proposed changes

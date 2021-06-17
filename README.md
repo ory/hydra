@@ -98,10 +98,10 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 
 <!--BEGIN ADOPTERS-->
 
-The ORY community stands on the shoulders of individuals, companies, and
+The Ory community stands on the shoulders of individuals, companies, and
 maintainers. We thank everyone involved - from submitting bug reports and
 feature requests, to contributing patches, to sponsoring our work. Our community
-is 1000+ strong and growing rapidly. The ORY stack protects 16.000.000.000+ API
+is 1000+ strong and growing rapidly. The Ory stack protects 16.000.000.000+ API
 requests every month with over 250.000+ active service nodes. We would have
 never been able to achieve this without each and everyone of you!
 
@@ -218,7 +218,7 @@ and past & current supporters (in alphabetical order) on
 Kennedy, Drozzy, Edwin Trejos, Howard Edidin, Ken Adler Oz Haven, Stefan Hans,
 TheCrealm.
 
-<em>\* Uses one of ORY's major projects in production.</em>
+<em>\* Uses one of Ory's major projects in production.</em>
 
 <!--END ADOPTERS-->
 
@@ -313,40 +313,40 @@ design:
 - Scales without effort
 - Minimize room for human and network errors
 
-ORY's architecture designed to run best on a Container Orchestration Systems
+Ory's architecture designed to run best on a Container Orchestration Systems
 such as Kubernetes, CloudFoundry, OpenShift, and similar projects. Binaries are
 small (5-15MB) and available for all popular processor types (ARM, AMD64, i386)
 and operating systems (FreeBSD, Linux, macOS, Windows) without system
 dependencies (Java, Node, Ruby, libxml, ...).
 
-### ORY Kratos: Identity and User Infrastructure and Management
+### Ory Kratos: Identity and User Infrastructure and Management
 
-[ORY Kratos](https://github.com/ory/kratos) is an API-first Identity and User
+[Ory Kratos](https://github.com/ory/kratos) is an API-first Identity and User
 Management system that is built according to
 [cloud architecture best practices](https://www.ory.sh/docs/next/ecosystem/software-architecture-philosophy).
 It implements core use cases that almost every software application needs to
 deal with: Self-service Login and Registration, Multi-Factor Authentication
 (MFA/2FA), Account Recovery and Verification, Profile and Account Management.
 
-### ORY Hydra: OAuth2 & OpenID Connect Server
+### Ory Hydra: OAuth2 & OpenID Connect Server
 
-[ORY Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
+[Ory Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
 OpenID Connect Provider which easily connects to any existing identity system by
 writing a tiny "bridge" application. Gives absolute control over user interface
 and user experience flows.
 
-### ORY Oathkeeper: Identity & Access Proxy
+### Ory Oathkeeper: Identity & Access Proxy
 
-[ORY Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust
+[Ory Oathkeeper](https://github.com/ory/oathkeeper) is a BeyondCorp/Zero Trust
 Identity & Access Proxy (IAP) with configurable authentication, authorization,
 and request mutation rules for your web services: Authenticate JWT, Access
 Tokens, API Keys, mTLS; Check if the contained subject is allowed to perform the
 request; Encode resulting content into custom headers (`X-User-ID`), JSON Web
 Tokens and more!
 
-### ORY Keto: Access Control Policies as a Server
+### Ory Keto: Access Control Policies as a Server
 
-[ORY Keto](https://github.com/ory/keto) is a policy decision point. It uses a
+[Ory Keto](https://github.com/ory/keto) is a policy decision point. It uses a
 set of access control policies, similar to AWS IAM Policies, in order to
 determine whether a subject (user, application, service, car, ...) is authorized
 to perform a certain action on a resource.

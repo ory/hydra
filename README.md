@@ -26,8 +26,7 @@ ORY Hydra is a hardened, **OpenID Certified OAuth 2.0 Server and OpenID Connect 
 and low resource consumption. ORY Hydra *is not* an identity provider (user sign up, user login, password reset flow),
 but connects to your existing identity provider through a [login and consent app](https://www.ory.sh/docs/next/hydra/oauth2#authenticating-users-and-requesting-consent).
 Implementing the login and consent app in a different language is easy, and exemplary consent apps
-([Go](https://github.com/ory/hydra-consent-app-go), [Node](https://github.com/ory/hydra-consent-app-express)) and
-[SDKs](https://www.ory.sh/docs/next/hydra/sdk/) are provided.
+([Node](https://github.com/ory/hydra-login-consent-node)) and [SDKs](https://www.ory.sh/docs/next/hydra/sdk/) for all common languages are provided.
 
 If you're looking to jump straight into it, go ahead:
 

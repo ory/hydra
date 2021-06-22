@@ -142,6 +142,10 @@ func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	}
 
 	kid, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	token, _, err := h.r.OpenIDJWTStrategy().Generate(r.Context(), jwtgo.MapClaims{
 		"iss": h.r.ClientValidator().conf.IssuerURL().String(),
 		"exp": time.Now().Add(h.r.ClientValidator().conf.DynamicClientRegistrationTokenLifespan()).Unix(),
@@ -600,7 +604,6 @@ func (h *Handler) validateDynClientRegistrationAuthorization(r *http.Request, c 
 	default:
 		return herodot.ErrUnauthorized.WithReason("Token does not contains a valid sid")
 	}
-	return herodot.ErrUnauthorized.WithReason("Unexpected error")
 }
 
 func getBasicAuth(req *http.Request) string {

@@ -45,7 +45,7 @@ const (
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
-	KeyDynamicClientRegistrationTokenLifespan    = "ttl.dynamic_client_registration_token"
+	KeyDynamicClientRegistrationTokenLifespan    = "ttl.dynamic_client_registration_token" // #nosec G101
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
 	KeyGetSystemSecret                           = "secrets.system"

@@ -702,6 +702,7 @@ serve:
     #    > set SERVE_PUBLIC_ALLOW_DYNAMIC_REGISTRATION=<value>
     #
     allow_dynamic_registration: false
+
     ## port ##
     #
     # Default value: 4444
@@ -1167,6 +1168,20 @@ ttl:
   #    > set TTL_LOGIN_CONSENT_REQUEST=<value>
   #
   login_consent_request: 1h
+
+  ## dynamic_client_registration_token ##
+  #
+  # Configures how long a dynamic client registration are valid.
+  #
+  # Default value: 1h
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export TTL_DYNAMIC_CLIENT_REGISTRATION_TOKEN=<value>
+  # - Windows Command Line (CMD):
+  #    > set TTL_DYNAMIC_CLIENT_REGISTRATION_TOKEN=<value>
+  #
+  dynamic_client_registration_token: 1h
 
 ## oauth2 ##
 #

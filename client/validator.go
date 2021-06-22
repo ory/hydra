@@ -33,8 +33,6 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/Jeffail/gabs/v2"
-
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 )
@@ -191,28 +189,11 @@ func (v *Validator) Validate(c *Client) error {
 func (v *Validator) ValidateDynamicRegistration(c *Client) error {
 
 	if c.Metadata != nil {
-		jsonParsed, err := gabs.ParseJSON(c.Metadata)
-		if err != nil {
-			return errorsx.WithStack(ErrInvalidClientMetadata.
-				WithHintf(`metadata "%v" cannot be parsed'`, c.Metadata),
-			)
-		}
-
-		_, ok := jsonParsed.Path("access_token_ttl").Data().(float64)
-		if ok {
-			return errorsx.WithStack(ErrInvalidClientMetadata.
-				WithHint(`access_token_ttl cannot be set for dynamic client registration'`),
-			)
-		}
-
-		_, ok = jsonParsed.Path("id_token_ttl").Data().(float64)
-		if ok {
-			return errorsx.WithStack(ErrInvalidClientMetadata.
-				WithHint(`id_token_ttl cannot be set for dynamic client registration'`),
-			)
-		}
+		return errorsx.WithStack(ErrInvalidClientMetadata.
+			WithHint(`metadata cannot be set for dynamic client registration'`),
+		)
 	}
-	return nil
+	return v.Validate(c)
 }
 
 func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {

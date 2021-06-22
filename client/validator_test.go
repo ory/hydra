@@ -26,8 +26,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Jeffail/gabs/v2"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
@@ -239,13 +237,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 				RedirectURIs:           []string{"https://foo/"},
 				Metadata:               []byte("{\"anything\":10}"),
 			},
-			check: func(t *testing.T, c *Client) {
-				jsonParsed, err := gabs.ParseJSON(c.Metadata)
-				assert.Nil(t, err)
-				val, ok := jsonParsed.Path("anything").Data().(float64)
-				assert.Equal(t, float64(10), val)
-				assert.Equal(t, true, ok)
-			},
+			expectErr: true,
 		},
 		{
 			in: &Client{

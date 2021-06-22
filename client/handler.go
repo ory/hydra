@@ -22,14 +22,19 @@ package client
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
-	"github.com/Jeffail/gabs/v2"
+	"github.com/ory/fosite"
 
-	"github.com/ory/x/sqlxx"
+	"github.com/pborman/uuid"
+
+	"github.com/ory/fosite/token/jwt"
+	jwtgo "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/x/errorsx"
 
@@ -50,7 +55,7 @@ type Handler struct {
 
 const (
 	ClientsHandlerPath    = "/clients"
-	DynClientsHandlerPath = "/dyn-clients"
+	DynClientsHandlerPath = "/connect/register"
 )
 
 func NewHandler(r InternalRegistry) *Handler {
@@ -69,9 +74,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 
 	if dynamicRegistration {
 		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
-		public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
-		public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
-		public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
+		public.GET(DynClientsHandlerPath, h.GetDynamicRegistration)
+		public.PUT(DynClientsHandlerPath, h.UpdateDynamicRegistration)
+		public.DELETE(DynClientsHandlerPath, h.DeleteDynamicRegistration)
 	}
 }
 
@@ -98,49 +103,22 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 //       409: genericError
 //       500: genericError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var c Client
-
-	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
+	c, err := h.create(w, r, h.r.ClientValidator().Validate)
+	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
-	if len(c.Secret) == 0 {
-		secretb, err := x.GenerateSecret(26)
-		if err != nil {
-			h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
-			return
-		}
-		c.Secret = string(secretb)
-	}
-
-	if err := h.r.ClientValidator().Validate(&c); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	secret := c.Secret
-	c.CreatedAt = time.Now().UTC().Round(time.Second)
-	c.UpdatedAt = c.CreatedAt
-	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	c.Secret = ""
-	if !c.IsPublic() {
-		c.Secret = secret
-	}
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route POST /dyn-clients public createDynOAuth2Client
+// swagger:route POST /connect/register public createOAuth2ClientPublic
 //
 // Create an OAuth 2.0 Client
 //
-// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
+// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.
 //
 //
 //     Consumes:
@@ -157,45 +135,76 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //       409: genericError
 //       500: genericError
 func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var c Client
-
-	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
+	c, err := h.create(w, r, h.r.ClientValidator().ValidateDynamicRegistration)
+	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
-	if err := h.r.ClientValidator().ValidateDynamicRegistration(&c); err != nil {
+	kid, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
+	token, _, err := h.r.OpenIDJWTStrategy().Generate(r.Context(), jwtgo.MapClaims{
+		"iss": h.r.ClientValidator().conf.IssuerURL().String(),
+		"exp": time.Now().Add(h.r.ClientValidator().conf.DynamicClientRegistrationTokenLifespan()).Unix(),
+		"aud": []string{c.OutfacingID},
+		"iat": time.Now().UTC().Unix(),
+		"jti": uuid.New(),
+		"sid": c.GetID(),
+	}, &jwt.Headers{
+		Extra: map[string]interface{}{"kid": kid},
+	})
+	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
+	}
+
+	b, err := json.Marshal(c)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	var resp map[string]interface{}
+	err = json.Unmarshal(b, &resp)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	resp["registration_access_token"] = token
+
+	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &resp)
+}
+
+func (h *Handler) create(w http.ResponseWriter, r *http.Request, f func(*Client) error) (*Client, error) {
+	var c Client
+
+	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
+		return nil, err
 	}
 
 	if len(c.Secret) == 0 {
 		secretb, err := x.GenerateSecret(26)
 		if err != nil {
-			h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
-			return
+			return nil, err
 		}
 		c.Secret = string(secretb)
 	}
 
-	if err := h.r.ClientValidator().Validate(&c); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
+	if err := f(&c); err != nil {
+		return nil, err
 	}
 
 	secret := c.Secret
 	c.CreatedAt = time.Now().UTC().Round(time.Second)
 	c.UpdatedAt = c.CreatedAt
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
+		return nil, err
 	}
 
 	c.Secret = ""
 	if !c.IsPublic() {
 		c.Secret = secret
 	}
-	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
+	return &c, nil
 }
 
 // swagger:route PUT /clients/{id} admin updateOAuth2Client
@@ -297,13 +306,13 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 	return nil
 }
 
-// swagger:route PUT /dyn-clients/{id} public updateDynOAuth2Client
+// swagger:route PUT/connect/register public updateOAuth2ClientPublic
 //
 // Update an OAuth 2.0 Client
 //
 // Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
 //
 //     Consumes:
 //     - application/json
@@ -328,19 +337,14 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	if len(c.Secret) > 0 {
 		secret = c.Secret
 	}
-	if _, err := h.r.ClientManager().Authenticate(r.Context(), ps.ByName("id"), []byte(secret)); err != nil {
-		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
-		h.r.Writer().WriteError(w, r, err)
+
+	c.OutfacingID = r.URL.Query().Get("client_id")
+	if err := h.validateDynClientRegistrationAuthorization(r, c); err != nil {
+		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
 		return
 	}
 
 	if err := h.r.ClientValidator().ValidateDynamicRegistration(&c); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	c.OutfacingID = ps.ByName("id")
-	if err := h.r.ClientValidator().Validate(&c); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -441,13 +445,13 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /dyn-clients/{id} public getDynOAuth2Client
+// swagger:route GET /connect/register public getOAuth2ClientPublic
 //
 // Get an OAuth 2.0 Client.
 //
 // Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
 //
 //
 //     Consumes:
@@ -463,39 +467,22 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //       401: genericError
 //       500: genericError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
-	var secret = r.URL.Query()["secret"][0]
+	var id = r.URL.Query().Get("client_id")
 
-	c, err := h.r.ClientManager().Authenticate(r.Context(), id, []byte(secret))
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
 		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	c.Secret = ""
-	if c.Metadata != nil {
-		jsonParsed, err := gabs.ParseJSON(c.Metadata)
-		if err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-
-		if _, ok := jsonParsed.Path("access_token_ttl").Data().(float64); ok {
-			if err := jsonParsed.Delete("access_token_ttl"); err != nil {
-				h.r.Writer().WriteError(w, r, err)
-				return
-			}
-		}
-
-		if _, ok := jsonParsed.Path("id_token_ttl").Data().(float64); ok {
-			if err := jsonParsed.Delete("id_token_ttl"); err != nil {
-				h.r.Writer().WriteError(w, r, err)
-				return
-			}
-		}
-		c.Metadata = sqlxx.JSONRawMessage(jsonParsed.String())
+	if err := h.validateDynClientRegistrationAuthorization(r, *c); err != nil {
+		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
+		return
 	}
+
+	c.Secret = ""
+	c.Metadata = nil
 	h.r.Writer().Write(w, r, c)
 }
 
@@ -530,13 +517,13 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /dyn-clients/{id} public deleteDynOAuth2Client
+// swagger:route DELETE /connect/register public deleteOAuth2ClientPublic
 //
 // Deletes an OAuth 2.0 Client
 //
 // Delete an existing OAuth 2.0 Client by its ID.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
 //
 //     Consumes:
 //     - application/json
@@ -551,13 +538,17 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       404: genericError
 //       500: genericError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = ps.ByName("id")
-	var secret = r.URL.Query()["secret"][0]
+	var id = r.URL.Query().Get("client_id")
 
-	_, err := h.r.ClientManager().Authenticate(r.Context(), id, []byte(secret))
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
 		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
 		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	if err := h.validateDynClientRegistrationAuthorization(r, *c); err != nil {
+		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
 		return
 	}
 
@@ -567,4 +558,58 @@ func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handler) validateDynClientRegistrationAuthorization(r *http.Request, c Client) error {
+
+	// Check basic auth
+	if basicAuth := getBasicAuth(r); basicAuth != "" {
+		sDec, err := base64.StdEncoding.DecodeString(basicAuth)
+		if err != nil {
+			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
+		}
+		split := strings.SplitN(string(sDec), ":", 2)
+		if len(split) != 2 {
+			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
+		}
+		if c.OutfacingID != split[0] {
+			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
+		}
+		_, err = h.r.ClientManager().Authenticate(r.Context(), split[0], []byte(split[1]))
+		if err != nil {
+			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
+		}
+		return nil
+	}
+
+	// Check check token
+	t, err := h.r.OpenIDJWTStrategy().Decode(r.Context(), fosite.AccessTokenFromRequest(r))
+	if err != nil {
+		return herodot.ErrUnauthorized.WithReason("Error parsing access token")
+	}
+
+	if !t.Valid() {
+		return herodot.ErrUnauthorized.WithReason("Invalid token")
+	}
+	switch sid := t.Claims["sid"].(type) {
+	case string:
+		if c.OutfacingID != sid {
+			return herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
+		}
+		return nil
+	default:
+		return herodot.ErrUnauthorized.WithReason("Token does not contains a valid sid")
+	}
+	return herodot.ErrUnauthorized.WithReason("Unexpected error")
+}
+
+func getBasicAuth(req *http.Request) string {
+	auth := req.Header.Get("Authorization")
+	split := strings.SplitN(auth, " ", 2)
+	if len(split) != 2 || !strings.EqualFold(split[0], "Basic") {
+		// Nothing in Authorization header
+		return ""
+	}
+
+	return split[1]
 }

@@ -110,6 +110,7 @@ ttl:
   refresh_token: 2h
   id_token: 2h
   auth_code: 2h
+  dynamic_client_registration_token: 2h
 
 oauth2:
   expose_internal_errors: true

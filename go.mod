@@ -16,7 +16,6 @@ replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
 require (
 	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
-	github.com/Jeffail/gabs/v2 v2.6.1
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/containerd/containerd v1.4.4 // indirect
 	github.com/evanphx/json-patch v0.5.2

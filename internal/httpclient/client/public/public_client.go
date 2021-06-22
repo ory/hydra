@@ -30,15 +30,15 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	CreateDynOAuth2Client(params *CreateDynOAuth2ClientParams, opts ...ClientOption) (*CreateDynOAuth2ClientCreated, error)
+	CreateOAuth2ClientPublic(params *CreateOAuth2ClientPublicParams, opts ...ClientOption) (*CreateOAuth2ClientPublicCreated, error)
 
-	DeleteDynOAuth2Client(params *DeleteDynOAuth2ClientParams, opts ...ClientOption) (*DeleteDynOAuth2ClientNoContent, error)
+	DeleteOAuth2ClientPublic(params *DeleteOAuth2ClientPublicParams, opts ...ClientOption) (*DeleteOAuth2ClientPublicNoContent, error)
 
 	DisconnectUser(params *DisconnectUserParams, opts ...ClientOption) error
 
 	DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams, opts ...ClientOption) (*DiscoverOpenIDConfigurationOK, error)
 
-	GetDynOAuth2Client(params *GetDynOAuth2ClientParams, opts ...ClientOption) (*GetDynOAuth2ClientOK, error)
+	GetOAuth2ClientPublic(params *GetOAuth2ClientPublicParams, opts ...ClientOption) (*GetOAuth2ClientPublicOK, error)
 
 	IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOption) (*IsInstanceReadyOK, error)
 
@@ -48,7 +48,7 @@ type ClientService interface {
 
 	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error)
 
-	UpdateDynOAuth2Client(params *UpdateDynOAuth2ClientParams, opts ...ClientOption) (*UpdateDynOAuth2ClientOK, error)
+	UpdateOAuth2ClientPublic(params *UpdateOAuth2ClientPublicParams, opts ...ClientOption) (*UpdateOAuth2ClientPublicOK, error)
 
 	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UserinfoOK, error)
 
@@ -58,26 +58,26 @@ type ClientService interface {
 }
 
 /*
-  CreateDynOAuth2Client creates an o auth 2 0 client
+  CreateOAuth2ClientPublic creates an o auth 2 0 client
 
-  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
+  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.
 */
-func (a *Client) CreateDynOAuth2Client(params *CreateDynOAuth2ClientParams, opts ...ClientOption) (*CreateDynOAuth2ClientCreated, error) {
+func (a *Client) CreateOAuth2ClientPublic(params *CreateOAuth2ClientPublicParams, opts ...ClientOption) (*CreateOAuth2ClientPublicCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewCreateDynOAuth2ClientParams()
+		params = NewCreateOAuth2ClientPublicParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "createDynOAuth2Client",
+		ID:                 "createOAuth2ClientPublic",
 		Method:             "POST",
-		PathPattern:        "/dyn-clients",
+		PathPattern:        "/connect/register",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &CreateDynOAuth2ClientReader{formats: a.formats},
+		Reader:             &CreateOAuth2ClientPublicReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -89,37 +89,37 @@ func (a *Client) CreateDynOAuth2Client(params *CreateDynOAuth2ClientParams, opts
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*CreateDynOAuth2ClientCreated)
+	success, ok := result.(*CreateOAuth2ClientPublicCreated)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for createDynOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for createOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
 /*
-  DeleteDynOAuth2Client deletes an o auth 2 0 client
+  DeleteOAuth2ClientPublic deletes an o auth 2 0 client
 
   Delete an existing OAuth 2.0 Client by its ID.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
 */
-func (a *Client) DeleteDynOAuth2Client(params *DeleteDynOAuth2ClientParams, opts ...ClientOption) (*DeleteDynOAuth2ClientNoContent, error) {
+func (a *Client) DeleteOAuth2ClientPublic(params *DeleteOAuth2ClientPublicParams, opts ...ClientOption) (*DeleteOAuth2ClientPublicNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewDeleteDynOAuth2ClientParams()
+		params = NewDeleteOAuth2ClientPublicParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "deleteDynOAuth2Client",
+		ID:                 "deleteOAuth2ClientPublic",
 		Method:             "DELETE",
-		PathPattern:        "/dyn-clients/{id}",
+		PathPattern:        "/connect/register",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &DeleteDynOAuth2ClientReader{formats: a.formats},
+		Reader:             &DeleteOAuth2ClientPublicReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -131,13 +131,13 @@ func (a *Client) DeleteDynOAuth2Client(params *DeleteDynOAuth2ClientParams, opts
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*DeleteDynOAuth2ClientNoContent)
+	success, ok := result.(*DeleteOAuth2ClientPublicNoContent)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteDynOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for deleteOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -223,26 +223,26 @@ func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfiguration
 }
 
 /*
-  GetDynOAuth2Client gets an o auth 2 0 client
+  GetOAuth2ClientPublic gets an o auth 2 0 client
 
   Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
 */
-func (a *Client) GetDynOAuth2Client(params *GetDynOAuth2ClientParams, opts ...ClientOption) (*GetDynOAuth2ClientOK, error) {
+func (a *Client) GetOAuth2ClientPublic(params *GetOAuth2ClientPublicParams, opts ...ClientOption) (*GetOAuth2ClientPublicOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetDynOAuth2ClientParams()
+		params = NewGetOAuth2ClientPublicParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "getDynOAuth2Client",
+		ID:                 "getOAuth2ClientPublic",
 		Method:             "GET",
-		PathPattern:        "/dyn-clients/{id}",
+		PathPattern:        "/connect/register",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &GetDynOAuth2ClientReader{formats: a.formats},
+		Reader:             &GetOAuth2ClientPublicReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -254,13 +254,13 @@ func (a *Client) GetDynOAuth2Client(params *GetDynOAuth2ClientParams, opts ...Cl
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetDynOAuth2ClientOK)
+	success, ok := result.(*GetOAuth2ClientPublicOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getDynOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for getOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -440,26 +440,26 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 }
 
 /*
-  UpdateDynOAuth2Client updates an o auth 2 0 client
+  UpdateOAuth2ClientPublic updates an o auth 2 0 client
 
   Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
 */
-func (a *Client) UpdateDynOAuth2Client(params *UpdateDynOAuth2ClientParams, opts ...ClientOption) (*UpdateDynOAuth2ClientOK, error) {
+func (a *Client) UpdateOAuth2ClientPublic(params *UpdateOAuth2ClientPublicParams, opts ...ClientOption) (*UpdateOAuth2ClientPublicOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewUpdateDynOAuth2ClientParams()
+		params = NewUpdateOAuth2ClientPublicParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "updateDynOAuth2Client",
+		ID:                 "updateOAuth2ClientPublic",
 		Method:             "PUT",
-		PathPattern:        "/dyn-clients/{id}",
+		PathPattern:        "/connect/register",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
 		Params:             params,
-		Reader:             &UpdateDynOAuth2ClientReader{formats: a.formats},
+		Reader:             &UpdateOAuth2ClientPublicReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -471,13 +471,13 @@ func (a *Client) UpdateDynOAuth2Client(params *UpdateDynOAuth2ClientParams, opts
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*UpdateDynOAuth2ClientOK)
+	success, ok := result.(*UpdateOAuth2ClientPublicOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for updateDynOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for updateOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

@@ -1,7 +1,6 @@
 import { prng } from '../../helpers'
 
 describe('The Clients Pubic Interface', function () {
-
   it('should return same client_secret given in request for newly created clients with client_secret specified', function () {
     cy.request({
       method: 'POST',
@@ -25,7 +24,7 @@ describe('The Clients Pubic Interface', function () {
       method: 'GET',
       url: Cypress.env('public_url') + '/connect/register?client_id=clientid',
       headers: {
-        'Authorization' : 'Basic Y2xpZW50aWQ6c2VjcmV0'
+        Authorization: 'Basic Y2xpZW50aWQ6c2VjcmV0'
       }
     }).then((response) => {
       console.log(response.body)
@@ -37,8 +36,7 @@ describe('The Clients Pubic Interface', function () {
     cy.request({
       method: 'GET',
       failOnStatusCode: false,
-      url:
-        Cypress.env('public_url') + '/connect/register?client_id=clientid'
+      url: Cypress.env('public_url') + '/connect/register?client_id=clientid'
     }).then((response) => {
       expect(response.status).to.eq(401)
     })
@@ -49,7 +47,7 @@ describe('The Clients Pubic Interface', function () {
       method: 'PUT',
       url: Cypress.env('public_url') + '/connect/register?client_id=clientid',
       headers: {
-        'Authorization' : 'Basic Y2xpZW50aWQ6c2VjcmV0'
+        Authorization: 'Basic Y2xpZW50aWQ6c2VjcmV0'
       },
       body: {
         client_id: 'clientid',
@@ -84,8 +82,7 @@ describe('The Clients Pubic Interface', function () {
     cy.request({
       method: 'DELETE',
       failOnStatusCode: false,
-      url:
-        Cypress.env('public_url') + '/connect/register?client_id=clientid'
+      url: Cypress.env('public_url') + '/connect/register?client_id=clientid'
     }).then((response) => {
       expect(response.status).to.eq(401)
     })
@@ -97,7 +94,7 @@ describe('The Clients Pubic Interface', function () {
       failOnStatusCode: false,
       url: Cypress.env('public_url') + '/connect/register?client_id=clientid',
       headers: {
-        'Authorization' : 'Basic Y2xpZW50aWQ6c2VjcmV0'
+        Authorization: 'Basic Y2xpZW50aWQ6c2VjcmV0'
       }
     }).then((response) => {
       expect(response.status).to.eq(204)

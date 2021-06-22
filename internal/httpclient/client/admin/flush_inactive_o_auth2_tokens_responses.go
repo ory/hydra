@@ -41,9 +41,8 @@ func (o *FlushInactiveOAuth2TokensReader) ReadResponse(response runtime.ClientRe
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,9 +51,9 @@ func NewFlushInactiveOAuth2TokensNoContent() *FlushInactiveOAuth2TokensNoContent
 	return &FlushInactiveOAuth2TokensNoContent{}
 }
 
-/*FlushInactiveOAuth2TokensNoContent handles this case with default header values.
+/* FlushInactiveOAuth2TokensNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type FlushInactiveOAuth2TokensNoContent struct {
@@ -74,7 +73,7 @@ func NewFlushInactiveOAuth2TokensUnauthorized() *FlushInactiveOAuth2TokensUnauth
 	return &FlushInactiveOAuth2TokensUnauthorized{}
 }
 
-/*FlushInactiveOAuth2TokensUnauthorized handles this case with default header values.
+/* FlushInactiveOAuth2TokensUnauthorized describes a response with status code 401, with default header values.
 
 genericError
 */
@@ -85,7 +84,6 @@ type FlushInactiveOAuth2TokensUnauthorized struct {
 func (o *FlushInactiveOAuth2TokensUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/flush][%d] flushInactiveOAuth2TokensUnauthorized  %+v", 401, o.Payload)
 }
-
 func (o *FlushInactiveOAuth2TokensUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -107,7 +105,7 @@ func NewFlushInactiveOAuth2TokensInternalServerError() *FlushInactiveOAuth2Token
 	return &FlushInactiveOAuth2TokensInternalServerError{}
 }
 
-/*FlushInactiveOAuth2TokensInternalServerError handles this case with default header values.
+/* FlushInactiveOAuth2TokensInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -118,7 +116,6 @@ type FlushInactiveOAuth2TokensInternalServerError struct {
 func (o *FlushInactiveOAuth2TokensInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/flush][%d] flushInactiveOAuth2TokensInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *FlushInactiveOAuth2TokensInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

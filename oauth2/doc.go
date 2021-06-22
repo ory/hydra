@@ -149,6 +149,10 @@ type WellKnown struct {
 	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
 	// (using the request_uri parameter).
 	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
+
+	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
+	// by this authorization server.
+	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
 }
 
 // swagger:parameters deleteOAuth2Token

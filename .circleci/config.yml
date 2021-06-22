@@ -46,6 +46,13 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
+
+      - go/load-cache:
+          key: ory-hydra-go-mod-v1
+      - go/mod-download
+      - go/save-cache:
+          key: ory-hydra-go-mod-v1
+
       - nancy/install
       - nancy/check
       - prettier/install
@@ -58,7 +65,6 @@ jobs:
       - goreleaser/check
       - golangci/install
       - golangci/lint
-      - go/mod-download-cached
       - run: make .bin/go-acc
       - run: .bin/go-acc -o coverage.txt ./... -- -failfast -timeout=20m -tags sqlite
       #      Running race conditions requires parallel tests, otherwise it's worthless (which is the case)
@@ -99,7 +105,11 @@ jobs:
             - node_modules
             - ~/.cache # cypress
 
-      - go/mod-download-cached
+      - go/load-cache:
+          key: ory-hydra-go-mod-v1
+      - go/mod-download
+      - go/save-cache:
+          key: ory-hydra-go-mod-v1
 
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory-jwt

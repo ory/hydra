@@ -41,9 +41,8 @@ func (o *IntrospectOAuth2TokenReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewIntrospectOAuth2TokenOK() *IntrospectOAuth2TokenOK {
 	return &IntrospectOAuth2TokenOK{}
 }
 
-/*IntrospectOAuth2TokenOK handles this case with default header values.
+/* IntrospectOAuth2TokenOK describes a response with status code 200, with default header values.
 
 oAuth2TokenIntrospection
 */
@@ -63,7 +62,6 @@ type IntrospectOAuth2TokenOK struct {
 func (o *IntrospectOAuth2TokenOK) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenOK  %+v", 200, o.Payload)
 }
-
 func (o *IntrospectOAuth2TokenOK) GetPayload() *models.OAuth2TokenIntrospection {
 	return o.Payload
 }
@@ -85,7 +83,7 @@ func NewIntrospectOAuth2TokenUnauthorized() *IntrospectOAuth2TokenUnauthorized {
 	return &IntrospectOAuth2TokenUnauthorized{}
 }
 
-/*IntrospectOAuth2TokenUnauthorized handles this case with default header values.
+/* IntrospectOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
 genericError
 */
@@ -96,7 +94,6 @@ type IntrospectOAuth2TokenUnauthorized struct {
 func (o *IntrospectOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-
 func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -118,7 +115,7 @@ func NewIntrospectOAuth2TokenInternalServerError() *IntrospectOAuth2TokenInterna
 	return &IntrospectOAuth2TokenInternalServerError{}
 }
 
-/*IntrospectOAuth2TokenInternalServerError handles this case with default header values.
+/* IntrospectOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -129,7 +126,6 @@ type IntrospectOAuth2TokenInternalServerError struct {
 func (o *IntrospectOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

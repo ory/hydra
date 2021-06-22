@@ -35,11 +35,12 @@ import (
 
 	"github.com/ory/x/sqlcon"
 
-	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/sessions"
 	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+
+	jwtgo "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/x/sqlxx"
 
@@ -190,13 +191,7 @@ func (s *DefaultStrategy) getIDTokenHintClaims(ctx context.Context, idTokenHint 
 	} else if err != nil {
 		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(err.Error()))
 	}
-
-	claims, ok := token.Claims.(jwtgo.MapClaims)
-	if !ok {
-		return nil, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Failed to validate OpenID Connect request as decoding id token from id_token_hint to jwt.MapClaims failed."))
-	}
-
-	return claims, nil
+	return token.Claims, nil
 }
 
 func (s *DefaultStrategy) getSubjectFromIDTokenHint(ctx context.Context, idTokenHint string) (string, error) {

@@ -30,7 +30,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/tidwall/gjson"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	goauth2 "golang.org/x/oauth2"
@@ -41,6 +40,7 @@ import (
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 )
 
 func TestClientCredentials(t *testing.T) {
@@ -108,7 +108,7 @@ func TestClientCredentials(t *testing.T) {
 			return
 		}
 
-		body, err := jwt.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
+		body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
 		require.NoError(t, err)
 
 		jwtClaims := gjson.ParseBytes(body)

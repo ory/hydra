@@ -152,7 +152,12 @@ request, go through this checklist:
 1. Ensure that each commit has a descriptive prefix. This ensures a uniform
    commit history and helps structure the changelog.  
    Please refer to this
-   [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml).
+   [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
+   for an overview.
+1. Sign-up with CircleCI so that it has access to your repository with the
+   branch containing your PR. Simply creating a CircleCI account is sufficient
+   for the CI jobs to run, you do not need to setup a CircleCI project for the
+   branch.
 
 If a pull request is not ready to be reviewed yet
 [it should be marked as a "Draft"](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request).

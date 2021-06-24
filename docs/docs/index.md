@@ -1,7 +1,7 @@
 ---
 id: index
 slug: /
-title: ORY Hydra
+title: Introduction
 sidebar_label: Introduction
 ---
 

@@ -475,7 +475,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		(&crh).TableName()),
 		notAfter)
 
-	if err := q.Limit(limit).All(&challenges); err == sql.ErrNoRows {
+	if err := q.Limit(limit).Order("challenge").All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
@@ -516,7 +516,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		(&lrh).TableName()),
 		notAfter)
 
-	if err := q.Limit(limit).All(&challenges); err == sql.ErrNoRows {
+	if err := q.Limit(limit).Order("challenge").All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 

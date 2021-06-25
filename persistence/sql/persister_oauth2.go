@@ -377,7 +377,7 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 			OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
 		notAfter,
 	)
-	if err := q.Limit(limit).All(&signatures); err == sql.ErrNoRows {
+	if err := q.Limit(limit).Order("signature").All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
@@ -413,7 +413,7 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 			OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
 		notAfter,
 	)
-	if err := q.Limit(limit).All(&signatures); err == sql.ErrNoRows {
+	if err := q.Limit(limit).Order("signature").All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 

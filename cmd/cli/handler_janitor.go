@@ -55,9 +55,15 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 			"Janitor requires either --tokens or --requests or both to be set")
 	}
 
-	if flagx.MustGetInt(cmd, Limit) <= 0 || flagx.MustGetInt(cmd, BatchSize) <= 0 {
+	limit := flagx.MustGetInt(cmd, Limit)
+	batchSize := flagx.MustGetInt(cmd, BatchSize)
+	if limit <= 0 || batchSize <= 0 {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Values for --limit and --batch-size should both be greater than 0")
+	}
+	if batchSize > limit {
+		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
+			"Value for --batch-size must not be greater than value for --limit")
 	}
 
 	return nil

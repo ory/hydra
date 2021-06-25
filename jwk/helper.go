@@ -139,7 +139,8 @@ func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
 	for _, k := range set.Keys {
-		if _, ok := k.Key.(*rsa.PrivateKey); !ok {
+		_, ecdsaOk := k.Key.(*ecdsa.PrivateKey)
+		if _, ok := k.Key.(*rsa.PrivateKey); !ok && !ecdsaOk {
 			keys.Keys = append(keys.Keys, k)
 		}
 	}

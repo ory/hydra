@@ -71,3 +71,22 @@ func TestIder(t *testing.T) {
 	assert.True(t, len(Ider("public", "")) > len("public:"))
 	assert.Equal(t, "public:foo", Ider("public", "foo"))
 }
+
+func TestHandlerFindPublicKey(t *testing.T) {
+	var testRSGenerator = RS256Generator{}
+	var testECDSAGenerator = ECDSA256Generator{}
+	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
+		RSIDKS, _ := testRSGenerator.Generate("test-id-1", "sig")
+		kesys, err := FindPublicKey(RSIDKS)
+		require.NoError(t, err)
+		assert.Equal(t, kesys.KeyID, Ider("public", "test-id-1"))
+
+	})
+	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {
+		ECDSAIDKS, _ := testECDSAGenerator.Generate("test-id-2", "sig")
+		kesys, err := FindPublicKey(ECDSAIDKS)
+		require.NoError(t, err)
+		assert.Equal(t, kesys.KeyID, Ider("public", "test-id-2"))
+
+	})
+}

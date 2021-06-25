@@ -69,6 +69,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		require.NotNil(t, resp, "Could not find key public")
 
 		assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("public:test-id-1")))
+		require.NoError(t, reg.KeyManager().DeleteKeySet(context.TODO(), x.OpenIDConnectKeyName))
 	})
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
@@ -86,8 +87,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var known jose.JSONWebKeySet
 		err = json.NewDecoder(res.Body).Decode(&known)
 		require.NoError(t, err, "problem in decoding response")
-
-		require.Len(t, known.Keys, 2)
+		require.Len(t, known.Keys, 1)
 
 		resp := known.Key("test-id-2")
 		require.NotNil(t, resp, "Could not find key public")

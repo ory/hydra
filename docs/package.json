@@ -4,7 +4,7 @@
   "private": true,
   "prettier": "ory-prettier-styles",
   "config": {
-    "prettierTarget": "{docs/**,docs,scripts,static,contrib,src,src/**}/*.{md,mdx,json,js,css,html}|*.{js,md}"
+    "prettierTarget": "{docs/**,docs/,scripts/,static/,contrib/,src/,src/**/,}*.{md,mdx,json,js,css,html}"
   },
   "scripts": {
     "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js && node ./docs/scripts/gen-faq.js",
@@ -19,12 +19,12 @@
     "format:check": "prettier --check ${npm_package_config_prettierTarget}"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.0",
-    "@docusaurus/plugin-content-docs": "2.0.0-beta.0",
-    "@docusaurus/plugin-content-pages": "2.0.0-beta.0",
-    "@docusaurus/plugin-sitemap": "2.0.0-beta.0",
-    "@docusaurus/theme-classic": "2.0.0-beta.0",
-    "@docusaurus/theme-search-algolia": "2.0.0-beta.0",
+    "@docusaurus/core": "2.0.0-beta.2",
+    "@docusaurus/plugin-content-docs": "2.0.0-beta.2",
+    "@docusaurus/plugin-content-pages": "2.0.0-beta.2",
+    "@docusaurus/plugin-sitemap": "2.0.0-beta.2",
+    "@docusaurus/theme-classic": "2.0.0-beta.2",
+    "@docusaurus/theme-search-algolia": "2.0.0-beta.2",
     "classnames": "2.3.1",
     "file-loader": "6.2.0",
     "mermaid": "8.10.2",
@@ -51,9 +51,9 @@
   },
   "devDependencies": {
     "json-schema-faker": "0.5.0-rcv.34",
-    "json-schema-ref-parser": "8.0.0",
+    "json-schema-ref-parser": "9.0.9",
     "ory-prettier-styles": "1.1.2",
-    "prettier": "2.2.1",
+    "prettier": "2.3.1",
     "ramda": "0.27.1",
     "raw-loader": "4.0.2",
     "remark-admonitions": "1.2.1",

@@ -454,6 +454,16 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	}
 
 	challenges := []string{}
+	queryFormat := `
+	SELECT %[1]s.challenge
+	FROM %[1]s
+	LEFT JOIN %[2]s ON %[1]s.challenge = %[2]s.challenge
+	WHERE (
+		(%[2]s.challenge IS NULL)
+		OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
+	)
+	AND %[1]s.requested_at < ?
+	`
 
 	// Select challenges from all consent requests that can be safely deleted with limit
 	// where hydra_oauth2_consent_request were unhandled or rejected, so either of these is true
@@ -461,19 +471,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_consent_request_handled has valid error (rejected)
 	// AND timed-out
 	// - hydra_oauth2_consent_request.requested_at < minimum between ttl.login_consent_request and notAfter
-	q := p.Connection(ctx).RawQuery(fmt.Sprintf(`
-		SELECT %[1]s.challenge
-		FROM %[1]s
-		LEFT JOIN %[2]s ON %[1]s.challenge = %[2]s.challenge
-		WHERE (
-			(%[2]s.challenge IS NULL)
-			OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
-		)
-		AND %[1]s.requested_at < ?
-		`,
-		(&cr).TableName(),
-		(&crh).TableName()),
-		notAfter)
+	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&cr).TableName(), (&crh).TableName()), notAfter)
 
 	if err := q.Limit(limit).Order("challenge").All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
@@ -502,19 +500,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_authentication_request_handled has valid error (rejected)
 	// AND timed-out
 	// - hydra_oauth2_authentication_request.requested_at < minimum between ttl.login_consent_request and notAfter
-	q = p.Connection(ctx).RawQuery(fmt.Sprintf(`
-		SELECT %[1]s.challenge
-		FROM %[1]s
-		LEFT JOIN %[2]s ON %[1]s.challenge = %[2]s.challenge
-		WHERE (
-			(%[2]s.challenge IS NULL)
-			OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
-		)
-		AND %[1]s.requested_at < ?
-		`,
-		(&lr).TableName(),
-		(&lrh).TableName()),
-		notAfter)
+	q = p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&lr).TableName(), (&lrh).TableName()), notAfter)
 
 	if err := q.Limit(limit).Order("challenge").All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")

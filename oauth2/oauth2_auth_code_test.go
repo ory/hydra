@@ -40,7 +40,6 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal/testhelpers"
 
-	djwt "github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -201,7 +200,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		require.True(t, ok)
 		assert.NotEmpty(t, idt)
 
-		body, err := djwt.DecodeSegment(strings.Split(idt, ".")[1])
+		body, err := x.DecodeSegment(strings.Split(idt, ".")[1])
 		require.NoError(t, err)
 
 		claims := gjson.ParseBytes(body)
@@ -241,7 +240,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 		require.Len(t, parts, 3)
 
-		body, err := djwt.DecodeSegment(parts[1])
+		body, err := x.DecodeSegment(parts[1])
 		require.NoError(t, err)
 
 		i := gjson.ParseBytes(body)
@@ -658,7 +657,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							return
 						}
 
-						body, err := djwt.DecodeSegment(strings.Split(token, ".")[1])
+						body, err := x.DecodeSegment(strings.Split(token, ".")[1])
 						require.NoError(t, err)
 
 						data := map[string]interface{}{}
@@ -867,13 +866,13 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 							t.Skip()
 						}
 
-						body, err := djwt.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
+						body, err := x.DecodeSegment(strings.Split(token.AccessToken, ".")[1])
 						require.NoError(t, err)
 
 						origPayload := map[string]interface{}{}
 						require.NoError(t, json.Unmarshal(body, &origPayload))
 
-						body, err = djwt.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
+						body, err = x.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
 						require.NoError(t, err)
 
 						refreshedPayload := map[string]interface{}{}

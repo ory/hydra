@@ -41,9 +41,8 @@ func (o *OauthAuthReader) ReadResponse(response runtime.ClientResponse, consumer
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,9 +51,9 @@ func NewOauthAuthFound() *OauthAuthFound {
 	return &OauthAuthFound{}
 }
 
-/*OauthAuthFound handles this case with default header values.
+/* OauthAuthFound describes a response with status code 302, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type OauthAuthFound struct {
@@ -74,7 +73,7 @@ func NewOauthAuthUnauthorized() *OauthAuthUnauthorized {
 	return &OauthAuthUnauthorized{}
 }
 
-/*OauthAuthUnauthorized handles this case with default header values.
+/* OauthAuthUnauthorized describes a response with status code 401, with default header values.
 
 genericError
 */
@@ -85,7 +84,6 @@ type OauthAuthUnauthorized struct {
 func (o *OauthAuthUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuthUnauthorized  %+v", 401, o.Payload)
 }
-
 func (o *OauthAuthUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -107,7 +105,7 @@ func NewOauthAuthInternalServerError() *OauthAuthInternalServerError {
 	return &OauthAuthInternalServerError{}
 }
 
-/*OauthAuthInternalServerError handles this case with default header values.
+/* OauthAuthInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -118,7 +116,6 @@ type OauthAuthInternalServerError struct {
 func (o *OauthAuthInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuthInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *OauthAuthInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

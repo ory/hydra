@@ -853,7 +853,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
+        "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
           "200": {
@@ -2024,11 +2024,6 @@
     "JoseJSONWebKeySet": {
       "type": "object"
     },
-    "NullTime": {
-      "type": "string",
-      "format": "date-time",
-      "title": "NullTime implements sql.NullTime functionality."
-    },
     "PluginConfig": {
       "type": "object",
       "title": "PluginConfig The config of a plugin.",
@@ -2435,7 +2430,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "$ref": "#/definitions/nullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2545,7 +2540,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "$ref": "#/definitions/nullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2834,6 +2829,11 @@
           "type": "string"
         }
       }
+    },
+    "nullTime": {
+      "type": "string",
+      "format": "date-time",
+      "title": "NullTime implements sql.NullTime functionality."
     },
     "oAuth2Client": {
       "type": "object",
@@ -3298,6 +3298,13 @@
         },
         "claims_supported": {
           "description": "JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "code_challenge_methods_supported": {
+          "description": "JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported\nby this authorization server.",
           "type": "array",
           "items": {
             "type": "string"

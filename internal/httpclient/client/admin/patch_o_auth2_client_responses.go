@@ -35,9 +35,8 @@ func (o *PatchOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -46,7 +45,7 @@ func NewPatchOAuth2ClientOK() *PatchOAuth2ClientOK {
 	return &PatchOAuth2ClientOK{}
 }
 
-/*PatchOAuth2ClientOK handles this case with default header values.
+/* PatchOAuth2ClientOK describes a response with status code 200, with default header values.
 
 oAuth2Client
 */
@@ -57,7 +56,6 @@ type PatchOAuth2ClientOK struct {
 func (o *PatchOAuth2ClientOK) Error() string {
 	return fmt.Sprintf("[PATCH /clients/{id}][%d] patchOAuth2ClientOK  %+v", 200, o.Payload)
 }
-
 func (o *PatchOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -79,7 +77,7 @@ func NewPatchOAuth2ClientInternalServerError() *PatchOAuth2ClientInternalServerE
 	return &PatchOAuth2ClientInternalServerError{}
 }
 
-/*PatchOAuth2ClientInternalServerError handles this case with default header values.
+/* PatchOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -90,7 +88,6 @@ type PatchOAuth2ClientInternalServerError struct {
 func (o *PatchOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[PATCH /clients/{id}][%d] patchOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *PatchOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

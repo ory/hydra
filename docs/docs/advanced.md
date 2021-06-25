@@ -141,6 +141,49 @@ library (e.g. [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa)) to
 `http://ory-hydra-public-api/.well-known/jwks.json`. All necessary keys are
 available there.
 
+#### Adding custom claims top-level to the Access Token
+
+Assume you want to add custom claims to the access token with the following
+code:
+
+```typescript
+let session: ConsentRequestSession = {
+  access_token: {
+    foo: 'bar'
+  }
+}
+```
+
+Then part of the resulting access token will look like this:
+
+```json
+{
+  "ext": {
+    "foo": "bar"
+  }
+}
+```
+
+If you instead want "foo" to be added top-level in the access token, you need to
+set the configuration flag `oauth2.allowed_top_level_claims` like described in
+[the reference Configuration](https://www.ory.sh/hydra/docs/reference/configuration).
+
+Note: Any user defined allowed top level claim may not override standardized
+access token claim names.
+
+Configuring Hydra to allow "foo" as a top-level claim will result in the
+following access token part (allowed claims get mirrored, for backwards
+compatibility):
+
+```json
+{
+  "foo": "bar",
+  "ext": {
+    "foo": "bar"
+  }
+}
+```
+
 ### OAuth 2.0 Client Authentication with private/public keypairs
 
 ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA

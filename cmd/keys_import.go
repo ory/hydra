@@ -34,10 +34,11 @@ Please be aware that importing a private key does not automatically import its p
 
 Examples:
 	hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json
-	hydra keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
+	hydra keys import my-set ./path/to/rsa.key ./path/to/rsa.pub --default-key-id cae6b214-fb1e-4ebc-9019-95286a62eabc
 `,
 		Run: cli.NewHandler().Keys.ImportKeys,
 	}
 	cmd.Flags().String("use", "sig", "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
+	cmd.Flags().String("default-key-id", "", "A fallback value for keys without \"kid\" attribute to be stored with a common \"kid\", e.g. private/public keypairs")
 	return cmd
 }

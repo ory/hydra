@@ -297,7 +297,6 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, 2*time.Hour, c.RefreshTokenLifespan())
 	assert.Equal(t, 2*time.Hour, c.IDTokenLifespan())
 	assert.Equal(t, 2*time.Hour, c.AuthCodeLifespan())
-	assert.Equal(t, 2*time.Hour, c.DynamicClientRegistrationTokenLifespan())
 
 	// oauth2
 	assert.Equal(t, true, c.ShareOAuth2Debug())

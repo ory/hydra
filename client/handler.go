@@ -29,13 +29,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/fosite"
-
-	"github.com/pborman/uuid"
-
-	"github.com/ory/fosite/token/jwt"
-	jwtgo "github.com/ory/fosite/token/jwt"
-
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/herodot"
@@ -141,41 +134,7 @@ func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	kid, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	token, _, err := h.r.OpenIDJWTStrategy().Generate(r.Context(), jwtgo.MapClaims{
-		"iss": h.r.ClientValidator().conf.IssuerURL().String(),
-		"exp": time.Now().Add(h.r.ClientValidator().conf.DynamicClientRegistrationTokenLifespan()).Unix(),
-		"aud": []string{c.OutfacingID},
-		"iat": time.Now().UTC().Unix(),
-		"jti": uuid.New(),
-		"sid": c.GetID(),
-	}, &jwt.Headers{
-		Extra: map[string]interface{}{"kid": kid},
-	})
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	b, err := json.Marshal(c)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	var resp map[string]interface{}
-	err = json.Unmarshal(b, &resp)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-	resp["registration_access_token"] = token
-
-	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &resp)
+	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
 func (h *Handler) create(w http.ResponseWriter, r *http.Request, f func(*Client) error) (*Client, error) {
@@ -566,44 +525,26 @@ func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Reque
 
 func (h *Handler) validateDynClientRegistrationAuthorization(r *http.Request, c Client) error {
 
-	// Check basic auth
-	if basicAuth := getBasicAuth(r); basicAuth != "" {
-		sDec, err := base64.StdEncoding.DecodeString(basicAuth)
-		if err != nil {
-			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-		}
-		split := strings.SplitN(string(sDec), ":", 2)
-		if len(split) != 2 {
-			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-		}
-		if c.OutfacingID != split[0] {
-			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-		}
-		_, err = h.r.ClientManager().Authenticate(r.Context(), split[0], []byte(split[1]))
-		if err != nil {
-			return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-		}
-		return nil
+	basicAuth := getBasicAuth(r)
+	if basicAuth == "" {
+		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
 	}
-
-	// Check check token
-	t, err := h.r.OpenIDJWTStrategy().Decode(r.Context(), fosite.AccessTokenFromRequest(r))
+	sDec, err := base64.StdEncoding.DecodeString(basicAuth)
 	if err != nil {
-		return herodot.ErrUnauthorized.WithReason("Error parsing access token")
+		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
 	}
-
-	if !t.Valid() {
-		return herodot.ErrUnauthorized.WithReason("Invalid token")
+	split := strings.SplitN(string(sDec), ":", 2)
+	if len(split) != 2 {
+		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
 	}
-	switch sid := t.Claims["sid"].(type) {
-	case string:
-		if c.OutfacingID != sid {
-			return herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
-		}
-		return nil
-	default:
-		return herodot.ErrUnauthorized.WithReason("Token does not contains a valid sid")
+	if c.OutfacingID != split[0] {
+		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
 	}
+	_, err = h.r.ClientManager().Authenticate(r.Context(), split[0], []byte(split[1]))
+	if err != nil {
+		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
+	}
+	return nil
 }
 
 func getBasicAuth(req *http.Request) string {

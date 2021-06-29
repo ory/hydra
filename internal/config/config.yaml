@@ -370,8 +370,6 @@ ttl:
   id_token: 1h
   # configures how long auth codes are valid. Defaults to 10m.
   auth_code: 10m
-  # configures how long dynamic registration tokens are valid. Defaults to 1h.
-  dynamic_client_registration_token: 1h
 
 oauth2:
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients.

@@ -45,7 +45,6 @@ const (
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
 	KeyIDTokenLifespan                           = "ttl.id_token"      // #nosec G101
 	KeyAuthCodeLifespan                          = "ttl.auth_code"
-	KeyDynamicClientRegistrationTokenLifespan    = "ttl.dynamic_client_registration_token" // #nosec G101
 	KeyScopeStrategy                             = "strategies.scope"
 	KeyGetCookieSecrets                          = "secrets.cookie"
 	KeyGetSystemSecret                           = "secrets.system"
@@ -249,10 +248,6 @@ func (p *Provider) IDTokenLifespan() time.Duration {
 
 func (p *Provider) AuthCodeLifespan() time.Duration {
 	return p.p.DurationF(KeyAuthCodeLifespan, time.Minute*10)
-}
-
-func (p *Provider) DynamicClientRegistrationTokenLifespan() time.Duration {
-	return p.p.DurationF(KeyDynamicClientRegistrationTokenLifespan, time.Hour)
 }
 
 func (p *Provider) ScopeStrategy() string {

@@ -764,15 +764,6 @@
               "$ref": "#/definitions/duration"
             }
           ]
-        },
-        "dynamic_client_registration_token": {
-          "description": "Configures how long dynamic client registration tokens are valid.",
-          "default": "1h",
-          "allOf": [
-            {
-              "$ref": "#/definitions/duration"
-            }
-          ]
         }
       }
     },

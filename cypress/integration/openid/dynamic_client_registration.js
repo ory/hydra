@@ -15,7 +15,6 @@ describe('The Clients Pubic Interface', function () {
     }).then((response) => {
       console.log(response.body)
       expect(response.body.client_secret).to.equal('secret')
-      expect(response.body.registration_access_token).to.not.be.empty
     })
   })
 

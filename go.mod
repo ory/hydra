@@ -50,8 +50,8 @@ require (
 	github.com/ory/fosite v0.40.2
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
-	github.com/ory/herodot v0.9.3
-	github.com/ory/x v0.0.244
+	github.com/ory/herodot v0.9.6
+	github.com/ory/x v0.0.256
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/philhofer/fwd v1.1.1 // indirect

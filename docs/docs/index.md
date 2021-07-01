@@ -41,7 +41,7 @@ OAuth 2.0 Clients.
 ## Security First
 
 ORY Hydra's architecture and work flows are designed to neutralize many common
-(OWASP TOP TEN) and uncoasdasdmmon attack vectors.
+(OWASP TOP TEN) and uncommon attack vectors.
 [Learn more](./security-architecture.md).
 
 ## High Performance

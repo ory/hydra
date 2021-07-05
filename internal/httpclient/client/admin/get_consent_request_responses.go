@@ -47,8 +47,9 @@ func (o *GetConsentRequestReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,7 +58,7 @@ func NewGetConsentRequestOK() *GetConsentRequestOK {
 	return &GetConsentRequestOK{}
 }
 
-/* GetConsentRequestOK describes a response with status code 200, with default header values.
+/*GetConsentRequestOK handles this case with default header values.
 
 consentRequest
 */
@@ -68,6 +69,7 @@ type GetConsentRequestOK struct {
 func (o *GetConsentRequestOK) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestOK  %+v", 200, o.Payload)
 }
+
 func (o *GetConsentRequestOK) GetPayload() *models.ConsentRequest {
 	return o.Payload
 }
@@ -89,7 +91,7 @@ func NewGetConsentRequestNotFound() *GetConsentRequestNotFound {
 	return &GetConsentRequestNotFound{}
 }
 
-/* GetConsentRequestNotFound describes a response with status code 404, with default header values.
+/*GetConsentRequestNotFound handles this case with default header values.
 
 genericError
 */
@@ -100,6 +102,7 @@ type GetConsentRequestNotFound struct {
 func (o *GetConsentRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestNotFound  %+v", 404, o.Payload)
 }
+
 func (o *GetConsentRequestNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -121,7 +124,7 @@ func NewGetConsentRequestGone() *GetConsentRequestGone {
 	return &GetConsentRequestGone{}
 }
 
-/* GetConsentRequestGone describes a response with status code 410, with default header values.
+/*GetConsentRequestGone handles this case with default header values.
 
 requestWasHandledResponse
 */
@@ -132,6 +135,7 @@ type GetConsentRequestGone struct {
 func (o *GetConsentRequestGone) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestGone  %+v", 410, o.Payload)
 }
+
 func (o *GetConsentRequestGone) GetPayload() *models.RequestWasHandledResponse {
 	return o.Payload
 }
@@ -153,7 +157,7 @@ func NewGetConsentRequestInternalServerError() *GetConsentRequestInternalServerE
 	return &GetConsentRequestInternalServerError{}
 }
 
-/* GetConsentRequestInternalServerError describes a response with status code 500, with default header values.
+/*GetConsentRequestInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -164,6 +168,7 @@ type GetConsentRequestInternalServerError struct {
 func (o *GetConsentRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *GetConsentRequestInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

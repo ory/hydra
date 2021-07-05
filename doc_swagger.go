@@ -20,7 +20,7 @@
 
 package main
 
-// Error response
+// Generic Error Response
 //
 // Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
 //
@@ -28,7 +28,6 @@ package main
 type genericError struct {
 	// Name is the error name.
 	//
-	// required: true
 	// example: The requested resource could not be found
 	Name string `json:"error"`
 

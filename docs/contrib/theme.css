@@ -8,7 +8,6 @@
 }
 
 .menu__link[href*="https://"] svg,
-svg[class*="iconExternalLink"]
-{
+svg[class*="iconExternalLink"] {
   display: none !important;
 }

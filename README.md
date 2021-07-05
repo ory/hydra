@@ -190,6 +190,24 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/sainsburys.svg" alt="Sainsbury's"></td>
             <td><a href="https://www.sainsburys.co.uk/">sainsburys.co.uk</a></td>
         </tr>
+                <tr>
+            <td>Adopter *</td>
+            <td>Contraste</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/contraste.svg" alt="Contraste"></td>
+            <td><a href="https://www.contraste.com/en">contraste.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Reyah</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/reyah.svg" alt="Reyah"></td>
+            <td><a href="https://reyah.eu/">reyah.eu</a></td>
+        </tr>        
+        <tr>
+            <td>Adopter *</td>
+            <td>Zero</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/commitzero.svg" alt="Project Zero by Commit"></td>
+            <td><a href="https://getzero.dev/">getzero.dev</a></td>
+        </tr>
         <tr>
             <td>Sponsor</td>
             <td>OrderMyGear</td>

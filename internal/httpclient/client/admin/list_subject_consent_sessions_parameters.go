@@ -16,70 +16,56 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewListSubjectConsentSessionsParams creates a new ListSubjectConsentSessionsParams object,
-// with the default timeout for this client.
-//
-// Default values are not hydrated, since defaults are normally applied by the API server side.
-//
-// To enforce default values in parameter, use SetDefaults or WithDefaults.
+// NewListSubjectConsentSessionsParams creates a new ListSubjectConsentSessionsParams object
+// with the default values initialized.
 func NewListSubjectConsentSessionsParams() *ListSubjectConsentSessionsParams {
+	var ()
 	return &ListSubjectConsentSessionsParams{
+
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewListSubjectConsentSessionsParamsWithTimeout creates a new ListSubjectConsentSessionsParams object
-// with the ability to set a timeout on a request.
+// with the default values initialized, and the ability to set a timeout on a request
 func NewListSubjectConsentSessionsParamsWithTimeout(timeout time.Duration) *ListSubjectConsentSessionsParams {
+	var ()
 	return &ListSubjectConsentSessionsParams{
+
 		timeout: timeout,
 	}
 }
 
 // NewListSubjectConsentSessionsParamsWithContext creates a new ListSubjectConsentSessionsParams object
-// with the ability to set a context for a request.
+// with the default values initialized, and the ability to set a context for a request
 func NewListSubjectConsentSessionsParamsWithContext(ctx context.Context) *ListSubjectConsentSessionsParams {
+	var ()
 	return &ListSubjectConsentSessionsParams{
+
 		Context: ctx,
 	}
 }
 
 // NewListSubjectConsentSessionsParamsWithHTTPClient creates a new ListSubjectConsentSessionsParams object
-// with the ability to set a custom HTTPClient for a request.
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewListSubjectConsentSessionsParamsWithHTTPClient(client *http.Client) *ListSubjectConsentSessionsParams {
+	var ()
 	return &ListSubjectConsentSessionsParams{
 		HTTPClient: client,
 	}
 }
 
-/* ListSubjectConsentSessionsParams contains all the parameters to send to the API endpoint
-   for the list subject consent sessions operation.
-
-   Typically these are written to a http.Request.
+/*ListSubjectConsentSessionsParams contains all the parameters to send to the API endpoint
+for the list subject consent sessions operation typically these are written to a http.Request
 */
 type ListSubjectConsentSessionsParams struct {
 
-	// Subject.
+	/*Subject*/
 	Subject string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
-}
-
-// WithDefaults hydrates default values in the list subject consent sessions params (not the query body).
-//
-// All values with no default are reset to their zero value.
-func (o *ListSubjectConsentSessionsParams) WithDefaults() *ListSubjectConsentSessionsParams {
-	o.SetDefaults()
-	return o
-}
-
-// SetDefaults hydrates default values in the list subject consent sessions params (not the query body).
-//
-// All values with no default are reset to their zero value.
-func (o *ListSubjectConsentSessionsParams) SetDefaults() {
-	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the list subject consent sessions params
@@ -138,7 +124,6 @@ func (o *ListSubjectConsentSessionsParams) WriteToRequest(r runtime.ClientReques
 	qrSubject := o.Subject
 	qSubject := qrSubject
 	if qSubject != "" {
-
 		if err := r.SetQueryParam("subject", qSubject); err != nil {
 			return err
 		}

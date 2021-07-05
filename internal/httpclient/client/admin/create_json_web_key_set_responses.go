@@ -47,8 +47,9 @@ func (o *CreateJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,7 +58,7 @@ func NewCreateJSONWebKeySetCreated() *CreateJSONWebKeySetCreated {
 	return &CreateJSONWebKeySetCreated{}
 }
 
-/* CreateJSONWebKeySetCreated describes a response with status code 201, with default header values.
+/*CreateJSONWebKeySetCreated handles this case with default header values.
 
 JSONWebKeySet
 */
@@ -68,6 +69,7 @@ type CreateJSONWebKeySetCreated struct {
 func (o *CreateJSONWebKeySetCreated) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetCreated  %+v", 201, o.Payload)
 }
+
 func (o *CreateJSONWebKeySetCreated) GetPayload() *models.JSONWebKeySet {
 	return o.Payload
 }
@@ -89,7 +91,7 @@ func NewCreateJSONWebKeySetUnauthorized() *CreateJSONWebKeySetUnauthorized {
 	return &CreateJSONWebKeySetUnauthorized{}
 }
 
-/* CreateJSONWebKeySetUnauthorized describes a response with status code 401, with default header values.
+/*CreateJSONWebKeySetUnauthorized handles this case with default header values.
 
 genericError
 */
@@ -100,6 +102,7 @@ type CreateJSONWebKeySetUnauthorized struct {
 func (o *CreateJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
+
 func (o *CreateJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -121,7 +124,7 @@ func NewCreateJSONWebKeySetForbidden() *CreateJSONWebKeySetForbidden {
 	return &CreateJSONWebKeySetForbidden{}
 }
 
-/* CreateJSONWebKeySetForbidden describes a response with status code 403, with default header values.
+/*CreateJSONWebKeySetForbidden handles this case with default header values.
 
 genericError
 */
@@ -132,6 +135,7 @@ type CreateJSONWebKeySetForbidden struct {
 func (o *CreateJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
+
 func (o *CreateJSONWebKeySetForbidden) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -153,7 +157,7 @@ func NewCreateJSONWebKeySetInternalServerError() *CreateJSONWebKeySetInternalSer
 	return &CreateJSONWebKeySetInternalServerError{}
 }
 
-/* CreateJSONWebKeySetInternalServerError describes a response with status code 500, with default header values.
+/*CreateJSONWebKeySetInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -164,6 +168,7 @@ type CreateJSONWebKeySetInternalServerError struct {
 func (o *CreateJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /keys/{set}][%d] createJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *CreateJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

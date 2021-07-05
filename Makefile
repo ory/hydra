@@ -113,7 +113,7 @@ mocks: .bin/mockgen
 .PHONY: sdk
 sdk: .bin/ory
 		swagger generate spec -m -o ./spec/api.json -x internal/httpclient -x gopkg.in/square/go-jose.v2
-		cli dev swagger sanitize ./spec/api.json
+		ory dev swagger sanitize ./spec/api.json
 		swagger flatten --with-flatten=remove-unused -o ./spec/api.json ./spec/api.json
 		swagger validate ./spec/api.json
 		rm -rf internal/httpclient

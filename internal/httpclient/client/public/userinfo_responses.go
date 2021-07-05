@@ -41,8 +41,9 @@ func (o *UserinfoReader) ReadResponse(response runtime.ClientResponse, consumer 
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -51,7 +52,7 @@ func NewUserinfoOK() *UserinfoOK {
 	return &UserinfoOK{}
 }
 
-/* UserinfoOK describes a response with status code 200, with default header values.
+/*UserinfoOK handles this case with default header values.
 
 userinfoResponse
 */
@@ -62,6 +63,7 @@ type UserinfoOK struct {
 func (o *UserinfoOK) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoOK  %+v", 200, o.Payload)
 }
+
 func (o *UserinfoOK) GetPayload() *models.UserinfoResponse {
 	return o.Payload
 }
@@ -83,7 +85,7 @@ func NewUserinfoUnauthorized() *UserinfoUnauthorized {
 	return &UserinfoUnauthorized{}
 }
 
-/* UserinfoUnauthorized describes a response with status code 401, with default header values.
+/*UserinfoUnauthorized handles this case with default header values.
 
 genericError
 */
@@ -94,6 +96,7 @@ type UserinfoUnauthorized struct {
 func (o *UserinfoUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoUnauthorized  %+v", 401, o.Payload)
 }
+
 func (o *UserinfoUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -115,7 +118,7 @@ func NewUserinfoInternalServerError() *UserinfoInternalServerError {
 	return &UserinfoInternalServerError{}
 }
 
-/* UserinfoInternalServerError describes a response with status code 500, with default header values.
+/*UserinfoInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -126,6 +129,7 @@ type UserinfoInternalServerError struct {
 func (o *UserinfoInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *UserinfoInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

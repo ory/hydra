@@ -47,8 +47,9 @@ func (o *DeleteJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -57,9 +58,9 @@ func NewDeleteJSONWebKeySetNoContent() *DeleteJSONWebKeySetNoContent {
 	return &DeleteJSONWebKeySetNoContent{}
 }
 
-/* DeleteJSONWebKeySetNoContent describes a response with status code 204, with default header values.
+/*DeleteJSONWebKeySetNoContent handles this case with default header values.
 
- Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteJSONWebKeySetNoContent struct {
@@ -79,7 +80,7 @@ func NewDeleteJSONWebKeySetUnauthorized() *DeleteJSONWebKeySetUnauthorized {
 	return &DeleteJSONWebKeySetUnauthorized{}
 }
 
-/* DeleteJSONWebKeySetUnauthorized describes a response with status code 401, with default header values.
+/*DeleteJSONWebKeySetUnauthorized handles this case with default header values.
 
 genericError
 */
@@ -90,6 +91,7 @@ type DeleteJSONWebKeySetUnauthorized struct {
 func (o *DeleteJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}][%d] deleteJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
+
 func (o *DeleteJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -111,7 +113,7 @@ func NewDeleteJSONWebKeySetForbidden() *DeleteJSONWebKeySetForbidden {
 	return &DeleteJSONWebKeySetForbidden{}
 }
 
-/* DeleteJSONWebKeySetForbidden describes a response with status code 403, with default header values.
+/*DeleteJSONWebKeySetForbidden handles this case with default header values.
 
 genericError
 */
@@ -122,6 +124,7 @@ type DeleteJSONWebKeySetForbidden struct {
 func (o *DeleteJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}][%d] deleteJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
+
 func (o *DeleteJSONWebKeySetForbidden) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -143,7 +146,7 @@ func NewDeleteJSONWebKeySetInternalServerError() *DeleteJSONWebKeySetInternalSer
 	return &DeleteJSONWebKeySetInternalServerError{}
 }
 
-/* DeleteJSONWebKeySetInternalServerError describes a response with status code 500, with default header values.
+/*DeleteJSONWebKeySetInternalServerError handles this case with default header values.
 
 genericError
 */
@@ -154,6 +157,7 @@ type DeleteJSONWebKeySetInternalServerError struct {
 func (o *DeleteJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}][%d] deleteJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
 }
+
 func (o *DeleteJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

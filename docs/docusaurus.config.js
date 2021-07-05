@@ -6,17 +6,33 @@ const githubRepoName =
 
 const baseUrl = config.baseUrl ? config.baseUrl : `/${config.projectSlug}/docs/`
 
-const links = [
+let links = [
   {
     to: 'https://www.ory.sh/',
     label: `Home`,
     position: 'left'
-  },
-  {
-    href: 'https://www.ory.sh/blog',
-    label: 'Blog',
-    position: 'left'
-  },
+  }
+]
+
+if (config.openApiSpec) {
+  links = [
+    ...links,
+    {
+      to: baseUrl,
+      label: `Docs`,
+      position: 'left',
+      activeBaseRegex: 'docs/(?!http-api/).*'
+    },
+    {
+      to: baseUrl + 'http-api/',
+      label: `HTTP API`,
+      position: 'left'
+    }
+  ]
+}
+
+links = [
+  ...links,
   {
     href: `https://github.com/ory/${githubRepoName}/discussions`,
     label: 'Discussions',
@@ -123,7 +139,7 @@ module.exports = {
       }
     },
     navbar: {
-      hideOnScroll: true,
+      hideOnScroll: false,
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
@@ -181,7 +197,8 @@ module.exports = {
             ? 'contrib/docs'
             : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
-        editUrl: `https://github.com/ory/${githubRepoName}/edit/master/docs`,
+        editUrl: ({ docPath }) =>
+          `https://github.com/ory/${githubRepoName}/edit/master/docs/docs/${docPath}`,
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
@@ -200,5 +217,20 @@ module.exports = {
       }
     ],
     '@docusaurus/theme-search-algolia'
+  ],
+  presets: [
+    [
+      'redocusaurus',
+      {
+        specs: config.openApiSpec
+          ? [
+              {
+                routePath: '/http-api/',
+                specUrl: config.openApiSpec
+              }
+            ]
+          : []
+      }
+    ]
   ]
 }

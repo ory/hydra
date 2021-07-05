@@ -10,6 +10,5 @@ import (
 	_ "golang.org/x/tools/cmd/stringer"
 	_ "gopkg.in/DataDog/dd-trace-go.v1/ddtrace"
 
-	_ "github.com/ory/cli"
 	_ "github.com/ory/go-acc"
 )

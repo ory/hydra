@@ -8,7 +8,6 @@ GO_DEPENDENCIES = github.com/ory/go-acc \
 				  golang.org/x/tools/cmd/goimports \
 				  github.com/golang/mock/mockgen \
 				  github.com/go-swagger/go-swagger/cmd/swagger \
-				  github.com/ory/cli \
 				  github.com/go-bindata/go-bindata/go-bindata
 
 define make-go-dependency
@@ -33,6 +32,10 @@ docs/node_modules: docs/package.json
 
 docs/cli: .bin/clidoc
 		clidoc .
+
+.bin/ory: Makefile
+		bash <(curl https://raw.githubusercontent.com/ory/cli/master/install.sh) -b .bin v0.0.53
+		touch -a -m .bin/ory
 
 .PHONY: lint
 lint: .bin/golangci-lint
@@ -108,7 +111,7 @@ mocks: .bin/mockgen
 
 # Generates the SDKs
 .PHONY: sdk
-sdk: .bin/cli
+sdk: .bin/ory
 		swagger generate spec -m -o ./spec/api.json -x internal/httpclient -x gopkg.in/square/go-jose.v2
 		cli dev swagger sanitize ./spec/api.json
 		swagger flatten --with-flatten=remove-unused -o ./spec/api.json ./spec/api.json

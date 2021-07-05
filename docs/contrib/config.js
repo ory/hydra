@@ -16,7 +16,8 @@ let config = {
   updateConfig: {
     src: '.schema/config.schema.json',
     dst: './docs/docs/reference/configuration.md'
-  }
+  },
+  enableRedoc: true
 }
 
 const cn = path.join(__dirname, '..', 'config.js')

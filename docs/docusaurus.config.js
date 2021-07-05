@@ -181,7 +181,8 @@ module.exports = {
             ? 'contrib/docs'
             : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
-        editUrl: `https://github.com/ory/${githubRepoName}/edit/master/docs`,
+        editUrl: ({ docPath }) =>
+          `https://github.com/ory/${githubRepoName}/edit/master/docs/docs/${docPath}`,
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,

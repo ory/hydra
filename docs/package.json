@@ -7,9 +7,11 @@
     "prettierTarget": "{docs/**,docs/,scripts/,static/,contrib/,src/,src/**/,}*.{md,mdx,json,js,css,html}"
   },
   "scripts": {
-    "gen": "npm run widdershins && cd .. && node ./docs/scripts/fix-api.js ./docs/docs/reference/api.mdx && node ./docs/scripts/config.js docs/config.js && node ./docs/scripts/gen-faq.js",
+    "gen": "npm-run-all gen:*",
     "docusaurus": "docusaurus",
-    "widdershins": "widdershins -u .widdershins/templates -e .widdershins/config.json ../spec/api.json -o ./docs/reference/api.mdx",
+    "gen:api": "mkdir -p docs/.static && cp ../spec/api.json docs/.static/api.json",
+    "gen:config": "./docs/scripts/config.js",
+    "gen:faq": "./docs/scripts/gen-faq.js",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
@@ -51,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "npm-run-all": "^4.1.5",
     "json-schema-faker": "0.5.0-rcv.35",
     "json-schema-ref-parser": "9.0.9",
     "ory-prettier-styles": "1.1.2",

@@ -26,100 +26,98 @@ if (process.argv.length !== 3 || process.argv[1] === 'help') {
 
 const config = require(path.resolve(process.argv[2]))
 
-const enhance =
-  (schema, parents = []) =>
-  (item) => {
-    const key = item.key.value
+const enhance = (schema, parents = []) => (item) => {
+  const key = item.key.value
 
-    const path = [
-      ...parents.map((parent) => ['properties', parent]),
-      ['properties', key]
-    ].flat()
+  const path = [
+    ...parents.map((parent) => ['properties', parent]),
+    ['properties', key]
+  ].flat()
 
-    if (['title', 'description'].find((f) => path[path.length - 1] === f)) {
-      return
-    }
+  if (['title', 'description'].find((f) => path[path.length - 1] === f)) {
+    return
+  }
 
-    const comments = [`# ${pathOr(key, [...path, 'title'], schema)} ##`, '']
+  const comments = [`# ${pathOr(key, [...path, 'title'], schema)} ##`, '']
 
-    const description = pathOr('', [...path, 'description'], schema)
-    if (description) {
-      comments.push(' ' + description.split('\n').join('\n '), '')
-    }
+  const description = pathOr('', [...path, 'description'], schema)
+  if (description) {
+    comments.push(' ' + description.split('\n').join('\n '), '')
+  }
 
-    const defaultValue = pathOr('', [...path, 'default'], schema)
-    if (defaultValue || defaultValue === false) {
-      comments.push(' Default value: ' + defaultValue, '')
-    }
+  const defaultValue = pathOr('', [...path, 'default'], schema)
+  if (defaultValue || defaultValue === false) {
+    comments.push(' Default value: ' + defaultValue, '')
+  }
 
-    const enums = pathOr('', [...path, 'enum'], schema)
-    if (enums && Array.isArray(enums)) {
-      comments.push(
-        ' One of:',
-        ...YAML.stringify(enums)
-          .split('\n')
-          .map((i) => ` ${i}`)
-      ) // split always returns one empty object so no need for newline
-    }
+  const enums = pathOr('', [...path, 'enum'], schema)
+  if (enums && Array.isArray(enums)) {
+    comments.push(
+      ' One of:',
+      ...YAML.stringify(enums)
+        .split('\n')
+        .map((i) => ` ${i}`)
+    ) // split always returns one empty object so no need for newline
+  }
 
-    const min = pathOr('', [...path, 'minimum'], schema)
-    if (min || min === 0) {
-      comments.push(` Minimum value: ${min}`, '')
-    }
+  const min = pathOr('', [...path, 'minimum'], schema)
+  if (min || min === 0) {
+    comments.push(` Minimum value: ${min}`, '')
+  }
 
-    const max = pathOr('', [...path, 'maximum'], schema)
-    if (max || max === 0) {
-      comments.push(` Maximum value: ${max}`, '')
-    }
+  const max = pathOr('', [...path, 'maximum'], schema)
+  if (max || max === 0) {
+    comments.push(` Maximum value: ${max}`, '')
+  }
 
-    const examples = pathOr('', [...path, 'examples'], schema)
-    if (examples) {
-      comments.push(
-        ' Examples:',
-        ...YAML.stringify(examples)
-          .split('\n')
-          .map((i) => ` ${i}`)
-      ) // split always returns one empty object so no need for newline
-    }
+  const examples = pathOr('', [...path, 'examples'], schema)
+  if (examples) {
+    comments.push(
+      ' Examples:',
+      ...YAML.stringify(examples)
+        .split('\n')
+        .map((i) => ` ${i}`)
+    ) // split always returns one empty object so no need for newline
+  }
 
-    let hasChildren
-    if (item.value.items) {
-      item.value.items.forEach((item) => {
-        if (item.key) {
-          enhance(schema, [...parents, key])(item)
-          hasChildren = true
-        }
-      })
-    }
+  let hasChildren
+  if (item.value.items) {
+    item.value.items.forEach((item) => {
+      if (item.key) {
+        enhance(schema, [...parents, key])(item)
+        hasChildren = true
+      }
+    })
+  }
 
-    const showEnvVarBlockForObject = pathOr(
-      '',
-      [...path, 'showEnvVarBlockForObject'],
-      schema
+  const showEnvVarBlockForObject = pathOr(
+    '',
+    [...path, 'showEnvVarBlockForObject'],
+    schema
+  )
+  if (!hasChildren || showEnvVarBlockForObject) {
+    const env = [...parents, key].map((i) => i.toUpperCase()).join('_')
+    comments.push(
+      ' Set this value using environment variables on',
+      ' - Linux/macOS:',
+      `    $ export ${env}=<value>`,
+      ' - Windows Command Line (CMD):',
+      `    > set ${env}=<value>`,
+      ''
     )
-    if (!hasChildren || showEnvVarBlockForObject) {
-      const env = [...parents, key].map((i) => i.toUpperCase()).join('_')
+
+    // Show this if the config property is an object, to call out how to specify the env var
+    if (hasChildren) {
       comments.push(
-        ' Set this value using environment variables on',
-        ' - Linux/macOS:',
-        `    $ export ${env}=<value>`,
-        ' - Windows Command Line (CMD):',
-        `    > set ${env}=<value>`,
+        ' This can be set as an environment variable by supplying it as a JSON object.',
         ''
       )
-
-      // Show this if the config property is an object, to call out how to specify the env var
-      if (hasChildren) {
-        comments.push(
-          ' This can be set as an environment variable by supplying it as a JSON object.',
-          ''
-        )
-      }
     }
-
-    item.commentBefore = comments.join('\n')
-    item.spaceBefore = true
   }
+
+  item.commentBefore = comments.join('\n')
+  item.spaceBefore = true
+}
 
 new Promise((resolve, reject) => {
   parser.dereference(

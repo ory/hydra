@@ -14,19 +14,21 @@ let links = [
   }
 ]
 
-if (config.openApiSpec) {
+if (config.enableRedoc) {
   links = [
     ...links,
     {
       to: baseUrl,
       label: `Docs`,
       position: 'left',
-      activeBaseRegex: 'docs/(?!http-api/).*'
+      activeBaseRegex: '/docs/(?!http-api).*'
     },
     {
-      to: baseUrl + 'http-api/',
-      label: `HTTP API`,
-      position: 'left'
+      type: 'docsVersion',
+      position: 'left',
+      to: '/http-api',
+      label: 'HTTP API',
+      docsPluginId: 'default'
     }
   ]
 }
@@ -197,12 +199,14 @@ module.exports = {
             ? 'contrib/docs'
             : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
-        editUrl: ({ docPath }) =>
-          `https://github.com/ory/${githubRepoName}/edit/master/docs/docs/${docPath}`,
+        editUrl: `https://github.com/ory/${githubRepoName}/edit/master/docs`,
+        editCurrentVersion: false,
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        disableVersioning: false
+        disableVersioning: false,
+
+        include: ['**/*.md', '**/*.mdx', '**/*.js']
       }
     ],
     '@docusaurus/plugin-content-pages',
@@ -217,20 +221,5 @@ module.exports = {
       }
     ],
     '@docusaurus/theme-search-algolia'
-  ],
-  presets: [
-    [
-      'redocusaurus',
-      {
-        specs: config.openApiSpec
-          ? [
-              {
-                routePath: '/http-api/',
-                specUrl: config.openApiSpec
-              }
-            ]
-          : []
-      }
-    ]
   ]
 }

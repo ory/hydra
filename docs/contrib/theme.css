@@ -7,7 +7,8 @@
   margin: 32px;
 }
 
-.menu__link[href*="https://"]:after
+.menu__link[href*="https://"] svg,
+svg[class*="iconExternalLink"]
 {
   display: none !important;
 }

@@ -182,8 +182,7 @@ module.exports = {
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
         disableVersioning: false,
-
-        include: ['**/*.md', '**/*.mdx', '**/*.js']
+        include: ['**/*.md', '**/*.mdx', '**/*.jsx']
       }
     ],
     '@docusaurus/plugin-content-pages',

@@ -1,118 +1,120 @@
 [
   {
-    "Introduction": ["index", "5min-tutorial", "install", "contributing"]
-  },
-  {
-    "Concepts": [
-      "concepts/before-oauth2",
-      "concepts/oauth2",
-      "concepts/openid-connect-oidc",
-      "concepts/login",
-      "concepts/consent",
-      "concepts/logout",
-      "jwks",
-      "limitations"
+    "Introduction": [
+      "index",
+      "quickstart",
+      "install",
+      "configuring",
+      "contributing",
+      "faq"
     ]
   },
   {
+    "Concepts": [
+      "concepts/index",
+      "concepts/terminology",
+      "concepts/ui-user-interface",
+      "concepts/identity-data-model",
+      {
+        "label": "Identity Credentials",
+        "type": "category",
+        "items": [
+          "concepts/credentials",
+          "concepts/credentials/username-email-password",
+          "concepts/credentials/openid-connect-oidc-oauth2"
+        ]
+      },
+      "concepts/browser-redirect-flow-completion",
+      "concepts/email-sms",
+      "concepts/rest-api",
+      "concepts/federation",
+      "concepts/security"
+    ]
+  },
+  {
+    "Self Service (End-User)": [
+      "self-service",
+      "self-service/flows/user-registration",
+      "self-service/flows/user-login",
+      "self-service/flows/user-settings",
+      "self-service/flows/account-recovery",
+      "self-service/flows/verify-email-account-activation",
+      "self-service/flows/user-logout",
+      "self-service/flows/user-facing-errors",
+      "self-service/flows/2fa-mfa-multi-factor-authentication",
+      "self-service/hooks"
+    ]
+  },
+  {
+    "Administration": ["admin/managing-users-identities"]
+  },
+  {
     "Guides": [
-      {
-        "type": "category",
-        "label": "Implementing the User Interface",
-        "items": ["guides/login", "guides/consent", "guides/logout"]
-      },
-      {
-        "type": "category",
-        "label": "Operations",
-        "items": [
-          "configure-deploy",
-          "dependencies-environment",
-          "production",
-          "guides/tracing",
-          "guides/secrets-key-rotation",
-          "guides/kubernetes-helm-chart",
-          "guides/ssl-https-tls",
-          "guides/cookies",
-          "guides/scaling-hydra",
-          "guides/cors",
-          "guides/gitlab",
-          "guides/migrating-from-mitreid",
-          "guides/merge-multiple-db-secrets"
-        ]
-      },
-      {
-        "type": "category",
-        "label": "OAuth2 & OpenID Connect",
-        "items": [
-          "advanced",
-          "guides/oauth2-clients",
-          "guides/common-oauth2-openid-connect-flows",
-          "guides/using-oauth2",
-          "guides/token-expiration",
-          "guides/oauth2-token-introspection",
-          "guides/oauth2-public-spa-mobile"
-        ]
-      }
+      "guides/sign-in-with-github-google-facebook-linkedin",
+      "guides/login-session",
+      "guides/configuring-cookies",
+      "guides/multi-domain-cookies",
+      "guides/setting-up-cors",
+      "guides/account-recovery-password-reset",
+      "guides/account-activation-email-verification",
+      "guides/zero-trust-iap-proxy-identity-access-proxy",
+      "guides/multi-tenancy-multitenant",
+      "guides/secret-key-rotation",
+      "guides/high-availability-ha",
+      "guides/docker",
+      "guides/setting-up-password-hashing-parameters",
+      "guides/integration-with-other-systems-using-web-hooks",
+      "guides/tracing"
     ]
   },
   {
     "Reference": [
       "reference/configuration",
+      "reference/json-schema-json-paths",
+      "reference/html-forms",
       "reference/api",
       {
         "Command Line Interface (CLI)": [
-          "cli/hydra",
-          "cli/hydra-clients",
-          "cli/hydra-clients-create",
-          "cli/hydra-clients-delete",
-          "cli/hydra-clients-get",
-          "cli/hydra-clients-import",
-          "cli/hydra-clients-import",
-          "cli/hydra-clients-import",
-          "cli/hydra-clients-import",
-          "cli/hydra-clients-list",
-          "cli/hydra-clients-update",
-          "cli/hydra-janitor",
-          "cli/hydra-keys",
-          "cli/hydra-keys-create",
-          "cli/hydra-keys-delete",
-          "cli/hydra-keys-get",
-          "cli/hydra-keys-import",
-          "cli/hydra-migrate",
-          "cli/hydra-migrate-sql",
-          "cli/hydra-serve",
-          "cli/hydra-serve-admin",
-          "cli/hydra-serve-all",
-          "cli/hydra-serve-public",
-          "cli/hydra-token",
-          "cli/hydra-token-client",
-          "cli/hydra-token-delete",
-          "cli/hydra-token-flush",
-          "cli/hydra-token-introspect",
-          "cli/hydra-token-revoke",
-          "cli/hydra-token-user",
-          "cli/hydra-version"
+          "cli/kratos",
+          "cli/kratos-courier",
+          "cli/kratos-courier-watch",
+          "cli/kratos-identities",
+          "cli/kratos-identities-delete",
+          "cli/kratos-identities-get",
+          "cli/kratos-identities-import",
+          "cli/kratos-identities-list",
+          "cli/kratos-identities-patch",
+          "cli/kratos-identities-validate",
+          "cli/kratos-jsonnet",
+          "cli/kratos-jsonnet-format",
+          "cli/kratos-jsonnet-lint",
+          "cli/kratos-migrate",
+          "cli/kratos-migrate-sql",
+          "cli/kratos-remote",
+          "cli/kratos-remote-status",
+          "cli/kratos-remote-version",
+          "cli/kratos-serve",
+          "cli/kratos-version"
         ]
       }
     ]
   },
   {
     "Debug & Help": [
-      "debug",
       "debug/csrf",
-      "debug/config",
-      "debug/token-endpoint-auth-method",
-      "debug/logout",
-      "faq"
+      "debug/performance-out-of-memory-password-hashing-argon2"
     ]
   },
   {
-    "SDKs": ["sdk", "sdk/go", "sdk/js", "sdk/php"]
+    "SDKs": ["sdk"]
   },
   {
     "Development": ["milestones"]
   },
   {
-    "Further Reading": ["case-study", "benchmark", "security-architecture"]
+    "Further Reading": [
+      "further-reading/comparison",
+      "further-reading/kratos-video-tutorials"
+    ]
   }
 ]

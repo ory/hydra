@@ -1,6 +1,6 @@
 const RefParser = require('json-schema-ref-parser')
 const parser = new RefParser()
-const jsf = require('json-schema-faker')
+const jsf = require('json-schema-faker').default
 const YAML = require('yaml')
 const { pathOr } = require('ramda')
 const path = require('path')

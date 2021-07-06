@@ -853,7 +853,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
+        "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
           "200": {
@@ -2024,11 +2024,6 @@
     "JoseJSONWebKeySet": {
       "type": "object"
     },
-    "NullTime": {
-      "type": "string",
-      "format": "date-time",
-      "title": "NullTime implements sql.NullTime functionality."
-    },
     "PluginConfig": {
       "type": "object",
       "title": "PluginConfig The config of a plugin.",
@@ -2159,6 +2154,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2435,7 +2434,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "$ref": "#/definitions/nullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2501,7 +2500,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -2545,7 +2544,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "$ref": "#/definitions/nullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2686,33 +2685,46 @@
       }
     },
     "genericError": {
-      "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "Error response",
       "required": [
-        "error"
+        "message"
       ],
       "properties": {
-        "debug": {
-          "description": "Debug contains debug information. This is usually not available and has to be enabled.",
-          "type": "string",
-          "example": "The database adapter was unable to find the element"
-        },
-        "error": {
-          "description": "Name is the error name.",
-          "type": "string",
-          "example": "The requested resource could not be found"
-        },
-        "error_description": {
-          "description": "Description contains further information on the nature of the error.",
-          "type": "string",
-          "example": "Object with ID 12345 does not exist"
-        },
-        "status_code": {
-          "description": "Code represents the error status code (404, 403, 401, ...).",
+        "code": {
+          "description": "The status code",
           "type": "integer",
           "format": "int64",
           "example": 404
+        },
+        "debug": {
+          "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
+          "type": "string",
+          "example": "SQL field \"foo\" is not a bool."
+        },
+        "details": {
+          "description": "Further error details",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "message": {
+          "description": "Error message\n\nThe error's message.",
+          "type": "string",
+          "example": "The resource could not be found"
+        },
+        "reason": {
+          "description": "A human-readable reason for the error",
+          "type": "string",
+          "example": "User with ID 1234 does not exist."
+        },
+        "request": {
+          "description": "The request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
+          "type": "string",
+          "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6"
+        },
+        "status": {
+          "description": "The status description",
+          "type": "string",
+          "example": "Not Found"
         }
       }
     },
@@ -2834,6 +2846,11 @@
           "type": "string"
         }
       }
+    },
+    "nullTime": {
+      "type": "string",
+      "format": "date-time",
+      "title": "NullTime implements sql.NullTime functionality."
     },
     "oAuth2Client": {
       "type": "object",
@@ -3298,6 +3315,13 @@
         },
         "claims_supported": {
           "description": "JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "code_challenge_methods_supported": {
+          "description": "JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported\nby this authorization server.",
           "type": "array",
           "items": {
             "type": "string"

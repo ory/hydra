@@ -230,7 +230,7 @@
           ]
         },
         "cert": {
-          "description": "Configures the private key (pem encoded).",
+          "description": "Configures the public certificate (pem encoded).",
           "allOf": [
             {
               "$ref": "#/definitions/pem_file"
@@ -800,6 +800,20 @@
             true
           ]
         },
+        "allowed_top_level_claims": {
+          "type": "array",
+          "description": "A list of custom claims which are allowed to be added top level to the Access Token. They cannot override reserved claims.",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            [
+              "username",
+              "email",
+              "user_uuid"
+            ]
+          ]
+        },
         "hashers": {
           "type": "object",
           "additionalProperties": false,
@@ -911,12 +925,13 @@
       "properties": {
         "provider": {
           "type": "string",
-          "description": "Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).",
+          "description": "Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin DataDog, Elastic APM and Instana. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).",
           "enum": [
             "jaeger",
             "zipkin",
             "datadog",
-            "elastic-apm"
+            "elastic-apm",
+            "instana"
           ],
           "examples": [
             "jaeger"

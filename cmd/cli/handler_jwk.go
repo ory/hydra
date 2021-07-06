@@ -89,6 +89,21 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
 	}
 }
 
+func updateKey(set jose.JSONWebKeySet,newKey jose.JSONWebKey) []jose.JSONWebKey {
+	if len(set.Key(newKey.KeyID)) > 0 {
+		tempSet := jose.JSONWebKeySet {}
+		for _, key := range set.Keys {
+			//copy not matching keys
+			if key.KeyID != newKey.KeyID {
+				tempSet.Keys = append(tempSet.Keys, key)
+			}
+		}
+		set.Keys = tempSet.Keys
+	}
+	set.Keys = append(set.Keys, newKey)
+	return set.Keys
+}
+
 func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 2)
 
@@ -123,7 +138,10 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		cmdx.Fatalf("Expected status code 200 or 404 but got %d while fetching data from %s", response.StatusCode, u)
 	}
 
-	set := jose.JSONWebKeySet{}
+	var set jose.JSONWebKeySet
+	err = json.NewDecoder(response.Body).Decode(&set)
+	cmdx.Must(err, "Unable to decode payload to JSON: %s", err)
+
 	for _, path := range args[1:] {
 		file, err := ioutil.ReadFile(path)
 		cmdx.Must(err, "Unable to read file %s", path)
@@ -137,9 +155,9 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
+			set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
 		} else {
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
+			set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
 		}
 
 		fmt.Printf("Successfully loaded key from file: %s\n", path)

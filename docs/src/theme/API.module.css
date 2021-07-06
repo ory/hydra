@@ -3,10 +3,6 @@
   max-width: 100%;
 }
 
-:global main {
-  max-width: 100% !important;
-}
-
 :global .container .col {
   width: 100% !important;
   max-width: 100% !important;
@@ -14,7 +10,4 @@
 
 :global .container .col.col--3 {
   display: none;
-}
-
-:global .container .col {
 }

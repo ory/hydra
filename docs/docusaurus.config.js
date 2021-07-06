@@ -11,30 +11,7 @@ let links = [
     to: 'https://www.ory.sh/',
     label: `Home`,
     position: 'left'
-  }
-]
-
-if (config.enableRedoc) {
-  links = [
-    ...links,
-    {
-      to: baseUrl,
-      label: `Docs`,
-      position: 'left',
-      activeBaseRegex: '/docs/(?!http-api).*'
-    },
-    {
-      type: 'docsVersion',
-      position: 'left',
-      to: '/http-api',
-      label: 'HTTP API',
-      docsPluginId: 'default'
-    }
-  ]
-}
-
-links = [
-  ...links,
+  },
   {
     href: `https://github.com/ory/${githubRepoName}/discussions`,
     label: 'Discussions',
@@ -220,6 +197,7 @@ module.exports = {
         customCss
       }
     ],
-    '@docusaurus/theme-search-algolia'
+    '@docusaurus/theme-search-algolia',
+    'docusaurus-theme-redoc'
   ]
 }

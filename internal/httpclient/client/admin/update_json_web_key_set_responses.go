@@ -93,23 +93,23 @@ func NewUpdateJSONWebKeySetUnauthorized() *UpdateJSONWebKeySetUnauthorized {
 
 /*UpdateJSONWebKeySetUnauthorized handles this case with default header values.
 
-genericError
+jsonError
 */
 type UpdateJSONWebKeySetUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *UpdateJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
 
-func (o *UpdateJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
+func (o *UpdateJSONWebKeySetUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *UpdateJSONWebKeySetUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -126,23 +126,23 @@ func NewUpdateJSONWebKeySetForbidden() *UpdateJSONWebKeySetForbidden {
 
 /*UpdateJSONWebKeySetForbidden handles this case with default header values.
 
-genericError
+jsonError
 */
 type UpdateJSONWebKeySetForbidden struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *UpdateJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
 
-func (o *UpdateJSONWebKeySetForbidden) GetPayload() *models.GenericError {
+func (o *UpdateJSONWebKeySetForbidden) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *UpdateJSONWebKeySetForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -159,23 +159,23 @@ func NewUpdateJSONWebKeySetInternalServerError() *UpdateJSONWebKeySetInternalSer
 
 /*UpdateJSONWebKeySetInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type UpdateJSONWebKeySetInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *UpdateJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}][%d] updateJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
 }
 
-func (o *UpdateJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
+func (o *UpdateJSONWebKeySetInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *UpdateJSONWebKeySetInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

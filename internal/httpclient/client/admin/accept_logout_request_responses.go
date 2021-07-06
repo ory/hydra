@@ -87,23 +87,23 @@ func NewAcceptLogoutRequestNotFound() *AcceptLogoutRequestNotFound {
 
 /*AcceptLogoutRequestNotFound handles this case with default header values.
 
-genericError
+jsonError
 */
 type AcceptLogoutRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *AcceptLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestNotFound  %+v", 404, o.Payload)
 }
 
-func (o *AcceptLogoutRequestNotFound) GetPayload() *models.GenericError {
+func (o *AcceptLogoutRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *AcceptLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -120,23 +120,23 @@ func NewAcceptLogoutRequestInternalServerError() *AcceptLogoutRequestInternalSer
 
 /*AcceptLogoutRequestInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type AcceptLogoutRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *AcceptLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestInternalServerError  %+v", 500, o.Payload)
 }
 
-func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *AcceptLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

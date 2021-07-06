@@ -87,23 +87,23 @@ func NewDiscoverOpenIDConfigurationUnauthorized() *DiscoverOpenIDConfigurationUn
 
 /*DiscoverOpenIDConfigurationUnauthorized handles this case with default header values.
 
-genericError
+jsonError
 */
 type DiscoverOpenIDConfigurationUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DiscoverOpenIDConfigurationUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationUnauthorized  %+v", 401, o.Payload)
 }
 
-func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.GenericError {
+func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -120,23 +120,23 @@ func NewDiscoverOpenIDConfigurationInternalServerError() *DiscoverOpenIDConfigur
 
 /*DiscoverOpenIDConfigurationInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type DiscoverOpenIDConfigurationInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DiscoverOpenIDConfigurationInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationInternalServerError  %+v", 500, o.Payload)
 }
 
-func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.GenericError {
+func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

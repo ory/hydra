@@ -87,23 +87,23 @@ func NewAcceptConsentRequestNotFound() *AcceptConsentRequestNotFound {
 
 /*AcceptConsentRequestNotFound handles this case with default header values.
 
-genericError
+jsonError
 */
 type AcceptConsentRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *AcceptConsentRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/accept][%d] acceptConsentRequestNotFound  %+v", 404, o.Payload)
 }
 
-func (o *AcceptConsentRequestNotFound) GetPayload() *models.GenericError {
+func (o *AcceptConsentRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *AcceptConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -120,23 +120,23 @@ func NewAcceptConsentRequestInternalServerError() *AcceptConsentRequestInternalS
 
 /*AcceptConsentRequestInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type AcceptConsentRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *AcceptConsentRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/accept][%d] acceptConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
 
-func (o *AcceptConsentRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *AcceptConsentRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *AcceptConsentRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

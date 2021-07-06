@@ -93,23 +93,23 @@ func NewOauth2TokenBadRequest() *Oauth2TokenBadRequest {
 
 /*Oauth2TokenBadRequest handles this case with default header values.
 
-genericError
+jsonError
 */
 type Oauth2TokenBadRequest struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *Oauth2TokenBadRequest) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenBadRequest  %+v", 400, o.Payload)
 }
 
-func (o *Oauth2TokenBadRequest) GetPayload() *models.GenericError {
+func (o *Oauth2TokenBadRequest) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *Oauth2TokenBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -126,23 +126,23 @@ func NewOauth2TokenUnauthorized() *Oauth2TokenUnauthorized {
 
 /*Oauth2TokenUnauthorized handles this case with default header values.
 
-genericError
+jsonError
 */
 type Oauth2TokenUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *Oauth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenUnauthorized  %+v", 401, o.Payload)
 }
 
-func (o *Oauth2TokenUnauthorized) GetPayload() *models.GenericError {
+func (o *Oauth2TokenUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *Oauth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -159,23 +159,23 @@ func NewOauth2TokenInternalServerError() *Oauth2TokenInternalServerError {
 
 /*Oauth2TokenInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type Oauth2TokenInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *Oauth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenInternalServerError  %+v", 500, o.Payload)
 }
 
-func (o *Oauth2TokenInternalServerError) GetPayload() *models.GenericError {
+func (o *Oauth2TokenInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *Oauth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -76,23 +76,23 @@ func NewDeleteOAuth2ClientNotFound() *DeleteOAuth2ClientNotFound {
 
 /*DeleteOAuth2ClientNotFound handles this case with default header values.
 
-genericError
+jsonError
 */
 type DeleteOAuth2ClientNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteOAuth2ClientNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientNotFound  %+v", 404, o.Payload)
 }
 
-func (o *DeleteOAuth2ClientNotFound) GetPayload() *models.GenericError {
+func (o *DeleteOAuth2ClientNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2ClientNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -109,23 +109,23 @@ func NewDeleteOAuth2ClientInternalServerError() *DeleteOAuth2ClientInternalServe
 
 /*DeleteOAuth2ClientInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type DeleteOAuth2ClientInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
 
-func (o *DeleteOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+func (o *DeleteOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

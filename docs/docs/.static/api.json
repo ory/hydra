@@ -27,9 +27,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -51,15 +51,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -101,9 +101,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -134,21 +134,21 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "409": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -180,15 +180,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -225,9 +225,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -254,15 +254,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -299,9 +299,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -322,9 +322,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -379,21 +379,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -430,21 +430,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -481,21 +481,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -522,21 +522,21 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -575,15 +575,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -627,21 +627,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -675,21 +675,21 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -722,15 +722,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -761,9 +761,9 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "410": {
@@ -773,9 +773,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -813,15 +813,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -859,15 +859,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -898,15 +898,15 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "410": {
@@ -916,9 +916,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -956,27 +956,27 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1014,27 +1014,27 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1064,9 +1064,9 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "410": {
@@ -1076,9 +1076,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1108,15 +1108,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1150,15 +1150,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1192,15 +1192,15 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1239,15 +1239,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1275,15 +1275,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1311,15 +1311,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1357,15 +1357,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1400,15 +1400,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1481,21 +1481,21 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1522,15 +1522,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1557,15 +1557,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1824,10 +1824,6 @@
       "type": "object",
       "required": ["Socket", "Types"],
       "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2320,48 +2316,6 @@
         }
       }
     },
-    "genericError": {
-      "type": "object",
-      "required": ["message"],
-      "properties": {
-        "code": {
-          "description": "The status code",
-          "type": "integer",
-          "format": "int64",
-          "example": 404
-        },
-        "debug": {
-          "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-          "type": "string",
-          "example": "SQL field \"foo\" is not a bool."
-        },
-        "details": {
-          "description": "Further error details",
-          "type": "object",
-          "additionalProperties": true
-        },
-        "message": {
-          "description": "Error message\n\nThe error's message.",
-          "type": "string",
-          "example": "The resource could not be found"
-        },
-        "reason": {
-          "description": "A human-readable reason for the error",
-          "type": "string",
-          "example": "User with ID 1234 does not exist."
-        },
-        "request": {
-          "description": "The request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
-          "type": "string",
-          "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6"
-        },
-        "status": {
-          "description": "The status description",
-          "type": "string",
-          "example": "Not Found"
-        }
-      }
-    },
     "healthNotReadyStatus": {
       "type": "object",
       "properties": {
@@ -2380,6 +2334,34 @@
         "status": {
           "description": "Status always contains \"ok\".",
           "type": "string"
+        }
+      }
+    },
+    "jsonError": {
+      "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
+      "type": "object",
+      "title": "Generic Error Response",
+      "properties": {
+        "error": {
+          "description": "Name is the error name.",
+          "type": "string",
+          "example": "The requested resource could not be found"
+        },
+        "error_debug": {
+          "description": "Debug contains debug information. This is usually not available and has to be enabled.",
+          "type": "string",
+          "example": "The database adapter was unable to find the element"
+        },
+        "error_description": {
+          "description": "Description contains further information on the nature of the error.",
+          "type": "string",
+          "example": "Object with ID 12345 does not exist"
+        },
+        "status_code": {
+          "description": "Code represents the error status code (404, 403, 401, ...).",
+          "type": "integer",
+          "format": "int64",
+          "example": 404
         }
       }
     },

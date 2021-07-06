@@ -8,13 +8,20 @@ If this change neither resolves an existing issue nor has sign-off from one of t
 chance substantial changes will be requested or that the changes will be rejected.
 
 You can discuss changes with maintainers either in the Github Discusssions in this repository or
-join the [ORY Chat](https://www.ory.sh/chat).
+join the [Ory Chat](https://www.ory.sh/chat).
 -->
 
 ## Proposed changes
 
 <!--
 Describe the big picture of your changes here to communicate to the maintainers why we should accept this pull request.
+
+If your change includes breaking changes please add a codeblock documenting the breaking change:
+
+```
+BREAKING CHANGES: This patch changes the behavior of configuration item `foo` to do bar. To keep the existing
+behavior please do baz.
+```
 -->
 
 ## Checklist
@@ -25,6 +32,8 @@ them, don't hesitate to ask. We're here to help! This is simply a reminder of wh
 -->
 
 - [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md).
+- [ ] I am following the
+      [contributing code guidelines](../blob/master/CONTRIBUTING.md#contributing-code).
 - [ ] I have read the [security policy](../security/policy).
 - [ ] I confirm that this pull request does not address a security
       vulnerability. If this pull request addresses a security. vulnerability, I

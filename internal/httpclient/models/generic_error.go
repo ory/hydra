@@ -12,32 +12,47 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// GenericError Error response
-//
-// Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
+// GenericError generic error
 //
 // swagger:model genericError
 type GenericError struct {
 
-	// Debug contains debug information. This is usually not available and has to be enabled.
+	// The status code
+	Code int64 `json:"code,omitempty"`
+
+	// Debug information
+	//
+	// This field is often not exposed to protect against leaking
+	// sensitive information.
 	Debug string `json:"debug,omitempty"`
 
-	// Name is the error name.
+	// Further error details
+	Details interface{} `json:"details,omitempty"`
+
+	// Error message
+	//
+	// The error's message.
 	// Required: true
-	Error *string `json:"error"`
+	Message *string `json:"message"`
 
-	// Description contains further information on the nature of the error.
-	ErrorDescription string `json:"error_description,omitempty"`
+	// A human-readable reason for the error
+	Reason string `json:"reason,omitempty"`
 
-	// Code represents the error status code (404, 403, 401, ...).
-	StatusCode int64 `json:"status_code,omitempty"`
+	// The request ID
+	//
+	// The request ID is often exposed internally in order to trace
+	// errors across service architectures. This is often a UUID.
+	Request string `json:"request,omitempty"`
+
+	// The status description
+	Status string `json:"status,omitempty"`
 }
 
 // Validate validates this generic error
 func (m *GenericError) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateError(formats); err != nil {
+	if err := m.validateMessage(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -47,9 +62,9 @@ func (m *GenericError) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *GenericError) validateError(formats strfmt.Registry) error {
+func (m *GenericError) validateMessage(formats strfmt.Registry) error {
 
-	if err := validate.Required("error", "body", m.Error); err != nil {
+	if err := validate.Required("message", "body", m.Message); err != nil {
 		return err
 	}
 

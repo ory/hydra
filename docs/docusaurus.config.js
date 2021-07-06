@@ -6,17 +6,35 @@ const githubRepoName =
 
 const baseUrl = config.baseUrl ? config.baseUrl : `/${config.projectSlug}/docs/`
 
-const links = [
+let links = [
   {
     to: 'https://www.ory.sh/',
     label: `Home`,
     position: 'left'
-  },
-  {
-    href: 'https://www.ory.sh/blog',
-    label: 'Blog',
-    position: 'left'
-  },
+  }
+]
+
+if (config.enableRedoc) {
+  links = [
+    ...links,
+    {
+      to: baseUrl,
+      label: `Docs`,
+      position: 'left',
+      activeBaseRegex: '/docs/(?!http-api).*'
+    },
+    {
+      type: 'docsVersion',
+      position: 'left',
+      to: '/http-api',
+      label: 'HTTP API',
+      docsPluginId: 'default'
+    }
+  ]
+}
+
+links = [
+  ...links,
   {
     href: `https://github.com/ory/${githubRepoName}/discussions`,
     label: 'Discussions',
@@ -123,7 +141,7 @@ module.exports = {
       }
     },
     navbar: {
-      hideOnScroll: true,
+      hideOnScroll: false,
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
@@ -182,10 +200,13 @@ module.exports = {
             : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
         editUrl: `https://github.com/ory/${githubRepoName}/edit/master/docs`,
+        editCurrentVersion: false,
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        disableVersioning: false
+        disableVersioning: false,
+
+        include: ['**/*.md', '**/*.mdx', '**/*.js']
       }
     ],
     '@docusaurus/plugin-content-pages',

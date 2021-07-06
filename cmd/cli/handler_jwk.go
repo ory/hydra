@@ -128,13 +128,18 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		file, err := ioutil.ReadFile(path)
 		cmdx.Must(err, "Unable to read file %s", path)
 
+		keyID := flagx.MustGetString(cmd, "default-key-id")
+		if keyID == "" {
+			keyID = uuid.New()
+		}
+
 		if key, privateErr := josex.LoadPrivateKey(file); privateErr != nil {
 			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use))
+			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
 		} else {
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+uuid.New(), use))
+			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
 		}
 
 		fmt.Printf("Successfully loaded key from file: %s\n", path)

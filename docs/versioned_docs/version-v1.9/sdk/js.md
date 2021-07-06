@@ -14,7 +14,7 @@ npm install --save @ory/hydra-client
 #### Basic configuration
 
 ```js
-import { Configuration, PublicApi, AdminApi } from '@oryd/hydra-client'
+import { Configuration, PublicApi, AdminApi } from '@ory/hydra-client'
 
 const hydraPublic = new PublicApi(
   new Configuration({

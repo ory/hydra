@@ -1,6 +1,6 @@
 :global .container {
-  width: 100%;
-  max-width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 :global .container .col {

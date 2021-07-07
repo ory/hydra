@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/hsm"
+
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
@@ -58,6 +60,7 @@ type RegistryBase struct {
 	fsc          fosite.ScopeStrategy
 	atjs         jwk.JWTStrategy
 	idtjs        jwk.JWTStrategy
+	hsm          *hsm.Context
 	fscPrev      string
 	fos          *openid.DefaultStrategy
 	forv         *openid.OpenIDConnectRequestValidator
@@ -124,6 +127,11 @@ func (m *RegistryBase) BuildHash() string {
 
 func (m *RegistryBase) WithConfig(c *config.Provider) Registry {
 	m.C = c
+	return m.r
+}
+
+func (m *RegistryBase) WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry {
+	m.kg = kg
 	return m.r
 }
 
@@ -347,7 +355,8 @@ func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 }
 
 func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), key); err != nil {
+
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, "RS256", key); err != nil {
 		var netError net.Error
 		if errors.As(err, &netError) {
 			m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, key)
@@ -358,7 +367,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
-		s, err = jwk.NewRS256JWTStrategy(m.r, func() string {
+		s, err = jwk.NewRS256JWTStrategy(*m.C, m.r, func() string {
 			return key
 		})
 		return err
@@ -370,7 +379,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 }
 
 func (m *RegistryBase) AccessTokenJWTStrategy() jwk.JWTStrategy {
-	if m.atjs == nil {
+	if m.atjs == nil && m.C.IsUsingJWTAsAccessTokens() {
 		m.atjs = m.newKeyStrategy(x.OAuth2JWTKeyName)
 	}
 	return m.atjs
@@ -477,4 +486,11 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 		}
 	}
 	return m.arhs
+}
+
+func (m *RegistryBase) HsmContext() *hsm.Context {
+	if m.hsm == nil {
+		m.hsm = hsm.NewContext(m.C, m.l)
+	}
+	return m.hsm
 }

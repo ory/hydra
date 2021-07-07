@@ -42,7 +42,7 @@ import (
 )
 
 const (
-	tlsKeyName = "hydra.https-tls"
+	TlsKeyName = "hydra.https-tls"
 )
 
 func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
@@ -63,10 +63,12 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface conf
 		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 
-	_, priv, err := jwk.AsymmetricKeypair(context.Background(), d, &jwk.RS256Generator{KeyLength: 4069}, tlsKeyName)
+	keySet, err := jwk.GetOrGenerateKeySet(context.Background(), d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
 	if err != nil {
-		d.Logger().WithError(err).Fatal("Unable to fetch HTTPS TLS key pairs")
+		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 	}
+
+	priv, _ := jwk.FindKeyByPrefix(keySet, "private")
 
 	if len(priv.Certificates) == 0 {
 		cert, err := tlsx.CreateSelfSignedCertificate(priv.Key)
@@ -75,11 +77,11 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface conf
 		}
 
 		AttachCertificate(priv, cert)
-		if err := d.KeyManager().DeleteKey(context.TODO(), tlsKeyName, priv.KeyID); err != nil {
+		if err := d.SoftwareKeyManager().DeleteKey(context.TODO(), TlsKeyName, priv.KeyID); err != nil {
 			d.Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
 		}
 
-		if err := d.KeyManager().AddKey(context.TODO(), tlsKeyName, priv); err != nil {
+		if err := d.SoftwareKeyManager().AddKey(context.TODO(), TlsKeyName, priv); err != nil {
 			d.Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
 		}
 	}

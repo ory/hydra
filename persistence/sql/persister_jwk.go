@@ -17,6 +17,25 @@ import (
 
 var _ jwk.Manager = &Persister{}
 
+func (p *Persister) GenerateKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+	generator, found := p.r.KeyGenerators()[alg]
+	if !found {
+		return nil, jwk.ErrUnsupportedKeyAlgorithm
+	}
+
+	keys, err := generator.Generate(kid, use)
+	if err != nil {
+		return nil, err
+	}
+
+	err = p.AddKeySet(ctx, set, keys)
+	if err != nil {
+		return nil, err
+	}
+
+	return keys, nil
+}
+
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
 	if err != nil {
@@ -60,6 +79,30 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 		}
 		return nil
 	})
+}
+
+func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
+		return err
+	}
+
+	if err := p.AddKey(ctx, set, key); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
+	if err := p.DeleteKeySet(ctx, set); err != nil {
+		return err
+	}
+
+	if err := p.AddKeySet(ctx, set, keySet); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {

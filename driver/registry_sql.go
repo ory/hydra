@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/hsm"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/luna-duclos/instrumentedsql"
@@ -30,7 +32,8 @@ import (
 
 type RegistrySQL struct {
 	*RegistryBase
-	db *sqlx.DB
+	db                *sqlx.DB
+	defaultKeyManager jwk.Manager
 }
 
 var _ Registry = new(RegistrySQL)
@@ -80,6 +83,14 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 			return err
 		}
 
+		// TODO: Some keys might need option to use software key manager. Ideas how to refactor this?
+		// 	Current solution ignores HSM configuration for TLS keys and always uses software key manager for persistence.
+		if m.C.HsmEnabled() {
+			m.defaultKeyManager = hsm.NewKeyManager(m.HsmContext())
+		} else {
+			m.defaultKeyManager = m.persister
+		}
+
 		// if dsn is memory we have to run the migrations on every start
 		// use case - such as
 		// - just in memory
@@ -121,5 +132,9 @@ func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
+	return m.defaultKeyManager
+}
+
+func (m *RegistrySQL) SoftwareKeyManager() jwk.Manager {
 	return m.Persister()
 }

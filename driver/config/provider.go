@@ -24,6 +24,11 @@ import (
 
 const (
 	KeyRoot                                      = ""
+	HsmEnabled                                   = "hsm.enabled"
+	HsmLibraryPath                               = "hsm.library"
+	HsmPin                                       = "hsm.pin"
+	HsmSlotNumber                                = "hsm.slot"
+	HsmTokenLabel                                = "hsm.token_label" // #nosec G101
 	KeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
 	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
@@ -432,4 +437,25 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
+}
+
+func (p *Provider) HsmEnabled() bool {
+	return p.p.Bool(HsmEnabled)
+}
+
+func (p *Provider) HsmLibraryPath() string {
+	return p.p.String(HsmLibraryPath)
+}
+
+func (p *Provider) HsmSlotNumber() *int {
+	n := p.p.Int(HsmSlotNumber)
+	return &n
+}
+
+func (p *Provider) HsmPin() string {
+	return p.p.String(HsmPin)
+}
+
+func (p *Provider) HsmTokenLabel() string {
+	return p.p.String(HsmTokenLabel)
 }

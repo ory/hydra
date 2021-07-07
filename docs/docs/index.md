@@ -38,6 +38,11 @@ In addition to the OAuth 2.0 functionality, ORY Hydra offers a safe storage for
 cryptographic keys (used for example to sign JSON Web Tokens) and can manage
 OAuth 2.0 Clients.
 
+### Hardware Security Module support
+
+ORY Hydra also offers a safe storage for cryptographic keys using HSM.
+[Learn more](./hsm-support.md).
+
 ## Security First
 
 ORY Hydra's architecture and work flows are designed to neutralize many common

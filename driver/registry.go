@@ -34,6 +34,7 @@ type Registry interface {
 
 	WithConfig(c *config.Provider) Registry
 	WithLogger(l *logrusx.Logger) Registry
+	WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry
 
 	Config() *config.Provider
 	persistence.Provider

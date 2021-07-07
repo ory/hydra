@@ -85,6 +85,10 @@ e2e: node_modules test-resetdb
 quicktest:
 		go test -failfast -short -tags sqlite ./...
 
+.PHONY: quicktest-hsm
+quicktest-hsm:
+		docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite --target test-hsm .
+
 # Formats the code
 .PHONY: format
 format: .bin/goimports node_modules docs/node_modules contributors

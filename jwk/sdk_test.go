@@ -54,6 +54,60 @@ func TestJWKSDK(t *testing.T) {
 	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
 	t.Run("JSON Web Key", func(t *testing.T) {
+		if !conf.HsmEnabled() {
+			t.Skip("Hardware Security Module not enabled. Skipping test.")
+		}
+
+		t.Run("CreateJwkSetKey", func(t *testing.T) {
+			// Create a key called set-foo
+			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo").WithBody(&models.JSONWebKeySetGeneratorRequest{
+				Alg: pointerx.String("RS256"),
+				Kid: pointerx.String("key-bar"),
+				Use: pointerx.String("sig"),
+			}))
+			require.NoError(t, err)
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			assert.Equal(t, "public:key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
+			assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
+		})
+
+		var resultKeys *models.JSONWebKeySet
+		t.Run("GetJwkSetKey after create", func(t *testing.T) {
+			result, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
+			require.NoError(t, err)
+			require.Len(t, result.Payload.Keys, 1)
+			require.Equal(t, "public:key-bar", *result.Payload.Keys[0].Kid)
+			require.Equal(t, "RS256", *result.Payload.Keys[0].Alg)
+
+			resultKeys = result.Payload
+		})
+
+		t.Run("UpdateJwkSetKey", func(t *testing.T) {
+			require.Len(t, resultKeys.Keys, 1)
+			resultKeys.Keys[0].Alg = pointerx.String("RS256")
+
+			_, err := sdk.Admin.UpdateJSONWebKey(admin.NewUpdateJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo").WithBody(resultKeys.Keys[0]))
+			require.Error(t, err)
+		})
+
+		t.Run("DeleteJwkSetKey after delete", func(t *testing.T) {
+			_, err := sdk.Admin.DeleteJSONWebKey(admin.NewDeleteJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
+			require.NoError(t, err)
+		})
+
+		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
+			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid("key-bar").WithSet("set-foo"))
+			require.Error(t, err)
+		})
+
+	})
+
+	t.Run("JSON Web Key", func(t *testing.T) {
+		if conf.HsmEnabled() {
+			t.Skip("Hardware Security Module enabled. Skipping test.")
+		}
+
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
 			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo").WithBody(&models.JSONWebKeySetGeneratorRequest{
@@ -102,6 +156,10 @@ func TestJWKSDK(t *testing.T) {
 	})
 
 	t.Run("JWK Set", func(t *testing.T) {
+		if conf.HsmEnabled() {
+			t.Skip("Hardware Security Module enabled. Skipping test.")
+		}
+
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			resultKeys, err := sdk.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet("set-foo2").WithBody(&models.JSONWebKeySetGeneratorRequest{
 				Alg: pointerx.String("HS256"),

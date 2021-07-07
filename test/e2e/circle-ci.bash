@@ -54,6 +54,7 @@ export SERVE_PUBLIC_PORT=5000
 export SERVE_ADMIN_PORT=5001
 export LOG_LEAK_SENSITIVE_VALUES=true
 export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_fk=true"
+export SERVE_PUBLIC_ALLOW_DYNAMIC_REGISTRATION=true
 
 WATCH=no
 for i in "$@"

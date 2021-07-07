@@ -37,6 +37,7 @@ const (
 	KeyDSN                                       = "dsn"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
 	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
+	KeyPublicAllowDynamicRegistration            = "serve.public.allow_dynamic_registration"
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
@@ -219,6 +220,10 @@ func (p *Provider) CookieSameSiteMode() http.SameSite {
 		}
 		return http.SameSiteDefaultMode
 	}
+}
+
+func (p *Provider) PublicAllowDynamicRegistration() bool {
+	return p.p.Bool(KeyPublicAllowDynamicRegistration)
 }
 
 func (p *Provider) CookieSameSiteLegacyWorkaround() bool {

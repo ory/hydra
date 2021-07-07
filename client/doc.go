@@ -47,6 +47,17 @@ type swaggerUpdateClientPayload struct {
 	Body Client
 }
 
+// swagger:parameters updateDynOAuth2Client
+type swaggerUpdateDynClientPayload struct {
+	// in: path
+	// required: true
+	ID string `json:"id"`
+
+	// in: body
+	// required: true
+	Body Client
+}
+
 // swagger:parameters patchOAuth2Client
 type swaggerPatchClientPayload struct {
 	// in: path
@@ -113,8 +124,24 @@ type swaggerGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
+// swagger:parameters getDynOAuth2Client
+type swaggerGetDynOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	ID string `json:"id"`
+}
+
 // swagger:parameters deleteOAuth2Client
 type swaggerDeleteOAuth2Client struct {
+	// The id of the OAuth 2.0 Client.
+	//
+	// in: path
+	ID string `json:"id"`
+}
+
+// swagger:parameters deleteDynOAuth2Client
+type swaggerDeleteDynOAuth2Client struct {
 	// The id of the OAuth 2.0 Client.
 	//
 	// in: path

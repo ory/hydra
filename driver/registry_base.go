@@ -105,7 +105,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetRoutes(admin)
+	m.ClientHandler().SetRoutes(admin, public, m.C.PublicAllowDynamicRegistration())
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 }
 

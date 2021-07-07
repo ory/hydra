@@ -331,6 +331,12 @@
             },
             "tls": {
               "$ref": "#/definitions/tls_config"
+            },
+            "allow_dynamic_registration": {
+              "type": "boolean",
+              "additionalProperties": false,
+              "description": "Allow oidc dynamic client registration.",
+              "default": false
             }
           }
         },

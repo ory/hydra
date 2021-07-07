@@ -182,7 +182,8 @@ module.exports = {
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
         disableVersioning: false,
-        include: ['**/*.md', '**/*.mdx', '**/*.jsx']
+        include: ['**/*.md', '**/*.mdx', '**/*.jsx'],
+        docLayoutComponent: '@theme/RoutedDocPage'
       }
     ],
     '@docusaurus/plugin-content-pages',

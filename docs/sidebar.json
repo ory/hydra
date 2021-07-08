@@ -55,10 +55,10 @@
       }
     ]
   },
+  "reference/api",
   {
     "Reference": [
       "reference/configuration",
-      "reference/api",
       {
         "Command Line Interface (CLI)": [
           "cli/hydra",

@@ -79,22 +79,22 @@ func NewPatchOAuth2ClientInternalServerError() *PatchOAuth2ClientInternalServerE
 
 /* PatchOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type PatchOAuth2ClientInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *PatchOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[PATCH /clients/{id}][%d] patchOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
-func (o *PatchOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+func (o *PatchOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *PatchOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

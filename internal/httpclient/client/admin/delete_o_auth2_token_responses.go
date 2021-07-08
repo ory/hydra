@@ -75,22 +75,22 @@ func NewDeleteOAuth2TokenUnauthorized() *DeleteOAuth2TokenUnauthorized {
 
 /* DeleteOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type DeleteOAuth2TokenUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -107,22 +107,22 @@ func NewDeleteOAuth2TokenInternalServerError() *DeleteOAuth2TokenInternalServerE
 
 /* DeleteOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type DeleteOAuth2TokenInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-func (o *DeleteOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+func (o *DeleteOAuth2TokenInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

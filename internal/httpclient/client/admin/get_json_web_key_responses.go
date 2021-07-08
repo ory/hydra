@@ -85,22 +85,22 @@ func NewGetJSONWebKeyNotFound() *GetJSONWebKeyNotFound {
 
 /* GetJSONWebKeyNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type GetJSONWebKeyNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetJSONWebKeyNotFound) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyNotFound  %+v", 404, o.Payload)
 }
-func (o *GetJSONWebKeyNotFound) GetPayload() *models.GenericError {
+func (o *GetJSONWebKeyNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetJSONWebKeyNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -117,22 +117,22 @@ func NewGetJSONWebKeyInternalServerError() *GetJSONWebKeyInternalServerError {
 
 /* GetJSONWebKeyInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type GetJSONWebKeyInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetJSONWebKeyInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}/{kid}][%d] getJsonWebKeyInternalServerError  %+v", 500, o.Payload)
 }
-func (o *GetJSONWebKeyInternalServerError) GetPayload() *models.GenericError {
+func (o *GetJSONWebKeyInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetJSONWebKeyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

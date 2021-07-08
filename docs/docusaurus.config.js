@@ -6,15 +6,10 @@ const githubRepoName =
 
 const baseUrl = config.baseUrl ? config.baseUrl : `/${config.projectSlug}/docs/`
 
-const links = [
+let links = [
   {
     to: 'https://www.ory.sh/',
     label: `Home`,
-    position: 'left'
-  },
-  {
-    href: 'https://www.ory.sh/blog',
-    label: 'Blog',
     position: 'left'
   },
   {
@@ -123,7 +118,7 @@ module.exports = {
       }
     },
     navbar: {
-      hideOnScroll: true,
+      hideOnScroll: false,
       logo: {
         alt: config.projectName,
         src: `img/logo-${config.projectSlug}.svg`,
@@ -182,10 +177,13 @@ module.exports = {
             : 'docs',
         sidebarPath: require.resolve('./contrib/sidebar.js'),
         editUrl: `https://github.com/ory/${githubRepoName}/edit/master/docs`,
+        editCurrentVersion: false,
         routeBasePath: '/',
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
-        disableVersioning: false
+        disableVersioning: false,
+        include: ['**/*.md', '**/*.mdx', '**/*.jsx'],
+        docLayoutComponent: '@theme/RoutedDocPage'
       }
     ],
     '@docusaurus/plugin-content-pages',
@@ -199,6 +197,7 @@ module.exports = {
         customCss
       }
     ],
-    '@docusaurus/theme-search-algolia'
+    '@docusaurus/theme-search-algolia',
+    'docusaurus-theme-redoc'
   ]
 }

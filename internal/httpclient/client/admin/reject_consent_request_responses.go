@@ -85,22 +85,22 @@ func NewRejectConsentRequestNotFound() *RejectConsentRequestNotFound {
 
 /* RejectConsentRequestNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type RejectConsentRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectConsentRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *RejectConsentRequestNotFound) GetPayload() *models.GenericError {
+func (o *RejectConsentRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -117,22 +117,22 @@ func NewRejectConsentRequestInternalServerError() *RejectConsentRequestInternalS
 
 /* RejectConsentRequestInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type RejectConsentRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectConsentRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/consent/reject][%d] rejectConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RejectConsentRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *RejectConsentRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectConsentRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

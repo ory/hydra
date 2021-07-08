@@ -91,22 +91,22 @@ func NewGetLogoutRequestNotFound() *GetLogoutRequestNotFound {
 
 /* GetLogoutRequestNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type GetLogoutRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *GetLogoutRequestNotFound) GetPayload() *models.GenericError {
+func (o *GetLogoutRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -155,22 +155,22 @@ func NewGetLogoutRequestInternalServerError() *GetLogoutRequestInternalServerErr
 
 /* GetLogoutRequestInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type GetLogoutRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/logout][%d] getLogoutRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *GetLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *GetLogoutRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

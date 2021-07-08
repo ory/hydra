@@ -75,22 +75,22 @@ func NewRejectLogoutRequestNotFound() *RejectLogoutRequestNotFound {
 
 /* RejectLogoutRequestNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type RejectLogoutRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/reject][%d] rejectLogoutRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *RejectLogoutRequestNotFound) GetPayload() *models.GenericError {
+func (o *RejectLogoutRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -107,22 +107,22 @@ func NewRejectLogoutRequestInternalServerError() *RejectLogoutRequestInternalSer
 
 /* RejectLogoutRequestInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type RejectLogoutRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/reject][%d] rejectLogoutRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RejectLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *RejectLogoutRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

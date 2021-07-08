@@ -75,22 +75,22 @@ func NewRevokeOAuth2TokenUnauthorized() *RevokeOAuth2TokenUnauthorized {
 
 /* RevokeOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type RevokeOAuth2TokenUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RevokeOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/revoke][%d] revokeOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-func (o *RevokeOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+func (o *RevokeOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RevokeOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -107,22 +107,22 @@ func NewRevokeOAuth2TokenInternalServerError() *RevokeOAuth2TokenInternalServerE
 
 /* RevokeOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type RevokeOAuth2TokenInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RevokeOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/revoke][%d] revokeOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RevokeOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+func (o *RevokeOAuth2TokenInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RevokeOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -32,7 +32,7 @@ var serveControls = `## Configuration
 ORY Hydra can be configured using environment variables as well as a configuration file. For more information
 on configuration options, open the configuration documentation:
 
->> https://github.com/ory/hydra/blob/` + config.Commit + `/docs/docs/reference/config.md <<
+>> https://www.ory.sh/hydra/docs/reference/configuration <<
 `
 
 // serveCmd represents the host command

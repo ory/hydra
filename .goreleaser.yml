@@ -63,8 +63,6 @@ builds:
     flags:
       - -tags
       - sqlite
-      # Remove once https://github.com/golang/go/issues/40795 is closed
-      - -buildmode=exe
     ldflags:
       - -s -w -X github.com/ory/hydra/driver/config.Version={{.Tag}} -X github.com/ory/hydra/driver/config.Commit={{.FullCommit}} -X github.com/ory/hydra/driver/config.Date={{.Date}}
       - "-extldflags '-static'"

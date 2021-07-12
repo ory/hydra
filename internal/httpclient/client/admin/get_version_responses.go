@@ -29,8 +29,9 @@ func (o *GetVersionReader) ReadResponse(response runtime.ClientResponse, consume
 			return nil, err
 		}
 		return result, nil
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -39,7 +40,7 @@ func NewGetVersionOK() *GetVersionOK {
 	return &GetVersionOK{}
 }
 
-/* GetVersionOK describes a response with status code 200, with default header values.
+/*GetVersionOK handles this case with default header values.
 
 version
 */
@@ -50,6 +51,7 @@ type GetVersionOK struct {
 func (o *GetVersionOK) Error() string {
 	return fmt.Sprintf("[GET /version][%d] getVersionOK  %+v", 200, o.Payload)
 }
+
 func (o *GetVersionOK) GetPayload() *models.Version {
 	return o.Payload
 }

@@ -129,7 +129,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.
 
 		assert.NoError(t, m.CreateClient(ctx, &Client{
 			OutfacingID:       "2-1234",
-			Name:              "name",
+			Name:              "name2",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",

@@ -36,7 +36,7 @@ describe('The Clients Pubic Interface', function () {
       failOnStatusCode: false,
       url: Cypress.env('public_url') + '/connect/register?client_id=clientid'
     }).then((response) => {
-      expect(response.status).to  .eq(401)
+      expect(response.status).to.eq(401)
     })
   })
 

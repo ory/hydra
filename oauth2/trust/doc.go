@@ -93,10 +93,10 @@ type getTrustedJwtGrantIssuer struct {
 }
 
 // swagger:model trustedJwtGrantIssuers
-type trustedJwtGrantIssuers []swaggerJWTBearerGrant
+type trustedJwtGrantIssuers []trustedJwtGrantIssuer
 
 // swagger:model trustedJwtGrantIssuer
-type swaggerJWTBearerGrant struct {
+type trustedJwtGrantIssuer struct {
 	// example: 9edc811f-4e28-453c-9b46-4de65f00217f
 	ID string `json:"id"`
 
@@ -113,7 +113,7 @@ type swaggerJWTBearerGrant struct {
 	Scope []string `json:"scope"`
 
 	// The "public_key" contains information about public key issued by "issuer", that will be used to check JWT assertion signature.
-	PublicKey swaggerJWTBearerGrantPublicKey `json:"public_key"`
+	PublicKey trustedJsonWebKey `json:"public_key"`
 
 	// The "created_at" indicates, when grant was created.
 	CreatedAt time.Time `json:"created_at"`
@@ -123,7 +123,7 @@ type swaggerJWTBearerGrant struct {
 }
 
 // swagger:model trustedJsonWebKey
-type swaggerJWTBearerGrantPublicKey struct {
+type trustedJsonWebKey struct {
 	// The "set" is basically a name for a group(set) of keys. Will be the same as "issuer" in grant.
 	// example: https://jwt-idp.example.com
 	Set string `json:"set"`

@@ -47,6 +47,13 @@ func AsymmetricKeypair(ctx context.Context, r InternalRegistry, g KeyGenerator, 
 	if err != nil {
 		return nil, nil, err
 	}
+	keys, err := r.KeyManager().GetKeySet(ctx, set)
+	if err == nil {
+		pub, err := FindPublicKey(keys)
+		if err == nil {
+			return pub, priv, nil
+		}
+	}
 
 	pub, err := GetOrCreateKey(ctx, r, g, set, "public")
 	if err != nil {
@@ -118,6 +125,26 @@ func FindKeyByPrefix(set *jose.JSONWebKeySet, prefix string) (key *jose.JSONWebK
 	}
 
 	return First(keys.Keys), nil
+}
+
+func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
+	keys := ExcludePrivateKeys(set)
+	if len(keys.Keys) == 0 {
+		return nil, errors.New("key not found")
+	}
+
+	return First(keys.Keys), nil
+}
+
+func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
+	keys := new(jose.JSONWebKeySet)
+	for _, k := range set.Keys {
+		_, ecdsaOk := k.Key.(*ecdsa.PrivateKey)
+		if _, ok := k.Key.(*rsa.PrivateKey); !ok && !ecdsaOk {
+			keys.Keys = append(keys.Keys, k)
+		}
+	}
+	return keys
 }
 
 func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeySet, error) {

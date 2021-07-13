@@ -23,7 +23,6 @@ package jwk
 import (
 	"context"
 	"crypto/rsa"
-	"strings"
 	"sync"
 
 	"github.com/ory/hydra/driver/config"
@@ -114,7 +113,7 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 		return err
 	}
 
-	public, err := FindKeyByPrefix(keys, "public")
+	public, err := FindPublicKey(keys)
 	if err != nil {
 		return err
 	}
@@ -124,12 +123,8 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 		return err
 	}
 
-	if strings.Replace(public.KeyID, "public:", "", 1) != strings.Replace(private.KeyID, "private:", "", 1) {
-		return errors.New("public and private key pair kids do not match")
-	}
-
 	if k, ok := private.Key.(*rsa.PrivateKey); !ok {
-		return errors.New("unable to type assert key to *rsa.PublicKey")
+		return errors.New("unable to type assert key to *rsa.PrivateKey")
 	} else {
 		j.Lock()
 		j.privateKey = k

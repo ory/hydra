@@ -302,7 +302,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	}
 
 	c.OutfacingID = r.URL.Query().Get("client_id")
-	if err := h.validateDynClientRegistrationAuthorization(r, c); err != nil {
+	if err := h.ValidateDynClientRegistrationAuthorization(r, c); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
 		return
 	}
@@ -439,7 +439,7 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	if err := h.validateDynClientRegistrationAuthorization(r, *c); err != nil {
+	if err := h.ValidateDynClientRegistrationAuthorization(r, *c); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
 		return
 	}
@@ -510,7 +510,7 @@ func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	if err := h.validateDynClientRegistrationAuthorization(r, *c); err != nil {
+	if err := h.ValidateDynClientRegistrationAuthorization(r, *c); err != nil {
 		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
 		return
 	}
@@ -523,7 +523,7 @@ func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) validateDynClientRegistrationAuthorization(r *http.Request, c Client) error {
+func (h *Handler) ValidateDynClientRegistrationAuthorization(r *http.Request, c Client) error {
 
 	basicAuth := getBasicAuth(r)
 	if basicAuth == "" {

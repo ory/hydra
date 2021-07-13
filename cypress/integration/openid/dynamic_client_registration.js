@@ -13,7 +13,6 @@ describe('The Clients Pubic Interface', function () {
         grant_types: ['client_credentials']
       }
     }).then((response) => {
-      console.log(response.body)
       expect(response.body.client_secret).to.equal('secret')
     })
   })
@@ -37,7 +36,7 @@ describe('The Clients Pubic Interface', function () {
       failOnStatusCode: false,
       url: Cypress.env('public_url') + '/connect/register?client_id=clientid'
     }).then((response) => {
-      expect(response.status).to.eq(401)
+      expect(response.status).to  .eq(401)
     })
   })
 
@@ -56,7 +55,6 @@ describe('The Clients Pubic Interface', function () {
         grant_types: ['client_credentials']
       }
     }).then((response) => {
-      console.log(response.body)
       expect(response.body.client_name).to.equal('clientName2')
     })
   })

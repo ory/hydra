@@ -6,18 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// CreateJwtBearerGrantParams create jwt bearer grant params
+// TrustJwtGrantIssuerBody trust jwt grant issuer body
 //
-// swagger:model createJwtBearerGrantParams
-type CreateJwtBearerGrantParams struct {
+// swagger:model trustJwtGrantIssuerBody
+type TrustJwtGrantIssuerBody struct {
 
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
 	// Required: true
@@ -25,7 +23,6 @@ type CreateJwtBearerGrantParams struct {
 	ExpiresAt *strfmt.DateTime `json:"expires_at"`
 
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
-	// Example: https://jwt-idp.example.com
 	// Required: true
 	Issuer *string `json:"issuer"`
 
@@ -34,18 +31,16 @@ type CreateJwtBearerGrantParams struct {
 	Jwk *JSONWebKey `json:"jwk"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
-	// Example: ["openid","offline"]
 	// Required: true
 	Scope []string `json:"scope"`
 
 	// The "subject" identifies the principal that is the subject of the JWT.
-	// Example: mike@example.com
 	// Required: true
 	Subject *string `json:"subject"`
 }
 
-// Validate validates this create jwt bearer grant params
-func (m *CreateJwtBearerGrantParams) Validate(formats strfmt.Registry) error {
+// Validate validates this trust jwt grant issuer body
+func (m *TrustJwtGrantIssuerBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateExpiresAt(formats); err != nil {
@@ -74,7 +69,7 @@ func (m *CreateJwtBearerGrantParams) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *CreateJwtBearerGrantParams) validateExpiresAt(formats strfmt.Registry) error {
+func (m *TrustJwtGrantIssuerBody) validateExpiresAt(formats strfmt.Registry) error {
 
 	if err := validate.Required("expires_at", "body", m.ExpiresAt); err != nil {
 		return err
@@ -87,7 +82,7 @@ func (m *CreateJwtBearerGrantParams) validateExpiresAt(formats strfmt.Registry) 
 	return nil
 }
 
-func (m *CreateJwtBearerGrantParams) validateIssuer(formats strfmt.Registry) error {
+func (m *TrustJwtGrantIssuerBody) validateIssuer(formats strfmt.Registry) error {
 
 	if err := validate.Required("issuer", "body", m.Issuer); err != nil {
 		return err
@@ -96,7 +91,7 @@ func (m *CreateJwtBearerGrantParams) validateIssuer(formats strfmt.Registry) err
 	return nil
 }
 
-func (m *CreateJwtBearerGrantParams) validateJwk(formats strfmt.Registry) error {
+func (m *TrustJwtGrantIssuerBody) validateJwk(formats strfmt.Registry) error {
 
 	if err := validate.Required("jwk", "body", m.Jwk); err != nil {
 		return err
@@ -114,7 +109,7 @@ func (m *CreateJwtBearerGrantParams) validateJwk(formats strfmt.Registry) error 
 	return nil
 }
 
-func (m *CreateJwtBearerGrantParams) validateScope(formats strfmt.Registry) error {
+func (m *TrustJwtGrantIssuerBody) validateScope(formats strfmt.Registry) error {
 
 	if err := validate.Required("scope", "body", m.Scope); err != nil {
 		return err
@@ -123,7 +118,7 @@ func (m *CreateJwtBearerGrantParams) validateScope(formats strfmt.Registry) erro
 	return nil
 }
 
-func (m *CreateJwtBearerGrantParams) validateSubject(formats strfmt.Registry) error {
+func (m *TrustJwtGrantIssuerBody) validateSubject(formats strfmt.Registry) error {
 
 	if err := validate.Required("subject", "body", m.Subject); err != nil {
 		return err
@@ -132,36 +127,8 @@ func (m *CreateJwtBearerGrantParams) validateSubject(formats strfmt.Registry) er
 	return nil
 }
 
-// ContextValidate validate this create jwt bearer grant params based on the context it is used
-func (m *CreateJwtBearerGrantParams) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateJwk(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *CreateJwtBearerGrantParams) contextValidateJwk(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Jwk != nil {
-		if err := m.Jwk.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("jwk")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 // MarshalBinary interface implementation
-func (m *CreateJwtBearerGrantParams) MarshalBinary() ([]byte, error) {
+func (m *TrustJwtGrantIssuerBody) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -169,8 +136,8 @@ func (m *CreateJwtBearerGrantParams) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *CreateJwtBearerGrantParams) UnmarshalBinary(b []byte) error {
-	var res CreateJwtBearerGrantParams
+func (m *TrustJwtGrantIssuerBody) UnmarshalBinary(b []byte) error {
+	var res TrustJwtGrantIssuerBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

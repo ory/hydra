@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -40,6 +38,7 @@ func (m *FlushInactiveJwtBearerGrantsParams) Validate(formats strfmt.Registry) e
 }
 
 func (m *FlushInactiveJwtBearerGrantsParams) validateNotAfter(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.NotAfter) { // not required
 		return nil
 	}
@@ -48,11 +47,6 @@ func (m *FlushInactiveJwtBearerGrantsParams) validateNotAfter(formats strfmt.Reg
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this flush inactive jwt bearer grants params based on context it is used
-func (m *FlushInactiveJwtBearerGrantsParams) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

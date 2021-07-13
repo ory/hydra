@@ -385,6 +385,43 @@
         }
       }
     },
+    "/grants/jwt-bearer/flush": {
+      "post": {
+        "description": "This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
+        "consumes": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Flush Expired jwt-bearer grants.",
+        "operationId": "flushInactiveJwtBearerGrants",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/flushInactiveJwtBearerGrantsParams"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
     "/health/alive": {
       "get": {
         "description": "This endpoint returns a 200 status code when the HTTP server is up running.\nThis status does currently not include checks whether the database connection is working.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
@@ -1842,6 +1879,208 @@
         }
       }
     },
+    "/trust/grants/jwt-bearer/issuers": {
+      "get": {
+        "description": "Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
+        "operationId": "listTrustedJwtGrantIssuers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned.",
+            "name": "issuer",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The maximum amount of policies returned, upper bound is 500 policies",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedJwtGrantIssuers",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuers"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "trustJwtGrantIssuer",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/trustJwtGrantIssuerBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "trustedJwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuer"
+            }
+          },
+          "400": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "409": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
+    "/trust/grants/jwt-bearer/issuers/{id}": {
+      "get": {
+        "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "getTrustedJwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedJwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuer"
+            }
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.\n\nOnce deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization Grant.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "deleteTrustedJwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
     "/userinfo": {
       "get": {
         "security": [
@@ -2500,7 +2739,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -2674,6 +2913,16 @@
         }
       }
     },
+    "flushInactiveJwtBearerGrantsParams": {
+      "type": "object",
+      "properties": {
+        "notAfter": {
+          "description": "The \"notAfter\" sets after which point grants should not be flushed. This is useful when you want to keep a history\nof recently added grants.",
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "flushInactiveOAuth2TokensRequest": {
       "type": "object",
       "properties": {
@@ -2681,6 +2930,50 @@
           "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "genericError": {
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "The status code",
+          "type": "integer",
+          "format": "int64",
+          "example": 404
+        },
+        "debug": {
+          "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
+          "type": "string",
+          "example": "SQL field \"foo\" is not a bool."
+        },
+        "details": {
+          "description": "Further error details",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "message": {
+          "description": "Error message\n\nThe error's message.",
+          "type": "string",
+          "example": "The resource could not be found"
+        },
+        "reason": {
+          "description": "A human-readable reason for the error",
+          "type": "string",
+          "example": "User with ID 1234 does not exist."
+        },
+        "request": {
+          "description": "The request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
+          "type": "string",
+          "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6"
+        },
+        "status": {
+          "description": "The status description",
+          "type": "string",
+          "example": "Not Found"
         }
       }
     },
@@ -3172,6 +3465,111 @@
           "description": "Original request URL to which you should redirect the user if request was already handled.",
           "type": "string"
         }
+      }
+    },
+    "trustJwtGrantIssuerBody": {
+      "type": "object",
+      "required": [
+        "issuer",
+        "subject",
+        "scope",
+        "jwk",
+        "expires_at"
+      ],
+      "properties": {
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "jwk": {
+          "$ref": "#/definitions/JSONWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "openid",
+            "offline"
+          ]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedJsonWebKey": {
+      "type": "object",
+      "properties": {
+        "kid": {
+          "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426655440000"
+        },
+        "set": {
+          "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        }
+      }
+    },
+    "trustedJwtGrantIssuer": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "The \"created_at\" indicates, when grant was created.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "public_key": {
+          "$ref": "#/definitions/trustedJsonWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "openid",
+            "offline"
+          ]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedJwtGrantIssuers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/trustedJwtGrantIssuer"
       }
     },
     "userinfoResponse": {

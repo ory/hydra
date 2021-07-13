@@ -10,10 +10,11 @@ import (
 
 	"github.com/go-openapi/strfmt"
 	"github.com/google/uuid"
-	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/jwk"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/jwk"
 
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/grant/jwtbearer"
@@ -84,7 +85,7 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	)
 	model := createRequestParams.Body
 
-	createResult, err := s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	createResult, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 
 	s.Require().NoError(err, "no errors expected on grant creation")
 	s.NotEmpty(createResult.Payload.ID, " grant id expected to be non-empty")
@@ -95,9 +96,9 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	s.Equal(*model.Jwk.Kid, createResult.Payload.PublicKey.Kid, "public key id must match")
 	s.Equal(model.ExpiresAt.String(), createResult.Payload.ExpiresAt.String(), "expiration date must match")
 
-	getRequestParams := admin.NewGetJwtBearerGrantParams()
+	getRequestParams := admin.NewGetTrustedJwtGrantIssuerParams()
 	getRequestParams.ID = createResult.Payload.ID
-	getResult, err := s.hydraClient.Admin.GetJwtBearerGrant(getRequestParams)
+	getResult, err := s.hydraClient.Admin.GetTrustedJwtGrantIssuer(getRequestParams)
 
 	s.Require().NoError(err, "no errors expected on grant fetching")
 	s.Equal(getRequestParams.ID, getResult.Payload.ID, " grant id must match")
@@ -117,15 +118,15 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSameIssuerSubjectKey() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, err := s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	_, err = s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err = s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().Error(err, "expected error, because grant with same issuer+subject+kid exists")
 
 	kid := uuid.New().String()
 	createRequestParams.Body.Jwk.Kid = &kid
-	_, err = s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err = s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.NoError(err, "no errors expected on grant creation, because kid is now different")
 }
 
@@ -137,7 +138,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, err := s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().Error(err, "expected error, because grant missing issuer")
 
 	createRequestParams = s.newCreateJwtBearerGrantParams(
@@ -147,7 +148,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, err = s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err = s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().Error(err, "expected error, because grant missing subject")
 
 	createRequestParams = s.newCreateJwtBearerGrantParams(
@@ -157,7 +158,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 		time.Time{},
 	)
 
-	_, err = s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err = s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Error(err, "expected error, because grant missing expiration date")
 }
 
@@ -170,7 +171,7 @@ func (s *HandlerTestSuite) TestGrantPublicCanBeFetched() {
 	)
 	model := createRequestParams.Body
 
-	_, err := s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().NoError(err, "no error expected on grant creation")
 
 	getJWKRequestParams := admin.NewGetJSONWebKeyParams()
@@ -197,20 +198,20 @@ func (s *HandlerTestSuite) TestGrantListCanBeFetched() {
 		time.Now().Add(time.Hour),
 	)
 
-	_, err := s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	_, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	_, err = s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams2)
+	_, err = s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams2)
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	getRequestParams := admin.NewGetJwtBearerGrantListParams()
-	getResult, err := s.hydraClient.Admin.GetJwtBearerGrantList(getRequestParams)
+	getRequestParams := admin.NewListTrustedJwtGrantIssuersParams()
+	getResult, err := s.hydraClient.Admin.ListTrustedJwtGrantIssuers(getRequestParams)
 
 	s.Require().NoError(err, "no errors expected on grant list fetching")
 	s.Len(getResult.Payload, 2, "expected to get list of 2 grants")
 
 	getRequestParams.Issuer = createRequestParams2.Body.Issuer
-	getResult, err = s.hydraClient.Admin.GetJwtBearerGrantList(getRequestParams)
+	getResult, err = s.hydraClient.Admin.ListTrustedJwtGrantIssuers(getRequestParams)
 
 	s.Require().NoError(err, "no errors expected on grant list fetching")
 	s.Len(getResult.Payload, 1, "expected to get list of 1 grant, when filtering by issuer")
@@ -225,16 +226,16 @@ func (s *HandlerTestSuite) TestGrantCanBeDeleted() {
 		time.Now().Add(time.Hour),
 	)
 
-	createResult, err := s.hydraClient.Admin.CreateJwtBearerGrant(createRequestParams)
+	createResult, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
 	s.Require().NoError(err, "no errors expected on grant creation")
 
-	deleteRequestParams := admin.NewDeleteJwtBearerGrantParams()
+	deleteRequestParams := admin.NewDeleteTrustedJwtGrantIssuerParams()
 	deleteRequestParams.ID = createResult.Payload.ID
-	_, err = s.hydraClient.Admin.DeleteJwtBearerGrant(deleteRequestParams)
+	_, err = s.hydraClient.Admin.DeleteTrustedJwtGrantIssuer(deleteRequestParams)
 
 	s.Require().NoError(err, "no errors expected on grant deletion")
 
-	_, err = s.hydraClient.Admin.DeleteJwtBearerGrant(deleteRequestParams)
+	_, err = s.hydraClient.Admin.DeleteTrustedJwtGrantIssuer(deleteRequestParams)
 	s.Error(err, "expected error, because grant has been already deleted")
 }
 
@@ -257,10 +258,10 @@ func (s *HandlerTestSuite) generateJWK(publicKey *rsa.PublicKey) *models.JSONWeb
 
 func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
 	issuer, subject string, scope []string, expiresAt time.Time,
-) *admin.CreateJwtBearerGrantParams {
-	createRequestParams := admin.NewCreateJwtBearerGrantParams()
+) *admin.TrustJwtGrantIssuerParams {
+	createRequestParams := admin.NewTrustJwtGrantIssuerParams()
 	exp := strfmt.DateTime(expiresAt.UTC().Round(time.Second))
-	model := &models.CreateJwtBearerGrantParams{
+	model := &models.TrustJwtGrantIssuerBody{
 		ExpiresAt: &exp,
 		Issuer:    &issuer,
 		Jwk:       s.generateJWK(s.publicKey),

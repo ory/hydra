@@ -6,18 +6,16 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// JwtBearerGrant jwt bearer grant
+// TrustedJwtGrantIssuer trusted jwt grant issuer
 //
-// swagger:model JwtBearerGrant
-type JwtBearerGrant struct {
+// swagger:model trustedJwtGrantIssuer
+type TrustedJwtGrantIssuer struct {
 
 	// The "created_at" indicates, when grant was created.
 	// Format: date-time
@@ -28,27 +26,23 @@ type JwtBearerGrant struct {
 	ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
 
 	// id
-	// Example: 9edc811f-4e28-453c-9b46-4de65f00217f
 	ID string `json:"id,omitempty"`
 
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
-	// Example: https://jwt-idp.example.com
 	Issuer string `json:"issuer,omitempty"`
 
 	// public key
-	PublicKey *JwtBearerGrantPublicKey `json:"public_key,omitempty"`
+	PublicKey *TrustedJSONWebKey `json:"public_key,omitempty"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
-	// Example: ["openid","offline"]
 	Scope []string `json:"scope"`
 
 	// The "subject" identifies the principal that is the subject of the JWT.
-	// Example: mike@example.com
 	Subject string `json:"subject,omitempty"`
 }
 
-// Validate validates this jwt bearer grant
-func (m *JwtBearerGrant) Validate(formats strfmt.Registry) error {
+// Validate validates this trusted jwt grant issuer
+func (m *TrustedJwtGrantIssuer) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCreatedAt(formats); err != nil {
@@ -69,7 +63,8 @@ func (m *JwtBearerGrant) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *JwtBearerGrant) validateCreatedAt(formats strfmt.Registry) error {
+func (m *TrustedJwtGrantIssuer) validateCreatedAt(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.CreatedAt) { // not required
 		return nil
 	}
@@ -81,7 +76,8 @@ func (m *JwtBearerGrant) validateCreatedAt(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *JwtBearerGrant) validateExpiresAt(formats strfmt.Registry) error {
+func (m *TrustedJwtGrantIssuer) validateExpiresAt(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.ExpiresAt) { // not required
 		return nil
 	}
@@ -93,7 +89,8 @@ func (m *JwtBearerGrant) validateExpiresAt(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *JwtBearerGrant) validatePublicKey(formats strfmt.Registry) error {
+func (m *TrustedJwtGrantIssuer) validatePublicKey(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.PublicKey) { // not required
 		return nil
 	}
@@ -110,36 +107,8 @@ func (m *JwtBearerGrant) validatePublicKey(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this jwt bearer grant based on the context it is used
-func (m *JwtBearerGrant) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidatePublicKey(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *JwtBearerGrant) contextValidatePublicKey(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.PublicKey != nil {
-		if err := m.PublicKey.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("public_key")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
 // MarshalBinary interface implementation
-func (m *JwtBearerGrant) MarshalBinary() ([]byte, error) {
+func (m *TrustedJwtGrantIssuer) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -147,8 +116,8 @@ func (m *JwtBearerGrant) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *JwtBearerGrant) UnmarshalBinary(b []byte) error {
-	var res JwtBearerGrant
+func (m *TrustedJwtGrantIssuer) UnmarshalBinary(b []byte) error {
+	var res TrustedJwtGrantIssuer
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

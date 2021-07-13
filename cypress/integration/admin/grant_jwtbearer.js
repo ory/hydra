@@ -1,8 +1,8 @@
 describe('The JWT-Bearer Grants Admin Interface', () => {
   let d = Cypress.moment().add(1, 'year').milliseconds(0).utc()
-  const newGrant = () => ({
-    issuer: 'token-service',
-    subject: 'bob@example.com',
+  const newGrant = (issuer = 'token-service', subject = 'bob@example.com') => ({
+    issuer,
+    subject,
     expires_at: d.toISOString(),
     scope: ['openid', 'offline'],
     jwk: {
@@ -14,6 +14,15 @@ describe('The JWT-Bearer Grants Admin Interface', () => {
         'ue1_WT_RU6Lc65dmmD7llh9Tcu_Xc909be1Yr5xlHUpkVzacHhSgjliSjUnGCuMo1-m3ILktgt3p86ba6bmIk9fK3nKA7OztDymHuuaYGbJVHhDSKcCBMXGFPcBLxtEns7nvMoQ-lkFN-kYgfSfg0iPGXeRo2Io7phqr54pBaEG_xMK9c-rQ_G3Y9eXn1JREEgQd4OvA2UR9Vc4E-xAYMx7V-ZOvMeKBj9HACE8cllnpKlEKLMo5O5BvkpqA1MeOtzL5jxUUH8D37TJvVQ67VgTs40dRwWwRePfIMDHRJSeJ0KTpkgnX4fmaF2xfi53N8hM9PHzzCtaWrjzm1r1Gyw',
       e: 'AQAB'
     }
+  })
+
+  beforeEach(() => {
+    // Delete all grants
+    cy.request('DELETE', Cypress.env('admin_url') + '/grants/jwt-bearer').then(
+      (response) => {
+        expect(response.body).to.length(1)
+      }
+    )
   })
 
   it('should return newly created jwt-bearer grant and grant can be retrieved later', () => {
@@ -51,6 +60,7 @@ describe('The JWT-Bearer Grants Admin Interface', () => {
   })
 
   it('should return newly created jwt-bearer grant in grants list', () => {
+    // We have exactly one grant
     cy.request('GET', Cypress.env('admin_url') + '/grants/jwt-bearer').then(
       (response) => {
         expect(response.body).to.length(1)

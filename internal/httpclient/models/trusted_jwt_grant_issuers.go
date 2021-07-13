@@ -13,13 +13,13 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// PatchRequest A JSONPatch request
+// TrustedJwtGrantIssuers trusted jwt grant issuers
 //
-// swagger:model patchRequest
-type PatchRequest []*PatchDocument
+// swagger:model trustedJwtGrantIssuers
+type TrustedJwtGrantIssuers []*TrustedJwtGrantIssuer
 
-// Validate validates this patch request
-func (m PatchRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this trusted jwt grant issuers
+func (m TrustedJwtGrantIssuers) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {

@@ -30,62 +30,72 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-// swagger:model createJwtBearerGrantParams
-type swaggerCreateJWTBearerGrantParams struct {
+// swagger:model trustJwtGrantIssuerBody
+type trustJwtGrantIssuerBody struct {
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
-	// required:true
+	//
+	// required: true
 	// example: https://jwt-idp.example.com
 	Issuer string `json:"issuer"`
 
 	// The "subject" identifies the principal that is the subject of the JWT.
+	//
 	// required:true
 	// example: mike@example.com
 	Subject string `json:"subject"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
+	//
 	// required:true
 	// example: ["openid", "offline"]
 	Scope []string `json:"scope"`
 
 	// The "jwk" contains public key in JWK format issued by "issuer", that will be used to check JWT assertion signature.
+	//
 	// required:true
 	JWK x.JSONWebKey `json:"jwk"`
 
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
+	//
 	// required:true
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-// swagger:parameters createJwtBearerGrant
-type swaggerCreateJWTBearerGrantRequestParams struct {
+// swagger:parameters trustJwtGrantIssuer
+type trustJwtGrantIssuer struct {
 	// in: body
-	Body swaggerCreateJWTBearerGrantParams
+	Body trustJwtGrantIssuerBody
 }
 
-// swagger:parameters getJwtBearerGrantList
-type swaggerGetJWTBearerGrantListParams struct {
-	// If Optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
+// swagger:parameters listTrustedJwtGrantIssuers
+type listTrustedJwtGrantIssuers struct {
+	// If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
+	//
 	// in: query
 	// required: false
 	Issuer string `json:"issuer"`
+
+	// The maximum amount of policies returned, upper bound is 500 policies
+	// in: query
+	Limit int `json:"limit"`
+
+	// The offset from where to start looking.
+	// in: query
+	Offset int `json:"offset"`
 }
 
-// swagger:parameters getJwtBearerGrant deleteJwtBearerGrant updateJwtBearerGrant
-type swaggerJWTBearerGrantQuery struct {
+// swagger:parameters getTrustedJwtGrantIssuer deleteTrustedJwtGrantIssuer
+type getTrustedJwtGrantIssuer struct {
 	// The id of the desired grant
 	// in: path
 	// required: true
 	ID string `json:"id"`
 }
 
-// swagger:response JwtBearerGrantList
-type swaggerJWTBearerGrantList struct {
-	// in: body
-	// type: array
-	Body []swaggerJWTBearerGrant
-}
+// swagger:model trustedJwtGrantIssuers
+type trustedJwtGrantIssuers []swaggerJWTBearerGrant
 
-// swagger:model JwtBearerGrant
+// swagger:model trustedJwtGrantIssuer
 type swaggerJWTBearerGrant struct {
 	// example: 9edc811f-4e28-453c-9b46-4de65f00217f
 	ID string `json:"id"`
@@ -112,7 +122,7 @@ type swaggerJWTBearerGrant struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-// swagger:model JwtBearerGrantPublicKey
+// swagger:model trustedJsonWebKey
 type swaggerJWTBearerGrantPublicKey struct {
 	// The "set" is basically a name for a group(set) of keys. Will be the same as "issuer" in grant.
 	// example: https://jwt-idp.example.com

@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	grantJWTBearerPath = "/grants/jwt-bearer"
+	grantJWTBearerPath = "/trust/grants/jwt-bearer/issuers"
 )
 
 type Handler struct {
@@ -30,19 +30,17 @@ func NewHandler(r InternalRegistry) *Handler {
 func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 	admin.GET(grantJWTBearerPath+"/:id", h.Get)
 	admin.GET(grantJWTBearerPath, h.List)
-
 	admin.POST(grantJWTBearerPath, h.Create)
-
 	admin.DELETE(grantJWTBearerPath+"/:id", h.Delete)
-	admin.POST(grantJWTBearerPath+"/flush", h.FlushHandler)
 }
 
-// swagger:route POST /grants/jwt-bearer admin createJwtBearerGrant
+// swagger:route POST /trust/grants/jwt-bearer/issuers admin trustJwtGrantIssuer
 //
-// Create a new jwt-bearer Grant.
+// Trust an OAuth2 JWT Bearer Grant Type Issuer
 //
-// This endpoint is capable of creating a new jwt-bearer Grant, by doing this, we are granting permission for client to
-// act on behalf of some resource owner.
+// Use this endpoint to establish a trust relationship for a JWT issuer
+// to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+// and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
 //
 //     Consumes:
 //     - application/json
@@ -53,7 +51,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //     Schemes: http, https
 //
 //     Responses:
-//       201: JwtBearerGrant
+//       201: trustedJwtGrantIssuer
 //       400: genericError
 //       409: genericError
 //       500: genericError
@@ -91,13 +89,13 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID, &grant)
 }
 
-// swagger:route GET /grants/jwt-bearer/{id} admin getJwtBearerGrant
+// swagger:route GET /trust/grants/jwt-bearer/issuers/{id} admin getTrustedJwtGrantIssuer
 //
-// Fetch jwt-bearer grant information.
+// Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
-// This endpoint returns jwt-bearer grant, identified by grant ID. Grant represents resource owner (RO) permission
-// for client to act on behalf of the RO. In this case client uses jwt to request access token to act as RO.
-//
+// Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+// created the trust relationship.
+///
 //     Consumes:
 //     - application/json
 //
@@ -107,7 +105,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JwtBearerGrant
+//       200: trustedJwtGrantIssuer
 //       404: genericError
 //       500: genericError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -122,13 +120,15 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.registry.Writer().Write(w, r, grant)
 }
 
-// swagger:route DELETE /grants/jwt-bearer/{id} admin deleteJwtBearerGrant
+// swagger:route DELETE /trust/grants/jwt-bearer/issuers/{id} admin deleteTrustedJwtGrantIssuer
 //
-// Delete jwt-bearer grant.
+// Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
-// This endpoint will delete jwt-bearer grant, identified by grant ID, so client won't be able to represent
-// resource owner (which granted permission), using this grant anymore. All associated public keys with grant
-// will also be deleted.
+// Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+// created the trust relationship.
+//
+// Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+// for OAuth 2.0 Client Authentication and Authorization Grant.
 //
 //     Consumes:
 //     - application/json
@@ -153,12 +153,11 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /grants/jwt-bearer admin getJwtBearerGrantList
+// swagger:route GET /trust/grants/jwt-bearer/issuers admin listTrustedJwtGrantIssuers
 //
-// Fetch all jwt-bearer grants.
+// List Trusted OAuth2 JWT Bearer Grant Type Issuers
 //
-// This endpoint returns list of jwt-bearer grants. Grant represents resource owner (RO) permission
-// for client to act on behalf of the RO. In this case client uses jwt to request access token to act as RO.
+// Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
 //
 //     Consumes:
 //     - application/json
@@ -169,11 +168,11 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JwtBearerGrantList
+//       200: trustedJwtGrantIssuers
 //       500: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
-	var optionalIssuer = r.URL.Query().Get("issuer")
+	optionalIssuer := r.URL.Query().Get("issuer")
 
 	grants, err := h.registry.GrantManager().GetGrants(r.Context(), limit, offset, optionalIssuer)
 	if err != nil {
@@ -188,7 +187,6 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	}
 
 	pagination.Header(w, r.URL, n, limit, offset)
-
 	if grants == nil {
 		grants = []Grant{}
 	}

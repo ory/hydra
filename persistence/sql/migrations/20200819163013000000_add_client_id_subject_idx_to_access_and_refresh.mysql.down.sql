@@ -1,0 +1,2 @@
+DROP INDEX hydra_oauth2_refresh_client_id_subject_idx ON hydra_oauth2_refresh;
+DROP INDEX hydra_oauth2_access_client_id_subject_idx ON hydra_oauth2_access;

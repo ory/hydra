@@ -23,12 +23,9 @@ package cli
 import (
 	"crypto/tls"
 	"encoding/json"
-	"fmt"
+	"net"
 	"net/http"
 	"os"
-	"time"
-
-	"github.com/ory/x/httpx"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/sawadashota/encrypta"
@@ -36,7 +33,7 @@ import (
 
 	httptransport "github.com/go-openapi/runtime/client"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 )
@@ -53,24 +50,10 @@ type transport struct {
 func newTransport(cmd *cobra.Command) *transport {
 	return &transport{
 		cmd: cmd,
-		Transport: httpx.NewResilientRoundTripper(
-			&http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
-			},
-			time.Second,
-			flagx.MustGetDuration(cmd, "fail-after"),
-		).WithShouldRetry(
-			func(res *http.Response, err error) bool {
-				if err != nil {
-					fmt.Printf("Unable to connect: %s\n", err)
-					return true
-				} else if res.StatusCode == 0 || res.StatusCode >= 500 {
-					fmt.Printf(`Unable to connect to "%s", unexpected HTTP error status code: %d\n`, res.Request.URL.String(), res.StatusCode)
-					return true
-				}
-				return false
-			},
-		),
+		/* #nosec G402 - we want to support dev environments, hence tls trickery */
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+		},
 	}
 }
 
@@ -83,14 +66,35 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 func configureClientBase(cmd *cobra.Command, withAuth bool) *hydra.OryHydra {
 	u := RemoteURI(cmd)
-	ht := httptransport.New(
-		u.Host,
-		u.Path,
-		[]string{u.Scheme},
-	)
 
-	ht.Transport = newTransport(cmd)
+	var ht *httptransport.Runtime
+	if u.Scheme == "unix" {
+		// Based on https://stackoverflow.com/a/26224019 .
+		// Here we implement the caveat that the url should be
+		// http://xxxx.xxx/path and not unix:// .
+		ht = httptransport.New(
+			"unix",
+			"",
+			[]string{"http"},
+		)
 
+		ht.Transport = &http.Transport{
+			Dial: func(proto, addr string) (conn net.Conn, err error) {
+				// RemoteURI splits unix:///var/run/hydra.sock into
+				// u.Host: ""
+				// u.Path: /run/hydra.sock
+				return net.Dial("unix", u.Path)
+			},
+		}
+	} else {
+		ht = httptransport.New(
+			u.Host,
+			u.Path,
+			[]string{u.Scheme},
+		)
+
+		ht.Transport = newTransport(cmd)
+	}
 	if withAuth {
 		if token := flagx.MustGetString(cmd, "access-token"); token != "" {
 			ht.DefaultAuthentication = httptransport.BearerToken(token)

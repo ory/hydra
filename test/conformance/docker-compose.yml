@@ -1,0 +1,76 @@
+version: '3.7'
+
+services:
+  hydra-migrate:
+    build:
+      # When running with `run.sh` the cwd is the project's root.
+      context: .
+      dockerfile: ./test/conformance/hydra/Dockerfile
+
+  hydra:
+    build:
+      # When running with `run.sh` the cwd is the project's root.
+      context: .
+      dockerfile: ./test/conformance/hydra/Dockerfile
+    environment:
+      ISSUER_URL: https://hydra:4444/
+    command:
+      serve -c /etc/config/hydra/hydra.yml all
+    volumes:
+      -
+        type: bind
+        source: ./test/conformance/hydra/config
+        target: /etc/config/hydra
+
+  mongodb:
+    image: mongo:4.2
+    networks:
+      - intranet
+    volumes:
+      - type: volume
+        source: mongodb-volume
+        target: /data/db
+        read_only: false
+    restart: unless-stopped
+
+  httpd:
+    image: oryd/hydra-oidc-httpd:latest
+#    build:
+#      # When running with `run.sh` the cwd is the project's root.
+#      context: ./test/conformance
+#      dockerfile: httpd/Dockerfile
+    ports:
+     - "8443:8443"
+    depends_on:
+     - server
+    networks:
+      - intranet
+    restart: unless-stopped
+
+  server:
+    image: oryd/hydra-oidc-server:latest
+#    build:
+#      # When running with `run.sh` the cwd is the project's root.
+#      context: ./test/conformance
+#      dockerfile: Dockerfile
+    depends_on:
+     - mongodb
+    logging:
+      # limit logs retained on host
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "5"
+    networks:
+      - intranet
+    restart: unless-stopped
+
+  consent:
+    image: oryd/hydra-login-consent-node:latest
+    environment:
+      HYDRA_ADMIN_URL: https://hydra:4445
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      CONFORMITY_FAKE_CLAIMS: 1
+
+volumes:
+  mongodb-volume:

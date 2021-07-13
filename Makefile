@@ -1,26 +1,70 @@
 SHELL=/bin/bash -o pipefail
 
-.PHONY: tools
-tools:
-		npm i
-		go install github.com/ory/go-acc github.com/ory/x/tools/listx github.com/go-swagger/go-swagger/cmd/swagger github.com/go-bindata/go-bindata/go-bindata github.com/sqs/goreturns
+export GO111MODULE := on
+export PATH := .bin:${PATH}
+export PWD := $(shell pwd)
+
+GO_DEPENDENCIES = github.com/ory/go-acc \
+				  golang.org/x/tools/cmd/goimports \
+				  github.com/golang/mock/mockgen \
+				  github.com/go-swagger/go-swagger/cmd/swagger \
+				  github.com/go-bindata/go-bindata/go-bindata
+
+define make-go-dependency
+  # go install is responsible for not re-building when the code hasn't changed
+  .bin/$(notdir $1): go.sum go.mod
+		GOBIN=$(PWD)/.bin/ go install $1
+endef
+
+.bin/golangci-lint: Makefile
+		curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b .bin v1.31.0
+
+$(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
+
+node_modules: package.json
+		npm ci
+
+docs/node_modules: docs/package.json
+		cd docs; npm ci
+
+.bin/clidoc: go.mod
+		go build -o .bin/clidoc ./cmd/clidoc/.
+
+docs/cli: .bin/clidoc
+		clidoc .
+
+.bin/ory: Makefile
+		bash <(curl https://raw.githubusercontent.com/ory/cli/master/install.sh) -b .bin v0.0.53
+		touch -a -m .bin/ory
+
+.PHONY: lint
+lint: .bin/golangci-lint
+		golangci-lint run -v ./...
+
+# Runs full test suite including tests where databases are enabled
+.PHONY: test-legacy-migrations
+test-legacy-migrations: test-resetdb .bin/go-bindata
+		cd internal/fizzmigrate/client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
+		cd internal/fizzmigrate/consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
+		cd internal/fizzmigrate/jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
+		cd internal/fizzmigrate/oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
+		source scripts/test-env.sh && go test -tags legacy_migration_test sqlite -failfast -timeout=20m ./internal/fizzmigrate
+		docker rm -f hydra_test_database_mysql
+		docker rm -f hydra_test_database_postgres
+		docker rm -f hydra_test_database_cockroach
 
 # Runs full test suite including tests where databases are enabled
 .PHONY: test
-test:
+test: .bin/go-acc
 		make test-resetdb
-		make sqlbin
-		TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true' \
-		TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable' \
-		TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable' \
-		$$(go env GOPATH)/bin/go-acc ./... -- -failfast -timeout=20m
+		source scripts/test-env.sh && go-acc ./... -- -failfast -timeout=20m -tags sqlite
 		docker rm -f hydra_test_database_mysql
 		docker rm -f hydra_test_database_postgres
 		docker rm -f hydra_test_database_cockroach
 
 # Resets the test databases
 .PHONY: test-resetdb
-test-resetdb:
+test-resetdb: node_modules
 		docker kill hydra_test_database_mysql || true
 		docker kill hydra_test_database_postgres || true
 		docker kill hydra_test_database_cockroach || true
@@ -28,23 +72,17 @@ test-resetdb:
 		docker rm -f hydra_test_database_postgres || true
 		docker rm -f hydra_test_database_cockroach || true
 		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
-		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hydra -d postgres:9.6
-		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v2.1.6 start --insecure
+		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:9.6
+		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v20.2.6 start-single-node --insecure
 
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
-		make sqlbin
-		CGO_ENABLED=0 GO111MODULE=on GOOS=linux GOARCH=amd64 go build
-		docker build -t oryd/hydra:latest .
-		rm hydra
+		docker build -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite .
 
 .PHONY: e2e
-e2e:
-		make test-resetdb
-		export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true'
-		export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/hydra?sslmode=disable'
-		export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
+e2e: node_modules test-resetdb
+		source ./scripts/test-env.sh
 		./test/e2e/circle-ci.bash memory
 		./test/e2e/circle-ci.bash memory-jwt
 		./test/e2e/circle-ci.bash postgres
@@ -53,86 +91,46 @@ e2e:
 		./test/e2e/circle-ci.bash mysql-jwt
 		./test/e2e/circle-ci.bash cockroach
 		./test/e2e/circle-ci.bash cockroach-jwt
-		./test/e2e/circle-ci.bash plugin
-		./test/e2e/circle-ci.bash plugin-jwt
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest
 quicktest:
-		go test -failfast -short ./...
+		go test -failfast -short -tags sqlite ./...
 
 # Formats the code
 .PHONY: format
-format:
-		$$(go env GOPATH)/bin/goreturns -w -local github.com/ory $$($$(go env GOPATH)/bin/listx .)
+format: .bin/goimports node_modules docs/node_modules
+		goimports -w --local github.com/ory .
 		npm run format
+		cd docs; npm run format
 
 # Generates mocks
 .PHONY: mocks
-mocks:
+mocks: .bin/mockgen
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
-
-# Adds sql files to the binary using go-bindata
-.PHONY: sqlbin
-sqlbin:
-		cd client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
-		cd consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
-		cd jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
-		cd oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
-
-# Runs all code generators
-.PHONY: gen
-gen: mocks sqlbin sdk
 
 # Generates the SDKs
 .PHONY: sdk
-sdk:
-		$$(go env GOPATH)/bin/swagger generate spec -m -o ./docs/api.swagger.json -x sdk
-		$$(go env GOPATH)/bin/swagger validate ./docs/api.swagger.json
-
-		rm -rf ./sdk/go/hydra/client
-		rm -rf ./sdk/go/hydra/models
-		rm -rf ./sdk/js/swagger
-		rm -rf ./sdk/php/swagger
-		rm -rf ./sdk/java
-
-		$$(go env GOPATH)/bin/swagger generate client -f ./docs/api.swagger.json -t sdk/go/hydra -A Ory_Hydra
-		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l javascript -o ./sdk/js/swagger
-		java -jar scripts/swagger-codegen-cli-2.2.3.jar generate -i ./docs/api.swagger.json -l php -o sdk/php/ \
-			--invoker-package Hydra\\SDK --git-repo-id swagger --git-user-id ory --additional-properties "packagePath=swagger,description=Client for Hydra"
-		java -DapiTests=false -DmodelTests=false -jar scripts/swagger-codegen-cli-2.2.3.jar generate \
-			--input-spec ./docs/api.swagger.json \
-			--lang java \
-			--library resttemplate \
-			--group-id com.github.ory \
-			--artifact-id hydra-client-resttemplate \
-			--invoker-package com.github.ory.hydra \
-			--api-package com.github.ory.hydra.api \
-			--model-package com.github.ory.hydra.model \
-			--output ./sdk/java/hydra-client-resttemplate
-
+sdk: .bin/ory
+		swagger generate spec -m -o ./spec/api.json -x internal/httpclient -x gopkg.in/square/go-jose.v2
+		ory dev swagger sanitize ./spec/api.json
+		swagger flatten --with-flatten=remove-unused -o ./spec/api.json ./spec/api.json
+		swagger validate ./spec/api.json
+		rm -rf internal/httpclient
+		mkdir -p internal/httpclient
+		swagger generate client -f ./spec/api.json -t internal/httpclient -A Ory_Hydra
 		make format
-
-		rm -f ./sdk/js/swagger/package.json
-		rm -rf ./sdk/js/swagger/test
-		rm -f ./sdk/php/swagger/composer.json ./sdk/php/swagger/phpunit.xml.dist
-		rm -rf ./sdk/php/swagger/test
-		rm -rf ./vendor
 
 .PHONY: install-stable
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)
 		git checkout $$HYDRA_LATEST
 		GO111MODULE=on go install \
-				-ldflags "-X github.com/ory/hydra/cmd.Version=$$HYDRA_LATEST -X github.com/ory/hydra/cmd.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/cmd.Commit=`git rev-parse HEAD`" \
+				-tags sqlite \
+				-ldflags "-X github.com/ory/hydra/driver/config.Version=$$HYDRA_LATEST -X github.com/ory/hydra/driver/config.Date=`TZ=UTC date -u '+%Y-%m-%dT%H:%M:%SZ'` -X github.com/ory/hydra/driver/config.Commit=`git rev-parse HEAD`" \
 				.
 		git checkout master
 
 .PHONY: install
 install:
-		GO111MODULE=on go install .
-
-.PHONY: init
-init:
-		GO111MODULE=on go get .
-		GO111MODULE=on go install github.com/ory/go-acc
+		GO111MODULE=on go install -tags sqlite .

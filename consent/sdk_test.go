@@ -26,31 +26,25 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/x/pointerx"
-
-	"github.com/ory/hydra/sdk/go/hydra/client"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
-	"github.com/ory/x/urlx"
-
-	"github.com/ory/hydra/x"
-
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/internal"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	. "github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/pointerx"
+	"github.com/ory/x/urlx"
 )
 
 func TestSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyIssuerURL, "https://www.ory.sh")
-	viper.Set(configuration.ViperKeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistry(conf)
+	conf.MustSet(config.KeyIssuerURL, "https://www.ory.sh")
+	conf.MustSet(config.KeyAccessTokenLifespan, time.Minute)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)
@@ -62,34 +56,57 @@ func TestSDK(t *testing.T) {
 
 	m := reg.ConsentManager()
 
-	require.NoError(t, m.CreateLoginSession(context.TODO(), &LoginSession{
+	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
 		ID:      "session1",
 		Subject: "subject1",
 	}))
 
 	ar1, _ := MockAuthRequest("1", false)
 	ar2, _ := MockAuthRequest("2", false)
-	require.NoError(t, m.CreateLoginRequest(context.TODO(), ar1))
-	require.NoError(t, m.CreateLoginRequest(context.TODO(), ar2))
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar1.Client))
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar2.Client))
+	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+		ID:      ar1.SessionID.String(),
+		Subject: ar1.Subject,
+	}))
+	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
+		ID:      ar2.SessionID.String(),
+		Subject: ar2.Subject,
+	}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), ar1))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), ar2))
 
 	cr1, hcr1 := MockConsentRequest("1", false, 0, false, false, false)
 	cr2, hcr2 := MockConsentRequest("2", false, 0, false, false, false)
 	cr3, hcr3 := MockConsentRequest("3", true, 3600, false, false, false)
-	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr1))
-	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr2))
-	require.NoError(t, m.CreateConsentRequest(context.TODO(), cr3))
-	_, err := m.HandleConsentRequest(context.TODO(), "challenge1", hcr1)
+	cr4, hcr4 := MockConsentRequest("4", true, 3600, false, false, false)
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr3.Client))
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr4.Client))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr1.LoginChallenge.String(), Client: cr1.Client, Verifier: cr1.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr2.LoginChallenge.String(), Client: cr2.Client, Verifier: cr2.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Client: cr3.Client, Verifier: cr3.ID}))
+	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr3.LoginSessionID.String()}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID}))
+	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr4.LoginSessionID.String()}))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), cr3))
+	require.NoError(t, m.CreateConsentRequest(context.Background(), cr4))
+	_, err := m.HandleConsentRequest(context.Background(), "challenge1", hcr1)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest(context.TODO(), "challenge2", hcr2)
+	_, err = m.HandleConsentRequest(context.Background(), "challenge2", hcr2)
 	require.NoError(t, err)
-	_, err = m.HandleConsentRequest(context.TODO(), "challenge3", hcr3)
+	_, err = m.HandleConsentRequest(context.Background(), "challenge3", hcr3)
+	require.NoError(t, err)
+	_, err = m.HandleConsentRequest(context.Background(), "challenge4", hcr4)
 	require.NoError(t, err)
 
 	lur1 := MockLogoutRequest("testsdk-1", true)
-	require.NoError(t, m.CreateLogoutRequest(context.TODO(), lur1))
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), lur1.Client))
+	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur1))
 
 	lur2 := MockLogoutRequest("testsdk-2", false)
-	require.NoError(t, m.CreateLogoutRequest(context.TODO(), lur2))
+	require.NoError(t, m.CreateLogoutRequest(context.Background(), lur2))
 
 	crGot, err := sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))
 	require.NoError(t, err)
@@ -111,6 +128,12 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1"))
+	require.Error(t, err)
+
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject(cr4.Subject).WithClient(&cr4.Client.OutfacingID))
+	require.NoError(t, err)
+
+	_, err = sdk.Admin.RevokeConsentSessions(admin.NewRevokeConsentSessionsParams().WithSubject("subject1").WithAll(pointerx.Bool(true)))
 	require.NoError(t, err)
 
 	_, err = sdk.Admin.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge("challenge1"))
@@ -130,7 +153,7 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(csGot.Payload))
 	cs := csGot.Payload[0]
-	assert.Equal(t, "challenge3", cs.ConsentRequest.Challenge)
+	assert.Equal(t, "challenge3", *cs.ConsentRequest.Challenge)
 
 	csGot, err = sdk.Admin.ListSubjectConsentSessions(admin.NewListSubjectConsentSessionsParams().WithSubject("subject2"))
 	require.NoError(t, err)
@@ -142,7 +165,7 @@ func TestSDK(t *testing.T) {
 
 	luaGot, err := sdk.Admin.AcceptLogoutRequest(admin.NewAcceptLogoutRequestParams().WithLogoutChallenge("challengetestsdk-1"))
 	require.NoError(t, err)
-	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier=verifiertestsdk-1", luaGot.Payload.RedirectTo)
+	assert.EqualValues(t, "https://www.ory.sh/oauth2/sessions/logout?logout_verifier=verifiertestsdk-1", *luaGot.Payload.RedirectTo)
 
 	_, err = sdk.Admin.RejectLogoutRequest(admin.NewRejectLogoutRequestParams().WithLogoutChallenge("challengetestsdk-2"))
 	require.NoError(t, err)
@@ -152,14 +175,14 @@ func TestSDK(t *testing.T) {
 }
 
 func compareSDKLoginRequest(t *testing.T, expected *LoginRequest, got models.LoginRequest) {
-	assert.EqualValues(t, expected.Challenge, got.Challenge)
-	assert.EqualValues(t, expected.Subject, got.Subject)
-	assert.EqualValues(t, expected.Skip, got.Skip)
+	assert.EqualValues(t, expected.ID, *got.Challenge)
+	assert.EqualValues(t, expected.Subject, *got.Subject)
+	assert.EqualValues(t, expected.Skip, *got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
 }
 
 func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models.ConsentRequest) {
-	assert.EqualValues(t, expected.Challenge, got.Challenge)
+	assert.EqualValues(t, expected.ID, *got.Challenge)
 	assert.EqualValues(t, expected.Subject, got.Subject)
 	assert.EqualValues(t, expected.Skip, got.Skip)
 	assert.EqualValues(t, expected.Client.GetID(), got.Client.ClientID)
@@ -167,8 +190,8 @@ func compareSDKConsentRequest(t *testing.T, expected *ConsentRequest, got models
 
 func compareSDKLogoutRequest(t *testing.T, expected *LogoutRequest, got *models.LogoutRequest) {
 	assert.EqualValues(t, expected.Subject, got.Subject)
-	assert.EqualValues(t, expected.SessionID, got.SessionID)
-	assert.EqualValues(t, expected.SessionID, got.SessionID)
+	assert.EqualValues(t, expected.SessionID, got.Sid)
+	assert.EqualValues(t, expected.SessionID, got.Sid)
 	assert.EqualValues(t, expected.RequestURL, got.RequestURL)
-	assert.EqualValues(t, expected.RPInitiated, got.RPInitiated)
+	assert.EqualValues(t, expected.RPInitiated, got.RpInitiated)
 }

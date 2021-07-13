@@ -10,33 +10,68 @@
 #                                                                         #
 ###########################################################################
 
-version: '3'
+version: '3.7'
 
 services:
 
   hydra:
-    image: oryd/hydra:latest
+    image: oryd/hydra:v1.10.2-sqlite
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
       - "5555:5555" # Port for hydra token user
     command:
-      serve all --dangerous-force-http
+      serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http
+    volumes:
+      -
+        type: volume
+        source: hydra-sqlite
+        target: /var/lib/sqlite
+        read_only: false
+      -
+        type: bind
+        source: ./contrib/quickstart/5-min
+        target: /etc/config/hydra
     environment:
-      - URLS_SELF_ISSUER=http://127.0.0.1:4444
-      - URLS_CONSENT=http://127.0.0.1:3000/consent
-      - URLS_LOGIN=http://127.0.0.1:3000/login
-      - URLS_LOGOUT=http://127.0.0.1:3000/logout
-      - DSN=memory
-      - SECRETS_SYSTEM=youReallyNeedToChangeThis
-      - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
-      - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=youReallyNeedToChangeThis
+      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
     restart: unless-stopped
+    depends_on:
+      - hydra-migrate
+    networks:
+      - intranet
+
+  hydra-migrate:
+    image: oryd/hydra:v1.10.2-sqlite
+    environment:
+      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+    command:
+      migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+    volumes:
+      -
+        type: volume
+        source: hydra-sqlite
+        target: /var/lib/sqlite
+        read_only: false
+      -
+        type: bind
+        source: ./contrib/quickstart/5-min
+        target: /etc/config/hydra
+    restart: on-failure
+    networks:
+      - intranet
 
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.0.0-rc.10
+    image: oryd/hydra-login-consent-node:v1.10.2
     ports:
       - "3000:3000"
     restart: unless-stopped
+    networks:
+      - intranet
+
+networks:
+  intranet:
+
+volumes:
+  hydra-sqlite:

@@ -1,0 +1,83 @@
+serve:
+  cookies:
+    same_site_mode: Lax
+  tls:
+    cert:
+      path: /etc/ssl/certs/ory-conformity.crt
+    key:
+      path: /etc/ssl/private/ory-conformity.key
+
+log:
+  level: trace
+  format: json
+
+urls:
+  self:
+    issuer: https://hydra:4444/
+  consent: http://consent:3000/consent
+  login: http://consent:3000/login
+  logout: http://consent:3000/logout
+
+secrets:
+  system:
+    - youReallyNeedToChangeThis
+
+oidc:
+  subject_identifiers:
+    supported_types:
+      - pairwise
+      - public
+    pairwise:
+      salt: youReallyNeedToChangeThis
+  dynamic_client_registration:
+    default_scope:
+      - email
+      - offline_access
+      - openid
+      - address
+      - phone
+      - profile
+
+oauth2:
+  hashers:
+    bcrypt:
+      cost: 4
+  session:
+    encrypt_at_rest: false
+
+# webfinger.oidc_discovery.client_registration_url
+
+webfinger:
+  oidc_discovery:
+    supported_claims:
+      - email
+      - email_verified
+      - phone_number
+      - phone_number_verified
+      - name
+      - given_name
+      - family_name
+      - website
+      - zoneinfo
+      - birthdate
+      - gender
+      - profile
+      - preferred_username
+      - middle_name
+      - locale
+      - picture
+      - updated_at
+      - nickname
+      - address
+    supported_scope:
+      - email
+      - offline_access
+      - openid
+      - address
+      - phone
+      - profile
+    userinfo_url: https://hydra:4444/userinfo
+    token_url: https://hydra:4444/oauth2/token
+    jwks_url: https://hydra:4444/.well-known/jwks.json
+    client_registration_url: https://hydra:4445/clients
+

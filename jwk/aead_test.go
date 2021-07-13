@@ -26,9 +26,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/jwk"
 
@@ -47,7 +45,7 @@ func secret(t *testing.T) string {
 func TestAEAD(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
 	t.Run("case=without-rotation", func(t *testing.T) {
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
 		a := NewAEAD(c)
 
 		plain := []byte(uuid.New())
@@ -60,20 +58,20 @@ func TestAEAD(t *testing.T) {
 	})
 
 	t.Run("case=wrong-secret", func(t *testing.T) {
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
 		a := NewAEAD(c)
 
 		ct, err := a.Encrypt([]byte(uuid.New()))
 		require.NoError(t, err)
 
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
 		_, err = a.Decrypt(ct)
 		require.Error(t, err)
 	})
 
 	t.Run("case=with-rotation", func(t *testing.T) {
 		old := secret(t)
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{old})
+		c.MustSet(config.KeyGetSystemSecret, []string{old})
 		a := NewAEAD(c)
 
 		plain := []byte(uuid.New())
@@ -81,7 +79,7 @@ func TestAEAD(t *testing.T) {
 		require.NoError(t, err)
 
 		// Sets the old secret as a rotated secret and creates a new one.
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t), old})
+		c.MustSet(config.KeyGetSystemSecret, []string{secret(t), old})
 		res, err := a.Decrypt(ct)
 		require.NoError(t, err)
 		assert.Equal(t, plain, res)
@@ -97,7 +95,7 @@ func TestAEAD(t *testing.T) {
 	})
 
 	t.Run("case=with-rotation-wrong-secret", func(t *testing.T) {
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
 		a := NewAEAD(c)
 
 		plain := []byte(uuid.New())
@@ -105,7 +103,7 @@ func TestAEAD(t *testing.T) {
 		require.NoError(t, err)
 
 		// When the secrets do not match, an error should be thrown during decryption.
-		viper.Set(configuration.ViperKeyGetSystemSecret, []string{secret(t), secret(t)})
+		c.MustSet(config.KeyGetSystemSecret, []string{secret(t), secret(t)})
 		_, err = a.Decrypt(ct)
 		require.Error(t, err)
 	})

@@ -1,0 +1,4 @@
+INSERT INTO hydra_client
+(pk, id, client_name, client_secret, redirect_uris, grant_types, response_types, scope, owner, policy_uri, tos_uri, client_uri, logo_uri, contacts, client_secret_expires_at, sector_identifier_uri, jwks, jwks_uri, request_uris, token_endpoint_auth_method, request_object_signing_alg, userinfo_signed_response_alg, subject_type, allowed_cors_origins, audience)
+VALUES
+(0011, 'client-0011', 'Client 0011', 'secret-0011', 'http://redirect/0011_1', 'grant-0011_1', 'response-0011_1', 'scope-0011', 'owner-0011', 'http://policy/0011', 'http://tos/0011', 'http://client/0011', 'http://logo/0011', 'contact-0011_1', 0, 'http://sector_id/0011', '', 'http://jwks/0011', 'http://request/0011_1', 'token_auth-0011', 'r_alg-0011', 'u_alg-0011', 'subject-0011', 'http://cors/0011_1', 'autdience-0011_1');

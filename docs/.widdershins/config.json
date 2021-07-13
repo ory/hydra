@@ -1,0 +1,20 @@
+{
+  "language_tabs": [],
+  "verbose": true,
+  "codeSamples": true,
+  "httpSnippet": true,
+  "search": false,
+  "discovery": false,
+  "tocSummary": true,
+  "sample": true,
+  "tagGroups": [
+    {
+      "title": "Public Endpoints",
+      "tags": ["public"]
+    },
+    {
+      "title": "Administrative Endpoints",
+      "tags": ["admin"]
+    }
+  ]
+}

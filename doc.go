@@ -37,11 +37,11 @@
 //     SecurityDefinitions:
 //     oauth2:
 //         type: oauth2
-//         authorizationUrl: /oauth2/auth
-//         tokenUrl: /oauth2/token
+//         authorizationUrl: https://hydra.demo.ory.sh/oauth2/auth
+//         tokenUrl: https://hydra.demo.ory.sh/oauth2/token
 //         flow: accessCode
 //         scopes:
-//           offline: "A scope required when requesting refresh tokens (alias for `offline`)"
+//           offline: "A scope required when requesting refresh tokens (alias for `offline_access`)"
 //           offline_access: "A scope required when requesting refresh tokens"
 //           openid: "Request an OpenID Connect ID Token"
 //     basic:

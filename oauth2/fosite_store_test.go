@@ -25,88 +25,71 @@ import (
 	"flag"
 	"testing"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon/dockertest"
 )
 
-var registries = make(map[string]driver.Registry)
-
 func TestMain(m *testing.M) {
 	flag.Parse()
+
 	runner := dockertest.Register()
 	runner.Exit(m.Run())
 }
 
-func connectToPG(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestPostgreSQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return db
+var registries = make(map[string]driver.Registry)
+var cleanRegistries = func(t *testing.T) {
+	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults())
 }
 
-func connectToMySQL(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestMySQL()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return db
-}
-
-func connectToCRDB(t *testing.T) *sqlx.DB {
-	db, err := dockertest.ConnectToTestCockroachDB()
-	require.NoError(t, err)
-	x.CleanSQL(t, db)
-	return db
-}
-
-func connectSQL(t *testing.T, conf *configuration.ViperProvider, dbName string, db *sqlx.DB) driver.Registry {
-	reg := internal.NewRegistrySQL(conf, db)
-	_, err := reg.CreateSchemas(dbName)
-	require.NoError(t, err)
-	return reg
+// returns clean registries that can safely be used for one test
+// to reuse call cleanRegistries
+func setupRegistries(t *testing.T) {
+	if len(registries) == 0 && !testing.Short() {
+		// first time called and sql tests
+		var cleanSQL func(*testing.T)
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t)
+		cleanMem := cleanRegistries
+		cleanMem(t)
+		cleanRegistries = func(t *testing.T) {
+			cleanMem(t)
+			cleanSQL(t)
+		}
+	} else {
+		// reset all/init mem
+		cleanRegistries(t)
+	}
 }
 
 func TestManagers(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	tests := []struct {
+		name                   string
+		enableSessionEncrypted bool
+	}{
+		{
+			name:                   "DisableSessionEncrypted",
+			enableSessionEncrypted: false,
+		},
+		{
+			name:                   "EnableSessionEncrypted",
+			enableSessionEncrypted: true,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			setupRegistries(t)
+			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 
-	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), &client.Client{ClientID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
-	registries["memory"] = reg
-
-	if !testing.Short() {
-		var p, m, c *sqlx.DB
-		dockertest.Parallel([]func(){
-			func() {
-				p = connectToPG(t)
-			},
-			func() {
-				m = connectToMySQL(t)
-			},
-			func() {
-				c = connectToCRDB(t)
-			},
+			for k, store := range registries {
+				store.Config().MustSet(config.KeyEncryptSessionData, tc.enableSessionEncrypted)
+				TestHelperRunner(t, store, k)
+			}
 		})
-		registries["postgres"] = connectSQL(t, conf, "postgres", p)
-		registries["mysql"] = connectSQL(t, conf, "mysql", m)
-		registries["cockroach"] = connectSQL(t, conf, "cockroach", c)
-	}
 
-	for k, store := range registries {
-		TestHelperRunner(t, store, k)
-	}
-
-	for _, m := range registries {
-		if mm, ok := m.(*driver.RegistrySQL); ok {
-			x.CleanSQL(t, mm.DB())
-		}
 	}
 }

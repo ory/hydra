@@ -28,6 +28,8 @@ import (
 	"encoding/pem"
 	"fmt"
 
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/hydra/x"
 
 	"github.com/pborman/uuid"
@@ -56,7 +58,7 @@ func AsymmetricKeypair(ctx context.Context, r InternalRegistry, g KeyGenerator, 
 
 func GetOrCreateKey(ctx context.Context, r InternalRegistry, g KeyGenerator, set, prefix string) (*jose.JSONWebKey, error) {
 	keys, err := r.KeyManager().GetKeySet(ctx, set)
-	if errors.Cause(err) == x.ErrNotFound || keys != nil && len(keys.Keys) == 0 {
+	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
 		keys, err = createKey(ctx, r, g, set)
 		if err != nil {
@@ -141,7 +143,7 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	case *ecdsa.PrivateKey:
 		b, err := x509.MarshalECPrivateKey(k)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, errorsx.WithStack(err)
 		}
 		return &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}, nil
 	default:

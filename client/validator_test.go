@@ -30,17 +30,16 @@ import (
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/viper"
-
 	. "github.com/ory/hydra/client"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 )
 
 func TestValidate(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise", "public"})
-	viper.Set(configuration.ViperKeyDefaultClientScope, []string{"openid"})
+	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
 
 	v := NewValidator(c)
 	for k, tc := range []struct {
@@ -52,77 +51,81 @@ func TestValidate(t *testing.T) {
 		{
 			in: new(Client),
 			check: func(t *testing.T, c *Client) {
-				assert.NotEmpty(t, c.ClientID)
+				assert.NotEmpty(t, c.OutfacingID)
 				assert.NotEmpty(t, c.GetID())
-				assert.Equal(t, c.GetID(), c.ClientID)
+				assert.Equal(t, c.GetID(), c.OutfacingID)
 			},
 		},
 		{
-			in: &Client{ClientID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.GetID(), c.ClientID)
+				assert.Equal(t, c.GetID(), c.OutfacingID)
 			},
 		},
 		{
-			in: &Client{ClientID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.GetID(), c.ClientID)
+				assert.Equal(t, c.GetID(), c.OutfacingID)
 			},
 		},
 		{
-			in:        &Client{ClientID: "foo", UserinfoSignedResponseAlg: "foo"},
+			in:        &Client{OutfacingID: "foo", UserinfoSignedResponseAlg: "foo"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{OutfacingID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", JSONWebKeys: &jose.JSONWebKeySet{}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{OutfacingID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, TokenEndpointAuthMethod: "private_key_jwt", TokenEndpointAuthSigningAlgorithm: "HS256"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in:        &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in: &Client{ClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
+			expectErr: true,
+		},
+		{
+			in: &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, []string{"https://foo/"}, c.PostLogoutRedirectURIs)
+				assert.Equal(t, []string{"https://foo/"}, []string(c.PostLogoutRedirectURIs))
 			},
 		},
 		{
-			in: &Client{ClientID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "public", c.SubjectType)
 			},
 		},
 		{
 			v: func(t *testing.T) *Validator {
-				viper.Set(configuration.ViperKeySubjectTypesSupported, []string{"pairwise"})
+				c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(c)
 			},
-			in: &Client{ClientID: "foo"},
+			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
 			},
 		},
 		{
-			in: &Client{ClientID: "foo", SubjectType: "pairwise"},
+			in: &Client{OutfacingID: "foo", SubjectType: "pairwise"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
 			},
 		},
 		{
-			in:        &Client{ClientID: "foo", SubjectType: "foo"},
+			in:        &Client{OutfacingID: "foo", SubjectType: "foo"},
 			expectErr: true,
 		},
 	} {

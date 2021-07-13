@@ -5,10 +5,10 @@ import (
 
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 )
 
-func Tokens(c configuration.Provider, length int) (res [][]string) {
+func Tokens(c *config.Provider, length int) (res [][]string) {
 	s := &oauth2.HMACSHAStrategy{
 		Enigma: &hmac.HMACStrategy{
 			GlobalSecret: c.GetSystemSecret(),

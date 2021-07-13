@@ -28,6 +28,8 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
+
+	"github.com/ory/x/stringslice"
 )
 
 type Session struct {
@@ -36,27 +38,53 @@ type Session struct {
 	KID                    string
 	ClientID               string
 	ConsentChallenge       string
+	ExcludeNotBeforeClaim  bool
+	AllowedTopLevelClaims  []string
 }
 
 func NewSession(subject string) *Session {
+	return NewSessionWithCustomClaims(subject, nil)
+}
+
+func NewSessionWithCustomClaims(subject string, allowedTopLevelClaims []string) *Session {
 	return &Session{
 		DefaultSession: &openid.DefaultSession{
 			Claims:  new(jwt.IDTokenClaims),
 			Headers: new(jwt.Headers),
 			Subject: subject,
 		},
-		Extra: map[string]interface{}{},
+		Extra:                 map[string]interface{}{},
+		AllowedTopLevelClaims: allowedTopLevelClaims,
 	}
 }
 
 func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
+	//a slice of claims that are reserved and should not be overridden
+	var reservedClaims = []string{"iss", "sub", "aud", "exp", "nbf", "iat", "jti", "client_id", "scp", "ext"}
+
+	//remove any reserved claims from the custom claims
+	allowedClaimsFromConfigWithoutReserved := stringslice.Filter(s.AllowedTopLevelClaims, func(s string) bool {
+		return stringslice.Has(reservedClaims, s)
+	})
+
+	//our new extra map which will be added to the jwt
+	var topLevelExtraWithMirrorExt = map[string]interface{}{}
+
+	//setting every allowed claim top level in jwt with respective value
+	for _, allowedClaim := range allowedClaimsFromConfigWithoutReserved {
+		topLevelExtraWithMirrorExt[allowedClaim] = s.Extra[allowedClaim]
+	}
+
+	//for every other claim that was already reserved and for mirroring, add original extra under "ext"
+	topLevelExtraWithMirrorExt["ext"] = s.Extra
+
 	claims := &jwt.JWTClaims{
-		Subject:   s.Subject,
-		Issuer:    s.DefaultSession.Claims.Issuer,
-		Extra:     map[string]interface{}{"ext": s.Extra},
+		Subject: s.Subject,
+		Issuer:  s.DefaultSession.Claims.Issuer,
+		//set our custom extra map as claims.Extra
+		Extra:     topLevelExtraWithMirrorExt,
 		ExpiresAt: s.GetExpiresAt(fosite.AccessToken),
 		IssuedAt:  time.Now(),
-		NotBefore: time.Now(),
 
 		// No need to set the audience because that's being done by fosite automatically.
 		// Audience:  s.Audience,
@@ -70,6 +98,9 @@ func (s *Session) GetJWTClaims() jwt.JWTClaimsContainer {
 		// Setting these here will cause the token to have the same iat/nbf values always
 		// IssuedAt:  s.DefaultSession.Claims.IssuedAt,
 		// NotBefore: s.DefaultSession.Claims.IssuedAt,
+	}
+	if !s.ExcludeNotBeforeClaim {
+		claims.NotBefore = claims.IssuedAt
 	}
 
 	if claims.Extra == nil {

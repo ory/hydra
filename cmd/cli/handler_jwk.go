@@ -28,11 +28,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
-	"github.com/ory/hydra/sdk/go/hydra/models"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/pointerx"
 
-	"github.com/mendsley/gojwk"
 	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	jose "gopkg.in/square/go-jose.v2"
@@ -57,16 +56,18 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 		kid = args[1]
 	}
 
-	res, err := m.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet(args[0]).WithBody(&models.CreateRequest{
-		Algorithm: pointerx.String(flagx.MustGetString(cmd, "alg")),
-		KeyID:     pointerx.String(kid),
-		Use:       pointerx.String(flagx.MustGetString(cmd, "use")),
+	res, err := m.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet(args[0]).WithBody(&models.JSONWebKeySetGeneratorRequest{
+		Alg: pointerx.String(flagx.MustGetString(cmd, "alg")),
+		Kid: pointerx.String(kid),
+		Use: pointerx.String(flagx.MustGetString(cmd, "use")),
 	}))
 	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Println(formatResponse(res.Payload))
 }
 
-func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose.JSONWebKey {
+func toSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
+	var alg string
+
 	if jwk, ok := key.(*jose.JSONWebKey); ok {
 		key = jwk.Key
 		if jwk.KeyID != "" {
@@ -75,22 +76,15 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid, use string, public bool) jose
 		if jwk.Use != "" {
 			use = jwk.Use
 		}
-	}
-
-	var err error
-	var jwk *gojwk.Key
-	if public {
-		jwk, err = gojwk.PublicKey(key)
-		cmdx.Must(err, "Unable to convert public key to JSON Web Key because %s", err)
-	} else {
-		jwk, err = gojwk.PrivateKey(key)
-		cmdx.Must(err, "Unable to convert private key to JSON Web Key because %s", err)
+		if jwk.Algorithm != "" {
+			alg = jwk.Algorithm
+		}
 	}
 
 	return jose.JSONWebKey{
 		KeyID:     kid,
 		Use:       use,
-		Algorithm: jwk.Alg,
+		Algorithm: alg,
 		Key:       key,
 	}
 }
@@ -102,6 +96,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	use := flagx.MustGetString(cmd, "use")
 	client := &http.Client{}
 
+	/* #nosec G402 - we want to support dev environments, hence tls trickery */
 	client.Transport = &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify"),
@@ -136,13 +131,18 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 		file, err := ioutil.ReadFile(path)
 		cmdx.Must(err, "Unable to read file %s", path)
 
+		keyID := flagx.MustGetString(cmd, "default-key-id")
+		if keyID == "" {
+			keyID = uuid.New()
+		}
+
 		if key, privateErr := josex.LoadPrivateKey(file); privateErr != nil {
 			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+uuid.New(), use, true))
+			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
 		} else {
-			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+uuid.New(), use, false))
+			set.Keys = append(set.Keys, toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
 		}
 
 		fmt.Printf("Successfully loaded key from file: %s\n", path)

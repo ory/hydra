@@ -40,5 +40,16 @@ type FositeStorer interface {
 
 	RevokeAccessToken(ctx context.Context, requestID string) error
 
+	// flush the access token requests from the database.
+	// no data will be deleted after the 'notAfter' timeframe.
 	FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time) error
+
+	// flush the login requests from the database.
+	// this will address the database long-term growth issues discussed in https://github.com/ory/hydra/issues/1574.
+	// no data will be deleted after the 'notAfter' timeframe.
+	FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error
+
+	DeleteAccessTokens(ctx context.Context, clientID string) error
+
+	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time) error
 }

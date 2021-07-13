@@ -27,7 +27,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
+	"github.com/ory/x/errorsx"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
@@ -36,14 +37,27 @@ import (
 func RandomBytes(n int) ([]byte, error) {
 	bytes := make([]byte, n)
 	if _, err := io.ReadFull(rand.Reader, bytes); err != nil {
-		return []byte{}, errors.WithStack(err)
+		return []byte{}, errorsx.WithStack(err)
 	}
 	return bytes, nil
 }
 
+func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
+	for k, v := range js {
+		if len(v.CertificateThumbprintSHA1) == 0 {
+			v.CertificateThumbprintSHA1 = nil
+		}
+		if len(v.CertificateThumbprintSHA256) == 0 {
+			v.CertificateThumbprintSHA256 = nil
+		}
+		js[k] = v
+	}
+	return js
+}
+
 func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
-	pub := keys.Key("public:" + suffix)
-	priv := keys.Key("private:" + suffix)
+	pub := canonicalizeThumbprints(keys.Key("public:" + suffix))
+	priv := canonicalizeThumbprints(keys.Key("private:" + suffix))
 
 	return func(t *testing.T) {
 		_, err := m.GetKey(context.TODO(), "faz", "baz")
@@ -54,18 +68,18 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 
 		got, err := m.GetKey(context.TODO(), "faz", "private:"+suffix)
 		require.NoError(t, err)
-		assert.Equal(t, priv, got.Keys)
+		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
 
 		err = m.AddKey(context.TODO(), "faz", First(pub))
 		require.NoError(t, err)
 
 		got, err = m.GetKey(context.TODO(), "faz", "private:"+suffix)
 		require.NoError(t, err)
-		assert.Equal(t, priv, got.Keys)
+		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
 
 		got, err = m.GetKey(context.TODO(), "faz", "public:"+suffix)
 		require.NoError(t, err)
-		assert.Equal(t, pub, got.Keys)
+		assert.Equal(t, pub, canonicalizeThumbprints(got.Keys))
 
 		// Because MySQL
 		time.Sleep(time.Second * 2)
@@ -104,8 +118,8 @@ func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet, suffix string)
 
 		got, err := m.GetKeySet(context.TODO(), "bar")
 		require.NoError(t, err)
-		assert.Equal(t, keys.Key("public:"+suffix), got.Key("public:"+suffix))
-		assert.Equal(t, keys.Key("private:"+suffix), got.Key("private:"+suffix))
+		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
+		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
 
 		err = m.DeleteKeySet(context.TODO(), "bar")
 		require.NoError(t, err)

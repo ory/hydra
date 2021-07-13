@@ -34,11 +34,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/oauth2"
 
-	hydra "github.com/ory/hydra/sdk/go/hydra/client"
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
+	hydra "github.com/ory/hydra/internal/httpclient/client"
+	"github.com/ory/hydra/internal/httpclient/client/admin"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/urlx"
 )
@@ -173,7 +173,7 @@ func checkTokenResponse(token oauth2token) {
 			log.Fatalf("JWT Access Token does not seem to have three parts: %d - %+v - %v", len(parts), token, parts)
 		}
 
-		payload, err := jwt.DecodeSegment(parts[1])
+		payload, err := x.DecodeSegment(parts[1])
 		if err != nil {
 			log.Fatalf("Unable to decode id token segment: %s", err)
 		}
@@ -193,7 +193,7 @@ func checkTokenResponse(token oauth2token) {
 		}
 	}
 
-	res, err := sdk.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().WithToken(token.AccessToken), nil)
+	res, err := sdk.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().WithToken(token.AccessToken))
 	if err != nil {
 		log.Fatalf("Unable to introspect OAuth2 token: %s", err)
 	}
@@ -203,15 +203,15 @@ func checkTokenResponse(token oauth2token) {
 		log.Fatalf("Expected token to be active: %s", token.AccessToken)
 	}
 
-	if intro.Subject != "the-subject" {
-		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Subject)
+	if intro.Sub != "the-subject" {
+		log.Fatalf("Expected subject from access token to be %s but got %s", "the-subject", intro.Sub)
 	}
 
-	if intro.Extra["foo"] != expectedValue {
-		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Extra["foo"])
+	if intro.Ext.(map[string]interface{})["foo"] != expectedValue {
+		log.Fatalf("Expected extra field \"foo\" from access token to be \"%s\" but got %s", expectedValue, intro.Ext.(map[string]interface{})["foo"])
 	}
 
-	idt := fmt.Sprintf("%s", token.IDToken)
+	idt := token.IDToken
 	if len(idt) == 0 {
 		log.Fatalf("ID Token does not seem to be set: %+v", token)
 	}
@@ -221,7 +221,7 @@ func checkTokenResponse(token oauth2token) {
 		log.Fatalf("ID Token does not seem to have three parts: %d - %+v - %v", len(parts), token, parts)
 	}
 
-	payload, err := jwt.DecodeSegment(parts[1])
+	payload, err := x.DecodeSegment(parts[1])
 	if err != nil {
 		log.Fatalf("Unable to decode id token segment: %s", err)
 	}

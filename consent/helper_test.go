@@ -22,8 +22,12 @@ package consent
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/gorilla/securecookie"
+	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/fosite"
@@ -51,35 +55,35 @@ func TestMatchScopes(t *testing.T) {
 		expectChallenge string
 	}{
 		{
-			granted:         []HandledConsentRequest{{Challenge: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []HandledConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar"},
 			expectChallenge: "1",
 		},
 		{
-			granted:         []HandledConsentRequest{{Challenge: "1", GrantedScope: []string{"foo", "bar"}}},
+			granted:         []HandledConsentRequest{{ID: "1", GrantedScope: []string{"foo", "bar"}}},
 			requested:       []string{"foo", "bar", "baz"},
 			expectChallenge: "",
 		},
 		{
 			granted: []HandledConsentRequest{
-				{Challenge: "1", GrantedScope: []string{"foo", "bar"}},
-				{Challenge: "2", GrantedScope: []string{"foo", "bar"}},
+				{ID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ID: "2", GrantedScope: []string{"foo", "bar"}},
 			},
 			requested:       []string{"foo", "bar"},
 			expectChallenge: "1",
 		},
 		{
 			granted: []HandledConsentRequest{
-				{Challenge: "1", GrantedScope: []string{"foo", "bar"}},
-				{Challenge: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+				{ID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
 			requested:       []string{"foo", "bar", "baz"},
 			expectChallenge: "2",
 		},
 		{
 			granted: []HandledConsentRequest{
-				{Challenge: "1", GrantedScope: []string{"foo", "bar"}},
-				{Challenge: "2", GrantedScope: []string{"foo", "bar", "baz"}},
+				{ID: "1", GrantedScope: []string{"foo", "bar"}},
+				{ID: "2", GrantedScope: []string{"foo", "bar", "baz"}},
 			},
 			requested:       []string{"zab"},
 			expectChallenge: "",
@@ -91,7 +95,268 @@ func TestMatchScopes(t *testing.T) {
 				assert.Nil(t, got)
 				return
 			}
-			assert.Equal(t, tc.expectChallenge, got.Challenge)
+			assert.Equal(t, tc.expectChallenge, got.ID)
+		})
+	}
+}
+
+func TestValidateCsrfSession(t *testing.T) {
+	type cookie struct {
+		name      string
+		csrfValue string
+		sameSite  http.SameSite
+	}
+	for k, tc := range []struct {
+		cookies                  []cookie
+		csrfValue                string
+		sameSiteLegacyWorkaround bool
+		expectError              bool
+	}{
+		{
+			cookies:                  []cookie{},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: false,
+			expectError:              true,
+		},
+		{
+			cookies:                  []cookie{},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: true,
+			expectError:              true,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      cookieAuthenticationCSRFName,
+					csrfValue: "WRONG-CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: false,
+			expectError:              true,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      cookieAuthenticationCSRFName,
+					csrfValue: "WRONG-CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: true,
+			expectError:              true,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      cookieAuthenticationCSRFName,
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: false,
+			expectError:              false,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      cookieAuthenticationCSRFName,
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: true,
+			expectError:              false,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      legacyCsrfSessionName(cookieAuthenticationCSRFName),
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: false,
+			expectError:              true,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      legacyCsrfSessionName(cookieAuthenticationCSRFName),
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: true,
+			expectError:              false,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      cookieAuthenticationCSRFName,
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteNoneMode,
+				},
+				{
+					name:      legacyCsrfSessionName(cookieAuthenticationCSRFName),
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: false,
+			expectError:              false,
+		},
+		{
+			cookies: []cookie{
+				{
+					name:      cookieAuthenticationCSRFName,
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteNoneMode,
+				},
+				{
+					name:      legacyCsrfSessionName(cookieAuthenticationCSRFName),
+					csrfValue: "CSRF-VALUE",
+					sameSite:  http.SameSiteDefaultMode,
+				},
+			},
+			csrfValue:                "CSRF-VALUE",
+			sameSiteLegacyWorkaround: true,
+			expectError:              false,
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			store := sessions.NewCookieStore(securecookie.GenerateRandomKey(16))
+			r := httptest.NewRequest(http.MethodGet, "/", nil)
+			w := httptest.NewRecorder()
+
+			for _, c := range tc.cookies {
+				session, _ := store.Get(r, c.name)
+				session.Values["csrf"] = c.csrfValue
+				session.Options.HttpOnly = true
+				session.Options.Secure = true
+				session.Options.SameSite = c.sameSite
+				err := session.Save(r, w)
+				assert.NoError(t, err, "failed to save cookie %s", c.name)
+			}
+
+			err := validateCsrfSession(r, store, cookieAuthenticationCSRFName, tc.csrfValue, tc.sameSiteLegacyWorkaround, true)
+			if tc.expectError {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestCreateCsrfSession(t *testing.T) {
+	type cookie struct {
+		httpOnly bool
+		secure   bool
+		sameSite http.SameSite
+	}
+	for _, tc := range []struct {
+		name                     string
+		secure                   bool
+		sameSite                 http.SameSite
+		sameSiteLegacyWorkaround bool
+		expectedCookies          map[string]cookie
+	}{
+		{
+			name:                     "csrf_default",
+			secure:                   true,
+			sameSite:                 http.SameSiteDefaultMode,
+			sameSiteLegacyWorkaround: false,
+			expectedCookies: map[string]cookie{
+				"csrf_default": {
+					httpOnly: true,
+					secure:   true,
+					sameSite: 0, // see https://golang.org/doc/go1.16#net/http
+				},
+			},
+		},
+		{
+			name:                     "csrf_lax_insecure",
+			secure:                   false,
+			sameSite:                 http.SameSiteLaxMode,
+			sameSiteLegacyWorkaround: false,
+			expectedCookies: map[string]cookie{
+				"csrf_lax_insecure_insecure": {
+					httpOnly: true,
+					secure:   false,
+					sameSite: http.SameSiteLaxMode,
+				},
+			},
+		},
+		{
+			name:                     "csrf_none",
+			secure:                   true,
+			sameSite:                 http.SameSiteNoneMode,
+			sameSiteLegacyWorkaround: false,
+			expectedCookies: map[string]cookie{
+				"csrf_none": {
+					httpOnly: true,
+					secure:   true,
+					sameSite: http.SameSiteNoneMode,
+				},
+			},
+		},
+		{
+			name:                     "csrf_none_fallback",
+			secure:                   true,
+			sameSite:                 http.SameSiteNoneMode,
+			sameSiteLegacyWorkaround: true,
+			expectedCookies: map[string]cookie{
+				"csrf_none_fallback": {
+					httpOnly: true,
+					secure:   true,
+					sameSite: http.SameSiteNoneMode,
+				},
+				"csrf_none_fallback_legacy": {
+					httpOnly: true,
+					secure:   true,
+					sameSite: 0,
+				},
+			},
+		},
+		{
+			name:                     "csrf_strict_fallback_ignored",
+			secure:                   true,
+			sameSite:                 http.SameSiteStrictMode,
+			sameSiteLegacyWorkaround: true,
+			expectedCookies: map[string]cookie{
+				"csrf_strict_fallback_ignored": {
+					httpOnly: true,
+					secure:   true,
+					sameSite: http.SameSiteStrictMode,
+				},
+			},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			store := sessions.NewCookieStore(securecookie.GenerateRandomKey(16))
+			rr := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+
+			err := createCsrfSession(rr, req, store, tc.name, "value", tc.secure, tc.sameSite, tc.sameSiteLegacyWorkaround)
+			assert.NoError(t, err)
+
+			cookies := make(map[string]cookie)
+			for _, c := range rr.Result().Cookies() {
+				cookies[c.Name] = cookie{
+					httpOnly: c.HttpOnly,
+					secure:   c.Secure,
+					sameSite: c.SameSite,
+				}
+			}
+			assert.Equal(t, tc.expectedCookies, cookies)
 		})
 	}
 }

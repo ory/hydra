@@ -10,11 +10,11 @@
 #                                                                         #
 ###########################################################################
 
-version: '3'
+version: '3.7'
 
 services:
 
   hydra:
     environment:
-      - OAUTH2_ACCESS_TOKEN_STRATEGY=jwt
-      - OIDC_SUBJECT_IDENTIFIERS_ENABLED=public
+      - STRATEGIES_ACCESS_TOKEN=jwt
+      - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public

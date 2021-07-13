@@ -2,20 +2,20 @@
 
 DB=${DB:-postgres}
 TRACING=${TRACING:-false}
-TWOC=${TWOC:-false}
+PROMETHEUS=${PROMETHEUS:-false}
 
-DC="docker-compose -f docker-compose.yml"
+DC="docker-compose -f quickstart.yml"
 if [[ $DB == "mysql" ]]; then
-    DC+=" -f docker-compose-mysql.yml"
+    DC+=" -f quickstart-mysql.yml"
 fi
 if [[ $DB == "postgres" ]]; then
-    DC+=" -f docker-compose-postgres.yml"
+    DC+=" -f quickstart-postgres.yml"
 fi
 if [[ $TRACING == true ]]; then
-    DC+=" -f docker-compose-tracing.yml"
+    DC+=" -f quickstart-tracing.yml"
 fi
-if [[ $TWOC == true ]]; then
-    DC+=" -f docker-compose-twoc.yml"
+if [[ $PROMETHEUS == true ]]; then
+    DC+=" -f quickstart-prometheus.yml"
 fi
 DC+=" up --build"
 

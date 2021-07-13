@@ -1,0 +1,144 @@
+log:
+  level: debug
+  leak_sensitive_values: false
+  format: json
+
+serve:
+  public:
+    port: 1
+    host: localhost
+    socket:
+      owner: hydra
+      group: hydra-public-api
+      mode: 0775
+    cors:
+      enabled: false
+      allowed_origins:
+        - https://example.com
+      allowed_methods:
+        - GET
+      allowed_headers:
+        - Authorization
+      exposed_headers:
+        - Content-Type
+      allow_credentials: true
+      options_passthrough: true
+      max_age: 1
+      debug: false
+    access_log:
+      disable_for_health: false
+  admin:
+    port: 2
+    host: localhost
+    socket:
+      owner: hydra
+      group: hydra-admin-api
+      mode: 0770
+
+    cors:
+      enabled: false
+      allowed_origins:
+        - https://example.com
+      allowed_methods:
+        - GET
+      allowed_headers:
+        - Authorization
+      exposed_headers:
+        - Content-Type
+      allow_credentials: true
+      options_passthrough: true
+      max_age: 1
+      debug: false
+    access_log:
+      disable_for_health: false
+  tls:
+    key:
+      path: /path/to/file.pem
+    cert:
+      base64: b3J5IGh5ZHJhIGlzIGF3ZXNvbWUK
+    allow_termination_from:
+      - 127.0.0.1/32
+  cookies:
+    same_site_mode: Lax
+    same_site_legacy_workaround: true
+
+dsn: memory
+
+webfinger:
+  jwks:
+    broadcast_keys:
+      - hydra.openid.id-token
+  oidc_discovery:
+    jwks_url: https://example.com/jwks.json
+    auth_url: https://example.com/auth
+    token_url: https://example.com/token
+    client_registration_url: https://example.com
+    supported_claims:
+      - username
+    supported_scope:
+      - whatever
+    userinfo_url: https://example.com
+
+oidc:
+  subject_identifiers:
+    supported_types:
+      - pairwise
+    pairwise:
+      salt: random_salt
+  dynamic_client_registration:
+    default_scope:
+      - whatever
+
+urls:
+  self:
+    issuer: https://issuer
+    public: https://public
+  login: https://login
+  consent: https://consent
+  logout: https://logout
+  error: https://error
+  post_logout_redirect: https://post_logout
+
+strategies:
+  scope: exact
+  access_token: opaque
+
+ttl:
+  login_consent_request: 2h
+  access_token: 2h
+  refresh_token: 2h
+  id_token: 2h
+  auth_code: 2h
+
+oauth2:
+  expose_internal_errors: true
+  include_legacy_error_fields: true
+  hashers:
+    bcrypt:
+      cost: 20
+  pkce:
+    enforced: true
+    enforced_for_public_clients: true
+
+secrets:
+  system:
+    - some-random-system-secret
+  cookie:
+    - some-random-cookie-secret
+
+profiling: cpu
+
+tracing:
+  provider: jaeger
+  service_name: hydra service
+  providers:
+    jaeger:
+      local_agent_address: 127.0.0.1:6831
+      propagation: jaeger
+      max_tag_value_length: 1024
+      sampling:
+        type: const
+        value: 1
+        server_url: http://sampling
+    zipkin:
+      server_url: http://zipkin/api/v2/spans

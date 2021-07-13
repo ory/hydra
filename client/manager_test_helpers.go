@@ -28,22 +28,24 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
+
+	"github.com/ory/hydra/x"
 )
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		c := &Client{
-			ClientID:          "foo",
+			OutfacingID:       "foo",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
 		}
 		assert.NoError(t, m.CreateClient(ctx, c))
-		//assert.NotEmpty(t, c.ID)
+		// assert.NotEmpty(t, c.ID)
 		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }
@@ -51,11 +53,11 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
-		m.CreateClient(ctx, &Client{
-			ClientID:     "1234321",
+		require.NoError(t, m.CreateClient(ctx, &Client{
+			OutfacingID:  "1234321",
 			Secret:       "secret",
 			RedirectURIs: []string{"http://redirect"},
-		})
+		}))
 
 		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
 		require.NotNil(t, err)
@@ -66,14 +68,28 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	}
 }
 
-func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
+func TestHelperUpdateTwoClients(_ string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
-		ctx := context.TODO()
-		_, err := m.GetClient(ctx, "4321")
-		assert.NotNil(t, err)
+		c1, c2 := &Client{OutfacingID: "klojdfc", Name: "test client 1"}, &Client{OutfacingID: "jlsdfkj", Name: "test client 2"}
+
+		require.NoError(t, m.CreateClient(context.Background(), c1))
+		require.NoError(t, m.CreateClient(context.Background(), c2))
+
+		c1.Name, c2.Name = "updated klojdfc client 1", "updated klojdfc client 2"
+
+		assert.NoError(t, m.UpdateClient(context.Background(), c1))
+		assert.NoError(t, m.UpdateClient(context.Background(), c2))
+	}
+}
+
+func TestHelperCreateGetUpdateDeleteClient(k string, m Storage) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		_, err := m.GetClient(ctx, "1234")
+		require.Error(t, err)
 
 		c := &Client{
-			ClientID:                          "1234",
+			OutfacingID:                       "1234",
 			Name:                              "name",
 			Secret:                            "secret",
 			RedirectURIs:                      []string{"http://redirect", "http://redirect1"},
@@ -88,9 +104,10 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			Contacts:                          []string{"aeneas1", "aeneas2"},
 			SecretExpiresAt:                   0,
 			SectorIdentifierURI:               "https://sector",
-			JSONWebKeys:                       &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}}}},
+			JSONWebKeys:                       &x.JoseJSONWebKeySet{JSONWebKeySet: &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{KeyID: "foo", Key: []byte("asdf"), Certificates: []*x509.Certificate{}, CertificateThumbprintSHA1: []uint8{}, CertificateThumbprintSHA256: []uint8{}}}}},
 			JSONWebKeysURI:                    "https://...",
 			TokenEndpointAuthMethod:           "none",
+			TokenEndpointAuthSigningAlgorithm: "RS256",
 			RequestURIs:                       []string{"foo", "bar"},
 			AllowedCORSOrigins:                []string{"foo", "bar"},
 			RequestObjectSigningAlgorithm:     "rs256",
@@ -104,7 +121,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 			BackChannelLogoutSessionRequired:  true,
 		}
 
-		assert.NoError(t, m.CreateClient(ctx, c))
+		require.NoError(t, m.CreateClient(ctx, c))
 		assert.Equal(t, c.GetID(), "1234")
 		if k != "http" {
 			assert.NotEmpty(t, c.GetHashedSecret())
@@ -127,9 +144,9 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		ds, err := m.GetClients(ctx, ClientFilters{Limit: 100, Offset: 0})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
-		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
-		//test if SecretExpiresAt was set properly
+		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
+		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
+		// test if SecretExpiresAt was set properly
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
 
@@ -158,11 +175,12 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.Equal(t, ds[0].Owner, "aeneas")
 
 		err = m.UpdateClient(ctx, &Client{
-			ClientID:          "2-1234",
+			OutfacingID:       "2-1234",
 			Name:              "name-new",
 			Secret:            "secret-new",
 			RedirectURIs:      []string{"http://redirect/new"},
 			TermsOfServiceURI: "bar",
+			JSONWebKeys:       new(x.JoseJSONWebKeySet),
 		})
 		require.NoError(t, err)
 
@@ -213,8 +231,9 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 		assert.EqualValues(t, expected.SecretExpiresAt, actual.SecretExpiresAt)
 		assert.EqualValues(t, expected.SectorIdentifierURI, actual.SectorIdentifierURI)
 		assert.EqualValues(t, expected.UserinfoSignedResponseAlg, actual.UserinfoSignedResponseAlg)
-		assert.EqualValues(t, expected.CreatedAt.Unix(), actual.CreatedAt.Unix())
-		assert.EqualValues(t, expected.UpdatedAt.Unix(), actual.UpdatedAt.Unix())
+		assert.EqualValues(t, expected.CreatedAt.UTC().Unix(), actual.CreatedAt.UTC().Unix())
+		// these values are not the same because of https://github.com/gobuffalo/pop/issues/591
+		//assert.EqualValues(t, expected.UpdatedAt.UTC().Unix(), actual.UpdatedAt.UTC().Unix(), "%s\n%s", expected.UpdatedAt.String(), actual.UpdatedAt.String())
 		assert.EqualValues(t, expected.FrontChannelLogoutURI, actual.FrontChannelLogoutURI)
 		assert.EqualValues(t, expected.FrontChannelLogoutSessionRequired, actual.FrontChannelLogoutSessionRequired)
 		assert.EqualValues(t, expected.PostLogoutRedirectURIs, actual.PostLogoutRedirectURIs)
@@ -223,7 +242,19 @@ func compare(t *testing.T, expected *Client, actual fosite.Client, k string) {
 	}
 
 	if actual, ok := actual.(fosite.OpenIDConnectClient); ok {
-		assert.EqualValues(t, expected.JSONWebKeys.Keys, actual.GetJSONWebKeys().Keys)
+		require.NotNil(t, expected.JSONWebKeys)
+
+		for k, v := range expected.JSONWebKeys.JSONWebKeySet.Keys {
+			if v.CertificateThumbprintSHA1 == nil {
+				v.CertificateThumbprintSHA1 = make([]byte, 0)
+			}
+			if v.CertificateThumbprintSHA256 == nil {
+				v.CertificateThumbprintSHA256 = make([]byte, 0)
+			}
+			expected.JSONWebKeys.JSONWebKeySet.Keys[k] = v
+		}
+
+		assert.EqualValues(t, expected.JSONWebKeys.JSONWebKeySet, actual.GetJSONWebKeys())
 		assert.EqualValues(t, expected.JSONWebKeysURI, actual.GetJSONWebKeysURI())
 		assert.EqualValues(t, expected.TokenEndpointAuthMethod, actual.GetTokenEndpointAuthMethod())
 		assert.EqualValues(t, expected.RequestURIs, actual.GetRequestURIs())

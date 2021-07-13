@@ -22,53 +22,29 @@ package x
 
 import (
 	"net/http"
-	"reflect"
-
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/ory/fosite"
+	"github.com/ory/x/logrusx"
 )
 
 var (
 	ErrNotFound = &fosite.RFC6749Error{
-		Code:        http.StatusNotFound,
-		Name:        http.StatusText(http.StatusNotFound),
-		Description: "Unable to located the requested resource",
+		CodeField:        http.StatusNotFound,
+		ErrorField:       http.StatusText(http.StatusNotFound),
+		DescriptionField: "Unable to located the requested resource",
 	}
 	ErrConflict = &fosite.RFC6749Error{
-		Code:        http.StatusConflict,
-		Name:        http.StatusText(http.StatusConflict),
-		Description: "Unable to process the requested resource because of conflict in the current state",
+		CodeField:        http.StatusConflict,
+		ErrorField:       http.StatusText(http.StatusConflict),
+		DescriptionField: "Unable to process the requested resource because of conflict in the current state",
 	}
 )
 
-type stackTracer interface {
-	StackTrace() errors.StackTrace
-}
-
-func LogError(err error, logger log.FieldLogger) {
-	extra := map[string]interface{}{}
+func LogError(r *http.Request, err error, logger *logrusx.Logger) {
 	if logger == nil {
-		logger = log.New()
+		logger = logrusx.New("", "")
 	}
 
-	if e, ok := errors.Cause(err).(*fosite.RFC6749Error); ok {
-		if e.Debug != "" {
-			extra["debug"] = e.Debug
-		}
-		if e.Hint != "" {
-			extra["hint"] = e.Hint
-		}
-		if e.Description != "" {
-			extra["description"] = e.Description
-		}
-	}
-
-	logger.WithError(err).WithFields(extra).Errorln("An error occurred")
-	if e, ok := err.(stackTracer); ok {
-		logger.Debugf("Stack trace: %+v", e.StackTrace())
-	} else {
-		logger.Debugf("Stack trace could not be recovered from error type %s", reflect.TypeOf(err))
-	}
+	logger.WithRequest(r).
+		WithError(err).Errorln("An error occurred")
 }

@@ -23,20 +23,20 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ory/hydra/driver/config"
+
 	"github.com/spf13/cobra"
 )
 
 // versionCmd represents the version command
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Display this binary's version, build time and git hash of this build",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Version:    %s\n", Version)
-		fmt.Printf("Git Hash:   %s\n", Commit)
-		fmt.Printf("Build Time: %s\n", Date)
-	},
-}
-
-func init() {
-	RootCmd.AddCommand(versionCmd)
+func NewVersionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Display this binary's version, build time and git hash of this build",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("Version:    %s\n", config.Version)
+			fmt.Printf("Git Hash:   %s\n", config.Commit)
+			fmt.Printf("Build Time: %s\n", config.Date)
+		},
+	}
 }

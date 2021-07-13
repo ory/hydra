@@ -1,14 +1,19 @@
 package x
 
 import (
+	"context"
+
 	"github.com/gorilla/sessions"
-	"github.com/sirupsen/logrus"
+
+	"github.com/ory/x/tracing"
 
 	"github.com/ory/herodot"
+	"github.com/ory/x/logrusx"
 )
 
 type RegistryLogger interface {
-	Logger() logrus.FieldLogger
+	Logger() *logrusx.Logger
+	AuditLogger() *logrusx.Logger
 }
 
 type RegistryWriter interface {
@@ -17,4 +22,8 @@ type RegistryWriter interface {
 
 type RegistryCookieStore interface {
 	CookieStore() sessions.Store
+}
+
+type TracingProvider interface {
+	Tracer(ctx context.Context) *tracing.Tracer
 }

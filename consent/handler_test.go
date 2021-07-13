@@ -22,6 +22,7 @@ package consent_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -37,79 +38,32 @@ import (
 	. "github.com/ory/hydra/consent"
 )
 
-//func TestLogout(t *testing.T) {
-//	conf := internal.NewConfigurationWithDefaults()
-//	reg := internal.NewRegistry(conf)
-//
-//	r := x.NewRouterPublic()
-//	h := NewHandler(reg, conf)
-//
-//	sid := uuid.New()
-//
-//	r.Handle("GET", "/login", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-//		cookie, _ := reg.CookieStore().Get(r, CookieAuthenticationName)
-//		require.NoError(t, reg.ConsentManager().CreateAuthenticationSession(context.TODO(), &AuthenticationSession{
-//			ID:              sid,
-//			Subject:         "foo",
-//			AuthenticatedAt: time.Now(),
-//		}))
-//
-//		cookie.Values[CookieAuthenticationSIDName] = sid
-//		cookie.Options.MaxAge = 60
-//
-//		require.NoError(t, cookie.Save(r, w))
-//	})
-//
-//	r.Handle("GET", "/logout", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-//	})
-//
-//	h.SetRoutes(r.RouterAdmin(), r)
-//	ts := httptest.NewServer(r)
-//	defer ts.Close()
-//
-//	viper.Set(configuration.ViperKeyLogoutRedirectURL, ts.URL+"/logout")
-//
-//	u, err := url.Parse(ts.URL)
-//	require.NoError(t, err)
-//
-//	cj, err := cookiejar.New(new(cookiejar.Options))
-//	require.NoError(t, err)
-//
-//	c := &http.Client{Jar: cj}
-//	resp, err := c.Get(ts.URL + "/login")
-//	require.NoError(t, err)
-//	require.EqualValues(t, http.StatusOK, resp.StatusCode)
-//	require.Len(t, cj.Cookies(u), 1)
-//
-//	resp, err = c.Get(ts.URL + "/oauth2/auth/sessions/login/revoke")
-//	require.NoError(t, err)
-//	require.EqualValues(t, http.StatusOK, resp.StatusCode)
-//	assert.Len(t, cj.Cookies(u), 0)
-//	assert.EqualValues(t, ts.URL+"/logout", resp.Request.URL.String())
-//}
-
 func TestGetLogoutRequest(t *testing.T) {
 	for k, tc := range []struct {
-		exists bool
-		used   bool
-		status int
+		exists  bool
+		handled bool
+		status  int
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
+			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
+				cl := &client.Client{OutfacingID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
-					Client:    &client.Client{ClientID: "client" + key},
-					Challenge: challenge,
-					WasUsed:   tc.used,
+					Client:     cl,
+					ID:         challenge,
+					WasHandled: tc.handled,
+					RequestURL: requestURL,
 				}))
 			}
 
@@ -123,6 +77,17 @@ func TestGetLogoutRequest(t *testing.T) {
 			resp, err := c.Get(ts.URL + LogoutPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
+
+			if tc.handled {
+				var result RequestWasHandledResponse
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.Equal(t, requestURL, result.RedirectTo)
+			} else if tc.exists {
+				var result LogoutRequest
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.Equal(t, challenge, result.ID)
+				require.Equal(t, requestURL, result.RequestURL)
+			}
 		})
 	}
 }
@@ -135,21 +100,29 @@ func TestGetLoginRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
+			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.TODO(), &LoginRequest{
-					Client:     &client.Client{ClientID: "client" + key},
-					Challenge:  challenge,
-					WasHandled: tc.handled,
+				cl := &client.Client{OutfacingID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+					Client:     cl,
+					ID:         challenge,
+					RequestURL: requestURL,
 				}))
+
+				if tc.handled {
+					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasHandled: true})
+					require.NoError(t, err)
+				}
 			}
 
 			h := NewHandler(reg, conf)
@@ -162,6 +135,18 @@ func TestGetLoginRequest(t *testing.T) {
 			resp, err := c.Get(ts.URL + LoginPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
+
+			if tc.handled {
+				var result RequestWasHandledResponse
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.Equal(t, requestURL, result.RedirectTo)
+			} else if tc.exists {
+				var result LoginRequest
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.Equal(t, challenge, result.ID)
+				require.Equal(t, requestURL, result.RequestURL)
+				require.NotNil(t, result.Client)
+			}
 		})
 	}
 }
@@ -174,21 +159,32 @@ func TestGetConsentRequest(t *testing.T) {
 	}{
 		{false, false, http.StatusNotFound},
 		{true, false, http.StatusOK},
-		{true, true, http.StatusConflict},
+		{true, true, http.StatusGone},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
 			challenge := "challenge" + key
+			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistry(conf)
+			reg := internal.NewRegistryMemory(t, conf)
 
 			if tc.exists {
-				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.TODO(), &ConsentRequest{
-					Client:     &client.Client{ClientID: "client" + key},
-					Challenge:  challenge,
-					WasHandled: tc.handled,
+				cl := &client.Client{OutfacingID: "client" + key}
+				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
+					Client:     cl,
+					ID:         challenge,
+					RequestURL: requestURL,
 				}))
+
+				if tc.handled {
+					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
+						ID:         challenge,
+						WasHandled: true,
+					})
+					require.NoError(t, err)
+				}
 			}
 
 			h := NewHandler(reg, conf)
@@ -202,6 +198,18 @@ func TestGetConsentRequest(t *testing.T) {
 			resp, err := c.Get(ts.URL + ConsentPath + "?challenge=" + challenge)
 			require.NoError(t, err)
 			require.EqualValues(t, tc.status, resp.StatusCode)
+
+			if tc.handled {
+				var result RequestWasHandledResponse
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.Equal(t, requestURL, result.RedirectTo)
+			} else if tc.exists {
+				var result ConsentRequest
+				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+				require.Equal(t, challenge, result.ID)
+				require.Equal(t, requestURL, result.RequestURL)
+				require.NotNil(t, result.Client)
+			}
 		})
 	}
 }

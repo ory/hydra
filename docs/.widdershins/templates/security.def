@@ -1,0 +1,16 @@
+## Authentication
+
+{{ for (var s in data.api.components.securitySchemes) { }}{{ var sd = data.api.components.securitySchemes[s]; }}{{? sd.type == 'apiKey' }}
+* API Key ({{=s}})
+    - Parameter Name: **{{=sd.name}}**, in: {{=sd.in}}. {{=sd.description || ''}}{{?}}{{? sd.type == 'http'}}
+- HTTP Authentication, scheme: {{=sd.scheme}} {{=sd.description || ''}}{{?}}{{? sd.type == 'oauth2'}}
+- OAuth 2.0 Authorization. {{=sd.description || ''}}
+  {{ for (var f in sd.flows) { }}{{ var flow = sd.flows[f]; }}- Flow: {{=f}}{{? flow.authorizationUrl}}
+  - OAuth 2.0 Authorization URL = [{{=flow.authorizationUrl}}]({{=flow.authorizationUrl}}){{?}}{{? flow.tokenUrl}}
+  - OAuth 2.0 Token URL = [{{=flow.tokenUrl}}]({{=flow.tokenUrl}}){{?}}{{? flow.scopes}}
+  - OAuth 2.0 Scope
+
+    |Scope|Scope Description|
+    |---|---|
+    {{ for (var sc in flow.scopes) { }}|{{=sc}}|{{=data.utils.join(flow.scopes[sc])}}|
+    {{ } /* of scopes */ }}{{?}}{{ } /* of flows */ }}{{?}}{{ } /* of securitySchemes */ }}

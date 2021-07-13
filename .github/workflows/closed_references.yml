@@ -1,0 +1,27 @@
+name: Closed Reference Notifier
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      issueLimit:
+        description: Max. number of issues to create
+        required: true
+        default: '5'
+
+jobs:
+  find_closed_references:
+    if: github.repository_owner == 'ory'
+    runs-on: ubuntu-latest
+    name: Find closed references
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+      - uses: ory/closed-reference-notifier@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issueLabels: upstream,good first issue,help wanted
+          issueLimit: ${{ github.event.inputs.issueLimit || '5' }}

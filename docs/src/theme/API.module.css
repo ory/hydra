@@ -1,0 +1,13 @@
+:global #route-identifier[data-route*='reference/api'] .container {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+:global #route-identifier[data-route*='reference/api'] .container .col {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+:global #route-identifier[data-route*='reference/api'] .container .col.col--3 {
+  display: none;
+}

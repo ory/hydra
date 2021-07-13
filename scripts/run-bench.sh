@@ -40,7 +40,7 @@ we have set \`BCRYPT_COST=8\`.
 
 EOF
 
-BCRYPT_COST=8 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve all --dangerous-force-http --disable-telemetry > /dev/null 2>&1 &
+BCRYPT_COST=8 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve all --dangerous-force-http --sqa-opt-out > /dev/null 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done

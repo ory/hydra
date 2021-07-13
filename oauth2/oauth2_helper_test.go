@@ -25,6 +25,8 @@ import (
 	"time"
 
 	"github.com/ory/fosite"
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/hydra/consent"
 )
 
@@ -47,7 +49,7 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 			SubjectIdentifier: "foo",
 			ACR:               "1",
 		},
-		AuthenticatedAt: c.authTime,
+		AuthenticatedAt: sqlxx.NullTime(c.authTime),
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},
 		Session: &consent.ConsentRequestSessionData{
 			AccessToken: map[string]interface{}{},

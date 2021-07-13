@@ -20,6 +20,8 @@
 
 package consent
 
+import "time"
+
 // swagger:parameters getLoginRequest
 type swaggerGetLoginRequestByChallenge struct {
 	// in: query
@@ -53,6 +55,11 @@ type swaggerRevokeConsentSessions struct {
 	//
 	// in: query
 	Client string `json:"client"`
+
+	// If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
+	//
+	// in: query
+	All bool `json:"all"`
 }
 
 // swagger:parameters listSubjectConsentSessions
@@ -132,4 +139,11 @@ type swaggerListHandledConsentRequestsResult struct {
 	// in: body
 	// type: array
 	Body []PreviousConsentSession
+}
+
+// swagger:model flushLoginConsentRequest
+type FlushLoginConsentRequest struct {
+	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
+	// of recent login and consent database entries for auditing.
+	NotAfter time.Time `json:"notAfter"`
 }

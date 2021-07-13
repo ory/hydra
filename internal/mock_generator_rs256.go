@@ -35,6 +35,7 @@ import (
 type veryInsecureRS256Generator struct{}
 
 func (g *veryInsecureRS256Generator) Generate(id, use string) (*jose.JSONWebKeySet, error) {
+	/* #nosec G403 - this is ok because this generator is only used in tests. */
 	key, err := rsa.GenerateKey(rand.Reader, 512)
 	if err != nil {
 		return nil, errors.Errorf("Could not generate key because %s", err)

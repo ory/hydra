@@ -1,4 +1,4 @@
-import { prng } from '../../helpers';
+import { prng } from '../../helpers'
 
 describe('OAuth 2.0 End-User Authorization', () => {
   const nc = () => ({
@@ -7,65 +7,78 @@ describe('OAuth 2.0 End-User Authorization', () => {
     scope: 'offline_access',
     redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
     grant_types: ['authorization_code', 'refresh_token']
-  });
+  })
 
   const hasConsent = (client, body) => {
-    let found = false;
-    body.forEach(({ consent_request: { client: { client_id } } }) => {
-      if (client_id === client.client_id) {
-        found = true;
+    let found = false
+    body.forEach(
+      ({
+        consent_request: {
+          client: { client_id }
+        }
+      }) => {
+        if (client_id === client.client_id) {
+          found = true
+        }
       }
-    });
-    return found;
-  };
+    )
+    return found
+  }
 
   it('should check if end user authorization exists', () => {
-    const client = nc();
+    const client = nc()
     cy.authCodeFlow(client, {
       consent: {
         scope: ['offline_access'],
         remember: true
       }
-    });
+    })
 
     cy.request(
       Cypress.env('admin_url') +
         '/oauth2/auth/sessions/consent?subject=foo@bar.com'
     )
       .its('body')
-      .then(body => {
-        expect(body.length).to.be.greaterThan(0);
-        expect(hasConsent(client, body)).to.be.true;
-      });
+      .then((body) => {
+        expect(body.length).to.be.greaterThan(0)
+        expect(hasConsent(client, body)).to.be.true
+        body.forEach((consent) => {
+          expect(
+            consent.handled_at.match(
+              /^[2-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/
+            )
+          ).not.to.be.empty
+        })
+      })
 
     cy.request(
       'DELETE',
       Cypress.env('admin_url') +
-        '/oauth2/auth/sessions/consent?subject=foo@bar.com'
-    );
+        '/oauth2/auth/sessions/consent?subject=foo@bar.com&all=true'
+    )
 
     cy.request(
       Cypress.env('admin_url') +
         '/oauth2/auth/sessions/consent?subject=foo@bar.com'
     )
       .its('body')
-      .then(body => {
-        expect(body.length).to.eq(0);
-        expect(hasConsent(client, body)).to.be.false;
-      });
+      .then((body) => {
+        expect(body.length).to.eq(0)
+        expect(hasConsent(client, body)).to.be.false
+      })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/introspect/at`)
       .its('body')
-      .then(body => {
-        expect(body.result).to.equal('success');
-        expect(body.body.active).to.be.false;
-      });
+      .then((body) => {
+        expect(body.result).to.equal('success')
+        expect(body.body.active).to.be.false
+      })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/introspect/rt`)
       .its('body')
-      .then(body => {
-        expect(body.result).to.equal('success');
-        expect(body.body.active).to.be.false;
-      });
-  });
-});
+      .then((body) => {
+        expect(body.result).to.equal('success')
+        expect(body.body.active).to.be.false
+      })
+  })
+})

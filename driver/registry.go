@@ -1,36 +1,42 @@
 package driver
 
 import (
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"context"
 
-	"github.com/ory/hydra/metrics/prometheus"
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/tracing"
+	"github.com/pkg/errors"
+
+	"github.com/ory/x/errorsx"
+
+	"github.com/ory/fosite"
+	foauth2 "github.com/ory/fosite/handler/oauth2"
+
+	"github.com/ory/x/logrusx"
+
+	"github.com/ory/hydra/persistence"
+
+	prometheus "github.com/ory/x/prometheusx"
+
+	"github.com/ory/x/dbal"
+	"github.com/ory/x/healthx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/healthx"
 )
 
 type Registry interface {
 	dbal.Driver
 
-	Init() error
+	Init(ctx context.Context) error
 
-	WithConfig(c configuration.Provider) Registry
-	WithLogger(l logrus.FieldLogger) Registry
+	WithConfig(c *config.Provider) Registry
+	WithLogger(l *logrusx.Logger) Registry
 
-	WithBuildInfo(version, hash, date string) Registry
-	BuildVersion() string
-	BuildDate() string
-	BuildHash() string
-
+	Config() *config.Provider
+	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
 	x.RegistryCookieStore
@@ -39,7 +45,7 @@ type Registry interface {
 	jwk.Registry
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
-	Tracer() *tracing.Tracer
+	x.TracingProvider
 
 	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
@@ -47,18 +53,16 @@ type Registry interface {
 	ConsentHandler() *consent.Handler
 	OAuth2Handler() *oauth2.Handler
 	HealthHandler() *healthx.Handler
+
+	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
+	WithOAuth2Provider(f fosite.OAuth2Provider)
+	WithConsentStrategy(c consent.Strategy)
 }
 
-func MustNewRegistry(c configuration.Provider) Registry {
-	r, err := NewRegistry(c)
-	cmdx.Must(err, "unable to initialize services: %s", err)
-	return r
-}
-
-func NewRegistry(c configuration.Provider) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, errorsx.WithStack(err)
 	}
 
 	registry, ok := driver.(Registry)
@@ -66,16 +70,16 @@ func NewRegistry(c configuration.Provider) (Registry, error) {
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
 
-	registry = registry.WithConfig(c)
+	registry = registry.WithLogger(l).WithConfig(c)
 
-	if err := registry.Init(); err != nil {
+	if err := registry.Init(ctx); err != nil {
 		return nil, err
 	}
 
 	return registry, nil
 }
 
-func CallRegistry(r Registry) {
+func CallRegistry(ctx context.Context, r Registry) {
 	r.ClientValidator()
 	r.ClientManager()
 	r.ClientHasher()
@@ -93,5 +97,5 @@ func CallRegistry(r Registry) {
 	r.OpenIDJWTStrategy()
 	r.OpenIDConnectRequestValidator()
 	r.PrometheusManager()
-	r.Tracer()
+	r.Tracer(ctx)
 }

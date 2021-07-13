@@ -9,9 +9,15 @@ before finalizing the upgrade process.
 
 
 - [Hassle-free upgrades](#hassle-free-upgrades)
+- [1.4](#14)
+- [1.3.0](#130)
+- [1.2.0](#120)
+- [1.1.0](#110)
+- [1.0.9](#109)
+  - [Schema Changes](#schema-changes)
 - [1.0.0-rc.10](#100-rc10)
   - [OpenID Connect Front-/Backchannel Logout 1.0](#openid-connect-front-backchannel-logout-10)
-  - [Schema Changes](#schema-changes)
+  - [Schema Changes](#schema-changes-1)
   - [SQL Migrations now require user-input or `--yes` flag](#sql-migrations-now-require-user-input-or---yes-flag)
   - [Login and Consent Management](#login-and-consent-management)
 - [1.0.0-rc.9](#100-rc9)
@@ -23,7 +29,7 @@ before finalizing the upgrade process.
   - [Database Plugins](#database-plugins)
 - [1.0.0-rc.4](#100-rc4)
 - [1.0.0-rc.1](#100-rc1)
-  - [Schema Changes](#schema-changes-1)
+  - [Schema Changes](#schema-changes-2)
     - [Foreign Keys](#foreign-keys)
       - [Removing inconsistent oauth2 data](#removing-inconsistent-oauth2-data)
       - [Removing inconsistent login & consent data](#removing-inconsistent-login--consent-data)
@@ -43,7 +49,7 @@ before finalizing the upgrade process.
 - [1.0.0-beta.9](#100-beta9)
   - [CORS is disabled by default](#cors-is-disabled-by-default)
 - [1.0.0-beta.8](#100-beta8)
-  - [Schema Changes](#schema-changes-2)
+  - [Schema Changes](#schema-changes-3)
   - [Split of Public and Administrative Endpoints](#split-of-public-and-administrative-endpoints)
   - [Golang SDK `Configuration.EndpointURL` is now `Configuration.AdminURL`](#golang-sdk-configurationendpointurl-is-now-configurationadminurl)
   - [`hydra serve` is now `hydra serve all`](#hydra-serve-is-now-hydra-serve-all)
@@ -54,7 +60,7 @@ before finalizing the upgrade process.
   - [Regenerated OpenID Connect ID Token cryptographic keys](#regenerated-openid-connect-id-token-cryptographic-keys)
 - [1.0.0-beta.5](#100-beta5)
   - [OAuth 2.0 Client Response Type changes](#oauth-20-client-response-type-changes)
-  - [Schema Changes](#schema-changes-3)
+  - [Schema Changes](#schema-changes-4)
   - [HTTP Error Payload](#http-error-payload)
   - [OAuth 2.0 Clients must specify correct `token_endpoint_auth_method`](#oauth-20-clients-must-specify-correct-token_endpoint_auth_method)
   - [OAuth 2.0 Client field `id` is now `client_id`](#oauth-20-client-field-id-is-now-client_id)
@@ -137,7 +143,67 @@ before finalizing the upgrade process.
 
 Do you want the latest features and patches without work and hassle? Are you looking for a reliable, scalable, and
 secure deployment with zero effort? We can run it for you! If you're interested,
-[contact us now](mailto:hi@ory.sh)!
+[contact us now](mailto:office@ory.sh)!
+
+## 1.5.0
+
+Migrations are now handled with https://github.com/gobuffalo/fizz. Please run `hydra migrate sql` when upgrading to this version.
+
+For a full list of changes please check: https://github.com/ory/hydra/compare/v1.4...v1.5.0
+
+## 1.4
+
+Please run `hydra migrate sql` when upgrading to this version. For more information, check https://github.com/ory/hydra/commit/700d17d3b7d507de1b1d459a7261d6fb2571ebe3.
+
+For a full list of changes please check: https://github.com/ory/hydra/compare/v1.3.2...v1.4.1
+
+## 1.3.0
+
+Please run `hydra migrate sql` when upgrading to this version. For more information, check https://github.com/ory/hydra/commit/d9308fa0dba26019a59e4d97e85b036133ad8362.
+
+## 1.2.0
+
+This release focuses on a rework of the SDK pipeline. First of all, we have introduced new SDKs for all popular programming
+languages and published them on their respective package repositories:
+
+- [Python](https://pypi.org/project/ory-hydra-client/)
+- [PHP](https://packagist.org/packages/ory/hydra-client)
+- [Go](https://github.com/ory/hydra-client-go)
+- [NodeJS](https://www.npmjs.com/package/@oryd/hydra-client) (with TypeScript)
+- [Java](https://search.maven.org/artifact/sh.ory.hydra/hydra-client)
+- [Ruby](https://rubygems.org/gems/ory-hydra-client)
+
+The SDKs hosted in this repository (under ./sdk/...) have been completely removed. Please use only the SDKs from the
+above sources from now on as it will also remove several issues that were caused by the previous SDK pipeline.
+
+Unfortunately, there were breaking changes introduced by the new SDK generation:
+
+- Several structs and fields have been renamed in the Go SDK. However, nothing else changed so upgrading should be a matter of
+half an hour if you made extensive use of the SDK, or several minutes if just one or two methods are being used.
+- All other SDKs changed to `openapi-generator`, which is a better maintained generator that creates
+better code than the one previously used. This manifests in TypeScript definitions for the NodeJS SDK and
+several other goodies. We do not have a proper migration path for those, unfortunately.
+
+If you have issues with upgrading the SDK, please let us know in an issue on this repository!
+
+## 1.1.0
+
+Several indices have been added to the SQL Migrations. There are no backwards incompatible changes in this release
+but we advise to do a test-run of the SQL Migrations before applying them, as they might lock some tables which
+may cause downtimes.
+
+> Make a backup of your database before applying this change.
+
+After applying these SQL Migrations, several queries and endpoints will be much faster than before.
+
+## 1.0.9
+
+### Schema Changes
+
+A minor Schema change was introduced to the OAuth 2.0 Clients table. It is now possible to store arbitrary metadata
+for a client.
+
+> Make a backup of your database before applying this change.
 
 ## 1.0.0-rc.10
 

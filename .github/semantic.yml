@@ -1,0 +1,17 @@
+titleOnly: true
+commitsOnly: false
+titleAndCommits: false
+
+types:
+  - feat
+  - fix
+  - revert
+  - docs
+  - style
+  - refactor
+  - test
+  - build
+  - autogen
+  - security
+  - ci
+  - chore

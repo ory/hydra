@@ -25,6 +25,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ory/hydra/driver/config"
+
+	"github.com/ory/x/errorsx"
+
 	"github.com/ory/x/stringslice"
 
 	"github.com/ory/hydra/x"
@@ -41,10 +45,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c Configuration
+	c *config.Provider
 }
 
-func NewHandler(r InternalRegistry, c Configuration) *Handler {
+func NewHandler(r InternalRegistry, c *config.Provider) *Handler {
 	return &Handler{r: r, c: c}
 }
 
@@ -82,7 +86,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       500: genericError
+//       500: jsonError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
@@ -121,8 +125,8 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
@@ -154,9 +158,9 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -171,7 +175,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 
 // swagger:route POST /keys/{set} admin createJsonWebKeySet
 //
-// Generate a new JSON Web Key
+// Generate a New JSON Web Key
 //
 // This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
 //
@@ -187,15 +191,15 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Responses:
 //       201: JSONWebKeySet
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keyRequest createRequest
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 	}
 
 	generator, found := h.r.KeyGenerators()[keyRequest.Algorithm]
@@ -236,15 +240,15 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keySet jose.JSONWebKeySet
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keySet); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
@@ -279,15 +283,15 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Responses:
 //       200: JSONWebKey
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var key jose.JSONWebKey
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&key); err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
 	}
 
@@ -322,9 +326,9 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -354,9 +358,9 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")

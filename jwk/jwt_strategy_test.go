@@ -26,9 +26,10 @@ import (
 
 	"github.com/ory/hydra/internal"
 
-	jwt2 "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	jwt2 "github.com/ory/fosite/token/jwt"
 
 	"github.com/ory/fosite/token/jwt"
 	. "github.com/ory/hydra/jwk"
@@ -36,7 +37,7 @@ import (
 
 func TestRS256JWTStrategy(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	testGenerator := &RS256Generator{}
 

@@ -27,24 +27,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/jwk"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
 )
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistry(conf)
+	reg := internal.NewRegistryMemory(t, conf)
 
-	viper.Set(configuration.ViperKeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
+	conf.MustSet(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 
 	router := x.NewRouterPublic()
+	var testGenerator = &jwk.RS256Generator{}
 	IDKS, _ := testGenerator.Generate("test-id", "sig")
 
 	h := reg.KeyHandler()
@@ -68,5 +69,19 @@ func TestHandlerWellKnown(t *testing.T) {
 
 	resp := known.Key("public:test-id")
 	require.NotNil(t, resp, "Could not find key public")
-	assert.Equal(t, resp, IDKS.Key("public:test-id"))
+
+	assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("public:test-id")))
+}
+
+func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
+	for k, v := range js {
+		if len(v.CertificateThumbprintSHA1) == 0 {
+			v.CertificateThumbprintSHA1 = nil
+		}
+		if len(v.CertificateThumbprintSHA256) == 0 {
+			v.CertificateThumbprintSHA256 = nil
+		}
+		js[k] = v
+	}
+	return js
 }

@@ -26,8 +26,6 @@ import (
 	"github.com/ory/fosite"
 )
 
-var _, _ Manager = new(SQLManager), new(MemoryManager)
-
 type Manager interface {
 	Storage
 
@@ -35,7 +33,7 @@ type Manager interface {
 }
 
 type Storage interface {
-	fosite.Storage
+	GetClient(ctx context.Context, id string) (fosite.Client, error)
 
 	CreateClient(ctx context.Context, c *Client) error
 

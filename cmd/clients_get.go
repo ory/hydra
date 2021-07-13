@@ -22,18 +22,18 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/cli"
 )
 
-var clientsGetCmd = &cobra.Command{
-	Use:   "get <id>",
-	Short: "Get an OAuth 2.0 Client",
-	Long: `This command retrieves an OAuth 2.0 Clients by its ID.
+func NewClientsGetCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "get <id>",
+		Short: "Get an OAuth 2.0 Client",
+		Long: `This command retrieves an OAuth 2.0 Clients by its ID.
 
 Example:
   hydra clients get client-1`,
-	Run: cmdHandler.Clients.GetClient,
-}
-
-func init() {
-	clientsCmd.AddCommand(clientsGetCmd)
+		Run: cli.NewHandler().Clients.GetClient,
+	}
 }

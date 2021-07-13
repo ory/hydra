@@ -22,14 +22,16 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+
+	"github.com/ory/x/configx"
 )
 
 // migrateCmd represents the migrate command
-var migrateCmd = &cobra.Command{
-	Use:   "migrate",
-	Short: "Various migration helpers",
-}
-
-func init() {
-	RootCmd.AddCommand(migrateCmd)
+func NewMigrateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "migrate",
+		Short: "Various migration helpers",
+	}
+	configx.RegisterFlags(cmd.PersistentFlags())
+	return cmd
 }

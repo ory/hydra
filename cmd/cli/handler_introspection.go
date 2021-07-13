@@ -22,19 +22,17 @@ package cli
 
 import (
 	"fmt"
-	"strings" //"encoding/json"
+	"os"
+	"strings" // "encoding/json"
 
-	"github.com/go-openapi/runtime"
-
-	"github.com/ory/hydra/sdk/go/hydra/client/admin"
 	"github.com/ory/x/pointerx"
+
+	"github.com/ory/hydra/internal/httpclient/client/admin"
 
 	"github.com/spf13/cobra"
 
-	httptransport "github.com/go-openapi/runtime/client"
-
 	"github.com/ory/x/cmdx"
-	"github.com/ory/x/flagx" //"context"
+	"github.com/ory/x/flagx" // "context"
 )
 
 type IntrospectionHandler struct{}
@@ -47,17 +45,13 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
 	c := configureClient(cmd)
 
-	var ht runtime.ClientAuthInfoWriter
 	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID != "" || clientSecret != "" {
-		ht = httptransport.BasicAuth(clientID, clientSecret)
-	} else {
-		fmt.Println("No OAuth 2.0 Client ID an secret set, skipping authorization header. This might fail if the introspection endpoint is protected.")
+		_, _ = fmt.Fprintf(os.Stderr, "Flags --client-id and --client-secret and environment variables OAUTH2_CLIENT_SECRET and OAUTH2_ACCESS_TOKEN are deprecated and have no longer any effect.")
 	}
 
 	result, err := c.Admin.IntrospectOAuth2Token(admin.NewIntrospectOAuth2TokenParams().
 		WithToken(args[0]).
 		WithScope(pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))),
-		ht,
 	)
 	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
 	fmt.Println(formatResponse(result.Payload))

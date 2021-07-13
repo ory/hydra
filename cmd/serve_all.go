@@ -21,10 +21,11 @@ import (
 )
 
 // allCmd represents the all command
-var allCmd = &cobra.Command{
-	Use:   "all",
-	Short: "Serves both public and administrative HTTP/2 APIs",
-	Long: `Starts a process which listens on two ports for public and administrative HTTP/2 API requests.
+func NewServeAllCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "all",
+		Short: "Serves both public and administrative HTTP/2 APIs",
+		Long: `Starts a process which listens on two ports for public and administrative HTTP/2 API requests.
 
 If you want more granular control (e.g. different TLS settings) over each API group (administrative, public) you
 can run "serve admin" and "serve public" separately.
@@ -37,19 +38,6 @@ All possible controls are listed below. This command exposes exposes command lin
 the controls section.
 
 ` + serveControls,
-	Run: server.RunServeAll(Version, Commit, Date),
-}
-
-func init() {
-	serveCmd.AddCommand(allCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// allCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// allCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+		Run: server.RunServeAll,
+	}
 }

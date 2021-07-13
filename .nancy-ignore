@@ -1,0 +1,10 @@
+# HashiCorp Consul issues - can be ignored because consul is not used.
+CVE-2020-7219
+CVE-2018-19653
+# End HashiCorp Consul
+
+# etcd issues - can be ignored because etcd is not used.
+CVE-2020-15114
+CVE-2020-15136
+CVE-2020-15115
+# end

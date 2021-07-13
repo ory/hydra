@@ -1,0 +1,4 @@
+data
+logs
+config/ssh_*
+config/gitlab-secrets.json

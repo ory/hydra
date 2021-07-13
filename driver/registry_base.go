@@ -2,58 +2,59 @@ package driver
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"time"
 
+	prometheus "github.com/ory/x/prometheusx"
+
+	"github.com/pkg/errors"
+
+	"github.com/ory/hydra/x/oauth2cors"
+
+	"github.com/ory/hydra/persistence"
+
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/ory/hydra/metrics/prometheus"
 	"github.com/ory/x/logrusx"
-	"github.com/ory/x/serverx"
 
 	"github.com/gorilla/sessions"
-	"github.com/sirupsen/logrus"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
-	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/driver/configuration"
-	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/resilience"
 	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
-)
 
-const (
-	MetricsPrometheusPath = "/metrics/prometheus"
+	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 )
 
 type RegistryBase struct {
-	l            logrus.FieldLogger
-	c            configuration.Provider
-	cm           client.Manager
+	l            *logrusx.Logger
+	al           *logrusx.Logger
+	C            *config.Provider
 	ch           *client.Handler
 	fh           fosite.Hasher
 	kh           *jwk.Handler
 	cv           *client.Validator
 	hh           *healthx.Handler
 	kg           map[string]jwk.KeyGenerator
-	km           jwk.Manager
 	kc           *jwk.AEAD
 	cs           sessions.Store
 	csPrev       [][]byte
-	com          consent.Manager
 	cos          consent.Strategy
 	writer       herodot.Writer
-	fs           x.FositeStorer
 	fsc          fosite.ScopeStrategy
 	atjs         jwk.JWTStrategy
 	idtjs        jwk.JWTStrategy
@@ -72,6 +73,7 @@ type RegistryBase struct {
 	buildHash    string
 	buildDate    string
 	r            Registry
+	persister    persistence.Persister
 }
 
 func (m *RegistryBase) with(r Registry) *RegistryBase {
@@ -88,18 +90,18 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 
 func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = OAuth2AwareCORSMiddleware("public", m.r, m.c)
+		m.oa2mw = oauth2cors.Middleware(m.r)
 	}
 	return m.oa2mw
 }
 
 func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
-	m.HealthHandler().SetRoutes(admin.Router, true)
+	m.HealthHandler().SetHealthRoutes(admin.Router, true)
+	m.HealthHandler().SetVersionRoutes(admin.Router)
 
-	public.GET(healthx.AliveCheckPath, m.HealthHandler().Alive)
-	public.GET(healthx.ReadyCheckPath, m.HealthHandler().Ready(false))
+	m.HealthHandler().SetHealthRoutes(public.Router, false)
 
-	admin.Handler("GET", MetricsPrometheusPath, promhttp.Handler())
+	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
@@ -119,38 +121,45 @@ func (m *RegistryBase) BuildHash() string {
 	return m.buildHash
 }
 
-func (m *RegistryBase) WithConfig(c configuration.Provider) Registry {
-	m.c = c
+func (m *RegistryBase) WithConfig(c *config.Provider) Registry {
+	m.C = c
 	return m.r
 }
 
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
 		h := herodot.NewJSONWriter(m.Logger())
-		h.ErrorEnhancer = serverx.ErrorEnhancerRFC6749
+		h.ErrorEnhancer = x.ErrorEnhancer
 		m.writer = h
 	}
 	return m.writer
 }
 
-func (m *RegistryBase) WithLogger(l logrus.FieldLogger) Registry {
+func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 	m.l = l
 	return m.r
 }
 
-func (m *RegistryBase) Logger() logrus.FieldLogger {
+func (m *RegistryBase) Logger() *logrusx.Logger {
 	if m.l == nil {
-		m.l = logrusx.New()
+		m.l = logrusx.New("ORY Hydra", m.BuildVersion())
 	}
 	return m.l
 }
 
+func (m *RegistryBase) AuditLogger() *logrusx.Logger {
+	if m.al == nil {
+		m.al = logrusx.NewAudit("ORY Hydra", m.BuildVersion())
+	}
+	return m.al
+}
+
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		if m.Tracer().IsLoaded() {
-			m.fh = &tracing.TracedBCrypt{WorkFactor: m.c.BCryptCost()}
+		if m.Tracer(context.TODO()).IsLoaded() {
+			m.fh = &tracing.TracedBCrypt{WorkFactor: m.C.BCryptCost()}
 		} else {
-			m.fh = x.NewBCrypt(m.c)
+			m.fh = x.NewBCrypt(m.C)
 		}
 	}
 	return m.fh
@@ -165,21 +174,38 @@ func (m *RegistryBase) ClientHandler() *client.Handler {
 
 func (m *RegistryBase) ClientValidator() *client.Validator {
 	if m.cv == nil {
-		m.cv = client.NewValidator(m.c)
+		m.cv = client.NewValidator(m.C)
 	}
 	return m.cv
 }
 
 func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	if m.kh == nil {
-		m.kh = jwk.NewHandler(m.r, m.c)
+		m.kh = jwk.NewHandler(m.r, m.C)
 	}
 	return m.kh
 }
+
 func (m *RegistryBase) HealthHandler() *healthx.Handler {
 	if m.hh == nil {
 		m.hh = healthx.NewHandler(m.Writer(), m.buildVersion, healthx.ReadyCheckers{
-			"database": m.r.Ping,
+			"database": func(_ *http.Request) error {
+				return m.r.Ping()
+			},
+			"migrations": func(r *http.Request) error {
+				status, err := m.r.Persister().MigrationStatus(r.Context())
+				if err != nil {
+					return err
+				}
+
+				if status.HasPending() {
+					err := errors.Errorf("migrations have not yet been fully applied: %+v", status)
+					m.Logger().WithField("status", fmt.Sprintf("%+v", status)).WithError(err).Warn("Instance is not yet ready because migrations have not yet been fully applied.")
+					return err
+				}
+
+				return nil
+			},
 		})
 	}
 
@@ -188,7 +214,7 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 
 func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	if m.cos == nil {
-		m.cos = consent.NewStrategy(m.r, m.c)
+		m.cos = consent.NewStrategy(m.r, m.C)
 	}
 	return m.cos
 }
@@ -207,39 +233,48 @@ func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
 
 func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	if m.kc == nil {
-		m.kc = jwk.NewAEAD(m.c)
+		m.kc = jwk.NewAEAD(m.C)
 	}
 	return m.kc
 }
 
 func (m *RegistryBase) CookieStore() sessions.Store {
 	if m.cs == nil {
-		m.cs = sessions.NewCookieStore(m.c.GetCookieSecrets()...)
-		m.csPrev = m.c.GetCookieSecrets()
+		cs := sessions.NewCookieStore(m.C.GetCookieSecrets()...)
+		// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.
+		// MaxAge(0) disables internal MaxAge check by SecureCookie, see:
+		//
+		// https://github.com/ory/hydra/pull/2488#discussion_r618992698
+		cs.MaxAge(0)
+
+		m.cs = cs
+		m.csPrev = m.C.GetCookieSecrets()
 	}
 	return m.cs
 }
 
 func (m *RegistryBase) oAuth2Config() *compose.Config {
 	return &compose.Config{
-		AccessTokenLifespan:            m.c.AccessTokenLifespan(),
-		RefreshTokenLifespan:           m.c.RefreshTokenLifespan(),
-		AuthorizeCodeLifespan:          m.c.AuthCodeLifespan(),
-		IDTokenLifespan:                m.c.IDTokenLifespan(),
-		IDTokenIssuer:                  m.c.IssuerURL().String(),
-		HashCost:                       m.c.BCryptCost(),
+		AccessTokenLifespan:            m.C.AccessTokenLifespan(),
+		RefreshTokenLifespan:           m.C.RefreshTokenLifespan(),
+		AuthorizeCodeLifespan:          m.C.AuthCodeLifespan(),
+		IDTokenLifespan:                m.C.IDTokenLifespan(),
+		IDTokenIssuer:                  m.C.IssuerURL().String(),
+		HashCost:                       m.C.BCryptCost(),
 		ScopeStrategy:                  m.ScopeStrategy(),
-		SendDebugMessagesToClients:     m.c.ShareOAuth2Debug(),
-		EnforcePKCE:                    m.c.PKCEEnforced(),
+		SendDebugMessagesToClients:     m.C.ShareOAuth2Debug(),
+		UseLegacyErrorFormat:           m.C.OAuth2LegacyErrors(),
+		EnforcePKCE:                    m.C.PKCEEnforced(),
+		EnforcePKCEForPublicClients:    m.C.EnforcePKCEForPublicClients(),
 		EnablePKCEPlainChallengeMethod: false,
-		TokenURL:                       urlx.AppendPaths(m.c.PublicURL(), oauth2.TokenPath).String(),
-		RedirectSecureChecker:          x.IsRedirectURISecure(m.c),
+		TokenURL:                       urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
+		RedirectSecureChecker:          x.IsRedirectURISecure(m.C),
 	}
 }
 
 func (m *RegistryBase) OAuth2HMACStrategy() *foauth2.HMACSHAStrategy {
 	if m.o2mc == nil {
-		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.c.GetSystemSecret(), m.c.GetRotatedSystemSecrets())
+		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.C.GetSystemSecret(), m.C.GetRotatedSystemSecrets())
 	}
 	return m.o2mc
 }
@@ -249,14 +284,14 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 		fc := m.oAuth2Config()
 		oidcStrategy := &openid.DefaultStrategy{
 			JWTStrategy: m.OpenIDJWTStrategy(),
-			Expiry:      m.c.IDTokenLifespan(),
-			Issuer:      m.c.IssuerURL().String(),
+			Expiry:      m.C.IDTokenLifespan(),
+			Issuer:      m.C.IssuerURL().String(),
 		}
 
 		var coreStrategy foauth2.CoreStrategy
 		hmacStrategy := m.OAuth2HMACStrategy()
 
-		switch ats := strings.ToLower(m.c.AccessTokenStrategy()); ats {
+		switch ats := strings.ToLower(m.C.AccessTokenStrategy()); ats {
 		case "jwt":
 			coreStrategy = &foauth2.DefaultJWTStrategy{
 				JWTStrategy:     m.AccessTokenJWTStrategy(),
@@ -295,22 +330,28 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 
 func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 	if m.fsc == nil {
-		if m.c.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
+		if m.C.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
 			m.Logger().Warn(`Using deprecated hierarchical scope strategy, consider upgrading to "wildcard"" or "exact"".`)
 			m.fsc = fosite.HierarchicScopeStrategy
-		} else if strings.ToLower(m.c.ScopeStrategy()) == "exact" {
+		} else if strings.ToLower(m.C.ScopeStrategy()) == "exact" {
 			m.fsc = fosite.ExactScopeStrategy
 		} else {
 			m.fsc = fosite.WildcardScopeStrategy
 		}
-		m.fscPrev = m.c.ScopeStrategy()
+		m.fscPrev = m.C.ScopeStrategy()
 	}
 	return m.fsc
 }
 
 func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), key); err != nil {
-		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. This can happen if you forget to run "hydra migrate sql", set the wrong "secrets.system" or forget to set "secrets.system" entirely.`, key)
+		var netError net.Error
+		if errors.As(err, &netError) {
+			m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, key)
+			return
+		}
+
+		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql"..`, key)
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
@@ -361,14 +402,14 @@ func (m *RegistryBase) AudienceStrategy() fosite.AudienceMatchingStrategy {
 
 func (m *RegistryBase) ConsentHandler() *consent.Handler {
 	if m.coh == nil {
-		m.coh = consent.NewHandler(m.r, m.c)
+		m.coh = consent.NewHandler(m.r, m.C)
 	}
 	return m.coh
 }
 
 func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 	if m.oah == nil {
-		m.oah = oauth2.NewHandler(m.r, m.c)
+		m.oah = oauth2.NewHandler(m.r, m.C)
 	}
 	return m.oah
 }
@@ -376,30 +417,25 @@ func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectIdentifierAlgorithm {
 	if m.sia == nil {
 		m.sia = map[string]consent.SubjectIdentifierAlgorithm{}
-		for _, t := range m.c.SubjectTypesSupported() {
+		for _, t := range m.C.SubjectTypesSupported() {
 			switch t {
 			case "public":
 				m.sia["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
 			case "pairwise":
-				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.c.SubjectIdentifierAlgorithmSalt()))
+				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.C.SubjectIdentifierAlgorithmSalt()))
 			}
 		}
 	}
 	return m.sia
 }
 
-func (m *RegistryBase) Tracer() *tracing.Tracer {
+func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 	if m.trc == nil {
-		m.trc = &tracing.Tracer{
-			ServiceName:  m.c.TracingServiceName(),
-			JaegerConfig: m.c.TracingJaegerConfig(),
-			Provider:     m.c.TracingProvider(),
-			Logger:       m.Logger(),
-		}
-
-		if err := m.trc.Setup(); err != nil {
+		t, err := tracing.New(m.l, m.C.Tracing())
+		if err != nil {
 			m.Logger().WithError(err).Fatalf("Unable to initialize Tracer.")
 		}
+		m.trc = t
 	}
 
 	return m.trc
@@ -407,7 +443,25 @@ func (m *RegistryBase) Tracer() *tracing.Tracer {
 
 func (m *RegistryBase) PrometheusManager() *prometheus.MetricsManager {
 	if m.pmm == nil {
-		m.pmm = prometheus.NewMetricsManager(m.buildVersion, m.buildHash, m.buildDate)
+		m.pmm = prometheus.NewMetricsManager("hydra", m.buildVersion, m.buildHash, m.buildDate)
 	}
 	return m.pmm
+}
+
+func (m *RegistryBase) Persister() persistence.Persister {
+	return m.persister
+}
+
+func (m *RegistryBase) Config() *config.Provider {
+	return m.C
+}
+
+// WithOAuth2Provider forces an oauth2 provider which is only used for testing.
+func (m *RegistryBase) WithOAuth2Provider(f fosite.OAuth2Provider) {
+	m.fop = f
+}
+
+// WithConsentStrategy forces a consent strategy which is only used for testing.
+func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
+	m.cos = c
 }

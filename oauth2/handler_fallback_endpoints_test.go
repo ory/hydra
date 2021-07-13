@@ -28,9 +28,7 @@ import (
 
 	"github.com/ory/hydra/x"
 
-	"github.com/ory/viper"
-
-	"github.com/ory/hydra/driver/configuration"
+	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 
@@ -39,8 +37,8 @@ import (
 
 func TestHandlerConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	viper.Set(configuration.ViperKeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	reg := internal.NewRegistry(conf)
+	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	reg := internal.NewRegistryMemory(t, conf)
 
 	h := reg.OAuth2Handler()
 	r := x.NewRouterAdmin()

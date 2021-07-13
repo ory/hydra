@@ -69,7 +69,9 @@ type WellKnown struct {
 	// pairwise and public.
 	//
 	// required: true
-	// example: public, pairwise
+	// example:
+	//   - public
+	//   - pairwise
 	SubjectTypes []string `json:"subject_types_supported"`
 
 	// JSON array containing a list of the OAuth 2.0 response_type values that this OP supports. Dynamic OpenID
@@ -141,6 +143,23 @@ type WellKnown struct {
 
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint string `json:"end_session_endpoint"`
+
+	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
+	// which are described in Section 6.1 of OpenID Connect Core 1.0 [OpenID.Core]. These algorithms are used both when
+	// the Request Object is passed by value (using the request parameter) and when it is passed by reference
+	// (using the request_uri parameter).
+	RequestObjectSigningAlgValuesSupported []string `json:"request_object_signing_alg_values_supported"`
+
+	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
+	// by this authorization server.
+	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+}
+
+// swagger:parameters deleteOAuth2Token
+type swaggerDeleteOAuth2Token struct {
+	//required: true
+	// in: query
+	ClientID string `json:"client_id"`
 }
 
 // swagger:model flushInactiveOAuth2TokensRequest

@@ -851,7 +851,7 @@
           "plain/text"
         ],
         "tags": [
-          "admin"
+          "metadata"
         ],
         "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",

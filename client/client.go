@@ -200,6 +200,13 @@ type Client struct {
 	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
 }
 
+type ClientFilters struct {
+	Limit  int
+	Offset int
+	Owner  string
+	Name   string
+}
+
 func (Client) TableName() string {
 	return "hydra_client"
 }

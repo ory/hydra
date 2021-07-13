@@ -76,13 +76,21 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) error {
 	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
 }
 
-func (p *Persister) GetClients(ctx context.Context, limit, offset int) ([]client.Client, error) {
+func (p *Persister) GetClients(ctx context.Context, filters client.ClientFilters) ([]client.Client, error) {
 	cs := make([]client.Client, 0)
-	return cs, sqlcon.HandleError(
-		p.Connection(ctx).
-			Paginate(offset/limit+1, limit).
-			Order("id").
-			All(&cs))
+
+	query := p.Connection(ctx).
+		Paginate(filters.Offset/filters.Limit+1, filters.Limit).
+		Order("id")
+
+	if filters.Name != "" {
+		query.Where("client_name = ?", filters.Name)
+	}
+	if filters.Owner != "" {
+		query.Where("owner = ?", filters.Owner)
+	}
+
+	return cs, sqlcon.HandleError(query.All(&cs))
 }
 
 func (p *Persister) CountClients(ctx context.Context) (int, error) {

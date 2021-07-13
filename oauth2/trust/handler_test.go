@@ -3,6 +3,7 @@ package trust_test
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"github.com/ory/hydra/oauth2/trust"
 	"net/http"
 	"net/http/httptest"
 	"testing"

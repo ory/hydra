@@ -28,5 +28,5 @@ type SQLData struct {
 }
 
 func (SQLData) TableName() string {
-	return "hydra_oauth2_grant_jwk"
+	return "hydra_oauth2_trusted_jwt_bearer_issuer"
 }

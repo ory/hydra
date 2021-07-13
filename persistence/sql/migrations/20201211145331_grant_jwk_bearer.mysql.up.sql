@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS hydra_oauth2_grant_jwk
+CREATE TABLE IF NOT EXISTS hydra_oauth2_trusted_jwt_bearer_issuer
 (
     id         VARCHAR(36) PRIMARY KEY,
     issuer     VARCHAR(255)                        NOT NULL,

@@ -15,7 +15,7 @@
     "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\""
   },
   "devDependencies": {
-    "cypress": "^6.6.0",
+    "cypress": "^7.7.0",
     "ory-prettier-styles": "1.1.1",
     "prettier": "2.1.2",
     "standard": "^12.0.1",

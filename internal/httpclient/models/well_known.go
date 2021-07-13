@@ -41,6 +41,10 @@ type WellKnown struct {
 	// values for. Note that for privacy or other reasons, this might not be an exhaustive list.
 	ClaimsSupported []string `json:"claims_supported"`
 
+	// JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported
+	// by this authorization server.
+	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
+
 	// URL at the OP to which an RP can perform a redirect to request that the End-User be logged out at the OP.
 	EndSessionEndpoint string `json:"end_session_endpoint,omitempty"`
 

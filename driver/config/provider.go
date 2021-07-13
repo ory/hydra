@@ -64,6 +64,7 @@ const (
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
+	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 	KeyOAuth2GrantJWTClientAuthOptional          = "oauth2.grant.jwt.client_auth_optional"
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
@@ -132,6 +133,10 @@ func (p *Provider) WellKnownKeys(include ...string) []string {
 
 func (p *Provider) IsUsingJWTAsAccessTokens() bool {
 	return p.AccessTokenStrategy() != "opaque"
+}
+
+func (p *Provider) AllowedTopLevelClaims() []string {
+	return stringslice.Unique(p.p.Strings(KeyAllowedTopLevelClaims))
 }
 
 func (p *Provider) SubjectTypesSupported() []string {

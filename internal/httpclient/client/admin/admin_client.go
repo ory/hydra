@@ -1169,7 +1169,7 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth
 }
 
 /*
-  Prometheus gets snapshot metrics from the hydra service if you re using k8s you can then add annotations to your deployment like so
+  Prometheus gets snapshot metrics from the service if you re using k8s you can then add annotations to your deployment like so
 
   ```
 metadata:

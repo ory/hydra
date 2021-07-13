@@ -44,9 +44,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -75,15 +75,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -134,9 +134,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -176,21 +176,21 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "409": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -231,15 +231,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -285,9 +285,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -323,15 +323,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -377,237 +377,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      }
-    },
-    "/grants/jwt-bearer": {
-      "get": {
-        "description": "This endpoint returns list of jwt-bearer grants. Grant represents resource owner (RO) permission\nfor client to act on behalf of the RO. In this case client uses jwt to request access token to act as RO.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Fetch all jwt-bearer grants.",
-        "operationId": "getJwtBearerGrantList",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "If Optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned.",
-            "name": "issuer",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/JwtBearerGrant"
-              }
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "This endpoint is capable of creating a new jwt-bearer Grant, by doing this, we are granting permission for client to\nact on behalf of some resource owner.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Create a new jwt-bearer Grant.",
-        "operationId": "createJwtBearerGrant",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/createJwtBearerGrantParams"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "JwtBearerGrant",
-            "schema": {
-              "$ref": "#/definitions/JwtBearerGrant"
-            }
-          },
-          "400": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "409": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      }
-    },
-    "/grants/jwt-bearer/flush": {
-      "post": {
-        "description": "This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
-        "consumes": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Flush Expired jwt-bearer grants.",
-        "operationId": "flushInactiveJwtBearerGrants",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/flushInactiveJwtBearerGrantsParams"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      }
-    },
-    "/grants/jwt-bearer/{id}": {
-      "get": {
-        "description": "This endpoint returns jwt-bearer grant, identified by grant ID. Grant represents resource owner (RO) permission\nfor client to act on behalf of the RO. In this case client uses jwt to request access token to act as RO.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Fetch jwt-bearer grant information.",
-        "operationId": "getJwtBearerGrant",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The id of the desired grant",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "JwtBearerGrant",
-            "schema": {
-              "$ref": "#/definitions/JwtBearerGrant"
-            }
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "delete": {
-        "description": "This endpoint will delete jwt-bearer grant, identified by grant ID, so client won't be able to represent\nresource owner (which granted permission), using this grant anymore. All associated public keys with grant\nwill also be deleted.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Delete jwt-bearer grant.",
-        "operationId": "deleteJwtBearerGrant",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The id of the desired grant",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -632,9 +404,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -702,21 +474,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -762,21 +534,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -822,21 +594,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -872,21 +644,21 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -934,15 +706,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -995,21 +767,21 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1052,21 +824,21 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "403": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1081,7 +853,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get snapshot metrics from the Hydra service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
+        "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
           "200": {
@@ -1110,15 +882,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1158,9 +930,9 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "410": {
@@ -1170,9 +942,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1219,15 +991,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1274,15 +1046,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1322,15 +1094,15 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "410": {
@@ -1340,9 +1112,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1389,27 +1161,27 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1456,27 +1228,27 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1513,9 +1285,9 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "410": {
@@ -1525,9 +1297,9 @@
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1564,15 +1336,15 @@
             }
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1613,15 +1385,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "404": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1664,15 +1436,15 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1720,15 +1492,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1765,15 +1537,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1808,15 +1580,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1863,15 +1635,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -1913,15 +1685,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -2008,21 +1780,21 @@
             }
           },
           "400": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -2056,15 +1828,15 @@
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -2098,15 +1870,15 @@
             }
           },
           "401": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           },
           "500": {
-            "description": "genericError",
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -2252,69 +2024,6 @@
     "JoseJSONWebKeySet": {
       "type": "object"
     },
-    "JwtBearerGrant": {
-      "type": "object",
-      "properties": {
-        "created_at": {
-          "description": "The \"created_at\" indicates, when grant was created.",
-          "type": "string",
-          "format": "date-time"
-        },
-        "expires_at": {
-          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
-          "type": "string",
-          "format": "date-time"
-        },
-        "id": {
-          "type": "string",
-          "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
-        },
-        "issuer": {
-          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
-          "type": "string",
-          "example": "https://jwt-idp.example.com"
-        },
-        "public_key": {
-          "$ref": "#/definitions/JwtBearerGrantPublicKey"
-        },
-        "scope": {
-          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "example": [
-            "openid",
-            "offline"
-          ]
-        },
-        "subject": {
-          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
-          "type": "string",
-          "example": "mike@example.com"
-        }
-      }
-    },
-    "JwtBearerGrantPublicKey": {
-      "type": "object",
-      "properties": {
-        "kid": {
-          "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
-          "type": "string",
-          "example": "123e4567-e89b-12d3-a456-426655440000"
-        },
-        "set": {
-          "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
-          "type": "string",
-          "example": "https://jwt-idp.example.com"
-        }
-      }
-    },
-    "NullTime": {
-      "type": "string",
-      "format": "date-time",
-      "title": "NullTime implements sql.NullTime functionality."
-    },
     "PluginConfig": {
       "type": "object",
       "title": "PluginConfig The config of a plugin.",
@@ -2445,6 +2154,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2721,7 +2434,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "$ref": "#/definitions/nullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2831,7 +2544,7 @@
           "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "handled_at": {
-          "$ref": "#/definitions/NullTime"
+          "$ref": "#/definitions/nullTime"
         },
         "remember": {
           "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
@@ -2961,57 +2674,6 @@
         }
       }
     },
-    "createJwtBearerGrantParams": {
-      "type": "object",
-      "required": [
-        "issuer",
-        "subject",
-        "scope",
-        "jwk",
-        "expires_at"
-      ],
-      "properties": {
-        "expires_at": {
-          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
-          "type": "string",
-          "format": "date-time"
-        },
-        "issuer": {
-          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
-          "type": "string",
-          "example": "https://jwt-idp.example.com"
-        },
-        "jwk": {
-          "$ref": "#/definitions/JSONWebKey"
-        },
-        "scope": {
-          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "example": [
-            "openid",
-            "offline"
-          ]
-        },
-        "subject": {
-          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
-          "type": "string",
-          "example": "mike@example.com"
-        }
-      }
-    },
-    "flushInactiveJwtBearerGrantsParams": {
-      "type": "object",
-      "properties": {
-        "notAfter": {
-          "description": "The \"notAfter\" sets after which point grants should not be flushed. This is useful when you want to keep a history\nof recently added grants.",
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "flushInactiveOAuth2TokensRequest": {
       "type": "object",
       "properties": {
@@ -3019,37 +2681,6 @@
           "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "genericError": {
-      "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
-      "type": "object",
-      "title": "Error response",
-      "required": [
-        "error"
-      ],
-      "properties": {
-        "debug": {
-          "description": "Debug contains debug information. This is usually not available and has to be enabled.",
-          "type": "string",
-          "example": "The database adapter was unable to find the element"
-        },
-        "error": {
-          "description": "Name is the error name.",
-          "type": "string",
-          "example": "The requested resource could not be found"
-        },
-        "error_description": {
-          "description": "Description contains further information on the nature of the error.",
-          "type": "string",
-          "example": "Object with ID 12345 does not exist"
-        },
-        "status_code": {
-          "description": "Code represents the error status code (404, 403, 401, ...).",
-          "type": "integer",
-          "format": "int64",
-          "example": 404
         }
       }
     },
@@ -3071,6 +2702,34 @@
         "status": {
           "description": "Status always contains \"ok\".",
           "type": "string"
+        }
+      }
+    },
+    "jsonError": {
+      "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
+      "type": "object",
+      "title": "Generic Error Response",
+      "properties": {
+        "error": {
+          "description": "Name is the error name.",
+          "type": "string",
+          "example": "The requested resource could not be found"
+        },
+        "error_debug": {
+          "description": "Debug contains debug information. This is usually not available and has to be enabled.",
+          "type": "string",
+          "example": "The database adapter was unable to find the element"
+        },
+        "error_description": {
+          "description": "Description contains further information on the nature of the error.",
+          "type": "string",
+          "example": "Object with ID 12345 does not exist"
+        },
+        "status_code": {
+          "description": "Code represents the error status code (404, 403, 401, ...).",
+          "type": "integer",
+          "format": "int64",
+          "example": 404
         }
       }
     },
@@ -3171,6 +2830,11 @@
           "type": "string"
         }
       }
+    },
+    "nullTime": {
+      "type": "string",
+      "format": "date-time",
+      "title": "NullTime implements sql.NullTime functionality."
     },
     "oAuth2Client": {
       "type": "object",
@@ -3635,6 +3299,13 @@
         },
         "claims_supported": {
           "description": "JSON array containing a list of the Claim Names of the Claims that the OpenID Provider MAY be able to supply\nvalues for. Note that for privacy or other reasons, this might not be an exhaustive list.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "code_challenge_methods_supported": {
+          "description": "JSON array containing a list of Proof Key for Code Exchange (PKCE) [RFC7636] code challenge methods supported\nby this authorization server.",
           "type": "array",
           "items": {
             "type": "string"

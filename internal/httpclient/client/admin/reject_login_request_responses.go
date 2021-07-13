@@ -53,8 +53,9 @@ func (o *RejectLoginRequestReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -63,7 +64,7 @@ func NewRejectLoginRequestOK() *RejectLoginRequestOK {
 	return &RejectLoginRequestOK{}
 }
 
-/* RejectLoginRequestOK describes a response with status code 200, with default header values.
+/*RejectLoginRequestOK handles this case with default header values.
 
 completedRequest
 */
@@ -74,6 +75,7 @@ type RejectLoginRequestOK struct {
 func (o *RejectLoginRequestOK) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestOK  %+v", 200, o.Payload)
 }
+
 func (o *RejectLoginRequestOK) GetPayload() *models.CompletedRequest {
 	return o.Payload
 }
@@ -95,24 +97,25 @@ func NewRejectLoginRequestBadRequest() *RejectLoginRequestBadRequest {
 	return &RejectLoginRequestBadRequest{}
 }
 
-/* RejectLoginRequestBadRequest describes a response with status code 400, with default header values.
+/*RejectLoginRequestBadRequest handles this case with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestBadRequest struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestBadRequest) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestBadRequest  %+v", 400, o.Payload)
 }
-func (o *RejectLoginRequestBadRequest) GetPayload() *models.GenericError {
+
+func (o *RejectLoginRequestBadRequest) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -127,24 +130,25 @@ func NewRejectLoginRequestUnauthorized() *RejectLoginRequestUnauthorized {
 	return &RejectLoginRequestUnauthorized{}
 }
 
-/* RejectLoginRequestUnauthorized describes a response with status code 401, with default header values.
+/*RejectLoginRequestUnauthorized handles this case with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestUnauthorized  %+v", 401, o.Payload)
 }
-func (o *RejectLoginRequestUnauthorized) GetPayload() *models.GenericError {
+
+func (o *RejectLoginRequestUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -159,24 +163,25 @@ func NewRejectLoginRequestNotFound() *RejectLoginRequestNotFound {
 	return &RejectLoginRequestNotFound{}
 }
 
-/* RejectLoginRequestNotFound describes a response with status code 404, with default header values.
+/*RejectLoginRequestNotFound handles this case with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *RejectLoginRequestNotFound) GetPayload() *models.GenericError {
+
+func (o *RejectLoginRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -191,24 +196,25 @@ func NewRejectLoginRequestInternalServerError() *RejectLoginRequestInternalServe
 	return &RejectLoginRequestInternalServerError{}
 }
 
-/* RejectLoginRequestInternalServerError describes a response with status code 500, with default header values.
+/*RejectLoginRequestInternalServerError handles this case with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RejectLoginRequestInternalServerError) GetPayload() *models.GenericError {
+
+func (o *RejectLoginRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

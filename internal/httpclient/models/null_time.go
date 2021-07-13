@@ -16,7 +16,7 @@ import (
 
 // NullTime NullTime implements sql.NullTime functionality.
 //
-// swagger:model NullTime
+// swagger:model nullTime
 type NullTime strfmt.DateTime
 
 // UnmarshalJSON sets a NullTime value from JSON input

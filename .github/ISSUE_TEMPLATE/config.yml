@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: ORY Hydra Forum
+  - name: Ory Hydra Forum
     url: https://github.com/ory/hydra/discussions
     about: Please ask and answer questions here, show your implementations and discuss ideas.
-  - name: ORY Chat
+  - name: Ory Chat
     url: https://www.ory.sh/chat
-    about: Hang out with other ORY community members and ask and answer questions.
-  - name: ORY Support for Business
+    about: Hang out with other Ory community members and ask and answer questions.
+  - name: Ory Support for Business
     url: https://github.com/ory/open-source-support/blob/master/README.md
-    about: Buy professional support for ORY Hydra.
+    about: Buy professional support for Ory Hydra.

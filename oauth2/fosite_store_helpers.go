@@ -443,7 +443,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 			require.NoError(t, err)
 		}
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-time.Hour*24)))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-time.Hour*24), 100, 10))
 		_, err := m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
@@ -451,7 +451,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.NoError(t, err)
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2))))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2)), 100, 10))
 		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
@@ -459,7 +459,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now()))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now(), 100, 10))
 		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)

@@ -1,0 +1,8 @@
+{
+  "kty": "RSA",
+  "e": "AQAB",
+  "use": "sig",
+  "kid": "public:7a5ff76a-6766-11ea-bc55-0242ac130003S",
+  "alg": "RS256",
+  "n": "l80jJJqcc1PpefIGVIjuPvA1D7NscnuF9aQqLa7I9rDUK4IaSOO3kL_EF13k-jTzcA5q4OZn5dR0kmqIMZT2gQ"
+}

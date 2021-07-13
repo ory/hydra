@@ -329,10 +329,28 @@ func (m *SQLManager) DeleteClient(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *SQLManager) GetClients(ctx context.Context, limit, offset int) (clients []Client, err error) {
+func (m *SQLManager) GetClients(ctx context.Context, filters ClientFilters) (clients []Client, err error) {
 	d := make([]sqlData, 0)
 
-	if err := m.DB.SelectContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client ORDER BY id LIMIT ? OFFSET ?"), limit, offset); err != nil {
+	filterString := ""
+	var inputArgs []interface{}
+
+	if filters.Owner != "" {
+		filterString = appendWhere(filterString, "owner = ?", true)
+		inputArgs = append(inputArgs, filters.Owner)
+	}
+	if filters.Name != "" {
+		filterString = appendWhere(filterString, "client_name = ?", true)
+		inputArgs = append(inputArgs, filters.Name)
+	}
+
+	filterString += " ORDER BY ID LIMIT ? OFFSET ?"
+	inputArgs = append(inputArgs, filters.Limit)
+	inputArgs = append(inputArgs, filters.Offset)
+
+	filterString = m.DB.Rebind(filterString)
+
+	if err := m.DB.SelectContext(ctx, &d, m.DB.Rebind("SELECT * FROM hydra_client "+filterString), inputArgs...); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -357,4 +375,15 @@ func (m *SQLManager) CountClients(ctx context.Context) (int, error) {
 	}
 
 	return n, nil
+}
+
+func appendWhere(existing, new string, and bool) string {
+	if existing == "" {
+		existing = " WHERE "
+	} else if and {
+		existing = fmt.Sprintf("%s AND ", existing)
+	} else {
+		existing = fmt.Sprintf("%s OR ", existing)
+	}
+	return fmt.Sprintf(" %s %s ", existing, new)
 }

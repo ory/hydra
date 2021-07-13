@@ -93,7 +93,7 @@ func (s *FositeMemoryStore) DeleteClient(ctx context.Context, id string) error {
 }
 
 func (s *FositeMemoryStore) GetClients(ctx context.Context, limit, offset int) (map[string]client.Client, error) {
-	interim, err := s.r.ClientManager().GetClients(ctx, limit, offset)
+	interim, err := s.r.ClientManager().GetClients(ctx, client.ClientFilters{Limit: limit, Offset: offset})
 	if err != nil {
 		return nil, err
 	}

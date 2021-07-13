@@ -188,6 +188,13 @@ type Client struct {
 	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty"`
 }
 
+type ClientFilters struct {
+	Limit  int
+	Offset int
+	Owner  string
+	Name   string
+}
+
 func (c *Client) GetID() string {
 	return c.ClientID
 }

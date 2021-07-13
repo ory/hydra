@@ -112,7 +112,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 
 		assert.NoError(t, m.CreateClient(ctx, &Client{
 			ClientID:          "2-1234",
-			Name:              "name",
+			Name:              "name2",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
@@ -124,7 +124,7 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 
 		compare(t, c, d, k)
 
-		ds, err := m.GetClients(ctx, 100, 0)
+		ds, err := m.GetClients(ctx, ClientFilters{Limit: 100, Offset: 0})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
 		assert.NotEqual(t, ds[0].ClientID, ds[1].ClientID)
@@ -133,12 +133,29 @@ func TestHelperCreateGetDeleteClient(k string, m Storage) func(t *testing.T) {
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
 
-		ds, err = m.GetClients(ctx, 1, 0)
+		ds, err = m.GetClients(ctx, ClientFilters{Limit: 1, Offset: 0})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 1)
 
-		ds, err = m.GetClients(ctx, 100, 100)
+		ds, err = m.GetClients(ctx, ClientFilters{Limit: 100, Offset: 100})
 		assert.NoError(t, err)
+
+		// get by name
+		ds, err = m.GetClients(ctx, ClientFilters{Limit: 100, Offset: 0, Name: "name"})
+		assert.NoError(t, err)
+		assert.Len(t, ds, 1)
+		assert.Equal(t, ds[0].Name, "name")
+
+		// get by name not exist
+		ds, err = m.GetClients(ctx, ClientFilters{Limit: 100, Offset: 0, Name: "bad name"})
+		assert.NoError(t, err)
+		assert.Len(t, ds, 0)
+
+		// get by owner
+		ds, err = m.GetClients(ctx, ClientFilters{Limit: 100, Offset: 0, Owner: "aeneas"})
+		assert.NoError(t, err)
+		assert.Len(t, ds, 1)
+		assert.Equal(t, ds[0].Owner, "aeneas")
 
 		err = m.UpdateClient(ctx, &Client{
 			ClientID:          "2-1234",

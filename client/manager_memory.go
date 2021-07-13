@@ -142,13 +142,20 @@ func (m *MemoryManager) DeleteClient(ctx context.Context, id string) error {
 	return nil
 }
 
-func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clients []Client, err error) {
+func (m *MemoryManager) GetClients(ctx context.Context, filters ClientFilters) (clients []Client, err error) {
 	m.RLock()
 	defer m.RUnlock()
 
-	start, end := pagination.Index(limit, offset, len(m.Clients))
+	start, end := pagination.Index(filters.Limit, filters.Offset, len(m.Clients))
 	for _, c := range m.Clients[start:end] {
 		clients = append(clients, c)
+	}
+
+	if filters.Name != "" {
+		clients = filterByName(clients, filters.Name)
+	}
+	if filters.Owner != "" {
+		clients = filterByOwner(clients, filters.Owner)
 	}
 
 	return clients, nil
@@ -156,4 +163,24 @@ func (m *MemoryManager) GetClients(ctx context.Context, limit, offset int) (clie
 
 func (m *MemoryManager) CountClients(ctx context.Context) (n int, err error) {
 	return len(m.Clients), nil
+}
+
+func filterByName(clients []Client, name string) (filteredClients []Client) {
+	for _, c := range clients {
+		if c.Name == name {
+			filteredClients = append(filteredClients, c)
+		}
+	}
+
+	return filteredClients
+}
+
+func filterByOwner(clients []Client, owner string) (filteredClients []Client) {
+	for _, c := range clients {
+		if c.Owner == owner {
+			filteredClients = append(filteredClients, c)
+		}
+	}
+
+	return filteredClients
 }

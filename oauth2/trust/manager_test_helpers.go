@@ -18,7 +18,7 @@
  * @license 	Apache-2.0
  */
 
-package jwtbearer
+package trust
 
 import (
 	"context"

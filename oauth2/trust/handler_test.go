@@ -1,4 +1,4 @@
-package jwtbearer_test
+package trust_test
 
 import (
 	"crypto/rand"
@@ -17,7 +17,6 @@ import (
 	"github.com/ory/hydra/jwk"
 
 	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/grant/jwtbearer"
 	"github.com/ory/hydra/internal"
 	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/internal/httpclient/client/admin"
@@ -45,7 +44,7 @@ func (s *HandlerTestSuite) SetupSuite() {
 	s.registry = internal.NewRegistryMemory(s.T(), conf)
 
 	router := x.NewRouterAdmin()
-	handler := jwtbearer.NewHandler(s.registry)
+	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
 	jwkHandler := jwk.NewHandler(s.registry, conf)
 	jwkHandler.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {

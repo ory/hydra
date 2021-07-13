@@ -3,7 +3,7 @@ package driver
 import (
 	"context"
 
-	"github.com/ory/hydra/grant/jwtbearer"
+	"github.com/ory/hydra/oauth2/trust"
 
 	"github.com/pkg/errors"
 
@@ -45,7 +45,7 @@ type Registry interface {
 	client.Registry
 	consent.Registry
 	jwk.Registry
-	jwtbearer.Registry
+	trust.Registry
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider

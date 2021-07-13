@@ -9,17 +9,17 @@ import (
 	"github.com/gobuffalo/pop/v5"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/grant/jwtbearer"
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/sqlcon"
 )
 
-var _ jwtbearer.GrantManager = &Persister{}
+var _ trust.GrantManager = &Persister{}
 
 const scopeSeparator = " "
 
-func (p *Persister) CreateGrant(ctx context.Context, g jwtbearer.Grant, publicKey jose.JSONWebKey) error {
+func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) error {
 	// add key, if it doesn't exist
 	if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
 		if errorsx.Cause(err) != sqlcon.ErrNoRows {
@@ -36,10 +36,10 @@ func (p *Persister) CreateGrant(ctx context.Context, g jwtbearer.Grant, publicKe
 	return sqlcon.HandleError(p.Connection(ctx).Create(&data))
 }
 
-func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (jwtbearer.Grant, error) {
-	var data jwtbearer.SQLData
+func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Grant, error) {
+	var data trust.SQLData
 	if err := p.Connection(ctx).Where("id = ?", id).First(&data); err != nil {
-		return jwtbearer.Grant{}, sqlcon.HandleError(err)
+		return trust.Grant{}, sqlcon.HandleError(err)
 	}
 
 	return p.jwtGrantFromSQlData(data), nil
@@ -52,7 +52,7 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 	}
 
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.Connection(ctx).Destroy(&jwtbearer.SQLData{ID: grant.ID}); err != nil {
+		if err := p.Connection(ctx).Destroy(&trust.SQLData{ID: grant.ID}); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
@@ -60,8 +60,8 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 	})
 }
 
-func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]jwtbearer.Grant, error) {
-	grantsData := make([]jwtbearer.SQLData, 0)
+func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]trust.Grant, error) {
+	grantsData := make([]trust.SQLData, 0)
 
 	query := p.Connection(ctx).Paginate(offset/limit+1, limit).Order("id")
 	if optionalIssuer != "" {
@@ -72,7 +72,7 @@ func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIs
 		return nil, sqlcon.HandleError(err)
 	}
 
-	grants := make([]jwtbearer.Grant, 0, len(grantsData))
+	grants := make([]trust.Grant, 0, len(grantsData))
 	for _, data := range grantsData {
 		grants = append(grants, p.jwtGrantFromSQlData(data))
 	}
@@ -81,12 +81,12 @@ func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIs
 }
 
 func (p *Persister) CountGrants(ctx context.Context) (int, error) {
-	n, err := p.Connection(ctx).Count(&jwtbearer.SQLData{})
+	n, err := p.Connection(ctx).Count(&trust.SQLData{})
 	return n, sqlcon.HandleError(err)
 }
 
 func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (*jose.JSONWebKey, error) {
-	var data jwtbearer.SQLData
+	var data trust.SQLData
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ?", subject).
@@ -104,7 +104,7 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 }
 
 func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (*jose.JSONWebKeySet, error) {
-	grantsData := make([]jwtbearer.SQLData, 0)
+	grantsData := make([]trust.SQLData, 0)
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ?", subject)
@@ -134,7 +134,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 }
 
 func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) ([]string, error) {
-	var data jwtbearer.SQLData
+	var data trust.SQLData
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ?", subject).
@@ -159,8 +159,8 @@ func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time
 	return p.SetClientAssertionJWT(ctx, jti, exp)
 }
 
-func (p *Persister) sqlDataFromJWTGrant(g jwtbearer.Grant) jwtbearer.SQLData {
-	return jwtbearer.SQLData{
+func (p *Persister) sqlDataFromJWTGrant(g trust.Grant) trust.SQLData {
+	return trust.SQLData{
 		ID:        g.ID,
 		Issuer:    g.Issuer,
 		Subject:   g.Subject,
@@ -172,13 +172,13 @@ func (p *Persister) sqlDataFromJWTGrant(g jwtbearer.Grant) jwtbearer.SQLData {
 	}
 }
 
-func (p *Persister) jwtGrantFromSQlData(data jwtbearer.SQLData) jwtbearer.Grant {
-	return jwtbearer.Grant{
+func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
+	return trust.Grant{
 		ID:      data.ID,
 		Issuer:  data.Issuer,
 		Subject: data.Subject,
 		Scope:   strings.Split(data.Scope, scopeSeparator),
-		PublicKey: jwtbearer.PublicKey{
+		PublicKey: trust.PublicKey{
 			Set:   data.KeySet,
 			KeyID: data.KeyID,
 		},
@@ -189,7 +189,7 @@ func (p *Persister) jwtGrantFromSQlData(data jwtbearer.SQLData) jwtbearer.Grant 
 
 func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time) error {
 	return sqlcon.HandleError(p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ? AND expires_at < ?", jwtbearer.SQLData{}.TableName()),
+		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ? AND expires_at < ?", trust.SQLData{}.TableName()),
 		time.Now().UTC(),
 		notAfter,
 	).Exec())

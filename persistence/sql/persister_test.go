@@ -5,7 +5,7 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/ory/hydra/grant/jwtbearer"
+	"github.com/ory/hydra/oauth2/trust"
 
 	"github.com/stretchr/testify/require"
 
@@ -63,9 +63,9 @@ func TestManagers(t *testing.T) {
 			})
 		})
 
-		t.Run("package=grant/jwtbearer/manager="+k, func(t *testing.T) {
-			t.Run("case=create-get-delete", jwtbearer.TestHelperGrantManagerCreateGetDeleteGrant(m.GrantManager()))
-			t.Run("case=errors", jwtbearer.TestHelperGrantManagerErrors(m.GrantManager()))
+		t.Run("package=grant/trust/manager="+k, func(t *testing.T) {
+			t.Run("case=create-get-delete", trust.TestHelperGrantManagerCreateGetDeleteGrant(m.GrantManager()))
+			t.Run("case=errors", trust.TestHelperGrantManagerErrors(m.GrantManager()))
 		})
 	}
 }

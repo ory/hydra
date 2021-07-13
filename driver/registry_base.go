@@ -12,7 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/hydra/grant/jwtbearer"
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x/oauth2cors"
 
 	"github.com/ory/hydra/persistence"
@@ -47,8 +47,8 @@ type RegistryBase struct {
 	C            *config.Provider
 	ch           *client.Handler
 	fh           fosite.Hasher
-	jwtGrantH    *jwtbearer.Handler
-	jwtGrantV    *jwtbearer.GrantValidator
+	jwtGrantH    *trust.Handler
+	jwtGrantV    *trust.GrantValidator
 	kh           *jwk.Handler
 	cv           *client.Validator
 	hh           *healthx.Handler
@@ -190,16 +190,16 @@ func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	return m.kh
 }
 
-func (m *RegistryBase) JWTGrantHandler() *jwtbearer.Handler {
+func (m *RegistryBase) JWTGrantHandler() *trust.Handler {
 	if m.jwtGrantH == nil {
-		m.jwtGrantH = jwtbearer.NewHandler(m.r)
+		m.jwtGrantH = trust.NewHandler(m.r)
 	}
 	return m.jwtGrantH
 }
 
-func (m *RegistryBase) GrantValidator() *jwtbearer.GrantValidator {
+func (m *RegistryBase) GrantValidator() *trust.GrantValidator {
 	if m.jwtGrantV == nil {
-		m.jwtGrantV = jwtbearer.NewGrantValidator()
+		m.jwtGrantV = trust.NewGrantValidator()
 	}
 	return m.jwtGrantV
 }

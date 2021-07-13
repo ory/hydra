@@ -18,11 +18,11 @@
  * @license 	Apache-2.0
  */
 
-// Package jwtbearer implements jwt-bearer grant management capabilities
+// Package trust implements jwt-bearer grant management capabilities
 //
 // JWT-Bearer Grant represents resource owner (RO) permission for client to act on behalf of the RO using jwt.
 // Client uses jwt to request access token to act as RO.
-package jwtbearer
+package trust
 
 import (
 	"time"

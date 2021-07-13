@@ -33,7 +33,7 @@ import (
 
 	"github.com/ory/fosite/handler/rfc7523"
 
-	"github.com/ory/hydra/grant/jwtbearer"
+	"github.com/ory/hydra/oauth2/trust"
 
 	"github.com/ory/hydra/x"
 
@@ -713,12 +713,12 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			publicKey := keySet.Keys[1]
 			issuer := "token-service"
 			subject := "bob@example.com"
-			grant := jwtbearer.Grant{
+			grant := trust.Grant{
 				ID:        uuid.New(),
 				Issuer:    issuer,
 				Subject:   subject,
 				Scope:     []string{"openid", "offline"},
-				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
 				CreatedAt: time.Now().UTC().Round(time.Second),
 				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
@@ -764,12 +764,12 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			publicKey := keySet.Keys[1]
 			issuer := "maria"
 			subject := "maria@example.com"
-			grant := jwtbearer.Grant{
+			grant := trust.Grant{
 				ID:        uuid.New(),
 				Issuer:    issuer,
 				Subject:   subject,
 				Scope:     []string{"openid"},
-				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
 				CreatedAt: time.Now().UTC().Round(time.Second),
 				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
@@ -799,12 +799,12 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			publicKey := keySet.Keys[1]
 			issuer := "aeneas"
 			subject := "aeneas@example.com"
-			grant := jwtbearer.Grant{
+			grant := trust.Grant{
 				ID:        uuid.New(),
 				Issuer:    issuer,
 				Subject:   subject,
 				Scope:     []string{"openid", "offline"},
-				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
 				CreatedAt: time.Now().UTC().Round(time.Second),
 				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
@@ -835,12 +835,12 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			publicKey := keySet.Keys[1]
 			issuer := "vladimir"
 			subject := "vladimir@example.com"
-			grant := jwtbearer.Grant{
+			grant := trust.Grant{
 				ID:        uuid.New(),
 				Issuer:    issuer,
 				Subject:   subject,
 				Scope:     []string{"openid", "offline"},
-				PublicKey: jwtbearer.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
 				CreatedAt: time.Now().UTC().Round(time.Second),
 				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}

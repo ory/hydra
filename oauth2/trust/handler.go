@@ -1,4 +1,4 @@
-package jwtbearer
+package trust
 
 import (
 	"encoding/json"

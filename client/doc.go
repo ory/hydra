@@ -95,6 +95,14 @@ type swaggerListClientsParameter struct {
 	// The offset from where to start looking.
 	// in: query
 	Offset int `json:"offset"`
+
+	// The name of the clients to filter by.
+	// in: query
+	Name string `json:"name"`
+
+	// The owner of the clients to filter by.
+	// in: query
+	Owner string `json:"owner"`
 }
 
 // A list of clients.

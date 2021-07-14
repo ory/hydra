@@ -97,8 +97,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 //
 //     Responses:
 //       204: emptyResponse
-//       400: genericError
-//       500: genericError
+//       400: jsonError
+//       500: jsonError
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -149,8 +149,8 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: handledConsentRequestList
-//       400: genericError
-//       500: genericError
+//       400: jsonError
+//       500: jsonError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -209,8 +209,8 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       204: emptyResponse
-//       400: genericError
-//       500: genericError
+//       400: jsonError
+//       500: jsonError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -249,10 +249,10 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: loginRequest
-//       400: genericError
-//       404: genericError
+//       400: jsonError
+//       404: jsonError
 //       410: requestWasHandledResponse
-//       500: genericError
+//       500: jsonError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -308,10 +308,10 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //
 //     Responses:
 //       200: completedRequest
-//       400: genericError
-//       404: genericError
-//       401: genericError
-//       500: genericError
+//       400: jsonError
+//       404: jsonError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -400,10 +400,10 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: completedRequest
-//       400: genericError
-//       401: genericError
-//       404: genericError
-//       500: genericError
+//       400: jsonError
+//       401: jsonError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -476,9 +476,9 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: consentRequest
-//       404: genericError
+//       404: jsonError
 //       410: requestWasHandledResponse
-//       500: genericError
+//       500: jsonError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -544,8 +544,8 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //
 //     Responses:
 //       200: completedRequest
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -623,8 +623,8 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: completedRequest
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
@@ -689,8 +689,8 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: completedRequest
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -724,8 +724,8 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //
 //     Responses:
 //       204: emptyResponse
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
@@ -753,9 +753,9 @@ func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 //
 //     Responses:
 //       200: logoutRequest
-//       404: genericError
+//       404: jsonError
 //       410: requestWasHandledResponse
-//       500: genericError
+//       500: jsonError
 func (h *Handler) GetLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),

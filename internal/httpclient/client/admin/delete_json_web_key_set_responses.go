@@ -47,9 +47,8 @@ func (o *DeleteJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -58,9 +57,9 @@ func NewDeleteJSONWebKeySetNoContent() *DeleteJSONWebKeySetNoContent {
 	return &DeleteJSONWebKeySetNoContent{}
 }
 
-/*DeleteJSONWebKeySetNoContent handles this case with default header values.
+/* DeleteJSONWebKeySetNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteJSONWebKeySetNoContent struct {
@@ -80,25 +79,24 @@ func NewDeleteJSONWebKeySetUnauthorized() *DeleteJSONWebKeySetUnauthorized {
 	return &DeleteJSONWebKeySetUnauthorized{}
 }
 
-/*DeleteJSONWebKeySetUnauthorized handles this case with default header values.
+/* DeleteJSONWebKeySetUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type DeleteJSONWebKeySetUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}][%d] deleteJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *DeleteJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
+func (o *DeleteJSONWebKeySetUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteJSONWebKeySetUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -113,25 +111,24 @@ func NewDeleteJSONWebKeySetForbidden() *DeleteJSONWebKeySetForbidden {
 	return &DeleteJSONWebKeySetForbidden{}
 }
 
-/*DeleteJSONWebKeySetForbidden handles this case with default header values.
+/* DeleteJSONWebKeySetForbidden describes a response with status code 403, with default header values.
 
-genericError
+jsonError
 */
 type DeleteJSONWebKeySetForbidden struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}][%d] deleteJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
-
-func (o *DeleteJSONWebKeySetForbidden) GetPayload() *models.GenericError {
+func (o *DeleteJSONWebKeySetForbidden) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteJSONWebKeySetForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -146,25 +143,24 @@ func NewDeleteJSONWebKeySetInternalServerError() *DeleteJSONWebKeySetInternalSer
 	return &DeleteJSONWebKeySetInternalServerError{}
 }
 
-/*DeleteJSONWebKeySetInternalServerError handles this case with default header values.
+/* DeleteJSONWebKeySetInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type DeleteJSONWebKeySetInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /keys/{set}][%d] deleteJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *DeleteJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
+func (o *DeleteJSONWebKeySetInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteJSONWebKeySetInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

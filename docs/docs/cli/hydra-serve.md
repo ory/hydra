@@ -41,9 +41,7 @@ ORY Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 
-&gt;&gt;
-https://github.com/ory/hydra/blob/undefined/docs/docs/reference/config.md
-&lt;&lt;
+&gt;&gt; https://www.ory.sh/hydra/docs/reference/configuration &lt;&lt;
 
 ### Options
 

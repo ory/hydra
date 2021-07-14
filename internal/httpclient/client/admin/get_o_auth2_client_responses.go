@@ -41,9 +41,8 @@ func (o *GetOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewGetOAuth2ClientOK() *GetOAuth2ClientOK {
 	return &GetOAuth2ClientOK{}
 }
 
-/*GetOAuth2ClientOK handles this case with default header values.
+/* GetOAuth2ClientOK describes a response with status code 200, with default header values.
 
 oAuth2Client
 */
@@ -63,7 +62,6 @@ type GetOAuth2ClientOK struct {
 func (o *GetOAuth2ClientOK) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientOK  %+v", 200, o.Payload)
 }
-
 func (o *GetOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -85,25 +83,24 @@ func NewGetOAuth2ClientUnauthorized() *GetOAuth2ClientUnauthorized {
 	return &GetOAuth2ClientUnauthorized{}
 }
 
-/*GetOAuth2ClientUnauthorized handles this case with default header values.
+/* GetOAuth2ClientUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type GetOAuth2ClientUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetOAuth2ClientUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.GenericError {
+func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetOAuth2ClientUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -118,25 +115,24 @@ func NewGetOAuth2ClientInternalServerError() *GetOAuth2ClientInternalServerError
 	return &GetOAuth2ClientInternalServerError{}
 }
 
-/*GetOAuth2ClientInternalServerError handles this case with default header values.
+/* GetOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type GetOAuth2ClientInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *GetOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+func (o *GetOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -41,9 +41,8 @@ func (o *UserinfoReader) ReadResponse(response runtime.ClientResponse, consumer 
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewUserinfoOK() *UserinfoOK {
 	return &UserinfoOK{}
 }
 
-/*UserinfoOK handles this case with default header values.
+/* UserinfoOK describes a response with status code 200, with default header values.
 
 userinfoResponse
 */
@@ -63,7 +62,6 @@ type UserinfoOK struct {
 func (o *UserinfoOK) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoOK  %+v", 200, o.Payload)
 }
-
 func (o *UserinfoOK) GetPayload() *models.UserinfoResponse {
 	return o.Payload
 }
@@ -85,25 +83,24 @@ func NewUserinfoUnauthorized() *UserinfoUnauthorized {
 	return &UserinfoUnauthorized{}
 }
 
-/*UserinfoUnauthorized handles this case with default header values.
+/* UserinfoUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type UserinfoUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *UserinfoUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *UserinfoUnauthorized) GetPayload() *models.GenericError {
+func (o *UserinfoUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *UserinfoUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -118,25 +115,24 @@ func NewUserinfoInternalServerError() *UserinfoInternalServerError {
 	return &UserinfoInternalServerError{}
 }
 
-/*UserinfoInternalServerError handles this case with default header values.
+/* UserinfoInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type UserinfoInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *UserinfoInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /userinfo][%d] userinfoInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *UserinfoInternalServerError) GetPayload() *models.GenericError {
+func (o *UserinfoInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *UserinfoInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

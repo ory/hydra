@@ -86,7 +86,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       500: genericError
+//       500: jsonError
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
@@ -125,8 +125,8 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
@@ -158,9 +158,9 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -191,9 +191,9 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Responses:
 //       201: JSONWebKeySet
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keyRequest createRequest
 	var set = ps.ByName("set")
@@ -240,9 +240,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Responses:
 //       200: JSONWebKeySet
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keySet jose.JSONWebKeySet
 	var set = ps.ByName("set")
@@ -283,9 +283,9 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Responses:
 //       200: JSONWebKey
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var key jose.JSONWebKey
 	var set = ps.ByName("set")
@@ -326,9 +326,9 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
@@ -358,9 +358,9 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       403: genericError
-//       500: genericError
+//       401: jsonError
+//       403: jsonError
+//       500: jsonError
 func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")

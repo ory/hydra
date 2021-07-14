@@ -18,58 +18,73 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewAcceptConsentRequestParams creates a new AcceptConsentRequestParams object
-// with the default values initialized.
+// NewAcceptConsentRequestParams creates a new AcceptConsentRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewAcceptConsentRequestParams() *AcceptConsentRequestParams {
-	var ()
 	return &AcceptConsentRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewAcceptConsentRequestParamsWithTimeout creates a new AcceptConsentRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewAcceptConsentRequestParamsWithTimeout(timeout time.Duration) *AcceptConsentRequestParams {
-	var ()
 	return &AcceptConsentRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewAcceptConsentRequestParamsWithContext creates a new AcceptConsentRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewAcceptConsentRequestParamsWithContext(ctx context.Context) *AcceptConsentRequestParams {
-	var ()
 	return &AcceptConsentRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewAcceptConsentRequestParamsWithHTTPClient creates a new AcceptConsentRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewAcceptConsentRequestParamsWithHTTPClient(client *http.Client) *AcceptConsentRequestParams {
-	var ()
 	return &AcceptConsentRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*AcceptConsentRequestParams contains all the parameters to send to the API endpoint
-for the accept consent request operation typically these are written to a http.Request
+/* AcceptConsentRequestParams contains all the parameters to send to the API endpoint
+   for the accept consent request operation.
+
+   Typically these are written to a http.Request.
 */
 type AcceptConsentRequestParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.AcceptConsentRequest
-	/*ConsentChallenge*/
+
+	// ConsentChallenge.
 	ConsentChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the accept consent request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *AcceptConsentRequestParams) WithDefaults() *AcceptConsentRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the accept consent request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *AcceptConsentRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the accept consent request params
@@ -134,7 +149,6 @@ func (o *AcceptConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
@@ -145,6 +159,7 @@ func (o *AcceptConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg
 	qrConsentChallenge := o.ConsentChallenge
 	qConsentChallenge := qrConsentChallenge
 	if qConsentChallenge != "" {
+
 		if err := r.SetQueryParam("consent_challenge", qConsentChallenge); err != nil {
 			return err
 		}

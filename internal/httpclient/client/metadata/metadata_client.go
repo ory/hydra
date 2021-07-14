@@ -25,12 +25,9 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
-type ClientOption func(*runtime.ClientOperation)
-
 // ClientService is the interface for Client methods
 type ClientService interface {
-	Prometheus(params *PrometheusParams, opts ...ClientOption) (*PrometheusOK, error)
+	Prometheus(params *PrometheusParams) (*PrometheusOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -45,12 +42,13 @@ prometheus.io/port: "4434"
 prometheus.io/path: "/metrics/prometheus"
 ```
 */
-func (a *Client) Prometheus(params *PrometheusParams, opts ...ClientOption) (*PrometheusOK, error) {
+func (a *Client) Prometheus(params *PrometheusParams) (*PrometheusOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPrometheusParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "prometheus",
 		Method:             "GET",
 		PathPattern:        "/metrics/prometheus",
@@ -61,12 +59,7 @@ func (a *Client) Prometheus(params *PrometheusParams, opts ...ClientOption) (*Pr
 		Reader:             &PrometheusReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,6 @@ https://github.com/ory/meta/blob/master/templates/repository/common/CONTRIBUTING
 - [Documentation](#documentation)
 - [Disclosing vulnerabilities](#disclosing-vulnerabilities)
 - [Code Style](#code-style)
-- [Pull request procedure](#pull-request-procedure)
   - [Working with Forks](#working-with-forks)
 - [Conduct](#conduct)
 
@@ -133,18 +132,34 @@ the core team via a GitHub issue or [in our chat](https://www.ory.sh/chat)
 before getting started to ensure your work is consistent with Ory Hydra's
 roadmap and architecture.
 
-All contributions are made via pull request. Note that **all patches from all
-contributors get reviewed**. After a pull request is made other contributors
-will offer feedback, and if the patch passes review a maintainer will accept it
-with a comment. When pull requests fail testing, authors are expected to update
-their pull requests to address the failures until the tests pass and the pull
-request merges successfully. Look here for more info on the
-[Pull request procedure](#pull-request-procedure).
+All contributions are made via pull requests. To make a pull request, you will
+need a GitHub account; if you are unclear on this process, see GitHub's
+documentation on [forking](https://help.github.com/articles/fork-a-repo) and
+[pull requests](https://help.github.com/articles/using-pull-requests). Pull
+requests should be targeted at the `master` branch. Before creating a pull
+request, go through this checklist:
 
-At least one review from a maintainer is required for all patches (even patches
-from maintainers).
+1. Create a feature branch off of `master` so that changes do not get mixed up.
+1. [Rebase](http://git-scm.com/book/en/Git-Branching-Rebasing) your local
+   changes against the `master` branch.
+1. Run the full project test suite with the `go test -tags sqlite ./...` (or
+   equivalent) command and confirm that it passes.
+1. Run `make format` if a `Makefile` is available, `gofmt -s` if the project is
+   written in Go, `npm run format` if the project is written for NodeJS.
+1. Ensure that each commit has a descriptive prefix. This ensures a uniform
+   commit history and helps structure the changelog.  
+   Please refer to this
+   [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
+   for an overview.
+1. Sign-up with CircleCI so that it has access to your repository with the
+   branch containing your PR. Simply creating a CircleCI account is sufficient
+   for the CI jobs to run, you do not need to setup a CircleCI project for the
+   branch.
 
-Before your contributions can be merged you need to sign our
+If a pull request is not ready to be reviewed yet
+[it should be marked as a "Draft"](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request).
+
+Before your contributions can be reviewed you need to sign our
 [Contributor License Agreement](https://cla-assistant.io/ory/hydra).
 
 This agreement defines the terms under which your code is contributed to Ory.
@@ -153,9 +168,26 @@ us the rights to use your contribution. You can see the Apache 2.0 license under
 which our projects are published
 [here](https://github.com/ory/meta/blob/master/LICENSE).
 
-Reviewers should leave a "LGTM" comment once they are satisfied with the patch.
-If the patch was submitted by a maintainer with write access, the pull request
-should be merged by the submitter after review.
+When pull requests fail testing, authors are expected to update their pull
+requests to address the failures until the tests pass.
+
+Pull requests eligible for review
+
+1. follow the repository's code formatting conventions;
+2. include tests which prove that the change works as intended and does not add
+   regressions;
+3. document the changes in the code and/or the project's documentation;
+4. pass the CI pipeline;
+5. have signed our
+   [Contributor License Agreement](https://cla-assistant.io/ory/hydra);
+6. include a proper git commit message following the
+   [Conventional Commit Specification](https://www.conventionalcommits.org/en/v1.0.0/).
+
+If all of these items are checked, the pull request is ready to be reviewed and
+you should change the status to "Ready for review" and
+[request review from a maintainer](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review).
+
+Reviewers will approve the pull request once they are satisfied with the patch.
 
 ## Documentation
 
@@ -179,33 +211,6 @@ Please follow these guidelines when formatting source code:
 - Go code should match the output of `gofmt -s` and pass `golangci-lint run`.
 - NodeJS and JavaScript code should be prettified using `npm run format` where
   appropriate.
-
-## Pull request procedure
-
-To make a pull request, you will need a GitHub account; if you are unclear on
-this process, see GitHub's documentation on
-[forking](https://help.github.com/articles/fork-a-repo) and
-[pull requests](https://help.github.com/articles/using-pull-requests). Pull
-requests should be targeted at the `master` branch. Before creating a pull
-request, go through this checklist:
-
-1. Create a feature branch off of `master` so that changes do not get mixed up.
-1. [Rebase](http://git-scm.com/book/en/Git-Branching-Rebasing) your local
-   changes against the `master` branch.
-1. Run the full project test suite with the `go test ./...` (or equivalent)
-   command and confirm that it passes.
-1. Run `gofmt -s` (if the project is written in Go).
-1. Ensure that each commit has a descriptive prefix. This ensures a uniform
-   commit history and helps structure the changelog.  
-   Please refer to this
-   [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml).
-
-Pull requests will be treated as "review requests," and maintainers will give
-feedback on the style and substance of the patch.
-
-Normally, all pull requests must include tests that test your change.
-Occasionally, a change will be very difficult to test for. In those cases,
-please include a note in your commit message explaining why.
 
 ### Working with Forks
 

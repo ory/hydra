@@ -85,22 +85,22 @@ func NewGetOAuth2ClientUnauthorized() *GetOAuth2ClientUnauthorized {
 
 /* GetOAuth2ClientUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type GetOAuth2ClientUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetOAuth2ClientUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientUnauthorized  %+v", 401, o.Payload)
 }
-func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.GenericError {
+func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetOAuth2ClientUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -117,22 +117,22 @@ func NewGetOAuth2ClientInternalServerError() *GetOAuth2ClientInternalServerError
 
 /* GetOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type GetOAuth2ClientInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetOAuth2ClientInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientInternalServerError  %+v", 500, o.Payload)
 }
-func (o *GetOAuth2ClientInternalServerError) GetPayload() *models.GenericError {
+func (o *GetOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -91,22 +91,22 @@ func NewGetConsentRequestNotFound() *GetConsentRequestNotFound {
 
 /* GetConsentRequestNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type GetConsentRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetConsentRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *GetConsentRequestNotFound) GetPayload() *models.GenericError {
+func (o *GetConsentRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetConsentRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -155,22 +155,22 @@ func NewGetConsentRequestInternalServerError() *GetConsentRequestInternalServerE
 
 /* GetConsentRequestInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type GetConsentRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetConsentRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/consent][%d] getConsentRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *GetConsentRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *GetConsentRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetConsentRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

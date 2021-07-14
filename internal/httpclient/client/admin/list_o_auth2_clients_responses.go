@@ -77,22 +77,22 @@ func NewListOAuth2ClientsInternalServerError() *ListOAuth2ClientsInternalServerE
 
 /* ListOAuth2ClientsInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type ListOAuth2ClientsInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *ListOAuth2ClientsInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /clients][%d] listOAuth2ClientsInternalServerError  %+v", 500, o.Payload)
 }
-func (o *ListOAuth2ClientsInternalServerError) GetPayload() *models.GenericError {
+func (o *ListOAuth2ClientsInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *ListOAuth2ClientsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

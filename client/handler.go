@@ -92,9 +92,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 //
 //     Responses:
 //       201: oAuth2Client
-//       400: genericError
-//       409: genericError
-//       500: genericError
+//       400: jsonError
+//       409: jsonError
+//       500: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	c, err := h.create(w, r, h.r.ClientValidator().Validate)
 	if err != nil {
@@ -188,7 +188,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request, f func(*Client)
 //
 //     Responses:
 //       200: oAuth2Client
-//       500: genericError
+//       500: jsonError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
 
@@ -224,7 +224,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 //     Responses:
 //       200: oAuth2Client
-//       500: genericError
+//       500: jsonError
 func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	patchJSON, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -342,7 +342,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 //
 //     Responses:
 //       200: oAuth2ClientList
-//       500: genericError
+//       500: jsonError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 
@@ -390,8 +390,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //
 //     Responses:
 //       200: oAuth2Client
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -467,8 +467,8 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 //
 //     Responses:
 //       204: emptyResponse
-//       404: genericError
-//       500: genericError
+//       404: jsonError
+//       500: jsonError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 

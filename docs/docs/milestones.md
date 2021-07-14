@@ -7,6 +7,17 @@ title: Milestones and Roadmap
 
 _This milestone does not have a description._
 
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [ ] Space character in secret.system value
+      ([hydra#2609](https://github.com/ory/hydra/issues/2609)) -
+      [@Patrik](https://github.com/zepatrik),
+      [@Jakub Błaszczyk](https://github.com/Demonsthere)
+
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
 New feature or request.

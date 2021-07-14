@@ -97,22 +97,22 @@ func NewRejectLoginRequestBadRequest() *RejectLoginRequestBadRequest {
 
 /* RejectLoginRequestBadRequest describes a response with status code 400, with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestBadRequest struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestBadRequest) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestBadRequest  %+v", 400, o.Payload)
 }
-func (o *RejectLoginRequestBadRequest) GetPayload() *models.GenericError {
+func (o *RejectLoginRequestBadRequest) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -129,22 +129,22 @@ func NewRejectLoginRequestUnauthorized() *RejectLoginRequestUnauthorized {
 
 /* RejectLoginRequestUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestUnauthorized  %+v", 401, o.Payload)
 }
-func (o *RejectLoginRequestUnauthorized) GetPayload() *models.GenericError {
+func (o *RejectLoginRequestUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -161,22 +161,22 @@ func NewRejectLoginRequestNotFound() *RejectLoginRequestNotFound {
 
 /* RejectLoginRequestNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *RejectLoginRequestNotFound) GetPayload() *models.GenericError {
+func (o *RejectLoginRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -193,22 +193,22 @@ func NewRejectLoginRequestInternalServerError() *RejectLoginRequestInternalServe
 
 /* RejectLoginRequestInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type RejectLoginRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *RejectLoginRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/login/reject][%d] rejectLoginRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RejectLoginRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *RejectLoginRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *RejectLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

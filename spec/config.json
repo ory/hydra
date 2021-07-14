@@ -230,7 +230,7 @@
           ]
         },
         "cert": {
-          "description": "Configures the private key (pem encoded).",
+          "description": "Configures the public certificate (pem encoded).",
           "allOf": [
             {
               "$ref": "#/definitions/pem_file"

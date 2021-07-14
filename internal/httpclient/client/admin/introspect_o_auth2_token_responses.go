@@ -85,22 +85,22 @@ func NewIntrospectOAuth2TokenUnauthorized() *IntrospectOAuth2TokenUnauthorized {
 
 /* IntrospectOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type IntrospectOAuth2TokenUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *IntrospectOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -117,22 +117,22 @@ func NewIntrospectOAuth2TokenInternalServerError() *IntrospectOAuth2TokenInterna
 
 /* IntrospectOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type IntrospectOAuth2TokenInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *IntrospectOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

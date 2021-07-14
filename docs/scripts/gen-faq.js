@@ -4,7 +4,7 @@ const fs = require('fs')
 const yaml = require('js-yaml')
 const { Remarkable } = require('remarkable')
 const path = require('path')
-const yamlPath = path.resolve('./docs/faq.yaml')
+const yamlPath = path.resolve('./faq.yaml')
 const prettier = require('prettier')
 const prettierStyles = require('ory-prettier-styles')
 const config = require('../contrib/config.js')
@@ -62,7 +62,7 @@ faq.forEach((el) => {
 })
 
 fs.writeFileSync(
-  path.resolve('./docs/docs/faq.mdx'),
+  path.resolve('./docs/faq.mdx'),
   prettier.format(markdownPage, { ...prettierStyles, parser: 'mdx' })
 )
 
@@ -100,6 +100,6 @@ li.selected.${tag}~.question.${tag} {
 })
 
 fs.writeFileSync(
-  './docs/src/theme/faq.gen.module.css',
+  './src/theme/faq.gen.module.css',
   prettier.format(generatedCSS, { ...prettierStyles, parser: 'css' })
 )

@@ -47,9 +47,8 @@ func (o *GetJSONWebKeySetReader) ReadResponse(response runtime.ClientResponse, c
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -58,7 +57,7 @@ func NewGetJSONWebKeySetOK() *GetJSONWebKeySetOK {
 	return &GetJSONWebKeySetOK{}
 }
 
-/*GetJSONWebKeySetOK handles this case with default header values.
+/* GetJSONWebKeySetOK describes a response with status code 200, with default header values.
 
 JSONWebKeySet
 */
@@ -69,7 +68,6 @@ type GetJSONWebKeySetOK struct {
 func (o *GetJSONWebKeySetOK) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}][%d] getJsonWebKeySetOK  %+v", 200, o.Payload)
 }
-
 func (o *GetJSONWebKeySetOK) GetPayload() *models.JSONWebKeySet {
 	return o.Payload
 }
@@ -91,25 +89,24 @@ func NewGetJSONWebKeySetUnauthorized() *GetJSONWebKeySetUnauthorized {
 	return &GetJSONWebKeySetUnauthorized{}
 }
 
-/*GetJSONWebKeySetUnauthorized handles this case with default header values.
+/* GetJSONWebKeySetUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type GetJSONWebKeySetUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetJSONWebKeySetUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}][%d] getJsonWebKeySetUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *GetJSONWebKeySetUnauthorized) GetPayload() *models.GenericError {
+func (o *GetJSONWebKeySetUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetJSONWebKeySetUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -124,25 +121,24 @@ func NewGetJSONWebKeySetForbidden() *GetJSONWebKeySetForbidden {
 	return &GetJSONWebKeySetForbidden{}
 }
 
-/*GetJSONWebKeySetForbidden handles this case with default header values.
+/* GetJSONWebKeySetForbidden describes a response with status code 403, with default header values.
 
-genericError
+jsonError
 */
 type GetJSONWebKeySetForbidden struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetJSONWebKeySetForbidden) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}][%d] getJsonWebKeySetForbidden  %+v", 403, o.Payload)
 }
-
-func (o *GetJSONWebKeySetForbidden) GetPayload() *models.GenericError {
+func (o *GetJSONWebKeySetForbidden) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetJSONWebKeySetForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -157,25 +153,24 @@ func NewGetJSONWebKeySetInternalServerError() *GetJSONWebKeySetInternalServerErr
 	return &GetJSONWebKeySetInternalServerError{}
 }
 
-/*GetJSONWebKeySetInternalServerError handles this case with default header values.
+/* GetJSONWebKeySetInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type GetJSONWebKeySetInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *GetJSONWebKeySetInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /keys/{set}][%d] getJsonWebKeySetInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *GetJSONWebKeySetInternalServerError) GetPayload() *models.GenericError {
+func (o *GetJSONWebKeySetInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *GetJSONWebKeySetInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

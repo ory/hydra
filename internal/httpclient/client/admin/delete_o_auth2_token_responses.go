@@ -41,9 +41,8 @@ func (o *DeleteOAuth2TokenReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,9 +51,9 @@ func NewDeleteOAuth2TokenNoContent() *DeleteOAuth2TokenNoContent {
 	return &DeleteOAuth2TokenNoContent{}
 }
 
-/*DeleteOAuth2TokenNoContent handles this case with default header values.
+/* DeleteOAuth2TokenNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteOAuth2TokenNoContent struct {
@@ -74,25 +73,24 @@ func NewDeleteOAuth2TokenUnauthorized() *DeleteOAuth2TokenUnauthorized {
 	return &DeleteOAuth2TokenUnauthorized{}
 }
 
-/*DeleteOAuth2TokenUnauthorized handles this case with default header values.
+/* DeleteOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type DeleteOAuth2TokenUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+func (o *DeleteOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -107,25 +105,24 @@ func NewDeleteOAuth2TokenInternalServerError() *DeleteOAuth2TokenInternalServerE
 	return &DeleteOAuth2TokenInternalServerError{}
 }
 
-/*DeleteOAuth2TokenInternalServerError handles this case with default header values.
+/* DeleteOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type DeleteOAuth2TokenInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DeleteOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/tokens][%d] deleteOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *DeleteOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+func (o *DeleteOAuth2TokenInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DeleteOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

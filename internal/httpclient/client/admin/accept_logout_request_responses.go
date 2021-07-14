@@ -41,9 +41,8 @@ func (o *AcceptLogoutRequestReader) ReadResponse(response runtime.ClientResponse
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewAcceptLogoutRequestOK() *AcceptLogoutRequestOK {
 	return &AcceptLogoutRequestOK{}
 }
 
-/*AcceptLogoutRequestOK handles this case with default header values.
+/* AcceptLogoutRequestOK describes a response with status code 200, with default header values.
 
 completedRequest
 */
@@ -63,7 +62,6 @@ type AcceptLogoutRequestOK struct {
 func (o *AcceptLogoutRequestOK) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestOK  %+v", 200, o.Payload)
 }
-
 func (o *AcceptLogoutRequestOK) GetPayload() *models.CompletedRequest {
 	return o.Payload
 }
@@ -85,25 +83,24 @@ func NewAcceptLogoutRequestNotFound() *AcceptLogoutRequestNotFound {
 	return &AcceptLogoutRequestNotFound{}
 }
 
-/*AcceptLogoutRequestNotFound handles this case with default header values.
+/* AcceptLogoutRequestNotFound describes a response with status code 404, with default header values.
 
-genericError
+jsonError
 */
 type AcceptLogoutRequestNotFound struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *AcceptLogoutRequestNotFound) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestNotFound  %+v", 404, o.Payload)
 }
-
-func (o *AcceptLogoutRequestNotFound) GetPayload() *models.GenericError {
+func (o *AcceptLogoutRequestNotFound) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *AcceptLogoutRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -118,25 +115,24 @@ func NewAcceptLogoutRequestInternalServerError() *AcceptLogoutRequestInternalSer
 	return &AcceptLogoutRequestInternalServerError{}
 }
 
-/*AcceptLogoutRequestInternalServerError handles this case with default header values.
+/* AcceptLogoutRequestInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type AcceptLogoutRequestInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *AcceptLogoutRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /oauth2/auth/requests/logout/accept][%d] acceptLogoutRequestInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.GenericError {
+func (o *AcceptLogoutRequestInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *AcceptLogoutRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -24,8 +24,8 @@ package main
 //
 // Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
 //
-// swagger:model genericError
-type genericError struct {
+// swagger:model jsonError
+type jsonError struct {
 	// Name is the error name.
 	//
 	// example: The requested resource could not be found
@@ -44,7 +44,7 @@ type genericError struct {
 	// Debug contains debug information. This is usually not available and has to be enabled.
 	//
 	// example: The database adapter was unable to find the element
-	Debug string `json:"debug"`
+	Debug string `json:"error_debug"`
 }
 
 // Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is

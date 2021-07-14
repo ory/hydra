@@ -46,7 +46,7 @@ The following is a copy of the original
 [comment on GitHub](https://github.com/ory/hydra/pull/297#issuecomment-294282671):
 
 I took a long time for this issue, primarily because I felt very uncomfortable
-implementing it. The ROCP grant is something from the "dark ages" of OAuth2 and
+implementing it. The ROPC grant is something from the "dark ages" of OAuth2 and
 there are suitable replacements for mobile clients, such as public oauth2
 clients, which are supported by Hydra:
 https://tools.ietf.org/html/draft-ietf-oauth-native-apps-09

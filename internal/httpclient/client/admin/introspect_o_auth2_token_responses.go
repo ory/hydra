@@ -41,9 +41,8 @@ func (o *IntrospectOAuth2TokenReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewIntrospectOAuth2TokenOK() *IntrospectOAuth2TokenOK {
 	return &IntrospectOAuth2TokenOK{}
 }
 
-/*IntrospectOAuth2TokenOK handles this case with default header values.
+/* IntrospectOAuth2TokenOK describes a response with status code 200, with default header values.
 
 oAuth2TokenIntrospection
 */
@@ -63,7 +62,6 @@ type IntrospectOAuth2TokenOK struct {
 func (o *IntrospectOAuth2TokenOK) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenOK  %+v", 200, o.Payload)
 }
-
 func (o *IntrospectOAuth2TokenOK) GetPayload() *models.OAuth2TokenIntrospection {
 	return o.Payload
 }
@@ -85,25 +83,24 @@ func NewIntrospectOAuth2TokenUnauthorized() *IntrospectOAuth2TokenUnauthorized {
 	return &IntrospectOAuth2TokenUnauthorized{}
 }
 
-/*IntrospectOAuth2TokenUnauthorized handles this case with default header values.
+/* IntrospectOAuth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type IntrospectOAuth2TokenUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *IntrospectOAuth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.GenericError {
+func (o *IntrospectOAuth2TokenUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -118,25 +115,24 @@ func NewIntrospectOAuth2TokenInternalServerError() *IntrospectOAuth2TokenInterna
 	return &IntrospectOAuth2TokenInternalServerError{}
 }
 
-/*IntrospectOAuth2TokenInternalServerError handles this case with default header values.
+/* IntrospectOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type IntrospectOAuth2TokenInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *IntrospectOAuth2TokenInternalServerError) Error() string {
 	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.GenericError {
+func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *IntrospectOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

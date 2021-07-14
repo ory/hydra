@@ -35,9 +35,8 @@ func (o *IsInstanceAliveReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -46,7 +45,7 @@ func NewIsInstanceAliveOK() *IsInstanceAliveOK {
 	return &IsInstanceAliveOK{}
 }
 
-/*IsInstanceAliveOK handles this case with default header values.
+/* IsInstanceAliveOK describes a response with status code 200, with default header values.
 
 healthStatus
 */
@@ -57,7 +56,6 @@ type IsInstanceAliveOK struct {
 func (o *IsInstanceAliveOK) Error() string {
 	return fmt.Sprintf("[GET /health/alive][%d] isInstanceAliveOK  %+v", 200, o.Payload)
 }
-
 func (o *IsInstanceAliveOK) GetPayload() *models.HealthStatus {
 	return o.Payload
 }
@@ -79,25 +77,24 @@ func NewIsInstanceAliveInternalServerError() *IsInstanceAliveInternalServerError
 	return &IsInstanceAliveInternalServerError{}
 }
 
-/*IsInstanceAliveInternalServerError handles this case with default header values.
+/* IsInstanceAliveInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type IsInstanceAliveInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *IsInstanceAliveInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /health/alive][%d] isInstanceAliveInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *IsInstanceAliveInternalServerError) GetPayload() *models.GenericError {
+func (o *IsInstanceAliveInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *IsInstanceAliveInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

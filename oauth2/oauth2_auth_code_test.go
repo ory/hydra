@@ -339,7 +339,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 				WithBody(&models.AcceptLoginRequest{Subject: pointerx.String(""), Remember: true}))
 			require.Error(t, err) // expects 400
-			assert.Contains(t, err.(*admin.AcceptLoginRequestBadRequest).Payload.ErrorDescription, "Field 'subject' must not be empty", "%+v", *err.(*admin.AcceptLoginRequestBadRequest).Payload.Error)
+			assert.Contains(t, err.(*admin.AcceptLoginRequestBadRequest).Payload.ErrorDescription, "Field 'subject' must not be empty", "%+v", *err.(*admin.AcceptLoginRequestBadRequest).Payload)
 		}, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 

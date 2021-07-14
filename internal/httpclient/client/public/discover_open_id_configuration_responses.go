@@ -41,9 +41,8 @@ func (o *DiscoverOpenIDConfigurationReader) ReadResponse(response runtime.Client
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewDiscoverOpenIDConfigurationOK() *DiscoverOpenIDConfigurationOK {
 	return &DiscoverOpenIDConfigurationOK{}
 }
 
-/*DiscoverOpenIDConfigurationOK handles this case with default header values.
+/* DiscoverOpenIDConfigurationOK describes a response with status code 200, with default header values.
 
 wellKnown
 */
@@ -63,7 +62,6 @@ type DiscoverOpenIDConfigurationOK struct {
 func (o *DiscoverOpenIDConfigurationOK) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationOK  %+v", 200, o.Payload)
 }
-
 func (o *DiscoverOpenIDConfigurationOK) GetPayload() *models.WellKnown {
 	return o.Payload
 }
@@ -85,25 +83,24 @@ func NewDiscoverOpenIDConfigurationUnauthorized() *DiscoverOpenIDConfigurationUn
 	return &DiscoverOpenIDConfigurationUnauthorized{}
 }
 
-/*DiscoverOpenIDConfigurationUnauthorized handles this case with default header values.
+/* DiscoverOpenIDConfigurationUnauthorized describes a response with status code 401, with default header values.
 
-genericError
+jsonError
 */
 type DiscoverOpenIDConfigurationUnauthorized struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DiscoverOpenIDConfigurationUnauthorized) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationUnauthorized  %+v", 401, o.Payload)
 }
-
-func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.GenericError {
+func (o *DiscoverOpenIDConfigurationUnauthorized) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -118,25 +115,24 @@ func NewDiscoverOpenIDConfigurationInternalServerError() *DiscoverOpenIDConfigur
 	return &DiscoverOpenIDConfigurationInternalServerError{}
 }
 
-/*DiscoverOpenIDConfigurationInternalServerError handles this case with default header values.
+/* DiscoverOpenIDConfigurationInternalServerError describes a response with status code 500, with default header values.
 
-genericError
+jsonError
 */
 type DiscoverOpenIDConfigurationInternalServerError struct {
-	Payload *models.GenericError
+	Payload *models.JSONError
 }
 
 func (o *DiscoverOpenIDConfigurationInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationInternalServerError  %+v", 500, o.Payload)
 }
-
-func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.GenericError {
+func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
 func (o *DiscoverOpenIDConfigurationInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.GenericError)
+	o.Payload = new(models.JSONError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

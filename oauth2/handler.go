@@ -223,8 +223,8 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //
 //     Responses:
 //       200: wellKnown
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.Writer().Write(w, r, &WellKnown{
 		Issuer:                                 strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
@@ -279,8 +279,8 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: userinfoResponse
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
 	tokenType, ar, err := h.r.OAuth2Provider().IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
@@ -379,8 +379,8 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: emptyResponse
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -412,8 +412,8 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: oAuth2TokenIntrospection
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
 	var ctx = r.Context()
@@ -518,8 +518,8 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var fr FlushInactiveOAuth2TokensRequest
 	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
@@ -572,9 +572,9 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //
 //     Responses:
 //       200: oauth2TokenResponse
-//       401: genericError
-//       400: genericError
-//       500: genericError
+//       401: jsonError
+//       400: jsonError
+//       500: jsonError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
 	var ctx = r.Context()
@@ -661,8 +661,8 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 //
 //     Responses:
 //       302: emptyResponse
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -787,8 +787,8 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //
 //     Responses:
 //       204: emptyResponse
-//       401: genericError
-//       500: genericError
+//       401: jsonError
+//       500: jsonError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	client := r.URL.Query().Get("client_id")
 

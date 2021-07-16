@@ -7,6 +7,17 @@ title: Milestones and Roadmap
 
 _This milestone does not have a description._
 
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [ ] Space character in secret.system value
+      ([hydra#2609](https://github.com/ory/hydra/issues/2609)) -
+      [@Patrik](https://github.com/zepatrik),
+      [@Jakub Błaszczyk](https://github.com/Demonsthere)
+
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
 New feature or request.
@@ -53,6 +64,10 @@ Something is not working.
 - [x] CORS error with v1.9 on localhost
       ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] Invalid json response with get login request
+      ([hydra#2515](https://github.com/ory/hydra/issues/2515))
+- [x] Invalid TLS config after upgrading to 1.10.2
+      ([hydra#2518](https://github.com/ory/hydra/issues/2518))
 
 #### Pull Requests
 

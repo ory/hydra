@@ -373,11 +373,11 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 
 	// Select tokens' signatures with limit
 	q := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ?",
-			OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
+		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ? ORDER BY signature LIMIT %d",
+			OAuth2RequestSQL{Table: sqlTableAccess}.TableName(), limit),
 		notAfter,
 	)
-	if err := q.Limit(limit).Order("signature").All(&signatures); err == sql.ErrNoRows {
+	if err := q.All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
@@ -389,10 +389,12 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 			j = len(signatures)
 		}
 
-		err = p.Connection(ctx).RawQuery(
-			fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
-			signatures[i:j],
-		).Exec()
+		if i != j {
+			err = p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
+				signatures[i:j],
+			).Exec()
+		}
 	}
 	return sqlcon.HandleError(err)
 }
@@ -409,11 +411,11 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 
 	// Select tokens' signatures with limit
 	q := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ?",
-			OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
+		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ? ORDER BY signature LIMIT %d",
+			OAuth2RequestSQL{Table: sqlTableRefresh}.TableName(), limit),
 		notAfter,
 	)
-	if err := q.Limit(limit).Order("signature").All(&signatures); err == sql.ErrNoRows {
+	if err := q.All(&signatures); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
@@ -425,10 +427,12 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 			j = len(signatures)
 		}
 
-		err = p.Connection(ctx).RawQuery(
-			fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
-			signatures[i:j],
-		).Exec()
+		if i != j {
+			err = p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
+				signatures[i:j],
+			).Exec()
+		}
 	}
 	return sqlcon.HandleError(err)
 }

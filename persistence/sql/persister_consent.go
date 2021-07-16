@@ -463,6 +463,8 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
 	)
 	AND %[1]s.requested_at < ?
+	ORDER BY %[1]s.challenge
+	LIMIT %[3]d
 	`
 
 	// Select challenges from all consent requests that can be safely deleted with limit
@@ -471,9 +473,9 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_consent_request_handled has valid error (rejected)
 	// AND timed-out
 	// - hydra_oauth2_consent_request.requested_at < minimum between ttl.login_consent_request and notAfter
-	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&cr).TableName(), (&crh).TableName()), notAfter)
+	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&cr).TableName(), (&crh).TableName(), limit), notAfter)
 
-	if err := q.Limit(limit).Order("challenge").All(&challenges); err == sql.ErrNoRows {
+	if err := q.All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
@@ -484,13 +486,15 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 			j = len(challenges)
 		}
 
-		q := p.Connection(ctx).RawQuery(
-			fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&cr).TableName()),
-			challenges[i:j],
-		)
+		if i != j {
+			q := p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&cr).TableName()),
+				challenges[i:j],
+			)
 
-		if err := q.Exec(); err != nil {
-			return sqlcon.HandleError(err)
+			if err := q.Exec(); err != nil {
+				return sqlcon.HandleError(err)
+			}
 		}
 	}
 
@@ -500,9 +504,9 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_authentication_request_handled has valid error (rejected)
 	// AND timed-out
 	// - hydra_oauth2_authentication_request.requested_at < minimum between ttl.login_consent_request and notAfter
-	q = p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&lr).TableName(), (&lrh).TableName()), notAfter)
+	q = p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&lr).TableName(), (&lrh).TableName(), limit), notAfter)
 
-	if err := q.Limit(limit).Order("challenge").All(&challenges); err == sql.ErrNoRows {
+	if err := q.All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
@@ -513,13 +517,15 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 			j = len(challenges)
 		}
 
-		q := p.Connection(ctx).RawQuery(
-			fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
-			challenges[i:j],
-		)
+		if i != j {
+			q := p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
+				challenges[i:j],
+			)
 
-		if err := q.Exec(); err != nil {
-			return sqlcon.HandleError(err)
+			if err := q.Exec(); err != nil {
+				return sqlcon.HandleError(err)
+			}
 		}
 	}
 

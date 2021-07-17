@@ -22,6 +22,7 @@ require (
 	github.com/go-openapi/swag v0.19.13
 	github.com/go-openapi/validate v0.20.1
 	github.com/go-swagger/go-swagger v0.26.1
+	github.com/gobuffalo/packr v1.30.1 // indirect
 	github.com/gobuffalo/pop/v5 v5.3.4
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3

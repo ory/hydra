@@ -491,16 +491,14 @@ func testHelperFlushTokensWithLimitAndBatchSize(x InternalRegistry, limit int, b
 		}
 
 		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now(), limit, batchSize))
-		_, err := m.GetAccessTokenSession(ctx, requests[0].ID, ds)
-		require.Error(t, err)
-		_, err = m.GetAccessTokenSession(ctx, requests[1].ID, ds)
-		require.Error(t, err)
-		_, err = m.GetAccessTokenSession(ctx, requests[2].ID, ds)
-		require.Error(t, err)
-		_, err = m.GetAccessTokenSession(ctx, requests[3].ID, ds)
-		require.NoError(t, err)
-		_, err = m.GetAccessTokenSession(ctx, requests[4].ID, ds)
-		require.NoError(t, err)
+		for i := range requests {
+			_, err := m.GetAccessTokenSession(ctx, requests[i].ID, ds)
+			if i >= limit {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		}
 	}
 }
 

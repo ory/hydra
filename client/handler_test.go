@@ -21,7 +21,9 @@
 package client_test
 
 import (
+	"bytes"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -62,4 +64,144 @@ func TestValidateDynClientRegistrationAuthorizationBadBasicAuthKo(t *testing.T) 
 	hr.Header.Add("Authorization", "Basic Y2xpZW50OnNlY3JldA==")
 	err := h.ValidateDynClientRegistrationAuthorization(hr, c)
 	require.EqualValues(t, "The request could not be authorized", err.Error())
+}
+
+func TestCreateOk(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.Create(rr, req, nil)
+	require.EqualValues(t, http.StatusCreated, rr.Result().StatusCode)
+}
+
+func TestCreateDynamicRegistrationOk(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.CreateDynamicRegistration(rr, req, nil)
+	require.EqualValues(t, http.StatusCreated, rr.Result().StatusCode)
+}
+
+func TestUpdateKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.Update(rr, req, nil)
+	require.EqualValues(t, http.StatusNotFound, rr.Result().StatusCode)
+}
+
+func TestPatchKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.Patch(rr, req, nil)
+	require.EqualValues(t, http.StatusNotFound, rr.Result().StatusCode)
+}
+
+func TestUpdateDynamicRegistrationKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.UpdateDynamicRegistration(rr, req, nil)
+	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
+}
+
+func TestListOk(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.List(rr, req, nil)
+	require.EqualValues(t, http.StatusOK, rr.Result().StatusCode)
+}
+
+func TestGetKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.Get(rr, req, nil)
+	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
+}
+
+func TestGetDynamicRegistrationKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.GetDynamicRegistration(rr, req, nil)
+	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
+}
+
+func TestDeleteKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.Delete(rr, req, nil)
+	require.EqualValues(t, http.StatusNotFound, rr.Result().StatusCode)
+}
+
+func TestDeleteDynamicRegistrationKo(t *testing.T) {
+	u := "https://www.something.com"
+	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
+	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	rr := httptest.NewRecorder()
+	reg := internal.NewMockedRegistry(t)
+	h := client.NewHandler(reg)
+	h.DeleteDynamicRegistration(rr, req, nil)
+	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
 }

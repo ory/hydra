@@ -26,8 +26,9 @@ func (o *DisconnectUserReader) ReadResponse(response runtime.ClientResponse, con
 			return nil, err
 		}
 		return nil, result
+
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -36,9 +37,9 @@ func NewDisconnectUserFound() *DisconnectUserFound {
 	return &DisconnectUserFound{}
 }
 
-/* DisconnectUserFound describes a response with status code 302, with default header values.
+/*DisconnectUserFound handles this case with default header values.
 
- Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DisconnectUserFound struct {

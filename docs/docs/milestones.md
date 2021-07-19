@@ -13,7 +13,7 @@ Something is not working.
 
 #### Issues
 
-- [ ] Space character in secret.system value
+- [x] Space character in secret.system value
       ([hydra#2609](https://github.com/ory/hydra/issues/2609)) -
       [@Patrik](https://github.com/zepatrik),
       [@Jakub Błaszczyk](https://github.com/Demonsthere)

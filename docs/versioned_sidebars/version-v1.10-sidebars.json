@@ -16,6 +16,16 @@
               "href": "https://www.ory.sh/docs/"
             },
             {
+              "label": "Get Started",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/get-started"
+            },
+            {
+              "label": "Ory Open Source",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/open-source"
+            },
+            {
               "label": "Early Access",
               "type": "link",
               "href": "https://www.ory.sh/docs/early-access"
@@ -24,6 +34,38 @@
               "label": "Community",
               "type": "link",
               "href": "https://www.ory.sh/docs/ecosystem/community"
+            }
+          ]
+        },
+        {
+          "collapsed": true,
+          "type": "category",
+          "label": "Guides",
+          "items": [
+            {
+              "label": "Install and Use the Ory CLI",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/guides/ory-cli-install-use"
+            },
+            {
+              "label": "Integrate with NodeJS",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/guides/integrate-nodejs"
+            },
+            {
+              "label": "No-Code with Ory Proxy",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/guides/proxy"
+            },
+            {
+              "label": "Bring your own UI",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/guides/bring-your-user-interface"
+            },
+            {
+              "label": "Create And Use Personal Access Tokens",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/guides/create-personal-access-token"
             }
           ]
         },
@@ -62,18 +104,6 @@
         {
           "collapsed": true,
           "type": "category",
-          "label": "Guides",
-          "items": [
-            {
-              "label": "Bring your own UI",
-              "type": "link",
-              "href": "https://www.ory.sh/docs/guides/ui"
-            }
-          ]
-        },
-        {
-          "collapsed": true,
-          "type": "category",
           "label": "Further Reading",
           "items": [
             {
@@ -87,6 +117,11 @@
               "href": "https://www.ory.sh/docs/ecosystem/software-architecture-philosophy"
             }
           ]
+        },
+        {
+          "label": "HTTP API Documentation",
+          "type": "link",
+          "href": "https://www.ory.sh/docs/reference/api"
         },
         {
           "collapsed": true,
@@ -129,6 +164,11 @@
                   "href": "https://www.ory.sh/docs/cli/ory-proxy"
                 },
                 {
+                  "label": "ory proxy local",
+                  "type": "link",
+                  "href": "https://www.ory.sh/docs/cli/ory-proxy-local"
+                },
+                {
                   "label": "ory version",
                   "type": "link",
                   "href": "https://www.ory.sh/docs/cli/ory-version"
@@ -166,6 +206,11 @@
               "label": "Contributing",
               "type": "link",
               "href": "https://www.ory.sh/docs/ecosystem/contributing"
+            },
+            {
+              "label": "Software Quality Assurance",
+              "type": "link",
+              "href": "https://www.ory.sh/docs/ecosystem/sqa"
             },
             {
               "label": "Roadmap",
@@ -387,7 +432,7 @@
                   "href": "https://www.ory.sh/kratos/docs/next/guides/configuring-cookies"
                 },
                 {
-                  "label": "Getting URLs and Cookies to Work on Multi-Domains",
+                  "label": "Advanced Base URL, CSRF & Session Cookie Settings",
                   "type": "link",
                   "href": "https://www.ory.sh/kratos/docs/next/guides/multi-domain-cookies"
                 },
@@ -432,11 +477,31 @@
                   "href": "https://www.ory.sh/kratos/docs/next/guides/docker"
                 },
                 {
+                  "label": "Setting up HTTPS (TLS)",
+                  "type": "link",
+                  "href": "https://www.ory.sh/kratos/docs/next/guides/https-tls"
+                },
+                {
                   "label": "Setting up Argon2 Password Hashing Parameters",
                   "type": "link",
                   "href": "https://www.ory.sh/kratos/docs/next/guides/setting-up-password-hashing-parameters"
+                },
+                {
+                  "label": "Integration using Web-Hooks",
+                  "type": "link",
+                  "href": "https://www.ory.sh/kratos/docs/next/guides/integration-with-other-systems-using-web-hooks"
+                },
+                {
+                  "label": "Distributed Tracing",
+                  "type": "link",
+                  "href": "https://www.ory.sh/kratos/docs/next/guides/tracing"
                 }
               ]
+            },
+            {
+              "label": "HTTP API Documentation",
+              "type": "link",
+              "href": "https://www.ory.sh/kratos/docs/next/reference/api"
             },
             {
               "collapsed": true,
@@ -459,11 +524,6 @@
                   "href": "https://www.ory.sh/kratos/docs/next/reference/html-forms"
                 },
                 {
-                  "label": "REST API",
-                  "type": "link",
-                  "href": "https://www.ory.sh/kratos/docs/next/reference/api"
-                },
-                {
                   "collapsed": true,
                   "type": "category",
                   "label": "Command Line Interface (CLI)",
@@ -482,31 +542,6 @@
                       "label": "kratos courier watch",
                       "type": "link",
                       "href": "https://www.ory.sh/kratos/docs/next/cli/kratos-courier-watch"
-                    },
-                    {
-                      "label": "kratos hashers",
-                      "type": "link",
-                      "href": "https://www.ory.sh/kratos/docs/next/cli/kratos-hashers"
-                    },
-                    {
-                      "label": "kratos hashers argon2",
-                      "type": "link",
-                      "href": "https://www.ory.sh/kratos/docs/next/cli/kratos-hashers-argon2"
-                    },
-                    {
-                      "label": "kratos hashers argon2 calibrate",
-                      "type": "link",
-                      "href": "https://www.ory.sh/kratos/docs/next/cli/kratos-hashers-argon2-calibrate"
-                    },
-                    {
-                      "label": "kratos hashers argon2 hash",
-                      "type": "link",
-                      "href": "https://www.ory.sh/kratos/docs/next/cli/kratos-hashers-argon2-hash"
-                    },
-                    {
-                      "label": "kratos hashers argon2 load-test",
-                      "type": "link",
-                      "href": "https://www.ory.sh/kratos/docs/next/cli/kratos-hashers-argon2-load-test"
                     },
                     {
                       "label": "kratos identities",
@@ -1148,6 +1183,10 @@
               ]
             },
             {
+              "type": "doc",
+              "id": "version-v1.10/reference/api"
+            },
+            {
               "collapsed": true,
               "type": "category",
               "label": "Reference",
@@ -1155,10 +1194,6 @@
                 {
                   "type": "doc",
                   "id": "version-v1.10/reference/configuration"
-                },
-                {
-                  "type": "doc",
-                  "id": "version-v1.10/reference/api"
                 },
                 {
                   "collapsed": true,
@@ -1228,6 +1263,10 @@
                     {
                       "type": "doc",
                       "id": "version-v1.10/cli/hydra-keys-get"
+                    },
+                    {
+                      "type": "doc",
+                      "id": "version-v1.10/cli/hydra-keys-import"
                     },
                     {
                       "type": "doc",
@@ -1459,6 +1498,11 @@
               ]
             },
             {
+              "label": "HTTP API Documentation",
+              "type": "link",
+              "href": "https://www.ory.sh/oathkeeper/docs/next/reference/api"
+            },
+            {
               "collapsed": true,
               "type": "category",
               "label": "Reference",
@@ -1467,11 +1511,6 @@
                   "label": "Configuration",
                   "type": "link",
                   "href": "https://www.ory.sh/oathkeeper/docs/next/reference/configuration"
-                },
-                {
-                  "label": "REST API",
-                  "type": "link",
-                  "href": "https://www.ory.sh/oathkeeper/docs/next/reference/api"
                 }
               ]
             },

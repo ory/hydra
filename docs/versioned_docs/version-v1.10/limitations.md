@@ -35,7 +35,7 @@ For more information on this topic we recommend reading:
 - https://security.stackexchange.com/questions/39849/does-bcrypt-have-a-maximum-password-length
 - https://security.stackexchange.com/questions/6623/pre-hash-password-before-applying-bcrypt-to-avoid-restricting-password-length
 
-## Resource Owner Password Credentials Grant Type (ROCP)
+## Resource Owner Password Credentials Grant Type (ROPC)
 
 ORY Hydra does not and will not implement the Resource Owner Password
 Credentials Grant Type. Read on for context.
@@ -80,7 +80,7 @@ first-party apps. If you plan on doing this, stop right now and read
 
 ### Legacy & Bad Security
 
-The ROCP grant type is discouraged by developers, professionals, and the IETF
+The ROPC grant type is discouraged by developers, professionals, and the IETF
 itself. It was originally added because big legacy corporations (not dropping
 any names, but they are part of the IETF consortium) did not want to migrate
 their authentication infrastructure to the modern web but instead do what

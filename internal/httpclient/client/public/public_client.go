@@ -25,120 +25,25 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
-// ClientOption is the option for Client methods
-type ClientOption func(*runtime.ClientOperation)
-
 // ClientService is the interface for Client methods
 type ClientService interface {
-	CreateOAuth2ClientPublic(params *CreateOAuth2ClientPublicParams, opts ...ClientOption) (*CreateOAuth2ClientPublicCreated, error)
+	DisconnectUser(params *DisconnectUserParams) error
 
-	DeleteOAuth2ClientPublic(params *DeleteOAuth2ClientPublicParams, opts ...ClientOption) (*DeleteOAuth2ClientPublicNoContent, error)
+	DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams) (*DiscoverOpenIDConfigurationOK, error)
 
-	DisconnectUser(params *DisconnectUserParams, opts ...ClientOption) error
+	IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceReadyOK, error)
 
-	DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams, opts ...ClientOption) (*DiscoverOpenIDConfigurationOK, error)
+	Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*Oauth2TokenOK, error)
 
-	GetOAuth2ClientPublic(params *GetOAuth2ClientPublicParams, opts ...ClientOption) (*GetOAuth2ClientPublicOK, error)
+	OauthAuth(params *OauthAuthParams) error
 
-	IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOption) (*IsInstanceReadyOK, error)
+	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*RevokeOAuth2TokenOK, error)
 
-	Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Oauth2TokenOK, error)
+	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error)
 
-	OauthAuth(params *OauthAuthParams, opts ...ClientOption) error
-
-	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error)
-
-	UpdateOAuth2ClientPublic(params *UpdateOAuth2ClientPublicParams, opts ...ClientOption) (*UpdateOAuth2ClientPublicOK, error)
-
-	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UserinfoOK, error)
-
-	WellKnown(params *WellKnownParams, opts ...ClientOption) (*WellKnownOK, error)
+	WellKnown(params *WellKnownParams) (*WellKnownOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
-}
-
-/*
-  CreateOAuth2ClientPublic creates an o auth 2 0 client
-
-  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.
-*/
-func (a *Client) CreateOAuth2ClientPublic(params *CreateOAuth2ClientPublicParams, opts ...ClientOption) (*CreateOAuth2ClientPublicCreated, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewCreateOAuth2ClientPublicParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "createOAuth2ClientPublic",
-		Method:             "POST",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &CreateOAuth2ClientPublicReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*CreateOAuth2ClientPublicCreated)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for createOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  DeleteOAuth2ClientPublic deletes an o auth 2 0 client
-
-  Delete an existing OAuth 2.0 Client by its ID.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
-*/
-func (a *Client) DeleteOAuth2ClientPublic(params *DeleteOAuth2ClientPublicParams, opts ...ClientOption) (*DeleteOAuth2ClientPublicNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewDeleteOAuth2ClientPublicParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "deleteOAuth2ClientPublic",
-		Method:             "DELETE",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &DeleteOAuth2ClientPublicReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*DeleteOAuth2ClientPublicNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
 }
 
 /*
@@ -149,12 +54,13 @@ func (a *Client) DeleteOAuth2ClientPublic(params *DeleteOAuth2ClientPublicParams
 https://openid.net/specs/openid-connect-frontchannel-1_0.html
 https://openid.net/specs/openid-connect-backchannel-1_0.html
 */
-func (a *Client) DisconnectUser(params *DisconnectUserParams, opts ...ClientOption) error {
+func (a *Client) DisconnectUser(params *DisconnectUserParams) error {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDisconnectUserParams()
 	}
-	op := &runtime.ClientOperation{
+
+	_, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "disconnectUser",
 		Method:             "GET",
 		PathPattern:        "/oauth2/sessions/logout",
@@ -165,12 +71,7 @@ func (a *Client) DisconnectUser(params *DisconnectUserParams, opts ...ClientOpti
 		Reader:             &DisconnectUserReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	_, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return err
 	}
@@ -187,12 +88,13 @@ flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
 Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 For a full list of clients go here: https://openid.net/developers/certified/
 */
-func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams, opts ...ClientOption) (*DiscoverOpenIDConfigurationOK, error) {
+func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams) (*DiscoverOpenIDConfigurationOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDiscoverOpenIDConfigurationParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "discoverOpenIDConfiguration",
 		Method:             "GET",
 		PathPattern:        "/.well-known/openid-configuration",
@@ -203,12 +105,7 @@ func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfiguration
 		Reader:             &DiscoverOpenIDConfigurationReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -219,48 +116,6 @@ func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfiguration
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for discoverOpenIDConfiguration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetOAuth2ClientPublic gets an o auth 2 0 client
-
-  Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
-*/
-func (a *Client) GetOAuth2ClientPublic(params *GetOAuth2ClientPublicParams, opts ...ClientOption) (*GetOAuth2ClientPublicOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetOAuth2ClientPublicParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getOAuth2ClientPublic",
-		Method:             "GET",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &GetOAuth2ClientPublicReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetOAuth2ClientPublicOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -276,12 +131,13 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 Be aware that if you are running multiple nodes of this service, the health status will never
 refer to the cluster state, only to a single instance.
 */
-func (a *Client) IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOption) (*IsInstanceReadyOK, error) {
+func (a *Client) IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceReadyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewIsInstanceReadyParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "isInstanceReady",
 		Method:             "GET",
 		PathPattern:        "/health/ready",
@@ -292,12 +148,7 @@ func (a *Client) IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOp
 		Reader:             &IsInstanceReadyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -323,12 +174,13 @@ request entity-body.
 >
 > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
 */
-func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Oauth2TokenOK, error) {
+func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*Oauth2TokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewOauth2TokenParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "oauth2Token",
 		Method:             "POST",
 		PathPattern:        "/oauth2/token",
@@ -340,12 +192,7 @@ func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientA
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -367,12 +214,13 @@ OAuth2 is a very popular protocol and a library for your programming language wi
 
 To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 */
-func (a *Client) OauthAuth(params *OauthAuthParams, opts ...ClientOption) error {
+func (a *Client) OauthAuth(params *OauthAuthParams) error {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewOauthAuthParams()
 	}
-	op := &runtime.ClientOperation{
+
+	_, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "oauthAuth",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth",
@@ -383,12 +231,7 @@ func (a *Client) OauthAuth(params *OauthAuthParams, opts ...ClientOption) error 
 		Reader:             &OauthAuthReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	_, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return err
 	}
@@ -403,12 +246,13 @@ longer be used to make access requests, and a revoked refresh token can no longe
 Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
 the client the token was generated for.
 */
-func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error) {
+func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*RevokeOAuth2TokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRevokeOAuth2TokenParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "revokeOAuth2Token",
 		Method:             "POST",
 		PathPattern:        "/oauth2/revoke",
@@ -420,12 +264,7 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -436,48 +275,6 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for revokeOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  UpdateOAuth2ClientPublic updates an o auth 2 0 client
-
-  Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
-*/
-func (a *Client) UpdateOAuth2ClientPublic(params *UpdateOAuth2ClientPublicParams, opts ...ClientOption) (*UpdateOAuth2ClientPublicOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUpdateOAuth2ClientPublicParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "updateOAuth2ClientPublic",
-		Method:             "PUT",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &UpdateOAuth2ClientPublicReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*UpdateOAuth2ClientPublicOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for updateOAuth2ClientPublic: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -493,12 +290,13 @@ In the case of authentication error, a WWW-Authenticate header might be set in t
 with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 for more details about header format.
 */
-func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UserinfoOK, error) {
+func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUserinfoParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "userinfo",
 		Method:             "GET",
 		PathPattern:        "/userinfo",
@@ -510,12 +308,7 @@ func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInf
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -536,12 +329,13 @@ func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInf
 if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
 [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 */
-func (a *Client) WellKnown(params *WellKnownParams, opts ...ClientOption) (*WellKnownOK, error) {
+func (a *Client) WellKnown(params *WellKnownParams) (*WellKnownOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewWellKnownParams()
 	}
-	op := &runtime.ClientOperation{
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
 		ID:                 "wellKnown",
 		Method:             "GET",
 		PathPattern:        "/.well-known/jwks.json",
@@ -552,12 +346,7 @@ func (a *Client) WellKnown(params *WellKnownParams, opts ...ClientOption) (*Well
 		Reader:             &WellKnownReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
+	})
 	if err != nil {
 		return nil, err
 	}

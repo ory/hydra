@@ -385,157 +385,6 @@
         }
       }
     },
-    "/connect/register": {
-      "get": {
-        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Get an OAuth 2.0 Client.",
-        "operationId": "getOAuth2ClientPublic",
-        "responses": {
-          "200": {
-            "description": "oAuth2Client",
-            "schema": {
-              "$ref": "#/definitions/oAuth2Client"
-            }
-          },
-          "401": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "put": {
-        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Update an OAuth 2.0 Client",
-        "operationId": "updateOAuth2ClientPublic",
-        "responses": {
-          "200": {
-            "description": "oAuth2Client",
-            "schema": {
-              "$ref": "#/definitions/oAuth2Client"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Create an OAuth 2.0 Client",
-        "operationId": "createOAuth2ClientPublic",
-        "responses": {
-          "201": {
-            "description": "oAuth2Client",
-            "schema": {
-              "$ref": "#/definitions/oAuth2Client"
-            }
-          },
-          "400": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "409": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "delete": {
-        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Deletes an OAuth 2.0 Client",
-        "operationId": "deleteOAuth2ClientPublic",
-        "responses": {
-          "204": {
-            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      }
-    },
     "/health/alive": {
       "get": {
         "description": "This endpoint returns a 200 status code when the HTTP server is up running.\nThis status does currently not include checks whether the database connection is working.\n\nIf the service supports TLS Edge Termination, this endpoint does not require the\n`X-Forwarded-Proto` header to be set.\n\nBe aware that if you are running multiple nodes of this service, the health status will never\nrefer to the cluster state, only to a single instance.",
@@ -2305,6 +2154,10 @@
         "Types"
       ],
       "properties": {
+        "ProtocolScheme": {
+          "description": "Protocol to use for clients connecting to the plugin.",
+          "type": "string"
+        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2828,50 +2681,6 @@
           "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
           "format": "date-time"
-        }
-      }
-    },
-    "genericError": {
-      "type": "object",
-      "required": [
-        "message"
-      ],
-      "properties": {
-        "code": {
-          "description": "The status code",
-          "type": "integer",
-          "format": "int64",
-          "example": 404
-        },
-        "debug": {
-          "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-          "type": "string",
-          "example": "SQL field \"foo\" is not a bool."
-        },
-        "details": {
-          "description": "Further error details",
-          "type": "object",
-          "additionalProperties": true
-        },
-        "message": {
-          "description": "Error message\n\nThe error's message.",
-          "type": "string",
-          "example": "The resource could not be found"
-        },
-        "reason": {
-          "description": "A human-readable reason for the error",
-          "type": "string",
-          "example": "User with ID 1234 does not exist."
-        },
-        "request": {
-          "description": "The request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
-          "type": "string",
-          "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6"
-        },
-        "status": {
-          "description": "The status description",
-          "type": "string",
-          "example": "Not Found"
         }
       }
     },

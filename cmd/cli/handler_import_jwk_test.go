@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"gopkg.in/square/go-jose.v2"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -50,5 +51,42 @@ func Test_toImportJSONWebKey(t *testing.T) {
 	NewHandler().Keys.ImportKeys(&cmd, []string{"import-2", "../test/private_key.json", "../test/public_key.json"})
 	v, _ = m.GetKeySet(context.TODO(), "import-2")
 	assert.NotEmpty(t, v)
+
+}
+
+func Test_toUpdateKeyList(t *testing.T) {
+
+	dummyPEM := []byte(`
+		-----BEGIN PUBLIC KEY-----
+		1MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPf64dykufSkwnvUiBAwd5Si0K6t4m5i
+		qJD8TmLJCmFjKaOUa6nszcFt/FkAuORfdlrD9mEZLPrPx74RSluyTBMCAwEAAQ==
+		-----END PUBLIC KEY-----
+	`)
+
+	anotherPEM := []byte(`
+		-----BEGIN PUBLIC KEY-----
+		2MFwwDAQYJKoZIhvcNAQEBBQADSwAwSAJBAPf64dykufSkwnvUiBAwd5Si0K6t4m5i
+		qJD8TmLJCmFjKaOUa6nszcFt/FkAuORfdlrD9mEZLPrPx74RSluyTBMCAwEAAQ==
+		-----END PUBLIC KEY-----
+	`)
+
+	var set jose.JSONWebKeySet
+	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(dummyPEM, "static-sid", "sig") )
+	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(dummyPEM, "another-sid", "sig") )
+	assert.Equal(t, len(set.Keys),2)
+
+	//overriding static-sid key with publicAnotherPEM
+	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(anotherPEM, "static-sid", "sig") )
+	assert.Equal(t, len(set.Keys),2)
+
+	key := set.Key("static-sid")[0]
+	verifyKey := toSDKFriendlyJSONWebKey(anotherPEM, "static-sid", "sig")
+	assert.Equal(t, key,verifyKey)
+
+	//adding a third key with different sid
+	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(anotherPEM, "different-sid", "sig") )
+	assert.Equal(t, len(set.Keys),3)
+
+
 
 }

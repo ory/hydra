@@ -10,6 +10,8 @@ replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+in
 
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
+replace github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
+
 require (
 	github.com/DataDog/datadog-go v4.6.0+incompatible // indirect
 	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
@@ -65,7 +67,6 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cobra v1.1.3
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0

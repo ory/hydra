@@ -76,7 +76,7 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) error {
 	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
 }
 
-func (p *Persister) GetClients(ctx context.Context, filters client.ClientFilters) ([]client.Client, error) {
+func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]client.Client, error) {
 	cs := make([]client.Client, 0)
 
 	query := p.Connection(ctx).

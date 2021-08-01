@@ -10,7 +10,7 @@
     "gen": "npm-run-all gen:*",
     "docusaurus": "docusaurus",
     "gen:api": "mkdir -p docs/.static && cp ../spec/api.json docs/.static/api.json",
-    "gen:config": "node ./scripts/config.js",
+    "gen:config": "node ./scripts/config.js config.js",
     "gen:faq": "node ./scripts/gen-faq.js",
     "start": "docusaurus start",
     "build": "docusaurus build",

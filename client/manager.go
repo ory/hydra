@@ -41,7 +41,7 @@ type Storage interface {
 
 	DeleteClient(ctx context.Context, id string) error
 
-	GetClients(ctx context.Context, limit, offset int) ([]Client, error)
+	GetClients(ctx context.Context, filters Filter) ([]Client, error)
 
 	CountClients(ctx context.Context) (int, error)
 

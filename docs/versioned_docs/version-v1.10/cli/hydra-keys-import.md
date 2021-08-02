@@ -28,17 +28,19 @@ Please be aware that importing a private key does not automatically import its
 public key as well.
 
 Examples: hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json hydra
-keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
+keys import my-set ./path/to/rsa.key ./path/to/rsa.pub --default-key-id
+cae6b214-fb1e-4ebc-9019-95286a62eabc
 
 ```
-hydra keys import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]
+hydra keys import &lt;set&gt; &lt;file-1&gt; [&lt;file-2&gt; [&lt;file-3 [&lt;...&gt;]]] [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help         help for import
-      --use string   Sets the "use" value of the JSON Web Key if not "use" value was defined by the key itself (default "sig")
+      --default-key-id string   A fallback value for keys without &#34;kid&#34; attribute to be stored with a common &#34;kid&#34;, e.g. private/public keypairs
+  -h, --help                    help for import
+      --use string              Sets the &#34;use&#34; value of the JSON Web Key if not &#34;use&#34; value was defined by the key itself (default &#34;sig&#34;)
 ```
 
 ### Options inherited from parent commands
@@ -47,7 +49,7 @@ hydra keys import <set> <file-1> [<file-2> [<file-3 [<...>]]] [flags]
       --access-token string    Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN
       --endpoint string        Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL
       --fail-after duration    Stop retrying after the specified duration (default 1m0s)
-      --fake-tls-termination   fake tls termination by adding "X-Forwarded-Proto: https" to http headers
+      --fake-tls-termination   fake tls termination by adding &#34;X-Forwarded-Proto: https&#34; to http headers
       --skip-tls-verify        Foolishly accept TLS certificates signed by unknown certificate authorities
 ```
 

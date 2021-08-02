@@ -699,7 +699,7 @@
       "get": {
         "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4434\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
         "produces": ["plain/text"],
-        "tags": ["admin"],
+        "tags": ["metadata"],
         "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
@@ -2145,7 +2145,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
           "type": "string"
         },
         "Status": {

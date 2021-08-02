@@ -28,7 +28,8 @@ Please be aware that importing a private key does not automatically import its
 public key as well.
 
 Examples: hydra keys import my-set ./path/to/jwk.json ./path/to/jwk-2.json hydra
-keys import my-set ./path/to/rsa.key ./path/to/rsa.pub
+keys import my-set ./path/to/rsa.key ./path/to/rsa.pub --default-key-id
+cae6b214-fb1e-4ebc-9019-95286a62eabc
 
 ```
 hydra clients import &lt;set&gt; &lt;file-1&gt; [&lt;file-2&gt; [&lt;file-3 [&lt;...&gt;]]] [flags]
@@ -37,8 +38,9 @@ hydra clients import &lt;set&gt; &lt;file-1&gt; [&lt;file-2&gt; [&lt;file-3 [&lt
 ### Options
 
 ```
-  -h, --help         help for import
-      --use string   Sets the &#34;use&#34; value of the JSON Web Key if not &#34;use&#34; value was defined by the key itself (default &#34;sig&#34;)
+      --default-key-id string   A fallback value for keys without &#34;kid&#34; attribute to be stored with a common &#34;kid&#34;, e.g. private/public keypairs
+  -h, --help                    help for import
+      --use string              Sets the &#34;use&#34; value of the JSON Web Key if not &#34;use&#34; value was defined by the key itself (default &#34;sig&#34;)
 ```
 
 ### Options inherited from parent commands

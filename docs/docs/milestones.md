@@ -13,8 +13,10 @@ Something is not working.
 
 #### Issues
 
-- [ ] Space character in secret.system value
-      ([hydra#2609](https://github.com/ory/hydra/issues/2609))
+- [x] Space character in secret.system value
+      ([hydra#2609](https://github.com/ory/hydra/issues/2609)) -
+      [@Patrik](https://github.com/zepatrik),
+      [@Jakub Błaszczyk](https://github.com/Demonsthere)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -198,6 +200,8 @@ Something is not working.
 - [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
       response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
       [@hackerman](https://github.com/aeneasr)
+- [ ] Jaeger being unavailable is a fatal error that stops service from starting
+      ([hydra#2642](https://github.com/ory/hydra/issues/2642))
 - [x] Introspection Response: `access_token` and `refresh_token` are not valid
       `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 - [x] RSA key generation is slow on ARM

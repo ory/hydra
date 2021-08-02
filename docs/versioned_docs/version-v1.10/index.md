@@ -20,17 +20,17 @@ registration), a particular template engine, or a predefined front-end.
 This allows you to implement user management and login your way, in your
 technology stack, with authentication mechanisms required by your use case
 (token-based 2FA, SMS 2FA, etc). You can of course use existing solutions like
-[authboss](https://github.com/go-authboss/authboss). It provides you all the benefits of OAuth 2.0
-and OpenID Connect while being minimally invasive to your business logic and
-technology stack.
+[authboss](https://github.com/go-authboss/authboss). It provides you all the
+benefits of OAuth 2.0 and OpenID Connect while being minimally invasive to your
+business logic and technology stack.
 
 ## OpenID Certified
 
 ORY Hydra is a
-[Certified OpenID Connect Provider Server](https://openid.net/developers/certified/) and
-implements all the requirements stated by the OpenID Foundation. In particular,
-it correctly implements the various OAuth 2.0 and OpenID Connect flows specified
-by the IETF and OpenID Foundation.
+[Certified OpenID Connect Provider Server](https://openid.net/developers/certified/)
+and implements all the requirements stated by the OpenID Foundation. In
+particular, it correctly implements the various OAuth 2.0 and OpenID Connect
+flows specified by the IETF and OpenID Foundation.
 
 ## Cryptographic Key Storage
 
@@ -93,6 +93,7 @@ If you only need a library or SDKs that implements OAuth 2.0, take a look at
 [fosite](https://github.com/ory/fosite) or
 [node-oauth2-server](https://github.com/oauthjs/node-oauth2-server).
 
-If you need a fully featured identity solution including user management
-and user interfaces, those exist in the cloud as [Ory](https://console.ory.sh) or when self-hosting as
-[Keycloak](https://www.keycloak.org) or [Ory Kratos](https://github.com/ory/kratos/) among others.
+If you need a fully featured identity solution including user management and
+user interfaces, those exist in the cloud as [Ory](https://console.ory.sh) or
+when self-hosting as [Keycloak](https://www.keycloak.org) or
+[Ory Kratos](https://github.com/ory/kratos/) among others.

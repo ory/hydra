@@ -10,6 +10,7 @@ replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+in
 
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
+replace github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
 replace github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 
 require (
@@ -53,7 +54,6 @@ require (
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
-	github.com/sqs/goreturns v0.0.0-20181028201513-538ac6014518 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.7.1
 	github.com/toqueteos/webbrowser v1.2.0

@@ -86,6 +86,8 @@ const resolveRefs = (node) => {
 
 const result = resolveRefs(base)
 
+const docs = [...resolveRefs({ $slug: 'docs' }), ...result]
+
 module.exports = {
-  docs: resolveRefs(result)
+  docs
 }

@@ -86,17 +86,6 @@ type patchDocument struct {
 	From string `json:"from"`
 }
 
-// swagger:parameters listOAuth2Clients
-type swaggerListClientsParameter struct {
-	// The maximum amount of policies returned, upper bound is 500 policies
-	// in: query
-	Limit int `json:"limit"`
-
-	// The offset from where to start looking.
-	// in: query
-	Offset int `json:"offset"`
-}
-
 // A list of clients.
 // swagger:response oAuth2ClientList
 type swaggerListClientsResult struct {

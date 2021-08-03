@@ -221,6 +221,25 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 	return nil
 }
 
+// swagger:parameters listOAuth2Clients
+type Filter struct {
+	// The maximum amount of clients to returned, upper bound is 500 clients.
+	// in: query
+	Limit int `json:"limit"`
+
+	// The offset from where to start looking.
+	// in: query
+	Offset int `json:"offset"`
+
+	// The name of the clients to filter by.
+	// in: query
+	Name string `json:"name"`
+
+	// The owner of the clients to filter by.
+	// in: query
+	Owner string `json:"owner"`
+}
+
 // swagger:route GET /clients admin listOAuth2Clients
 //
 // List OAuth 2.0 Clients
@@ -244,8 +263,14 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 //       500: jsonError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
+	filters := Filter{
+		Limit:  limit,
+		Offset: offset,
+		Name:   r.URL.Query().Get("client_name"),
+		Owner:  r.URL.Query().Get("owner"),
+	}
 
-	c, err := h.r.ClientManager().GetClients(r.Context(), limit, offset)
+	c, err := h.r.ClientManager().GetClients(r.Context(), filters)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

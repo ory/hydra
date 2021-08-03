@@ -75,18 +75,19 @@ func TestIder(t *testing.T) {
 func TestHandlerFindPublicKey(t *testing.T) {
 	var testRSGenerator = RS256Generator{}
 	var testECDSAGenerator = ECDSA256Generator{}
+
 	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
 		RSIDKS, _ := testRSGenerator.Generate("test-id-1", "sig")
-		kesys, err := FindPublicKey(RSIDKS)
+		keys, err := FindPublicKey(RSIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, kesys.KeyID, Ider("public", "test-id-1"))
+		assert.Equal(t, keys.KeyID, Ider("public", "test-id-1"))
 
 	})
 	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {
 		ECDSAIDKS, _ := testECDSAGenerator.Generate("test-id-2", "sig")
-		kesys, err := FindPublicKey(ECDSAIDKS)
+		keys, err := FindPublicKey(ECDSAIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, kesys.KeyID, Ider("public", "test-id-2"))
+		assert.Equal(t, keys.KeyID, Ider("public", "test-id-2"))
 
 	})
 }

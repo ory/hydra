@@ -18,7 +18,8 @@ Clean the database of old tokens and login/consent requests
 ### Synopsis
 
 This command will cleanup any expired oauth2 tokens as well as login/consent
-requests.
+requests. This will select records to delete with a limit and delete records in
+batch to ensure that no table locking issues arise in big production databases.
 
 ### Warning
 
@@ -69,6 +70,8 @@ hydra janitor [&lt;database-url&gt;] [flags]
   -c, --config strings                      Path to one or more .json, .yaml, .yml, .toml config files. Values are loaded in the order provided, meaning that the last config file overwrites values from the previous config file.
       --consent-request-lifespan duration   Set the login/consent request lifespan e.g. 1s, 1m, 1h
   -h, --help                                help for janitor
+      --limit                               Limits the number of records retrieved from database for deletion. This is optional and default value is 10000 records. This value should be bigger than your database grow rate, this being calculated in the time interval between two consecutive janitor runs.
+      --batch-size                          Define how many records are deleted with each iteration. This is optional and default value is 100 records. This value must be smaller than the limit value.
       --keep-if-younger duration            Keep database records that are younger than a specified duration e.g. 1s, 1m, 1h.
   -e, --read-from-env                       If set, reads the database connection string from the environment variable DSN or config file key dsn.
       --refresh-lifespan duration           Set the refresh token lifespan e.g. 1s, 1m, 1h.

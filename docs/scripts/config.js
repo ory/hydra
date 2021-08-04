@@ -7,6 +7,25 @@ const path = require('path')
 const fs = require('fs')
 const prettier = require('prettier')
 const prettierStyles = require('ory-prettier-styles')
+const { execSync } = require('child_process')
+const fetch = require('node-fetch')
+
+const oryXVersion = execSync(
+  "cd ..; go list -f '{{.Module.Version}}' -find github.com/ory/x"
+)
+  .toString('utf-8')
+  .trim()
+
+const refs = {
+  'ory://tracing-config': `https://raw.githubusercontent.com/ory/x/${oryXVersion}/tracing/config.schema.json`,
+  'ory://logging-config': `https://raw.githubusercontent.com/ory/x/${oryXVersion}/logrusx/config.schema.json`
+}
+
+const oryResolver = {
+  order: 1,
+  canRead: /^ory:/i,
+  read: ({ url }) => fetch(refs[url]).then((res) => res.json())
+}
 
 jsf.option({
   alwaysFakeOptionals: true,
@@ -124,6 +143,11 @@ const enhance =
 new Promise((resolve, reject) => {
   parser.dereference(
     require(path.resolve(config.updateConfig.src)),
+    {
+      resolve: {
+        ory: oryResolver
+      }
+    },
     (err, result) => (err ? reject(err) : resolve(result))
   )
 })

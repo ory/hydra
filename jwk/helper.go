@@ -22,12 +22,12 @@ package jwk
 
 import (
 	"context"
-	"crypto/dsa"
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+
 	"golang.org/x/crypto/ed25519"
 
 	"github.com/ory/x/errorsx"
@@ -139,20 +139,18 @@ func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 }
 
 func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
-	i := 0
+	keys := new(jose.JSONWebKeySet)
+
 	for _, k := range set.Keys {
 		_, ecdsaOk := k.Key.(*ecdsa.PublicKey)
-		_, dsaOK := k.Key.(*dsa.PublicKey)
 		_, ed25519OK := k.Key.(*ed25519.PublicKey)
 		_, rsaOK := k.Key.(*rsa.PublicKey)
 
-		if ecdsaOk || dsaOK || ed25519OK || rsaOK {
-			set.Keys[i] = k
-			i++
+		if ecdsaOk || ed25519OK || rsaOK {
+			keys.Keys = append(keys.Keys, k)
 		}
 	}
-	set.Keys = set.Keys[:i]
-	return set
+	return keys
 }
 
 func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeySet, error) {

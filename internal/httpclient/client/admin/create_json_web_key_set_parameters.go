@@ -18,61 +18,76 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewCreateJSONWebKeySetParams creates a new CreateJSONWebKeySetParams object
-// with the default values initialized.
+// NewCreateJSONWebKeySetParams creates a new CreateJSONWebKeySetParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewCreateJSONWebKeySetParams() *CreateJSONWebKeySetParams {
-	var ()
 	return &CreateJSONWebKeySetParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewCreateJSONWebKeySetParamsWithTimeout creates a new CreateJSONWebKeySetParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewCreateJSONWebKeySetParamsWithTimeout(timeout time.Duration) *CreateJSONWebKeySetParams {
-	var ()
 	return &CreateJSONWebKeySetParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewCreateJSONWebKeySetParamsWithContext creates a new CreateJSONWebKeySetParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewCreateJSONWebKeySetParamsWithContext(ctx context.Context) *CreateJSONWebKeySetParams {
-	var ()
 	return &CreateJSONWebKeySetParams{
-
 		Context: ctx,
 	}
 }
 
 // NewCreateJSONWebKeySetParamsWithHTTPClient creates a new CreateJSONWebKeySetParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewCreateJSONWebKeySetParamsWithHTTPClient(client *http.Client) *CreateJSONWebKeySetParams {
-	var ()
 	return &CreateJSONWebKeySetParams{
 		HTTPClient: client,
 	}
 }
 
-/*CreateJSONWebKeySetParams contains all the parameters to send to the API endpoint
-for the create Json web key set operation typically these are written to a http.Request
+/* CreateJSONWebKeySetParams contains all the parameters to send to the API endpoint
+   for the create Json web key set operation.
+
+   Typically these are written to a http.Request.
 */
 type CreateJSONWebKeySetParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.JSONWebKeySetGeneratorRequest
-	/*Set
-	  The set
 
+	/* Set.
+
+	   The set
 	*/
 	Set string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the create Json web key set params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *CreateJSONWebKeySetParams) WithDefaults() *CreateJSONWebKeySetParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the create Json web key set params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *CreateJSONWebKeySetParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the create Json web key set params
@@ -137,7 +152,6 @@ func (o *CreateJSONWebKeySetParams) WriteToRequest(r runtime.ClientRequest, reg 
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

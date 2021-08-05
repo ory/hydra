@@ -75,7 +75,7 @@ func Test_toUpdateKeyList(t *testing.T) {
 	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(dummyPEM, "another-sid", "sig") )
 	assert.Equal(t, len(set.Keys),2)
 
-	//overriding static-sid key with publicAnotherPEM
+	//overriding static-sid key with anotherPEM
 	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(anotherPEM, "static-sid", "sig") )
 	assert.Equal(t, len(set.Keys),2)
 
@@ -87,6 +87,7 @@ func Test_toUpdateKeyList(t *testing.T) {
 	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(anotherPEM, "different-sid", "sig") )
 	assert.Equal(t, len(set.Keys),3)
 
-
-
+	key = set.Key("another-sid")[0]
+	verifyKey = toSDKFriendlyJSONWebKey(dummyPEM, "another-sid", "sig")
+	assert.Equal(t, key,verifyKey)
 }

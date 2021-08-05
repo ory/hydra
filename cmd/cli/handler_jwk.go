@@ -92,7 +92,7 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
 // updateKey replaces a key in the JSON Key Set or appends it if the key ID is not yet known.
 func updateKey(set jose.JSONWebKeySet, newKey jose.JSONWebKey) []jose.JSONWebKey {
 	if len(set.Key(newKey.KeyID)) > 0 {
-		tempSet := jose.JSONWebKeySet {}
+		tempSet := jose.JSONWebKeySet{}
 		for _, key := range set.Keys {
 			//copy not matching keys
 			if key.KeyID != newKey.KeyID {
@@ -156,9 +156,9 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
-			set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
+			set.Keys = updateKey(set, toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
 		} else {
-			set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
+			set.Keys = updateKey(set, toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
 		}
 
 		fmt.Printf("Successfully loaded key from file: %s\n", path)

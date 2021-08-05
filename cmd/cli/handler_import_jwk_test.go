@@ -86,7 +86,4 @@ func Test_toUpdateKeyList(t *testing.T) {
 	//adding a third key with different sid
 	set.Keys = updateKey(set,toSDKFriendlyJSONWebKey(anotherPEM, "different-sid", "sig") )
 	assert.Equal(t, len(set.Keys),3)
-
-
-
 }

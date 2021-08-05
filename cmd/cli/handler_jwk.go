@@ -89,6 +89,7 @@ func toSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
 	}
 }
 
+// updateKey replaces a key in the JSON Key Set or appends it if the key ID is not yet known.
 func updateKey(set jose.JSONWebKeySet, newKey jose.JSONWebKey) []jose.JSONWebKey {
 	if len(set.Key(newKey.KeyID)) > 0 {
 		tempSet := jose.JSONWebKeySet {}

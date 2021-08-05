@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_toImportJSONWebKey(t *testing.T) {
+func TestImportJSONWebKey(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
 	router := x.NewRouterPublic()

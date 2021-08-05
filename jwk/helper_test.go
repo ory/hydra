@@ -81,7 +81,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 		keys, err := FindPublicKey(RSIDKS)
 		require.NoError(t, err)
 		assert.Equal(t, keys.KeyID, Ider("public", "test-id-1"))
-
+		assert.IsType(t, keys.Key, new(rsa.PublicKey))
 	})
 	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {
 		ECDSAIDKS, _ := testECDSAGenerator.Generate("test-id-2", "sig")

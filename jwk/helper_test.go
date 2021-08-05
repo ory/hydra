@@ -88,6 +88,6 @@ func TestHandlerFindPublicKey(t *testing.T) {
 		keys, err := FindPublicKey(ECDSAIDKS)
 		require.NoError(t, err)
 		assert.Equal(t, keys.KeyID, Ider("public", "test-id-2"))
-
+		assert.IsType(t, keys.Key, new(ecdsa.PublicKey))
 	})
 }

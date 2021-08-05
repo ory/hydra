@@ -21,6 +21,8 @@
 package jwk
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

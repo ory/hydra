@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_toImportJSONWebKey(t *testing.T) {
+func TestImportJSONWebKey(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
 	router := x.NewRouterPublic()
@@ -54,8 +54,7 @@ func Test_toImportJSONWebKey(t *testing.T) {
 
 }
 
-func Test_toUpdateKeyList(t *testing.T) {
-
+func TestUpdateKeyList(t *testing.T) {
 	dummyPEM := []byte(`
 		-----BEGIN PUBLIC KEY-----
 		1MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPf64dykufSkwnvUiBAwd5Si0K6t4m5i

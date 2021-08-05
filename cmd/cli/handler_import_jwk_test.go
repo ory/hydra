@@ -55,7 +55,6 @@ func Test_toImportJSONWebKey(t *testing.T) {
 }
 
 func Test_toUpdateKeyList(t *testing.T) {
-
 	dummyPEM := []byte(`
 		-----BEGIN PUBLIC KEY-----
 		1MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPf64dykufSkwnvUiBAwd5Si0K6t4m5i

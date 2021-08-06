@@ -209,7 +209,8 @@ Hydra makes a `POST` request to this hook with the following payload:
 }
 ```
 
-Hook has to respond with `200 OK` and updated session data (i.e. "extra" claims) for a token refresh to continue:
+Hook has to respond with `200 OK` and updated session data (i.e. "extra" claims)
+for a token refresh to continue:
 
 ```json
 {
@@ -226,8 +227,8 @@ Hook has to respond with `200 OK` and updated session data (i.e. "extra" claims)
 
 This will overwrite existing session data from the original consent request.
 
-Hydra will gracefully deny refresh requests if the hook responds with `403 Forbidden`.
-Any other response from the hook will fail refresh requests.
+Hydra will gracefully deny refresh requests if the hook responds with
+`403 Forbidden`. Any other response from the hook will fail refresh requests.
 
 ### OAuth 2.0 Client Authentication with private/public keypairs
 

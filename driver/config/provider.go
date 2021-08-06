@@ -65,7 +65,7 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
-	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook"
+	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
 )
 
 const DSNMemory = "memory"

@@ -17,95 +17,74 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewListOAuth2ClientsParams creates a new ListOAuth2ClientsParams object,
-// with the default timeout for this client.
-//
-// Default values are not hydrated, since defaults are normally applied by the API server side.
-//
-// To enforce default values in parameter, use SetDefaults or WithDefaults.
+// NewListOAuth2ClientsParams creates a new ListOAuth2ClientsParams object
+// with the default values initialized.
 func NewListOAuth2ClientsParams() *ListOAuth2ClientsParams {
+	var ()
 	return &ListOAuth2ClientsParams{
+
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewListOAuth2ClientsParamsWithTimeout creates a new ListOAuth2ClientsParams object
-// with the ability to set a timeout on a request.
+// with the default values initialized, and the ability to set a timeout on a request
 func NewListOAuth2ClientsParamsWithTimeout(timeout time.Duration) *ListOAuth2ClientsParams {
+	var ()
 	return &ListOAuth2ClientsParams{
+
 		timeout: timeout,
 	}
 }
 
 // NewListOAuth2ClientsParamsWithContext creates a new ListOAuth2ClientsParams object
-// with the ability to set a context for a request.
+// with the default values initialized, and the ability to set a context for a request
 func NewListOAuth2ClientsParamsWithContext(ctx context.Context) *ListOAuth2ClientsParams {
+	var ()
 	return &ListOAuth2ClientsParams{
+
 		Context: ctx,
 	}
 }
 
 // NewListOAuth2ClientsParamsWithHTTPClient creates a new ListOAuth2ClientsParams object
-// with the ability to set a custom HTTPClient for a request.
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
 func NewListOAuth2ClientsParamsWithHTTPClient(client *http.Client) *ListOAuth2ClientsParams {
+	var ()
 	return &ListOAuth2ClientsParams{
 		HTTPClient: client,
 	}
 }
 
-/* ListOAuth2ClientsParams contains all the parameters to send to the API endpoint
-   for the list o auth2 clients operation.
-
-   Typically these are written to a http.Request.
+/*ListOAuth2ClientsParams contains all the parameters to send to the API endpoint
+for the list o auth2 clients operation typically these are written to a http.Request
 */
 type ListOAuth2ClientsParams struct {
 
-	/* Limit.
+	/*Limit
+	  The maximum amount of clients to returned, upper bound is 500 clients.
 
-	   The maximum amount of clients to returned, upper bound is 500 clients.
-
-	   Format: int64
 	*/
 	Limit *int64
+	/*Name
+	  The name of the clients to filter by.
 
-	/* Name.
-
-	   The name of the clients to filter by.
 	*/
 	Name *string
+	/*Offset
+	  The offset from where to start looking.
 
-	/* Offset.
-
-	   The offset from where to start looking.
-
-	   Format: int64
 	*/
 	Offset *int64
+	/*Owner
+	  The owner of the clients to filter by.
 
-	/* Owner.
-
-	   The owner of the clients to filter by.
 	*/
 	Owner *string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
-}
-
-// WithDefaults hydrates default values in the list o auth2 clients params (not the query body).
-//
-// All values with no default are reset to their zero value.
-func (o *ListOAuth2ClientsParams) WithDefaults() *ListOAuth2ClientsParams {
-	o.SetDefaults()
-	return o
-}
-
-// SetDefaults hydrates default values in the list o auth2 clients params (not the query body).
-//
-// All values with no default are reset to their zero value.
-func (o *ListOAuth2ClientsParams) SetDefaults() {
-	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the list o auth2 clients params
@@ -197,68 +176,64 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 
 		// query param limit
 		var qrLimit int64
-
 		if o.Limit != nil {
 			qrLimit = *o.Limit
 		}
 		qLimit := swag.FormatInt64(qrLimit)
 		if qLimit != "" {
-
 			if err := r.SetQueryParam("limit", qLimit); err != nil {
 				return err
 			}
 		}
+
 	}
 
 	if o.Name != nil {
 
 		// query param name
 		var qrName string
-
 		if o.Name != nil {
 			qrName = *o.Name
 		}
 		qName := qrName
 		if qName != "" {
-
 			if err := r.SetQueryParam("name", qName); err != nil {
 				return err
 			}
 		}
+
 	}
 
 	if o.Offset != nil {
 
 		// query param offset
 		var qrOffset int64
-
 		if o.Offset != nil {
 			qrOffset = *o.Offset
 		}
 		qOffset := swag.FormatInt64(qrOffset)
 		if qOffset != "" {
-
 			if err := r.SetQueryParam("offset", qOffset); err != nil {
 				return err
 			}
 		}
+
 	}
 
 	if o.Owner != nil {
 
 		// query param owner
 		var qrOwner string
-
 		if o.Owner != nil {
 			qrOwner = *o.Owner
 		}
 		qOwner := qrOwner
 		if qOwner != "" {
-
 			if err := r.SetQueryParam("owner", qOwner); err != nil {
 				return err
 			}
 		}
+
 	}
 
 	if len(res) > 0 {

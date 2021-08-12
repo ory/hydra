@@ -305,12 +305,12 @@ func TestViperProviderValidates(t *testing.T) {
 			Jaeger: &tracing.JaegerConfig{
 				LocalAgentAddress: "127.0.0.1:6831",
 				Sampling: &tracing.JaegerSampling{
-					Type:        "const",
-					Value:       1,
-					ServerURL:   "http://sampling",
+					Type:      "const",
+					Value:     1,
+					ServerURL: "http://sampling",
 				},
-				Propagation:        "jaeger",
-				MaxTagValueLength:  1024,
+				Propagation:       "jaeger",
+				MaxTagValueLength: 1024,
 			},
 			Zipkin: &tracing.ZipkinConfig{
 				ServerURL: "http://zipkin/api/v2/spans",

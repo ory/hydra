@@ -18,11 +18,15 @@ Config files can be formatted as JSON, YAML and TOML. Some configuration values
 support reloading without server restart. All configuration values can be set
 using environment variables, as documented below.
 
+:::warning Disclaimer
+
 This reference configuration documents all keys, also deprecated ones! It is a
 reference for all possible configuration values.
 
 If you are looking for an example configuration, it is better to try out the
 quickstart.
+
+:::
 
 To find out more about edge cases like setting string array values through
 environmental variables head to the
@@ -333,7 +337,7 @@ serve:
   tls:
     ## cert ##
     #
-    # Configures the private key (pem encoded).
+    # Configures the public certificate (pem encoded).
     #
     cert:
       ## path ##
@@ -648,7 +652,7 @@ serve:
     tls:
       ## cert ##
       #
-      # Configures the private key (pem encoded).
+      # Configures the public certificate (pem encoded).
       #
       cert:
         ## path ##
@@ -1209,6 +1213,26 @@ oauth2:
   #
   exclude_not_before_claim: true
 
+  ## allowed_top_level_claims ##
+  #
+  # A list of custom claims which are allowed to be added top level to the Access Token. They cannot override reserved claims.
+  #
+  # Examples:
+  # - - username
+  #   - email
+  #   - user_uuid
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_ALLOWED_TOP_LEVEL_CLAIMS=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_ALLOWED_TOP_LEVEL_CLAIMS=<value>
+  #
+  allowed_top_level_claims:
+    - username
+    - email
+    - user_uuid
+
   ## hashers ##
   #
   # Configures hashing algorithms. Supports only BCrypt at the moment.
@@ -1501,13 +1525,14 @@ tracing:
 
   ## provider ##
   #
-  # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
+  # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin DataDog, Elastic APM and Instana. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
   #
   # One of:
   # - jaeger
   # - zipkin
   # - datadog
   # - elastic-apm
+  # - instana
   #
   # Examples:
   # - jaeger

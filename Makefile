@@ -42,18 +42,6 @@ lint: .bin/golangci-lint
 		golangci-lint run -v ./...
 
 # Runs full test suite including tests where databases are enabled
-.PHONY: test-legacy-migrations
-test-legacy-migrations: test-resetdb .bin/go-bindata
-		cd internal/fizzmigrate/client; go-bindata -o sql_migration_files.go -pkg client ./migrations/sql/...
-		cd internal/fizzmigrate/consent; go-bindata -o sql_migration_files.go -pkg consent ./migrations/sql/...
-		cd internal/fizzmigrate/jwk; go-bindata -o sql_migration_files.go -pkg jwk ./migrations/sql/...
-		cd internal/fizzmigrate/oauth2; go-bindata -o sql_migration_files.go -pkg oauth2 ./migrations/sql/...
-		source scripts/test-env.sh && go test -tags legacy_migration_test sqlite -failfast -timeout=20m ./internal/fizzmigrate
-		docker rm -f hydra_test_database_mysql
-		docker rm -f hydra_test_database_postgres
-		docker rm -f hydra_test_database_cockroach
-
-# Runs full test suite including tests where databases are enabled
 .PHONY: test
 test: .bin/go-acc
 		make test-resetdb

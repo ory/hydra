@@ -62,15 +62,25 @@ for the list o auth2 clients operation typically these are written to a http.Req
 type ListOAuth2ClientsParams struct {
 
 	/*Limit
-	  The maximum amount of policies returned, upper bound is 500 policies
+	  The maximum amount of clients to returned, upper bound is 500 clients.
 
 	*/
 	Limit *int64
+	/*Name
+	  The name of the clients to filter by.
+
+	*/
+	Name *string
 	/*Offset
 	  The offset from where to start looking.
 
 	*/
 	Offset *int64
+	/*Owner
+	  The owner of the clients to filter by.
+
+	*/
+	Owner *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -121,6 +131,17 @@ func (o *ListOAuth2ClientsParams) SetLimit(limit *int64) {
 	o.Limit = limit
 }
 
+// WithName adds the name to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) WithName(name *string) *ListOAuth2ClientsParams {
+	o.SetName(name)
+	return o
+}
+
+// SetName adds the name to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) SetName(name *string) {
+	o.Name = name
+}
+
 // WithOffset adds the offset to the list o auth2 clients params
 func (o *ListOAuth2ClientsParams) WithOffset(offset *int64) *ListOAuth2ClientsParams {
 	o.SetOffset(offset)
@@ -130,6 +151,17 @@ func (o *ListOAuth2ClientsParams) WithOffset(offset *int64) *ListOAuth2ClientsPa
 // SetOffset adds the offset to the list o auth2 clients params
 func (o *ListOAuth2ClientsParams) SetOffset(offset *int64) {
 	o.Offset = offset
+}
+
+// WithOwner adds the owner to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) WithOwner(owner *string) *ListOAuth2ClientsParams {
+	o.SetOwner(owner)
+	return o
+}
+
+// SetOwner adds the owner to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) SetOwner(owner *string) {
+	o.Owner = owner
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -156,6 +188,22 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 
 	}
 
+	if o.Name != nil {
+
+		// query param name
+		var qrName string
+		if o.Name != nil {
+			qrName = *o.Name
+		}
+		qName := qrName
+		if qName != "" {
+			if err := r.SetQueryParam("name", qName); err != nil {
+				return err
+			}
+		}
+
+	}
+
 	if o.Offset != nil {
 
 		// query param offset
@@ -166,6 +214,22 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		qOffset := swag.FormatInt64(qrOffset)
 		if qOffset != "" {
 			if err := r.SetQueryParam("offset", qOffset); err != nil {
+				return err
+			}
+		}
+
+	}
+
+	if o.Owner != nil {
+
+		// query param owner
+		var qrOwner string
+		if o.Owner != nil {
+			qrOwner = *o.Owner
+		}
+		qOwner := qrOwner
+		if qOwner != "" {
+			if err := r.SetQueryParam("owner", qOwner); err != nil {
 				return err
 			}
 		}

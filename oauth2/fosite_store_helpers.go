@@ -175,6 +175,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testHelperRevokeRefreshToken/db=%s", k), testHelperRevokeRefreshToken(store))
 	t.Run(fmt.Sprintf("case=testHelperCreateGetDeletePKCERequestSession/db=%s", k), testHelperCreateGetDeletePKCERequestSession(store))
 	t.Run(fmt.Sprintf("case=testHelperFlushTokens/db=%s", k), testHelperFlushTokens(store, time.Hour))
+	t.Run(fmt.Sprintf("case=testHelperFlushTokensWithLimitAndBatchSize/db=%s", k), testHelperFlushTokensWithLimitAndBatchSize(store, 3, 2))
 	t.Run(fmt.Sprintf("case=testFositeStoreSetClientAssertionJWT/db=%s", k), testFositeStoreSetClientAssertionJWT(store))
 	t.Run(fmt.Sprintf("case=testFositeStoreClientAssertionJWTValid/db=%s", k), testFositeStoreClientAssertionJWTValid(store))
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
@@ -443,7 +444,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 			require.NoError(t, err)
 		}
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-time.Hour*24)))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-time.Hour*24), 100, 10))
 		_, err := m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
@@ -451,7 +452,7 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.NoError(t, err)
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2))))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now().Add(-(lifespan+time.Hour/2)), 100, 10))
 		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
@@ -459,13 +460,45 @@ func testHelperFlushTokens(x InternalRegistry, lifespan time.Duration) func(t *t
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
 
-		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now()))
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now(), 100, 10))
 		_, err = m.GetAccessTokenSession(ctx, "flush-1", ds)
 		require.NoError(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-2", ds)
 		require.Error(t, err)
 		_, err = m.GetAccessTokenSession(ctx, "flush-3", ds)
 		require.Error(t, err)
+	}
+}
+
+func testHelperFlushTokensWithLimitAndBatchSize(x InternalRegistry, limit int, batchSize int) func(t *testing.T) {
+	m := x.OAuth2Storage()
+	ds := &Session{}
+
+	return func(t *testing.T) {
+		ctx := context.Background()
+		var requests []*fosite.Request
+
+		// create five expired requests
+		id := uuid.New()
+		for i := 0; i < 5; i++ {
+			r := createTestRequest(fmt.Sprintf("%s-%d", id, i+1))
+			r.RequestedAt = time.Now().Add(-2 * time.Hour)
+			mockRequestForeignKey(t, r.ID, x, false)
+			require.NoError(t, m.CreateAccessTokenSession(ctx, r.ID, r))
+			_, err := m.GetAccessTokenSession(ctx, r.ID, ds)
+			require.NoError(t, err)
+			requests = append(requests, r)
+		}
+
+		require.NoError(t, m.FlushInactiveAccessTokens(ctx, time.Now(), limit, batchSize))
+		for i := range requests {
+			_, err := m.GetAccessTokenSession(ctx, requests[i].ID, ds)
+			if i >= limit {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		}
 	}
 }
 

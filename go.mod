@@ -11,6 +11,7 @@ replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+in
 replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 
 replace github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
+
 replace github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 
 require (
@@ -44,13 +45,12 @@ require (
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.6
-	github.com/ory/x v0.0.264
+	github.com/ory/x v0.0.276
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.9.0
 	github.com/rs/cors v1.6.0
-	github.com/rubenv/sql-migrate v0.0.0-20190212093014-1007f53448d7
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3

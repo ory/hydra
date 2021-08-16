@@ -138,3 +138,39 @@ hydra clients get --endpoint http://ory-hydra <the-client-id>
 
 Here you see that `http://my-url/callback` is not in the list, which is why the
 request fails.
+
+### oauth2/token endpoint fails for jwks based client
+
+When trying to get an access token for a client registered with ```"token_endpoint_auth_method": "private_key_jwt"```  it is possible that the provided jwt has expired.
+
+The repsonse body that is sent to the client is like below 
+
+```
+{
+    "error": "error",
+    "error_description": "The error is unrecognizable Token is expired"
+}
+```
+
+The debug error messages is not provided to avoid divulging more information to a malicious client.
+
+However if you need more information in repsonse (for debugging) , you can enable the following environment variables in hydra server :
+
+```
+
+OAUTH2_EXPOSE_INTERNAL_ERRORS=true;
+OAUTH2_INCLUDE_LEGACY_ERROR_FIELDS=true
+```
+
+These configuration are documented [here](https://www.ory.sh/hydra/docs/reference/configuration/).
+
+Now you will be able to see the error_debug field in the response like below :
+
+```
+{
+    "error": "error",
+    "error_description": "The error is unrecognizable",
+    "status_code": 500,
+    "error_debug": "Token is expired"
+}
+```

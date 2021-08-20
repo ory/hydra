@@ -61,6 +61,7 @@ require (
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
+	golang.org/x/sys v0.0.0-20210819135213-f52c844e1c1c // indirect
 	golang.org/x/tools v0.1.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1
 	gopkg.in/square/go-jose.v2 v2.5.1

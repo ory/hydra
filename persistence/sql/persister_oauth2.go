@@ -296,6 +296,7 @@ func (p *Persister) GetAuthorizeCodeSession(ctx context.Context, signature strin
 }
 
 func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) (err error) {
+	signature = p.hashSignature(signature, sqlTableCode)
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).

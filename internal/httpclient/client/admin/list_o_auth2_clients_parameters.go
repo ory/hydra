@@ -61,16 +61,16 @@ for the list o auth2 clients operation typically these are written to a http.Req
 */
 type ListOAuth2ClientsParams struct {
 
+	/*ClientName
+	  The name of the clients to filter by.
+
+	*/
+	ClientName *string
 	/*Limit
 	  The maximum amount of clients to returned, upper bound is 500 clients.
 
 	*/
 	Limit *int64
-	/*Name
-	  The name of the clients to filter by.
-
-	*/
-	Name *string
 	/*Offset
 	  The offset from where to start looking.
 
@@ -120,6 +120,17 @@ func (o *ListOAuth2ClientsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithClientName adds the clientName to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) WithClientName(clientName *string) *ListOAuth2ClientsParams {
+	o.SetClientName(clientName)
+	return o
+}
+
+// SetClientName adds the clientName to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) SetClientName(clientName *string) {
+	o.ClientName = clientName
+}
+
 // WithLimit adds the limit to the list o auth2 clients params
 func (o *ListOAuth2ClientsParams) WithLimit(limit *int64) *ListOAuth2ClientsParams {
 	o.SetLimit(limit)
@@ -129,17 +140,6 @@ func (o *ListOAuth2ClientsParams) WithLimit(limit *int64) *ListOAuth2ClientsPara
 // SetLimit adds the limit to the list o auth2 clients params
 func (o *ListOAuth2ClientsParams) SetLimit(limit *int64) {
 	o.Limit = limit
-}
-
-// WithName adds the name to the list o auth2 clients params
-func (o *ListOAuth2ClientsParams) WithName(name *string) *ListOAuth2ClientsParams {
-	o.SetName(name)
-	return o
-}
-
-// SetName adds the name to the list o auth2 clients params
-func (o *ListOAuth2ClientsParams) SetName(name *string) {
-	o.Name = name
 }
 
 // WithOffset adds the offset to the list o auth2 clients params
@@ -172,6 +172,22 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 	}
 	var res []error
 
+	if o.ClientName != nil {
+
+		// query param client_name
+		var qrClientName string
+		if o.ClientName != nil {
+			qrClientName = *o.ClientName
+		}
+		qClientName := qrClientName
+		if qClientName != "" {
+			if err := r.SetQueryParam("client_name", qClientName); err != nil {
+				return err
+			}
+		}
+
+	}
+
 	if o.Limit != nil {
 
 		// query param limit
@@ -182,22 +198,6 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		qLimit := swag.FormatInt64(qrLimit)
 		if qLimit != "" {
 			if err := r.SetQueryParam("limit", qLimit); err != nil {
-				return err
-			}
-		}
-
-	}
-
-	if o.Name != nil {
-
-		// query param name
-		var qrName string
-		if o.Name != nil {
-			qrName = *o.Name
-		}
-		qName := qrName
-		if qName != "" {
-			if err := r.SetQueryParam("name", qName); err != nil {
 				return err
 			}
 		}

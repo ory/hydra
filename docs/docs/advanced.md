@@ -191,6 +191,12 @@ token refresh, which provides updated claims for a given subject and scopes.
 This is similar to accepting consent request, where the application provides the
 session data by calling Hydra Admin API.
 
+:::note
+
+This endpoint is called _before_ any logic in Ory Hydra is executed. If the hook, for example, returns an error, the refresh token will remain unused!
+
+::note
+
 You can configure `oauth2.refresh_token_hook` config key:
 
 ```yaml

@@ -193,7 +193,8 @@ session data by calling Hydra Admin API.
 
 :::note
 
-This endpoint is called _before_ any logic in Ory Hydra is executed. If the hook, for example, returns an error, the refresh token will remain unused!
+This endpoint is called _before_ any logic in Ory Hydra is executed. If the
+hook, for example, returns an error, the refresh token will remain unused!
 
 ::note
 

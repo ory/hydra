@@ -1312,6 +1312,21 @@ oauth2:
     #
     default_grant_allowed_scope: false
 
+  ## refresh_token_hook ##
+  #
+  # Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.
+  #
+  # Examples:
+  # - https://my-example.app/token-refresh-hook
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  #
+  refresh_token_hook: https://my-example.app/token-refresh-hook
+
   ## expose_internal_errors ##
   #
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.

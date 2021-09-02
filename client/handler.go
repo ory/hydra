@@ -233,7 +233,7 @@ type Filter struct {
 
 	// The name of the clients to filter by.
 	// in: query
-	Name string `json:"name"`
+	Name string `json:"client_name"`
 
 	// The owner of the clients to filter by.
 	// in: query

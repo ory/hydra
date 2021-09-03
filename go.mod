@@ -2,17 +2,16 @@ module github.com/ory/hydra
 
 go 1.16
 
-replace github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.7-0.20210414154423-1157a4212dcb
-
-replace github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
-
-replace github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+incompatible
-
-replace github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
-
-replace github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
-
-replace github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
+replace (
+	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.7-0.20210414154423-1157a4212dcb
+	github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
+	github.com/dgrijalva/jwt-go => github.com/form3tech-oss/jwt-go v3.2.1+incompatible
+	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
+    github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
+	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
+	github.com/luna-duclos/instrumentedsql => github.com/ory/instrumentedsql v1.2.0
+	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
+)
 
 require (
 	github.com/cenkalti/backoff/v3 v3.0.0

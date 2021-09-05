@@ -45,9 +45,17 @@ multiple reasons:
    correct would be `/oauth2/auth?response_type=token+id_token&scope=openid` or
    any other combination such as `response_type=id_token`,
    `response_type=token+code+id_token`).
-3. You consent app did not send `granted_scope: ["openid"]` or when accepting
+3. You forgot to include `nonce` when calling `/oauth2/auth?response_type=id_token`
+   or any combination of `id_token` (`token+id_token`, `token+code+id_token` etc.)
+   `nonce` is a value sent by the client application and included as a claim in 
+   the returned `id_token`. The `nonce` claim can then be verified by the client 
+   application to mitigate any replay attacks. Optional for Authoize Code Flow,
+   but mandatory for Implicit/Hybrid flow. Correct request would be - 
+   `/oauth2/auth?response_type=id_token?nonce=some-value`.
+   You can read more about `nonce` here [OpenId Connect Core](https://openid.net/specs/openid-connect-core-1_0.html#NonceNotes).
+4. Your consent app did not send `granted_scope: ["openid"]` or when accepting
    the consent request.
-4. The OAuth 2.0 Client making the request is not allowed to request the scope
+5. The OAuth 2.0 Client making the request is not allowed to request the scope
    `openid`.
 
 ## OAuth 2.0 Refresh Token is missing

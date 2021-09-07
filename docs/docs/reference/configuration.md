@@ -9,7 +9,7 @@ FILE -->
 
 You can load the config file from another source using the
 `-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
-`hydra --config path/to/config.yaml`. The specified file will be used as a 
+`hydra --config path/to/config.yaml`. The specified file will be used as a
 configuration file which supports all configuration settings listed below.
 
 Config files can be formatted as JSON, YAML and TOML. Some configuration values

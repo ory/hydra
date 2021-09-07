@@ -7,9 +7,12 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
+If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file
+which supports all configuration settings listed below.
+
 You can load the config file from another source using the
 `-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
-`hydra --config path/to/config.yaml`. The specified file will be used as a configuration file which supports all configuration settings listed below.
+`hydra --config path/to/config.yaml`.
 
 Config files can be formatted as JSON, YAML and TOML. Some configuration values
 support reloading without server restart. All configuration values can be set

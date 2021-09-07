@@ -53,7 +53,7 @@ hydra serve public [flags]
 ### Options inherited from parent commands
 
 ```
-      --config string                                    Config file
+      --config string                                    Config file (default is $HOME/.hydra.yaml)
       --dangerous-allow-insecure-redirect-urls strings   DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs
       --dangerous-force-http                             DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead
       --disable-telemetry                                Disable anonymized telemetry reports - for more information please visit https://www.ory.sh/docs/ecosystem/sqa

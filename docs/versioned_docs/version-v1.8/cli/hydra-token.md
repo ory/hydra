@@ -29,7 +29,7 @@ Issue and Manage OAuth2 tokens
 ### Options inherited from parent commands
 
 ```
-      --config string     Config file
+      --config string     Config file (default is $HOME/.hydra.yaml)
       --skip-tls-verify   Foolishly accept TLS certificates signed by unkown certificate authorities
 ```
 

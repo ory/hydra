@@ -358,3 +358,11 @@ func TestLoginConsentURL(t *testing.T) {
 	assert.Equal(t, "http://localhost:3000/#/oauth/login", p2.LoginURL().String())
 	assert.Equal(t, "http://localhost:3000/#/oauth/consent", p2.ConsentURL().String())
 }
+
+func TestInfinitRefreshTokenTTL(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	c := MustNew(l, configx.WithValue("ttl.refresh_token", -1))
+
+	assert.Equal(t, -1*time.Nanosecond, c.RefreshTokenLifespan())
+}

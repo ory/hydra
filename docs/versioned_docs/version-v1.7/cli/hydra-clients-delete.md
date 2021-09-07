@@ -34,7 +34,7 @@ hydra clients delete <id> [<id>...] [flags]
 
 ```
       --access-token string    Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN
-      --config string          Config file (default is $HOME/.hydra.yaml)
+      --config string          Config file
       --endpoint string        Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket
       --fail-after duration    Stop retrying after the specified duration (default 1m0s)
       --fake-tls-termination   Fake tls termination by adding "X-Forwarded-Proto: https" to http headers

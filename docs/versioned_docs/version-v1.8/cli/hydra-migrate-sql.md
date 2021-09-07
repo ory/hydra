@@ -46,7 +46,7 @@ hydra migrate sql <database-url> [flags]
 ### Options inherited from parent commands
 
 ```
-      --config string     Config file (default is $HOME/.hydra.yaml)
+      --config string     Config file
       --skip-tls-verify   Foolishly accept TLS certificates signed by unkown certificate authorities
 ```
 

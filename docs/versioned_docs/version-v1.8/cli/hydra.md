@@ -21,7 +21,7 @@ Run and manage ORY Hydra
 ### Options
 
 ```
-      --config string     Config file (default is $HOME/.hydra.yaml)
+      --config string     Config file
   -h, --help              help for hydra
       --skip-tls-verify   Foolishly accept TLS certificates signed by unkown certificate authorities
 ```

@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -85,6 +86,38 @@ func (m *PluginConfigLinux) validateDevices(formats strfmt.Registry) error {
 
 		if m.Devices[i] != nil {
 			if err := m.Devices[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("Devices" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this plugin config linux based on the context it is used
+func (m *PluginConfigLinux) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateDevices(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *PluginConfigLinux) contextValidateDevices(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Devices); i++ {
+
+		if m.Devices[i] != nil {
+			if err := m.Devices[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Devices" + "." + strconv.Itoa(i))
 				}

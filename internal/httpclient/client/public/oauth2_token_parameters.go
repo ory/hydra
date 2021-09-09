@@ -16,64 +16,82 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewOauth2TokenParams creates a new Oauth2TokenParams object
-// with the default values initialized.
+// NewOauth2TokenParams creates a new Oauth2TokenParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewOauth2TokenParams() *Oauth2TokenParams {
-	var ()
 	return &Oauth2TokenParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewOauth2TokenParamsWithTimeout creates a new Oauth2TokenParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewOauth2TokenParamsWithTimeout(timeout time.Duration) *Oauth2TokenParams {
-	var ()
 	return &Oauth2TokenParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewOauth2TokenParamsWithContext creates a new Oauth2TokenParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewOauth2TokenParamsWithContext(ctx context.Context) *Oauth2TokenParams {
-	var ()
 	return &Oauth2TokenParams{
-
 		Context: ctx,
 	}
 }
 
 // NewOauth2TokenParamsWithHTTPClient creates a new Oauth2TokenParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewOauth2TokenParamsWithHTTPClient(client *http.Client) *Oauth2TokenParams {
-	var ()
 	return &Oauth2TokenParams{
 		HTTPClient: client,
 	}
 }
 
-/*Oauth2TokenParams contains all the parameters to send to the API endpoint
-for the oauth2 token operation typically these are written to a http.Request
+/* Oauth2TokenParams contains all the parameters to send to the API endpoint
+   for the oauth2 token operation.
+
+   Typically these are written to a http.Request.
 */
 type Oauth2TokenParams struct {
 
-	/*ClientID*/
+	// ClientID.
 	ClientID *string
-	/*Code*/
+
+	// Code.
 	Code *string
-	/*GrantType*/
+
+	// GrantType.
 	GrantType string
-	/*RedirectURI*/
+
+	// RedirectURI.
 	RedirectURI *string
-	/*RefreshToken*/
+
+	// RefreshToken.
 	RefreshToken *string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the oauth2 token params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *Oauth2TokenParams) WithDefaults() *Oauth2TokenParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the oauth2 token params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *Oauth2TokenParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the oauth2 token params
@@ -185,7 +203,6 @@ func (o *Oauth2TokenParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 				return err
 			}
 		}
-
 	}
 
 	if o.Code != nil {
@@ -201,7 +218,6 @@ func (o *Oauth2TokenParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 				return err
 			}
 		}
-
 	}
 
 	// form param grant_type
@@ -226,7 +242,6 @@ func (o *Oauth2TokenParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 				return err
 			}
 		}
-
 	}
 
 	if o.RefreshToken != nil {
@@ -242,7 +257,6 @@ func (o *Oauth2TokenParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.R
 				return err
 			}
 		}
-
 	}
 
 	if len(res) > 0 {

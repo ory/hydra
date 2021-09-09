@@ -220,9 +220,6 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file \`$HOME/.${config.projectSlug}.yaml\` exists, it will be used as a configuration file which supports all
-configuration settings listed below.
-
 You can load the config file from another source using the \`-c path/to/config.yaml\` or \`--config path/to/config.yaml\`
 flag: \`${config.projectSlug} --config path/to/config.yaml\`.
 

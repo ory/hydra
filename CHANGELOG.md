@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2021-09-08)](#000-2021-09-08)
+- [0.0.0 (2021-09-15)](#000-2021-09-15)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -593,20 +593,29 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.10.6...v0.0.0) (2021-09-08)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.10.6...v0.0.0) (2021-09-15)
 
 
 ### Bug Fixes
+
+* List oauth2 clients query parameter 'name' -> 'client_name' ([#2747](https://github.com/ory/hydra/issues/2747)) ([283c351](https://github.com/ory/hydra/commit/283c3514c63eba87d314013977c21bbebb9f1c6d)):
+
+    This commit renders the docs to be in parity with an earlier change [1]
+    
+    Reference(s):
+    [1] https://github.com/ory/hydra/pull/2706
 
 * Update client filter to client_name ([#2706](https://github.com/ory/hydra/issues/2706)) ([dee4fa2](https://github.com/ory/hydra/commit/dee4fa278701010a20ca8617d59dd21d7be83583)), closes [#2691](https://github.com/ory/hydra/issues/2691)
 
 ### Documentation
 
 * Faq item ([#2678](https://github.com/ory/hydra/issues/2678)) ([856ccc0](https://github.com/ory/hydra/commit/856ccc0cd3a0b5f7bb58e25c15f4013000b29a50))
+* K8s installation section ([#2724](https://github.com/ory/hydra/issues/2724)) ([aec73bb](https://github.com/ory/hydra/commit/aec73bb15c960bbd7cb8b3925c04b45289647a6b))
 * Remove outdated information in doc configuration section ([#2723](https://github.com/ory/hydra/issues/2723)) ([3f16045](https://github.com/ory/hydra/commit/3f16045dcd000b1b2f87ab059d745869b5450bc6))
 * Update installation section helm command ([#2725](https://github.com/ory/hydra/issues/2725)) ([f6a4dc6](https://github.com/ory/hydra/commit/f6a4dc6d68d7551dc54361a5dd497ecbe9b1af92))
 * Update k8s examples section part of the page ([#2719](https://github.com/ory/hydra/issues/2719)) ([048156d](https://github.com/ory/hydra/commit/048156dba821a24573c64f074b8e4023f31e89f2))
 * Update k8s examples section part of the page ([#2720](https://github.com/ory/hydra/issues/2720)) ([1d6eeba](https://github.com/ory/hydra/commit/1d6eeba521429ca76bbfb88fe2a47a2b3579303a))
+* Update oauth2 debug swction ([#2717](https://github.com/ory/hydra/issues/2717)) ([a2cdc08](https://github.com/ory/hydra/commit/a2cdc0869321e6a67c93dee2e1f07952efd62ef6))
 
 ### Features
 

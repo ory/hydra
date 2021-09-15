@@ -125,7 +125,7 @@
           {
             "type": "string",
             "description": "The name of the clients to filter by.",
-            "name": "name",
+            "name": "client_name",
             "in": "query"
           },
           {

@@ -16,59 +16,73 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewGetOAuth2ClientParams creates a new GetOAuth2ClientParams object
-// with the default values initialized.
+// NewGetOAuth2ClientParams creates a new GetOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetOAuth2ClientParams() *GetOAuth2ClientParams {
-	var ()
 	return &GetOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetOAuth2ClientParamsWithTimeout creates a new GetOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetOAuth2ClientParamsWithTimeout(timeout time.Duration) *GetOAuth2ClientParams {
-	var ()
 	return &GetOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetOAuth2ClientParamsWithContext creates a new GetOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetOAuth2ClientParamsWithContext(ctx context.Context) *GetOAuth2ClientParams {
-	var ()
 	return &GetOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetOAuth2ClientParamsWithHTTPClient creates a new GetOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetOAuth2ClientParamsWithHTTPClient(client *http.Client) *GetOAuth2ClientParams {
-	var ()
 	return &GetOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the get o auth2 client operation typically these are written to a http.Request
+/* GetOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the get o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type GetOAuth2ClientParams struct {
 
-	/*ID
-	  The id of the OAuth 2.0 Client.
+	/* ID.
 
+	   The id of the OAuth 2.0 Client.
 	*/
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetOAuth2ClientParams) WithDefaults() *GetOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get o auth2 client params

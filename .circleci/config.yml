@@ -1,9 +1,9 @@
 version: 2.1
 
 orbs:
-  goreleaser: ory/goreleaser@0.1.31
+  goreleaser: ory/goreleaser@0.1.34
   slack: circleci/slack@3.4.2
-  sdk: ory/sdk@0.1.41
+  sdk: ory/sdk@0.1.43
   changelog: ory/changelog@0.1.10
   nancy: ory/nancy@0.0.18
   docs: ory/docs@0.0.11

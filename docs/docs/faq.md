@@ -11,9 +11,24 @@ find an outdated section, please create a PR which removes or updates it!**
 
 <!-- toc -->
 
+## How to omit consent redirection
+
+From [GitHub](https://github.com/ory/hydra/discussions/2562).
+
+> Is it possible to omit the consent redirection flow (not just skip the UI).
+> After accepting the login, redirect to callback URL with the authorization
+> code directly (no redirect to consent URL at all)?
+
+You can not skip the
+[consent redirection](https://www.ory.sh/hydra/docs/concepts/consent#redirection-to-the-consent-endpoint),
+but you can accept the redirection to the redirect URL immediately. The user
+will not notice as this takes less than < 100ms. The example on how to skip the
+consent screen provides a good starting point:
+[Skipping Consent Screen](https://www.ory.sh/hydra/docs/guides/consent/#skipping-consent-screen).
+
 ## How can I store custom data ?
 
-From [Github](https://github.com/ory/hydra/issues/2333)
+From [Github](https://github.com/ory/hydra/issues/2333).
 
 > How can I store custom data in the client that can be retrieved along with the
 > login request (using the challenge code)? I would like send in some metadata

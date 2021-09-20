@@ -27,7 +27,7 @@ strong secret, a Login and Consent provider located at `https://my-idp/` run:
 
 ```bash
 $ helm install \
-    --set 'hydra.config.secrets.system=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | base64 | head -c 32)' \
+    --set 'hydra.config.secrets.system={'$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | base64 | head -c 32)'}' \
     --set 'hydra.config.dsn=memory' \
     --set 'hydra.config.urls.self.issuer=https://my-hydra/' \
     --set 'hydra.config.urls.login=https://my-idp/login' \
@@ -143,14 +143,14 @@ Let's install the Login and Consent App first
 
 ```bash
 $ helm install hydra-example-idp ory/example-idp \
-    --set 'hydraAdminUrl=http://hydra-example-admin:4445/' \
+    --set 'hydraAdminUrl=http://hydra-example-admin/' \
     --set 'hydraPublicUrl=http://public.hydra.localhost/' \
     --set 'ingress.enabled=true'
 ```
 
 with hostnames
 
-- `http://hydra-example-admin:4445/` corresponding to deployment name
+- `http://hydra-example-admin` corresponding to deployment name
   `--name hydra-example` (see next code sample) with suffix `-admin` which is
   the hostname of the ORY Hydra Admin API Service.
 - `https://public.hydra.localhost/` which is the default value for
@@ -163,7 +163,7 @@ the ORY Hydra Helm Chart
 
 ```bash
 $ helm install hydra-example ory/hydra \
-    --set 'hydra.config.secrets.system=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | base64 | head -c 32)' \
+    --set 'hydra.config.secrets.system={'$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | base64 | head -c 32)'}' \
     --set 'hydra.config.dsn=memory' \
     --set 'hydra.config.urls.self.issuer=http://public.hydra.localhost/' \
     --set 'hydra.config.urls.login=http://example-idp.localhost/login' \

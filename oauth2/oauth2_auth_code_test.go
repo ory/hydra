@@ -38,6 +38,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal/testhelpers"
 
 	"github.com/julienschmidt/httprouter"
@@ -53,6 +54,7 @@ import (
 	hydra "github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
+	hydraoauth2 "github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
@@ -906,6 +908,113 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						body, err := ioutil.ReadAll(res.Body)
 						require.NoError(t, err)
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+					})
+
+					t.Run("should call refresh token hook if configured", func(t *testing.T) {
+						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							var hookReq hydraoauth2.RefreshTokenHookRequest
+							require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
+							require.Equal(t, hookReq.Subject, "foo")
+							require.ElementsMatch(t, hookReq.GrantedScopes, []string{"openid", "offline", "hydra.*"})
+							require.ElementsMatch(t, hookReq.GrantedAudience, []string{})
+							require.Equal(t, hookReq.ClientID, oauthConfig.ClientID)
+
+							claims := map[string]interface{}{
+								"hooked": true,
+							}
+
+							hookResp := hydraoauth2.RefreshTokenHookResponse{
+								Session: consent.ConsentRequestSessionData{
+									AccessToken: claims,
+									IDToken:     claims,
+								},
+							}
+
+							w.WriteHeader(http.StatusOK)
+							require.NoError(t, json.NewEncoder(w).Encode(&hookResp))
+						}))
+						defer hs.Close()
+
+						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusOK, res.StatusCode)
+
+						body, err := ioutil.ReadAll(res.Body)
+						require.NoError(t, err)
+						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+
+						accessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
+						require.True(t, accessTokenClaims.Get("ext.hooked").Bool())
+
+						idTokenBody, err := x.DecodeSegment(
+							strings.Split(
+								gjson.GetBytes(body, "id_token").String(),
+								".",
+							)[1],
+						)
+						require.NoError(t, err)
+
+						require.True(t, gjson.GetBytes(idTokenBody, "hooked").Bool())
+					})
+
+					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {
+						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusInternalServerError)
+						}))
+						defer hs.Close()
+
+						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+
+						var errBody fosite.RFC6749ErrorJson
+						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
+						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
+						require.Equal(t, fosite.ErrServerError.GetDescription(), errBody.Description)
+					})
+
+					t.Run("should fail token refresh with `access_denied` if hook denied the request", func(t *testing.T) {
+						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusForbidden)
+						}))
+						defer hs.Close()
+
+						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusForbidden, res.StatusCode)
+
+						var errBody fosite.RFC6749ErrorJson
+						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
+						require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
+						require.Equal(t, fosite.ErrAccessDenied.GetDescription(), errBody.Description)
+					})
+
+					t.Run("should fail token refresh with `server_error` if hook response is malformed", func(t *testing.T) {
+						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusOK)
+						}))
+						defer hs.Close()
+
+						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
+
+						var errBody fosite.RFC6749ErrorJson
+						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
+						require.Equal(t, fosite.ErrServerError.Error(), errBody.Name)
+						require.Equal(t, fosite.ErrServerError.GetDescription(), errBody.Description)
 					})
 
 					t.Run("refreshing old token should no longer work", func(t *testing.T) {

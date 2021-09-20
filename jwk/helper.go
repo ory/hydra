@@ -49,13 +49,6 @@ func AsymmetricKeypair(ctx context.Context, r InternalRegistry, g KeyGenerator, 
 	if err != nil {
 		return nil, nil, err
 	}
-	keys, err := r.KeyManager().GetKeySet(ctx, set)
-	if err == nil {
-		pub, err := FindPublicKey(keys)
-		if err == nil {
-			return pub, priv, nil
-		}
-	}
 
 	pub, err := GetOrCreateKey(ctx, r, g, set, "public")
 	if err != nil {

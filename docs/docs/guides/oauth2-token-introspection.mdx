@@ -30,7 +30,7 @@ Another helpful resource is
 const token = 'the access token'
 const body = qs.stringify({ token })
 
-fetch('http://ory-hydra/oauth2/introspect', {
+fetch('http://ory-hydra-admin/oauth2/introspect', {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Content-Length': body.length
@@ -44,6 +44,8 @@ fetch('http://ory-hydra/oauth2/introspect', {
     // token is active
 })
 ```
+
+Where `ory-hydra-admin` implies `http://localhost:4445` if deployed locally.
 
 #### CURL
 

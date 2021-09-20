@@ -94,7 +94,7 @@ func updateKey(set jose.JSONWebKeySet, newKey jose.JSONWebKey) []jose.JSONWebKey
 	if len(set.Key(newKey.KeyID)) > 0 {
 		tempSet := jose.JSONWebKeySet{}
 		for _, key := range set.Keys {
-			//copy not matching keys
+			// Copy not matching keys
 			if key.KeyID != newKey.KeyID {
 				tempSet.Keys = append(tempSet.Keys, key)
 			}

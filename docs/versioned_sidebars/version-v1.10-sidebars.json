@@ -27,6 +27,11 @@
           "href": "https://www.ory.sh/docs/start-building"
         },
         {
+          "label": "Create Ory Cloud Project",
+          "type": "link",
+          "href": "https://www.ory.sh/docs/start-building/create-project"
+        },
+        {
           "label": "Install the Ory CLI",
           "type": "link",
           "href": "https://www.ory.sh/docs/start-building/ory-cli-install-use"
@@ -98,6 +103,11 @@
           "href": "https://www.ory.sh/docs/concepts/project"
         },
         {
+          "label": "Terminology",
+          "type": "link",
+          "href": "https://www.ory.sh/docs/concepts/terminology"
+        },
+        {
           "label": "Personal Access Tokens",
           "type": "link",
           "href": "https://www.ory.sh/docs/concepts/personal-access-token"
@@ -121,6 +131,11 @@
           "label": "API Design",
           "type": "link",
           "href": "https://www.ory.sh/docs/ecosystem/api-design"
+        },
+        {
+          "label": "Services & APIs",
+          "type": "link",
+          "href": "https://www.ory.sh/docs/concepts/services-api"
         }
       ]
     },

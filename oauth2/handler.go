@@ -626,6 +626,14 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	for _, hook := range h.r.AccessRequestHooks() {
+		if err := hook(ctx, accessRequest); err != nil {
+			h.logOrAudit(err, r)
+			h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+			return
+		}
+	}
+
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 
 	if err != nil {

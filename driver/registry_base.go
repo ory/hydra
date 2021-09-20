@@ -69,6 +69,7 @@ type RegistryBase struct {
 	pmm          *prometheus.MetricsManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
+	arhs         []oauth2.AccessRequestHook
 	buildVersion string
 	buildHash    string
 	buildDate    string
@@ -464,4 +465,13 @@ func (m *RegistryBase) WithOAuth2Provider(f fosite.OAuth2Provider) {
 // WithConsentStrategy forces a consent strategy which is only used for testing.
 func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
 	m.cos = c
+}
+
+func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
+	if m.arhs == nil {
+		m.arhs = []oauth2.AccessRequestHook{
+			oauth2.RefreshTokenHook(m.C),
+		}
+	}
+	return m.arhs
 }

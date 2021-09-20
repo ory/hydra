@@ -125,7 +125,7 @@
           {
             "type": "string",
             "description": "The name of the clients to filter by.",
-            "name": "name",
+            "name": "client_name",
             "in": "query"
           },
           {
@@ -2508,7 +2508,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
           "type": "string"
         },
         "Status": {

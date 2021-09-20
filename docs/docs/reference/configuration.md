@@ -7,9 +7,6 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file
-which supports all configuration settings listed below.
-
 You can load the config file from another source using the
 `-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
 `hydra --config path/to/config.yaml`.
@@ -1311,6 +1308,21 @@ oauth2:
     #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_ALLOWED_SCOPE=<value>
     #
     default_grant_allowed_scope: false
+
+  ## refresh_token_hook ##
+  #
+  # Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.
+  #
+  # Examples:
+  # - https://my-example.app/token-refresh-hook
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  #
+  refresh_token_hook: https://my-example.app/token-refresh-hook
 
   ## expose_internal_errors ##
   #

@@ -52,12 +52,12 @@ Something is not working.
 
 #### Issues
 
-- [ ] Report expired JWT assertion token to client
-      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [ ] Client allowed_cors_origins not working
       ([hydra#1754](https://github.com/ory/hydra/issues/1754))
 - [x] Slow consent revocation request
       ([hydra#1997](https://github.com/ory/hydra/issues/1997))
+- [x] Report expired JWT assertion token to client
+      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [x] Client update changes it's PK to 0
       ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
       [@Patrik](https://github.com/zepatrik)

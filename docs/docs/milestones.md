@@ -37,8 +37,6 @@ A request for comments to discuss and share ideas.
 
 #### Issues
 
-- [ ] Device Authorization Grant
-      ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 - [x] Multi-region deployment support
       ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 

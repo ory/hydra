@@ -28,6 +28,11 @@ New feature or request.
       ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 - [ ] Support AWS X-Ray as distributed trace
       ([hydra#2130](https://github.com/ory/hydra/issues/2130))
+- [ ] Refactor client CLI
+      ([hydra#2124](https://github.com/ory/hydra/issues/2124)) -
+      [@Patrik](https://github.com/zepatrik)
+- [ ] Auth grant jwt bearer support
+      ([hydra#2229](https://github.com/ory/hydra/issues/2229))
 - [x] Reuse Detection in Refresh Token Rotation
       ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 
@@ -37,6 +42,8 @@ A request for comments to discuss and share ideas.
 
 #### Issues
 
+- [ ] Device Authorization Grant
+      ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 - [x] Multi-region deployment support
       ([hydra#2018](https://github.com/ory/hydra/issues/2018))
 
@@ -244,8 +251,8 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [ ] Update clients from cli
       ([hydra#2020](https://github.com/ory/hydra/issues/2020))
-- [ ] Find out if a login/consent challenge is still valid
-      ([hydra#2057](https://github.com/ory/hydra/issues/2057))
+- [ ] issuer in discovery document contains trailing '/'
+      ([hydra#1482](https://github.com/ory/hydra/issues/1482))
 - [x] consent: Improve remember for consent
       ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [x] [Feature] Enhance Security Middleware
@@ -277,6 +284,8 @@ New feature or request.
       ([hydra#2031](https://github.com/ory/hydra/issues/2031))
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota
       ([hydra#2033](https://github.com/ory/hydra/issues/2033))
+- [x] Find out if a login/consent challenge is still valid
+      ([hydra#2057](https://github.com/ory/hydra/issues/2057))
 - [x] Prometheus endpoint should not require x-forwarded-proto header
       ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 

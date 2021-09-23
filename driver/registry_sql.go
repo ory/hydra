@@ -55,7 +55,6 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		if m.Tracer(ctx).IsLoaded() {
 			opts = []instrumentedsql.Opt{
 				instrumentedsql.WithTracer(opentracing.NewTracer(true)),
-				instrumentedsql.WithOmitArgs(),
 			}
 		}
 

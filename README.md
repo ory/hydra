@@ -207,6 +207,12 @@ that your company deserves a spot here, reach out to
             <td>Zero</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/commitzero.svg" alt="Project Zero by Commit"></td>
             <td><a href="https://getzero.dev/">getzero.dev</a></td>
+        </tr>        
+        <tr>
+            <td>Adopter *</td>
+            <td>Padis</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/padis.svg" alt="Padis"></td>
+            <td><a href="https://padis.io/">padis.io</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
@@ -219,6 +225,12 @@ that your company deserves a spot here, reach out to
             <td>Spiri.bo</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/spiribo.svg" alt="Spiri.bo"></td>
             <td><a href="https://spiri.bo/">spiri.bo</a></td>
+        </tr>        
+        <tr>
+            <td>Sponsor</td>
+            <td>Strivacity</td>
+            <td align="center"><img height="16px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/strivacity.svg" alt="Strivacity"></td>
+            <td><a href="https://strivacity.com/">strivacity</a></td>
         </tr>
     </tbody>
 </table>

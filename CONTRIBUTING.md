@@ -102,7 +102,7 @@ a few things you can do to help out:
 - **Reviewing documentation changes.** Most documentation just needs a review
   for proper spelling and grammar. If you think a document can be improved in
   any way, feel free to hit the `edit` button at the top of the page. More info
-  on contributing to documentation here.
+  on contributing to documentation [here](#documentation).
 
 - **Help with tests.** Some pull requests may lack proper tests or test plans.
   These are needed for the change to be implemented safely.

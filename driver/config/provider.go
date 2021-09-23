@@ -66,6 +66,7 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
+	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
 )
 
 const DSNMemory = "memory"
@@ -378,6 +379,10 @@ func (p *Provider) OAuth2AuthURL() *url.URL {
 
 func (p *Provider) JWKSURL() *url.URL {
 	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
+}
+
+func (p *Provider) TokenRefreshHookURL() *url.URL {
+	return p.p.URIF(KeyRefreshTokenHookURL, nil)
 }
 
 func (p *Provider) AccessTokenStrategy() string {

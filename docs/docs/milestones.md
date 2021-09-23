@@ -28,6 +28,11 @@ New feature or request.
       ([hydra#1553](https://github.com/ory/hydra/issues/1553))
 - [ ] Support AWS X-Ray as distributed trace
       ([hydra#2130](https://github.com/ory/hydra/issues/2130))
+- [ ] Refactor client CLI
+      ([hydra#2124](https://github.com/ory/hydra/issues/2124)) -
+      [@Patrik](https://github.com/zepatrik)
+- [ ] Auth grant jwt bearer support
+      ([hydra#2229](https://github.com/ory/hydra/issues/2229))
 - [x] Reuse Detection in Refresh Token Rotation
       ([hydra#2022](https://github.com/ory/hydra/issues/2022))
 
@@ -52,12 +57,12 @@ Something is not working.
 
 #### Issues
 
-- [ ] Report expired JWT assertion token to client
-      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [ ] Client allowed_cors_origins not working
       ([hydra#1754](https://github.com/ory/hydra/issues/1754))
 - [x] Slow consent revocation request
       ([hydra#1997](https://github.com/ory/hydra/issues/1997))
+- [x] Report expired JWT assertion token to client
+      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [x] Client update changes it's PK to 0
       ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
       [@Patrik](https://github.com/zepatrik)
@@ -200,6 +205,8 @@ Something is not working.
 - [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
       response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
       [@hackerman](https://github.com/aeneasr)
+- [ ] Jaeger being unavailable is a fatal error that stops service from starting
+      ([hydra#2642](https://github.com/ory/hydra/issues/2642))
 - [x] Introspection Response: `access_token` and `refresh_token` are not valid
       `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 - [x] RSA key generation is slow on ARM
@@ -227,9 +234,6 @@ New feature or request.
       ([hydra#1404](https://github.com/ory/hydra/issues/1404))
 - [ ] Add oAuth2Client to logoutRequest similar to loginRequest.
       ([hydra#1483](https://github.com/ory/hydra/issues/1483))
-- [ ] Add a way to filter/sort the list of clients
-      ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
-      [@hackerman](https://github.com/aeneasr)
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
@@ -247,8 +251,8 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [ ] Update clients from cli
       ([hydra#2020](https://github.com/ory/hydra/issues/2020))
-- [ ] Find out if a login/consent challenge is still valid
-      ([hydra#2057](https://github.com/ory/hydra/issues/2057))
+- [ ] issuer in discovery document contains trailing '/'
+      ([hydra#1482](https://github.com/ory/hydra/issues/1482))
 - [x] consent: Improve remember for consent
       ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [x] [Feature] Enhance Security Middleware
@@ -258,6 +262,9 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible
       ([hydra#1130](https://github.com/ory/hydra/issues/1130)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] Add a way to filter/sort the list of clients
+      ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
 - [x] Remove "not before" claim "nbf" from JWT access token
       ([hydra#1542](https://github.com/ory/hydra/issues/1542))
@@ -277,6 +284,8 @@ New feature or request.
       ([hydra#2031](https://github.com/ory/hydra/issues/2031))
 - [x] Automatically set GOMAXPROCS according to linux container cpu quota
       ([hydra#2033](https://github.com/ory/hydra/issues/2033))
+- [x] Find out if a login/consent challenge is still valid
+      ([hydra#2057](https://github.com/ory/hydra/issues/2057))
 - [x] Prometheus endpoint should not require x-forwarded-proto header
       ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 
@@ -289,6 +298,8 @@ Affects documentation.
 - [ ] Add list of possible errors to REST API documentation
       ([hydra#2166](https://github.com/ory/hydra/issues/2166)) -
       [@Alano Terblanche](https://github.com/Benehiko)
+- [ ] Documentation for hydra-clients-import is incorrect
+      ([hydra#2732](https://github.com/ory/hydra/issues/2732))
 - [x] Docs: rendering issue (?) on reference REST API
       ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
       [@Vincent](https://github.com/vinckr)

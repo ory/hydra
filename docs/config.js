@@ -44,7 +44,7 @@ module.exports = {
     }
   ],
   updateConfig: {
-    src: 'spec/config.json',
-    dst: './docs/docs/reference/configuration.md'
+    src: '../spec/config.json',
+    dst: './docs/reference/configuration.md'
   }
 }

@@ -111,7 +111,7 @@
           {
             "type": "integer",
             "format": "int64",
-            "description": "The maximum amount of policies returned, upper bound is 500 policies",
+            "description": "The maximum amount of clients to returned, upper bound is 500 clients.",
             "name": "limit",
             "in": "query"
           },
@@ -120,6 +120,18 @@
             "format": "int64",
             "description": "The offset from where to start looking.",
             "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "The name of the clients to filter by.",
+            "name": "client_name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "The owner of the clients to filter by.",
+            "name": "owner",
             "in": "query"
           }
         ],
@@ -2154,10 +2166,6 @@
         "Types"
       ],
       "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2500,7 +2508,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
           "type": "string"
         },
         "Status": {

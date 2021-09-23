@@ -31,7 +31,7 @@ var (
 	ErrNotFound = &fosite.RFC6749Error{
 		CodeField:        http.StatusNotFound,
 		ErrorField:       http.StatusText(http.StatusNotFound),
-		DescriptionField: "Unable to located the requested resource",
+		DescriptionField: "Unable to locate the requested resource",
 	}
 	ErrConflict = &fosite.RFC6749Error{
 		CodeField:        http.StatusConflict,

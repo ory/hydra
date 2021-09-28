@@ -196,7 +196,7 @@ session data by calling Hydra Admin API.
 This endpoint is called _before_ any logic in Ory Hydra is executed. If the
 hook, for example, returns an error, the refresh token will remain unused!
 
-::note
+:::note
 
 You can configure `oauth2.refresh_token_hook` config key:
 

@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2021-09-15)](#000-2021-09-15)
+- [0.0.0 (2021-09-28)](#000-2021-09-28)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -593,11 +593,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.10.6...v0.0.0) (2021-09-15)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.10.6...v0.0.0) (2021-09-28)
 
 
 ### Bug Fixes
 
+* Broken note ([#2769](https://github.com/ory/hydra/issues/2769)) ([c84427d](https://github.com/ory/hydra/commit/c84427d334af0342bd06955054c8fc73199ada2e))
 * List oauth2 clients query parameter 'name' -> 'client_name' ([#2747](https://github.com/ory/hydra/issues/2747)) ([283c351](https://github.com/ory/hydra/commit/283c3514c63eba87d314013977c21bbebb9f1c6d)):
 
     This commit renders the docs to be in parity with an earlier change [1]
@@ -609,6 +610,7 @@
 
 ### Documentation
 
+* Clarify endpoint ([#2757](https://github.com/ory/hydra/issues/2757)) ([d772748](https://github.com/ory/hydra/commit/d772748be7902dd76366c16359ead2e84b54b4c6)), closes [#2751](https://github.com/ory/hydra/issues/2751)
 * Faq item ([#2678](https://github.com/ory/hydra/issues/2678)) ([856ccc0](https://github.com/ory/hydra/commit/856ccc0cd3a0b5f7bb58e25c15f4013000b29a50))
 * K8s installation section ([#2724](https://github.com/ory/hydra/issues/2724)) ([aec73bb](https://github.com/ory/hydra/commit/aec73bb15c960bbd7cb8b3925c04b45289647a6b))
 * Remove outdated information in doc configuration section ([#2723](https://github.com/ory/hydra/issues/2723)) ([3f16045](https://github.com/ory/hydra/commit/3f16045dcd000b1b2f87ab059d745869b5450bc6))
@@ -619,11 +621,13 @@
 
 ### Features
 
+* Add method to detect public keys without prefixing ([#2758](https://github.com/ory/hydra/issues/2758)) ([b12e70c](https://github.com/ory/hydra/commit/b12e70c9a08ad62490731f57b5bfcb52c64217f0)), closes [#2459](https://github.com/ory/hydra/issues/2459)
 * Making use of the updated instrumentedsql version ([#2713](https://github.com/ory/hydra/issues/2713)) ([0a9df15](https://github.com/ory/hydra/commit/0a9df1579bb3196134c8b3ede8f28977365518e3))
 * Refresh token hook to update claims ([#2649](https://github.com/ory/hydra/issues/2649)) ([1a7dcd1](https://github.com/ory/hydra/commit/1a7dcd1c464a9707237108a894f7b1d10f27c79a)), closes [#2570](https://github.com/ory/hydra/issues/2570):
 
     This patch adds a new feature to Ory Hydra which allows the updating of access and ID tokens during the refresh flow. To set it up, use the `oauth2.refresh_token_hook` configuration to set up a HTTP(S) endpoint which receives a POST request when a refresh token is about to be issued.
 
+* Support updating keys in CLI ([#2460](https://github.com/ory/hydra/issues/2460)) ([e874f4f](https://github.com/ory/hydra/commit/e874f4f300012f363c0bdf685458d0c56c5a8477)), closes [#2436](https://github.com/ory/hydra/issues/2436)
 
 
 # [1.10.6](https://github.com/ory/hydra/compare/v1.10.5...v1.10.6) (2021-08-28)

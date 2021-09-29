@@ -3,14 +3,14 @@ module github.com/ory/hydra
 go 1.16
 
 replace (
-	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.7-0.20210414154423-1157a4212dcb
-	github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.0.0
+	github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
-    github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
-	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 	github.com/luna-duclos/instrumentedsql => github.com/ory/instrumentedsql v1.2.0
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
+	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.7-0.20210414154423-1157a4212dcb
+	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
+	github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
 )
 
 require (
@@ -26,7 +26,7 @@ require (
 	github.com/gobuffalo/pop/v5 v5.3.4
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
-	github.com/golang/mock v1.5.0
+	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.0
@@ -41,7 +41,7 @@ require (
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.1
-	github.com/ory/fosite v0.40.2
+	github.com/ory/fosite v0.40.3-0.20210927193520-47901ddecc68
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.6
@@ -62,7 +62,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/sys v0.0.0-20210819135213-f52c844e1c1c // indirect
-	golang.org/x/tools v0.1.0
+	golang.org/x/tools v0.1.1
 	gopkg.in/DataDog/dd-trace-go.v1 v1.27.1
-	gopkg.in/square/go-jose.v2 v2.5.1
+	gopkg.in/square/go-jose.v2 v2.5.2-0.20210529014059-a5c7eec3c614
 )

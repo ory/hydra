@@ -34,7 +34,7 @@ docs/cli: .bin/clidoc
 		clidoc .
 
 .bin/ory: Makefile
-		bash <(curl https://raw.githubusercontent.com/ory/cli/master/install.sh) -b .bin TODO
+		bash <(curl https://raw.githubusercontent.com/ory/cli/master/install.sh) -b .bin v0.0.72
 		touch -a -m .bin/ory
 
 .PHONY: lint

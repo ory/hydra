@@ -20,7 +20,7 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 		-----BEGIN PUBLIC KEY-----
 		MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAPf64dykufSkwnvUiBAwd5Si0K6t4m5i
 		qJD8TmLJCmFjKaOUa6nszcFt/FkAuORfdlrD9mEZLPrPx74RSluyTBMCAwEAAQ==
-		-----END PUBLIC KEY-----		
+		-----END PUBLIC KEY-----
 	`)
 
 	type args struct {

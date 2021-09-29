@@ -21,6 +21,8 @@
 package jwk
 
 import (
+	"crypto/ecdsa"
+	"crypto/rsa"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -70,4 +72,25 @@ func TestFindKeyByPrefix(t *testing.T) {
 func TestIder(t *testing.T) {
 	assert.True(t, len(Ider("public", "")) > len("public:"))
 	assert.Equal(t, "public:foo", Ider("public", "foo"))
+}
+
+func TestHandlerFindPublicKey(t *testing.T) {
+	var testRSGenerator = RS256Generator{}
+	var testECDSAGenerator = ECDSA256Generator{}
+
+	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
+		RSIDKS, _ := testRSGenerator.Generate("test-id-1", "sig")
+		keys, err := FindPublicKey(RSIDKS)
+		require.NoError(t, err)
+		assert.Equal(t, keys.KeyID, Ider("public", "test-id-1"))
+		assert.IsType(t, keys.Key, new(rsa.PublicKey))
+	})
+
+	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {
+		ECDSAIDKS, _ := testECDSAGenerator.Generate("test-id-2", "sig")
+		keys, err := FindPublicKey(ECDSAIDKS)
+		require.NoError(t, err)
+		assert.Equal(t, keys.KeyID, Ider("public", "test-id-2"))
+		assert.IsType(t, keys.Key, new(ecdsa.PublicKey))
+	})
 }

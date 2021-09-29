@@ -145,6 +145,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				Subject:  &subject,
 				Remember: !*rr.Payload.Skip,
 				Acr:      "1",
+				Amr:      models.StringSlicePipeDelimiter{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
 			if checkRequestPayload != nil {
@@ -213,6 +214,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.EqualValues(t, reg.Config().IssuerURL().String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
 		assert.Equal(t, "1", claims.Get("acr").String(), "%s", claims)
+		require.Len(t, claims.Get("amr").Array(), 1, "%s", claims)
+		assert.EqualValues(t, "pwd", claims.Get("amr").Array()[0].String(), "%s", claims)
 
 		require.Len(t, claims.Get("aud").Array(), 1, "%s", claims)
 		assert.EqualValues(t, c.ClientID, claims.Get("aud").Array()[0].String(), "%s", claims)

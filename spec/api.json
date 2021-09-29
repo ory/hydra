@@ -2166,10 +2166,6 @@
         "Types"
       ],
       "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2583,6 +2579,9 @@
           "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
         },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
         },
@@ -2628,6 +2627,9 @@
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
+        },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "challenge": {
           "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",

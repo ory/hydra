@@ -16,52 +16,66 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewDisconnectUserParams creates a new DisconnectUserParams object
-// with the default values initialized.
+// NewDisconnectUserParams creates a new DisconnectUserParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDisconnectUserParams() *DisconnectUserParams {
-
 	return &DisconnectUserParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDisconnectUserParamsWithTimeout creates a new DisconnectUserParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDisconnectUserParamsWithTimeout(timeout time.Duration) *DisconnectUserParams {
-
 	return &DisconnectUserParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDisconnectUserParamsWithContext creates a new DisconnectUserParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDisconnectUserParamsWithContext(ctx context.Context) *DisconnectUserParams {
-
 	return &DisconnectUserParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDisconnectUserParamsWithHTTPClient creates a new DisconnectUserParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDisconnectUserParamsWithHTTPClient(client *http.Client) *DisconnectUserParams {
-
 	return &DisconnectUserParams{
 		HTTPClient: client,
 	}
 }
 
-/*DisconnectUserParams contains all the parameters to send to the API endpoint
-for the disconnect user operation typically these are written to a http.Request
+/* DisconnectUserParams contains all the parameters to send to the API endpoint
+   for the disconnect user operation.
+
+   Typically these are written to a http.Request.
 */
 type DisconnectUserParams struct {
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the disconnect user params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DisconnectUserParams) WithDefaults() *DisconnectUserParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the disconnect user params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DisconnectUserParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the disconnect user params

@@ -5,14 +5,14 @@ export PATH := .bin:${PATH}
 export PWD := $(shell pwd)
 
 GO_DEPENDENCIES = github.com/ory/go-acc \
-				  golang.org/x/tools/cmd/goimports \
-				  github.com/golang/mock/mockgen \
-				  github.com/go-swagger/go-swagger/cmd/swagger \
-				  github.com/go-bindata/go-bindata/go-bindata
+					golang.org/x/tools/cmd/goimports \
+					github.com/golang/mock/mockgen \
+					github.com/go-swagger/go-swagger/cmd/swagger \
+					github.com/go-bindata/go-bindata/go-bindata
 
 define make-go-dependency
-  # go install is responsible for not re-building when the code hasn't changed
-  .bin/$(notdir $1): go.sum go.mod
+	# go install is responsible for not re-building when the code hasn't changed
+	.bin/$(notdir $1): go.sum go.mod
 		GOBIN=$(PWD)/.bin/ go install $1
 endef
 
@@ -66,7 +66,9 @@ test-resetdb: node_modules
 # Runs tests in short mode, without database adapters
 .PHONY: docker
 docker:
+		docker build -f .docker/Dockerfile-alpine -t oryd/hydra:latest-alpine .
 		docker build -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite .
+		docker build -f .docker/Dockerfile-scratch -t oryd/hydra:latest-scratch .
 
 .PHONY: e2e
 e2e: node_modules test-resetdb

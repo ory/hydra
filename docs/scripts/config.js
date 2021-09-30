@@ -11,7 +11,7 @@ const { execSync } = require('child_process')
 const fetch = require('node-fetch')
 
 const oryXVersion = execSync(
-  "cd ..; go list -f '{{.Module.Version}}' -find github.com/ory/x"
+  "cd ..; go list -f '{{.Version}}' -m github.com/ory/x"
 )
   .toString('utf-8')
   .trim()

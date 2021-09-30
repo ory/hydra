@@ -63,7 +63,7 @@ test-resetdb: node_modules
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:9.6
 		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v20.2.6 start-single-node --insecure
 
-# Runs tests in short mode, without database adapters
+# Build local docker images
 .PHONY: docker
 docker:
 		docker build -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite .

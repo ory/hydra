@@ -18,58 +18,73 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewRejectConsentRequestParams creates a new RejectConsentRequestParams object
-// with the default values initialized.
+// NewRejectConsentRequestParams creates a new RejectConsentRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewRejectConsentRequestParams() *RejectConsentRequestParams {
-	var ()
 	return &RejectConsentRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewRejectConsentRequestParamsWithTimeout creates a new RejectConsentRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewRejectConsentRequestParamsWithTimeout(timeout time.Duration) *RejectConsentRequestParams {
-	var ()
 	return &RejectConsentRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewRejectConsentRequestParamsWithContext creates a new RejectConsentRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewRejectConsentRequestParamsWithContext(ctx context.Context) *RejectConsentRequestParams {
-	var ()
 	return &RejectConsentRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewRejectConsentRequestParamsWithHTTPClient creates a new RejectConsentRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewRejectConsentRequestParamsWithHTTPClient(client *http.Client) *RejectConsentRequestParams {
-	var ()
 	return &RejectConsentRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*RejectConsentRequestParams contains all the parameters to send to the API endpoint
-for the reject consent request operation typically these are written to a http.Request
+/* RejectConsentRequestParams contains all the parameters to send to the API endpoint
+   for the reject consent request operation.
+
+   Typically these are written to a http.Request.
 */
 type RejectConsentRequestParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.RejectRequest
-	/*ConsentChallenge*/
+
+	// ConsentChallenge.
 	ConsentChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the reject consent request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RejectConsentRequestParams) WithDefaults() *RejectConsentRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the reject consent request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RejectConsentRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the reject consent request params
@@ -134,7 +149,6 @@ func (o *RejectConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
@@ -145,6 +159,7 @@ func (o *RejectConsentRequestParams) WriteToRequest(r runtime.ClientRequest, reg
 	qrConsentChallenge := o.ConsentChallenge
 	qConsentChallenge := qrConsentChallenge
 	if qConsentChallenge != "" {
+
 		if err := r.SetQueryParam("consent_challenge", qConsentChallenge); err != nil {
 			return err
 		}

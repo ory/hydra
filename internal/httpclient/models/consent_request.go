@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -20,6 +22,9 @@ type ConsentRequest struct {
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
 	Acr string `json:"acr,omitempty"`
+
+	// amr
+	Amr StringSlicePipeDelimiter `json:"amr,omitempty"`
 
 	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
@@ -70,6 +75,10 @@ type ConsentRequest struct {
 func (m *ConsentRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAmr(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateChallenge(formats); err != nil {
 		res = append(res, err)
 	}
@@ -96,6 +105,21 @@ func (m *ConsentRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *ConsentRequest) validateAmr(formats strfmt.Registry) error {
+	if swag.IsZero(m.Amr) { // not required
+		return nil
+	}
+
+	if err := m.Amr.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amr")
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (m *ConsentRequest) validateChallenge(formats strfmt.Registry) error {
 
 	if err := validate.Required("challenge", "body", m.Challenge); err != nil {
@@ -106,7 +130,6 @@ func (m *ConsentRequest) validateChallenge(formats strfmt.Registry) error {
 }
 
 func (m *ConsentRequest) validateClient(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Client) { // not required
 		return nil
 	}
@@ -124,7 +147,6 @@ func (m *ConsentRequest) validateClient(formats strfmt.Registry) error {
 }
 
 func (m *ConsentRequest) validateOidcContext(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.OidcContext) { // not required
 		return nil
 	}
@@ -142,7 +164,6 @@ func (m *ConsentRequest) validateOidcContext(formats strfmt.Registry) error {
 }
 
 func (m *ConsentRequest) validateRequestedAccessTokenAudience(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.RequestedAccessTokenAudience) { // not required
 		return nil
 	}
@@ -158,12 +179,105 @@ func (m *ConsentRequest) validateRequestedAccessTokenAudience(formats strfmt.Reg
 }
 
 func (m *ConsentRequest) validateRequestedScope(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.RequestedScope) { // not required
 		return nil
 	}
 
 	if err := m.RequestedScope.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this consent request based on the context it is used
+func (m *ConsentRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmr(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateClient(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOidcContext(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRequestedAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRequestedScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateAmr(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Amr.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amr")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateClient(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Client != nil {
+		if err := m.Client.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("client")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateOidcContext(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OidcContext != nil {
+		if err := m.OidcContext.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidc_context")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateRequestedAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.RequestedAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateRequestedScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.RequestedScope.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
 		}

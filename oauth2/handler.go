@@ -730,6 +730,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		RequestedAt:                         session.RequestedAt,
 		Extra:                               session.Session.IDToken,
 		AuthenticationContextClassReference: session.ConsentRequest.ACR,
+		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
 
 		// These are required for work around https://github.com/ory/fosite/issues/530
 		Nonce:    authorizeRequest.GetRequestForm().Get("nonce"),

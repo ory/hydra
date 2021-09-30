@@ -18,58 +18,73 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewRejectLogoutRequestParams creates a new RejectLogoutRequestParams object
-// with the default values initialized.
+// NewRejectLogoutRequestParams creates a new RejectLogoutRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewRejectLogoutRequestParams() *RejectLogoutRequestParams {
-	var ()
 	return &RejectLogoutRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewRejectLogoutRequestParamsWithTimeout creates a new RejectLogoutRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewRejectLogoutRequestParamsWithTimeout(timeout time.Duration) *RejectLogoutRequestParams {
-	var ()
 	return &RejectLogoutRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewRejectLogoutRequestParamsWithContext creates a new RejectLogoutRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewRejectLogoutRequestParamsWithContext(ctx context.Context) *RejectLogoutRequestParams {
-	var ()
 	return &RejectLogoutRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewRejectLogoutRequestParamsWithHTTPClient creates a new RejectLogoutRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewRejectLogoutRequestParamsWithHTTPClient(client *http.Client) *RejectLogoutRequestParams {
-	var ()
 	return &RejectLogoutRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*RejectLogoutRequestParams contains all the parameters to send to the API endpoint
-for the reject logout request operation typically these are written to a http.Request
+/* RejectLogoutRequestParams contains all the parameters to send to the API endpoint
+   for the reject logout request operation.
+
+   Typically these are written to a http.Request.
 */
 type RejectLogoutRequestParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.RejectRequest
-	/*LogoutChallenge*/
+
+	// LogoutChallenge.
 	LogoutChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the reject logout request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RejectLogoutRequestParams) WithDefaults() *RejectLogoutRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the reject logout request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *RejectLogoutRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the reject logout request params
@@ -134,7 +149,6 @@ func (o *RejectLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg 
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
@@ -145,6 +159,7 @@ func (o *RejectLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg 
 	qrLogoutChallenge := o.LogoutChallenge
 	qLogoutChallenge := qrLogoutChallenge
 	if qLogoutChallenge != "" {
+
 		if err := r.SetQueryParam("logout_challenge", qLogoutChallenge); err != nil {
 			return err
 		}

@@ -35,8 +35,8 @@ Manage OAuth 2.0 Clients
   one or more JSON files
 - [hydra clients import](hydra-clients-import) - Import OAuth 2.0 Clients from
   one or more JSON files
-- [hydra clients import](hydra-clients-import) - Imports cryptographic keys of
-  any format to the JSON Web Key Store
+- [hydra clients import](hydra-clients-import) - Imports OAuth 2.0 Clients from
+  one or more JSON files to the JSON Web Key Store
 - [hydra clients import](hydra-clients-import) - Import OAuth 2.0 Clients from
   one or more JSON files
 - [hydra clients list](hydra-clients-list) - List OAuth 2.0 Clients

@@ -24,8 +24,8 @@ import (
 func NewKeysImportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "import <set> <file-1> [<file-2> [<file-3 [<...>]]]",
-		Short: "Imports cryptographic keys of any format to the JSON Web Key Store",
-		Long: `This command allows you to import cryptographic keys to the JSON Web Key Store.
+		Short: "Imports OAuth 2.0 Clients from one or more JSON files to the JSON Web Key Store",
+		Long: `This command allows you to import OAuth 2.0 Clients from one or more JSON files to the JSON Web Key Store.
 
 Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If the JSON Web Key Set exists already,
 the imported keys will be added to that set. Otherwise, a new set will be created.

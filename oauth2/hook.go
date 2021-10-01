@@ -81,6 +81,7 @@ func RefreshTokenHook(config *config.Provider) AccessRequestHook {
 					WithDebug("refresh token hook: new http request"),
 			)
 		}
+		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 		resp, err := client.Do(req)
 		if err != nil {

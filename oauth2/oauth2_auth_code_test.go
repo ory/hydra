@@ -915,6 +915,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					t.Run("should call refresh token hook if configured", func(t *testing.T) {
 						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							assert.Equal(t, r.Header.Get("Content-Type"), "application/json; charset=UTF-8")
+
 							var hookReq hydraoauth2.RefreshTokenHookRequest
 							require.NoError(t, json.NewDecoder(r.Body).Decode(&hookReq))
 							require.Equal(t, hookReq.Subject, "foo")

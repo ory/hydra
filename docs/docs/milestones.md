@@ -298,14 +298,14 @@ Affects documentation.
 - [ ] Add list of possible errors to REST API documentation
       ([hydra#2166](https://github.com/ory/hydra/issues/2166)) -
       [@Alano Terblanche](https://github.com/Benehiko)
-- [ ] Documentation for hydra-clients-import is incorrect
-      ([hydra#2732](https://github.com/ory/hydra/issues/2732))
 - [x] Docs: rendering issue (?) on reference REST API
       ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
       [@Vincent](https://github.com/vinckr)
 - [x] 'make deps' Not work
       ([hydra#2154](https://github.com/ory/hydra/issues/2154)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] Documentation for hydra-clients-import is incorrect
+      ([hydra#2732](https://github.com/ory/hydra/issues/2732))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

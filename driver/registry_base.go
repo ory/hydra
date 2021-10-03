@@ -432,11 +432,20 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectId
 
 func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 	if m.trc == nil {
-		t, err := tracing.New(m.l, m.C.Tracing())
-		if err != nil {
-			m.Logger().WithError(err).Fatalf("Unable to initialize Tracer.")
+		var err error
+		var t *tracing.Tracer
+
+		// Make 3 attempts to initialize tracer
+		for i := 0; i < 3; i++ {
+			t, err = tracing.New(m.l, m.C.Tracing())
+			if err != nil {
+				m.Logger().WithError(err).Println("Unable to initialize Tracer. Retrying")
+			} else {
+				m.trc = t
+				break
+			}
 		}
-		m.trc = t
+		m.Logger().WithError(err).Println("Failed to initialize Tracer.")
 	}
 
 	return m.trc

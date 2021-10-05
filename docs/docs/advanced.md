@@ -245,6 +245,7 @@ private/public keypairs with currently supported signing algorithms:
 - RS256 (default), RS384, RS512
 - PS256, PS384, PS512
 - ES256, ES384, ES512
+- EdDSA
 
 This authentication method replaces the classic HTTP Basic Authorization and
 HTTP POST Authorization schemes. Instead of sending the `client_id` and
@@ -329,6 +330,27 @@ And here is how it looks like for a `jwks` including an ECDSA public key:
   },
   "token_endpoint_auth_method": "private_key_jwt",
   "token_endpoint_auth_signing_alg": "ES256"
+}
+```
+
+And here is how it looks like for a `jwks` including an EdDSA public key:
+
+```json
+{
+  "client_id": "eddsa-client-jwks",
+  "jwks": {
+    "keys": [
+      {
+        "kty": "OKP",
+        "use": "sig",
+        "crv": "Ed25519",
+        "kid": "eddsa-jwk",
+        "x": "cg1qGqQGSF6xvzoDZVaDfxu0c2fPhUEuVHYUr1WYVXs"
+      }
+    ]
+  },
+  "token_endpoint_auth_method": "private_key_jwt",
+  "token_endpoint_auth_signing_alg": "EdDSA"
 }
 ```
 

@@ -33,7 +33,7 @@ func NewKeysCreateCmd() *cobra.Command {
 		Short: "Create a new JSON Web Key Set",
 		Run:   cli.NewHandler().Keys.CreateKeys,
 	}
-	cmd.Flags().StringP("alg", "a", "RS256", "The algorithm to be used to generated they key. Supports: RS256, ES512, HS256")
+	cmd.Flags().StringP("alg", "a", "RS256", "The algorithm to be used to generated they key. Supports: RS256, ES512, HS256, EdDSA")
 	cmd.Flags().StringP("use", "u", "sig", "The intended use of this key")
 	return cmd
 }

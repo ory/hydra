@@ -92,6 +92,28 @@ func TestGenerator(t *testing.T) {
 				assert.Equal(t, "enc", ks.Keys[1].Use)
 			},
 		},
+		{
+			g:   &EdDSAGenerator{},
+			use: "sig",
+			check: func(ks *jose.JSONWebKeySet) {
+				assert.Len(t, ks, 2)
+				assert.NotEmpty(t, ks.Keys[0].Key)
+				assert.NotEmpty(t, ks.Keys[1].Key)
+				assert.Equal(t, "sig", ks.Keys[0].Use)
+				assert.Equal(t, "sig", ks.Keys[1].Use)
+			},
+		},
+		{
+			g:   &EdDSAGenerator{},
+			use: "enc",
+			check: func(ks *jose.JSONWebKeySet) {
+				assert.Len(t, ks, 2)
+				assert.NotEmpty(t, ks.Keys[0].Key)
+				assert.NotEmpty(t, ks.Keys[1].Key)
+				assert.Equal(t, "sig", ks.Keys[0].Use)
+				assert.Equal(t, "sig", ks.Keys[1].Use)
+			},
+		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			keys, err := c.g.Generate("foo", c.use)

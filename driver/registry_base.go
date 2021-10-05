@@ -227,6 +227,7 @@ func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
 			"ES512": &jwk.ECDSA512Generator{},
 			"HS256": &jwk.HS256Generator{},
 			"HS512": &jwk.HS512Generator{},
+			"EdDSA": &jwk.EdDSAGenerator{},
 		}
 	}
 	return m.kg

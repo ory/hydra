@@ -435,9 +435,10 @@ func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 	if m.trc == nil {
 		t, err := tracing.New(m.l, m.C.Tracing())
 		if err != nil {
-			m.Logger().WithError(err).Fatalf("Unable to initialize Tracer.")
+			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
+		} else {
+			m.trc = t
 		}
-		m.trc = t
 	}
 
 	return m.trc

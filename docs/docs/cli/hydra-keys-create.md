@@ -21,7 +21,7 @@ hydra keys create &lt;set&gt; &lt;key&gt; [flags]
 ### Options
 
 ```
-  -a, --alg string   The algorithm to be used to generated they key. Supports: RS256, ES512, HS256 (default &#34;RS256&#34;)
+  -a, --alg string   The algorithm to be used to generated they key. Supports: RS256, ES512, HS256, EdDSA (default &#34;RS256&#34;)
   -h, --help         help for create
   -u, --use string   The intended use of this key (default &#34;sig&#34;)
 ```

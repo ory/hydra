@@ -23,12 +23,11 @@ package jwk
 import (
 	"context"
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-
-	"golang.org/x/crypto/ed25519"
 
 	"github.com/ory/x/errorsx"
 
@@ -136,7 +135,7 @@ func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 
 	for _, k := range set.Keys {
 		_, ecdsaOk := k.Key.(*ecdsa.PublicKey)
-		_, ed25519OK := k.Key.(*ed25519.PublicKey)
+		_, ed25519OK := k.Key.(ed25519.PublicKey)
 		_, rsaOK := k.Key.(*rsa.PublicKey)
 
 		if ecdsaOk || ed25519OK || rsaOK {
@@ -172,6 +171,12 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 			return nil, errorsx.WithStack(err)
 		}
 		return &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}, nil
+	case ed25519.PrivateKey:
+		b, err := x509.MarshalPKCS8PrivateKey(k)
+		if err != nil {
+			return nil, errorsx.WithStack(err)
+		}
+		return &pem.Block{Type: "PRIVATE KEY", Bytes: b}, nil
 	default:
 		return nil, errors.New("Invalid key type")
 	}

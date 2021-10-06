@@ -462,7 +462,7 @@
         }
       },
       "post": {
-        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA, EdDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -1656,7 +1656,7 @@
           "example": "1603dfe0af8f4596"
         },
         "kty": {
-          "description": "The \"kty\" (key type) parameter identifies the cryptographic algorithm\nfamily used with the key, such as \"RSA\", \"EC\" or \"OKP\". \"kty\" values should\neither be registered in the IANA \"JSON Web Key Types\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.  The \"kty\" value is a case-sensitive string.",
+          "description": "The \"kty\" (key type) parameter identifies the cryptographic algorithm\nfamily used with the key, such as \"RSA\" or \"EC\". \"kty\" values should\neither be registered in the IANA \"JSON Web Key Types\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.  The \"kty\" value is a case-sensitive string.",
           "type": "string",
           "example": "RSA"
         },
@@ -1695,10 +1695,6 @@
         "y": {
           "type": "string",
           "example": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0"
-        },
-        "d": {
-          "type": "string",
-          "example": "coI45jiIFWasP6gSRyUZkud4OCdoiemikVjClc1v8uA"
         }
       }
     },
@@ -1840,10 +1836,6 @@
       "type": "object",
       "required": ["Socket", "Types"],
       "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
         "Socket": {
           "description": "socket",
           "type": "string"
@@ -2227,6 +2219,9 @@
           "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
         },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
         },
@@ -2268,6 +2263,9 @@
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
+        },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "challenge": {
           "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -2390,7 +2388,7 @@
       "required": ["alg", "use", "kid"],
       "properties": {
         "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", \"HS256\", and \"EdDSA\"",
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"",
           "type": "string"
         },
         "kid": {

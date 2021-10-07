@@ -205,8 +205,6 @@ Something is not working.
 - [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
       response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
       [@hackerman](https://github.com/aeneasr)
-- [ ] Jaeger being unavailable is a fatal error that stops service from starting
-      ([hydra#2642](https://github.com/ory/hydra/issues/2642))
 - [x] Introspection Response: `access_token` and `refresh_token` are not valid
       `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 - [x] RSA key generation is slow on ARM
@@ -218,6 +216,8 @@ Something is not working.
 - [x] Docs: rendering issue (?) on reference REST API
       ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
       [@Vincent](https://github.com/vinckr)
+- [x] Jaeger being unavailable is a fatal error that stops service from starting
+      ([hydra#2642](https://github.com/ory/hydra/issues/2642))
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 

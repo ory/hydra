@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/ory/x/configx"
 
 	"github.com/ory/hydra/persistence/sql"
@@ -75,6 +77,8 @@ func TestMigrations(t *testing.T) {
 					expected := expectedClient(i)
 					actual := &client.Client{}
 					require.NoError(t, c.Where("id = ?", expected.OutfacingID).First(actual))
+					require.NotEqual(t, uuid.Nil.String(), actual.ID.String())
+					expected.ID = actual.ID
 					assertEqualClients(t, expected, actual)
 					lastClient = actual
 				})

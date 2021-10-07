@@ -1,0 +1,1 @@
+ALTER TABLE hydra_client ALTER pk_new SET DEFAULT gen_random_uuid();

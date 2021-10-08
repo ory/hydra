@@ -143,6 +143,16 @@ func TestMigrations(t *testing.T) {
 				})
 			}
 
+			t.Run("case=client migration 20211004/description=new client ID should be valid UUIDv4 variant 1", func(t *testing.T) {
+				outfacingID := fmt.Sprintf("client-%04d", 1)
+				require.NoError(t, d.Persister().CreateClient(context.Background(), &client.Client{OutfacingID: outfacingID}))
+				actual := &client.Client{}
+				require.NoError(t, c.Where("id = ?", outfacingID).First(actual))
+				require.NotEqual(t, actual.ID, uuid.Nil)
+				require.Equal(t, actual.ID.Version(), byte(0x4))
+				require.Equal(t, actual.ID.Variant(), byte(0x1))
+			})
+
 			// TODO https://github.com/ory/hydra/issues/1815
 			// this is very stupid and should be replaced as soon the manager uses pop
 			// necessary because the manager does not provide any way to access the data

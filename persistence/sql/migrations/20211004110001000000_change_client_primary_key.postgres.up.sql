@@ -1,6 +1,6 @@
 ALTER TABLE hydra_client RENAME pk TO pk_deprecated;
 -- UUID generation based on https://stackoverflow.com/a/21327318/12723442
-ALTER TABLE hydra_client ADD COLUMN pk_new UUID DEFAULT uuid_in(
+ALTER TABLE hydra_client ADD COLUMN pk UUID DEFAULT uuid_in(
   overlay(
     overlay(
       md5(random()::text || ':' || clock_timestamp()::text)
@@ -11,6 +11,6 @@ ALTER TABLE hydra_client ADD COLUMN pk_new UUID DEFAULT uuid_in(
     from 17
   )::cstring
 );
-ALTER TABLE hydra_client ALTER pk_new DROP DEFAULT;
+ALTER TABLE hydra_client ALTER pk DROP DEFAULT;
 ALTER TABLE hydra_client DROP CONSTRAINT hydra_client_pkey;
-ALTER TABLE hydra_client ADD PRIMARY KEY (pk_new);
+ALTER TABLE hydra_client ADD PRIMARY KEY (pk);

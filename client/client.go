@@ -38,7 +38,7 @@ import (
 //
 // swagger:model oAuth2Client
 type Client struct {
-	ID uuid.UUID `json:"-" db:"pk_new"`
+	ID uuid.UUID `json:"-" db:"pk"`
 
 	// This field is deprecated and will be removed
 	PKDeprecated int64 `json:"-" db:"pk_deprecated"`

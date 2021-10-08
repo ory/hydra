@@ -1,6 +1,6 @@
 INSERT INTO hydra_client
 (
-  pk_new,
+  pk,
   pk_deprecated,
   id,
   client_name,

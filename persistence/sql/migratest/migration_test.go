@@ -144,7 +144,7 @@ func TestMigrations(t *testing.T) {
 			}
 
 			t.Run("case=client migration 20211004/description=new client ID should be valid UUIDv4 variant 1", func(t *testing.T) {
-				outfacingID := fmt.Sprintf("client-%04d", 1)
+				outfacingID := "2021100400"
 				require.NoError(t, d.Persister().CreateClient(context.Background(), &client.Client{OutfacingID: outfacingID}))
 				actual := &client.Client{}
 				require.NoError(t, c.Where("id = ?", outfacingID).First(actual))

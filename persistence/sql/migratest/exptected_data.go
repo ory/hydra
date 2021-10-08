@@ -17,9 +17,9 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-func expectedClient(i int) *client.Client {
+func expectedClient(id uuid.UUID, i int) *client.Client {
 	c := &client.Client{
-		ID:                                uuid.Nil,
+		ID:                                id,
 		PKDeprecated:                      int64(i),
 		OutfacingID:                       fmt.Sprintf("client-%04d", i),
 		Name:                              fmt.Sprintf("Client %04d", i),

@@ -74,10 +74,11 @@ func TestMigrations(t *testing.T) {
 					continue
 				}
 				t.Run(fmt.Sprintf("case=client migration %d", i), func(t *testing.T) {
-					expected := expectedClient(i)
 					actual := &client.Client{}
-					require.NoError(t, c.Where("id = ?", expected.OutfacingID).First(actual))
-					require.NotEqual(t, uuid.Nil.String(), actual.ID.String())
+					outfacingID := fmt.Sprintf("client-%04d", i)
+					require.NoError(t, c.Where("id = ?", outfacingID).First(actual))
+					require.NotEqual(t, actual.ID, uuid.Nil) // random UUID is backfilled in a migration
+					expected := expectedClient(actual.ID, i)
 					expected.ID = actual.ID
 					assertEqualClients(t, expected, actual)
 					lastClient = actual

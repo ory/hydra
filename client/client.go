@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
 	jose "gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
 
@@ -37,7 +38,10 @@ import (
 //
 // swagger:model oAuth2Client
 type Client struct {
-	ID int64 `json:"-" db:"pk"`
+	ID uuid.UUID `json:"-" db:"pk"`
+
+	// This field is deprecated and will be removed
+	PKDeprecated int64 `json:"-" db:"pk_deprecated"`
 
 	// ID  is the id for this client.
 	OutfacingID string `json:"client_id" db:"id"`

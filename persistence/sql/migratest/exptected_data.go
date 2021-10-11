@@ -6,6 +6,8 @@ import (
 
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
@@ -15,9 +17,10 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
-func expectedClient(i int) *client.Client {
+func expectedClient(id uuid.UUID, i int) *client.Client {
 	c := &client.Client{
-		ID:                                int64(i),
+		ID:                                id,
+		PKDeprecated:                      int64(i),
 		OutfacingID:                       fmt.Sprintf("client-%04d", i),
 		Name:                              fmt.Sprintf("Client %04d", i),
 		Secret:                            fmt.Sprintf("secret-%04d", i),

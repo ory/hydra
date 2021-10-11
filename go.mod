@@ -28,6 +28,7 @@ require (
 	github.com/gobuffalo/pop/v6 v6.0.1
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
+	github.com/gofrs/uuid v4.1.0+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/securecookie v1.1.1

@@ -24,6 +24,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/gofrs/uuid"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
@@ -43,12 +44,14 @@ type (
 	}
 
 	SQLData struct {
-		ID        int       `db:"pk"`
-		Set       string    `db:"sid"`
-		KID       string    `db:"kid"`
-		Version   int       `db:"version"`
-		CreatedAt time.Time `db:"created_at"`
-		Key       string    `db:"keydata"`
+		ID uuid.UUID `db:"pk"`
+		// This field is deprecated and will be removed
+		PKDeprecated int64     `json:"-" db:"pk_deprecated"`
+		Set          string    `db:"sid"`
+		KID          string    `db:"kid"`
+		Version      int       `db:"version"`
+		CreatedAt    time.Time `db:"created_at"`
+		Key          string    `db:"keydata"`
 	}
 )
 

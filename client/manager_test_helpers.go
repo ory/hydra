@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
@@ -34,6 +35,11 @@ import (
 
 	"github.com/ory/hydra/x"
 )
+
+func assertUUID(t *testing.T, id *uuid.UUID) {
+	require.Equal(t, id.Version(), uuid.V4)
+	require.Equal(t, id.Variant(), uuid.VariantRFC4122)
+}
 
 func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
@@ -45,7 +51,11 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 			TermsOfServiceURI: "foo",
 		}
 		assert.NoError(t, m.CreateClient(ctx, c))
-		// assert.NotEmpty(t, c.ID)
+		dbClient, err := m.GetClient(ctx, c.GetID())
+		assert.NoError(t, err)
+		dbClientConcrete, ok := dbClient.(*Client)
+		assert.True(t, ok)
+		assertUUID(t, &dbClientConcrete.ID)
 		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }

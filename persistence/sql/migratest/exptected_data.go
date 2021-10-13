@@ -89,13 +89,14 @@ func expectedClient(id uuid.UUID, i int) *client.Client {
 	return c
 }
 
-func expectedJWK(i int) *jwk.SQLData {
+func expectedJWK(id uuid.UUID, i int) *jwk.SQLData {
 	return &jwk.SQLData{
-		ID:      i,
-		Set:     fmt.Sprintf("sid-%04d", i),
-		KID:     fmt.Sprintf("kid-%04d", i),
-		Version: i,
-		Key:     fmt.Sprintf("key-%04d", i),
+		ID:           id,
+		PKDeprecated: int64(i),
+		Set:          fmt.Sprintf("sid-%04d", i),
+		KID:          fmt.Sprintf("kid-%04d", i),
+		Version:      i,
+		Key:          fmt.Sprintf("key-%04d", i),
 	}
 }
 

@@ -16,56 +16,70 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewGetLogoutRequestParams creates a new GetLogoutRequestParams object
-// with the default values initialized.
+// NewGetLogoutRequestParams creates a new GetLogoutRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetLogoutRequestParams() *GetLogoutRequestParams {
-	var ()
 	return &GetLogoutRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetLogoutRequestParamsWithTimeout creates a new GetLogoutRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetLogoutRequestParamsWithTimeout(timeout time.Duration) *GetLogoutRequestParams {
-	var ()
 	return &GetLogoutRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetLogoutRequestParamsWithContext creates a new GetLogoutRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetLogoutRequestParamsWithContext(ctx context.Context) *GetLogoutRequestParams {
-	var ()
 	return &GetLogoutRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetLogoutRequestParamsWithHTTPClient creates a new GetLogoutRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetLogoutRequestParamsWithHTTPClient(client *http.Client) *GetLogoutRequestParams {
-	var ()
 	return &GetLogoutRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetLogoutRequestParams contains all the parameters to send to the API endpoint
-for the get logout request operation typically these are written to a http.Request
+/* GetLogoutRequestParams contains all the parameters to send to the API endpoint
+   for the get logout request operation.
+
+   Typically these are written to a http.Request.
 */
 type GetLogoutRequestParams struct {
 
-	/*LogoutChallenge*/
+	// LogoutChallenge.
 	LogoutChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get logout request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetLogoutRequestParams) WithDefaults() *GetLogoutRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get logout request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetLogoutRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get logout request params
@@ -124,6 +138,7 @@ func (o *GetLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg str
 	qrLogoutChallenge := o.LogoutChallenge
 	qLogoutChallenge := qrLogoutChallenge
 	if qLogoutChallenge != "" {
+
 		if err := r.SetQueryParam("logout_challenge", qLogoutChallenge); err != nil {
 			return err
 		}

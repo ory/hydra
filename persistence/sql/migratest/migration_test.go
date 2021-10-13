@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/gobuffalo/pop/v6"
-	"github.com/gofrs/uuid"
 
 	"github.com/ory/x/configx"
 
+	"github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/ory/x/popx"
@@ -28,11 +28,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 )
-
-func assertUUID(t *testing.T, id *uuid.UUID) {
-	require.Equal(t, id.Version(), uuid.V4)
-	require.Equal(t, id.Variant(), uuid.VariantRFC4122)
-}
 
 func TestMigrations(t *testing.T) {
 	if testing.Short() {
@@ -83,7 +78,7 @@ func TestMigrations(t *testing.T) {
 					actual := &client.Client{}
 					outfacingID := fmt.Sprintf("client-%04d", i)
 					require.NoError(t, c.Where("id = ?", outfacingID).First(actual))
-					assertUUID(t, &actual.ID)
+					uuid.AssertUUID(t, &actual.ID)
 					expected := expectedClient(actual.ID, i)
 					assertEqualClients(t, expected, actual)
 					lastClient = actual
@@ -145,14 +140,6 @@ func TestMigrations(t *testing.T) {
 					}
 				})
 			}
-
-			t.Run("case=client migration 20211004/description=new client ID should be valid UUIDv4 variant 1", func(t *testing.T) {
-				outfacingID := "2021100400"
-				require.NoError(t, d.Persister().CreateClient(context.Background(), &client.Client{OutfacingID: outfacingID}))
-				actual := &client.Client{}
-				require.NoError(t, c.Where("id = ?", outfacingID).First(actual))
-				assertUUID(t, &actual.ID)
-			})
 
 			// TODO https://github.com/ory/hydra/issues/1815
 			// this is very stupid and should be replaced as soon the manager uses pop

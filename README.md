@@ -35,7 +35,7 @@ If you're looking to jump straight into it, go ahead:
 - [Install and Set Up ORY Hydra](https://www.ory.sh/docs/hydra/configure-deploy): An advanced look at installation options and interaction with ORY Hydra.
 - [Integrating your Login and Consent UI with ORY Hydra](https://www.ory.sh/docs/hydra/oauth2): The go-to place if you wish to adopt ORY Hydra in your new or existing stack.
 
-Besides mitigating various attack vectors, such as database compromise and OAuth 2.0 weaknesses, ORY Hydra is also
+Besides mitigating various attack vectors, such as a compromised database and OAuth 2.0 weaknesses, ORY Hydra is also
 able to securely manage JSON Web Keys.
 [Click here](https://www.ory.sh/docs/next/hydra/security-architecture) to read more about security.
 
@@ -78,7 +78,7 @@ able to securely manage JSON Web Keys.
 - [Libraries and third-party projects](#libraries-and-third-party-projects)
 - [Blog posts & articles](#blog-posts--articles)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto-update -->
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## What is ORY Hydra?
 
@@ -312,7 +312,7 @@ To obtain certification, we deployed the [reference user login and consent app](
 
 ## Quickstart
 
-This section is a quick start guide to working with ORY Hydra. In-depth docs are available as well:
+This section is a starter guide to working with ORY Hydra. In-depth docs are available as well:
 
 * The documentation is available [here](https://www.ory.sh/docs/next/hydra).
 * The REST API documentation is available [here](https://www.ory.sh/docs/next/hydra/sdk/api).

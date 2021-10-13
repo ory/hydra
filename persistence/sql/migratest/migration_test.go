@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gofrs/uuid"
-
 	"github.com/ory/x/configx"
 
+	"github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/ory/x/popx"
@@ -77,8 +76,7 @@ func TestMigrations(t *testing.T) {
 					actual := &client.Client{}
 					outfacingID := fmt.Sprintf("client-%04d", i)
 					require.NoError(t, c.Where("id = ?", outfacingID).First(actual))
-					require.Equal(t, actual.ID.Version(), uuid.V4)
-					require.Equal(t, actual.ID.Variant(), uuid.VariantRFC4122)
+					uuid.AssertUUID(t, &actual.ID)
 					expected := expectedClient(actual.ID, i)
 					assertEqualClients(t, expected, actual)
 					lastClient = actual

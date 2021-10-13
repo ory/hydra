@@ -32,6 +32,7 @@ import (
 
 	"github.com/ory/fosite"
 
+	"github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/x"
 )
 
@@ -45,7 +46,11 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 			TermsOfServiceURI: "foo",
 		}
 		assert.NoError(t, m.CreateClient(ctx, c))
-		// assert.NotEmpty(t, c.ID)
+		dbClient, err := m.GetClient(ctx, c.GetID())
+		assert.NoError(t, err)
+		dbClientConcrete, ok := dbClient.(*Client)
+		assert.True(t, ok)
+		uuid.AssertUUID(t, &dbClientConcrete.ID)
 		assert.NoError(t, m.DeleteClient(ctx, c.GetID()))
 	}
 }

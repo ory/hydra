@@ -138,12 +138,6 @@ that your company deserves a spot here, reach out to
         </tr>
         <tr>
             <td>Sponsor</td>
-            <td>ThoughtWorks</td>
-            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/tw.svg" alt="ThoughtWorks"></td>
-            <td><a href="https://www.thoughtworks.com/">thoughtworks.com</a></td>
-        </tr>
-        <tr>
-            <td>Sponsor</td>
             <td>Tulip</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/tulip.svg" alt="Tulip Retail"></td>
             <td><a href="https://tulip.com/">tulip.com</a></td>
@@ -153,12 +147,6 @@ that your company deserves a spot here, reach out to
             <td>Cashdeck / All My Funds</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/allmyfunds.svg" alt="All My Funds"></td>
             <td><a href="https://cashdeck.com.au/">cashdeck.com.au</a></td>
-        </tr>
-        <tr>
-            <td>Sponsor</td>
-            <td>3Rein</td>
-            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/3R-horiz.svg" alt="3Rein"></td>
-            <td><a href="https://3rein.com/">3rein.com</a></td>
         </tr>
         <tr>
             <td>Contributor</td>

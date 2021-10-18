@@ -91,8 +91,8 @@ Implementing and using OAuth2 without understanding the whole specification is c
 SDKs are being used. The primary goal of ORY Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
 
 ORY Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
-or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
-to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/) or your proprietary Java authentication.
+or some template engine or a predefined front-end. Instead, it relies on HTTP redirection and cryptographic methods
+to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/), or your proprietary Java authentication.
 
 ### Who's using it?
 
@@ -100,13 +100,13 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 
 The Ory community stands on the shoulders of individuals, companies, and
 maintainers. We thank everyone involved - from submitting bug reports and
-feature requests, to contributing patches, to sponsoring our work. Our community
+feature requests to contributing patches to sponsoring our work. Our community
 is 1000+ strong and growing rapidly. The Ory stack protects 16.000.000.000+ API
 requests every month with over 250.000+ active service nodes. We would have
-never been able to achieve this without each and everyone of you!
+never been able to achieve this without each and every one of you!
 
 The following list represents companies that have accompanied us along the way
-and that have made outstanding contributions to our ecosystem. _If you think
+and have made outstanding contributions to our ecosystem. _If you think
 that your company deserves a spot here, reach out to
 <a href="mailto:office-muc@ory.sh">office-muc@ory.sh</a> now_!
 
@@ -308,7 +308,7 @@ This section is a quickstart guide to working with ORY Hydra. In-depth docs are 
 ### 5 minutes tutorial: Run your very own OAuth2 environment
 
 The **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)** teaches you to set up ORY Hydra,
-a Postgres instance and an exemplary identity provider written in React using docker-compose.
+a Postgres instance, and an exemplary identity provider written in React using docker-compose.
 It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh/docs/next/hydra/5min-tutorial)**.
 
 <img src="docs/static/img/docs/oauth2-flow.gif" alt="OAuth2 Flow">
@@ -317,7 +317,7 @@ It will take you about 5 minutes to complete the **[tutorial](https://www.ory.sh
 
 ### Installation
 
-Head over to the [ORY Developer Documentation](https://www.ory.sh/docs/next/hydra/configure-deploy#installing-ory-hydra) to learn how to install ORY Hydra on Linux, macOS, Windows, and Docker and how to build ORY Hydra from source.
+Head over to the [ORY Developer Documentation](https://www.ory.sh/docs/next/hydra/configure-deploy#installing-ory-hydra) to learn how to install ORY Hydra on Linux, macOS, Windows, and Docker and how to build ORY Hydra from the source.
 
 ## Ecosystem
 
@@ -331,7 +331,7 @@ design:
 - Scales without effort
 - Minimize room for human and network errors
 
-Ory's architecture designed to run best on a Container Orchestration Systems
+Ory's architecture is designed to run best on  Container Orchestration Systems
 such as Kubernetes, CloudFoundry, OpenShift, and similar projects. Binaries are
 small (5-15MB) and available for all popular processor types (ARM, AMD64, i386)
 and operating systems (FreeBSD, Linux, macOS, Windows) without system
@@ -340,17 +340,17 @@ dependencies (Java, Node, Ruby, libxml, ...).
 ### Ory Kratos: Identity and User Infrastructure and Management
 
 [Ory Kratos](https://github.com/ory/kratos) is an API-first Identity and User
-Management system that is built according to
+Management system  built according to
 [cloud architecture best practices](https://www.ory.sh/docs/next/ecosystem/software-architecture-philosophy).
 It implements core use cases that almost every software application needs to
 deal with: Self-service Login and Registration, Multi-Factor Authentication
-(MFA/2FA), Account Recovery and Verification, Profile and Account Management.
+(MFA/2FA), Account Recovery and Verification, Profile, and Account Management.
 
 ### Ory Hydra: OAuth2 & OpenID Connect Server
 
 [Ory Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
 OpenID Connect Provider which easily connects to any existing identity system by
-writing a tiny "bridge" application. Gives absolute control over user interface
+writing a tiny "bridge" application. Gives absolute control over the user interface
 and user experience flows.
 
 ### Ory Oathkeeper: Identity & Access Proxy
@@ -393,10 +393,10 @@ to perform a certain action on a resource.
 
 ## Security
 
-*Why should I use ORY Hydra? It's not that hard to implement two OAuth2 endpoints and there are numerous SDKs out there!*
+*Why should I use ORY Hydra? It's not that hard to implement two OAuth2 endpoints and, there are numerous SDKs out there!*
 
-OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy, getting it right is hard.
-ORY Hydra is trusted by companies all around the world, has a vibrant community and faces millions of requests in production
+OAuth2 and OAuth2 related specifications are over 400 written pages. Implementing OAuth2 is easy; getting it right is hard.
+ORY Hydra is trusted by companies worldwide, has a vibrant community, and faces millions of requests in production
 each day. Of course, we also compiled a security guide with more details on cryptography and security concepts.
 Read [the security guide now](https://www.ory.sh/docs/next/hydra/security-architecture).
 
@@ -429,7 +429,7 @@ The HTTP API is documented [here](https://www.ory.sh/docs/next/hydra/sdk/api).
 New releases might introduce breaking changes. To help you identify and incorporate those changes, we document these
 changes in [UPGRADE.md](./UPGRADE.md) and [CHANGELOG.md](./CHANGELOG.md).
 
-### Command line documentation
+### Command-line documentation
 
 Run `hydra -h` or `hydra help`.
 
@@ -449,7 +449,7 @@ It is possible to develop ORY Hydra on Windows, but please be aware that all gui
 
 #### Formatting Code
 
-You can format all code using `make format`. Our CI checks if your code is properly formatted.
+You can format all code using `make format`. Our CI checks if your code is formatted correctly.
 
 #### Running Tests
 
@@ -507,7 +507,7 @@ go test -v -failfast -short -tags sqlite -run ^TestName$ ./...
 
 Regular tests require a database set up. Our test suite is able to work with docker directly (using [ory/dockertest](https://github.com/ory/dockertest))
 but we encourage to use the Makefile instead. Using dockertest can bloat the number of Docker Images on your system
-and are quite slow. Instead we recommend doing:
+and are quite slow. Instead, we recommend doing:
 
 ```shell script
 make test
@@ -542,7 +542,7 @@ make e2e
 ```
 
 The runner will not show the Browser window, as it runs in the CI Mode (background). That makes debugging these
-type of tests very difficult, but thankfully you can run the e2e test in the browser which helps with debugging! Just run:
+types of tests very difficult, but thankfully you can run the e2e test in the browser, which helps with debugging! Just run:
 
 ```shell script
 ./test/e2e/circle-ci.bash memory --watch

@@ -13,8 +13,6 @@ replace (
 	github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
 )
 
-replace github.com/ory/fosite => github.com/aarmam/fosite v0.40.2-0.20210815183342-cea98a80a5fb
-
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/cenkalti/backoff/v3 v3.0.0

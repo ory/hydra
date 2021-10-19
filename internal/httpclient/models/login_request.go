@@ -126,8 +126,6 @@ func (m *LoginRequest) validateClient(formats strfmt.Registry) error {
 		if err := m.Client.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("client")
 			}
 			return err
 		}
@@ -145,8 +143,6 @@ func (m *LoginRequest) validateOidcContext(formats strfmt.Registry) error {
 		if err := m.OidcContext.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("oidc_context")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("oidc_context")
 			}
 			return err
 		}
@@ -173,8 +169,6 @@ func (m *LoginRequest) validateRequestedAccessTokenAudience(formats strfmt.Regis
 	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_access_token_audience")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("requested_access_token_audience")
 		}
 		return err
 	}
@@ -191,8 +185,6 @@ func (m *LoginRequest) validateRequestedScope(formats strfmt.Registry) error {
 	if err := m.RequestedScope.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("requested_scope")
 		}
 		return err
 	}
@@ -250,8 +242,6 @@ func (m *LoginRequest) contextValidateClient(ctx context.Context, formats strfmt
 		if err := m.Client.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("client")
 			}
 			return err
 		}
@@ -266,8 +256,6 @@ func (m *LoginRequest) contextValidateOidcContext(ctx context.Context, formats s
 		if err := m.OidcContext.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("oidc_context")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("oidc_context")
 			}
 			return err
 		}
@@ -281,8 +269,6 @@ func (m *LoginRequest) contextValidateRequestedAccessTokenAudience(ctx context.C
 	if err := m.RequestedAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_access_token_audience")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("requested_access_token_audience")
 		}
 		return err
 	}
@@ -295,8 +281,6 @@ func (m *LoginRequest) contextValidateRequestedScope(ctx context.Context, format
 	if err := m.RequestedScope.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("requested_scope")
 		}
 		return err
 	}

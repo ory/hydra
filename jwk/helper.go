@@ -127,23 +127,15 @@ func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeyS
 	return keys, nil
 }
 
-func FilterOpaqueKeys(set *jose.JSONWebKeySet) (*jose.JSONWebKeySet, error) {
+func ExcludeOpaquePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
 
-	var opaque bool
 	for _, k := range set.Keys {
 		if _, opaque := k.Key.(jose.OpaqueSigner); !opaque {
 			keys.Keys = append(keys.Keys, k)
 		}
 	}
-
-	if len(keys.Keys) == 0 {
-		if opaque {
-			return nil, errors.Errorf("Unable to return opaque private key in JSON Web Key Set")
-		}
-	}
-
-	return keys, nil
+	return keys
 }
 
 func PEMBlockForKey(key interface{}) (*pem.Block, error) {

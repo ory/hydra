@@ -98,6 +98,7 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 		keys = ExcludePrivateKeys(keys)
 		jwks.Keys = append(jwks.Keys, keys.Keys...)
 	}
+
 	h.r.Writer().Write(w, r, &jwks)
 }
 
@@ -128,12 +129,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-
-	keys, err = FilterOpaqueKeys(keys)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
+	keys = ExcludeOpaquePrivateKeys(keys)
 
 	h.r.Writer().Write(w, r, keys)
 }
@@ -167,12 +163,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-
-	keys, err = FilterOpaqueKeys(keys)
-	if err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
+	keys = ExcludeOpaquePrivateKeys(keys)
 
 	h.r.Writer().Write(w, r, keys)
 }
@@ -207,13 +198,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	if keys, err := h.r.KeyManager().GenerateKeySet(r.Context(), set, keyRequest.KeyID, keyRequest.Algorithm, keyRequest.Use); err == nil {
-
-		keys, err = FilterOpaqueKeys(keys)
-		if err != nil {
-			h.r.Writer().WriteError(w, r, err)
-			return
-		}
-
+		keys = ExcludeOpaquePrivateKeys(keys)
 		h.r.Writer().WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 	} else {
 		h.r.Writer().WriteError(w, r, err)

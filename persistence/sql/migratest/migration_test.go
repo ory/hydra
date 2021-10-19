@@ -93,7 +93,7 @@ func TestMigrations(t *testing.T) {
 				t.Run(fmt.Sprintf("case=jwk migration %d", i), func(t *testing.T) {
 					actual := &jwk.SQLData{}
 					require.NoError(t, c.Where("pk_deprecated = ?", i).First(actual))
-					assertUUID(t, &actual.ID)
+					uuid.AssertUUID(t, &actual.ID)
 					expected := expectedJWK(actual.ID, i)
 					assertEqualJWKs(t, expected, actual)
 				})

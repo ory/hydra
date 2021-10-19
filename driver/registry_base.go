@@ -60,7 +60,7 @@ type RegistryBase struct {
 	fsc          fosite.ScopeStrategy
 	atjs         jwk.JWTStrategy
 	idtjs        jwk.JWTStrategy
-	hsm          *hsm.Context
+	hsm          hsm.Context
 	fscPrev      string
 	fos          *openid.DefaultStrategy
 	forv         *openid.OpenIDConnectRequestValidator
@@ -488,7 +488,7 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	return m.arhs
 }
 
-func (m *RegistryBase) HsmContext() *hsm.Context {
+func (m *RegistryBase) HsmContext() hsm.Context {
 	if m.hsm == nil {
 		m.hsm = hsm.NewContext(m.C, m.l)
 	}

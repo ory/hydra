@@ -17,7 +17,7 @@ type Context interface {
 	GetAttribute(key interface{}, attribute crypto11.AttributeType) (a *crypto11.Attribute, err error)
 }
 
-func NewContext(c *config.Provider, l *logrusx.Logger) *Context {
+func NewContext(c *config.Provider, l *logrusx.Logger) Context {
 	config11 := &crypto11.Config{
 		Path: c.HsmLibraryPath(),
 		Pin:  c.HsmPin(),
@@ -38,5 +38,5 @@ func NewContext(c *config.Provider, l *logrusx.Logger) *Context {
 	}
 
 	var hsmContext Context = ctx11
-	return &hsmContext
+	return hsmContext
 }

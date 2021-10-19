@@ -87,8 +87,6 @@ func (m *PluginSettings) validateDevices(formats strfmt.Registry) error {
 			if err := m.Devices[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Devices" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("Devices" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -123,8 +121,6 @@ func (m *PluginSettings) validateMounts(formats strfmt.Registry) error {
 			if err := m.Mounts[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Mounts" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("Mounts" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -161,8 +157,6 @@ func (m *PluginSettings) contextValidateDevices(ctx context.Context, formats str
 			if err := m.Devices[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Devices" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("Devices" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -181,8 +175,6 @@ func (m *PluginSettings) contextValidateMounts(ctx context.Context, formats strf
 			if err := m.Mounts[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Mounts" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("Mounts" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

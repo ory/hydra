@@ -15,6 +15,9 @@ version: '3.7'
 services:
 
   hydra:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile-hsm
     environment:
       - HSM_ENABLED=true
       - HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so

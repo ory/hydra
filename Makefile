@@ -87,7 +87,7 @@ quicktest:
 
 .PHONY: quicktest-hsm
 quicktest-hsm:
-		docker build --progress=plain -f .docker/Dockerfile-build -t oryd/hydra:latest-sqlite --target test-hsm .
+		docker build --progress=plain -f .docker/Dockerfile-hsm --target test-hsm .
 
 # Formats the code
 .PHONY: format

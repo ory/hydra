@@ -425,6 +425,7 @@
       "type": "string",
       "description": "Sets the data source name. This configures the backend where ORY Hydra persists data. If dsn is \"memory\", data will be written to memory and is lost when you restart this instance. ORY Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
     },
+
     "webfinger": {
       "type": "object",
       "additionalProperties": false,
@@ -867,6 +868,11 @@
               ]
             }
           }
+        },
+        "enable_one_time_use_refresh_token": {
+          "type": "boolean",
+          "description": "Configures refresh_token behavior. By default refresh tokens are one time use.",
+          "default": true
         }
       }
     },

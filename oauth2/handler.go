@@ -21,6 +21,7 @@
 package oauth2
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -576,8 +577,13 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       400: jsonError
 //       500: jsonError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
+
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
 	var ctx = r.Context()
+
+	ctx = context.WithValue(ctx,
+		fosite.EnableOneTimeUseRefreshTokenContextKey,
+		h.c.EnableOneTimeUseRefreshToken())
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 

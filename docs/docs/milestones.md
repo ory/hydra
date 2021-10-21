@@ -75,17 +75,8 @@ New feature or request.
 
 #### Issues
 
-- [ ] consent: Allow removing tokens without revoking consent
-      ([hydra#1142](https://github.com/ory/hydra/issues/1142)) -
-      [@hackerman](https://github.com/aeneasr)
-- [ ] OAuth Client authentication creation CLI jwks client field not present
-      ([hydra#1404](https://github.com/ory/hydra/issues/1404))
-- [ ] Add oAuth2Client to logoutRequest similar to loginRequest.
-      ([hydra#1483](https://github.com/ory/hydra/issues/1483))
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
-- [ ] CLI Migration Down
-      ([hydra#1763](https://github.com/ory/hydra/issues/1763))
 - [ ] Move to go-jose key generation
       ([hydra#1825](https://github.com/ory/hydra/issues/1825))
 - [ ] Token claims customization with Jsonnet
@@ -103,6 +94,13 @@ New feature or request.
 - [x] oauth2: Make cleaning up refresh and authz codes possible
       ([hydra#1130](https://github.com/ory/hydra/issues/1130)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] consent: Allow removing tokens without revoking consent
+      ([hydra#1142](https://github.com/ory/hydra/issues/1142)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] OAuth Client authentication creation CLI jwks client field not present
+      ([hydra#1404](https://github.com/ory/hydra/issues/1404))
+- [x] Add oAuth2Client to logoutRequest similar to loginRequest.
+      ([hydra#1483](https://github.com/ory/hydra/issues/1483))
 - [x] Add a way to filter/sort the list of clients
       ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
@@ -116,6 +114,8 @@ New feature or request.
 - [x] Migrate to gobuffalo/pop
       ([hydra#1730](https://github.com/ory/hydra/issues/1730)) -
       [@Patrik](https://github.com/zepatrik)
+- [x] CLI Migration Down
+      ([hydra#1763](https://github.com/ory/hydra/issues/1763))
 - [x] Split HTTPS handling for public/admin
       ([hydra#1962](https://github.com/ory/hydra/issues/1962))
 - [x] issueLogoutVerifier should allow POST requests as well

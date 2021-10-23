@@ -35,7 +35,7 @@ If you're looking to jump straight into it, go ahead:
 - [Install and Set Up ORY Hydra](https://www.ory.sh/docs/hydra/configure-deploy): An advanced look at installation options and interaction with ORY Hydra.
 - [Integrating your Login and Consent UI with ORY Hydra](https://www.ory.sh/docs/hydra/oauth2): The go-to place if you wish to adopt ORY Hydra in your new or existing stack.
 
-Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
+Besides mitigating various attack vectors, such as a compromised database and OAuth 2.0 weaknesses, ORY Hydra is also
 able to securely manage JSON Web Keys.
 [Click here](https://www.ory.sh/docs/next/hydra/security-architecture) to read more about security.
 
@@ -91,7 +91,7 @@ Implementing and using OAuth2 without understanding the whole specification is c
 SDKs are being used. The primary goal of ORY Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
 
 ORY Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
-or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
+or some template engine or a predefined front-end. Instead, it relies on HTTP redirection and cryptographic methods
 to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/) or your proprietary Java authentication.
 
 ### Who's using it?
@@ -100,10 +100,10 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 
 The Ory community stands on the shoulders of individuals, companies, and
 maintainers. We thank everyone involved - from submitting bug reports and
-feature requests, to contributing patches, to sponsoring our work. Our community
+feature requests to contributing patches to sponsoring our work. Our community
 is 1000+ strong and growing rapidly. The Ory stack protects 16.000.000.000+ API
 requests every month with over 250.000+ active service nodes. We would have
-never been able to achieve this without each and everyone of you!
+never been able to achieve this without each and every one of you!
 
 The following list represents companies that have accompanied us along the way
 and that have made outstanding contributions to our ecosystem. _If you think
@@ -300,7 +300,7 @@ To obtain certification, we deployed the [reference user login and consent app](
 
 ## Quickstart
 
-This section is a quickstart guide to working with ORY Hydra. In-depth docs are available as well:
+This section is a starter guide to working with ORY Hydra. In-depth docs are available as well:
 
 * The documentation is available [here](https://www.ory.sh/docs/next/hydra).
 * The REST API documentation is available [here](https://www.ory.sh/docs/next/hydra/sdk/api).
@@ -331,7 +331,7 @@ design:
 - Scales without effort
 - Minimize room for human and network errors
 
-Ory's architecture designed to run best on a Container Orchestration Systems
+Ory's architecture is designed to run best on a Container Orchestration Systems
 such as Kubernetes, CloudFoundry, OpenShift, and similar projects. Binaries are
 small (5-15MB) and available for all popular processor types (ARM, AMD64, i386)
 and operating systems (FreeBSD, Linux, macOS, Windows) without system
@@ -340,17 +340,17 @@ dependencies (Java, Node, Ruby, libxml, ...).
 ### Ory Kratos: Identity and User Infrastructure and Management
 
 [Ory Kratos](https://github.com/ory/kratos) is an API-first Identity and User
-Management system that is built according to
+A management system that is built according to
 [cloud architecture best practices](https://www.ory.sh/docs/next/ecosystem/software-architecture-philosophy).
 It implements core use cases that almost every software application needs to
 deal with: Self-service Login and Registration, Multi-Factor Authentication
-(MFA/2FA), Account Recovery and Verification, Profile and Account Management.
+(MFA/2FA), Account Recovery and Verification, Profile, and Account Management.
 
 ### Ory Hydra: OAuth2 & OpenID Connect Server
 
 [Ory Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
 OpenID Connect Provider which easily connects to any existing identity system by
-writing a tiny "bridge" application. Gives absolute control over user interface
+writing a tiny "bridge" application. Gives absolute control over the user interface
 and user experience flows.
 
 ### Ory Oathkeeper: Identity & Access Proxy

@@ -659,7 +659,7 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			jti := NewBlacklistedJTI("already set jti", time.Now().Add(time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
-			assert.True(t, errors.Is(store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown))
+			assert.ErrorIs(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown)
 		})
 
 		t.Run("case=deletes expired JTIs", func(t *testing.T) {

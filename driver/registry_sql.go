@@ -83,8 +83,6 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 			return err
 		}
 
-		// TODO: Some keys might need option to use software key manager. Ideas how to refactor this?
-		// 	Current solution ignores HSM configuration for TLS keys and always uses software key manager for persistence.
 		if m.C.HsmEnabled() {
 			m.defaultKeyManager = hsm.NewKeyManager(m.HsmContext())
 		} else {

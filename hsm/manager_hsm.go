@@ -6,6 +6,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rsa"
 	"crypto/x509"
+	"github.com/pkg/errors"
 	"net/http"
 	"sync"
 
@@ -81,7 +82,7 @@ func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string
 		return createKeySet(key, kid, alg, use)
 	// TODO: HS256, HS512. Makes sense only if shared HSM is used between hydra and authenticating application?
 	default:
-		return nil, jwk.ErrUnsupportedKeyAlgorithm
+		return nil, errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
 	}
 }
 
@@ -95,7 +96,7 @@ func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKe
 	}
 
 	if keyPair == nil {
-		return nil, x.ErrNotFound
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	id, alg, use, err := getKeySetAttributes(m, keyPair, []byte(kid))
@@ -116,7 +117,7 @@ func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeyS
 	}
 
 	if keyPairs == nil {
-		return nil, x.ErrNotFound
+		return nil, errors.WithStack(x.ErrNotFound)
 	}
 
 	var keys []jose.JSONWebKey
@@ -148,7 +149,7 @@ func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
 			return err
 		}
 	} else {
-		return x.ErrNotFound
+		return errors.WithStack(x.ErrNotFound)
 	}
 	return nil
 }
@@ -163,7 +164,7 @@ func (m *KeyManager) DeleteKeySet(_ context.Context, set string) error {
 	}
 
 	if keyPairs == nil {
-		return x.ErrNotFound
+		return errors.WithStack(x.ErrNotFound)
 	}
 
 	for _, keyPair := range keyPairs {
@@ -176,19 +177,19 @@ func (m *KeyManager) DeleteKeySet(_ context.Context, set string) error {
 }
 
 func (m *KeyManager) AddKey(_ context.Context, _ string, _ *jose.JSONWebKey) error {
-	return ErrPreGeneratedKeys
+	return errors.WithStack(ErrPreGeneratedKeys)
 }
 
 func (m *KeyManager) AddKeySet(_ context.Context, _ string, _ *jose.JSONWebKeySet) error {
-	return ErrPreGeneratedKeys
+	return errors.WithStack(ErrPreGeneratedKeys)
 }
 
 func (m *KeyManager) UpdateKey(_ context.Context, _ string, _ *jose.JSONWebKey) error {
-	return ErrPreGeneratedKeys
+	return errors.WithStack(ErrPreGeneratedKeys)
 }
 
 func (m *KeyManager) UpdateKeySet(_ context.Context, _ string, _ *jose.JSONWebKeySet) error {
-	return ErrPreGeneratedKeys
+	return errors.WithStack(ErrPreGeneratedKeys)
 }
 
 func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string, string, string, error) {
@@ -212,7 +213,7 @@ func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string
 		}
 	// TODO: HS256, HS512. Makes sense only if shared HSM is used between hydra and authenticating application?
 	default:
-		return "", "", "", jwk.ErrUnsupportedKeyAlgorithm
+		return "", "", "", errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
 	}
 
 	use := "sig"

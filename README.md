@@ -100,10 +100,10 @@ to verify user consent allowing you to use ORY Hydra with any authentication end
 
 The Ory community stands on the shoulders of individuals, companies, and
 maintainers. We thank everyone involved - from submitting bug reports and
-feature requests to contributing patches to sponsoring our work. Our community
+feature requests, to contributing patches, to sponsoring our work. Our community
 is 1000+ strong and growing rapidly. The Ory stack protects 16.000.000.000+ API
 requests every month with over 250.000+ active service nodes. We would have
-never been able to achieve this without each and every one of you!
+never been able to achieve this without each and everyone of you!
 
 The following list represents companies that have accompanied us along the way
 and that have made outstanding contributions to our ecosystem. _If you think
@@ -178,7 +178,7 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/sainsburys.svg" alt="Sainsbury's"></td>
             <td><a href="https://www.sainsburys.co.uk/">sainsburys.co.uk</a></td>
         </tr>
-                <tr>
+        <tr>
             <td>Adopter *</td>
             <td>Contraste</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/contraste.svg" alt="Contraste"></td>
@@ -225,7 +225,7 @@ that your company deserves a spot here, reach out to
 
 We also want to thank all individual contributors
 
-<a href="https://opencollective.com/ory" target="_blank"><img src="https://opencollective.com/ory/contributors.svg?width=890&button=false" /></a>
+<a href="https://opencollective.com/ory" target="_blank"><img src="https://opencollective.com/ory/contributors.svg?width=890&limit=714&button=false" /></a>
 
 as well as all of our backers
 
@@ -331,7 +331,7 @@ design:
 - Scales without effort
 - Minimize room for human and network errors
 
-Ory's architecture is designed to run best on a Container Orchestration Systems
+Ory's architecture designed to run best on a Container Orchestration Systems
 such as Kubernetes, CloudFoundry, OpenShift, and similar projects. Binaries are
 small (5-15MB) and available for all popular processor types (ARM, AMD64, i386)
 and operating systems (FreeBSD, Linux, macOS, Windows) without system
@@ -340,17 +340,17 @@ dependencies (Java, Node, Ruby, libxml, ...).
 ### Ory Kratos: Identity and User Infrastructure and Management
 
 [Ory Kratos](https://github.com/ory/kratos) is an API-first Identity and User
-A management system that is built according to
+Management system that is built according to
 [cloud architecture best practices](https://www.ory.sh/docs/next/ecosystem/software-architecture-philosophy).
 It implements core use cases that almost every software application needs to
 deal with: Self-service Login and Registration, Multi-Factor Authentication
-(MFA/2FA), Account Recovery and Verification, Profile, and Account Management.
+(MFA/2FA), Account Recovery and Verification, Profile and Account Management.
 
 ### Ory Hydra: OAuth2 & OpenID Connect Server
 
 [Ory Hydra](https://github.com/ory/hydra) is an OpenID Certified™ OAuth2 and
 OpenID Connect Provider which easily connects to any existing identity system by
-writing a tiny "bridge" application. Gives absolute control over the user interface
+writing a tiny "bridge" application. Gives absolute control over user interface
 and user experience flows.
 
 ### Ory Oathkeeper: Identity & Access Proxy

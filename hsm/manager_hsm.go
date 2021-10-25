@@ -6,8 +6,10 @@ import (
 	"crypto/elliptic"
 	"crypto/rsa"
 	"crypto/x509"
-	"fmt"
 	"net/http"
+	"sync"
+
+	"github.com/pborman/uuid"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/jwk"
@@ -17,12 +19,12 @@ import (
 	"github.com/ory/hydra/x"
 
 	"github.com/ThalesIgnite/crypto11"
-	"github.com/pborman/uuid"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/cryptosigner"
 )
 
 type KeyManager struct {
+	sync.RWMutex
 	Context
 }
 
@@ -36,11 +38,13 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 
 func NewKeyManager(hsm Context) *KeyManager {
 	return &KeyManager{
-		hsm,
+		Context: hsm,
 	}
 }
 
 func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+	m.Lock()
+	defer m.Unlock()
 
 	err := m.deleteExistingKeySet(set)
 	if err != nil {
@@ -82,6 +86,9 @@ func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string
 }
 
 func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
+	m.RLock()
+	defer m.RUnlock()
+
 	keyPair, err := m.FindKeyPair([]byte(kid), []byte(set))
 	if err != nil {
 		return nil, err
@@ -95,10 +102,14 @@ func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKe
 	if err != nil {
 		return nil, err
 	}
+
 	return createKeySet(keyPair, id, alg, use)
 }
 
 func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeySet, error) {
+	m.RLock()
+	defer m.RUnlock()
+
 	keyPairs, err := m.FindKeyPairs(nil, []byte(set))
 	if err != nil {
 		return nil, err
@@ -123,6 +134,9 @@ func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeyS
 }
 
 func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
+	m.Lock()
+	defer m.Unlock()
+
 	keyPair, err := m.FindKeyPair([]byte(kid), []byte(set))
 	if err != nil {
 		return err
@@ -140,6 +154,9 @@ func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
 }
 
 func (m *KeyManager) DeleteKeySet(_ context.Context, set string) error {
+	m.Lock()
+	defer m.Unlock()
+
 	keyPairs, err := m.FindKeyPairs(nil, []byte(set))
 	if err != nil {
 		return err
@@ -265,7 +282,7 @@ func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
 		Algorithm:                   alg,
 		Use:                         use,
 		Key:                         cryptosigner.Opaque(key),
-		KeyID:                       fmt.Sprintf("private:%s", kid),
+		KeyID:                       kid,
 		Certificates:                []*x509.Certificate{},
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},
@@ -273,7 +290,7 @@ func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
 		Algorithm:                   alg,
 		Use:                         use,
 		Key:                         key.Public(),
-		KeyID:                       fmt.Sprintf("public:%s", kid),
+		KeyID:                       kid,
 		Certificates:                []*x509.Certificate{},
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},

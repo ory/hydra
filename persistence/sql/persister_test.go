@@ -59,6 +59,7 @@ func TestManagers(t *testing.T) {
 					jwk.TestHelperManagerKeySet(m.KeyManager(), algo, ks, uuid.New())
 				})
 			}
+			t.Run("TestManagerGenerateKeySet", jwk.TestHelperManagerGenerateKeySet(m.KeyManager()))
 		})
 	}
 }

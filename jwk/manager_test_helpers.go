@@ -128,3 +128,30 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 		require.Error(t, err)
 	}
 }
+
+func TestHelperManagerGenerateKeySet(m Manager) func(t *testing.T) {
+	return func(t *testing.T) {
+		_, err := m.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		_, err = m.GenerateKeySet(context.TODO(), "foo", "bar", "RS128", "sig")
+		require.Error(t, err, "Unsupported key algorithm")
+
+		_, err = m.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		keys, err := m.GenerateKeySet(context.TODO(), "foo", "bar", "RS256", "sig")
+		require.NoError(t, err)
+
+		got, err := m.GetKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:bar")), canonicalizeThumbprints(got.Key("public:bar")))
+		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:bar")), canonicalizeThumbprints(got.Key("private:bar")))
+
+		err = m.DeleteKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+
+		_, err = m.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+	}
+}

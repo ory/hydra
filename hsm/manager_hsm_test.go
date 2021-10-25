@@ -51,11 +51,11 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 		use string
 	}
 	tests := []struct {
-		name    string
-		setup   func(t *testing.T)
-		args    args
-		want    *jose.JSONWebKeySet
-		wantErr bool
+		name       string
+		setup      func(t *testing.T)
+		args       args
+		want       *jose.JSONWebKeySet
+		wantErrMsg string
 	}{
 		{
 			name: "Generate RS256",
@@ -117,7 +117,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErr: true,
+			wantErrMsg: "Unsupported key algorithm",
 		},
 	}
 	for _, tt := range tests {
@@ -127,8 +127,8 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 				Context: hsmContext,
 			}
 			got, err := m.GenerateKeySet(tt.args.ctx, tt.args.set, tt.args.kid, tt.args.alg, tt.args.use)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GenerateKeySet() error = %v, wantErr %v", err, tt.wantErr)
+			if len(tt.wantErrMsg) != 0 {
+				require.Error(t, err, tt.wantErrMsg)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -158,6 +158,11 @@ func TestKeyManager_GetKey(t *testing.T) {
 	ecdsaP521KeyPair := NewMockSignerDecrypter(ctrl)
 	ecdsaP521KeyPair.EXPECT().Public().Return(&ecdsaP521Key.PublicKey).AnyTimes()
 
+	ecdsaP224Key, err := ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
+	require.NoError(t, err)
+	ecdsaP224KeyPair := NewMockSignerDecrypter(ctrl)
+	ecdsaP224KeyPair.EXPECT().Public().Return(&ecdsaP224Key.PublicKey).AnyTimes()
+
 	var kid = uuid.New()
 
 	type args struct {
@@ -166,11 +171,11 @@ func TestKeyManager_GetKey(t *testing.T) {
 		kid string
 	}
 	tests := []struct {
-		name    string
-		setup   func(t *testing.T)
-		args    args
-		want    *jose.JSONWebKeySet
-		wantErr bool
+		name       string
+		setup      func(t *testing.T)
+		args       args
+		want       *jose.JSONWebKeySet
+		wantErrMsg string
 	}{
 		{
 			name: "Get RS256 sig",
@@ -273,7 +278,19 @@ func TestKeyManager_GetKey(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErr: true,
+			wantErrMsg: "Unable to locate the requested resource",
+		},
+		{
+			name: "Unsupported elliptic curve",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(ecdsaP224KeyPair, nil)
+			},
+			wantErrMsg: "Unsupported elliptic curve",
 		},
 	}
 	for _, tt := range tests {
@@ -283,8 +300,8 @@ func TestKeyManager_GetKey(t *testing.T) {
 				Context: hsmContext,
 			}
 			got, err := m.GetKey(tt.args.ctx, tt.args.set, tt.args.kid)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetKey() error = %v, wantErr %v", err, tt.wantErr)
+			if len(tt.wantErrMsg) != 0 {
+				require.Error(t, err, tt.wantErrMsg)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -312,11 +329,16 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 	ecdsaP256KeyPair.EXPECT().Public().Return(&ecdsaP256Key.PublicKey).AnyTimes()
 
 	ecdsaP521Key, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-
 	require.NoError(t, err)
 	ecdsaP521Kid := uuid.New()
 	ecdsaP521KeyPair := NewMockSignerDecrypter(ctrl)
 	ecdsaP521KeyPair.EXPECT().Public().Return(&ecdsaP521Key.PublicKey).AnyTimes()
+
+	ecdsaP224Key, err := ecdsa.GenerateKey(elliptic.P224(), rand.Reader)
+	require.NoError(t, err)
+	ecdsaP224Kid := uuid.New()
+	ecdsaP224KeyPair := NewMockSignerDecrypter(ctrl)
+	ecdsaP224KeyPair.EXPECT().Public().Return(&ecdsaP224Key.PublicKey).AnyTimes()
 
 	allKeys := []crypto11.Signer{rsaKeyPair, ecdsaP256KeyPair, ecdsaP521KeyPair}
 
@@ -330,11 +352,11 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 		set string
 	}
 	tests := []struct {
-		name    string
-		setup   func(t *testing.T)
-		args    args
-		want    *jose.JSONWebKeySet
-		wantErr bool
+		name       string
+		setup      func(t *testing.T)
+		args       args
+		want       *jose.JSONWebKeySet
+		wantErrMsg string
 	}{
 		{
 			name: "With multiple keys per set",
@@ -362,7 +384,19 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErr: true,
+			wantErrMsg: "Unable to locate the requested resource",
+		},
+		{
+			name: "Unsupported elliptic curve",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return([]crypto11.Signer{ecdsaP224KeyPair}, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP224KeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(ecdsaP224Kid)), nil)
+			},
+			wantErrMsg: "Unsupported elliptic curve",
 		},
 	}
 	for _, tt := range tests {
@@ -372,8 +406,8 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 				Context: hsmContext,
 			}
 			got, err := m.GetKeySet(tt.args.ctx, tt.args.set)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetKey() error = %v, wantErr %v", err, tt.wantErr)
+			if len(tt.wantErrMsg) != 0 {
+				require.Error(t, err, tt.wantErrMsg)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -398,10 +432,10 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 		kid string
 	}
 	tests := []struct {
-		name    string
-		setup   func(t *testing.T)
-		args    args
-		wantErr bool
+		name       string
+		setup      func(t *testing.T)
+		args       args
+		wantErrMsg string
 	}{
 		{
 			name: "Existing key",
@@ -425,7 +459,7 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErr: true,
+			wantErrMsg: "Unable to locate the requested resource",
 		},
 	}
 	for _, tt := range tests {
@@ -434,8 +468,8 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 			m := &hsm.KeyManager{
 				Context: hsmContext,
 			}
-			if err := m.DeleteKey(tt.args.ctx, tt.args.set, tt.args.kid); (err != nil) != tt.wantErr {
-				t.Errorf("DeleteKey() error = %v, wantErr %v", err, tt.wantErr)
+			if err := m.DeleteKey(tt.args.ctx, tt.args.set, tt.args.kid); len(tt.wantErrMsg) != 0 {
+				require.Error(t, err, tt.wantErrMsg)
 			}
 		})
 	}
@@ -455,10 +489,10 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 		set string
 	}
 	tests := []struct {
-		name    string
-		setup   func(t *testing.T)
-		args    args
-		wantErr bool
+		name       string
+		setup      func(t *testing.T)
+		args       args
+		wantErrMsg string
 	}{
 		{
 			name: "Existing key",
@@ -481,7 +515,7 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErr: true,
+			wantErrMsg: "Unable to locate the requested resource",
 		},
 	}
 	for _, tt := range tests {
@@ -490,8 +524,8 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 			m := &hsm.KeyManager{
 				Context: hsmContext,
 			}
-			if err := m.DeleteKeySet(tt.args.ctx, tt.args.set); (err != nil) != tt.wantErr {
-				t.Errorf("DeleteKey() error = %v, wantErr %v", err, tt.wantErr)
+			if err := m.DeleteKeySet(tt.args.ctx, tt.args.set); len(tt.wantErrMsg) != 0 {
+				require.Error(t, err, tt.wantErrMsg)
 			}
 		})
 	}

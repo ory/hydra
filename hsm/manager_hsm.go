@@ -193,7 +193,8 @@ func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string
 	}
 
 	use := "sig"
-	if ckaEncrypt, _ := m.GetAttribute(key, crypto11.CkaEncrypt); ckaEncrypt != nil && ckaEncrypt.Value[0] == 0x1 {
+	ckaDecrypt, _ := m.GetAttribute(key, crypto11.CkaDecrypt)
+	if ckaDecrypt != nil && len(ckaDecrypt.Value) != 0 && ckaDecrypt.Value[0] == 0x1 {
 		use = "enc"
 	}
 	return string(kid), alg, use, nil

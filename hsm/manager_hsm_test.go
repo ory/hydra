@@ -7,7 +7,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -69,6 +68,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateRSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(4096)).Return(rsaKeyPair, nil)
 			},
 			want: expectedKeySet(rsaKeyPair, kid, "RS256", "sig"),
@@ -84,6 +84,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P256())).Return(ecdsaKeyPair, nil)
 			},
 			want: expectedKeySet(ecdsaKeyPair, kid, "ES256", "sig"),
@@ -99,6 +100,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P521())).Return(ecdsaKeyPair, nil)
 			},
 			want: expectedKeySet(ecdsaKeyPair, kid, "ES512", "sig"),
@@ -112,7 +114,9 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 				alg: "ES384",
 				use: "sig",
 			},
-			setup:   func(t *testing.T) {},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
+			},
 			wantErr: true,
 		},
 	}
@@ -177,7 +181,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(rsaKeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
 			},
 			want: expectedKeySet(rsaKeyPair, kid, "RS256", "sig"),
 		},
@@ -190,7 +194,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(rsaKeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(pkcs11.NewAttribute(pkcs11.CKA_ENCRYPT, true), nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(pkcs11.NewAttribute(pkcs11.CKA_DECRYPT, true), nil)
 			},
 			want: expectedKeySet(rsaKeyPair, kid, "RS256", "enc"),
 		},
@@ -203,7 +207,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(rsaKeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, errors.New(""))
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, errors.New(""))
 			},
 			want: expectedKeySet(rsaKeyPair, kid, "RS256", "sig"),
 		},
@@ -216,7 +220,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(ecdsaP256KeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
 			},
 			want: expectedKeySet(ecdsaP256KeyPair, kid, "ES256", "sig"),
 		},
@@ -229,7 +233,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(ecdsaP256KeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(pkcs11.NewAttribute(pkcs11.CKA_ENCRYPT, true), nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(pkcs11.NewAttribute(pkcs11.CKA_DECRYPT, true), nil)
 			},
 			want: expectedKeySet(ecdsaP256KeyPair, kid, "ES256", "enc"),
 		},
@@ -242,7 +246,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(ecdsaP521KeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
 			},
 			want: expectedKeySet(ecdsaP521KeyPair, kid, "ES512", "sig"),
 		},
@@ -255,7 +259,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(ecdsaP521KeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(pkcs11.NewAttribute(pkcs11.CKA_ENCRYPT, true), nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(pkcs11.NewAttribute(pkcs11.CKA_DECRYPT, true), nil)
 			},
 			want: expectedKeySet(ecdsaP521KeyPair, kid, "ES512", "enc"),
 		},
@@ -341,11 +345,11 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(allKeys, nil)
 				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(rsaKid)), nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
 				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(ecdsaP256Kid)), nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP256KeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
 				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(ecdsaP521Kid)), nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaEncrypt)).Return(nil, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP521KeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
 			},
 			want: &jose.JSONWebKeySet{Keys: keys},
 		},
@@ -550,7 +554,7 @@ func createJSONWebKeys(keyPair *MockSignerDecrypter, kid string, alg string, use
 		Algorithm:                   alg,
 		Use:                         use,
 		Key:                         cryptosigner.Opaque(keyPair),
-		KeyID:                       fmt.Sprintf("private:%s", kid),
+		KeyID:                       kid,
 		Certificates:                []*x509.Certificate{},
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},
@@ -558,7 +562,7 @@ func createJSONWebKeys(keyPair *MockSignerDecrypter, kid string, alg string, use
 		Algorithm:                   alg,
 		Use:                         use,
 		Key:                         keyPair.Public(),
-		KeyID:                       fmt.Sprintf("public:%s", kid),
+		KeyID:                       kid,
 		Certificates:                []*x509.Certificate{},
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},

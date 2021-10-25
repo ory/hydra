@@ -41,6 +41,12 @@ func NewKeyManager(hsm Context) *KeyManager {
 }
 
 func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+
+	err := m.deleteExistingKeySet(set)
+	if err != nil {
+		return nil, err
+	}
+
 	if len(kid) == 0 {
 		kid = uuid.New()
 	}
@@ -233,6 +239,19 @@ func getKeyPairAttributes(kid string, set string, use string) (crypto11.Attribut
 	}
 
 	return privateAttrSet, publicAttrSet, nil
+}
+
+func (m *KeyManager) deleteExistingKeySet(set string) error {
+	existingKeyPairs, err := m.FindKeyPairs(nil, []byte(set))
+	if err != nil {
+		return err
+	}
+	if len(existingKeyPairs) != 0 {
+		for _, keyPair := range existingKeyPairs {
+			_ = keyPair.Delete()
+		}
+	}
+	return nil
 }
 
 func createKeySet(key crypto11.Signer, kid, alg, use string) (*jose.JSONWebKeySet, error) {

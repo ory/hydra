@@ -211,7 +211,7 @@ func getKeyPairAttributes(kid string, set string, use string) (crypto11.Attribut
 		return nil, nil, err
 	}
 
-	if use == "sig" {
+	if len(use) == 0 || use == "sig" {
 		publicAttrSet.AddIfNotPresent([]*pkcs11.Attribute{
 			pkcs11.NewAttribute(pkcs11.CKA_VERIFY, true),
 			pkcs11.NewAttribute(pkcs11.CKA_ENCRYPT, false),

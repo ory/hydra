@@ -20,7 +20,7 @@ var _ jwk.Manager = &Persister{}
 func (p *Persister) GenerateKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	generator, found := p.r.KeyGenerators()[alg]
 	if !found {
-		return nil, jwk.ErrUnsupportedKeyAlgorithm
+		return nil, errorsx.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
 	}
 
 	keys, err := generator.Generate(kid, use)

@@ -34,7 +34,7 @@ var _ jwk.Manager = &KeyManager{}
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	CodeField:        http.StatusBadRequest,
 	ErrorField:       http.StatusText(http.StatusBadRequest),
-	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module.",
+	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
 func NewKeyManager(hsm Context) *KeyManager {
@@ -210,6 +210,8 @@ func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string
 			alg = "ES512"
 		} else if k.Curve == elliptic.P256() {
 			alg = "ES256"
+		} else {
+			return "", "", "", errors.WithStack(jwk.ErrUnsupportedEllipticCurve)
 		}
 	// TODO: HS256, HS512. Makes sense only if shared HSM is used between hydra and authenticating application?
 	default:

@@ -33,7 +33,13 @@ import (
 var ErrUnsupportedKeyAlgorithm = &fosite.RFC6749Error{
 	CodeField:        http.StatusBadRequest,
 	ErrorField:       http.StatusText(http.StatusBadRequest),
-	DescriptionField: "Unsupported key algorithm.",
+	DescriptionField: "Unsupported key algorithm",
+}
+
+var ErrUnsupportedEllipticCurve = &fosite.RFC6749Error{
+	CodeField:        http.StatusBadRequest,
+	ErrorField:       http.StatusText(http.StatusBadRequest),
+	DescriptionField: "Unsupported elliptic curve",
 }
 
 type (

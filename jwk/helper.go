@@ -39,36 +39,40 @@ import (
 )
 
 func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, alg, set string) error {
-	_, err := GetOrGenerateKeySet(ctx, r, r.KeyManager(), set, set, alg)
+	_, _, err := GetOrGenerateKeys(ctx, r, r.KeyManager(), set, set, alg)
 	return err
 }
 
-func GetOrGenerateKeySet(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (*jose.JSONWebKeySet, error) {
+func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (public, private *jose.JSONWebKey, err error) {
 	keys, err := m.GetKeySet(ctx, set)
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
-		keys, err := m.GenerateKeySet(ctx, set, kid, alg, "sig")
+		keys, err = m.GenerateKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return keys, nil
 	} else if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	for _, prefix := range []string{"public", "private"} {
-		_, err := FindKeyByPrefix(keys, prefix)
-		if err != nil {
-			r.Logger().Warnf("JSON Web Key with prefix %s not found in JSON Web Key Set %s, generating new key pair...", prefix, set)
-			keys, err := m.GenerateKeySet(ctx, set, kid, alg, "sig")
-			if err != nil {
-				return nil, err
-			}
-			return keys, nil
+	pubKey, pubKeyErr := FindPublicKey(keys)
+	privKey, privKeyErr := FindPrivateKey(keys)
+	if pubKeyErr == nil && privKeyErr == nil {
+		return pubKey, privKey, nil
+	} else {
+		if pubKeyErr != nil {
+			r.Logger().Warnf("Public JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
+		} else {
+			r.Logger().Warnf("Private JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
 		}
+		keys, err = m.GenerateKeySet(ctx, set, kid, alg, "sig")
+		if err != nil {
+			return nil, nil, err
+		}
+		pubKey, _ = FindPublicKey(keys)
+		privKey, _ = FindPrivateKey(keys)
+		return pubKey, privKey, nil
 	}
-
-	return keys, nil
 }
 
 func First(keys []jose.JSONWebKey) *jose.JSONWebKey {
@@ -78,15 +82,6 @@ func First(keys []jose.JSONWebKey) *jose.JSONWebKey {
 	return &keys[0]
 }
 
-func FindKeyByPrefix(set *jose.JSONWebKeySet, prefix string) (key *jose.JSONWebKey, err error) {
-	keys, err := FindKeysByPrefix(set, prefix)
-	if err != nil {
-		return nil, err
-	}
-
-	return First(keys.Keys), nil
-}
-
 func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 	keys := ExcludePrivateKeys(set)
 	if len(keys.Keys) == 0 {
@@ -94,6 +89,30 @@ func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 	}
 
 	return First(keys.Keys), nil
+}
+
+func FindPrivateKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
+	keys := ExcludePublicKeys(set)
+	if len(keys.Keys) == 0 {
+		return nil, errors.New("key not found")
+	}
+
+	return First(keys.Keys), nil
+}
+
+func ExcludePublicKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
+	keys := new(jose.JSONWebKeySet)
+
+	for _, k := range set.Keys {
+		_, ecdsaOk := k.Key.(*ecdsa.PublicKey)
+		_, ed25519OK := k.Key.(ed25519.PublicKey)
+		_, rsaOK := k.Key.(*rsa.PublicKey)
+
+		if !ecdsaOk && !ed25519OK && !rsaOK {
+			keys.Keys = append(keys.Keys, k)
+		}
+	}
+	return keys
 }
 
 func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
@@ -109,22 +128,6 @@ func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 		}
 	}
 	return keys
-}
-
-func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeySet, error) {
-	keys := new(jose.JSONWebKeySet)
-
-	for _, k := range set.Keys {
-		if len(k.KeyID) >= len(prefix)+1 && k.KeyID[:len(prefix)+1] == prefix+":" {
-			keys.Keys = append(keys.Keys, k)
-		}
-	}
-
-	if len(keys.Keys) == 0 {
-		return nil, errors.Errorf("Unable to find key with prefix %s in JSON Web Key Set", prefix)
-	}
-
-	return keys, nil
 }
 
 func ExcludeOpaquePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {

@@ -63,12 +63,10 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface conf
 		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 
-	keySet, err := jwk.GetOrGenerateKeySet(context.Background(), d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
+	_, priv, err := jwk.GetOrGenerateKeys(context.Background(), d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 	}
-
-	priv, _ := jwk.FindKeyByPrefix(keySet, "private")
 
 	if len(priv.Certificates) == 0 {
 		cert, err := tlsx.CreateSelfSignedCertificate(priv.Key)

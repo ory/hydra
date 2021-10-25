@@ -6,9 +6,10 @@ import (
 	"crypto/elliptic"
 	"crypto/rsa"
 	"crypto/x509"
-	"github.com/pkg/errors"
 	"net/http"
 	"sync"
+
+	"github.com/pkg/errors"
 
 	"github.com/pborman/uuid"
 

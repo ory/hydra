@@ -53,6 +53,9 @@ func TestHandlerWellKnown(t *testing.T) {
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
+		if conf.HsmEnabled() {
+			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
+		}
 		IDKS, _ := testGenerator.Generate("test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		res, err := http.Get(testServer.URL + JWKPath)
@@ -65,21 +68,30 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		require.Len(t, known.Keys, 1)
 
-		resp := known.Key("public:test-id-1")
-		require.NotNil(t, resp, "Could not find key public")
+		knownKey := known.Key("public:test-id-1")[0]
+		require.NotNil(t, knownKey, "Could not find key public")
 
-		assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("public:test-id-1")))
+		expectedKey, err := jwk.FindPublicKey(IDKS)
+		require.NoError(t, err)
+		assert.EqualValues(t, canonicalizeThumbprints(*expectedKey), canonicalizeThumbprints(knownKey))
 		require.NoError(t, reg.KeyManager().DeleteKeySet(context.TODO(), x.OpenIDConnectKeyName))
 	})
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
-		IDKS, _ := testGenerator.Generate("test-id-2", "sig")
-		if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {
-			IDKS.Keys[1].KeyID = "test-id-2"
+		var IDKS *jose.JSONWebKeySet
+
+		if conf.HsmEnabled() {
+			IDKS, _ = reg.KeyManager().GenerateKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
 		} else {
-			IDKS.Keys[0].KeyID = "test-id-2"
+			IDKS, _ = testGenerator.Generate("test-id-2", "sig")
+			if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {
+				IDKS.Keys[1].KeyID = "test-id-2"
+			} else {
+				IDKS.Keys[0].KeyID = "test-id-2"
+			}
+			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}
-		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
+
 		res, err := http.Get(testServer.URL + JWKPath)
 		require.NoError(t, err, "problem in http request")
 		defer res.Body.Close()
@@ -89,22 +101,21 @@ func TestHandlerWellKnown(t *testing.T) {
 		require.NoError(t, err, "problem in decoding response")
 		require.Len(t, known.Keys, 1)
 
-		resp := known.Key("test-id-2")
-		require.NotNil(t, resp, "Could not find key public")
+		knownKey := known.Key("test-id-2")[0]
+		require.NotNil(t, knownKey, "Could not find key public")
 
-		assert.EqualValues(t, canonicalizeThumbprints(resp), canonicalizeThumbprints(IDKS.Key("test-id-2")))
+		expectedKey, err := jwk.FindPublicKey(IDKS)
+		require.NoError(t, err)
+		assert.EqualValues(t, canonicalizeThumbprints(*expectedKey), canonicalizeThumbprints(knownKey))
 	})
 }
 
-func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
-	for k, v := range js {
-		if len(v.CertificateThumbprintSHA1) == 0 {
-			v.CertificateThumbprintSHA1 = nil
-		}
-		if len(v.CertificateThumbprintSHA256) == 0 {
-			v.CertificateThumbprintSHA256 = nil
-		}
-		js[k] = v
+func canonicalizeThumbprints(js jose.JSONWebKey) jose.JSONWebKey {
+	if len(js.CertificateThumbprintSHA1) == 0 {
+		js.CertificateThumbprintSHA1 = nil
+	}
+	if len(js.CertificateThumbprintSHA256) == 0 {
+		js.CertificateThumbprintSHA256 = nil
 	}
 	return js
 }

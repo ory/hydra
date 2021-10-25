@@ -22,10 +22,7 @@ package jwk_test
 
 import (
 	"context"
-	"fmt"
 	"testing"
-
-	"github.com/pborman/uuid"
 
 	"github.com/ory/hydra/internal"
 
@@ -38,20 +35,13 @@ import (
 	. "github.com/ory/hydra/jwk"
 )
 
-func TestRS256JWTStrategy_withSoftwareKeyStore(t *testing.T) {
+func TestRS256JWTStrategy(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf)
-
-	if conf.HsmEnabled() {
-		t.Skip("Hardware Security Module enabled. Skipping test.")
-	}
-
-	testGenerator := &RS256Generator{}
-
 	m := reg.KeyManager()
-	ks, err := testGenerator.Generate("foo", "sig")
+
+	_, err := m.GenerateKeySet(context.TODO(), "foo-set", "foo", "RS256", "sig")
 	require.NoError(t, err)
-	require.NoError(t, m.AddKeySet(context.TODO(), "foo-set", ks))
 
 	s, err := NewRS256JWTStrategy(*conf, reg, func() string {
 		return "foo-set"
@@ -66,13 +56,11 @@ func TestRS256JWTStrategy_withSoftwareKeyStore(t *testing.T) {
 	_, err = s.Validate(context.TODO(), a)
 	require.NoError(t, err)
 
-	kid, err := s.GetPublicKeyID(context.TODO())
+	kidFoo, err := s.GetPublicKeyID(context.TODO())
 	assert.NoError(t, err)
-	assert.Equal(t, "public:foo", kid)
 
-	ks, err = testGenerator.Generate("bar", "sig")
+	_, err = m.GenerateKeySet(context.TODO(), "foo-set", "bar", "RS256", "sig")
 	require.NoError(t, err)
-	require.NoError(t, m.AddKeySet(context.TODO(), "foo-set", ks))
 
 	a, b, err = s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 	require.NoError(t, err)
@@ -82,57 +70,14 @@ func TestRS256JWTStrategy_withSoftwareKeyStore(t *testing.T) {
 	_, err = s.Validate(context.TODO(), a)
 	require.NoError(t, err)
 
-	kid, err = s.GetPublicKeyID(context.TODO())
+	kidBar, err := s.GetPublicKeyID(context.TODO())
 	assert.NoError(t, err)
-	assert.Equal(t, "public:bar", kid)
-}
 
-func TestRS256JWTStrategy_withHardwareKeyStore(t *testing.T) {
-	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
-
-	if !conf.HsmEnabled() {
-		t.Skip("Hardware Security Module not enabled. Skipping test.")
+	if conf.HsmEnabled() {
+		assert.Equal(t, "foo", kidFoo)
+		assert.Equal(t, "bar", kidBar)
+	} else {
+		assert.Equal(t, "public:foo", kidFoo)
+		assert.Equal(t, "public:bar", kidBar)
 	}
-
-	m := reg.KeyManager()
-
-	var kid1 = uuid.New()
-	_, err := m.GenerateKeySet(context.TODO(), "foo-set", kid1, "RS256", "sig")
-	require.NoError(t, err)
-
-	s, err := NewRS256JWTStrategy(*conf, reg, func() string {
-		return "foo-set"
-	})
-
-	require.NoError(t, err)
-	token, sig, err := s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
-	require.NoError(t, err)
-	assert.NotEmpty(t, token)
-	assert.NotEmpty(t, sig)
-
-	_, err = s.Validate(context.TODO(), token)
-	require.NoError(t, err)
-
-	kid, err := s.GetPublicKeyID(context.TODO())
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("public:%s", kid1), kid)
-
-	err = m.DeleteKeySet(context.TODO(), "foo-set")
-	require.NoError(t, err)
-
-	var kid2 = uuid.New()
-	_, err = m.GenerateKeySet(context.TODO(), "foo-set", kid2, "RS256", "sig")
-
-	token, sig, err = s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
-	require.NoError(t, err)
-	assert.NotEmpty(t, token)
-	assert.NotEmpty(t, sig)
-
-	_, err = s.Validate(context.TODO(), token)
-	require.NoError(t, err)
-
-	kid, err = s.GetPublicKeyID(context.TODO())
-	assert.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("public:%s", kid2), kid)
 }

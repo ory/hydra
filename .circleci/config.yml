@@ -75,6 +75,55 @@ jobs:
       - run: |
           bash <(curl -s https://codecov.io/bash)
 
+  test-hsm:
+    docker:
+      - image: cimg/go:1.16-node
+        environment:
+          - HSM_ENABLED=true
+          - HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
+          - HSM_TOKEN_LABEL=hydra
+          - HSM_PIN=1234
+          - TEST_DATABASE_POSTGRESQL=postgres://test:test@localhost:5432/postgres?sslmode=disable
+          - TEST_DATABASE_MYSQL=mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true
+          - TEST_DATABASE_COCKROACHDB=cockroach://root@localhost:26257/defaultdb?sslmode=disable
+      - image: postgres:9.6
+        environment:
+          - POSTGRES_USER=test
+          - POSTGRES_PASSWORD=test
+          - POSTGRES_DB=postgres
+      - image: mysql:8.0
+        environment:
+          - MYSQL_ROOT_PASSWORD=test
+      - image: cockroachdb/cockroach:v20.2.5
+        command: start-single-node --insecure
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - go/load-cache:
+          key: ory-hydra-go-mod-v1
+      - go/mod-download
+      - go/save-cache:
+          key: ory-hydra-go-mod-v1
+
+      - nancy/install
+      - nancy/check
+      - prettier/install
+      - prettier/check
+      - prettier/install:
+          dir: docs/
+      - prettier/check:
+          dir: docs/
+      - goreleaser/install
+      - goreleaser/check
+      - golangci/install
+      - golangci/lint
+      - run: sudo apt update
+      - run: sudo apt install -y softhsm opensc
+      - run: sudo rm -rf /var/lib/softhsm/tokens; sudo mkdir -p /var/lib/softhsm/tokens; sudo chmod -R a+rwx /var/lib/softhsm; sudo chmod a+rx /etc/softhsm; sudo chmod a+r /etc/softhsm/*
+      - run: pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
+      - run: go test -p 1 -v -failfast -short -timeout=20m -tags sqlite ./...
+
   test-e2e:
     docker:
       - image: oryd/e2e-env:latest
@@ -157,6 +206,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - test-hsm:
+          filters:
+            tags:
+              only: /.*/
       - test-e2e:
           filters:
             tags:
@@ -164,6 +217,7 @@ workflows:
       - changelog/generate:
           requires:
             - test
+            - test-hsm
             - test-e2e
             - docs/build
 #            - test-legacy-migrations-mysql
@@ -179,6 +233,7 @@ workflows:
           specignorepgks: internal/httpclient gopkg.in/square/go-jose.v2
           requires:
             - test
+            - test-hsm
             - test-e2e
 #            - test-legacy-migrations-mysql
 #            - test-legacy-migrations-cockroach
@@ -192,6 +247,7 @@ workflows:
           swagpath: spec/api.json
           requires:
             - test
+            - test-hsm
             - sdk/generate
             - goreleaser/release
             - docs/build
@@ -216,6 +272,7 @@ workflows:
       - goreleaser/release:
           requires:
             - test
+            - test-hsm
             - test-e2e
             - changelog/generate
   #            - test-legacy-migrations-mysql

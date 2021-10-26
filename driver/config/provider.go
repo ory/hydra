@@ -65,7 +65,7 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
-	KeyEnableOneTimeUseRefreshToken              = "oauth2.enable_one_time_use_refresh_token"
+	KeyEnableRefreshTokenRotation                = "oauth2.refresh_token_rotation.enabled"
 )
 
 const DSNMemory = "memory"
@@ -194,8 +194,8 @@ func (p *Provider) ExcludeNotBeforeClaim() bool {
 	return p.p.BoolF(KeyExcludeNotBeforeClaim, false)
 }
 
-func (p *Provider) EnableOneTimeUseRefreshToken() bool {
-	return p.p.BoolF(KeyEnableOneTimeUseRefreshToken, true)
+func (p *Provider) EnableRefreshTokenRotation() bool {
+	return p.p.BoolF(KeyEnableRefreshTokenRotation, true)
 }
 
 func (p *Provider) DataSourcePlugin() string {

@@ -869,10 +869,15 @@
             }
           }
         },
-        "enable_one_time_use_refresh_token": {
-          "type": "boolean",
-          "description": "Configures refresh_token behavior. By default refresh tokens are one time use.",
-          "default": true
+        "refresh_token_rotation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Configures refresh_token rotatation behavior. By default refresh tokens are rotated on use.",
+              "default": true
+            }
+          }
         }
       }
     },

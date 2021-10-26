@@ -582,8 +582,8 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
 	ctx = context.WithValue(ctx,
-		fosite.EnableOneTimeUseRefreshTokenContextKey,
-		h.c.EnableOneTimeUseRefreshToken())
+		fosite.RefreshTokenRotationEnabledContextKey,
+		h.c.EnableRefreshTokenRotation())
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 

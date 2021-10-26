@@ -147,6 +147,7 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 	d.PrometheusManager().RegisterRouter(admin.Router)
 	d.PrometheusManager().RegisterRouter(public.Router)
 
+
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -185,6 +186,8 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 			d.Logger().WithError(err).Fatal("Couldn't set GOMAXPROCS")
 		}
 	}
+
+	d.Config().Validate()
 
 	adminmw = negroni.New()
 	publicmw = negroni.New()

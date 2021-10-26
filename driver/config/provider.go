@@ -433,3 +433,15 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
 }
+
+// Validate validates the configuration contained within this provider
+func (p *Provider) Validate() {
+	if !p.EnableRefreshTokenRotation() {
+		refreshTokenLifespan := p.RefreshTokenLifespan()
+		if refreshTokenLifespan == 0 {
+			p.l.Fatalf("Disabling refresh token rotation (%s) must also set %s to -1",
+				KeyEnableRefreshTokenRotation,
+				KeyRefreshTokenLifespan)
+		}
+	}
+}

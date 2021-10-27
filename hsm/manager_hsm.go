@@ -81,6 +81,13 @@ func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string
 			return nil, err
 		}
 		return createKeySet(key, kid, alg, use)
+
+	// NOTE:
+	//	- HS256, HS512 not supported. Makes sense only if shared HSM is used between Hydra and authenticating client.
+	//	- EdDSA not supported. As of now PKCS#11 v2.4 doesn't support EdDSA keys using curve Ed25519. However,
+	//	  PKCS#11 3.0 (https://docs.oasis-open.org/pkcs11/pkcs11-curr/v3.0/pkcs11-curr-v3.0.html)
+	//	  contains support for EdDSA.
+
 	default:
 		return nil, errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
 	}

@@ -20,8 +20,7 @@ $ docker run --rm -it oryd/hydra:v1.10.6 help
 You can install ORY Hydra using [homebrew](https://brew.sh/) on macOS:
 
 ```shell
-$ brew tap ory/hydra
-$ brew install ory/hydra/hydra
+$ brew install ory/tap/hydra
 $ hydra help
 ```
 

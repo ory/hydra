@@ -7,34 +7,13 @@ about: Create a report to help us improve
 
 A clear and concise description of what the bug is.
 
-**Reproducing the bug**
+**To Reproduce**
 
 Steps to reproduce the behavior:
 
 <!--
-1. Run `docker run ....`
-2. Make API Request to with `curl ...`
-3. Request fails with response: `{"some": "error"}`
--->
-
-_Server logs_
-
-<!--
-```
-log=error ....
-```
--->
-
-_Server configuration_
-
-<!--
-PLEASE OMIT SENSITIVE VALUES
-
-```yaml
-server:
-    admin:
-        port: 1234
-```
+1. Call function `foo.Bar`
+2. Function returns invalid value `baz`
 -->
 
 **Expected behavior**

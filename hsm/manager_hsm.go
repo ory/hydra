@@ -81,7 +81,6 @@ func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string
 			return nil, err
 		}
 		return createKeySet(key, kid, alg, use)
-	// TODO: HS256, HS512. Makes sense only if shared HSM is used between hydra and authenticating application?
 	default:
 		return nil, errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
 	}

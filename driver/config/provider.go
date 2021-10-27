@@ -65,6 +65,7 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
+	KeyRefreshTokenRotationGracePeriod           = "oauth2.refresh_token_rotation.grace_period"
 )
 
 const DSNMemory = "memory"
@@ -427,4 +428,8 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
+}
+
+func(p *Provider) RefreshTokenRotationGracePeriod() time.Duration {
+	return p.p.DurationF(KeyRefreshTokenRotationGracePeriod, 0)
 }

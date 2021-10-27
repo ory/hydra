@@ -867,9 +867,23 @@
               ]
             }
           }
+        },
+        "refresh_token_rotation": {
+        "type": "object",
+        "properties": {
+          "grace_period": {
+            "description": "Configures how long a Refresh Token remains valid after it has been used.",
+            "default": "0h",
+            "allOf": [
+              {
+                "$ref": "#/definitions/duration"
+              }
+            ]
+          }
         }
       }
-    },
+    }
+  },
     "secrets": {
       "type": "object",
       "additionalProperties": false,

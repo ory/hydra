@@ -56,7 +56,11 @@ const (
 )
 
 func (r OAuth2RequestSQL) TableName() string {
-	return "hydra_oauth2_" + string(r.Table)
+	return r.Table.TableName()
+}
+
+func (table tableName) TableName() string {
+	return "hydra_oauth2_" + string(table)
 }
 
 func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
@@ -67,17 +71,9 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 		subject = r.GetSession().GetSubject()
 	}
 
-	session, err := json.Marshal(r.GetSession())
+	session, err := p.marshalSession(r.GetSession())
 	if err != nil {
 		return nil, errorsx.WithStack(err)
-	}
-
-	if p.config.EncryptSessionData() {
-		ciphertext, err := p.r.KeyCipher().Encrypt(session)
-		if err != nil {
-			return nil, errorsx.WithStack(err)
-		}
-		session = []byte(ciphertext)
 	}
 
 	var challenge sql.NullString
@@ -106,6 +102,31 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 		Active:            true,
 		Table:             table,
 	}, nil
+}
+
+func (p *Persister) marshalSession(session fosite.Session) ([]byte, error) {
+	sessionBytes, err := json.Marshal(session)
+	if err != nil {
+		return nil, err
+	}
+
+	if sessionBytes, err = p.maybeEncryptSession(sessionBytes); err != nil {
+		return nil, err
+	}
+	return sessionBytes, nil
+}
+
+// MaybeEncryptSession encrypt a session if configuration indicates it should
+func (p *Persister) maybeEncryptSession(session []byte) ([]byte, error) {
+	if !p.config.EncryptSessionData() {
+		return session, nil
+	}
+
+	ciphertext, err := p.r.KeyCipher().Encrypt(session)
+	if err != nil {
+		return nil, err
+	}
+	return []byte(ciphertext), nil
 }
 
 func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
@@ -219,6 +240,29 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
+func (p *Persister) updateSession(ctx context.Context, requestId string, session fosite.Session, table tableName) error {
+	_, ok := session.(*oauth2.Session)
+	if !ok && session != nil {
+		return errors.Errorf("Expected session to be of type *Session, but got: %T", session)
+	}
+	sessionBytes, err := p.marshalSession(session)
+	if err != nil {
+		return err
+	}
+
+	updateSql := fmt.Sprintf("UPDATE %s SET session_data = ? WHERE request_id = ?", table.TableName())
+
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := p.Connection(ctx).RawQuery(updateSql, sessionBytes, requestId).Exec()
+		if errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		return err
+	})
+}
+
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
 	rawSignature = p.hashSignature(rawSignature, table)
 
@@ -227,6 +271,33 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 
 	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		err := p.Connection(ctx).Where("signature = ?", rawSignature).First(&r)
+		if errors.Is(err, sql.ErrNoRows) {
+			return errorsx.WithStack(fosite.ErrNotFound)
+		} else if err != nil {
+			return sqlcon.HandleError(err)
+		} else if !r.Active {
+			fr, err = r.toRequest(ctx, session, p)
+			if err != nil {
+				return err
+			} else if table == sqlTableCode {
+				return errorsx.WithStack(fosite.ErrInvalidatedAuthorizeCode)
+			}
+
+			return errorsx.WithStack(fosite.ErrInactiveToken)
+		}
+
+		fr, err = r.toRequest(ctx, session, p)
+		return err
+	})
+}
+
+func (p *Persister) findSessionByRequestId(ctx context.Context, requestId string, table tableName) (fosite.Requester, error) {
+	r := OAuth2RequestSQL{Table: table}
+	var fr fosite.Requester
+	session := new(oauth2.Session)
+
+	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		err := p.Connection(ctx).Where("request_id = ?", requestId).First(&r)
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(fosite.ErrNotFound)
 		} else if err != nil {
@@ -353,8 +424,19 @@ func (p *Persister) DeletePKCERequestSession(ctx context.Context, signature stri
 	return p.deleteSessionBySignature(ctx, signature, sqlTablePKCE)
 }
 
-func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) error {
-	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+func (p *Persister) RevokeRefreshToken(ctx context.Context, requestId string) error {
+	gracePeriod := p.config.RefreshTokenRotationGracePeriod()
+	if gracePeriod > 0 {
+		if requester, err := p.findSessionByRequestId(ctx, requestId, sqlTableRefresh); err != nil {
+			p.l.Errorf("session_id: %s not found grace period not applied", requestId)
+		} else {
+			session := requester.GetSession()
+			session.SetExpiresAt(fosite.RefreshToken, time.Now().UTC().Add(gracePeriod))
+			p.updateSession(ctx, requestId, session, sqlTableRefresh)
+			return nil
+		}
+	}
+	return p.deactivateSessionByRequestID(ctx, requestId, sqlTableRefresh)
 }
 
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) error {

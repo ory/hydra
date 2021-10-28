@@ -61,8 +61,10 @@ func TestSDK(t *testing.T) {
 		Subject: "subject1",
 	}))
 
-	ar1, _ := MockAuthRequest("1", false)
-	ar2, _ := MockAuthRequest("2", false)
+	requestedAt := time.Now().Add(time.Hour)
+
+	ar1, _ := MockAuthRequest("1", false, requestedAt)
+	ar2, _ := MockAuthRequest("2", false, requestedAt)
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar1.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar2.Client))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{

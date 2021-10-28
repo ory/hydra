@@ -275,6 +275,10 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 		})
 		return
 	}
+	if request.RequestedAt.Add(h.c.ConsentRequestMaxAge()).Before(time.Now()) {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("You took too long to login. Please try again.")))
+		return
+	}
 
 	request.Client = sanitizeClient(request.Client)
 	h.r.Writer().Write(w, r, request)
@@ -353,6 +357,11 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 			// Rounding is important to avoid SQL time synchronization issues in e.g. MySQL!
 			Truncate(time.Second))
 		ar.AuthenticatedAt = p.AuthenticatedAt
+	}
+
+	if ar.RequestedAt.Add(h.c.ConsentRequestMaxAge()).Before(time.Now()) {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("You took too long to login. Please try again.")))
+		return
 	}
 	p.RequestedAt = ar.RequestedAt
 

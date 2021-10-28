@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/ory/hydra/x"
 
@@ -36,6 +37,8 @@ import (
 
 	"github.com/ory/hydra/client"
 	. "github.com/ory/hydra/consent"
+
+	"github.com/ory/x/ioutilx"
 )
 
 func TestGetLogoutRequest(t *testing.T) {
@@ -96,11 +99,13 @@ func TestGetLoginRequest(t *testing.T) {
 	for k, tc := range []struct {
 		exists  bool
 		handled bool
+		expired bool
 		status  int
 	}{
-		{false, false, http.StatusNotFound},
-		{true, false, http.StatusOK},
-		{true, true, http.StatusGone},
+		{false, false, false, http.StatusNotFound},
+		{true, false, false, http.StatusOK},
+		{true, true, false, http.StatusGone},
+		{true, false, true, http.StatusBadRequest},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			key := fmt.Sprint(k)
@@ -113,11 +118,18 @@ func TestGetLoginRequest(t *testing.T) {
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
-				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+				loginRequest := &LoginRequest{
 					Client:     cl,
 					ID:         challenge,
 					RequestURL: requestURL,
-				}))
+				}
+				if tc.expired {
+					loginRequest.RequestedAt = time.Now().Add(-conf.ConsentRequestMaxAge())
+
+				} else {
+					loginRequest.RequestedAt = time.Now().Add(conf.ConsentRequestMaxAge())
+				}
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), loginRequest))
 
 				if tc.handled {
 					_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), challenge, &HandledLoginRequest{ID: challenge, WasHandled: true})
@@ -140,6 +152,10 @@ func TestGetLoginRequest(t *testing.T) {
 				var result RequestWasHandledResponse
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
 				require.Equal(t, requestURL, result.RedirectTo)
+			} else if tc.expired {
+				defer resp.Body.Close()
+				body := string(ioutilx.MustReadAll(resp.Body))
+				require.Contains(t, body, "You took too long to login. Please try again.")
 			} else if tc.exists {
 				var result LoginRequest
 				require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))

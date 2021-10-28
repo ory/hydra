@@ -120,14 +120,14 @@ func MockLogoutRequest(key string, withClient bool) (c *LogoutRequest) {
 	}
 }
 
-func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginRequest) {
+func MockAuthRequest(key string, authAt bool, requestedAt time.Time) (c *LoginRequest, h *HandledLoginRequest) {
 	c = &LoginRequest{
 		OpenIDConnectContext: &OpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
-		RequestedAt:    time.Now().UTC().Add(-time.Hour),
+		RequestedAt:    requestedAt,
 		Client:         &client.Client{OutfacingID: "fk-client-" + key},
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
@@ -362,7 +362,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				{"6", false},
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
-					c, h := MockAuthRequest(tc.key, tc.authAt)
+					c, h := MockAuthRequest(tc.key, tc.authAt, time.Now().UTC().Add(-time.Hour))
 					_ = clientManager.CreateClient(context.Background(), c.Client) // Ignore errors that are caused by duplication
 
 					_, err := m.GetLoginRequest(context.Background(), "challenge"+tc.key)

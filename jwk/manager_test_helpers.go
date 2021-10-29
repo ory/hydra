@@ -55,29 +55,29 @@ func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
 	return js
 }
 
-func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
 	pub := canonicalizeThumbprints(keys.Key("public:" + suffix))
 	priv := canonicalizeThumbprints(keys.Key("private:" + suffix))
 
 	return func(t *testing.T) {
-		_, err := m.GetKey(context.TODO(), "faz", "baz")
+		_, err := m.GetKey(context.TODO(), algo+"faz", "baz")
 		assert.NotNil(t, err)
 
-		err = m.AddKey(context.TODO(), "faz", First(priv))
+		err = m.AddKey(context.TODO(), algo+"faz", First(priv))
 		require.NoError(t, err)
 
-		got, err := m.GetKey(context.TODO(), "faz", "private:"+suffix)
-		require.NoError(t, err)
-		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
-
-		err = m.AddKey(context.TODO(), "faz", First(pub))
-		require.NoError(t, err)
-
-		got, err = m.GetKey(context.TODO(), "faz", "private:"+suffix)
+		got, err := m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
 		require.NoError(t, err)
 		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
 
-		got, err = m.GetKey(context.TODO(), "faz", "public:"+suffix)
+		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
+		require.NoError(t, err)
+
+		got, err = m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
+		require.NoError(t, err)
+		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
+
+		got, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.NoError(t, err)
 		assert.Equal(t, pub, canonicalizeThumbprints(got.Keys))
 
@@ -85,46 +85,46 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 		time.Sleep(time.Second * 2)
 
 		First(pub).KeyID = "new-key-id:" + suffix
-		err = m.AddKey(context.TODO(), "faz", First(pub))
+		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), "faz", "new-key-id:"+suffix)
+		_, err = m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
 		require.NoError(t, err)
 
-		keys, err = m.GetKeySet(context.TODO(), "faz")
+		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
 		require.NoError(t, err)
 		assert.EqualValues(t, "new-key-id:"+suffix, First(keys.Keys).KeyID)
 
 		beforeDeleteKeysCount := len(keys.Keys)
-		err = m.DeleteKey(context.TODO(), "faz", "public:"+suffix)
+		err = m.DeleteKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), "faz", "public:"+suffix)
+		_, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.Error(t, err)
 
-		keys, err = m.GetKeySet(context.TODO(), "faz")
+		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
 		require.NoError(t, err)
 		assert.EqualValues(t, beforeDeleteKeysCount-1, len(keys.Keys))
 	}
 }
 
-func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
 	return func(t *testing.T) {
-		_, err := m.GetKeySet(context.TODO(), "foo")
+		_, err := m.GetKeySet(context.TODO(), algo+"foo")
 		require.Error(t, err)
 
-		err = m.AddKeySet(context.TODO(), "bar", keys)
+		err = m.AddKeySet(context.TODO(), algo+"bar", keys)
 		require.NoError(t, err)
 
-		got, err := m.GetKeySet(context.TODO(), "bar")
+		got, err := m.GetKeySet(context.TODO(), algo+"bar")
 		require.NoError(t, err)
 		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
 		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
 
-		err = m.DeleteKeySet(context.TODO(), "bar")
+		err = m.DeleteKeySet(context.TODO(), algo+"bar")
 		require.NoError(t, err)
 
-		_, err = m.GetKeySet(context.TODO(), "bar")
+		_, err = m.GetKeySet(context.TODO(), algo+"bar")
 		require.Error(t, err)
 	}
 }

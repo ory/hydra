@@ -30,7 +30,7 @@ import "github.com/ory/hydra/x"
 
 // swagger:model jsonWebKeySetGeneratorRequest
 type createRequest struct {
-	// The algorithm to be used for creating the key. Supports "RS256", "ES512", "HS512", and "HS256"
+	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES512", "HS512", and "HS256"
 	// required: true
 	Algorithm string `json:"alg"`
 

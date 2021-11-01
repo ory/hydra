@@ -412,66 +412,64 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 
 func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
 
-	var revokesTokenWhenGracePeriodNotConfigured = func(t *testing.T){
-		// SETUP
-		m := x.OAuth2Storage()
-		ctx := context.Background()
-
-		refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
-		err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
-		assert.NoError(t, err, "precondition failed: could not create refresh token session")
-
-		// ACT
-		err = m.RevokeRefreshTokenMaybeGracePeriod(ctx,defaultRequest.GetID(), refreshTokenSession)
-
-		// ASSERT
-		assert.NoError(t, err)
-
-		tmpSession := new(fosite.Session)
-		_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
-
-		// a revoked refresh token returns an error when getting the token again
-		assert.Error(t, err)
-		assert.True(t, errors.Is(err, fosite.ErrInactiveToken))
-	}
-
-	var tokenEntersGracePeriodWhenGracePeriodConfigured = func(t *testing.T){
-
-		/* TODO: figure out how to change config values and get a new/udpated OAuth2Storage instance
-		// SETUP
-		log := logrusx.New("testGracePeriod", "na")
-		option := configx.WithValue("oauth2.refresh_token_rotation.grace_period", "1m")
-		c := config.MustNew(log, option)
-
-		//TODO make m := OAuth2Storage
-
-		ctx := context.Background()
-
-		refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
-		err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
-		assert.NoError(t, err, "precondition failed: could not create refresh token session")
-
-		// ACT
-		err = m.RevokeRefreshTokenMaybeGracePeriod(ctx,defaultRequest.GetID(), refreshTokenSession)
-
-		// ASSERT
-		assert.NoError(t, err)
-
-		tmpSession := new(fosite.Session)
-		_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
-
-		// when grace period is configured the refresh token can be obtained within
-		// the grace period without error
-		assert.NoError(t, err)
-
-		registry.WithConfig(oldConfig)
-		 */
-	}
-
 	return func(t *testing.T) {
-		revokesTokenWhenGracePeriodNotConfigured(t)
-		tokenEntersGracePeriodWhenGracePeriodConfigured(t)
+		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
+			// SETUP
+			m := x.OAuth2Storage()
+			ctx := context.Background()
+
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
+			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
+			assert.NoError(t, err, "precondition failed: could not create refresh token session")
+
+			// ACT
+			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)
+
+			// ASSERT
+			assert.NoError(t, err)
+
+			tmpSession := new(fosite.Session)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
+
+			// a revoked refresh token returns an error when getting the token again
+			assert.Error(t, err)
+			assert.True(t, errors.Is(err, fosite.ErrInactiveToken))
+		})
+
+		t.Run("refresh token enters grace period when configured,", func(t *testing.T) {
+
+			/* TODO: figure out how to change config values and get a new/udpated OAuth2Storage instance
+			// SETUP
+			log := logrusx.New("testGracePeriod", "na")
+			option := configx.WithValue("oauth2.refresh_token_rotation.grace_period", "1m")
+			c := config.MustNew(log, option)
+
+			//TODO make m := OAuth2Storage
+
+			ctx := context.Background()
+
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
+			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
+			assert.NoError(t, err, "precondition failed: could not create refresh token session")
+
+			// ACT
+			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx,defaultRequest.GetID(), refreshTokenSession)
+
+			// ASSERT
+			assert.NoError(t, err)
+
+			tmpSession := new(fosite.Session)
+			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
+
+			// when grace period is configured the refresh token can be obtained within
+			// the grace period without error
+			assert.NoError(t, err)
+
+			registry.WithConfig(oldConfig)
+			*/
+		})
 	}
+
 }
 
 func testHelperCreateGetDeletePKCERequestSession(x InternalRegistry) func(t *testing.T) {

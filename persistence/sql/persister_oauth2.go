@@ -292,31 +292,6 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	})
 }
 
-func (p *Persister) findRequesterBySignature(ctx context.Context, signature string, tableName tableName) (fosite.Requester, error) {
-	r := OAuth2RequestSQL{Table: tableName}
-
-	var fr fosite.Requester
-	session := new(oauth2.Session)
-
-	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := p.Connection(ctx).Where("signature = ?", signature).First(&r)
-		if errors.Is(err, sql.ErrNoRows) {
-			return errorsx.WithStack(fosite.ErrNotFound)
-		} else if err != nil {
-			return sqlcon.HandleError(err)
-		} else if !r.Active {
-			fr, err = r.toRequest(ctx, session, p)
-			if err != nil {
-				return err
-			}
-			return errorsx.WithStack(fosite.ErrInactiveToken)
-		}
-
-		fr, err = r.toRequest(ctx, session, p)
-		return err
-	})
-}
-
 func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) error {
 	signature = p.hashSignature(signature, table)
 
@@ -449,7 +424,8 @@ func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, requ
 
 	var requester fosite.Requester
 	var err error
-	if requester, err = p.findRequesterBySignature(ctx, signature, sqlTableRefresh); err != nil {
+	session := new(oauth2.Session)
+	if requester, err = p.GetRefreshTokenSession(ctx, signature, session); err != nil {
 		p.l.Errorf("signature: %s not found. grace period not applied", signature)
 		return errors.WithStack(err)
 	}

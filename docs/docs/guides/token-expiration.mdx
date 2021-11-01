@@ -75,6 +75,40 @@ for refresh tokens to never expire.
     #....
 ```
 
+### Refresh Token Rotation
+
+When a refresh token is used it is deactivated, which is known as Refresh Token Rotation. By default Hydra deactivates
+the refresh token it receives and issues a new token. More information on Refresh Token Rotation can be found in the
+Recommendations section of the OAuth 2.0 Security Best Practices document
+[here](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.13.2).
+
+There are some cases when a one time use refresh token may be undesirable, such as when a networking error occurs
+and the newly issued refresh token is not received. Hydra may be configured to use a refresh token grace period which
+allows a refresh token to be reused for the duration of the grace period. Note that a new refresh token is still generated
+and sent back in the response; clients **must** store and use the new refresh token.
+
+**WARNING** Using the refresh token grace period is an increased security risk, as an intercepted refresh token may be
+reused by a bad actor. Use this feature with appropriate consideration.
+
+```
+  ## refresh_token_rotation
+  #
+  # By default Refresh Tokens are rotated and invalidated with each use.
+  # See https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.13.2 for more details
+  #
+  refresh_token_rotation:
+    #
+    ## grace_period
+    #
+    # Set the grace period for a refresh token to allow it to be used for the duration of this configuration after
+    # its first use. New refresh tokens will continue to be issued.
+    #
+    # Examples:
+    # - 5s
+    # - 1m
+    grace_period: 0s
+```
+
 ## ID Token Expiration
 
 Key `ttl.id_token` configures how long id tokens are valid.

@@ -1329,6 +1329,23 @@ oauth2:
   #
   expose_internal_errors: true
 
+  ## refresh_token_rotation
+  #
+  # By default Refresh Tokens are rotated and invalidated with each use. See https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.13.2 for more details
+  #
+  refresh_token_rotation:
+    #
+    ## grace_period
+    # 
+    # Set the grace period for a refresh token to allow it to be used for the duration of this configuration after its first use. New refresh tokens will continue
+    # to be issued. 
+    #
+    # Examples:
+    # - 5s
+    # - 1m
+    grace_period: 0s
+
+
 ## secrets ##
 #
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated, for more information on this topic go to: https://www.ory.sh/docs/hydra/advanced#rotation-of-hmac-token-signing-and-database-and-cookie-encryption-keys

@@ -14,8 +14,7 @@ builds:
   -
     id: hydra-sqlite-darwin
     flags:
-      - -tags
-      - sqlite
+      - -tags=sqlite,hsm
     ldflags:
       - -s -w -X github.com/ory/hydra/driver/config.Version={{.Tag}} -X github.com/ory/hydra/driver/config.Commit={{.FullCommit}} -X github.com/ory/hydra/driver/config.Date={{.Date}}
       # - "-extldflags '-static'"
@@ -32,8 +31,7 @@ builds:
   -
     id: hydra-sqlite-linux
     flags:
-      - -tags
-      - sqlite
+      - -tags=sqlite,hsm
     ldflags:
       - -s -w -X github.com/ory/hydra/driver/config.Version={{.Tag}} -X github.com/ory/hydra/driver/config.Commit={{.FullCommit}} -X github.com/ory/hydra/driver/config.Date={{.Date}}
     binary: hydra
@@ -46,8 +44,7 @@ builds:
   -
     id: hydra-sqlite-linux-libmusl
     flags:
-      - -tags
-      - sqlite
+      - -tags=sqlite,hsm
     ldflags:
       - -s -w -X github.com/ory/hydra/driver/config.Version={{.Tag}} -X github.com/ory/hydra/driver/config.Commit={{.FullCommit}} -X github.com/ory/hydra/driver/config.Date={{.Date}}
     binary: hydra
@@ -61,8 +58,7 @@ builds:
   -
     id: hydra-sqlite-windows
     flags:
-      - -tags
-      - sqlite
+      - -tags=sqlite,hsm
     ldflags:
       - -s -w -X github.com/ory/hydra/driver/config.Version={{.Tag}} -X github.com/ory/hydra/driver/config.Commit={{.FullCommit}} -X github.com/ory/hydra/driver/config.Date={{.Date}}
       - "-extldflags '-static'"

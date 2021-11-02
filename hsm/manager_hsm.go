@@ -1,3 +1,6 @@
+//go:build hsm
+// +build hsm
+
 package hsm
 
 import (
@@ -38,10 +41,10 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context) *KeyManager {
+func NewKeyManager(hsm Context) (*KeyManager, error) {
 	return &KeyManager{
 		Context: hsm,
-	}
+	}, nil
 }
 
 func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {

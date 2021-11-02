@@ -1,3 +1,6 @@
+//go:build hsm
+// +build hsm
+
 package hsm
 
 import (

@@ -1336,15 +1336,14 @@ oauth2:
   refresh_token_rotation:
     #
     ## grace_period
-    # 
+    #
     # Set the grace period for a refresh token to allow it to be used for the duration of this configuration after its first use. New refresh tokens will continue
-    # to be issued. 
+    # to be issued.
     #
     # Examples:
     # - 5s
     # - 1m
     grace_period: 0s
-
 
 ## secrets ##
 #

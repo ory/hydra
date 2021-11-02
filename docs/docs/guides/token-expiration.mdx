@@ -77,18 +77,22 @@ for refresh tokens to never expire.
 
 ### Refresh Token Rotation
 
-When a refresh token is used it is deactivated, which is known as Refresh Token Rotation. By default Hydra deactivates
-the refresh token it receives and issues a new token. More information on Refresh Token Rotation can be found in the
+When a refresh token is used it is deactivated, which is known as Refresh Token
+Rotation. By default Hydra deactivates the refresh token it receives and issues
+a new token. More information on Refresh Token Rotation can be found in the
 Recommendations section of the OAuth 2.0 Security Best Practices document
 [here](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.13.2).
 
-There are some cases when a one time use refresh token may be undesirable, such as when a networking error occurs
-and the newly issued refresh token is not received. Hydra may be configured to use a refresh token grace period which
-allows a refresh token to be reused for the duration of the grace period. Note that a new refresh token is still generated
-and sent back in the response; clients **must** store and use the new refresh token.
+There are some cases when a one time use refresh token may be undesirable, such
+as when a networking error occurs and the newly issued refresh token is not
+received. Hydra may be configured to use a refresh token grace period which
+allows a refresh token to be reused for the duration of the grace period. Note
+that a new refresh token is still generated and sent back in the response;
+clients **must** store and use the new refresh token.
 
-**WARNING** Using the refresh token grace period is an increased security risk, as an intercepted refresh token may be
-reused by a bad actor. Use this feature with appropriate consideration.
+**WARNING** Using the refresh token grace period is an increased security risk,
+as an intercepted refresh token may be reused by a bad actor. Use this feature
+with appropriate consideration.
 
 ```
   ## refresh_token_rotation

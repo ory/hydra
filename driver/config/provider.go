@@ -66,6 +66,10 @@ const (
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
+	KeyOAuth2GrantJWTClientAuthOptional          = "oauth2.grant.jwt.client_auth_optional"
+	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
+	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
+	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
 )
 
 const DSNMemory = "memory"
@@ -432,4 +436,20 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
+}
+
+func (p *Provider) GrantTypeJWTBearerClientAuthOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTClientAuthOptional)
+}
+
+func (p *Provider) GrantTypeJWTBearerIDOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTIDOptional)
+}
+
+func (p *Provider) GrantTypeJWTBearerIssuedDateOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTIssuedDateOptional)
+}
+
+func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
+	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
 }

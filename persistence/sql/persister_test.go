@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/pborman/uuid"
+
+	"github.com/ory/hydra/oauth2/trust"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal/testhelpers"
@@ -58,6 +61,11 @@ func TestManagers(t *testing.T) {
 
 				jwk.TestHelperManagerKeySet(m.KeyManager(), ks, uuid.New())
 			})
+		})
+
+		t.Run("package=grant/trust/manager="+k, func(t *testing.T) {
+			t.Run("case=create-get-delete", trust.TestHelperGrantManagerCreateGetDeleteGrant(m.GrantManager()))
+			t.Run("case=errors", trust.TestHelperGrantManagerErrors(m.GrantManager()))
 		})
 	}
 }

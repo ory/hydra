@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS hydra_oauth2_trusted_jwt_bearer_issuer;

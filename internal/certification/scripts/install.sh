@@ -10,9 +10,12 @@ sudo apt-get install -y nodejs
 wget https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.10.2.linux-amd64.tar.gz
 mkdir -p go/bin
-echo "export PATH=\$PATH:/usr/local/go/bin" >> "$HOME"/.profile
-echo "GOPATH=\$HOME/go" >> "$HOME"/.profile
-echo "export PATH=\$PATH:\$HOME/go" >> "$HOME"/.profile
+{
+    echo "export PATH=\$PATH:/usr/local/go/bin"
+    echo "GOPATH=\$HOME/go"
+    echo "export PATH=\$PATH:\$HOME/go"
+} >> "$HOME"/.profile
+
 # shellcheck disable=SC1091
 source "$HOME"/.profile
 

@@ -16,6 +16,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/flow"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
 )
@@ -153,18 +154,35 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 }
 
 func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRequest) error {
-	return errorsx.WithStack(p.Connection(ctx).Create(req))
+	f := flow.NewFlow(req)
+	return errorsx.WithStack(p.Connection(ctx).Create(f))
 }
 
-func (p *Persister) GetLoginRequest(ctx context.Context, challenge string) (*consent.LoginRequest, error) {
-	var lr consent.LoginRequest
-	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := (&lr).FindInDB(c, challenge); err != nil {
+func (p *Persister) GetFlow(ctx context.Context, challenge string) (*flow.Flow, error) {
+	var f flow.Flow
+	return &f, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := (&f).FindInDB(c, challenge); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return errorsx.WithStack(x.ErrNotFound)
 			}
 			return sqlcon.HandleError(err)
 		}
+
+		return nil
+	})
+}
+
+func (p *Persister) GetLoginRequest(ctx context.Context, challenge string) (*consent.LoginRequest, error) {
+	var lr *consent.LoginRequest
+	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		f := &flow.Flow{}
+		if err := f.FindInDB(c, challenge); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return errorsx.WithStack(x.ErrNotFound)
+			}
+			return sqlcon.HandleError(err)
+		}
+		lr = f.GetLoginRequest()
 
 		return nil
 	})
@@ -216,7 +234,16 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 
 func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r *consent.HandledLoginRequest) (lr *consent.LoginRequest, err error) {
 	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := c.Create(r)
+		f, err := p.GetFlow(ctx, challenge)
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+		err = f.HandleLoginRequest(r)
+		if err != nil {
+			return err
+		}
+
+		err = c.Update(f)
 		if err != nil {
 			return sqlcon.HandleError(err)
 		}
@@ -229,21 +256,17 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifier string) (*consent.HandledLoginRequest, error) {
 	var d consent.HandledLoginRequest
 	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		var ar consent.LoginRequest
-		if err := c.Where("verifier = ?", verifier).Select("challenge", "client_id").First(&ar); err != nil {
+		var f flow.Flow
+		if err := c.Where("verifier = ?", verifier).Select("*").First(&f); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		if err := c.Find(&d, ar.ID); err != nil {
-			return sqlcon.HandleError(err)
+		if err := f.InitializeConsent(); err != nil {
+			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 		}
 
-		if d.WasHandled {
-			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug("Login verifier has been used already."))
-		}
-
-		d.WasHandled = true
-		return sqlcon.HandleError(c.Update(&d))
+		d = f.GetHandledLoginRequest()
+		return sqlcon.HandleError(c.Update(&f))
 	})
 }
 
@@ -441,8 +464,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 
 func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 	/* #nosec G201 table is static */
-	var lr consent.LoginRequest
-	var lrh consent.HandledLoginRequest
+	var f flow.Flow
 
 	var cr consent.ConsentRequest
 	var crh consent.HandledConsentRequest
@@ -498,13 +520,25 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		}
 	}
 
+	loginQueryFormat := `
+	SELECT %[1]s.challenge
+	FROM %[1]s
+	WHERE (
+		(%[1]s.state = ` + fmt.Sprint(flow.FlowStateLoginInitialized) + `)
+		OR (%[1]s.error IS NOT NULL AND %[1]s.error <> '{}' AND %[1]s.error <> '')
+	)
+	AND %[1]s.requested_at < ?
+	ORDER BY %[1]s.challenge
+	LIMIT %[2]d
+	`
+
 	// Select challenges from all authentication requests that can be safely deleted with limit
 	// where hydra_oauth2_authentication_request were unhandled or rejected, so either of these is true
 	// - hydra_oauth2_authentication_request_handled does not exist (unhandled)
 	// - hydra_oauth2_authentication_request_handled has valid error (rejected)
 	// AND timed-out
 	// - hydra_oauth2_authentication_request.requested_at < minimum between ttl.login_consent_request and notAfter
-	q = p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&lr).TableName(), (&lrh).TableName(), limit), notAfter)
+	q = p.Connection(ctx).RawQuery(fmt.Sprintf(loginQueryFormat, (&f).TableName(), limit), notAfter)
 
 	if err := q.All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
@@ -519,7 +553,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 
 		if i != j {
 			q := p.Connection(ctx).RawQuery(
-				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
+				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&f).TableName()),
 				challenges[i:j],
 			)
 

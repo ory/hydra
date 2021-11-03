@@ -56,7 +56,6 @@ hydra clients create \
     --endpoint http://localhost:9001
 
 echo "Generating initial access tokens for token introspection benchmark"
-authToken=$(hydra token client --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
 introToken=$(hydra token client --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
 
 cat >> BENCHMARKS.md << EOF

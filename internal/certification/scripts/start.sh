@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
 source "$HOME"/.profile
 
 domain=oidc-certification.ory.sh:8443

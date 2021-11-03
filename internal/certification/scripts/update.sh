@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# shellcheck disable=SC1091
 source "$HOME"/.profile
 
 go get -u -d github.com/ory/hydra

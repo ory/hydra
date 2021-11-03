@@ -13,6 +13,7 @@ mkdir -p go/bin
 echo "export PATH=\$PATH:/usr/local/go/bin" >> "$HOME"/.profile
 echo "GOPATH=\$HOME/go" >> "$HOME"/.profile
 echo "export PATH=\$PATH:\$HOME/go" >> "$HOME"/.profile
+# shellcheck disable=SC1091
 source "$HOME"/.profile
 
 # go/dep

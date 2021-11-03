@@ -56,14 +56,14 @@ jobs:
 
       - nancy/install
       - nancy/check
+      - shellcheck/install
+      - shellcheck/check
       - prettier/install
       - prettier/check
       - prettier/install:
           dir: docs/
       - prettier/check:
           dir: docs/
-      - shellcheck/install
-      - shellcheck/check
       - goreleaser/install
       - goreleaser/check
       - golangci/install

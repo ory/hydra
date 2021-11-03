@@ -184,10 +184,10 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 	if f.State != FlowStateLoginInitialized {
-		return errors.New(fmt.Sprintf("Invalid state for HandleLoginRequest. Expected %d, got %d", FlowStateLoginUnused, f.State))
+		return fmt.Errorf("Invalid state for HandleLoginRequest. Expected %d, got %d", FlowStateLoginUnused, f.State)
 	}
 	if f.ID != h.ID {
-		return errors.New(fmt.Sprintf("Flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID))
+		return fmt.Errorf("Flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
 	}
 	// Each of the below checks causes some tests to fail. TODO determine whether these conditions require special care
 	//if f.Subject != h.Subject {
@@ -218,9 +218,9 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 
 func (f *Flow) InitializeConsent() error {
 	if f.State != FlowStateLoginUnused {
-		return errors.New(fmt.Sprintf("Invalid state for InitializeConsent. Expected %d, got %d", FlowStateLoginUnused, f.State))
+		return fmt.Errorf("Invalid state for InitializeConsent. Expected %d, got %d", FlowStateLoginUnused, f.State)
 	}
-	if f.WasHandled != false {
+	if f.WasHandled {
 		return errors.New("Login verifier has already been used.")
 	}
 	f.WasHandled = true

@@ -215,6 +215,7 @@ func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string
 	switch k := key.Public().(type) {
 	case *rsa.PublicKey:
 		alg = "RS256"
+		// TODO: Should we validate minimal key length by checking CKA_MODULUS_BITS?
 	case *ecdsa.PublicKey:
 		if k.Curve == elliptic.P521() {
 			alg = "ES512"
@@ -223,7 +224,6 @@ func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string
 		} else {
 			return "", "", "", errors.WithStack(jwk.ErrUnsupportedEllipticCurve)
 		}
-	// TODO: HS256, HS512. Makes sense only if shared HSM is used between hydra and authenticating application?
 	default:
 		return "", "", "", errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
 	}

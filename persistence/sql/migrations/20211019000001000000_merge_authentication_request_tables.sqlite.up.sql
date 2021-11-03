@@ -1,6 +1,6 @@
 -- login_used_at
 
-CREATE TABLE hydra_oauth2_authentication_request_tmp
+CREATE TABLE hydra_oauth2_flow
 (
     challenge                 VARCHAR(40)  NOT NULL PRIMARY KEY,
     requested_scope           TEXT         NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE hydra_oauth2_authentication_request_tmp
 );
 
 
-INSERT INTO hydra_oauth2_authentication_request_tmp (
+INSERT INTO hydra_oauth2_flow (
     challenge,
     requested_scope,
     verifier,
@@ -107,7 +107,6 @@ ON hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_authenti
 
 DROP TABLE hydra_oauth2_authentication_request;
 DROP TABLE hydra_oauth2_authentication_request_handled;
-ALTER TABLE hydra_oauth2_authentication_request_tmp RENAME TO hydra_oauth2_flow;
 
 CREATE INDEX hydra_oauth2_flow_client_id_idx ON hydra_oauth2_flow (client_id);
 CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON hydra_oauth2_flow (login_session_id);

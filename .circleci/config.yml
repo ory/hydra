@@ -11,6 +11,7 @@ orbs:
   go: circleci/go@1.5.0
   prettier: ory/prettier@0.0.11
   node: circleci/node@4.2.0
+  shellcheck: circleci/shellcheck@2.2.4
 
 jobs:
 #  test-legacy-migrations:
@@ -61,6 +62,8 @@ jobs:
           dir: docs/
       - prettier/check:
           dir: docs/
+      - shellcheck/install
+      - shellcheck/check
       - goreleaser/install
       - goreleaser/check
       - golangci/install

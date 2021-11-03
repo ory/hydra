@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $HOME/.profile
+source "$HOME"/.profile
 
 hydra clients delete \
     --endpoint http://localhost:9000 \

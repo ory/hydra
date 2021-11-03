@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $HOME/.profile
+source "$HOME"/.profile
 
 domain=oidc-certification.ory.sh:8443
 hydraport=9000
@@ -19,7 +19,7 @@ curl -i -X DELETE --url http://localhost:8001/apis/login-consent
 curl -i -X POST \
   --url http://localhost:8001/apis/ \
   --data 'name=hydra-oauth' \
-  --data upstream_url=http://${ip}:9000/ \
+  --data upstream_url=http://"${ip}":9000/ \
   --data 'uris=/oauth2,/.well-known,/userinfo,/clients' \
   --data 'strip_uri=false' \
   --data 'preserve_host=true'
@@ -27,7 +27,7 @@ curl -i -X POST \
 curl -i -X POST \
   --url http://localhost:8001/apis/ \
   --data 'name=login-consent' \
-  --data upstream_url=http://$ip:9001/ \
+  --data upstream_url=http://"$ip":9001/ \
   --data 'uris=/login,/consent' \
   --data 'strip_uri=false' \
   --data 'preserve_host=true'

@@ -93,6 +93,7 @@ hey -n $numReqs -c $numParallel -m POST \
     | tee -a BENCHMARKS.md
 
 
+# shellcheck disable=SC2006
 cat >> BENCHMARKS.md << EOF
 \`\`\`
 

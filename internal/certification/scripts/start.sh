@@ -34,7 +34,7 @@ curl -i -X POST \
   --data 'preserve_host=true'
 
 
-(cd ./hydra-login-consent-node; HYDRA_URL=http://localhost:$hydraport PORT=$idport npm start &)
+(cd ./hydra-login-consent-node || exit; HYDRA_URL=http://localhost:$hydraport PORT=$idport npm start &)
 
 PORT=$hydraport \
     OAUTH2_CONSENT_URL=https://$domain/consent \

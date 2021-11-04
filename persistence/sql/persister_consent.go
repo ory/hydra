@@ -155,7 +155,7 @@ func (p *Persister) GetConsentRequest(ctx context.Context, challenge string) (*c
 
 func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRequest) error {
 	f := flow.NewFlow(req)
-	return errorsx.WithStack(p.Connection(ctx).Create(f))
+	return sqlcon.HandleError(p.Connection(ctx).Create(f))
 }
 
 func (p *Persister) GetFlow(ctx context.Context, challenge string) (*flow.Flow, error) {

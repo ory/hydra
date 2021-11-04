@@ -1,9 +1,9 @@
 package flow
 
 import (
-	"errors"
-	"fmt"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/pop/v5"
 
@@ -184,20 +184,20 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 	if f.State != FlowStateLoginInitialized {
-		return fmt.Errorf("Invalid state for HandleLoginRequest. Expected %d, got %d", FlowStateLoginUnused, f.State)
+		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
 	}
 	if f.ID != h.ID {
-		return fmt.Errorf("Flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
+		return errors.Errorf("flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
 	}
 	// Each of the below checks causes some tests to fail. TODO determine whether these conditions require special care
 	//if f.Subject != h.Subject {
-	//	return errors.New(fmt.Sprintf("Flow Subject %s does not match the HandledLoginRequest Subject %s", f.Subject, h.Subject))
+	//	return errors.Errorf("flow Subject %s does not match the HandledLoginRequest Subject %s", f.Subject, h.Subject)
 	//}
 	//if f.ForceSubjectIdentifier != h.ForceSubjectIdentifier {
-	//	return errors.New(fmt.Sprintf("Flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier  %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier))
+	//	return errors.Errorf("flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier)
 	//}
 	//if h.Error != nil {
-	//	return errors.New("Refusing to process HandledLoginRequest " + h.ID + " with error")
+	//	return errors.New("refusing to process HandledLoginRequest " + h.ID + " with error")
 	//}
 
 	f.State = FlowStateLoginUnused
@@ -218,10 +218,10 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 
 func (f *Flow) InitializeConsent() error {
 	if f.State != FlowStateLoginUnused {
-		return fmt.Errorf("Invalid state for InitializeConsent. Expected %d, got %d", FlowStateLoginUnused, f.State)
+		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginUnused, f.State)
 	}
 	if f.WasHandled {
-		return errors.New("Login verifier has already been used.")
+		return errors.New("login verifier has already been used")
 	}
 	f.WasHandled = true
 	f.State = FlowStateConsentInitialized

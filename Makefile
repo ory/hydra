@@ -83,14 +83,11 @@ docker:
 .PHONY: e2e
 e2e: node_modules test-resetdb
 		source ./scripts/test-env.sh
-		./test/e2e/circle-ci.bash memory
-		./test/e2e/circle-ci.bash memory-jwt
-		./test/e2e/circle-ci.bash postgres
-		./test/e2e/circle-ci.bash postgres-jwt
-		./test/e2e/circle-ci.bash mysql
-		./test/e2e/circle-ci.bash mysql-jwt
-		./test/e2e/circle-ci.bash cockroach
-		./test/e2e/circle-ci.bash cockroach-jwt
+		for db in memory postgres mysql cockroach; do \
+			./test/e2e/circle-ci.bash "$${db}"; \
+			./test/e2e/circle-ci.bash "$${db}" --jwt; \
+			./test/e2e/circle-ci.bash "$${db}" --grant_jwt_client_auth_optional --grant_jwt_jti_optional --grant_jwt_iat_optional; \
+		done
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

@@ -6,7 +6,10 @@
     "client_url": "http://127.0.0.1:5003",
     "public_port": "5000",
     "client_port": "5003",
-    "jwt_enabled": false
+    "jwt_enabled": false,
+    "grant_jwt_client_auth_optional": false,
+    "grant_jwt_jti_optional": false,
+    "grant_jwt_iat_optional": false
   },
   "chromeWebSecurity": false,
   "retries": {

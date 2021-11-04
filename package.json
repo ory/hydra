@@ -17,6 +17,7 @@
   "devDependencies": {
     "cypress": "^7.7.0",
     "dayjs": "^1.10.6",
+    "jsonwebtoken": "^8.5.1",
     "ory-prettier-styles": "1.1.1",
     "prettier": "2.1.2",
     "standard": "^12.0.1",

@@ -183,24 +183,21 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 }
 
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
+	// TODO Validate HandledLoginRequest. This will require updating tests that expect the flow to fail at a later point.
 	if f.State != FlowStateLoginInitialized {
 		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
 	}
 	if f.ID != h.ID {
 		return errors.Errorf("flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
 	}
-	// Each of the below checks causes some tests to fail. TODO determine whether these conditions require special care
-	//if f.Subject != h.Subject {
-	//	return errors.Errorf("flow Subject %s does not match the HandledLoginRequest Subject %s", f.Subject, h.Subject)
-	//}
-	//if f.ForceSubjectIdentifier != h.ForceSubjectIdentifier {
-	//	return errors.Errorf("flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier)
-	//}
-	//if h.Error != nil {
-	//	return errors.New("refusing to process HandledLoginRequest " + h.ID + " with error")
-	//}
+	if f.Subject != "" && h.Subject != "" && f.Subject != h.Subject {
+		return errors.Errorf("flow Subject %s does not match the HandledLoginRequest Subject %s", f.Subject, h.Subject)
+	}
+	if f.ForceSubjectIdentifier != "" && h.ForceSubjectIdentifier != "" && f.ForceSubjectIdentifier != h.ForceSubjectIdentifier {
+		return errors.Errorf("flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier)
+	}
 
-	f.State = FlowStateLoginUnused
+	f.State = FlowStateLoginUnused // TODO FlowStateError if h.Error != nil
 	f.ID = h.ID
 	f.Subject = h.Subject
 	f.ForceSubjectIdentifier = h.ForceSubjectIdentifier
@@ -272,7 +269,7 @@ func (_ Flow) TableName() string {
 }
 
 func (f *Flow) FindInDB(c *pop.Connection, id string) error {
-	return c.Select("hydra_oauth2_flow.*").Find(f, id)
+	return c.Find(f, id)
 }
 
 func (f *Flow) BeforeSave(_ *pop.Connection) error {
@@ -285,6 +282,7 @@ func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
+// TODO Populate the client field in FindInDB in order to avoid accessing the database twice.
 func (f *Flow) AfterFind(c *pop.Connection) error {
 	f.Client = &client.Client{}
 	return sqlcon.HandleError(c.Where("id = ?", f.ClientID).First(f.Client))

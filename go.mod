@@ -14,6 +14,7 @@ replace (
 )
 
 require (
+	github.com/bxcodec/faker/v3 v3.6.0
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/evanphx/json-patch v0.5.2
 	github.com/go-bindata/go-bindata v3.1.1+incompatible

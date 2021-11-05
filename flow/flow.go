@@ -225,21 +225,21 @@ func (f *Flow) InitializeConsent() error {
 	return nil
 }
 
-func (r *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
+func (f *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
 	return consent.HandledLoginRequest{
-		ID:                     r.ID,
-		Remember:               r.Remember,
-		RememberFor:            r.RememberFor,
-		ACR:                    r.ACR,
-		AMR:                    r.AMR,
-		Subject:                r.Subject,
-		ForceSubjectIdentifier: r.ForceSubjectIdentifier,
-		Context:                r.Context,
-		WasHandled:             r.WasHandled,
-		Error:                  r.Error,
-		LoginRequest:           r.GetLoginRequest(),
-		RequestedAt:            r.RequestedAt,
-		AuthenticatedAt:        r.LoginAuthenticatedAt,
+		ID:                     f.ID,
+		Remember:               f.Remember,
+		RememberFor:            f.RememberFor,
+		ACR:                    f.ACR,
+		AMR:                    f.AMR,
+		Subject:                f.Subject,
+		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
+		Context:                f.Context,
+		WasHandled:             f.WasHandled,
+		Error:                  f.Error,
+		LoginRequest:           f.GetLoginRequest(),
+		RequestedAt:            f.RequestedAt,
+		AuthenticatedAt:        f.LoginAuthenticatedAt,
 	}
 }
 

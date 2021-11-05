@@ -7,10 +7,46 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/bxcodec/faker/v3"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/x/sqlxx"
 )
+
+func (f *Flow) setLoginRequest(r *consent.LoginRequest) {
+	f.ID = r.ID
+	f.RequestedScope = r.RequestedScope
+	f.RequestedAudience = r.RequestedAudience
+	f.Skip = r.Skip
+	f.Subject = r.Subject
+	f.OpenIDConnectContext = r.OpenIDConnectContext
+	f.Client = r.Client
+	f.ClientID = r.ClientID
+	f.RequestURL = r.RequestURL
+	f.SessionID = r.SessionID
+	f.WasHandled = r.WasHandled
+	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
+	f.Verifier = r.Verifier
+	f.CSRF = r.CSRF
+	f.LoginAuthenticatedAt = r.AuthenticatedAt
+	f.RequestedAt = r.RequestedAt
+}
+
+func (f *Flow) setHandledLoginRequest(r *consent.HandledLoginRequest) {
+	f.ID = r.ID
+	f.Remember = r.Remember
+	f.RememberFor = r.RememberFor
+	f.ACR = r.ACR
+	f.AMR = r.AMR
+	f.Subject = r.Subject
+	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
+	f.Context = r.Context
+	f.WasHandled = r.WasHandled
+	f.Error = r.Error
+	f.RequestedAt = r.RequestedAt
+	f.LoginAuthenticatedAt = r.AuthenticatedAt
+}
 
 func newTimeIterator(baseTime time.Time) func() time.Time {
 	i := 0
@@ -21,6 +57,30 @@ func newTimeIterator(baseTime time.Time) func() time.Time {
 }
 
 var nextSecond = newTimeIterator(time.Now())
+
+func TestFlow_GetLoginRequest(t *testing.T) {
+	t.Run("GetLoginRequest sets all fields on its return value", func(t *testing.T) {
+		f := Flow{}
+		expected := consent.LoginRequest{}
+		assert.NoError(t, faker.FakeData(&expected))
+		f.setLoginRequest(&expected)
+		actual := f.GetLoginRequest()
+		assert.Equal(t, expected, *actual)
+	})
+}
+
+func TestFlow_GetHandledLoginRequest(t *testing.T) {
+	t.Run("GetHandledLoginRequest sets all fields on its return value", func(t *testing.T) {
+		f := Flow{}
+		expected := consent.HandledLoginRequest{}
+		assert.NoError(t, faker.FakeData(&expected))
+		f.setHandledLoginRequest(&expected)
+		actual := f.GetHandledLoginRequest()
+		expected.LoginRequest = nil
+		actual.LoginRequest = nil
+		assert.Equal(t, expected, actual)
+	})
+}
 
 func TestFlow_NewFlow(t *testing.T) {
 	clientID := uuid.Must(uuid.NewV4())

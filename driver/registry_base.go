@@ -224,6 +224,7 @@ func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
 	if m.kg == nil {
 		m.kg = map[string]jwk.KeyGenerator{
 			"RS256": &jwk.RS256Generator{},
+			"ES256": &jwk.ECDSA256Generator{},
 			"ES512": &jwk.ECDSA512Generator{},
 			"HS256": &jwk.HS256Generator{},
 			"HS512": &jwk.HS512Generator{},

@@ -2,16 +2,12 @@ package flow
 
 import (
 	"testing"
-	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/bxcodec/faker/v3"
 
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/x/sqlxx"
 )
 
 func (f *Flow) setLoginRequest(r *consent.LoginRequest) {
@@ -48,18 +44,8 @@ func (f *Flow) setHandledLoginRequest(r *consent.HandledLoginRequest) {
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 }
 
-func newTimeIterator(baseTime time.Time) func() time.Time {
-	i := 0
-	return func() time.Time {
-		i += 1
-		return baseTime.Add(time.Second * time.Duration(i))
-	}
-}
-
-var nextSecond = newTimeIterator(time.Now())
-
 func TestFlow_GetLoginRequest(t *testing.T) {
-	t.Run("GetLoginRequest sets all fields on its return value", func(t *testing.T) {
+	t.Run("GetLoginRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}
 		expected := consent.LoginRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
@@ -70,7 +56,7 @@ func TestFlow_GetLoginRequest(t *testing.T) {
 }
 
 func TestFlow_GetHandledLoginRequest(t *testing.T) {
-	t.Run("GetHandledLoginRequest sets all fields on its return value", func(t *testing.T) {
+	t.Run("GetHandledLoginRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}
 		expected := consent.HandledLoginRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
@@ -83,33 +69,17 @@ func TestFlow_GetHandledLoginRequest(t *testing.T) {
 }
 
 func TestFlow_NewFlow(t *testing.T) {
-	clientID := uuid.Must(uuid.NewV4())
-	nonDefaultLoginRequest := &consent.LoginRequest{
-		ID:                     "t1",
-		RequestedScope:         sqlxx.StringSlicePipeDelimiter{"t1-requested_scope"},
-		RequestedAudience:      sqlxx.StringSlicePipeDelimiter{"t1-requested_audience"},
-		Skip:                   true,
-		Subject:                "t1-subject",
-		OpenIDConnectContext:   &consent.OpenIDConnectContext{Display: "t1-display"},
-		RequestURL:             "http://request/t1",
-		SessionID:              sqlxx.NullString("t1-auth_session"),
-		Verifier:               "t1-verifier",
-		CSRF:                   "t1-csrf",
-		WasHandled:             true,
-		Client:                 &client.Client{ID: clientID},
-		ClientID:               clientID.String(),
-		ForceSubjectIdentifier: "t1-force-subject-id",
-		AuthenticatedAt:        sqlxx.NullTime(nextSecond()),
-		RequestedAt:            nextSecond(),
-	}
-
-	roundtrip := NewFlow(nonDefaultLoginRequest).GetLoginRequest()
-	assert.Equal(t, nonDefaultLoginRequest, roundtrip)
+	t.Run("NewFlow and GetLoginRequest should use all LoginRequest fields", func(t *testing.T) {
+		expected := &consent.LoginRequest{}
+		assert.NoError(t, faker.FakeData(expected))
+		actual := NewFlow(expected).GetLoginRequest()
+		assert.Equal(t, expected, actual)
+	})
 }
 
 func TestFlow_HandleLoginRequest(t *testing.T) {
 	t.Run(
-		"HandleLoginRequest ignores RequestedAt in its argument and copies the other fields",
+		"HandleLoginRequest should ignore RequestedAt in its argument and copy the other fields",
 		func(t *testing.T) {
 			f := Flow{}
 			assert.NoError(t, faker.FakeData(&f))
@@ -133,7 +103,7 @@ func TestFlow_HandleLoginRequest(t *testing.T) {
 }
 
 func TestFlow_InitializeConsent(t *testing.T) {
-	t.Run("InitializeConsent transitions the flow into FlowStateConsentInitialized", func(t *testing.T) {
+	t.Run("InitializeConsent should transition the flow into FlowStateConsentInitialized", func(t *testing.T) {
 		f := NewFlow(&consent.LoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",

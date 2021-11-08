@@ -10,8 +10,15 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/tidwall/gjson"
+
+	"github.com/ory/hydra/driver"
 
 	"github.com/ory/x/pointerx"
 
@@ -274,5 +281,271 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result2))
 		require.NotNil(t, result2.RedirectTo)
 		require.Contains(t, result2.RedirectTo, "login_verifier")
+	})
+}
+
+func TestRevokeConsentSession(t *testing.T) {
+	newWg := func(add int) *sync.WaitGroup {
+		var wg sync.WaitGroup
+		wg.Add(add)
+		return &wg
+	}
+
+	t.Run("case=subject=subject-1,client=client-1,session=session-1,trigger_back_channel_logout=true", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(1)
+		cl := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{"login-session-1"}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl)
+		performLoginFlow(t, reg, "2", cl)
+		performDeleteConsentSession(t, reg, "client-1", "login-session-1", true)
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.NoError(t, err)
+		require.NotNil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,client=client-1,session=session-1,trigger_back_channel_logout=false", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(0)
+		cl := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl)
+		performLoginFlow(t, reg, "2", cl)
+		performDeleteConsentSession(t, reg, "client-1", "login-session-1", false)
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.NoError(t, err)
+		require.NotNil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,client=client-1,trigger_back_channel_logout=true", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(2)
+		cl := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{"login-session-1", "login-session-2"}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl)
+		performLoginFlow(t, reg, "2", cl)
+
+		performDeleteConsentSession(t, reg, "client-1", nil, true)
+
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,client=client-1,trigger_back_channel_logout=false", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(0)
+		cl := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl)
+		performLoginFlow(t, reg, "2", cl)
+
+		performDeleteConsentSession(t, reg, "client-1", nil, false)
+
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,all=true,session=session-1,trigger_back_channel_logout=true", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(1)
+		cl1 := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{"login-session-1"}, backChannelWG)
+		cl2 := createClientWithBackChannelEndpoint(t, reg, "client-2", []string{}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl1)
+		performLoginFlow(t, reg, "2", cl2)
+
+		performDeleteConsentSession(t, reg, nil, "login-session-1", true)
+
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.NoError(t, err)
+		require.NotNil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,all=true,session=session-1,trigger_back_channel_logout=false", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(0)
+		cl1 := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{}, backChannelWG)
+		cl2 := createClientWithBackChannelEndpoint(t, reg, "client-2", []string{}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl1)
+		performLoginFlow(t, reg, "2", cl2)
+
+		performDeleteConsentSession(t, reg, nil, "login-session-1", false)
+
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.NoError(t, err)
+		require.NotNil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,all=true,trigger_back_channel_logout=true", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(2)
+		cl1 := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{"login-session-1"}, backChannelWG)
+		cl2 := createClientWithBackChannelEndpoint(t, reg, "client-2", []string{"login-session-2"}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl1)
+		performLoginFlow(t, reg, "2", cl2)
+
+		performDeleteConsentSession(t, reg, nil, nil, true)
+
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c2)
+		backChannelWG.Wait()
+	})
+
+	t.Run("case=subject=subject-1,all=true,trigger_back_channel_logout=false", func(t *testing.T) {
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+		backChannelWG := newWg(0)
+		cl1 := createClientWithBackChannelEndpoint(t, reg, "client-1", []string{}, backChannelWG)
+		cl2 := createClientWithBackChannelEndpoint(t, reg, "client-2", []string{}, backChannelWG)
+		performLoginFlow(t, reg, "1", cl1)
+		performLoginFlow(t, reg, "2", cl2)
+
+		performDeleteConsentSession(t, reg, nil, nil, false)
+
+		c1, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-1")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c1)
+		c2, err := reg.ConsentManager().GetConsentRequest(context.Background(), "consent-challenge-2")
+		require.Error(t, x.ErrNotFound, err)
+		require.Nil(t, c2)
+		backChannelWG.Wait()
+	})
+}
+
+func performDeleteConsentSession(t *testing.T, reg driver.Registry, client, loginSessionId interface{}, triggerBackChannelLogout bool) {
+	conf := internal.NewConfigurationWithDefaults()
+	h := NewHandler(reg, conf)
+	r := x.NewRouterAdmin(conf.AdminURL)
+	h.SetRoutes(r)
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+	c := &http.Client{}
+
+	u, _ := url.Parse(ts.URL + "/admin" + SessionsPath + "/consent")
+	q := u.Query()
+	q.Set("subject", "subject-1")
+	if client != nil && len(client.(string)) != 0 {
+		q.Set("client", client.(string))
+	} else {
+		q.Set("all", "true")
+	}
+	if loginSessionId != nil && len(loginSessionId.(string)) != 0 {
+		q.Set("login_session_id", loginSessionId.(string))
+	}
+	if triggerBackChannelLogout {
+		q.Set("trigger_back_channel_logout", "true")
+	}
+	u.RawQuery = q.Encode()
+	req, err := http.NewRequest(http.MethodDelete, u.String(), nil)
+
+	require.NoError(t, err)
+	_, err = c.Do(req)
+	require.NoError(t, err)
+}
+
+func performLoginFlow(t *testing.T, reg driver.Registry, flowId string, cl *client.Client) {
+	subject := "subject-1"
+	loginSessionId := "login-session-" + flowId
+	loginChallenge := "login-challenge-" + flowId
+	consentChallenge := "consent-challenge-" + flowId
+	requestURL := "http://192.0.2.1"
+
+	ls := &LoginSession{
+		ID:      loginSessionId,
+		Subject: subject,
+	}
+	lr := &LoginRequest{
+		ID:         loginChallenge,
+		Subject:    subject,
+		Client:     cl,
+		RequestURL: requestURL,
+		Verifier:   "login-verifier-" + flowId,
+		SessionID:  sqlxx.NullString(loginSessionId),
+	}
+	cr := &OAuth2ConsentRequest{
+		Client:         cl,
+		ID:             consentChallenge,
+		Verifier:       consentChallenge,
+		CSRF:           consentChallenge,
+		Subject:        subject,
+		LoginChallenge: sqlxx.NullString(loginChallenge),
+		LoginSessionID: sqlxx.NullString(loginSessionId),
+	}
+	hcr := &AcceptOAuth2ConsentRequest{
+		ConsentRequest: cr,
+		ID:             consentChallenge,
+		WasHandled:     true,
+		HandledAt:      sqlxx.NullTime(time.Now().UTC()),
+	}
+
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), ls))
+	require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), lr))
+	require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), cr))
+	_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), hcr)
+	require.NoError(t, err)
+}
+
+func createClientWithBackChannelEndpoint(t *testing.T, reg driver.Registry, clientId string, expectedBackChannelLogoutFlowIds []string, wg *sync.WaitGroup) *client.Client {
+	return func(t *testing.T, key string, wg *sync.WaitGroup, cb func(t *testing.T, logoutToken gjson.Result)) *client.Client {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer wg.Done()
+			require.NoError(t, r.ParseForm())
+			lt := r.PostFormValue("logout_token")
+			assert.NotEmpty(t, lt)
+			token, err := reg.OpenIDJWTStrategy().Decode(r.Context(), lt)
+			require.NoError(t, err)
+			var b bytes.Buffer
+			require.NoError(t, json.NewEncoder(&b).Encode(token.Claims))
+			cb(t, gjson.Parse(b.String()))
+		}))
+		t.Cleanup(server.Close)
+		c := &client.Client{
+			LegacyClientID:       clientId,
+			BackChannelLogoutURI: server.URL,
+		}
+		err := reg.ClientManager().CreateClient(context.Background(), c)
+		require.NoError(t, err)
+		return c
+	}(t, clientId, wg, func(t *testing.T, logoutToken gjson.Result) {
+		sid := logoutToken.Get("sid").String()
+		assert.Contains(t, expectedBackChannelLogoutFlowIds, sid)
+		for i, v := range expectedBackChannelLogoutFlowIds {
+			if v == sid {
+				expectedBackChannelLogoutFlowIds = append(expectedBackChannelLogoutFlowIds[:i], expectedBackChannelLogoutFlowIds[i+1:]...)
+				break
+			}
+		}
 	})
 }

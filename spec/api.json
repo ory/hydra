@@ -2747,9 +2747,25 @@
             }
           },
           {
+            "description": "If set, deletes only those consent sessions by the Subject that have been granted to the specified session id. Can be combined with client or all parameter.",
+            "in": "query",
+            "name": "login_session_id",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "Revoke All Consent Sessions\n\nIf set to `true` deletes all consent sessions by the Subject that have been granted.",
             "in": "query",
             "name": "all",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "If set to `?trigger_back_channel_logout=true`, performs back channel logout for matching clients",
+            "in": "query",
+            "name": "trigger_back_channel_logout",
             "schema": {
               "type": "boolean"
             }

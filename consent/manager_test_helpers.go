@@ -839,7 +839,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				}
 
 				for _, ls := range sessions {
-					check := func(t *testing.T, expected map[string][]client.Client, actual []client.Client) {
+					check := func(t *testing.T, expected map[string][]client.Client, actual []client.LoginSessionClient) {
 						es, ok := expected[ls.ID]
 						if !ok {
 							require.Len(t, actual, 0)
@@ -861,14 +861,14 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 						}
 					}
 
-					t.Run(fmt.Sprintf("method=ListUserAuthenticatedClientsWithFrontChannelLogout/session=%s/subject=%s", ls.ID, ls.Subject), func(t *testing.T) {
-						actual, err := m.ListUserAuthenticatedClientsWithFrontChannelLogout(context.Background(), ls.Subject, ls.ID)
+					t.Run(fmt.Sprintf("method=ListUserSessionAuthenticatedClientsWithFrontChannelLogout/session=%s/subject=%s", ls.ID, ls.Subject), func(t *testing.T) {
+						actual, err := m.ListUserSessionAuthenticatedClientsWithFrontChannelLogout(context.Background(), ls.Subject, ls.ID)
 						require.NoError(t, err)
 						check(t, frontChannels, actual)
 					})
 
-					t.Run(fmt.Sprintf("method=ListUserAuthenticatedClientsWithBackChannelLogout/session=%s", ls.ID), func(t *testing.T) {
-						actual, err := m.ListUserAuthenticatedClientsWithBackChannelLogout(context.Background(), ls.Subject, ls.ID)
+					t.Run(fmt.Sprintf("method=ListUserSessionAuthenticatedClientsWithBackChannelLogout/session=%s", ls.ID), func(t *testing.T) {
+						actual, err := m.ListUserSessionAuthenticatedClientsWithBackChannelLogout(context.Background(), ls.Subject, ls.ID)
 						require.NoError(t, err)
 						check(t, backChannels, actual)
 					})

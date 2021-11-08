@@ -1041,6 +1041,16 @@ paths:
         schema:
           type: string
         style: form
+      - description: "If set, deletes only those consent sessions by the Subject that\
+          \ have been granted to the specified session id. Can be combined with client\
+          \ or all parameter."
+        explode: true
+        in: query
+        name: login_session_id
+        required: false
+        schema:
+          type: string
+        style: form
       - description: |-
           Revoke All Consent Sessions
 
@@ -1048,6 +1058,15 @@ paths:
         explode: true
         in: query
         name: all
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "If set to `?trigger_back_channel_logout=true`, performs back\
+          \ channel logout for matching clients"
+        explode: true
+        in: query
+        name: trigger_back_channel_logout
         required: false
         schema:
           type: boolean

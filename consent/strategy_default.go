@@ -619,7 +619,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 }
 
 func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
+	clients, err := s.r.ConsentManager().ListUserSessionAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return nil, err
 	}
@@ -641,11 +641,15 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 }
 
 func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.Request, subject, sid string) error {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
+	clients, err := s.r.ConsentManager().ListUserSessionAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return err
 	}
 
+	return s.executeBackChannelLogoutForClients(ctx, r, clients)
+}
+
+func (s *DefaultStrategy) executeBackChannelLogoutForClients(ctx context.Context, r *http.Request, clients []client.LoginSessionClient) error {
 	openIDKeyID, err := s.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 	if err != nil {
 		return err
@@ -672,7 +676,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 			"iat":    time.Now().UTC().Unix(),
 			"jti":    uuid.New(),
 			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},
-			"sid":    sid,
+			"sid":    c.LoginSessionID,
 		}, &jwt.Headers{
 			Extra: map[string]interface{}{"kid": openIDKeyID},
 		})
@@ -1056,4 +1060,39 @@ func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fos
 		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
 	}
 	return subject, nil
+}
+
+func (s *DefaultStrategy) ExecuteBackChannelLogoutBySession(ctx context.Context, r *http.Request, subject, sid string) {
+	_ = s.executeBackChannelLogout(ctx, r, subject, sid)
+}
+
+func (s *DefaultStrategy) ExecuteBackChannelLogoutBySubject(ctx context.Context, r *http.Request, subject string) {
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	if err == nil {
+		_ = s.executeBackChannelLogoutForClients(ctx, r, clients)
+	}
+}
+
+func (s *DefaultStrategy) ExecuteBackChannelLogoutByClient(ctx context.Context, r *http.Request, subject, client string) {
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	if err == nil {
+		for i := len(clients) - 1; i >= 0; i-- {
+			if clients[i].LegacyClientID != client {
+				clients = append(clients[:i], clients[i+1:]...)
+			}
+		}
+		_ = s.executeBackChannelLogoutForClients(ctx, r, clients)
+	}
+}
+
+func (s *DefaultStrategy) ExecuteBackChannelLogoutByClientSession(ctx context.Context, r *http.Request, subject, client, sid string) {
+	clients, err := s.r.ConsentManager().ListUserSessionAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
+	if err == nil {
+		for i := len(clients) - 1; i >= 0; i-- {
+			if clients[i].LegacyClientID != client {
+				clients = append(clients[:i], clients[i+1:]...)
+			}
+		}
+		_ = s.executeBackChannelLogoutForClients(ctx, r, clients)
+	}
 }

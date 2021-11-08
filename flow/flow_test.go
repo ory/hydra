@@ -108,84 +108,28 @@ func TestFlow_NewFlow(t *testing.T) {
 }
 
 func TestFlow_HandleLoginRequest(t *testing.T) {
-	t2ID := uuid.Must(uuid.NewV4())
-	tests := []struct {
-		name    string
-		flow    Flow
-		arg     *consent.HandledLoginRequest
-		wantErr bool
-	}{
-		{
-			name: "HandleLoginRequest ignores RequestedAt in its argument and copies the other fields",
-			flow: Flow{
-				ID:                     "t2-id",
-				RequestedScope:         sqlxx.StringSlicePipeDelimiter{"t2-requested_scope"},
-				RequestedAudience:      sqlxx.StringSlicePipeDelimiter{"t2-requested_audience"},
-				Skip:                   false,
-				Subject:                "t2-sub-valid",
-				OpenIDConnectContext:   &consent.OpenIDConnectContext{Display: "t2-display"},
-				Client:                 &client.Client{ID: t2ID},
-				ClientID:               t2ID.String(),
-				RequestURL:             "http://test/t2",
-				SessionID:              sqlxx.NullString("t2-auth_session"),
-				Verifier:               "t2-verifier",
-				CSRF:                   "t2-csrf",
-				LoginInitializedAt:     sqlxx.NullTime(nextSecond()),
-				RequestedAt:            nextSecond(),
-				State:                  FlowStateLoginInitialized,
-				Remember:               false,
-				RememberFor:            0,
-				ACR:                    "",
-				AMR:                    []string{},
-				ForceSubjectIdentifier: "t2-force-sub-id-valid",
-				Context:                []byte("{\"v\": \"t2-invlid\"}"),
-				WasHandled:             false,
-				Error:                  nil,
-				LoginAuthenticatedAt:   sqlxx.NullTime(nextSecond()),
-			},
-			arg: &consent.HandledLoginRequest{
-				ID:                     "t2-id",
-				Subject:                "t2-sub-valid",
-				ForceSubjectIdentifier: "t2-force-sub-id-valid",
-				WasHandled:             true,
-				Remember:               true,
-				RememberFor:            1,
-				ACR:                    "valid",
-				AMR:                    []string{"t2-amr-1-valid", "t2-amr-2-valid"},
-				Context:                []byte("{\"v\": \"t2-valid\"}"),
-				LoginRequest:           nil,
-				Error:                  nil,
-				RequestedAt:            nextSecond(),
-				AuthenticatedAt:        sqlxx.NullTime(nextSecond()),
-			},
-			wantErr: false,
+	t.Run(
+		"HandleLoginRequest ignores RequestedAt in its argument and copies the other fields",
+		func(t *testing.T) {
+			f := Flow{}
+			assert.NoError(t, faker.FakeData(&f))
+			f.State = FlowStateLoginInitialized
+
+			r := consent.HandledLoginRequest{}
+			assert.NoError(t, faker.FakeData(&r))
+			r.ID = f.ID
+			r.Subject = f.Subject
+			r.ForceSubjectIdentifier = f.ForceSubjectIdentifier
+
+			assert.NoError(t, f.HandleLoginRequest(&r))
+
+			actual := f.GetHandledLoginRequest()
+			assert.NotEqual(t, r.RequestedAt, actual.RequestedAt)
+			r.LoginRequest = f.GetLoginRequest()
+			actual.RequestedAt = r.RequestedAt
+			assert.Equal(t, r, actual)
 		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			expected := &consent.HandledLoginRequest{
-				ID:                     tt.flow.ID,
-				Remember:               tt.arg.Remember,
-				RememberFor:            tt.arg.RememberFor,
-				ACR:                    tt.arg.ACR,
-				AMR:                    tt.arg.AMR,
-				Subject:                tt.arg.Subject,
-				ForceSubjectIdentifier: tt.arg.ForceSubjectIdentifier,
-				Context:                tt.arg.Context,
-				WasHandled:             true,
-				LoginRequest:           &consent.LoginRequest{ID: "invalid-set-later"},
-				Error:                  tt.arg.Error,
-				RequestedAt:            tt.flow.RequestedAt,
-				AuthenticatedAt:        tt.arg.AuthenticatedAt,
-			}
-			if err := tt.flow.HandleLoginRequest(tt.arg); (err != nil) != tt.wantErr {
-				t.Errorf("Flow.HandleLoginRequest() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			expected.LoginRequest = tt.flow.GetLoginRequest()
-			actual := tt.flow.GetHandledLoginRequest()
-			assert.Equal(t, expected, &actual)
-		})
-	}
+	)
 }
 
 func TestFlow_InitializeConsent(t *testing.T) {

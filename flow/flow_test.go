@@ -118,7 +118,7 @@ func TestFlow_InitializeConsent(t *testing.T) {
 		assert.Equal(t, FlowStateConsentInitialized, f.State)
 		assert.Equal(t, true, f.WasHandled)
 	})
-	t.Run("InitializeConsent fails when flow.WasHandled is true", func(t *testing.T) {
+	t.Run("InitializeConsent should fail when flow.WasHandled is true", func(t *testing.T) {
 		f := NewFlow(&consent.LoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/ory/hydra/client"
+
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/x/errorsx"
@@ -14,7 +16,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
@@ -28,6 +29,10 @@ func (p *Persister) RevokeSubjectConsentSession(ctx context.Context, user string
 
 func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error {
 	return p.transaction(ctx, p.revokeConsentSession("r.subject = ? AND r.client_id = ?", user, client))
+}
+
+func (p *Persister) RevokeSubjectClientLoginSessionConsentSession(ctx context.Context, user, client, loginSessionId string) error {
+	return p.transaction(ctx, p.revokeConsentSession("r.subject = ? AND r.client_id = ? AND r.login_session_id = ?", user, client, loginSessionId))
 }
 
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
@@ -363,25 +368,55 @@ func (p *Persister) resolveHandledConsentRequests(ctx context.Context, requests 
 	return result, nil
 }
 
-func (p *Persister) ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
-	return p.listUserAuthenticatedClients(ctx, subject, sid, "front")
+func (p *Persister) ListUserSessionAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.AuthenticatedClient, error) {
+	return p.listUserLoginSessionAuthenticatedClients(ctx, subject, sid, "front")
 }
 
-func (p *Persister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error) {
-	return p.listUserAuthenticatedClients(ctx, subject, sid, "back")
+func (p *Persister) ListUserSessionAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.AuthenticatedClient, error) {
+	return p.listUserLoginSessionAuthenticatedClients(ctx, subject, sid, "back")
 }
 
-func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, sid, channel string) ([]client.Client, error) {
-	var cs []client.Client
-	return cs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+func (p *Persister) ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.AuthenticatedClient, error) {
+	return p.listUserAuthenticatedClients(ctx, subject, "back")
+}
+
+func (p *Persister) listUserLoginSessionAuthenticatedClients(ctx context.Context, subject, sid, channel string) ([]client.AuthenticatedClient, error) {
+	var cs []client.AuthenticatedClient
+	err := p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := c.RawQuery(
 			/* #nosec G201 - channel can either be "front" or "back" */
-			fmt.Sprintf(`SELECT DISTINCT c.* FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND r.login_session_id = ?`,
+			fmt.Sprintf(`SELECT DISTINCT c.id, c.frontchannel_logout_uri, c.frontchannel_logout_session_required, c.backchannel_logout_uri, c.backchannel_logout_session_required FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND r.login_session_id = ?`,
 				channel,
 				channel,
 			),
 			subject,
 			sid,
+		).All(&cs); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range cs {
+		cs[i].LoginSessionID = sid
+	}
+	return cs, err
+}
+
+func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, channel string) ([]client.AuthenticatedClient, error) {
+	var cs []client.AuthenticatedClient
+	return cs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := c.RawQuery(
+			/* #nosec G201 - channel can either be "front" or "back" */
+			fmt.Sprintf(`SELECT DISTINCT c.id, c.frontchannel_logout_uri, c.frontchannel_logout_session_required, c.backchannel_logout_uri, c.backchannel_logout_session_required, r.login_session_id FROM hydra_client as c JOIN hydra_oauth2_consent_request as r ON (c.id = r.client_id) WHERE r.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL`,
+				channel,
+				channel,
+			),
+			subject,
 		).All(&cs); err != nil {
 			return sqlcon.HandleError(err)
 		}

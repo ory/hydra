@@ -21,6 +21,7 @@
 package oauth2_test
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -60,5 +61,21 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 }
 
 func (c *consentMock) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
+	panic("not implemented")
+}
+
+func (c *consentMock) ExecuteBackChannelLogoutBySession(ctx context.Context, r *http.Request, subject, sid string) error {
+	panic("not implemented")
+}
+
+func (c *consentMock) ExecuteBackChannelLogoutByClientSession(ctx context.Context, r *http.Request, subject, client, sid string) error {
+	panic("not implemented")
+}
+
+func (c *consentMock) ExecuteBackChannelLogoutByClient(ctx context.Context, r *http.Request, subject, client string) error {
+	panic("not implemented")
+}
+
+func (c *consentMock) ExecuteBackChannelLogoutBySubject(ctx context.Context, r *http.Request, subject string) error {
 	panic("not implemented")
 }

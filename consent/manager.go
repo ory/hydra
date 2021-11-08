@@ -43,6 +43,7 @@ type Manager interface {
 	HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
 	RevokeSubjectConsentSession(ctx context.Context, user string) error
 	RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
+	RevokeSubjectClientLoginSessionConsentSession(ctx context.Context, user, client, loginSessionId string) error
 
 	VerifyAndInvalidateConsentRequest(ctx context.Context, verifier string) (*HandledConsentRequest, error)
 	FindGrantedAndRememberedConsentRequests(ctx context.Context, client, user string) ([]HandledConsentRequest, error)
@@ -64,8 +65,9 @@ type Manager interface {
 	CreateForcedObfuscatedLoginSession(ctx context.Context, session *ForcedObfuscatedLoginSession) error
 	GetForcedObfuscatedLoginSession(ctx context.Context, client, obfuscated string) (*ForcedObfuscatedLoginSession, error)
 
-	ListUserAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
-	ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.Client, error)
+	ListUserSessionAuthenticatedClientsWithFrontChannelLogout(ctx context.Context, subject, sid string) ([]client.AuthenticatedClient, error)
+	ListUserSessionAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject, sid string) ([]client.AuthenticatedClient, error)
+	ListUserAuthenticatedClientsWithBackChannelLogout(ctx context.Context, subject string) ([]client.AuthenticatedClient, error)
 
 	CreateLogoutRequest(ctx context.Context, request *LogoutRequest) error
 	GetLogoutRequest(ctx context.Context, challenge string) (*LogoutRequest, error)

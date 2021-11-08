@@ -632,7 +632,7 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 }
 
 func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, subject, sid string) ([]string, error) {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
+	clients, err := s.r.ConsentManager().ListUserSessionAuthenticatedClientsWithFrontChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return nil, err
 	}
@@ -653,12 +653,49 @@ func (s *DefaultStrategy) generateFrontChannelLogoutURLs(ctx context.Context, su
 	return urls, nil
 }
 
-func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.Request, subject, sid string) error {
-	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
+func (s *DefaultStrategy) ExecuteBackChannelLogoutBySession(ctx context.Context, r *http.Request, subject, sid string) error {
+	clients, err := s.r.ConsentManager().ListUserSessionAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
 	if err != nil {
 		return err
 	}
+	return s.executeBackChannelLogout(ctx, r, clients)
+}
 
+func (s *DefaultStrategy) ExecuteBackChannelLogoutByClientSession(ctx context.Context, r *http.Request, subject, client, sid string) error {
+	clients, err := s.r.ConsentManager().ListUserSessionAuthenticatedClientsWithBackChannelLogout(ctx, subject, sid)
+	if err != nil {
+		return err
+	}
+	for i := len(clients) - 1; i >= 0; i-- {
+		if clients[i].ClientID != client {
+			clients = append(clients[:i], clients[i+1:]...)
+		}
+	}
+	return s.executeBackChannelLogout(ctx, r, clients)
+}
+
+func (s *DefaultStrategy) ExecuteBackChannelLogoutByClient(ctx context.Context, r *http.Request, subject, client string) error {
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	if err != nil {
+		return err
+	}
+	for i := len(clients) - 1; i >= 0; i-- {
+		if clients[i].ClientID != client {
+			clients = append(clients[:i], clients[i+1:]...)
+		}
+	}
+	return s.executeBackChannelLogout(ctx, r, clients)
+}
+
+func (s *DefaultStrategy) ExecuteBackChannelLogoutBySubject(ctx context.Context, r *http.Request, subject string) error {
+	clients, err := s.r.ConsentManager().ListUserAuthenticatedClientsWithBackChannelLogout(ctx, subject)
+	if err != nil {
+		return err
+	}
+	return s.executeBackChannelLogout(ctx, r, clients)
+}
+
+func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.Request, clients []client.AuthenticatedClient) error {
 	openIDKeyID, err := s.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 	if err != nil {
 		return err
@@ -678,14 +715,13 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		//
 		// s.r.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), subject, <missing>)
 		// sub := s.obfuscateSubjectIdentifier(c, subject, )
-
 		t, _, err := s.r.OpenIDJWTStrategy().Generate(ctx, jwtgo.MapClaims{
 			"iss":    s.c.IssuerURL().String(),
-			"aud":    []string{c.OutfacingID},
+			"aud":    []string{c.ClientID},
 			"iat":    time.Now().UTC().Unix(),
 			"jti":    uuid.New(),
 			"events": map[string]struct{}{"http://schemas.openid.net/event/backchannel-logout": {}},
-			"sid":    sid,
+			"sid":    c.LoginSessionID,
 		}, &jwt.Headers{
 			Extra: map[string]interface{}{"kid": openIDKeyID},
 		})
@@ -693,7 +729,7 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 			return err
 		}
 
-		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.OutfacingID, token: t})
+		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.ClientID, token: t})
 	}
 
 	var wg sync.WaitGroup
@@ -964,7 +1000,7 @@ func (s *DefaultStrategy) completeLogout(w http.ResponseWriter, r *http.Request)
 		return nil, err
 	}
 
-	if err := s.executeBackChannelLogout(r.Context(), r, lr.Subject, lr.SessionID); err != nil {
+	if err := s.ExecuteBackChannelLogoutBySession(r.Context(), r, lr.Subject, lr.SessionID); err != nil {
 		return nil, err
 	}
 

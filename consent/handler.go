@@ -102,6 +102,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
+	loginSessionId := r.URL.Query().Get("login_session_id")
+	triggerBackChannelLogout := r.URL.Query().Get("trigger_backchannel_logout")
+
 	allClients := r.URL.Query().Get("all") == "true"
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
@@ -110,9 +113,26 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 
 	switch {
 	case len(client) > 0:
-		if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil && !errors.Is(err, x.ErrNotFound) {
-			h.r.Writer().WriteError(w, r, err)
-			return
+		if len(loginSessionId) > 0 {
+			if triggerBackChannelLogout == "true" {
+				if err := h.r.ConsentStrategy().ExecuteBackChannelLogoutByClientSession(r.Context(), r, subject, client, loginSessionId); err != nil {
+					h.r.Logger().WithError(err).Warn("Unable to execute back channel logout")
+				}
+			}
+			if err := h.r.ConsentManager().RevokeSubjectClientLoginSessionConsentSession(r.Context(), subject, client, loginSessionId); err != nil && !errors.Is(err, x.ErrNotFound) {
+				h.r.Writer().WriteError(w, r, err)
+				return
+			}
+		} else {
+			if triggerBackChannelLogout == "true" {
+				if err := h.r.ConsentStrategy().ExecuteBackChannelLogoutByClient(r.Context(), r, subject, client); err != nil {
+					h.r.Logger().WithError(err).Warn("Unable to execute back channel logout")
+				}
+			}
+			if err := h.r.ConsentManager().RevokeSubjectClientConsentSession(r.Context(), subject, client); err != nil && !errors.Is(err, x.ErrNotFound) {
+				h.r.Writer().WriteError(w, r, err)
+				return
+			}
 		}
 	case allClients:
 		if err := h.r.ConsentManager().RevokeSubjectConsentSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {

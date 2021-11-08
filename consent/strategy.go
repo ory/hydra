@@ -21,6 +21,7 @@
 package consent
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/ory/fosite"
@@ -31,4 +32,8 @@ var _ Strategy = new(DefaultStrategy)
 type Strategy interface {
 	HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*HandledConsentRequest, error)
 	HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*LogoutResult, error)
+	ExecuteBackChannelLogoutBySubject(ctx context.Context, r *http.Request, subject string) error
+	ExecuteBackChannelLogoutBySession(ctx context.Context, r *http.Request, subject, sid string) error
+	ExecuteBackChannelLogoutByClient(ctx context.Context, r *http.Request, subject, client string) error
+	ExecuteBackChannelLogoutByClientSession(ctx context.Context, r *http.Request, subject, client, sid string) error
 }

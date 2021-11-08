@@ -19,17 +19,18 @@ import (
 //graph TD
 //    LOGIN_INITIALIZED --> LOGIN_UNUSED
 //    LOGIN_UNUSED --> CONSENT_INITIALIZED
-//    LOGIN_UNUSED --> ERROR
+//    LOGIN_UNUSED --> LOGIN_ERROR
 //    CONSENT_INITIALIZED --> CONSENT_UNUSED
 //    CONSENT_UNUSED --> CONSENT_USED
-//    CONSENT_UNUSED --> ERROR
+//    CONSENT_UNUSED --> CONSENT_ERROR
 const (
-	FlowStateError              = int16(0)
 	FlowStateLoginInitialized   = int16(1)
 	FlowStateLoginUnused        = int16(2)
 	FlowStateConsentInitialized = int16(3)
 	FlowStateConsentUnused      = int16(4)
 	FlowStateConsentUsed        = int16(5)
+	FlowStateLoginError         = int16(128)
+	FlowStateConsentError       = int16(129)
 )
 
 // Flow is an abstraction used in the persistence layer to unify LoginRequest

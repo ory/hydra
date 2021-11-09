@@ -23,6 +23,7 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.1);
   z-index: 10000;
+  margin-bottom: 0;
 }
 
 .graph.overlay .backdrop {
@@ -34,6 +35,7 @@
   background-color: white;
   text-align: center;
   cursor: default;
+  overflow: auto;
 }
 
 .graph.overlay .backdrop svg {

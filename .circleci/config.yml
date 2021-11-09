@@ -11,6 +11,7 @@ orbs:
   go: circleci/go@1.5.0
   prettier: ory/prettier@0.0.11
   node: circleci/node@4.2.0
+  shellcheck: circleci/shellcheck@2.2.4
 
 jobs:
 #  test-legacy-migrations:
@@ -55,6 +56,8 @@ jobs:
 
       - nancy/install
       - nancy/check
+      - shellcheck/install
+      - shellcheck/check
       - prettier/install
       - prettier/check
       - prettier/install:

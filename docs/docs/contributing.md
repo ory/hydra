@@ -88,7 +88,7 @@ a few things you can do to help out:
 
 - **Give us a star.** It may not seem like much, but it really makes a
   difference. This is something that everyone can do to help out Ory Hydra.
-  Github stars help the project gain visibility and stand out.
+  GitHub stars help the project gain visibility and stand out.
 
 - **Join the community.** Sometimes helping people can be as easy as listening
   to their problems and offering a different perspective. Join our Slack, have a
@@ -150,13 +150,13 @@ request, go through this checklist:
 1. Run `make format` if a `Makefile` is available, `gofmt -s` if the project is
    written in Go, `npm run format` if the project is written for NodeJS.
 1. Ensure that each commit has a descriptive prefix. This ensures a uniform
-   commit history and helps structure the changelog.  
+   commit history and helps structure the changelog.
    Please refer to this
    [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
    for an overview.
 1. Sign-up with CircleCI so that it has access to your repository with the
    branch containing your PR. Simply creating a CircleCI account is sufficient
-   for the CI jobs to run, you do not need to setup a CircleCI project for the
+   for the CI jobs to run, you do not need to set up a CircleCI project for the
    branch.
 
 If a pull request is not ready to be reviewed yet

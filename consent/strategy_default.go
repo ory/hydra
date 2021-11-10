@@ -26,7 +26,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/ory/hydra/driver/config"
@@ -696,13 +695,9 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.OutfacingID, token: t})
 	}
 
-	var wg sync.WaitGroup
 	hc := httpx.NewResilientClient()
-	wg.Add(len(tasks))
 
 	var execute = func(t task) {
-		defer wg.Done()
-
 		res, err := hc.PostForm(t.url, url.Values{"logout_token": {t.token}})
 		if err != nil {
 			s.r.Logger().WithRequest(r).WithError(err).
@@ -726,8 +721,6 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 	for _, t := range tasks {
 		go execute(t)
 	}
-
-	wg.Wait()
 
 	return nil
 }

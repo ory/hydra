@@ -11,13 +11,12 @@ import (
 
 	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/stringsx"
 
 	"github.com/ory/x/sqlcon"
 )
 
 var _ trust.GrantManager = &Persister{}
-
-const scopeSeparator = " "
 
 func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) error {
 	// add key, if it doesn't exist
@@ -143,7 +142,7 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 		return nil, sqlcon.HandleError(err)
 	}
 
-	return strings.Split(data.Scope, scopeSeparator), nil
+	return p.jwtGrantFromSQlData(data).Scope, nil
 }
 
 func (p *Persister) IsJWTUsed(ctx context.Context, jti string) (bool, error) {
@@ -164,7 +163,7 @@ func (p *Persister) sqlDataFromJWTGrant(g trust.Grant) trust.SQLData {
 		ID:        g.ID,
 		Issuer:    g.Issuer,
 		Subject:   g.Subject,
-		Scope:     strings.Join(g.Scope, " "),
+		Scope:     strings.Join(g.Scope, "|"),
 		KeySet:    g.PublicKey.Set,
 		KeyID:     g.PublicKey.KeyID,
 		CreatedAt: g.CreatedAt,
@@ -177,7 +176,7 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 		ID:      data.ID,
 		Issuer:  data.Issuer,
 		Subject: data.Subject,
-		Scope:   strings.Split(data.Scope, scopeSeparator),
+		Scope:   stringsx.Splitx(data.Scope, "|"),
 		PublicKey: trust.PublicKey{
 			Set:   data.KeySet,
 			KeyID: data.KeyID,

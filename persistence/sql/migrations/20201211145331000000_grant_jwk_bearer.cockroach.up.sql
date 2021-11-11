@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_trusted_jwt_bearer_issuer
     UNIQUE (issuer, subject, key_id),
     FOREIGN KEY (key_set, key_id) REFERENCES hydra_jwk (sid, kid) ON DELETE CASCADE
 );
+
+CREATE INDEX hydra_oauth2_trusted_jwt_bearer_issuer_expires_at_idx ON hydra_oauth2_trusted_jwt_bearer_issuer (expires_at);

@@ -45,12 +45,12 @@ func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Gran
 }
 
 func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
-	grant, err := p.GetConcreteGrant(ctx, id)
-	if err != nil {
-		return err
-	}
-
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		grant, err := p.GetConcreteGrant(ctx, id)
+		if err != nil {
+			return sqlcon.HandleError(err)
+		}
+
 		if err := p.Connection(ctx).Destroy(&trust.SQLData{ID: grant.ID}); err != nil {
 			return sqlcon.HandleError(err)
 		}

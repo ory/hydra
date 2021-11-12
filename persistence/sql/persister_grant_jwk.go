@@ -187,9 +187,12 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 }
 
 func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time) error {
+	deleteUntil := time.Now().UTC()
+	if deleteUntil.After(notAfter) {
+		deleteUntil = notAfter
+	}
 	return sqlcon.HandleError(p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ? AND expires_at < ?", trust.SQLData{}.TableName()),
-		time.Now().UTC(),
-		notAfter,
+		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ?", trust.SQLData{}.TableName()),
+		deleteUntil,
 	).Exec())
 }

@@ -19,20 +19,22 @@ import (
 var _ trust.GrantManager = &Persister{}
 
 func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jose.JSONWebKey) error {
-	// add key, if it doesn't exist
-	if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
-		if errorsx.Cause(err) != sqlcon.ErrNoRows {
-			return err
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		// add key, if it doesn't exist
+		if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
+			if errorsx.Cause(err) != sqlcon.ErrNoRows {
+				return sqlcon.HandleError(err)
+			}
+
+			if err = p.AddKey(ctx, g.PublicKey.Set, &publicKey); err != nil {
+				return sqlcon.HandleError(err)
+			}
 		}
 
-		if err = p.AddKey(ctx, g.PublicKey.Set, &publicKey); err != nil {
-			return err
-		}
-	}
+		data := p.sqlDataFromJWTGrant(g)
 
-	data := p.sqlDataFromJWTGrant(g)
-
-	return sqlcon.HandleError(p.Connection(ctx).Create(&data))
+		return sqlcon.HandleError(p.Connection(ctx).Create(&data))
+	})
 }
 
 func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Grant, error) {

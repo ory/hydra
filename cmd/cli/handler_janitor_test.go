@@ -203,10 +203,47 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		fmt.Sprintf("--%s", cli.OnlyTokens),
 		"memory",
 	)
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyGrants),
+		"memory",
+	)
 
 	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
 		"janitor",
 		"memory")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Janitor requires either --tokens or --requests or both to be set")
+	require.Contains(t, err.Error(), "Janitor requires at least one of --tokens, --requests or --grants to be set")
+}
+
+func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
+	ctx := context.Background()
+	testCycles := testhelpers.NewConsentJanitorTestHelper("").GetNotAfterTestCycles()
+
+	require.True(t, len(testCycles) > 0)
+
+	for k, v := range testCycles {
+		t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
+			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			reg, err := jt.GetRegistry(ctx, k)
+			require.NoError(t, err)
+
+			// setup test
+			t.Run("step=setup", jt.GrantNotAfterSetup(ctx, reg.ClientManager(), reg.GrantManager()))
+
+			// run the cleanup routine
+			t.Run("step=cleanup", func(t *testing.T) {
+				cmdx.ExecNoErr(t, newJanitorCmd(),
+					"janitor",
+					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
+					fmt.Sprintf("--%s", cli.OnlyGrants),
+					jt.GetDSN(),
+				)
+			})
+
+			// validate test
+			notAfter := time.Now().Round(time.Second).Add(-v)
+			t.Run("step=validate-access", jt.GrantNotAfterValidate(ctx, notAfter, reg.GrantManager()))
+		})
+	}
 }

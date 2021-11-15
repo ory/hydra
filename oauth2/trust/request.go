@@ -22,9 +22,3 @@ type createGrantRequest struct {
 	// ExpiresAt indicates, when grant will expire, so we will reject assertion from Issuer targeting Subject.
 	ExpiresAt time.Time `json:"expires_at"`
 }
-
-type flushInactiveGrantsRequest struct {
-	// NotAfter sets after which point grants should not be flushed. This is useful when you want to keep a history
-	// of recently added grants.
-	NotAfter time.Time `json:"notAfter"`
-}

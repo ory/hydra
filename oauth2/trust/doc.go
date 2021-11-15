@@ -132,16 +132,3 @@ type trustedJsonWebKey struct {
 	// example: 123e4567-e89b-12d3-a456-426655440000
 	KeyID string `json:"kid"`
 }
-
-// swagger:parameters flushInactiveJwtBearerGrants
-type swaggerFlushInactiveJWTBearerGrantsRequestParams struct {
-	// in: body
-	Body swaggerFlushInactiveJWTBearerGrantsParams
-}
-
-// swagger:model flushInactiveJwtBearerGrantsParams
-type swaggerFlushInactiveJWTBearerGrantsParams struct {
-	// The "notAfter" sets after which point grants should not be flushed. This is useful when you want to keep a history
-	// of recently added grants.
-	NotAfter time.Time `json:"notAfter"`
-}

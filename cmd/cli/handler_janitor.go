@@ -26,6 +26,7 @@ const (
 	ConsentRequestLifespan = "consent-request-lifespan"
 	OnlyTokens             = "tokens"
 	OnlyRequests           = "requests"
+	OnlyGrants             = "grants"
 	ReadFromEnv            = "read-from-env"
 	Config                 = "config"
 )
@@ -48,9 +49,9 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 			"- Using the config file with flag -c, --config")
 	}
 
-	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) {
+	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) && !flagx.MustGetBool(cmd, OnlyGrants) {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
-			"Janitor requires either --tokens or --requests or both to be set")
+			"Janitor requires at least one of --tokens, --requests or --grants to be set")
 	}
 
 	return nil
@@ -121,6 +122,10 @@ func purge(cmd *cobra.Command, args []string) error {
 		routineFlags = append(routineFlags, OnlyRequests)
 	}
 
+	if flagx.MustGetBool(cmd, OnlyGrants) {
+		routineFlags = append(routineFlags, OnlyGrants)
+	}
+
 	return cleanupRun(cmd.Context(), notAfter, addRoutine(p, routineFlags...)...)
 }
 
@@ -133,6 +138,8 @@ func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
 			routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
 		case OnlyRequests:
 			routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
+		case OnlyGrants:
+			routines = append(routines, cleanup(p.FlushInactiveGrants, "grants"))
 		}
 	}
 	return routines

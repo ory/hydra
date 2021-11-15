@@ -10,7 +10,7 @@ import (
 func NewJanitorCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "janitor [<database-url>]",
-		Short: "Clean the database of old tokens and login/consent requests",
+		Short: "Clean the database of old tokens, login/consent requests and jwt grant issuers",
 		Long: `This command will cleanup any expired oauth2 tokens as well as login/consent requests.
 
 ### Warning ###
@@ -45,9 +45,13 @@ Janitor can be used in several ways.
 
 		janitor --requests <database-url>
 
-   or both
+    or
 
-		janitor --tokens --requests <database-url>
+		janitor --grants <database-url>
+
+   or any combination of them
+
+		janitor --tokens --requests --grants <database-url>
 `,
 		RunE: cli.NewHandler().Janitor.RunE,
 		Args: cli.NewHandler().Janitor.Args,
@@ -56,8 +60,9 @@ Janitor can be used in several ways.
 	cmd.Flags().Duration(cli.AccessLifespan, 0, "Set the access token lifespan e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.RefreshLifespan, 0, "Set the refresh token lifespan e.g. 1s, 1m, 1h.")
 	cmd.Flags().Duration(cli.ConsentRequestLifespan, 0, "Set the login/consent request lifespan e.g. 1s, 1m, 1h")
-	cmd.Flags().Bool(cli.OnlyRequests, false, "This will only run the cleanup on requests and will skip token cleanup.")
-	cmd.Flags().Bool(cli.OnlyTokens, false, "This will only run the cleanup on tokens and will skip requests cleanup.")
+	cmd.Flags().Bool(cli.OnlyRequests, false, "This will only run the cleanup on requests and will skip token and trust relationships cleanup.")
+	cmd.Flags().Bool(cli.OnlyTokens, false, "This will only run the cleanup on tokens and will skip requests and trust relationships cleanup.")
+	cmd.Flags().Bool(cli.OnlyGrants, false, "This will only run the cleanup on trust relationships and will skip requests and token cleanup.")
 	cmd.Flags().BoolP(cli.ReadFromEnv, "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")
 	configx.RegisterFlags(cmd.PersistentFlags())
 	return cmd

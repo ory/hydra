@@ -193,38 +193,3 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	h.registry.Writer().Write(w, r, grants)
 }
-
-// swagger:route POST /grants/jwt-bearer/flush admin flushInactiveJwtBearerGrants
-//
-// Flush Expired jwt-bearer grants.
-//
-// This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be
-// not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
-// automatically when performing the refresh flow.
-//
-//     Consumes:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       500: genericError
-func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var request flushInactiveGrantsRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		h.registry.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if request.NotAfter.IsZero() {
-		request.NotAfter = time.Now().UTC()
-	}
-
-	if err := h.registry.GrantManager().FlushInactiveGrants(r.Context(), request.NotAfter); err != nil {
-		h.registry.Writer().WriteError(w, r, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}

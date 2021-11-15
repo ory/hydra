@@ -71,7 +71,7 @@ func (p *Persister) Commit(ctx context.Context) error {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
-	return c.TX.Commit()
+	return errorsx.WithStack(c.TX.Commit())
 }
 
 func (p *Persister) Rollback(ctx context.Context) error {
@@ -80,7 +80,7 @@ func (p *Persister) Rollback(ctx context.Context) error {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
-	return c.TX.Rollback()
+	return errorsx.WithStack(c.TX.Rollback())
 }
 
 func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.Provider, l *logrusx.Logger) (*Persister, error) {

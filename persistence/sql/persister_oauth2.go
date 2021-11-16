@@ -378,7 +378,9 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 		notAfter,
 	)
 	if err := q.All(&signatures); err == sql.ErrNoRows {
-		return errors.Wrap(fosite.ErrNotFound, "")
+		return errorsx.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return errorsx.WithStack(err)
 	}
 
 	// Delete tokens in batch
@@ -394,6 +396,9 @@ func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time
 				fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
 				signatures[i:j],
 			).Exec()
+			if err != nil {
+				break
+			}
 		}
 	}
 	return sqlcon.HandleError(err)
@@ -416,7 +421,9 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 		notAfter,
 	)
 	if err := q.All(&signatures); err == sql.ErrNoRows {
-		return errors.Wrap(fosite.ErrNotFound, "")
+		return errorsx.WithStack(fosite.ErrNotFound)
+	} else if err != nil {
+		return errorsx.WithStack(err)
 	}
 
 	// Delete tokens in batch
@@ -432,6 +439,9 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 				fmt.Sprintf("DELETE FROM %s WHERE signature in (?)", OAuth2RequestSQL{Table: sqlTableRefresh}.TableName()),
 				signatures[i:j],
 			).Exec()
+			if err != nil {
+				break
+			}
 		}
 	}
 	return sqlcon.HandleError(err)

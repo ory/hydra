@@ -114,12 +114,12 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 		return err
 	}
 
-	public, err := FindKeyByPrefix(keys, "public")
+	public, err := FindPublicKey(keys)
 	if err != nil {
 		return err
 	}
 
-	private, err := FindKeyByPrefix(keys, "private")
+	private, err := FindPrivateKey(keys)
 	if err != nil {
 		return err
 	}

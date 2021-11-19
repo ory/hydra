@@ -9,6 +9,7 @@ import (
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
 )
@@ -21,6 +22,7 @@ import (
 //    LOGIN_UNUSED --> CONSENT_INITIALIZED
 //    LOGIN_UNUSED --> LOGIN_ERROR
 //    CONSENT_INITIALIZED --> CONSENT_UNUSED
+//    CONSENT_UNUSED --> CONSENT_UNUSED
 //    CONSENT_UNUSED --> CONSENT_USED
 //    CONSENT_UNUSED --> CONSENT_ERROR
 const (
@@ -159,6 +161,21 @@ type Flow struct {
 
 	Error                *consent.RequestDeniedError `json:"-" db:"error"`
 	LoginAuthenticatedAt sqlxx.NullTime              `json:"-" db:"login_authenticated_at"`
+
+	ConsentChallengeID sqlxx.NullString `json:"consent_challenge_id" db:"consent_challenge_id"`
+	ConsentSkip        bool             `json:"consent_skip" db:"consent_skip"`
+	ConsentVerifier    string           `json:"-" db:"consent_verifier"`
+	ConsentCSRF        string           `json:"-" db:"consent_csrf"`
+
+	CHGrantedScope       sqlxx.StringSlicePipeDelimiter `json:"ch_grant_scope" db:"ch_granted_scope"`
+	CHGrantedAudience    sqlxx.StringSlicePipeDelimiter `json:"ch_grant_access_token_audience" db:"ch_granted_at_audience"`
+	CHRemember           bool                           `json:"ch_remember" db:"ch_remember"`
+	CHRememberFor        int                            `json:"ch_remember_for" db:"ch_remember_for"`
+	CHHandledAt          sqlxx.NullTime                 `json:"ch_handled_at" db:"ch_handled_at"`
+	CHWasHandled         bool                           `json:"-" db:"ch_was_used"`
+	CHError              *consent.RequestDeniedError    `json:"-" db:"ch_error"`
+	CHSessionIDToken     sqlxx.MapStringInterface       `json:"-" db:"ch_session_id_token" faker:"-"`
+	CHSessionAccessToken sqlxx.MapStringInterface       `json:"-" db:"ch_session_access_token" faker:"-"`
 }
 
 func NewFlow(r *consent.LoginRequest) *Flow {
@@ -214,18 +231,6 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 	return nil
 }
 
-func (f *Flow) InitializeConsent() error {
-	if f.State != FlowStateLoginUnused {
-		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginUnused, f.State)
-	}
-	if f.WasHandled {
-		return errors.New("login verifier has already been used")
-	}
-	f.WasHandled = true
-	f.State = FlowStateConsentInitialized
-	return nil
-}
-
 func (f *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
 	return consent.HandledLoginRequest{
 		ID:                     f.ID,
@@ -265,12 +270,119 @@ func (f *Flow) GetLoginRequest() *consent.LoginRequest {
 	}
 }
 
+// InitializeConsent shifts the flow state to FlowStateConsentInitialized. This
+// transition is executed upon login completion.
+func (f *Flow) InitializeConsent() error {
+	if f.State != FlowStateLoginUnused {
+		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginUnused, f.State)
+	}
+	if f.WasHandled {
+		return errors.New("login verifier has already been used")
+	}
+	f.WasHandled = true
+	f.State = FlowStateConsentInitialized
+	return nil
+}
+
+func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
+	if f.CHWasHandled {
+		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
+	}
+	if f.State != FlowStateConsentUnused {
+		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateConsentUnused, f.State)
+	}
+	if f.ConsentChallengeID.String() != r.ID {
+		return errors.Errorf("flow.ConsentChallengeID %s doesn't match HandledConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
+	}
+
+	if r.WasHandled {
+		f.State = FlowStateConsentUsed
+	}
+
+	f.CHGrantedScope = r.GrantedScope
+	f.CHGrantedAudience = r.GrantedAudience
+	f.CHRemember = r.Remember
+	f.CHRememberFor = r.RememberFor
+	f.CHHandledAt = r.HandledAt
+	f.CHWasHandled = r.WasHandled
+	f.CHError = r.Error
+
+	if r.Session != nil {
+		f.CHSessionIDToken = r.Session.IDToken
+		f.CHSessionAccessToken = r.Session.AccessToken
+	}
+	return nil
+}
+
+func (f *Flow) InvalidateConsentRequest() error {
+	if f.CHWasHandled {
+		return errors.New("consent verifier has already been used")
+	}
+	if f.State != FlowStateConsentUnused {
+		return errors.Errorf("unexpected flow state: expected %d, got %d", FlowStateConsentUnused, f.State)
+	}
+
+	f.CHWasHandled = true
+	f.State = FlowStateConsentUsed
+	return nil
+}
+
+func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
+	return &consent.ConsentRequest{
+		ID:                     f.ConsentChallengeID.String(),
+		RequestedScope:         f.RequestedScope,
+		RequestedAudience:      f.RequestedAudience,
+		Skip:                   f.ConsentSkip,
+		Subject:                f.Subject,
+		OpenIDConnectContext:   f.OpenIDConnectContext,
+		Client:                 f.Client,
+		ClientID:               f.ClientID,
+		RequestURL:             f.RequestURL,
+		LoginChallenge:         sqlxx.NullString(f.ID),
+		LoginSessionID:         f.SessionID,
+		ACR:                    f.ACR,
+		AMR:                    f.AMR,
+		Context:                f.Context,
+		WasHandled:             f.CHWasHandled,
+		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
+		SubjectIdentifier:      "", // TODO remove SubjectIdentifier from ConsentRequest,
+		Verifier:               f.ConsentVerifier,
+		CSRF:                   f.ConsentCSRF,
+		AuthenticatedAt:        f.LoginAuthenticatedAt,
+		RequestedAt:            f.RequestedAt,
+	}
+}
+
+func (f *Flow) GetHandledConsentRequest() *consent.HandledConsentRequest {
+	return &consent.HandledConsentRequest{
+		ID:                 f.ConsentChallengeID.String(),
+		GrantedScope:       f.CHGrantedScope,
+		GrantedAudience:    f.CHGrantedAudience,
+		Session:            &consent.ConsentRequestSessionData{AccessToken: f.CHSessionAccessToken, IDToken: f.CHSessionIDToken},
+		Remember:           f.CHRemember,
+		RememberFor:        f.CHRememberFor,
+		HandledAt:          f.CHHandledAt,
+		WasHandled:         f.CHWasHandled,
+		ConsentRequest:     f.GetConsentRequest(),
+		Error:              f.CHError,
+		RequestedAt:        f.RequestedAt,
+		AuthenticatedAt:    f.LoginAuthenticatedAt,
+		SessionIDToken:     f.CHSessionIDToken,
+		SessionAccessToken: f.CHSessionAccessToken,
+	}
+}
+
 func (_ Flow) TableName() string {
-	return "hydra_oauth2_flow"
+	return "hydra_flow"
 }
 
 func (f *Flow) FindInDB(c *pop.Connection, id string) error {
 	return c.Find(f, id)
+}
+
+// FindByConsentChallengeID retrieves a flow given its consent challenge ID.
+func (f *Flow) FindByConsentChallengeID(c *pop.Connection, id string) error {
+	return c.Where("consent_challenge_id = ?", id).First(f)
 }
 
 func (f *Flow) BeforeSave(_ *pop.Connection) error {
@@ -283,8 +395,19 @@ func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	return nil
 }
 
-// TODO Populate the client field in FindInDB in order to avoid accessing the database twice.
+// TODO Populate the client field in FindInDB and FindByConsentChallengeID in
+// order to avoid accessing the database twice.
 func (f *Flow) AfterFind(c *pop.Connection) error {
+	f.AfterSave(c)
 	f.Client = &client.Client{}
 	return sqlcon.HandleError(c.Where("id = ?", f.ClientID).First(f.Client))
+}
+
+func (f *Flow) AfterSave(c *pop.Connection) {
+	if f.CHSessionAccessToken == nil {
+		f.CHSessionAccessToken = make(map[string]interface{})
+	}
+	if f.CHSessionIDToken == nil {
+		f.CHSessionIDToken = make(map[string]interface{})
+	}
 }

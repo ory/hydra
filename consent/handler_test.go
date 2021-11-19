@@ -28,7 +28,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/internal"
 
@@ -172,10 +174,16 @@ func TestGetConsentRequest(t *testing.T) {
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
+				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), lr))
+				_, err := reg.ConsentManager().HandleLoginRequest(context.Background(), lr.ID, &consent.HandledLoginRequest{
+					ID: lr.ID,
+				})
+				require.NoError(t, err)
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
-					Client:     cl,
-					ID:         challenge,
-					RequestURL: requestURL,
+					Client:         cl,
+					ID:             challenge,
+					LoginChallenge: sqlxx.NullString(lr.ID),
 				}))
 
 				if tc.handled {

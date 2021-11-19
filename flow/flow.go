@@ -345,7 +345,6 @@ func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
 		Context:                f.Context,
 		WasHandled:             f.CHWasHandled,
 		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
-		SubjectIdentifier:      "", // TODO remove SubjectIdentifier from ConsentRequest,
 		Verifier:               f.ConsentVerifier,
 		CSRF:                   f.ConsentCSRF,
 		AuthenticatedAt:        f.LoginAuthenticatedAt,

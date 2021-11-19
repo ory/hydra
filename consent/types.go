@@ -581,7 +581,6 @@ type ConsentRequest struct {
 
 	// ForceSubjectIdentifier is the value from authentication (if set).
 	ForceSubjectIdentifier string         `json:"-"`
-	SubjectIdentifier      string         `json:"-"`
 	Verifier               string         `json:"-"`
 	CSRF                   string         `json:"-"`
 	AuthenticatedAt        sqlxx.NullTime `json:"-"`

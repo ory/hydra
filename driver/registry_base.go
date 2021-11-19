@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/errorsx"
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
@@ -429,6 +430,24 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectId
 		}
 	}
 	return m.sia
+}
+
+func (s *RegistryBase) ObfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error) {
+	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
+		algorithm, ok := s.SubjectIdentifierAlgorithm()[c.SubjectType]
+		if !ok {
+			return "", errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf(`Subject Identifier Algorithm '%s' was requested by OAuth 2.0 Client '%s' but is not configured.`, c.SubjectType, c.OutfacingID))
+		}
+
+		if len(forcedIdentifier) > 0 {
+			return forcedIdentifier, nil
+		}
+
+		return algorithm.Obfuscate(subject, c)
+	} else if !ok {
+		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
+	}
+	return subject, nil
 }
 
 func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {

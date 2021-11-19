@@ -682,6 +682,10 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(w, r, authorizeRequest)
+	var obfuscatedSubject string
+	if err == nil {
+		obfuscatedSubject, err = h.r.ObfuscateSubjectIdentifier(authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	}
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -723,7 +727,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	authorizeRequest.SetID(session.ID)
 	claims := &jwt.IDTokenClaims{
-		Subject: session.ConsentRequest.SubjectIdentifier,
+		Subject: obfuscatedSubject,
 		Issuer:  strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
 
 		AuthTime:                            time.Time(session.AuthenticatedAt),

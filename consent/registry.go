@@ -25,4 +25,5 @@ type Registry interface {
 	ConsentManager() Manager
 	ConsentStrategy() Strategy
 	SubjectIdentifierAlgorithm() map[string]SubjectIdentifierAlgorithm
+	ObfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error)
 }

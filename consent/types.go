@@ -175,7 +175,7 @@ type HandledConsentRequest struct {
 	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
-	Session *ConsentRequestSessionData `json:"session"`
+	Session *ConsentRequestSessionData `json:"session" faker:"-"`
 
 	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
@@ -199,8 +199,8 @@ type HandledConsentRequest struct {
 	RequestedAt     time.Time           `json:"-"`
 	AuthenticatedAt sqlxx.NullTime      `json:"-"`
 
-	SessionIDToken     sqlxx.MapStringInterface `json:"-"`
-	SessionAccessToken sqlxx.MapStringInterface `json:"-"`
+	SessionIDToken     sqlxx.MapStringInterface `json:"-" faker:"-"`
+	SessionAccessToken sqlxx.MapStringInterface `json:"-" faker:"-"`
 }
 
 func (r *HandledConsentRequest) HasError() bool {

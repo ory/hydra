@@ -492,8 +492,8 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	LIMIT %[1]d
 	`
 
-	// Select up to [limit] flows that can be safely deleted, i.e. flows where
-	// login or consent requests expired and were unhandled or rejected:
+	// Select up to [limit] flows that can be safely deleted, i.e. flows that meet
+	// the following criteria:
 	// - flow.state is anything between FlowStateLoginInitialized and FlowStateConsentUnused (unhandled)
 	// - flow.error has valid error (login rejected)
 	// - flow.ch_error has valid error (consent rejected)

@@ -233,7 +233,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 	return nil
 }
 
-func (p *Persister) updateRefreshSession(ctx context.Context, requestId string, session fosite.Session, used bool) error {
+func (p *Persister) updateRefreshSession(ctx context.Context, requestId string, session fosite.Session, inGracePeriod bool) error {
 	_, ok := session.(*oauth2.Session)
 	if !ok && session != nil {
 		return errors.Errorf("expected session to be of type *oauth2.Session but got: %T", session)
@@ -243,11 +243,11 @@ func (p *Persister) updateRefreshSession(ctx context.Context, requestId string, 
 		return err
 	}
 
-	updateSql := fmt.Sprintf("UPDATE %s SET session_data = ?, used = ? WHERE request_id = ?",
+	updateSql := fmt.Sprintf("UPDATE %s SET session_data = ?, in_grace_period = ? WHERE request_id = ?",
 		sqlTableRefresh.TableName())
 
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := p.Connection(ctx).RawQuery(updateSql, sessionBytes, used, requestId).Exec()
+		err := p.Connection(ctx).RawQuery(updateSql, sessionBytes, inGracePeriod, requestId).Exec()
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(fosite.ErrNotFound)
 		} else if err != nil {
@@ -318,18 +318,18 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false, used=true WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false, in_grace_period=true WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
 				id,
 			).
 			Exec(),
 	)
 }
 
-func (p *Persister) getRefreshTokenUsedStatusBySignature(ctx context.Context, signature string) (bool, error) {
-	var used bool
-	return used, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		query := fmt.Sprintf("SELECT used FROM %s WHERE signature = ?", sqlTableRefresh.TableName())
-		err := p.Connection(ctx).RawQuery(query, signature).First(&used)
+func (p *Persister) getRefreshTokenGracePeriodStatusBySignature(ctx context.Context, signature string) (bool, error) {
+	var inGracePeriod bool
+	return inGracePeriod, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		query := fmt.Sprintf("SELECT in_grace_period FROM %s WHERE signature = ?", sqlTableRefresh.TableName())
+		err := p.Connection(ctx).RawQuery(query, signature).First(&inGracePeriod)
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(fosite.ErrNotFound)
 		} else if err != nil {
@@ -423,13 +423,13 @@ func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, requ
 		return errors.WithStack(err)
 	}
 
-	var used bool
-	if used,err = p.getRefreshTokenUsedStatusBySignature(ctx, signature); err != nil {
-		p.l.Errorf("signature: %s used status not found. grace period not applied", signature)
+	var inGracePeriod bool
+	if inGracePeriod,err = p.getRefreshTokenGracePeriodStatusBySignature(ctx, signature); err != nil {
+		p.l.Errorf("signature: %s in_grace_period status not found. grace period not applied", signature)
 		return errors.WithStack(err)
 	}
 
-	if ! used {
+	if ! inGracePeriod {
 		session := requester.GetSession()
 		session.SetExpiresAt(fosite.RefreshToken, time.Now().UTC().Add(gracePeriod))
 		if err = p.updateRefreshSession(ctx, requestId, session, true); err != nil {
@@ -437,7 +437,7 @@ func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, requ
 			return errors.WithStack(err)
 		}
 	} else {
-		p.l.Debugf("request_id: %s has already been used and is in the grace period", requestId)
+		p.l.Tracef("request_id: %s is in the grace period", requestId)
 	}
 	return nil
 }

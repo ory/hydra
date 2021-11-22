@@ -318,7 +318,7 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 	return sqlcon.HandleError(
 		p.Connection(ctx).
 			RawQuery(
-				fmt.Sprintf("UPDATE %s SET active=false, in_grace_period=true WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
+				fmt.Sprintf("UPDATE %s SET active=false, in_grace_period=false WHERE request_id=?", OAuth2RequestSQL{Table: table}.TableName()),
 				id,
 			).
 			Exec(),

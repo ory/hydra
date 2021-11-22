@@ -243,7 +243,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 func (p *Persister) updateRefreshSession(ctx context.Context, requestId string, session fosite.Session, used bool) error {
 	_, ok := session.(*oauth2.Session)
 	if !ok && session != nil {
-		return errors.Errorf("Expected session to be of type *Session, but got: %T", session)
+		return errors.Errorf("expected session to be of type *oauth2.Session but got: %T", session)
 	}
 	sessionBytes, err := p.marshalSession(session)
 	if err != nil {

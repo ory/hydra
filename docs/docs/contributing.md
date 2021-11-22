@@ -150,8 +150,7 @@ request, go through this checklist:
 1. Run `make format` if a `Makefile` is available, `gofmt -s` if the project is
    written in Go, `npm run format` if the project is written for NodeJS.
 1. Ensure that each commit has a descriptive prefix. This ensures a uniform
-   commit history and helps structure the changelog.
-   Please refer to this
+   commit history and helps structure the changelog. Please refer to this
    [list of prefixes for Hydra](https://github.com/ory/hydra/blob/master/.github/semantic.yml)
    for an overview.
 1. Sign-up with CircleCI so that it has access to your repository with the

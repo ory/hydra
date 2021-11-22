@@ -397,7 +397,7 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 				signatures[i:j],
 			).Exec()
 			if err != nil {
-				break
+				return sqlcon.HandleError(err)
 			}
 		}
 	}

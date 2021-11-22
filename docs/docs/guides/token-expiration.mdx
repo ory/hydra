@@ -79,7 +79,8 @@ for refresh tokens to never expire.
 
 When a refresh token is used it is deactivated, which is known as Refresh Token
 Rotation. By default Hydra deactivates the refresh token it receives and issues
-a new token. More information on Refresh Token Rotation can be found in the
+a new token. If a deactivated refresh token is used again, all tokens related to that refresh token
+will also be deactivated. More information on Refresh Token Rotation can be found in the
 Recommendations section of the OAuth 2.0 Security Best Practices document
 [here](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics#section-4.13.2).
 

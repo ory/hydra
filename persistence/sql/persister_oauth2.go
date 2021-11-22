@@ -110,22 +110,15 @@ func (p *Persister) marshalSession(session fosite.Session) ([]byte, error) {
 		return nil, err
 	}
 
-	if sessionBytes, err = p.maybeEncryptSession(sessionBytes); err != nil {
-		return nil, err
-	}
-	return sessionBytes, nil
-}
-
-// MaybeEncryptSession encrypt a session if configuration indicates it should
-func (p *Persister) maybeEncryptSession(session []byte) ([]byte, error) {
 	if !p.config.EncryptSessionData() {
-		return session, nil
+		return sessionBytes, nil
 	}
 
-	ciphertext, err := p.r.KeyCipher().Encrypt(session)
+	ciphertext, err := p.r.KeyCipher().Encrypt(sessionBytes)
 	if err != nil {
 		return nil, err
 	}
+
 	return []byte(ciphertext), nil
 }
 

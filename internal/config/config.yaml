@@ -389,7 +389,6 @@ oauth2:
   session:
     # store encrypted data in database, default true
     encrypt_at_rest: true
-
   ## refresh_token_rotation
   #
   # By default Refresh Tokens are rotated and invalidated with each use.
@@ -405,7 +404,7 @@ oauth2:
     # Examples:
     # - 5s
     # - 1m
-    # - 0m (default; grace period disabled)
+    # - 0s (default; grace period disabled)
     grace_period: 0s
 
 # The secrets section configures secrets used for encryption and signing of several systems. All secrets can be rotated,
@@ -430,6 +429,7 @@ secrets:
     - this-is-the-primary-secret
     - this-is-an-old-secret
     - this-is-another-old-secret
+
 
 # Enables profiling if set. Use "cpu" to enable cpu profiling and "mem" to enable memory profiling. For more details
 # on profiling, head over to: https://blog.golang.org/profiling-go-programs

@@ -113,16 +113,16 @@ jobs:
 
       - run: ./test/e2e/circle-ci.bash memory
       - run: ./test/e2e/circle-ci.bash memory --jwt
-      - run: ./test/e2e/circle-ci.bash memory --grant_jwt_client_auth_optional --grant_jwt_jti_optional --grant_jwt_iat_optional
+      - run: ./test/e2e/circle-ci.bash memory --grant_jwt_jti_optional --grant_jwt_iat_optional
       - run: ./test/e2e/circle-ci.bash cockroach
       - run: ./test/e2e/circle-ci.bash cockroach --jwt
-      - run: ./test/e2e/circle-ci.bash cockroach --grant_jwt_client_auth_optional --grant_jwt_jti_optional --grant_jwt_iat_optional
+      - run: ./test/e2e/circle-ci.bash cockroach --grant_jwt_jti_optional --grant_jwt_iat_optional
       - run: ./test/e2e/circle-ci.bash mysql
       - run: ./test/e2e/circle-ci.bash mysql --jwt
-      - run: ./test/e2e/circle-ci.bash mysql --grant_jwt_client_auth_optional --grant_jwt_jti_optional --grant_jwt_iat_optional
+      - run: ./test/e2e/circle-ci.bash mysql --grant_jwt_jti_optional --grant_jwt_iat_optional
       - run: ./test/e2e/circle-ci.bash postgres
       - run: ./test/e2e/circle-ci.bash postgres --jwt
-      - run: ./test/e2e/circle-ci.bash postgres --grant_jwt_client_auth_optional --grant_jwt_jti_optional --grant_jwt_iat_optional
+      - run: ./test/e2e/circle-ci.bash postgres --grant_jwt_jti_optional --grant_jwt_iat_optional
 
 
 workflows:

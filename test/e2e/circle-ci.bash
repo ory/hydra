@@ -82,10 +82,6 @@ case $i in
         export OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public
         export CYPRESS_jwt_enabled=true
     ;;
-    --grant_jwt_client_auth_optional)
-        export OAUTH2_GRANT_JWT_CLIENT_AUTH_OPTIONAL=true
-        export CYPRESS_grant_jwt_client_auth_optional=true
-    ;;
     --grant_jwt_jti_optional)
         export OAUTH2_GRANT_JWT_JTI_OPTIONAL=true
         export CYPRESS_grant_jwt_jti_optional=true
@@ -96,7 +92,7 @@ case $i in
     ;;
     *)
         echo $"Invalid param $i"
-        echo $"Usage: $0 [memory|postgres|mysql|cockroach] [--watch][--jwt][--grant_jwt_client_auth_optional][--grant_jwt_jti_optional][--grant_jwt_iat_optional]"
+        echo $"Usage: $0 [memory|postgres|mysql|cockroach] [--watch][--jwt][--grant_jwt_jti_optional][--grant_jwt_iat_optional]"
         exit 1
     ;;
 esac

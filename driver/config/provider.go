@@ -65,7 +65,6 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
-	KeyOAuth2GrantJWTClientAuthOptional          = "oauth2.grant.jwt.client_auth_optional"
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
@@ -431,10 +430,6 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
-}
-
-func (p *Provider) GrantTypeJWTBearerClientAuthOptional() bool {
-	return p.p.Bool(KeyOAuth2GrantJWTClientAuthOptional)
 }
 
 func (p *Provider) GrantTypeJWTBearerIDOptional() bool {

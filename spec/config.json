@@ -251,11 +251,6 @@
       "additionalProperties": false,
       "description": "Authorization Grants using JWT configuration",
       "properties": {
-        "client_auth_optional": {
-          "type": "boolean",
-          "description": "If false, client authentication is required to get access token. If true client authentication is not required.",
-          "default": false
-        },
         "jti_optional": {
           "type": "boolean",
           "description": "If false, JTI claim must be present in JWT assertion.",

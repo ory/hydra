@@ -199,7 +199,7 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	}
 
 	// fix for #2869
-	// GetConcreteClient returns a client with the hashed secret, however updateClient expects 
+	// GetConcreteClient returns a client with the hashed secret, however updateClient expects
 	// an empty secret if the secret hasn't changed. As such we need to check if the patch has
 	// updated the secret or not
 	if oldSecret == c.Secret {

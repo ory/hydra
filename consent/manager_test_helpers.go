@@ -60,7 +60,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		CSRF:                   "csrf" + key,
 		ACR:                    "1",
 		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
-		RequestedAt:            time.Now().UTC().Add(-time.Minute),
+		RequestedAt:            time.Now().UTC().Add(-time.Hour),
 		Context:                sqlxx.JSONRawMessage(`{"foo": "bar` + key + `"}`),
 	}
 

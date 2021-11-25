@@ -41,7 +41,7 @@ import (
 
 func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
 	c = &ConsentRequest{
-		ID:                "consent-challenge" + key,
+		ID:                "challenge" + key,
 		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
 		RequestedAudience: []string{"auda" + key, "audb" + key},
 		Skip:              skip,
@@ -53,10 +53,10 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		},
 		Client:                 &client.Client{OutfacingID: "fk-client-" + key},
 		RequestURL:             "https://request-url/path" + key,
-		LoginChallenge:         sqlxx.NullString("login-challenge" + key),
+		LoginChallenge:         sqlxx.NullString("challenge" + key),
 		LoginSessionID:         sqlxx.NullString("fk-login-session-" + key),
 		ForceSubjectIdentifier: "forced-subject",
-		Verifier:               "consent-verifier" + key,
+		Verifier:               "verifier" + key,
 		CSRF:                   "csrf" + key,
 		ACR:                    "1",
 		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
@@ -85,7 +85,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		ConsentRequest:  c,
 		RememberFor:     rememberFor,
 		Remember:        remember,
-		ID:              "consent-challenge" + key,
+		ID:              "challenge" + key,
 		RequestedAt:     time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt: authenticatedAt,
 		GrantedScope:    []string{"scopea" + key, "scopeb" + key},
@@ -131,8 +131,8 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
 		Skip:           true,
-		ID:             "login-challenge" + key,
-		Verifier:       "login-verifier" + key,
+		ID:             "challenge" + key,
+		Verifier:       "verifier" + key,
 		RequestedScope: []string{"scopea" + key, "scopeb" + key},
 		CSRF:           "csrf" + key,
 		SessionID:      sqlxx.NullString("fk-login-session-" + key),
@@ -156,7 +156,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 		LoginRequest:           c,
 		RememberFor:            120,
 		Remember:               true,
-		ID:                     "login-challenge" + key,
+		ID:                     "challenge" + key,
 		RequestedAt:            time.Now().UTC().Add(-time.Minute),
 		AuthenticatedAt:        sqlxx.NullTime(authenticatedAt),
 		Error:                  err,
@@ -271,7 +271,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			for _, k := range []string{"rv1", "rv2"} {
 				require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{
-					ID:              fmt.Sprintf("login-challenge%s", k),
+					ID:              fmt.Sprintf("challenge%s", k),
 					Subject:         fmt.Sprintf("subject%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{OutfacingID: fmt.Sprintf("fk-client-%s", k)},
@@ -367,29 +367,29 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					c, h := MockAuthRequest(tc.key, tc.authAt)
 					_ = clientManager.CreateClient(context.Background(), c.Client) // Ignore errors that are caused by duplication
 
-					_, err := m.GetLoginRequest(context.Background(), "login-challenge"+tc.key)
+					_, err := m.GetLoginRequest(context.Background(), "challenge"+tc.key)
 					require.Error(t, err)
 
 					require.NoError(t, m.CreateLoginRequest(context.Background(), c))
 
-					got1, err := m.GetLoginRequest(context.Background(), "login-challenge"+tc.key)
+					got1, err := m.GetLoginRequest(context.Background(), "challenge"+tc.key)
 					require.NoError(t, err)
 					assert.False(t, got1.WasHandled)
 					compareAuthenticationRequest(t, c, got1)
 
-					got1, err = m.HandleLoginRequest(context.Background(), "login-challenge"+tc.key, h)
+					got1, err = m.HandleLoginRequest(context.Background(), "challenge"+tc.key, h)
 					require.NoError(t, err)
 					compareAuthenticationRequest(t, c, got1)
 
-					got2, err := m.VerifyAndInvalidateLoginRequest(context.Background(), "login-verifier"+tc.key)
+					got2, err := m.VerifyAndInvalidateLoginRequest(context.Background(), "verifier"+tc.key)
 					require.NoError(t, err)
 					compareAuthenticationRequest(t, c, got2.LoginRequest)
 					assert.Equal(t, c.ID, got2.ID)
 
-					_, err = m.VerifyAndInvalidateLoginRequest(context.Background(), "login-verifier"+tc.key)
+					_, err = m.VerifyAndInvalidateLoginRequest(context.Background(), "verifier"+tc.key)
 					require.Error(t, err)
 
-					got1, err = m.GetLoginRequest(context.Background(), "login-challenge"+tc.key)
+					got1, err = m.GetLoginRequest(context.Background(), "challenge"+tc.key)
 					require.NoError(t, err)
 					assert.True(t, got1.WasHandled)
 				})
@@ -417,26 +417,26 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					c, h := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt)
 					_ = clientManager.CreateClient(context.Background(), c.Client) // Ignore errors that are caused by duplication
 
-					_, err := m.GetConsentRequest(context.Background(), "consent-challenge"+tc.key)
+					_, err := m.GetConsentRequest(context.Background(), "challenge"+tc.key)
 					require.Error(t, err)
 
 					require.NoError(t, m.CreateConsentRequest(context.Background(), c))
 
-					got1, err := m.GetConsentRequest(context.Background(), "consent-challenge"+tc.key)
+					got1, err := m.GetConsentRequest(context.Background(), "challenge"+tc.key)
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got1)
 					assert.False(t, got1.WasHandled)
 
-					got1, err = m.HandleConsentRequest(context.Background(), "consent-challenge"+tc.key, h)
+					got1, err = m.HandleConsentRequest(context.Background(), "challenge"+tc.key, h)
 					require.NoError(t, err)
 					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
 					compareConsentRequest(t, c, got1)
 
 					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience"}
-					_, err = m.HandleConsentRequest(context.Background(), "consent-challenge"+tc.key, h)
+					_, err = m.HandleConsentRequest(context.Background(), "challenge"+tc.key, h)
 					require.NoError(t, err)
 
-					got2, err := m.VerifyAndInvalidateConsentRequest(context.Background(), "consent-verifier"+tc.key)
+					got2, err := m.VerifyAndInvalidateConsentRequest(context.Background(), "verifier"+tc.key)
 					require.NoError(t, err)
 					compareConsentRequest(t, c, got2.ConsentRequest)
 					assert.Equal(t, c.ID, got2.ID)
@@ -444,7 +444,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					// Trying to update this again should return an error because the consent request was used.
 					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience", "new-audience-2"}
-					_, err = m.HandleConsentRequest(context.Background(), "consent-challenge"+tc.key, h)
+					_, err = m.HandleConsentRequest(context.Background(), "challenge"+tc.key, h)
 					require.Error(t, err)
 
 					if tc.hasError {
@@ -453,10 +453,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					assert.Equal(t, tc.remember, got2.Remember)
 					assert.Equal(t, tc.rememberFor, got2.RememberFor)
 
-					_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), "consent-verifier"+tc.key)
+					_, err = m.VerifyAndInvalidateConsentRequest(context.Background(), "verifier"+tc.key)
 					require.Error(t, err)
 
-					got1, err = m.GetConsentRequest(context.Background(), "consent-challenge"+tc.key)
+					got1, err = m.GetConsentRequest(context.Background(), "challenge"+tc.key)
 					require.NoError(t, err)
 					assert.True(t, got1.WasHandled)
 				})
@@ -543,15 +543,15 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
-			_, err := m.HandleConsentRequest(context.Background(), "consent-challengerv1", hcr1)
+			_, err := m.HandleConsentRequest(context.Background(), "challengerv1", hcr1)
 			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(context.Background(), "consent-challengerv2", hcr2)
+			_, err = m.HandleConsentRequest(context.Background(), "challengerv2", hcr2)
 			require.NoError(t, err)
 
-			require.NoError(t, fositeManager.CreateAccessTokenSession(context.Background(), "trva1", &fosite.Request{Client: cr1.Client, ID: "login-challengerv1", RequestedAt: time.Now()}))
-			require.NoError(t, fositeManager.CreateRefreshTokenSession(context.Background(), "rrva1", &fosite.Request{Client: cr1.Client, ID: "login-challengerv1", RequestedAt: time.Now()}))
-			require.NoError(t, fositeManager.CreateAccessTokenSession(context.Background(), "trva2", &fosite.Request{Client: cr2.Client, ID: "login-challengerv2", RequestedAt: time.Now()}))
-			require.NoError(t, fositeManager.CreateRefreshTokenSession(context.Background(), "rrva2", &fosite.Request{Client: cr2.Client, ID: "login-challengerv2", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateAccessTokenSession(context.Background(), "trva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateRefreshTokenSession(context.Background(), "rrva1", &fosite.Request{Client: cr1.Client, ID: "challengerv1", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateAccessTokenSession(context.Background(), "trva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()}))
+			require.NoError(t, fositeManager.CreateRefreshTokenSession(context.Background(), "rrva2", &fosite.Request{Client: cr2.Client, ID: "challengerv2", RequestedAt: time.Now()}))
 
 			for i, tc := range []struct {
 				subject string
@@ -564,13 +564,13 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					at: "trva1", rt: "rrva1",
 					subject: "subjectrv1",
 					client:  "",
-					ids:     []string{"consent-challengerv1"},
+					ids:     []string{"challengerv1"},
 				},
 				{
 					at: "trva2", rt: "rrva2",
 					subject: "subjectrv2",
 					client:  "fk-client-rv2",
-					ids:     []string{"consent-challengerv2"},
+					ids:     []string{"challengerv2"},
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
@@ -606,7 +606,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
 			for _, k := range []string{"rv1", "rv2"} {
 				require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{
-					ID:              fmt.Sprintf("login-challenge%s", k),
+					ID:              fmt.Sprintf("challenge%s", k),
 					Subject:         fmt.Sprintf("subject%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{OutfacingID: fmt.Sprintf("fk-client-%s", k)},
@@ -624,9 +624,9 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
-			_, err := m.HandleConsentRequest(context.Background(), "consent-challengerv1", hcr1)
+			_, err := m.HandleConsentRequest(context.Background(), "challengerv1", hcr1)
 			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(context.Background(), "consent-challengerv2", hcr2)
+			_, err = m.HandleConsentRequest(context.Background(), "challengerv2", hcr2)
 			require.NoError(t, err)
 
 			for i, tc := range []struct {
@@ -636,12 +636,12 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 			}{
 				{
 					subject:    "subjectrv1",
-					challenges: []string{"consent-challengerv1"},
+					challenges: []string{"challengerv1"},
 					clients:    []string{"fk-client-rv1"},
 				},
 				{
 					subject:    "subjectrv2",
-					challenges: []string{"consent-challengerv2"},
+					challenges: []string{"challengerv2"},
 					clients:    []string{"fk-client-rv2"},
 				},
 				{

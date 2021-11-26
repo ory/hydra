@@ -191,9 +191,19 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		return
 	}
 
+	oldSecret := c.Secret
+
 	if err := x.ApplyJSONPatch(patchJSON, c, "/id"); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
+	}
+
+	// fix for #2869
+	// GetConcreteClient returns a client with the hashed secret, however updateClient expects
+	// an empty secret if the secret hasn't changed. As such we need to check if the patch has
+	// updated the secret or not
+	if oldSecret == c.Secret {
+		c.Secret = ""
 	}
 
 	if err := h.updateClient(r.Context(), c); err != nil {

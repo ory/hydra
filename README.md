@@ -203,6 +203,18 @@ that your company deserves a spot here, reach out to
             <td><a href="https://padis.io/">padis.io</a></td>
         </tr>
         <tr>
+            <td>Adopter *</td>
+            <td>Cloudbear</td>
+            <td align="center"><img height="32px" src="../../../static/adopters/cloudbear.svg" alt="Cloudbear"></td>
+            <td><a href="https://cloudbear.eu/">cloudbear.eu</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Security Onion Solutions</td>
+            <td align="center"><img height="32px" src="../../../static/adopters/securityonion.svg" alt="Security Onion Solutions"></td>
+            <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
+        </tr>
+        <tr>
             <td>Sponsor</td>
             <td>OrderMyGear</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/ordermygear.svg" alt="OrderMyGear"></td>

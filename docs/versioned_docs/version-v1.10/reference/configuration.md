@@ -1115,7 +1115,7 @@ ttl:
   # - Windows Command Line (CMD):
   #    > set TTL_REFRESH_TOKEN=<value>
   #
-  refresh_token: 1h
+  refresh_token: "-1"
 
   ## id_token ##
   #
@@ -1149,7 +1149,7 @@ ttl:
   #
   # Configures how long a user login and consent flow may take.
   #
-  # Default value: 30m
+  # Default value: 1h
   #
   # Set this value using environment variables on
   # - Linux/macOS:

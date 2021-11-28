@@ -36,7 +36,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 		fs := make([]*flow.Flow, 0)
 		if err := c.
 			Where(whereStmt, whereArgs...).
-			Select("challenge").
+			Select("consent_challenge_id").
 			All(&fs); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return errorsx.WithStack(x.ErrNotFound)
@@ -47,19 +47,19 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 
 		var count int
 		for _, f := range fs {
-			if err := p.RevokeAccessToken(ctx, f.ID); errors.Is(err, fosite.ErrNotFound) {
+			if err := p.RevokeAccessToken(ctx, f.ConsentChallengeID.String()); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
 
-			if err := p.RevokeRefreshToken(ctx, f.ID); errors.Is(err, fosite.ErrNotFound) {
+			if err := p.RevokeRefreshToken(ctx, f.ConsentChallengeID.String()); errors.Is(err, fosite.ErrNotFound) {
 				// do nothing
 			} else if err != nil {
 				return err
 			}
 
-			localCount, err := c.RawQuery("DELETE FROM hydra_flow WHERE challenge = ?", f.ID).ExecWithCount()
+			localCount, err := c.RawQuery("DELETE FROM hydra_flow WHERE consent_challenge_id = ?", f.ConsentChallengeID).ExecWithCount()
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return errorsx.WithStack(x.ErrNotFound)
@@ -136,7 +136,7 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 // consent request. It doesn't touch fields that would be copied from the login
 // request.
 func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.ConsentRequest) error {
-	if err := p.Connection(ctx).RawQuery(`
+	c, err := p.Connection(ctx).RawQuery(`
 UPDATE hydra_flow
 SET
 	state = ?,
@@ -152,8 +152,12 @@ WHERE challenge = ?;
 		req.Verifier,
 		req.CSRF,
 		req.LoginChallenge.String(),
-	).Exec(); err != nil {
+	).ExecWithCount()
+	if err != nil {
 		return sqlcon.HandleError(err)
+	}
+	if c != 1 {
+		return errorsx.WithStack(x.ErrNotFound)
 	}
 	return nil
 }

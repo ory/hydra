@@ -13,6 +13,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pborman/uuid"
+
+	"github.com/ory/x/sqlxx"
+
 	"github.com/ory/x/pointerx"
 
 	"github.com/ory/hydra/v2/x"
@@ -275,4 +279,85 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		require.NotNil(t, result2.RedirectTo)
 		require.Contains(t, result2.RedirectTo, "login_verifier")
 	})
+}
+
+func TestDeleteLoginSessionBySessionId(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistryMemory(t, conf)
+	loginSession1 := uuid.NewUUID().String()
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+		ID:              loginSession1,
+		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+		Subject:         "subject1",
+		Remember:        true,
+	}))
+	loginSession2 := uuid.NewUUID().String()
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+		ID:              loginSession2,
+		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+		Subject:         "subject1",
+		Remember:        true,
+	}))
+	h := NewHandler(reg, conf)
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r)
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+	_, err := reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+	require.NoError(t, err)
+	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+	require.NoError(t, err)
+	c := &http.Client{}
+
+	req, err := http.NewRequest("DELETE", ts.URL+SessionsPath+"/login/"+loginSession1, nil)
+
+	require.NoError(t, err)
+	resp, err := c.Do(req)
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+	require.EqualError(t, err, x.ErrNotFound.Error())
+	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+	require.NoError(t, err)
+}
+
+func TestDeleteLoginSessionBySubject(t *testing.T) {
+	conf := internal.NewConfigurationWithDefaults()
+	reg := internal.NewRegistryMemory(t, conf)
+	subject := "subject1"
+	loginSession1 := uuid.NewUUID().String()
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+		ID:              loginSession1,
+		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+		Subject:         subject,
+		Remember:        true,
+	}))
+	loginSession2 := uuid.NewUUID().String()
+	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+		ID:              loginSession2,
+		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+		Subject:         subject,
+		Remember:        true,
+	}))
+	h := NewHandler(reg, conf)
+	r := x.NewRouterAdmin()
+	h.SetRoutes(r)
+	ts := httptest.NewServer(r)
+	defer ts.Close()
+	_, err := reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+	require.NoError(t, err)
+	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+	require.NoError(t, err)
+	c := &http.Client{}
+
+	req, err := http.NewRequest("DELETE", ts.URL+SessionsPath+"/login?subject="+subject, nil)
+
+	require.NoError(t, err)
+	resp, err := c.Do(req)
+	require.NoError(t, err)
+	require.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+	require.EqualError(t, err, x.ErrNotFound.Error())
+	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+	require.EqualError(t, err, x.ErrNotFound.Error())
 }

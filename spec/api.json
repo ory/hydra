@@ -2890,6 +2890,42 @@
         ]
       }
     },
+    "/oauth2/auth/sessions/login/{id}": {
+      "delete": {
+        "description": "This endpoint invalidates an authentication session by session id. After revoking the authentication session, the\nsubject has to re-authenticate at ORY Hydra for this device/browser. This endpoint does not invalidate any tokens\nand does not work with OpenID Connect Front- or Back-channel logout.",
+        "operationId": "revokeAuthenticationSessionById",
+        "parameters": [
+          {
+            "description": "The login session id",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/components/responses/emptyResponse"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/errorOAuth2"
+                }
+              }
+            },
+            "description": "errorOAuth2"
+          }
+        },
+        "summary": "Revokes OAuth 2.0 Login Session by session id",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/admin/oauth2/introspect": {
       "post": {
         "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `session.access_token` during the consent flow.",

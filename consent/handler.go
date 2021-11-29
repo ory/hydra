@@ -56,6 +56,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.PUT(ConsentPath+"/accept", h.acceptOAuth2ConsentRequest)
 	admin.PUT(ConsentPath+"/reject", h.rejectOAuth2ConsentRequest)
 
+	admin.DELETE(SessionsPath+"/login/:id", h.revokeOAuth2LoginSession)
 	admin.DELETE(SessionsPath+"/login", h.revokeOAuth2LoginSessions)
 	admin.GET(SessionsPath+"/consent", h.listOAuth2ConsentSessions)
 	admin.DELETE(SessionsPath+"/consent", h.revokeOAuth2ConsentSessions)
@@ -284,6 +285,39 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 	}
 
 	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// swagger:route DELETE /oauth2/auth/sessions/login/{id} oAuth2 revokeOAuth2LoginSession
+//
+// # Revokes OAuth 2.0 Login Sessions of by session id
+//
+// This endpoint invalidates an authentication session by session id. After revoking the authentication session, the
+// subject has to re-authenticate at ORY Hydra for this device/browser. This endpoint does not invalidate any tokens
+// and does not work with OpenID Connect Front- or Back-channel logout.
+//
+//     Produces:
+//     - application/json
+//
+//     Schemes: http, https
+//
+//     Responses:
+//       204: emptyResponse
+//       400: jsonError
+//       500: jsonError
+func (h *Handler) revokeOAuth2LoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var loginSessionId = ps.ByName("id")
+
+	if loginSessionId == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Path parameter 'id' is not defined but should have been.`)))
+		return
+	}
+
+	if err := h.r.ConsentManager().DeleteLoginSession(r.Context(), loginSessionId); err != nil && !errors.Is(err, x.ErrNotFound) {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

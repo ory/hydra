@@ -144,7 +144,7 @@ SET
 	consent_skip = ?,
 	consent_verifier = ?,
 	consent_csrf = ?
-WHERE challenge = ?;
+WHERE login_challenge = ?;
 `,
 		flow.FlowStateConsentUnused,
 		sqlxx.NullString(req.ID),
@@ -280,7 +280,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 	var d consent.HandledLoginRequest
 	return &d, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		var f flow.Flow
-		if err := c.Where("verifier = ?", verifier).Select("*").First(&f); err != nil {
+		if err := c.Where("login_verifier = ?", verifier).Select("*").First(&f); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
@@ -333,7 +333,7 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 		f := &flow.Flow{}
 
 		if err := c.
-			Where("subject = ? AND client_id = ? AND consent_skip=FALSE AND (ch_error='{}' AND ch_remember=TRUE)", subject, client).
+			Where("subject = ? AND client_id = ? AND consent_skip=FALSE AND (consent_error='{}' AND consent_remember=TRUE)", subject, client).
 			Order("requested_at DESC").
 			Limit(1).
 			First(f); err != nil {
@@ -354,7 +354,7 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 	c := p.Connection(ctx)
 
 	if err := c.
-		Where("subject = ? AND consent_skip=FALSE AND ch_error='{}'", subject).
+		Where("subject = ? AND consent_skip=FALSE AND consent_error='{}'", subject).
 		Order("requested_at DESC").
 		Paginate(offset/limit+1, limit).
 		All(&fs); err != nil {
@@ -374,7 +374,7 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
 	n, err := p.Connection(ctx).
-		Where("subject = ? AND consent_skip=FALSE AND ch_error='{}'", subject).
+		Where("subject = ? AND consent_skip=FALSE AND consent_error='{}'", subject).
 		Count(&flow.Flow{})
 	return n, sqlcon.HandleError(err)
 }
@@ -481,26 +481,26 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 
 	challenges := []string{}
 	queryFormat := `
-	SELECT challenge
+	SELECT login_challenge
 	FROM hydra_flow
 	WHERE (
 		(state = ` + fmt.Sprint(flow.FlowStateLoginInitialized) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateLoginUnused) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateConsentInitialized) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateConsentUnused) + `)
-		OR (error IS NOT NULL AND error <> '{}' AND error <> '')
-		OR (ch_error IS NOT NULL AND ch_error <> '{}' AND ch_error <> '')
+		OR (login_error IS NOT NULL AND login_error <> '{}' AND login_error <> '')
+		OR (consent_error IS NOT NULL AND consent_error <> '{}' AND consent_error <> '')
 	)
 	AND requested_at < ?
-	ORDER BY challenge
+	ORDER BY login_challenge
 	LIMIT %[1]d
 	`
 
 	// Select up to [limit] flows that can be safely deleted, i.e. flows that meet
 	// the following criteria:
 	// - flow.state is anything between FlowStateLoginInitialized and FlowStateConsentUnused (unhandled)
-	// - flow.error has valid error (login rejected)
-	// - flow.ch_error has valid error (consent rejected)
+	// - flow.login_error has valid error (login rejected)
+	// - flow.consent_error has valid error (consent rejected)
 	// AND timed-out
 	// - flow.requested_at < minimum of ttl.login_consent_request and notAfter
 	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, limit), notAfter)
@@ -517,7 +517,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		}
 
 		q := p.Connection(ctx).RawQuery(
-			fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&f).TableName()),
+			fmt.Sprintf("DELETE FROM %s WHERE login_challenge in (?)", (&f).TableName()),
 			challenges[i:j],
 		)
 

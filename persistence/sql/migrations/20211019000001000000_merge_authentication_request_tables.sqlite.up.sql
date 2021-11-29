@@ -1,12 +1,12 @@
 CREATE TABLE hydra_flow
 (
-    challenge                 VARCHAR(40)  NOT NULL PRIMARY KEY,
+    login_challenge           VARCHAR(40)  NOT NULL PRIMARY KEY,
     requested_scope           TEXT         NOT NULL,
-    verifier                  VARCHAR(40)  NOT NULL,
-    csrf                      VARCHAR(40)  NOT NULL,
+    login_verifier            VARCHAR(40)  NOT NULL,
+    login_csrf                VARCHAR(40)  NOT NULL,
     subject                   VARCHAR(255) NOT NULL,
     request_url               TEXT         NOT NULL,
-    skip                      INTEGER      NOT NULL,
+    login_skip                INTEGER      NOT NULL,
     client_id                 VARCHAR(255) NOT NULL REFERENCES hydra_client (id) ON DELETE CASCADE,
     requested_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     login_initialized_at      TIMESTAMP    NULL,
@@ -16,12 +16,12 @@ CREATE TABLE hydra_flow
 
     state                     INTEGER      NOT NULL DEFAULT 0,
 
-    remember                  INTEGER      NULL,
-    remember_for              INTEGER      NULL,
-    error                     TEXT         NULL,
+    login_remember            INTEGER      NULL,
+    login_remember_for        INTEGER      NULL,
+    login_error               TEXT         NULL,
     acr                       TEXT         NULL,
     login_authenticated_at    TIMESTAMP    NULL,
-    was_used                  INTEGER      NULL,
+    login_was_used            INTEGER      NULL,
     forced_subject_identifier VARCHAR(255) NULL DEFAULT '',
     context                   TEXT         NULL DEFAULT '{}',
     amr                       TEXT         NULL DEFAULT '',
@@ -31,44 +31,44 @@ CREATE TABLE hydra_flow
     consent_verifier          VARCHAR(40)  NOT NULL,
     consent_csrf              VARCHAR(40)  NOT NULL,
 
-    ch_granted_scope         TEXT        NOT NULL,
-    ch_granted_at_audience   TEXT        NULL DEFAULT '',
-    ch_remember              INTEGER     NOT NULL,
-    ch_remember_for          INTEGER     NOT NULL,
-    ch_handled_at            TIMESTAMP   NULL,
-    ch_was_used              INTEGER     NOT NULL,
-    ch_error                 TEXT        NOT NULL,
-    ch_session_id_token      TEXT        NOT NULL,
-    ch_session_access_token  TEXT        NOT NULL,
+    granted_scope             TEXT        NOT NULL,
+    granted_at_audience       TEXT        NULL DEFAULT '',
+    consent_remember          INTEGER     NOT NULL,
+    consent_remember_for      INTEGER     NOT NULL,
+    consent_handled_at        TIMESTAMP   NULL,
+    consent_was_used          INTEGER     NOT NULL,
+    consent_error             TEXT        NOT NULL,
+    session_id_token          TEXT        NOT NULL,
+    session_access_token      TEXT        NOT NULL,
 
     CHECK (
         state = 128 OR
         state = 129 OR
         state = 1 OR
         (state = 2 AND (
-            remember IS NOT NULL AND
-            remember_for IS NOT NULL AND
-            error IS NOT NULL AND
+            login_remember IS NOT NULL AND
+            login_remember_for IS NOT NULL AND
+            login_error IS NOT NULL AND
             acr IS NOT NULL AND
-            was_used IS NOT NULL AND
+            login_was_used IS NOT NULL AND
             context IS NOT NULL AND
             amr IS NOT NULL
         )) OR
         (state = 3 AND (
-            remember IS NOT NULL AND
-            remember_for IS NOT NULL AND
-            error IS NOT NULL AND
+            login_remember IS NOT NULL AND
+            login_remember_for IS NOT NULL AND
+            login_error IS NOT NULL AND
             acr IS NOT NULL AND
-            was_used IS NOT NULL AND
+            login_was_used IS NOT NULL AND
             context IS NOT NULL AND
             amr IS NOT NULL
         )) OR
         (state = 4 AND (
-            remember IS NOT NULL AND
-            remember_for IS NOT NULL AND
-            error IS NOT NULL AND
+            login_remember IS NOT NULL AND
+            login_remember_for IS NOT NULL AND
+            login_error IS NOT NULL AND
             acr IS NOT NULL AND
-            was_used IS NOT NULL AND
+            login_was_used IS NOT NULL AND
             context IS NOT NULL AND
             amr IS NOT NULL AND
 
@@ -78,11 +78,11 @@ CREATE TABLE hydra_flow
             consent_csrf IS NOT NULL
         )) OR
         (state = 5 AND (
-            remember IS NOT NULL AND
-            remember_for IS NOT NULL AND
-            error IS NOT NULL AND
+            login_remember IS NOT NULL AND
+            login_remember_for IS NOT NULL AND
+            login_error IS NOT NULL AND
             acr IS NOT NULL AND
-            was_used IS NOT NULL AND
+            login_was_used IS NOT NULL AND
             context IS NOT NULL AND
             amr IS NOT NULL AND
 
@@ -91,25 +91,25 @@ CREATE TABLE hydra_flow
             consent_skip IS NOT NULL AND
             consent_csrf IS NOT NULL AND
 
-            ch_granted_scope IS NOT NULL AND
-            ch_remember IS NOT NULL AND
-            ch_remember_for IS NOT NULL AND
-            ch_error IS NOT NULL AND
-            ch_session_access_token IS NOT NULL AND
-            ch_session_id_token IS NOT NULL AND
-            ch_was_used IS NOT NULL
+            granted_scope IS NOT NULL AND
+            consent_remember IS NOT NULL AND
+            consent_remember_for IS NOT NULL AND
+            consent_error IS NOT NULL AND
+            session_access_token IS NOT NULL AND
+            session_id_token IS NOT NULL AND
+            consent_was_used IS NOT NULL
         ))
     )
 );
 
 INSERT INTO hydra_flow (
-    challenge,
+    login_challenge,
     requested_scope,
-    verifier,
-    csrf,
+    login_verifier,
+    login_csrf,
     subject,
     request_url,
-    skip,
+    login_skip,
     client_id,
     requested_at,
     login_initialized_at,
@@ -117,12 +117,12 @@ INSERT INTO hydra_flow (
     login_session_id,
     requested_at_audience,
 
-    remember,
-    remember_for,
-    error,
+    login_remember,
+    login_remember_for,
+    login_error,
     acr,
     login_authenticated_at,
-    was_used,
+    login_was_used,
     forced_subject_identifier,
     context,
     amr
@@ -158,7 +158,7 @@ CREATE INDEX hydra_flow_client_id_idx ON hydra_flow (client_id);
 CREATE INDEX hydra_flow_login_session_id_idx ON hydra_flow (login_session_id);
 CREATE INDEX hydra_flow_subject_idx ON hydra_flow (subject);
 CREATE UNIQUE INDEX hydra_flow_consent_challenge_id_idx ON hydra_flow (consent_challenge_id);
-CREATE UNIQUE INDEX hydra_flow_verifier_idx ON hydra_flow (verifier);
+CREATE UNIQUE INDEX hydra_flow_login_verifier_idx ON hydra_flow (login_verifier);
 CREATE INDEX hydra_flow_consent_verifier_idx ON hydra_flow (consent_verifier);
 
 

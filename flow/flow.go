@@ -51,83 +51,83 @@ type Flow struct {
 	// identify the session.
 	//
 	// required: true
-	ID string `json:"challenge" db:"challenge"`
+	ID string `db:"login_challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope" db:"requested_scope"`
+	RequestedScope sqlxx.StringSlicePipeDelimiter `db:"requested_scope"`
 
-	// RequestedScope contains the access token audience as requested by the OAuth 2.0 Client.
+	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience" db:"requested_at_audience"`
+	RequestedAudience sqlxx.StringSlicePipeDelimiter `db:"requested_at_audience"`
 
-	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
+	// LoginSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
 	//
 	// This feature allows you to update / set session information.
 	//
 	// required: true
-	Skip bool `json:"skip" db:"skip"`
+	LoginSkip bool `db:"login_skip"`
 
 	// Subject is the user ID of the end-user that authenticated. Now, that end user needs to grant or deny the scope
 	// requested by the OAuth 2.0 client. If this value is set and `skip` is true, you MUST include this subject type
 	// when accepting the login request, or the request will fail.
 	//
 	// required: true
-	Subject string `json:"subject" db:"subject"`
+	Subject string `db:"subject"`
 
 	// OpenIDConnectContext provides context for the (potential) OpenID Connect context. Implementation of these
 	// values in your app are optional but can be useful if you want to be fully compliant with the OpenID Connect spec.
-	OpenIDConnectContext *consent.OpenIDConnectContext `json:"oidc_context" db:"oidc_context"`
+	OpenIDConnectContext *consent.OpenIDConnectContext `db:"oidc_context"`
 
 	// Client is the OAuth 2.0 Client that initiated the request.
 	//
 	// required: true
-	Client *client.Client `json:"client" db:"-"`
+	Client *client.Client `db:"-"`
 
-	ClientID string `json:"-" db:"client_id"`
+	ClientID string `db:"client_id"`
 
 	// RequestURL is the original OAuth 2.0 Authorization URL requested by the OAuth 2.0 client. It is the URL which
 	// initiates the OAuth 2.0 Authorization Code or OAuth 2.0 Implicit flow. This URL is typically not needed, but
 	// might come in handy if you want to deal with additional request parameters.
 	//
 	// required: true
-	RequestURL string `json:"request_url" db:"request_url"`
+	RequestURL string `db:"request_url"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
 	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
-	SessionID sqlxx.NullString `json:"session_id" db:"login_session_id"`
+	SessionID sqlxx.NullString `db:"login_session_id"`
 
-	Verifier string `json:"-" db:"verifier"`
-	CSRF     string `json:"-" db:"csrf"`
+	LoginVerifier string `db:"login_verifier"`
+	LoginCSRF     string `db:"login_csrf"`
 
-	LoginInitializedAt sqlxx.NullTime `json:"-" db:"login_initialized_at"`
-	RequestedAt        time.Time      `json:"-" db:"requested_at"`
+	LoginInitializedAt sqlxx.NullTime `db:"login_initialized_at"`
+	RequestedAt        time.Time      `db:"requested_at"`
 
-	State int16 `json:"state" db:"state"`
+	State int16 `db:"state"`
 
-	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
+	// LoginRemember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
-	Remember bool `json:"remember" db:"remember"`
+	LoginRemember bool `db:"login_remember"`
 
-	// RememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
+	// LoginRememberFor sets how long the authentication should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered for the duration of the browser session (using a session cookie).
-	RememberFor int `json:"remember_for" db:"remember_for"`
+	LoginRememberFor int `db:"login_remember_for"`
 
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
-	ACR string `json:"acr" db:"acr"`
+	ACR string `db:"acr"`
 
 	// AMR sets the Authentication Methods References value for this
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSlicePipeDelimiter `json:"amr" db:"amr"`
+	AMR sqlxx.StringSlicePipeDelimiter `db:"amr"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -146,36 +146,58 @@ type Flow struct {
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
-	ForceSubjectIdentifier string `json:"force_subject_identifier" db:"forced_subject_identifier"`
+	ForceSubjectIdentifier string `db:"forced_subject_identifier"`
 
 	// Context is an optional object which can hold arbitrary data. The data will be made available when fetching the
 	// consent request under the "context" field. This is useful in scenarios where login and consent endpoints share
 	// data.
-	Context sqlxx.JSONRawMessage `json:"context" db:"context"`
+	Context sqlxx.JSONRawMessage `db:"context"`
 
-	// If set to true means that the request was already handled. This
-	// can happen on form double-submit or other errors. If this is set
-	// we recommend redirecting the user to `request_url` to re-initiate
-	// the flow.
-	WasHandled bool `json:"-" db:"was_used"`
+	// LoginWasUsed set to true means that the login request was already handled.
+	// This can happen on form double-submit or other errors. If this is set we
+	// recommend redirecting the user to `request_url` to re-initiate the flow.
+	LoginWasUsed bool `db:"login_was_used"`
 
-	Error                *consent.RequestDeniedError `json:"-" db:"error"`
-	LoginAuthenticatedAt sqlxx.NullTime              `json:"-" db:"login_authenticated_at"`
+	LoginError           *consent.RequestDeniedError `db:"login_error"`
+	LoginAuthenticatedAt sqlxx.NullTime              `db:"login_authenticated_at"`
 
-	ConsentChallengeID sqlxx.NullString `json:"consent_challenge_id" db:"consent_challenge_id"`
-	ConsentSkip        bool             `json:"consent_skip" db:"consent_skip"`
-	ConsentVerifier    string           `json:"-" db:"consent_verifier"`
-	ConsentCSRF        string           `json:"-" db:"consent_csrf"`
+	// ConsentChallengeID is the identifier ("authorization challenge") of the consent authorization request. It is used to
+	// identify the session.
+	//
+	// required: true
+	ConsentChallengeID sqlxx.NullString `db:"consent_challenge_id"`
 
-	CHGrantedScope       sqlxx.StringSlicePipeDelimiter `json:"ch_grant_scope" db:"ch_granted_scope"`
-	CHGrantedAudience    sqlxx.StringSlicePipeDelimiter `json:"ch_grant_access_token_audience" db:"ch_granted_at_audience"`
-	CHRemember           bool                           `json:"ch_remember" db:"ch_remember"`
-	CHRememberFor        int                            `json:"ch_remember_for" db:"ch_remember_for"`
-	CHHandledAt          sqlxx.NullTime                 `json:"ch_handled_at" db:"ch_handled_at"`
-	CHWasHandled         bool                           `json:"-" db:"ch_was_used"`
-	CHError              *consent.RequestDeniedError    `json:"-" db:"ch_error"`
-	CHSessionIDToken     sqlxx.MapStringInterface       `json:"-" db:"ch_session_id_token" faker:"-"`
-	CHSessionAccessToken sqlxx.MapStringInterface       `json:"-" db:"ch_session_access_token" faker:"-"`
+	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.
+	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
+	// consent request using the usual API call.
+	ConsentSkip     bool   `db:"consent_skip"`
+	ConsentVerifier string `db:"consent_verifier"`
+	ConsentCSRF     string `db:"consent_csrf"`
+
+	// GrantedScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
+	GrantedScope sqlxx.StringSlicePipeDelimiter `db:"granted_scope"`
+
+	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
+	GrantedAudience sqlxx.StringSlicePipeDelimiter `db:"granted_at_audience"`
+
+	// ConsentRemember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
+	// client asks the same user for the same, or a subset of, scope.
+	ConsentRemember bool `db:"consent_remember"`
+
+	// ConsentRememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
+	// authorization will be remembered indefinitely.
+	ConsentRememberFor int `db:"consent_remember_for"`
+
+	// ConsentHandledAt contains the timestamp the consent request was handled.
+	ConsentHandledAt sqlxx.NullTime `db:"consent_handled_at"`
+
+	// ConsentWasHandled set to true means that the request was already handled.
+	// This can happen on form double-submit or other errors. If this is set we
+	// recommend redirecting the user to `request_url` to re-initiate the flow.
+	ConsentWasHandled  bool                        `db:"consent_was_used"`
+	ConsentError       *consent.RequestDeniedError `db:"consent_error"`
+	SessionIDToken     sqlxx.MapStringInterface    `db:"session_id_token" faker:"-"`
+	SessionAccessToken sqlxx.MapStringInterface    `db:"session_access_token" faker:"-"`
 }
 
 func NewFlow(r *consent.LoginRequest) *Flow {
@@ -183,17 +205,17 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 		ID:                     r.ID,
 		RequestedScope:         r.RequestedScope,
 		RequestedAudience:      r.RequestedAudience,
-		Skip:                   r.Skip,
+		LoginSkip:              r.Skip,
 		Subject:                r.Subject,
 		OpenIDConnectContext:   r.OpenIDConnectContext,
 		Client:                 r.Client,
 		ClientID:               r.ClientID,
 		RequestURL:             r.RequestURL,
 		SessionID:              r.SessionID,
-		WasHandled:             r.WasHandled,
+		LoginWasUsed:           r.WasHandled,
 		ForceSubjectIdentifier: r.ForceSubjectIdentifier,
-		Verifier:               r.Verifier,
-		CSRF:                   r.CSRF,
+		LoginVerifier:          r.Verifier,
+		LoginCSRF:              r.CSRF,
 		LoginAuthenticatedAt:   r.AuthenticatedAt,
 		RequestedAt:            r.RequestedAt,
 		State:                  FlowStateLoginInitialized,
@@ -201,7 +223,6 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 }
 
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
-	// TODO Validate HandledLoginRequest. This will require updating tests that expect the flow to fail at a later point.
 	if f.State != FlowStateLoginInitialized {
 		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
 	}
@@ -219,14 +240,14 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 	f.ID = h.ID
 	f.Subject = h.Subject
 	f.ForceSubjectIdentifier = h.ForceSubjectIdentifier
-	f.Error = h.Error
+	f.LoginError = h.Error
 
-	f.Remember = h.Remember
-	f.RememberFor = h.RememberFor
+	f.LoginRemember = h.Remember
+	f.LoginRememberFor = h.RememberFor
 	f.ACR = h.ACR
 	f.AMR = h.AMR
 	f.Context = h.Context
-	f.WasHandled = h.WasHandled
+	f.LoginWasUsed = h.WasHandled
 	f.LoginAuthenticatedAt = h.AuthenticatedAt
 	return nil
 }
@@ -234,15 +255,15 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 func (f *Flow) GetHandledLoginRequest() consent.HandledLoginRequest {
 	return consent.HandledLoginRequest{
 		ID:                     f.ID,
-		Remember:               f.Remember,
-		RememberFor:            f.RememberFor,
+		Remember:               f.LoginRemember,
+		RememberFor:            f.LoginRememberFor,
 		ACR:                    f.ACR,
 		AMR:                    f.AMR,
 		Subject:                f.Subject,
 		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
 		Context:                f.Context,
-		WasHandled:             f.WasHandled,
-		Error:                  f.Error,
+		WasHandled:             f.LoginWasUsed,
+		Error:                  f.LoginError,
 		LoginRequest:           f.GetLoginRequest(),
 		RequestedAt:            f.RequestedAt,
 		AuthenticatedAt:        f.LoginAuthenticatedAt,
@@ -254,17 +275,17 @@ func (f *Flow) GetLoginRequest() *consent.LoginRequest {
 		ID:                     f.ID,
 		RequestedScope:         f.RequestedScope,
 		RequestedAudience:      f.RequestedAudience,
-		Skip:                   f.Skip,
+		Skip:                   f.LoginSkip,
 		Subject:                f.Subject,
 		OpenIDConnectContext:   f.OpenIDConnectContext,
 		Client:                 f.Client,
 		ClientID:               f.ClientID,
 		RequestURL:             f.RequestURL,
 		SessionID:              f.SessionID,
-		WasHandled:             f.WasHandled,
+		WasHandled:             f.LoginWasUsed,
 		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
-		Verifier:               f.Verifier,
-		CSRF:                   f.CSRF,
+		Verifier:               f.LoginVerifier,
+		CSRF:                   f.LoginCSRF,
 		AuthenticatedAt:        f.LoginAuthenticatedAt,
 		RequestedAt:            f.RequestedAt,
 	}
@@ -276,16 +297,16 @@ func (f *Flow) InitializeConsent() error {
 	if f.State != FlowStateLoginUnused {
 		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginUnused, f.State)
 	}
-	if f.WasHandled {
+	if f.LoginWasUsed {
 		return errors.New("login verifier has already been used")
 	}
-	f.WasHandled = true
+	f.LoginWasUsed = true
 	f.State = FlowStateConsentInitialized
 	return nil
 }
 
 func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
-	if f.CHWasHandled {
+	if f.ConsentWasHandled {
 		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
 	}
 	if f.State != FlowStateConsentUnused {
@@ -299,30 +320,30 @@ func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
 		f.State = FlowStateConsentUsed
 	}
 
-	f.CHGrantedScope = r.GrantedScope
-	f.CHGrantedAudience = r.GrantedAudience
-	f.CHRemember = r.Remember
-	f.CHRememberFor = r.RememberFor
-	f.CHHandledAt = r.HandledAt
-	f.CHWasHandled = r.WasHandled
-	f.CHError = r.Error
+	f.GrantedScope = r.GrantedScope
+	f.GrantedAudience = r.GrantedAudience
+	f.ConsentRemember = r.Remember
+	f.ConsentRememberFor = r.RememberFor
+	f.ConsentHandledAt = r.HandledAt
+	f.ConsentWasHandled = r.WasHandled
+	f.ConsentError = r.Error
 
 	if r.Session != nil {
-		f.CHSessionIDToken = r.Session.IDToken
-		f.CHSessionAccessToken = r.Session.AccessToken
+		f.SessionIDToken = r.Session.IDToken
+		f.SessionAccessToken = r.Session.AccessToken
 	}
 	return nil
 }
 
 func (f *Flow) InvalidateConsentRequest() error {
-	if f.CHWasHandled {
+	if f.ConsentWasHandled {
 		return errors.New("consent verifier has already been used")
 	}
 	if f.State != FlowStateConsentUnused {
 		return errors.Errorf("unexpected flow state: expected %d, got %d", FlowStateConsentUnused, f.State)
 	}
 
-	f.CHWasHandled = true
+	f.ConsentWasHandled = true
 	f.State = FlowStateConsentUsed
 	return nil
 }
@@ -343,7 +364,7 @@ func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
 		ACR:                    f.ACR,
 		AMR:                    f.AMR,
 		Context:                f.Context,
-		WasHandled:             f.CHWasHandled,
+		WasHandled:             f.ConsentWasHandled,
 		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
 		Verifier:               f.ConsentVerifier,
 		CSRF:                   f.ConsentCSRF,
@@ -355,19 +376,19 @@ func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
 func (f *Flow) GetHandledConsentRequest() *consent.HandledConsentRequest {
 	return &consent.HandledConsentRequest{
 		ID:                 f.ConsentChallengeID.String(),
-		GrantedScope:       f.CHGrantedScope,
-		GrantedAudience:    f.CHGrantedAudience,
-		Session:            &consent.ConsentRequestSessionData{AccessToken: f.CHSessionAccessToken, IDToken: f.CHSessionIDToken},
-		Remember:           f.CHRemember,
-		RememberFor:        f.CHRememberFor,
-		HandledAt:          f.CHHandledAt,
-		WasHandled:         f.CHWasHandled,
+		GrantedScope:       f.GrantedScope,
+		GrantedAudience:    f.GrantedAudience,
+		Session:            &consent.ConsentRequestSessionData{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
+		Remember:           f.ConsentRemember,
+		RememberFor:        f.ConsentRememberFor,
+		HandledAt:          f.ConsentHandledAt,
+		WasHandled:         f.ConsentWasHandled,
 		ConsentRequest:     f.GetConsentRequest(),
-		Error:              f.CHError,
+		Error:              f.ConsentError,
 		RequestedAt:        f.RequestedAt,
 		AuthenticatedAt:    f.LoginAuthenticatedAt,
-		SessionIDToken:     f.CHSessionIDToken,
-		SessionAccessToken: f.CHSessionAccessToken,
+		SessionIDToken:     f.SessionIDToken,
+		SessionAccessToken: f.SessionAccessToken,
 	}
 }
 
@@ -403,10 +424,10 @@ func (f *Flow) AfterFind(c *pop.Connection) error {
 }
 
 func (f *Flow) AfterSave(c *pop.Connection) {
-	if f.CHSessionAccessToken == nil {
-		f.CHSessionAccessToken = make(map[string]interface{})
+	if f.SessionAccessToken == nil {
+		f.SessionAccessToken = make(map[string]interface{})
 	}
-	if f.CHSessionIDToken == nil {
-		f.CHSessionIDToken = make(map[string]interface{})
+	if f.SessionIDToken == nil {
+		f.SessionIDToken = make(map[string]interface{})
 	}
 }

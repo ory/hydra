@@ -15,32 +15,32 @@ func (f *Flow) setLoginRequest(r *consent.LoginRequest) {
 	f.ID = r.ID
 	f.RequestedScope = r.RequestedScope
 	f.RequestedAudience = r.RequestedAudience
-	f.Skip = r.Skip
+	f.LoginSkip = r.Skip
 	f.Subject = r.Subject
 	f.OpenIDConnectContext = r.OpenIDConnectContext
 	f.Client = r.Client
 	f.ClientID = r.ClientID
 	f.RequestURL = r.RequestURL
 	f.SessionID = r.SessionID
-	f.WasHandled = r.WasHandled
+	f.LoginWasUsed = r.WasHandled
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
-	f.Verifier = r.Verifier
-	f.CSRF = r.CSRF
+	f.LoginVerifier = r.Verifier
+	f.LoginCSRF = r.CSRF
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 	f.RequestedAt = r.RequestedAt
 }
 
 func (f *Flow) setHandledLoginRequest(r *consent.HandledLoginRequest) {
 	f.ID = r.ID
-	f.Remember = r.Remember
-	f.RememberFor = r.RememberFor
+	f.LoginRemember = r.Remember
+	f.LoginRememberFor = r.RememberFor
 	f.ACR = r.ACR
 	f.AMR = r.AMR
 	f.Subject = r.Subject
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
 	f.Context = r.Context
-	f.WasHandled = r.WasHandled
-	f.Error = r.Error
+	f.LoginWasUsed = r.WasHandled
+	f.LoginError = r.Error
 	f.RequestedAt = r.RequestedAt
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 }
@@ -60,7 +60,7 @@ func (f *Flow) setConsentRequest(r *consent.ConsentRequest) {
 	f.ACR = r.ACR
 	f.AMR = r.AMR
 	f.Context = r.Context
-	f.CHWasHandled = r.WasHandled
+	f.ConsentWasHandled = r.WasHandled
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
 	f.ConsentVerifier = r.Verifier
 	f.ConsentCSRF = r.CSRF
@@ -70,13 +70,13 @@ func (f *Flow) setConsentRequest(r *consent.ConsentRequest) {
 
 func (f *Flow) setHandledConsentRequest(r *consent.HandledConsentRequest) {
 	f.ConsentChallengeID = sqlxx.NullString(r.ID)
-	f.CHGrantedScope = r.GrantedScope
-	f.CHGrantedAudience = r.GrantedAudience
-	f.CHRemember = r.Remember
-	f.CHRememberFor = r.RememberFor
-	f.CHHandledAt = r.HandledAt
-	f.CHWasHandled = r.WasHandled
-	f.CHError = r.Error
+	f.GrantedScope = r.GrantedScope
+	f.GrantedAudience = r.GrantedAudience
+	f.ConsentRemember = r.Remember
+	f.ConsentRememberFor = r.RememberFor
+	f.ConsentHandledAt = r.HandledAt
+	f.ConsentWasHandled = r.WasHandled
+	f.ConsentError = r.Error
 	f.RequestedAt = r.RequestedAt
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 }
@@ -153,7 +153,7 @@ func TestFlow_InitializeConsent(t *testing.T) {
 		}))
 		assert.NoError(t, f.InitializeConsent())
 		assert.Equal(t, FlowStateConsentInitialized, f.State)
-		assert.Equal(t, true, f.WasHandled)
+		assert.Equal(t, true, f.LoginWasUsed)
 	})
 	t.Run("InitializeConsent should fail when flow.WasHandled is true", func(t *testing.T) {
 		f := NewFlow(&consent.LoginRequest{

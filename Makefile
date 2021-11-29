@@ -109,6 +109,14 @@ sdk: .bin/ory
 		swagger generate client -f ./spec/api.json -t internal/httpclient -A Ory_Hydra
 		make format
 
+MIGRATIONS_SRC_DIR = ./persistence/sql/src/
+MIGRATIONS_DST_DIR = ./persistence/sql/migrations/
+MIGRATION_NAMES=$(shell find $(MIGRATIONS_SRC_DIR) -maxdepth 1 -mindepth 1 -type d -print0 | xargs -0 -I{} basename {})
+MIGRATION_TARGETS=$(addprefix $(MIGRATIONS_DST_DIR), $(MIGRATION_NAMES))
+.PHONY: $(MIGRATION_TARGETS)
+$(MIGRATION_TARGETS): $(MIGRATIONS_DST_DIR)%:
+	go run . migrate gen $(MIGRATIONS_SRC_DIR)$* $(MIGRATIONS_DST_DIR)
+
 .PHONY: install-stable
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)

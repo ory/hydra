@@ -216,7 +216,7 @@
         "1h5m1s"
       ]
     },
-    "tls_config": {
+    "server_tls_config": {
       "type": "object",
       "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
       "properties": {
@@ -246,6 +246,97 @@
           "items": {
             "$ref": "#/definitions/cidr"
           }
+        }
+      }
+    },
+    "client_tls_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures http client TLS settings.",
+      "properties": {
+        "insecure_skip_verify": {
+          "type": "boolean",
+          "description": "Controls whether a client verifies the server's certificate chain and host name."
+        },
+        "min_version": {
+          "type": "string",
+          "description": "Minimum supported TLS version.",
+          "examples": [
+            "tls10",
+            "tls11",
+            "tls12",
+            "tls13"
+          ]
+        },
+        "max_version": {
+          "type": "string",
+          "description": "Maximum supported TLS version.",
+          "examples": [
+            "tls10",
+            "tls11",
+            "tls12",
+            "tls13"
+          ]
+        },
+        "cipher_suites": {
+          "type": "array",
+          "description": "A list of supported cipher suites.",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            "TLS_RSA_WITH_RC4_128_SHA",
+            "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+            "TLS_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_RSA_WITH_AES_128_CBC_SHA256",
+            "TLS_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_RC4_128_SHA",
+            "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+            "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
+            "TLS_AES_128_GCM_SHA256",
+            "TLS_AES_256_GCM_SHA384",
+            "TLS_CHACHA20_POLY1305_SHA256"
+          ]
+        }
+      }
+    },
+    "grantJwt": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Authorization Grants using JWT configuration",
+      "properties": {
+        "jti_optional": {
+          "type": "boolean",
+          "description": "If false, JTI claim must be present in JWT assertion.",
+          "default": false
+        },
+        "iat_optional": {
+          "type": "boolean",
+          "description": "If false, IAT claim must be present in JWT assertion.",
+          "default": false
+        },
+        "max_ttl": {
+          "description": "Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.",
+          "default": "720h",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
         }
       }
     }
@@ -336,7 +427,7 @@
               }
             },
             "tls": {
-              "$ref": "#/definitions/tls_config"
+              "$ref": "#/definitions/server_tls_config"
             }
           }
         },
@@ -380,14 +471,14 @@
             "tls": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/tls_config"
+                  "$ref": "#/definitions/server_tls_config"
                 }
               ]
             }
           }
         },
         "tls": {
-          "$ref": "#/definitions/tls_config"
+          "$ref": "#/definitions/server_tls_config"
         },
         "cookies": {
           "type": "object",
@@ -453,6 +544,18 @@
               }
             }
           }
+        }
+      }
+    },
+    "client": {
+      "default": {
+        "tls": {
+          "$ref": "#/definitions/client_tls_config"
+        }
+      },
+      "back_channel_logout": {
+        "tls": {
+          "$ref": "#/definitions/client_tls_config"
         }
       }
     },

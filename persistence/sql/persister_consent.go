@@ -59,7 +59,7 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 				return err
 			}
 
-			localCount, err := c.RawQuery("DELETE FROM hydra_flow WHERE consent_challenge_id = ?", f.ConsentChallengeID).ExecWithCount()
+			localCount, err := c.RawQuery("DELETE FROM hydra_oauth2_flow WHERE consent_challenge_id = ?", f.ConsentChallengeID).ExecWithCount()
 			if err != nil {
 				if errors.Is(err, sql.ErrNoRows) {
 					return errorsx.WithStack(x.ErrNotFound)
@@ -137,7 +137,7 @@ func (p *Persister) GetForcedObfuscatedLoginSession(ctx context.Context, client,
 // request.
 func (p *Persister) CreateConsentRequest(ctx context.Context, req *consent.ConsentRequest) error {
 	c, err := p.Connection(ctx).RawQuery(`
-UPDATE hydra_flow
+UPDATE hydra_oauth2_flow
 SET
 	state = ?,
 	consent_challenge_id = ?,
@@ -406,7 +406,7 @@ func (p *Persister) listUserAuthenticatedClients(ctx context.Context, subject, s
 	return cs, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		if err := c.RawQuery(
 			/* #nosec G201 - channel can either be "front" or "back" */
-			fmt.Sprintf(`SELECT DISTINCT c.* FROM hydra_client as c JOIN hydra_flow as f ON (c.id = f.client_id) WHERE f.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND f.login_session_id = ?`,
+			fmt.Sprintf(`SELECT DISTINCT c.* FROM hydra_client as c JOIN hydra_oauth2_flow as f ON (c.id = f.client_id) WHERE f.subject=? AND c.%schannel_logout_uri!='' AND c.%schannel_logout_uri IS NOT NULL AND f.login_session_id = ?`,
 				channel,
 				channel,
 			),
@@ -482,7 +482,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	challenges := []string{}
 	queryFormat := `
 	SELECT login_challenge
-	FROM hydra_flow
+	FROM hydra_oauth2_flow
 	WHERE (
 		(state = ` + fmt.Sprint(flow.FlowStateLoginInitialized) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateLoginUnused) + `)

@@ -393,7 +393,7 @@ func (f *Flow) GetHandledConsentRequest() *consent.HandledConsentRequest {
 }
 
 func (_ Flow) TableName() string {
-	return "hydra_flow"
+	return "hydra_oauth2_flow"
 }
 
 func (f *Flow) FindInDB(c *pop.Connection, id string) error {

@@ -1,4 +1,4 @@
-CREATE TABLE hydra_flow
+CREATE TABLE hydra_oauth2_flow
 (
     login_challenge           VARCHAR(40)  NOT NULL PRIMARY KEY,
     requested_scope           TEXT         NOT NULL,
@@ -102,7 +102,7 @@ CREATE TABLE hydra_flow
     )
 );
 
-INSERT INTO hydra_flow (
+INSERT INTO hydra_oauth2_flow (
     login_challenge,
     requested_scope,
     login_verifier,
@@ -154,12 +154,12 @@ FROM hydra_oauth2_authentication_request
 LEFT JOIN hydra_oauth2_authentication_request_handled
 ON hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_authentication_request_handled.challenge;
 
-CREATE INDEX hydra_flow_client_id_idx ON hydra_flow (client_id);
-CREATE INDEX hydra_flow_login_session_id_idx ON hydra_flow (login_session_id);
-CREATE INDEX hydra_flow_subject_idx ON hydra_flow (subject);
-CREATE UNIQUE INDEX hydra_flow_consent_challenge_id_idx ON hydra_flow (consent_challenge_id);
-CREATE UNIQUE INDEX hydra_flow_login_verifier_idx ON hydra_flow (login_verifier);
-CREATE INDEX hydra_flow_consent_verifier_idx ON hydra_flow (consent_verifier);
+CREATE INDEX hydra_oauth2_flow_client_id_idx ON hydra_oauth2_flow (client_id);
+CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON hydra_oauth2_flow (login_session_id);
+CREATE INDEX hydra_oauth2_flow_subject_idx ON hydra_oauth2_flow (subject);
+CREATE UNIQUE INDEX hydra_oauth2_flow_consent_challenge_id_idx ON hydra_oauth2_flow (consent_challenge_id);
+CREATE UNIQUE INDEX hydra_oauth2_flow_login_verifier_idx ON hydra_oauth2_flow (login_verifier);
+CREATE INDEX hydra_oauth2_flow_consent_verifier_idx ON hydra_oauth2_flow (consent_verifier);
 
 
 DROP TABLE hydra_oauth2_authentication_request;
@@ -183,7 +183,7 @@ CREATE TABLE hydra_oauth2_code
     active             INTEGER      NOT NULL DEFAULT true,
     requested_audience TEXT         NULL     DEFAULT '',
     granted_audience   TEXT         NULL     DEFAULT '',
-    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_flow (consent_challenge_id) ON DELETE CASCADE
+    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE
 );
 
 CREATE INDEX hydra_oauth2_code_client_id_idx ON hydra_oauth2_code (client_id);
@@ -206,7 +206,7 @@ CREATE TABLE hydra_oauth2_oidc
     active             INTEGER      NOT NULL DEFAULT true,
     requested_audience TEXT         NULL     DEFAULT '',
     granted_audience   TEXT         NULL     DEFAULT '',
-    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_flow (consent_challenge_id) ON DELETE CASCADE
+    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE
 );
 
 CREATE INDEX hydra_oauth2_oidc_client_id_idx ON hydra_oauth2_oidc (client_id);
@@ -229,7 +229,7 @@ CREATE TABLE hydra_oauth2_pkce
     active             INTEGER      NOT NULL DEFAULT true,
     requested_audience TEXT         NULL     DEFAULT '',
     granted_audience   TEXT         NULL     DEFAULT '',
-    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_flow (consent_challenge_id) ON DELETE CASCADE
+    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE
 );
 
 CREATE INDEX hydra_oauth2_pkce_client_id_idx ON hydra_oauth2_pkce (client_id);
@@ -252,7 +252,7 @@ CREATE TABLE IF NOT EXISTS "hydra_oauth2_access"
     active             INTEGER      NOT NULL DEFAULT true,
     requested_audience TEXT         NULL     DEFAULT '',
     granted_audience   TEXT         NULL     DEFAULT '',
-    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_flow (consent_challenge_id) ON DELETE CASCADE
+    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE
 );
 
 CREATE INDEX hydra_oauth2_access_requested_at_idx ON hydra_oauth2_access (requested_at);
@@ -277,7 +277,7 @@ CREATE TABLE hydra_oauth2_refresh
     active             INTEGER      NOT NULL DEFAULT true,
     requested_audience TEXT         NULL     DEFAULT '',
     granted_audience   TEXT         NULL     DEFAULT '',
-    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_flow (consent_challenge_id) ON DELETE CASCADE
+    challenge_id       VARCHAR(40)  NULL REFERENCES hydra_oauth2_flow (consent_challenge_id) ON DELETE CASCADE
 );
 
 CREATE INDEX hydra_oauth2_refresh_client_id_idx ON hydra_oauth2_refresh (client_id);

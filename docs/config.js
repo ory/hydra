@@ -1,5 +1,5 @@
 module.exports = {
-  projectName: 'ORY Hydra',
+  projectName: 'Ory Hydra',
   projectSlug: 'hydra',
   newsletter:
     'https://ory.us10.list-manage.com/subscribe?u=ffb1a878e4ec6c0ed312a3480&id=f605a41b53&group[17097][8]=1',

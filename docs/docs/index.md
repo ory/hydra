@@ -41,7 +41,7 @@ OAuth 2.0 Clients.
 ### Hardware Security Module support
 
 ORY Hydra also offers a safe storage for cryptographic keys using HSM.
-[Learn more](./hsm-support.md).
+[Learn more](guides/hsm-support.md).
 
 ## Security First
 

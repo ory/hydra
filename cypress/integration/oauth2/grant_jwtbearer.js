@@ -16,9 +16,6 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     const tokenUrl = `${Cypress.env('public_url')}/oauth2/token`
 
-    const jtiOptional = () => Cypress.env('grant_jwt_jti_optional') === 'true' || Boolean(Cypress.env('grant_jwt_jti_optional'))
-    const iatOptional = () => Cypress.env('grant_jwt_iat_optional') === 'true' || Boolean(Cypress.env('grant_jwt_iat_optional'))
-
     const nc = () => ({
         client_id: prng(),
         client_secret: prng(),
@@ -108,11 +105,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
         })
     })
 
-    it('[jti required] should return an Error (400) when given client credentials and a JWT assertion without a jti', function () {
-        if (jtiOptional()) {
-            this.skip()
-        }
-
+    it('should return an Error (400) when given client credentials and a JWT assertion without a jti', function () {
         const client = nc()
         createClient(client)
 
@@ -198,11 +191,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
         })
     })
 
-    it('[iat required] should return an Error (400) when given client credentials and a JWT assertion without an iat', function () {
-        if (iatOptional()) {
-            this.skip()
-        }
-
+    it('should return an Error (400) when given client credentials and a JWT assertion without an iat', function () {
         const client = nc()
         createClient(client)
 

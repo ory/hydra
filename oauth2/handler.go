@@ -29,6 +29,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/logrusx"
 	"github.com/pborman/uuid"
 
 	"github.com/ory/x/errorsx"
@@ -582,7 +583,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
 
 	if err != nil {
-		h.logOrAudit(err, r)
+		h.logOrAudit(err, r, h.r.Logger().WithField("flow_state", "NewAccessRequest"))
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -592,7 +593,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		if h.c.AccessTokenStrategy() == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
 			if err != nil {
-				x.LogError(r, err, h.r.Logger())
+				x.LogError(r, err, h.r.Logger().WithField("flow_state", "GetPublicKeyID"))
 				h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 				return
 			}
@@ -628,7 +629,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	for _, hook := range h.r.AccessRequestHooks() {
 		if err := hook(ctx, accessRequest); err != nil {
-			h.logOrAudit(err, r)
+			h.logOrAudit(err, r, h.r.Logger().WithField("flow_state", "AccessRequestHooks"))
 			h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 			return
 		}
@@ -637,7 +638,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 
 	if err != nil {
-		h.logOrAudit(err, r)
+		h.logOrAudit(err, r, h.r.Logger().WithField("flow_state", "NewAccessResponse"))
 		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
 		return
 	}
@@ -645,11 +646,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.OAuth2Provider().WriteAccessResponse(w, accessRequest, accessResponse)
 }
 
-func (h *Handler) logOrAudit(err error, r *http.Request) {
+func (h *Handler) logOrAudit(err error, r *http.Request, logger *logrusx.Logger) {
 	if errors.Is(err, fosite.ErrServerError) || errors.Is(err, fosite.ErrTemporarilyUnavailable) || errors.Is(err, fosite.ErrMisconfiguration) {
-		x.LogError(r, err, h.r.Logger())
+		x.LogError(r, err, logger)
 	} else {
-		x.LogAudit(r, err, h.r.Logger())
+		x.LogAudit(r, err, logger)
 	}
 }
 

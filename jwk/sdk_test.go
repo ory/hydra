@@ -165,17 +165,11 @@ func TestJWKSDK(t *testing.T) {
 
 			result, err := sdk.Admin.UpdateJSONWebKeySet(admin.NewUpdateJSONWebKeySetParams().WithSet("set-foo2").WithBody(resultKeys.Payload))
 			require.NoError(t, err)
-			if conf.HsmEnabled() {
-				require.Len(t, result.Payload.Keys, 1)
-				assert.Equal(t, expectedPublicKid, *result.Payload.Keys[0].Kid)
-				assert.Equal(t, "ES256", *result.Payload.Keys[0].Alg)
-			} else {
-				require.Len(t, result.Payload.Keys, 2)
-				assert.Equal(t, expectedPublicKid, *result.Payload.Keys[0].Kid)
-				assert.Equal(t, "ES256", *result.Payload.Keys[0].Alg)
-				assert.Equal(t, "private:key-bar", *result.Payload.Keys[1].Kid)
-				assert.Equal(t, "ES256", *result.Payload.Keys[1].Alg)
-			}
+			require.Len(t, result.Payload.Keys, 2)
+			assert.Equal(t, expectedPublicKid, *result.Payload.Keys[0].Kid)
+			assert.Equal(t, "ES256", *result.Payload.Keys[0].Alg)
+			assert.Equal(t, "private:key-bar", *result.Payload.Keys[1].Kid)
+			assert.Equal(t, "ES256", *result.Payload.Keys[1].Alg)
 		})
 
 		t.Run("DeleteJwkSet", func(t *testing.T) {

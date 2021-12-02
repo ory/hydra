@@ -61,6 +61,7 @@ func newRegistryDefault(t *testing.T, url string, c *config.Provider) driver.Reg
 
 	kg := map[string]jwk.KeyGenerator{
 		"RS256": new(veryInsecureRS256Generator),
+		"ES256": &jwk.ECDSA256Generator{},
 		"ES512": &jwk.ECDSA512Generator{},
 		"EdDSA": &jwk.EdDSAGenerator{},
 		"HS256": &jwk.HS256Generator{},

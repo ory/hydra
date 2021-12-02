@@ -106,18 +106,6 @@ jobs:
       - go/save-cache:
           key: ory-hydra-go-mod-v1
 
-      - nancy/install
-      - nancy/check
-      - prettier/install
-      - prettier/check
-      - prettier/install:
-          dir: docs/
-      - prettier/check:
-          dir: docs/
-      - goreleaser/install
-      - goreleaser/check
-      - golangci/install
-      - golangci/lint
       - run: sudo apt update
       - run: sudo apt install -y softhsm opensc
       - run: sudo rm -rf /var/lib/softhsm/tokens; sudo mkdir -p /var/lib/softhsm/tokens; sudo chmod -R a+rwx /var/lib/softhsm; sudo chmod a+rx /etc/softhsm; sudo chmod a+r /etc/softhsm/*

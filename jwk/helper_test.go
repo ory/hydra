@@ -29,6 +29,8 @@ import (
 	"strings"
 	"testing"
 
+	"gopkg.in/square/go-jose.v2/cryptosigner"
+
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/stretchr/testify/assert"
@@ -155,4 +157,16 @@ func TestPEMBlockForKey(t *testing.T) {
 		require.Error(t, err)
 		assert.True(t, strings.Contains(err.Error(), "Invalid key type"))
 	})
+}
+
+func TestExcludeOpaquePrivateKeys(t *testing.T) {
+	var testRSGenerator = RS256Generator{}
+
+	opaqueKeys, err := testRSGenerator.Generate("test-id-1", "sig")
+	assert.NoError(t, err)
+	assert.Len(t, opaqueKeys.Keys, 2)
+	opaqueKeys.Keys[0].Key = cryptosigner.Opaque(opaqueKeys.Keys[0].Key.(*rsa.PrivateKey))
+	keys := ExcludeOpaquePrivateKeys(opaqueKeys)
+	assert.Len(t, keys.Keys, 1)
+	assert.IsType(t, new(rsa.PublicKey), keys.Keys[0].Key)
 }

@@ -82,27 +82,27 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 }
 
 func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
-	if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
-		return err
-	}
-
-	if err := p.AddKey(ctx, set, key); err != nil {
-		return err
-	}
-
-	return nil
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
+			return err
+		}
+		if err := p.AddKey(ctx, set, key); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
-	if err := p.DeleteKeySet(ctx, set); err != nil {
-		return err
-	}
-
-	if err := p.AddKeySet(ctx, set, keySet); err != nil {
-		return err
-	}
-
-	return nil
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.DeleteKeySet(ctx, set); err != nil {
+			return err
+		}
+		if err := p.AddKeySet(ctx, set, keySet); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {

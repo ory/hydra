@@ -44,15 +44,19 @@ func RandomBytes(n int) ([]byte, error) {
 
 func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
 	for k, v := range js {
-		if len(v.CertificateThumbprintSHA1) == 0 {
-			v.CertificateThumbprintSHA1 = nil
-		}
-		if len(v.CertificateThumbprintSHA256) == 0 {
-			v.CertificateThumbprintSHA256 = nil
-		}
-		js[k] = v
+		js[k] = canonicalizeKeyThumbprints(&v)
 	}
 	return js
+}
+
+func canonicalizeKeyThumbprints(v *jose.JSONWebKey) jose.JSONWebKey {
+	if len(v.CertificateThumbprintSHA1) == 0 {
+		v.CertificateThumbprintSHA1 = nil
+	}
+	if len(v.CertificateThumbprintSHA256) == 0 {
+		v.CertificateThumbprintSHA256 = nil
+	}
+	return *v
 }
 
 func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
@@ -85,11 +89,22 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 		time.Sleep(time.Second * 2)
 
 		First(pub).KeyID = "new-key-id:" + suffix
+		First(pub).Use = "sig"
 		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
+		got, err = m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
 		require.NoError(t, err)
+		newKey := First(got.Keys)
+		assert.EqualValues(t, "sig", newKey.Use)
+
+		newKey.Use = "enc"
+		err = m.UpdateKey(context.TODO(), algo+"faz", newKey)
+		require.NoError(t, err)
+		updated, err := m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
+		require.NoError(t, err)
+		updatedKey := First(updated.Keys)
+		assert.EqualValues(t, "enc", updatedKey.Use)
 
 		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
 		require.NoError(t, err)
@@ -121,6 +136,16 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
 		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
 
+		for i, _ := range got.Keys {
+			got.Keys[i].Use = "enc"
+		}
+		err = m.UpdateKeySet(context.TODO(), algo+"bar", got)
+		require.NoError(t, err)
+		updated, err := m.GetKeySet(context.TODO(), algo+"bar")
+		require.NoError(t, err)
+		assert.EqualValues(t, "enc", First(updated.Key("public:"+suffix)).Use)
+		assert.EqualValues(t, "enc", First(updated.Key("private:"+suffix)).Use)
+
 		err = m.DeleteKeySet(context.TODO(), algo+"bar")
 		require.NoError(t, err)
 
@@ -129,24 +154,27 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 	}
 }
 
-func TestHelperManagerGenerateKeySet(m Manager) func(t *testing.T) {
+func TestHelperManagerGenerateKeySet(m Manager, alg string) func(t *testing.T) {
 	return func(t *testing.T) {
 		_, err := m.GetKeySet(context.TODO(), "foo")
 		require.Error(t, err)
 
-		_, err = m.GenerateKeySet(context.TODO(), "foo", "bar", "RS128", "sig")
-		require.Error(t, err, "Unsupported key algorithm")
-
-		_, err = m.GetKeySet(context.TODO(), "foo")
-		require.Error(t, err)
-
-		keys, err := m.GenerateKeySet(context.TODO(), "foo", "bar", "RS256", "sig")
+		keys, err := m.GenerateKeySet(context.TODO(), "foo", "bar", alg, "sig")
+		require.NoError(t, err)
+		genPub, err := FindPublicKey(keys)
+		require.NoError(t, err)
+		genPriv, err := FindPrivateKey(keys)
 		require.NoError(t, err)
 
 		got, err := m.GetKeySet(context.TODO(), "foo")
 		require.NoError(t, err)
-		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:bar")), canonicalizeThumbprints(got.Key("public:bar")))
-		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:bar")), canonicalizeThumbprints(got.Key("private:bar")))
+		gotPub, err := FindPublicKey(got)
+		require.NoError(t, err)
+		gotPriv, err := FindPrivateKey(got)
+		require.NoError(t, err)
+
+		assert.Equal(t, canonicalizeKeyThumbprints(genPub), canonicalizeKeyThumbprints(gotPub))
+		assert.Equal(t, canonicalizeKeyThumbprints(genPriv), canonicalizeKeyThumbprints(gotPriv))
 
 		err = m.DeleteKeySet(context.TODO(), "foo")
 		require.NoError(t, err)

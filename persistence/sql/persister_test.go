@@ -1,7 +1,10 @@
 package sql_test
 
 import (
+	"context"
 	"testing"
+
+	"github.com/pkg/errors"
 
 	"github.com/pborman/uuid"
 	"github.com/stretchr/testify/assert"
@@ -74,6 +77,12 @@ func TestManagers(t *testing.T) {
 					}
 				})
 			}
+
+			t.Run("TestManagerGenerateKeySetWithUnsupportedKeyGenerator", func(t *testing.T) {
+				_, err := m.KeyManager().GenerateKeySet(context.TODO(), "foo", "bar", "UNKNOWN", "sig")
+				require.Error(t, err)
+				assert.IsType(t, errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm), err)
+			})
 		})
 	}
 }

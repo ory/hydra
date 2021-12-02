@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/pborman/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal/testhelpers"
@@ -42,24 +43,37 @@ func TestManagers(t *testing.T) {
 		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(m.Config(), m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
 
 		t.Run("package=jwk/manager="+k, func(t *testing.T) {
-			testGenerators := new(driver.RegistryBase).KeyGenerators()
-			for algo, testGenerator := range testGenerators {
-				t.Run("TestManagerKey", func(t *testing.T) {
-					ks, err := testGenerator.Generate("TestManagerKey", "sig")
-					require.NoError(t, err)
+			keyGenerators := new(driver.RegistryBase).KeyGenerators()
+			assert.Equalf(t, 6, len(keyGenerators), "Test for key generator is not implemented")
 
-					jwk.TestHelperManagerKey(m.KeyManager(), algo, ks, uuid.New())
-				})
-
-				t.Run("TestManagerKeySet", func(t *testing.T) {
-					ks, err := testGenerator.Generate("TestManagerKeySet", "sig")
-					require.NoError(t, err)
-					ks.Key("private")
-
-					jwk.TestHelperManagerKeySet(m.KeyManager(), algo, ks, uuid.New())
+			for _, tc := range []struct {
+				keyGenerator jwk.KeyGenerator
+				alg          string
+				skip         bool
+			}{
+				{keyGenerator: keyGenerators["RS256"], alg: "RS256", skip: false},
+				{keyGenerator: keyGenerators["ES256"], alg: "ES256", skip: false},
+				{keyGenerator: keyGenerators["ES512"], alg: "ES512", skip: false},
+				{keyGenerator: keyGenerators["HS256"], alg: "HS256", skip: true},
+				{keyGenerator: keyGenerators["HS512"], alg: "HS512", skip: true},
+				{keyGenerator: keyGenerators["EdDSA"], alg: "EdDSA", skip: m.Config().HsmEnabled()},
+			} {
+				t.Run("key_generator="+tc.alg, func(t *testing.T) {
+					if tc.skip {
+						t.Skipf("Skipping test. Not applicable for alg: %s", tc.alg)
+					}
+					if m.Config().HsmEnabled() {
+						t.Run("TestManagerGenerateKeySet", jwk.TestHelperManagerGenerateKeySet(m.KeyManager(), tc.alg))
+					} else {
+						kid := uuid.New()
+						ks, err := tc.keyGenerator.Generate(kid, "sig")
+						require.NoError(t, err)
+						t.Run("TestManagerKey", jwk.TestHelperManagerKey(m.KeyManager(), tc.alg, ks, kid))
+						t.Run("TestManagerKeySet", jwk.TestHelperManagerKeySet(m.KeyManager(), tc.alg, ks, kid))
+						t.Run("TestManagerGenerateKeySet", jwk.TestHelperManagerGenerateKeySet(m.KeyManager(), tc.alg))
+					}
 				})
 			}
-			t.Run("TestManagerGenerateKeySet", jwk.TestHelperManagerGenerateKeySet(m.KeyManager()))
 		})
 	}
 }

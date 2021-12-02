@@ -379,7 +379,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 }
 
 func (m *RegistryBase) AccessTokenJWTStrategy() jwk.JWTStrategy {
-	if m.atjs == nil && m.C.IsUsingJWTAsAccessTokens() {
+	if m.atjs == nil {
 		m.atjs = m.newKeyStrategy(x.OAuth2JWTKeyName)
 	}
 	return m.atjs

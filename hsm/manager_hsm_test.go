@@ -13,6 +13,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/x/configx"
+	"github.com/ory/x/logrusx"
+
 	"github.com/ThalesIgnite/crypto11"
 	"github.com/golang/mock/gomock"
 	"github.com/miekg/pkcs11"
@@ -26,6 +32,24 @@ import (
 	"github.com/ory/hydra/hsm"
 	"github.com/ory/hydra/x"
 )
+
+func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockHsmContext := NewMockContext(ctrl)
+	defer ctrl.Finish()
+	l := logrusx.New("", "")
+	c := config.MustNew(l, configx.SkipValidation())
+	c.MustSet(config.KeyDSN, "memory")
+	c.MustSet(config.HsmEnabled, "true")
+	reg := driver.NewRegistrySQL()
+	reg.WithLogger(l)
+	reg.WithConfig(c)
+	reg.WithHsmContext(mockHsmContext)
+	err := reg.Init(context.Background())
+	assert.NoError(t, err)
+	assert.IsType(t, &hsm.KeyManager{}, reg.KeyManager())
+	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
+}
 
 func TestKeyManager_GenerateKeySet(t *testing.T) {
 	ctrl := gomock.NewController(t)

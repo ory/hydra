@@ -488,6 +488,10 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	return m.arhs
 }
 
+func (m *RegistryBase) WithHsmContext(h hsm.Context) {
+	m.hsm = h
+}
+
 func (m *RegistryBase) HsmContext() hsm.Context {
 	if m.hsm == nil {
 		m.hsm = hsm.NewContext(m.C, m.l)

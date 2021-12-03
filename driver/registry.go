@@ -3,6 +3,8 @@ package driver
 import (
 	"context"
 
+	"github.com/ory/hydra/hsm"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/errorsx"
@@ -58,6 +60,7 @@ type Registry interface {
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
 	WithOAuth2Provider(f fosite.OAuth2Provider)
 	WithConsentStrategy(c consent.Strategy)
+	WithHsmContext(h hsm.Context)
 }
 
 func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger) (Registry, error) {

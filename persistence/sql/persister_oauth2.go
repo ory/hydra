@@ -429,10 +429,10 @@ func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, requ
 		return errors.WithStack(err)
 	}
 
+	requesterSession := requester.GetSession()
 	if ! inGracePeriod {
-		session := requester.GetSession()
-		session.SetExpiresAt(fosite.RefreshToken, time.Now().UTC().Add(gracePeriod))
-		if err = p.updateRefreshSession(ctx, requestId, session, true); err != nil {
+		requesterSession.SetExpiresAt(fosite.RefreshToken, time.Now().UTC().Add(gracePeriod))
+		if err = p.updateRefreshSession(ctx, requestId, requesterSession, true); err != nil {
 			p.l.Errorf("failed to update session with signature: %s", signature)
 			return errors.WithStack(err)
 		}

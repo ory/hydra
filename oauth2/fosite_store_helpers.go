@@ -25,6 +25,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/url"
+	"reflect"
 	"testing"
 	"time"
 
@@ -412,6 +413,15 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 
 func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
 
+	setConfig := func(registry InternalRegistry, key string, value interface{}){
+		r := reflect.ValueOf(registry)
+		updateConfig := r.MethodByName("SetConfig")
+		updateConfig.Call([]reflect.Value{
+			reflect.ValueOf(key),
+			reflect.ValueOf(value),
+		})
+	}
+
 	return func(t *testing.T) {
 		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
 			// SETUP
@@ -424,49 +434,45 @@ func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *te
 
 			// ACT
 			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)
-
-			// ASSERT
 			assert.NoError(t, err)
 
 			tmpSession := new(fosite.Session)
 			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
 
+			// ASSERT
 			// a revoked refresh token returns an error when getting the token again
 			assert.Error(t, err)
 			assert.True(t, errors.Is(err, fosite.ErrInactiveToken))
 		})
 
+
 		t.Run("refresh token enters grace period when configured,", func(t *testing.T) {
 
-			/* TODO: figure out how to change config values and get a new/udpated OAuth2Storage instance
 			// SETUP
-			log := logrusx.New("testGracePeriod", "na")
-			option := configx.WithValue("oauth2.refresh_token_rotation.grace_period", "1m")
-			c := config.MustNew(log, option)
+			setConfig(x, "oauth2.refresh_token_rotation.grace_period", "1m")
 
-			//TODO make m := OAuth2Storage
+			// always reset back to the default
+			defer setConfig(x, "oauth2.refresh_token_rotation.grace_period", "0m")
 
 			ctx := context.Background()
+			m := x.OAuth2Storage()
 
-			refreshTokenSession := fmt.Sprintf("refresh_token_%d", time.Now().Unix())
+			refreshTokenSession := fmt.Sprintf("refresh_token_%d_with_grace_period", time.Now().Unix())
 			err := m.CreateRefreshTokenSession(ctx, refreshTokenSession, &defaultRequest)
 			assert.NoError(t, err, "precondition failed: could not create refresh token session")
 
 			// ACT
 			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx,defaultRequest.GetID(), refreshTokenSession)
 
-			// ASSERT
 			assert.NoError(t, err)
 
 			tmpSession := new(fosite.Session)
 			_, err = m.GetRefreshTokenSession(ctx, refreshTokenSession, *tmpSession)
 
+			// ASSERT
 			// when grace period is configured the refresh token can be obtained within
 			// the grace period without error
 			assert.NoError(t, err)
-
-			registry.WithConfig(oldConfig)
-			*/
 		})
 	}
 

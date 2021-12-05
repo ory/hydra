@@ -13,6 +13,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/ory/hydra/jwk"
+
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/persistence/sql"
@@ -83,6 +85,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 		args       args
 		want       *jose.JSONWebKeySet
 		wantErrMsg string
+		wantErr    error
 	}{
 		{
 			name: "Generate RS256",
@@ -101,6 +104,22 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			want: expectedKeySet(rsaKeyPair, kid, "RS256", "sig"),
 		},
 		{
+			name: "Generate RS256 with GenerateRSAKeyPairWithAttributes Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+				alg: "RS256",
+				use: "sig",
+			},
+			setup: func(t *testing.T) {
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
+				hsmContext.EXPECT().GenerateRSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(4096)).Return(nil, errors.New("GenerateRSAKeyPairWithAttributesError"))
+			},
+			wantErrMsg: "GenerateRSAKeyPairWithAttributesError",
+		},
+		{
 			name: "Generate ES256",
 			args: args{
 				ctx: context.TODO(),
@@ -115,6 +134,22 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P256())).Return(ecdsaKeyPair, nil)
 			},
 			want: expectedKeySet(ecdsaKeyPair, kid, "ES256", "sig"),
+		},
+		{
+			name: "Generate ES256 with GenerateECDSAKeyPairWithAttributes Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+				alg: "ES256",
+				use: "sig",
+			},
+			setup: func(t *testing.T) {
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
+				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P256())).Return(nil, errors.New("GenerateECDSAKeyPairWithAttributesError"))
+			},
+			wantErrMsg: "GenerateECDSAKeyPairWithAttributesError",
 		},
 		{
 			name: "Generate ES512",
@@ -133,6 +168,22 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			want: expectedKeySet(ecdsaKeyPair, kid, "ES512", "sig"),
 		},
 		{
+			name: "Generate ES512 GenerateECDSAKeyPairWithAttributes Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+				alg: "ES512",
+				use: "sig",
+			},
+			setup: func(t *testing.T) {
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
+				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P521())).Return(nil, errors.New("GenerateECDSAKeyPairWithAttributesError"))
+			},
+			wantErrMsg: "GenerateECDSAKeyPairWithAttributesError",
+		},
+		{
 			name: "Generate unsupported",
 			args: args{
 				ctx: context.TODO(),
@@ -144,7 +195,21 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErrMsg: "Unsupported key algorithm",
+			wantErr: errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm),
+		},
+		{
+			name: "Generate with FindKeyPair Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+				alg: "RS256",
+				use: "sig",
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, errors.New("FindKeyPairError"))
+			},
+			wantErrMsg: "FindKeyPairError",
 		},
 	}
 	for _, tt := range tests {
@@ -154,8 +219,12 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 				Context: hsmContext,
 			}
 			got, err := m.GenerateKeySet(tt.args.ctx, tt.args.set, tt.args.kid, tt.args.alg, tt.args.use)
-			if len(tt.wantErrMsg) != 0 {
-				require.Error(t, err, tt.wantErrMsg)
+			if tt.wantErr != nil {
+				require.Nil(t, got)
+				require.IsType(t, tt.wantErr, err)
+			} else if len(tt.wantErrMsg) != 0 {
+				require.Nil(t, got)
+				require.EqualError(t, err, tt.wantErrMsg)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -203,6 +272,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 		args       args
 		want       *jose.JSONWebKeySet
 		wantErrMsg string
+		wantErr    error
 	}{
 		{
 			name: "Get RS256 sig",
@@ -239,7 +309,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			},
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(rsaKeyPair, nil)
-				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, errors.New(""))
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, errors.New("GetAttributeError"))
 			},
 			want: expectedKeySet(rsaKeyPair, kid, "RS256", "sig"),
 		},
@@ -305,7 +375,19 @@ func TestKeyManager_GetKey(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErrMsg: "Unable to locate the requested resource",
+			wantErrMsg: "Not Found",
+		},
+		{
+			name: "FindKeyPair Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, errors.New("FindKeyPairError"))
+			},
+			wantErrMsg: "FindKeyPairError",
 		},
 		{
 			name: "Unsupported elliptic curve",
@@ -317,7 +399,7 @@ func TestKeyManager_GetKey(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(ecdsaP224KeyPair, nil)
 			},
-			wantErrMsg: "Unsupported elliptic curve",
+			wantErr: errors.WithStack(jwk.ErrUnsupportedEllipticCurve),
 		},
 	}
 	for _, tt := range tests {
@@ -327,8 +409,12 @@ func TestKeyManager_GetKey(t *testing.T) {
 				Context: hsmContext,
 			}
 			got, err := m.GetKey(tt.args.ctx, tt.args.set, tt.args.kid)
-			if len(tt.wantErrMsg) != 0 {
-				require.Error(t, err, tt.wantErrMsg)
+			if tt.wantErr != nil {
+				require.Nil(t, got)
+				require.IsType(t, tt.wantErr, err)
+			} else if len(tt.wantErrMsg) != 0 {
+				require.Nil(t, got)
+				require.EqualError(t, err, tt.wantErrMsg)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -384,6 +470,7 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 		args       args
 		want       *jose.JSONWebKeySet
 		wantErrMsg string
+		wantErr    error
 	}{
 		{
 			name: "With multiple keys per set",
@@ -403,6 +490,18 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 			want: &jose.JSONWebKeySet{Keys: keys},
 		},
 		{
+			name: "GetCkaIdAttributeError Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(allKeys, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaId)).Return(nil, errors.New("GetCkaIdAttributeError"))
+			},
+			wantErrMsg: "GetCkaIdAttributeError",
+		},
+		{
 			name: "Key set not found",
 			args: args{
 				ctx: context.TODO(),
@@ -411,7 +510,18 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErrMsg: "Unable to locate the requested resource",
+			wantErrMsg: "Not Found",
+		},
+		{
+			name: "FindKeyPairs Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, errors.New("FindKeyPairsError"))
+			},
+			wantErrMsg: "FindKeyPairsError",
 		},
 		{
 			name: "Unsupported elliptic curve",
@@ -423,7 +533,21 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return([]crypto11.Signer{ecdsaP224KeyPair}, nil)
 				hsmContext.EXPECT().GetAttribute(gomock.Eq(ecdsaP224KeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(ecdsaP224Kid)), nil)
 			},
-			wantErrMsg: "Unsupported elliptic curve",
+			wantErr: errors.WithStack(jwk.ErrUnsupportedEllipticCurve),
+		},
+		{
+			name: "Invalid key type Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+			},
+			setup: func(t *testing.T) {
+				keyPair := NewMockSignerDecrypter(ctrl)
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return([]crypto11.Signer{keyPair}, nil)
+				hsmContext.EXPECT().GetAttribute(gomock.Eq(keyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(rsaKid)), nil)
+				keyPair.EXPECT().Public().Return(nil).Times(1)
+			},
+			wantErr: errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm),
 		},
 	}
 	for _, tt := range tests {
@@ -433,8 +557,12 @@ func TestKeyManager_GetKeySet(t *testing.T) {
 				Context: hsmContext,
 			}
 			got, err := m.GetKeySet(tt.args.ctx, tt.args.set)
-			if len(tt.wantErrMsg) != 0 {
-				require.Error(t, err, tt.wantErrMsg)
+			if tt.wantErr != nil {
+				require.Nil(t, got)
+				require.IsType(t, tt.wantErr, err)
+			} else if len(tt.wantErrMsg) != 0 {
+				require.Nil(t, got)
+				require.EqualError(t, err, tt.wantErrMsg)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
@@ -486,7 +614,32 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErrMsg: "Unable to locate the requested resource",
+			wantErrMsg: "Not Found",
+		},
+		{
+			name: "FindKeyPair Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, errors.New("FindKeyPairError"))
+			},
+			wantErrMsg: "FindKeyPairError",
+		},
+		{
+			name: "Delete Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+				kid: kid,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(rsaKeyPair, nil)
+				rsaKeyPair.EXPECT().Delete().Return(errors.New("DeleteError"))
+			},
+			wantErrMsg: "DeleteError",
 		},
 	}
 	for _, tt := range tests {
@@ -496,7 +649,7 @@ func TestKeyManager_DeleteKey(t *testing.T) {
 				Context: hsmContext,
 			}
 			if err := m.DeleteKey(tt.args.ctx, tt.args.set, tt.args.kid); len(tt.wantErrMsg) != 0 {
-				require.Error(t, err, tt.wantErrMsg)
+				require.EqualError(t, err, tt.wantErrMsg)
 			}
 		})
 	}
@@ -542,7 +695,30 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 			setup: func(t *testing.T) {
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 			},
-			wantErrMsg: "Unable to locate the requested resource",
+			wantErrMsg: "Not Found",
+		},
+		{
+			name: "FindKeyPairs Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, errors.New("FindKeyPairsError"))
+			},
+			wantErrMsg: "FindKeyPairsError",
+		},
+		{
+			name: "Delete Error",
+			args: args{
+				ctx: context.TODO(),
+				set: x.OpenIDConnectKeyName,
+			},
+			setup: func(t *testing.T) {
+				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(allKeys, nil)
+				rsaKeyPair1.EXPECT().Delete().Return(errors.New("DeleteError"))
+			},
+			wantErrMsg: "DeleteError",
 		},
 	}
 	for _, tt := range tests {
@@ -552,7 +728,7 @@ func TestKeyManager_DeleteKeySet(t *testing.T) {
 				Context: hsmContext,
 			}
 			if err := m.DeleteKeySet(tt.args.ctx, tt.args.set); len(tt.wantErrMsg) != 0 {
-				require.Error(t, err, tt.wantErrMsg)
+				require.EqualError(t, err, tt.wantErrMsg)
 			}
 		})
 	}

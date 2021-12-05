@@ -78,7 +78,7 @@
           {
             "type": "integer",
             "format": "int64",
-            "description": "The maximum amount of policies returned, upper bound is 500 policies",
+            "description": "The maximum amount of clients to returned, upper bound is 500 clients.",
             "name": "limit",
             "in": "query"
           },
@@ -87,6 +87,18 @@
             "format": "int64",
             "description": "The offset from where to start looking.",
             "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "The name of the clients to filter by.",
+            "name": "client_name",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "The owner of the clients to filter by.",
+            "name": "owner",
             "in": "query"
           }
         ],
@@ -699,7 +711,7 @@
       "get": {
         "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4434\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
         "produces": ["plain/text"],
-        "tags": ["admin"],
+        "tags": ["metadata"],
         "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
         "operationId": "prometheus",
         "responses": {
@@ -2211,6 +2223,9 @@
           "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
         },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
         },
@@ -2252,6 +2267,9 @@
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
+        },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "challenge": {
           "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -2374,7 +2392,7 @@
       "required": ["alg", "use", "kid"],
       "properties": {
         "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"",
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
           "type": "string"
         },
         "kid": {

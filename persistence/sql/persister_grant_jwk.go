@@ -188,7 +188,7 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 	}
 }
 
-func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time) error {
+func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 	deleteUntil := time.Now().UTC()
 	if deleteUntil.After(notAfter) {
 		deleteUntil = notAfter

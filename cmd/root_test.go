@@ -123,6 +123,7 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "delete", "--skip-tls-verify", "--endpoint", backend, "foo"}},
 		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
 		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
+		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
 		{args: []string{"token", "revoke", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
 		{args: []string{"token", "client", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
 		{args: []string{"help", "migrate", "sql"}},

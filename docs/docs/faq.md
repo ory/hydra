@@ -11,9 +11,24 @@ find an outdated section, please create a PR which removes or updates it!**
 
 <!-- toc -->
 
+## How to omit consent redirection
+
+From [GitHub](https://github.com/ory/hydra/discussions/2562).
+
+> Is it possible to omit the consent redirection flow (not just skip the UI).
+> After accepting the login, redirect to callback URL with the authorization
+> code directly (no redirect to consent URL at all)?
+
+You can not skip the
+[consent redirection](https://www.ory.sh/hydra/docs/concepts/consent#redirection-to-the-consent-endpoint),
+but you can accept the redirection to the redirect URL immediately. The user
+will not notice as this takes less than < 100ms. The example on how to skip the
+consent screen provides a good starting point:
+[Skipping Consent Screen](https://www.ory.sh/hydra/docs/guides/consent/#skipping-consent-screen).
+
 ## How can I store custom data ?
 
-From [Github](https://github.com/ory/hydra/issues/2333)
+From [Github](https://github.com/ory/hydra/issues/2333).
 
 > How can I store custom data in the client that can be retrieved along with the
 > login request (using the challenge code)? I would like send in some metadata
@@ -111,7 +126,7 @@ Since ORY Hydra 0.8.0, migrations are no longer run automatically on boot. This
 is required in production environments, because:
 
 1. Although SQL migrations are tested, migrating schemas can cause data loss and
-   should only be done consciously with prior back ups.
+   should only be done consciously with prior back-ups.
 2. Running a production system with a user that has right such as ALTER TABLE is
    a security anti-pattern.
 
@@ -258,7 +273,7 @@ Check the logs using `docker logs <container-id>`.
 ## Hydra won't remember my login
 
 Hydra only keeps track of the session if you set the `remember_me` parameter in
-the `accept login request`. Otherwise the login challenge will always instruct
+the `accept login request`. Otherwise, the login challenge will always instruct
 you to show the login UI.
 
 ## Where can I get documentation on running multiple instances of Hydra?
@@ -284,7 +299,7 @@ also some information on collecting statistics in the section on
 Yes - you can configure that in your client. It has things like grant_types
 etc - there you can basically whitelist the flows you need.
 
-## How can i test if my 4445 is running properly?
+## How can I test if my 4445 is running properly?
 
 > I am using ory hydra for authentication. I get a 404 when im trying to create
 > a client on my private EC2 hydra task. Is there a way to test if my 4445 is

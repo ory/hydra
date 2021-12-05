@@ -7,6 +7,25 @@ const path = require('path')
 const fs = require('fs')
 const prettier = require('prettier')
 const prettierStyles = require('ory-prettier-styles')
+const { execSync } = require('child_process')
+const fetch = require('node-fetch')
+
+const oryXVersion = execSync(
+  "cd ..; go list -f '{{.Version}}' -m github.com/ory/x"
+)
+  .toString('utf-8')
+  .trim()
+
+const refs = {
+  'ory://tracing-config': `https://raw.githubusercontent.com/ory/x/${oryXVersion}/tracing/config.schema.json`,
+  'ory://logging-config': `https://raw.githubusercontent.com/ory/x/${oryXVersion}/logrusx/config.schema.json`
+}
+
+const oryResolver = {
+  order: 1,
+  canRead: /^ory:/i,
+  read: ({ url }) => fetch(refs[url]).then((res) => res.json())
+}
 
 jsf.option({
   alwaysFakeOptionals: true,
@@ -124,6 +143,11 @@ const enhance =
 new Promise((resolve, reject) => {
   parser.dereference(
     require(path.resolve(config.updateConfig.src)),
+    {
+      resolve: {
+        ory: oryResolver
+      }
+    },
     (err, result) => (err ? reject(err) : resolve(result))
   )
 })
@@ -196,19 +220,20 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file \`$HOME/.${config.projectSlug}.yaml\` exists, it will be used as a configuration file which supports all
-configuration settings listed below.
-
 You can load the config file from another source using the \`-c path/to/config.yaml\` or \`--config path/to/config.yaml\`
 flag: \`${config.projectSlug} --config path/to/config.yaml\`.
 
 Config files can be formatted as JSON, YAML and TOML. Some configuration values support reloading without server restart.
 All configuration values can be set using environment variables, as documented below.
 
+:::warning Disclaimer
+
 This reference configuration documents all keys, also deprecated ones!
 It is a reference for all possible configuration values.
 
 If you are looking for an example configuration, it is better to try out the quickstart.
+
+:::
 
 To find out more about edge cases like setting string array values through environmental variables head to the
 [Configuring ORY services](https://www.ory.sh/docs/ecosystem/configuring) section.

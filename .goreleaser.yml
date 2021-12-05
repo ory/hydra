@@ -170,7 +170,9 @@ changelog:
 brews:
   - tap:
       owner: ory
-      name: homebrew-hydra
+      name: homebrew-tap
+    name: hydra
+    description: Ory Hydra with SQLite Support
     ids:
       - hydra-sqlite
     homepage:  https://www.ory.sh
@@ -179,6 +181,8 @@ brews:
       email: 3372410+aeneasr@users.noreply.github.com
     install: |
       bin.install "hydra"
+    test: |
+      system "#{bin}/ory version"
 
 scoop:
   bucket:

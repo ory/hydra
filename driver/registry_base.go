@@ -72,6 +72,7 @@ type RegistryBase struct {
 	pmm          *prometheus.MetricsManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
+	arhs         []oauth2.AccessRequestHook
 	buildVersion string
 	buildHash    string
 	buildDate    string
@@ -241,9 +242,11 @@ func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
 	if m.kg == nil {
 		m.kg = map[string]jwk.KeyGenerator{
 			"RS256": &jwk.RS256Generator{},
+			"ES256": &jwk.ECDSA256Generator{},
 			"ES512": &jwk.ECDSA512Generator{},
 			"HS256": &jwk.HS256Generator{},
 			"HS512": &jwk.HS512Generator{},
+			"EdDSA": &jwk.EdDSAGenerator{},
 		}
 	}
 	return m.kg
@@ -456,9 +459,10 @@ func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
 	if m.trc == nil {
 		t, err := tracing.New(m.l, m.C.Tracing())
 		if err != nil {
-			m.Logger().WithError(err).Fatalf("Unable to initialize Tracer.")
+			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
+		} else {
+			m.trc = t
 		}
-		m.trc = t
 	}
 
 	return m.trc
@@ -487,4 +491,13 @@ func (m *RegistryBase) WithOAuth2Provider(f fosite.OAuth2Provider) {
 // WithConsentStrategy forces a consent strategy which is only used for testing.
 func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
 	m.cos = c
+}
+
+func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
+	if m.arhs == nil {
+		m.arhs = []oauth2.AccessRequestHook{
+			oauth2.RefreshTokenHook(m.C),
+		}
+	}
+	return m.arhs
 }

@@ -23,6 +23,7 @@ package jwk
 import (
 	"context"
 	"crypto/ecdsa"
+	"crypto/ed25519"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -120,6 +121,30 @@ func FindKeyByPrefix(set *jose.JSONWebKeySet, prefix string) (key *jose.JSONWebK
 	return First(keys.Keys), nil
 }
 
+func FindPublicKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
+	keys := ExcludePrivateKeys(set)
+	if len(keys.Keys) == 0 {
+		return nil, errors.New("key not found")
+	}
+
+	return First(keys.Keys), nil
+}
+
+func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
+	keys := new(jose.JSONWebKeySet)
+
+	for _, k := range set.Keys {
+		_, ecdsaOk := k.Key.(*ecdsa.PublicKey)
+		_, ed25519OK := k.Key.(ed25519.PublicKey)
+		_, rsaOK := k.Key.(*rsa.PublicKey)
+
+		if ecdsaOk || ed25519OK || rsaOK {
+			keys.Keys = append(keys.Keys, k)
+		}
+	}
+	return keys
+}
+
 func FindKeysByPrefix(set *jose.JSONWebKeySet, prefix string) (*jose.JSONWebKeySet, error) {
 	keys := new(jose.JSONWebKeySet)
 
@@ -146,6 +171,12 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 			return nil, errorsx.WithStack(err)
 		}
 		return &pem.Block{Type: "EC PRIVATE KEY", Bytes: b}, nil
+	case ed25519.PrivateKey:
+		b, err := x509.MarshalPKCS8PrivateKey(k)
+		if err != nil {
+			return nil, errorsx.WithStack(err)
+		}
+		return &pem.Block{Type: "PRIVATE KEY", Bytes: b}, nil
 	default:
 		return nil, errors.New("Invalid key type")
 	}

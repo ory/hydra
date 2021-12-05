@@ -129,7 +129,7 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 	}
 
 	if k, ok := private.Key.(*rsa.PrivateKey); !ok {
-		return errors.New("unable to type assert key to *rsa.PublicKey")
+		return errors.New("unable to type assert key to *rsa.PrivateKey")
 	} else {
 		j.Lock()
 		j.privateKey = k

@@ -79,8 +79,6 @@ type ClientService interface {
 
 	PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth2ClientOK, error)
 
-	Prometheus(params *PrometheusParams) (*PrometheusOK, error)
-
 	RejectConsentRequest(params *RejectConsentRequestParams) (*RejectConsentRequestOK, error)
 
 	RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLoginRequestOK, error)
@@ -1129,47 +1127,6 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for patchOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  Prometheus gets snapshot metrics from the service if you re using k8s you can then add annotations to your deployment like so
-
-  ```
-metadata:
-annotations:
-prometheus.io/port: "4434"
-prometheus.io/path: "/metrics/prometheus"
-```
-*/
-func (a *Client) Prometheus(params *PrometheusParams) (*PrometheusOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewPrometheusParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "prometheus",
-		Method:             "GET",
-		PathPattern:        "/metrics/prometheus",
-		ProducesMediaTypes: []string{"plain/text"},
-		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &PrometheusReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*PrometheusOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for prometheus: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

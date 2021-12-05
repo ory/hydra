@@ -68,6 +68,7 @@ const (
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
+	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
 )
 
 const DSNMemory = "memory"
@@ -376,6 +377,10 @@ func (p *Provider) OAuth2AuthURL() *url.URL {
 
 func (p *Provider) JWKSURL() *url.URL {
 	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
+}
+
+func (p *Provider) TokenRefreshHookURL() *url.URL {
+	return p.p.URIF(KeyRefreshTokenHookURL, nil)
 }
 
 func (p *Provider) AccessTokenStrategy() string {

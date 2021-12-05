@@ -28,7 +28,7 @@ repositories:
 - [Go](https://github.com/ory/hydra-client-go)
 - [Java](https://search.maven.org/artifact/sh.ory.hydra/hydra-client)
 - [JavaScript](https://www.npmjs.com/package/@ory/hydra-client) with TypeScript
-  definitions and compatible with: NodeJS, ReactJS, AnuglarJS, Vue.js, and many
+  definitions and compatible with: NodeJS, ReactJS, AngularJS, Vue.js, and many
   more.
 - [PHP](https://packagist.org/packages/ory/hydra-client)
 - [Python](https://pypi.org/project/ory-hydra-client/)

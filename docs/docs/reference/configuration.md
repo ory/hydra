@@ -7,9 +7,6 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file
-which supports all configuration settings listed below.
-
 You can load the config file from another source using the
 `-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
 `hydra --config path/to/config.yaml`.
@@ -18,11 +15,15 @@ Config files can be formatted as JSON, YAML and TOML. Some configuration values
 support reloading without server restart. All configuration values can be set
 using environment variables, as documented below.
 
+:::warning Disclaimer
+
 This reference configuration documents all keys, also deprecated ones! It is a
 reference for all possible configuration values.
 
 If you are looking for an example configuration, it is better to try out the
 quickstart.
+
+:::
 
 To find out more about edge cases like setting string array values through
 environmental variables head to the
@@ -333,7 +334,7 @@ serve:
   tls:
     ## cert ##
     #
-    # Configures the private key (pem encoded).
+    # Configures the public certificate (pem encoded).
     #
     cert:
       ## path ##
@@ -648,7 +649,7 @@ serve:
     tls:
       ## cert ##
       #
-      # Configures the private key (pem encoded).
+      # Configures the public certificate (pem encoded).
       #
       cert:
         ## path ##
@@ -1209,6 +1210,26 @@ oauth2:
   #
   exclude_not_before_claim: true
 
+  ## allowed_top_level_claims ##
+  #
+  # A list of custom claims which are allowed to be added top level to the Access Token. They cannot override reserved claims.
+  #
+  # Examples:
+  # - - username
+  #   - email
+  #   - user_uuid
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_ALLOWED_TOP_LEVEL_CLAIMS=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_ALLOWED_TOP_LEVEL_CLAIMS=<value>
+  #
+  allowed_top_level_claims:
+    - username
+    - email
+    - user_uuid
+
   ## hashers ##
   #
   # Configures hashing algorithms. Supports only BCrypt at the moment.
@@ -1287,6 +1308,21 @@ oauth2:
     #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_ALLOWED_SCOPE=<value>
     #
     default_grant_allowed_scope: false
+
+  ## refresh_token_hook ##
+  #
+  # Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.
+  #
+  # Examples:
+  # - https://my-example.app/token-refresh-hook
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  #
+  refresh_token_hook: https://my-example.app/token-refresh-hook
 
   ## expose_internal_errors ##
   #
@@ -1501,13 +1537,14 @@ tracing:
 
   ## provider ##
   #
-  # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin and DataDog. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
+  # Set this to the tracing backend you wish to use. Supports Jaeger, Zipkin DataDog, Elastic APM and Instana. If omitted or empty, tracing will be disabled. Use environment variables to configure DataDog (see https://docs.datadoghq.com/tracing/setup/go/#configuration).
   #
   # One of:
   # - jaeger
   # - zipkin
   # - datadog
   # - elastic-apm
+  # - instana
   #
   # Examples:
   # - jaeger

@@ -77,7 +77,7 @@ at rest, this is might only impose a problem if
 
 ### RS256
 
-RSASSA-PKCS1-v1_5 using SHA-256 (RS256) is used to sign JWTs. It’s use is
+RSASSA-PKCS1-v1_5 using SHA-256 (RS256) is used to sign JWTs. Its use is
 recommended by the JWA specification, see
 [https://www.rfc-editor.org/rfc/rfc7518.txt](https://www.rfc-editor.org/rfc/rfc7518.txt)
 

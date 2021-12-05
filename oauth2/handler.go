@@ -531,12 +531,12 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 		fr.NotAfter = time.Now()
 	}
 
-	if err := h.r.OAuth2Storage().FlushInactiveAccessTokens(r.Context(), fr.NotAfter); err != nil {
+	if err := h.r.OAuth2Storage().FlushInactiveAccessTokens(r.Context(), fr.NotAfter, 1000, 100); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	if err := h.r.OAuth2Storage().FlushInactiveRefreshTokens(r.Context(), fr.NotAfter); err != nil {
+	if err := h.r.OAuth2Storage().FlushInactiveRefreshTokens(r.Context(), fr.NotAfter, 1000, 100); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -623,6 +623,14 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			if h.r.AudienceStrategy()(accessRequest.GetClient().GetAudience(), []string{audience}) == nil {
 				accessRequest.GrantAudience(audience)
 			}
+		}
+	}
+
+	for _, hook := range h.r.AccessRequestHooks() {
+		if err := hook(ctx, accessRequest); err != nil {
+			h.logOrAudit(err, r)
+			h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+			return
 		}
 	}
 
@@ -722,6 +730,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		RequestedAt:                         session.RequestedAt,
 		Extra:                               session.Session.IDToken,
 		AuthenticationContextClassReference: session.ConsentRequest.ACR,
+		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
 
 		// These are required for work around https://github.com/ory/fosite/issues/530
 		Nonce:    authorizeRequest.GetRequestForm().Get("nonce"),

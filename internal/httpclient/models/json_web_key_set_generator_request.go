@@ -17,7 +17,7 @@ import (
 // swagger:model jsonWebKeySetGeneratorRequest
 type JSONWebKeySetGeneratorRequest struct {
 
-	// The algorithm to be used for creating the key. Supports "RS256", "ES512", "HS512", and "HS256"
+	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES512", "HS512", and "HS256"
 	// Required: true
 	Alg *string `json:"alg"`
 

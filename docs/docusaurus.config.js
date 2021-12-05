@@ -100,7 +100,7 @@ module.exports = {
     prism: {
       theme: prismThemeLight,
       darkTheme: require('prism-react-renderer/themes/dracula'),
-      additionalLanguages: ['pug', 'shell-session']
+      additionalLanguages: ['json5', 'pug', 'shell-session']
     },
     announcementBar: {
       id: 'supportus',
@@ -110,7 +110,8 @@ module.exports = {
           : `Sign up for <a href="${config.newsletter}">important security announcements</a> and if you like ${config.projectName} give it a ⭐️ on <a target="_blank" rel="noopener noreferrer" href="https://github.com/ory/${githubRepoName}">GitHub</a>!`
     },
     algolia: {
-      apiKey: '8463c6ece843b377565726bb4ed325b0',
+      appId: 'V2EFIWEJ25',
+      apiKey: 'dc6b220f7d2bcd12da60b9cce431d8c5',
       indexName: 'ory',
       contextualSearch: true,
       searchParameters: {

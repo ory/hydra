@@ -214,6 +214,55 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"memory")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Janitor requires at least one of --tokens, --requests or --grants to be set")
+
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s=%s", cli.Limit, "1000"),
+		fmt.Sprintf("--%s=%s", cli.BatchSize, "100"),
+		"memory",
+	)
+
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s=%s", cli.Limit, "0"),
+		"memory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
+
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s=%s", cli.Limit, "-100"),
+		"memory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
+
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s=%s", cli.BatchSize, "0"),
+		"memory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
+
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s=%s", cli.BatchSize, "-100"),
+		"memory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Values for --limit and --batch-size should both be greater than 0")
+
+	_, _, err = cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyRequests),
+		fmt.Sprintf("--%s=%s", cli.Limit, "100"),
+		fmt.Sprintf("--%s=%s", cli.BatchSize, "1000"),
+		"memory")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "Value for --batch-size must not be greater than value for --limit")
 }
 
 func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {

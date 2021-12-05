@@ -13,7 +13,7 @@ type GrantManager interface {
 	DeleteGrant(ctx context.Context, id string) error
 	GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]Grant, error)
 	CountGrants(ctx context.Context) (int, error)
-	FlushInactiveGrants(ctx context.Context, notAfter time.Time) error
+	FlushInactiveGrants(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 }
 
 type SQLData struct {

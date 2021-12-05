@@ -439,7 +439,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 	})
 }
 
-func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time) error {
+func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
 	/* #nosec G201 table is static */
 	var lr consent.LoginRequest
 	var lrh consent.HandledLoginRequest
@@ -447,76 +447,87 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	var cr consent.ConsentRequest
 	var crh consent.HandledConsentRequest
 
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+	// The value of notAfter should be the minimum between input parameter and request max expire based on its configured age
+	requestMaxExpire := time.Now().Add(-p.config.ConsentRequestMaxAge())
+	if requestMaxExpire.Before(notAfter) {
+		notAfter = requestMaxExpire
+	}
 
-		// Delete all entries (and their FK)
-		// where hydra_oauth2_authentication_request were timed-out or rejected
-		// - hydra_oauth2_authentication_request_handled
-		// - hydra_oauth2_consent_request_handled
-		// AND
-		// - hydra_oauth2_authentication_request.requested_at < ttl.login_consent_request
-		// - hydra_oauth2_authentication_request.requested_at < notAfter
+	challenges := []string{}
+	queryFormat := `
+	SELECT %[1]s.challenge
+	FROM %[1]s
+	LEFT JOIN %[2]s ON %[1]s.challenge = %[2]s.challenge
+	WHERE (
+		(%[2]s.challenge IS NULL)
+		OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
+	)
+	AND %[1]s.requested_at < ?
+	ORDER BY %[1]s.challenge
+	LIMIT %[3]d
+	`
 
-		// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
-		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
-		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
-		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
+	// Select challenges from all consent requests that can be safely deleted with limit
+	// where hydra_oauth2_consent_request were unhandled or rejected, so either of these is true
+	// - hydra_oauth2_authentication_request_handled does not exist (unhandled)
+	// - hydra_oauth2_consent_request_handled has valid error (rejected)
+	// AND timed-out
+	// - hydra_oauth2_consent_request.requested_at < minimum between ttl.login_consent_request and notAfter
+	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&cr).TableName(), (&crh).TableName(), limit), notAfter)
 
-		err := p.Connection(ctx).RawQuery(fmt.Sprintf(`
-			DELETE
-			FROM %[1]s
-			WHERE NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[2]s
-				WHERE %[1]s.challenge = %[2]s.challenge AND (%[2]s.error = '{}' OR %[2]s.error = '' OR %[2]s.error is NULL)
-				)
-			AND NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[3]s
-				INNER JOIN %[4]s
-				ON %[3]s.challenge = %[4]s.challenge
-				WHERE %[1]s.challenge = %[3]s.login_challenge AND (%[4]s.error = '{}' OR %[4]s.error = '' OR %[4]s.error is NULL)
-				)
-			AND requested_at < ?
-			AND requested_at < ?
-			`,
-			(&lr).TableName(),
-			(&lrh).TableName(),
-			(&cr).TableName(),
-			(&crh).TableName()),
-			time.Now().Add(-p.config.ConsentRequestMaxAge()),
-			notAfter).Exec()
+	if err := q.All(&challenges); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	}
 
-		if err != nil {
-			return sqlcon.HandleError(err)
+	// Delete in batch consent requests and their references in cascade
+	for i := 0; i < len(challenges); i += batchSize {
+		j := i + batchSize
+		if j > len(challenges) {
+			j = len(challenges)
 		}
 
-		// This query is needed due to the fact that the first query will not delete cascade to the consent tables
-		// This cleans up the consent requests if requests have timed out or been rejected.
+		if i != j {
+			q := p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&cr).TableName()),
+				challenges[i:j],
+			)
 
-		// Using NOT EXISTS instead of LEFT JOIN or NOT IN due to
-		// LEFT JOIN not supported by Postgres and NOT IN will have performance hits with large tables.
-		// https://stackoverflow.com/questions/19363481/select-rows-which-are-not-present-in-other-table/19364694#19364694
-		// Cannot use table aliasing in MYSQL, will work in Postgresql though...
-		err = p.Connection(ctx).RawQuery(
-			fmt.Sprintf(`
-			DELETE
-			FROM %[1]s
-			WHERE NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[2]s
-				WHERE %[1]s.challenge = %[2]s.challenge AND (%[2]s.error = '{}' OR %[2]s.error = '' OR %[2]s.error is NULL)
-				)
-			AND requested_at < ?
-			AND requested_at < ?`,
-				(&cr).TableName(),
-				(&crh).TableName()),
-			time.Now().Add(-p.config.ConsentRequestMaxAge()),
-			notAfter).Exec()
+			if err := q.Exec(); err != nil {
+				return sqlcon.HandleError(err)
+			}
+		}
+	}
 
-		return sqlcon.HandleError(err)
-	})
+	// Select challenges from all authentication requests that can be safely deleted with limit
+	// where hydra_oauth2_authentication_request were unhandled or rejected, so either of these is true
+	// - hydra_oauth2_authentication_request_handled does not exist (unhandled)
+	// - hydra_oauth2_authentication_request_handled has valid error (rejected)
+	// AND timed-out
+	// - hydra_oauth2_authentication_request.requested_at < minimum between ttl.login_consent_request and notAfter
+	q = p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&lr).TableName(), (&lrh).TableName(), limit), notAfter)
+
+	if err := q.All(&challenges); err == sql.ErrNoRows {
+		return errors.Wrap(fosite.ErrNotFound, "")
+	}
+
+	// Delete in batch authentication requests
+	for i := 0; i < len(challenges); i += batchSize {
+		j := i + batchSize
+		if j > len(challenges) {
+			j = len(challenges)
+		}
+
+		if i != j {
+			q := p.Connection(ctx).RawQuery(
+				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
+				challenges[i:j],
+			)
+
+			if err := q.Exec(); err != nil {
+				return sqlcon.HandleError(err)
+			}
+		}
+	}
+
+	return nil
 }

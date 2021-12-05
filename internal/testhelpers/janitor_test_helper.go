@@ -220,6 +220,40 @@ func (j *JanitorConsentTestHelper) LoginRejectionValidate(ctx context.Context, c
 	}
 }
 
+func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
+	return func(t *testing.T) {
+		var err error
+
+		// Create login requests
+		for _, r := range j.flushLoginRequests {
+			require.NoError(t, cl.CreateClient(ctx, r.Client))
+			require.NoError(t, cm.CreateLoginRequest(ctx, r))
+		}
+
+		// Reject each request
+		for _, r := range j.flushLoginRequests {
+			_, err = cm.HandleLoginRequest(ctx, r.ID, consent.NewHandledLoginRequest(
+				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
+			require.NoError(t, err)
+		}
+	}
+}
+
+func (j *JanitorConsentTestHelper) LimitValidate(ctx context.Context, cm consent.Manager) func(t *testing.T) {
+	return func(t *testing.T) {
+		// flush-login-2 and 3 should be cleared now
+		for _, r := range j.flushLoginRequests {
+			t.Logf("check login: %s", r.ID)
+			_, err := cm.GetLoginRequest(ctx, r.ID)
+			if r.ID == j.flushLoginRequests[0].ID {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		}
+	}
+}
+
 func (j *JanitorConsentTestHelper) ConsentRejectionSetup(ctx context.Context, cm consent.Manager, cl client.Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		var err error
@@ -454,7 +488,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 					// run the cleanup routine
 					t.Run("step=cleanup", func(t *testing.T) {
-						require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, notAfter))
+						require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, notAfter, 1000, 100))
 					})
 
 					// validate test
@@ -462,6 +496,23 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 				})
 
 			}
+		})
+
+		t.Run("case=flush-consent-request-limit", func(t *testing.T) {
+			jt := NewConsentJanitorTestHelper("limit")
+
+			t.Run("case=limit", func(t *testing.T) {
+				// setup
+				t.Run("step=setup", jt.LimitSetup(ctx, consentManager, clientManager))
+
+				// cleanup
+				t.Run("step=cleanup", func(t *testing.T) {
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 2, 1))
+				})
+
+				// validate
+				t.Run("step=validate", jt.LimitValidate(ctx, consentManager))
+			})
 		})
 
 		t.Run("case=flush-consent-request-rejection", func(t *testing.T) {
@@ -473,7 +524,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate
@@ -488,7 +539,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate
@@ -507,7 +558,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate
@@ -524,7 +575,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second)))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 1000, 100))
 				})
 
 				// validate

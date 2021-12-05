@@ -20,6 +20,8 @@ import (
 )
 
 const (
+	Limit                  = "limit"
+	BatchSize              = "batch-size"
 	KeepIfYounger          = "keep-if-younger"
 	AccessLifespan         = "access-lifespan"
 	RefreshLifespan        = "refresh-lifespan"
@@ -52,6 +54,17 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) && !flagx.MustGetBool(cmd, OnlyGrants) {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor requires at least one of --tokens, --requests or --grants to be set")
+	}
+
+	limit := flagx.MustGetInt(cmd, Limit)
+	batchSize := flagx.MustGetInt(cmd, BatchSize)
+	if limit <= 0 || batchSize <= 0 {
+		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
+			"Values for --limit and --batch-size should both be greater than 0")
+	}
+	if batchSize > limit {
+		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
+			"Value for --batch-size must not be greater than value for --limit")
 	}
 
 	return nil
@@ -112,6 +125,9 @@ func purge(cmd *cobra.Command, args []string) error {
 
 	p := d.Persister()
 
+	limit := flagx.MustGetInt(cmd, Limit)
+	batchSize := flagx.MustGetInt(cmd, BatchSize)
+
 	var routineFlags []string
 
 	if flagx.MustGetBool(cmd, OnlyTokens) {
@@ -126,7 +142,7 @@ func purge(cmd *cobra.Command, args []string) error {
 		routineFlags = append(routineFlags, OnlyGrants)
 	}
 
-	return cleanupRun(cmd.Context(), notAfter, addRoutine(p, routineFlags...)...)
+	return cleanupRun(cmd.Context(), notAfter, limit, batchSize, addRoutine(p, routineFlags...)...)
 }
 
 func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
@@ -145,11 +161,11 @@ func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
 	return routines
 }
 
-type cleanupRoutine func(ctx context.Context, notAfter time.Time) error
+type cleanupRoutine func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
 
 func cleanup(cr cleanupRoutine, routineName string) cleanupRoutine {
-	return func(ctx context.Context, notAfter time.Time) error {
-		if err := cr(ctx, notAfter); err != nil {
+	return func(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
+		if err := cr(ctx, notAfter, limit, batchSize); err != nil {
 			return errors.Wrap(errorsx.WithStack(err), fmt.Sprintf("Could not cleanup inactive %s", routineName))
 		}
 		fmt.Printf("Successfully completed Janitor run on %s\n", routineName)
@@ -157,13 +173,13 @@ func cleanup(cr cleanupRoutine, routineName string) cleanupRoutine {
 	}
 }
 
-func cleanupRun(ctx context.Context, notAfter time.Time, routines ...cleanupRoutine) error {
+func cleanupRun(ctx context.Context, notAfter time.Time, limit int, batchSize int, routines ...cleanupRoutine) error {
 	if len(routines) == 0 {
 		return errors.New("clean up run received 0 routines")
 	}
 
 	for _, r := range routines {
-		if err := r(ctx, notAfter); err != nil {
+		if err := r(ctx, notAfter, limit, batchSize); err != nil {
 			return err
 		}
 	}

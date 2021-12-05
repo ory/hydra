@@ -7,6 +7,17 @@ title: Milestones and Roadmap
 
 _This milestone does not have a description._
 
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [x] Space character in secret.system value
+      ([hydra#2609](https://github.com/ory/hydra/issues/2609)) -
+      [@Patrik](https://github.com/zepatrik),
+      [@Jakub Błaszczyk](https://github.com/Demonsthere)
+
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
 New feature or request.
@@ -41,18 +52,22 @@ Something is not working.
 
 #### Issues
 
-- [ ] Report expired JWT assertion token to client
-      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [ ] Client allowed_cors_origins not working
       ([hydra#1754](https://github.com/ory/hydra/issues/1754))
 - [x] Slow consent revocation request
       ([hydra#1997](https://github.com/ory/hydra/issues/1997))
+- [x] Report expired JWT assertion token to client
+      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
 - [x] Client update changes it's PK to 0
       ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
       [@Patrik](https://github.com/zepatrik)
 - [x] CORS error with v1.9 on localhost
       ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
       [@hackerman](https://github.com/aeneasr)
+- [x] Invalid json response with get login request
+      ([hydra#2515](https://github.com/ory/hydra/issues/2515))
+- [x] Invalid TLS config after upgrading to 1.10.2
+      ([hydra#2518](https://github.com/ory/hydra/issues/2518))
 
 #### Pull Requests
 
@@ -185,6 +200,8 @@ Something is not working.
 - [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
       response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
       [@hackerman](https://github.com/aeneasr)
+- [ ] Jaeger being unavailable is a fatal error that stops service from starting
+      ([hydra#2642](https://github.com/ory/hydra/issues/2642))
 - [x] Introspection Response: `access_token` and `refresh_token` are not valid
       `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 - [x] RSA key generation is slow on ARM
@@ -212,9 +229,6 @@ New feature or request.
       ([hydra#1404](https://github.com/ory/hydra/issues/1404))
 - [ ] Add oAuth2Client to logoutRequest similar to loginRequest.
       ([hydra#1483](https://github.com/ory/hydra/issues/1483))
-- [ ] Add a way to filter/sort the list of clients
-      ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
-      [@hackerman](https://github.com/aeneasr)
 - [ ] Auth session cannot be prolonged even if the user is active
       ([hydra#1690](https://github.com/ory/hydra/issues/1690))
 - [ ] Rename DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY
@@ -243,6 +257,9 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [x] oauth2: Make cleaning up refresh and authz codes possible
       ([hydra#1130](https://github.com/ory/hydra/issues/1130)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] Add a way to filter/sort the list of clients
+      ([hydra#1485](https://github.com/ory/hydra/issues/1485)) -
       [@hackerman](https://github.com/aeneasr)
 - [x] Remove "not before" claim "nbf" from JWT access token
       ([hydra#1542](https://github.com/ory/hydra/issues/1542))

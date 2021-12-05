@@ -30,4 +30,6 @@ type Registry interface {
 	OpenIDJWTStrategy() jwk.JWTStrategy
 
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
+
+	AccessRequestHooks() []AccessRequestHook
 }

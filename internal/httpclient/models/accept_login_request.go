@@ -21,6 +21,9 @@ type AcceptLoginRequest struct {
 	// to express that, for example, a user authenticated using two factor authentication.
 	Acr string `json:"acr,omitempty"`
 
+	// amr
+	Amr StringSlicePipeDelimiter `json:"amr,omitempty"`
+
 	// context
 	Context JSONRawMessage `json:"context,omitempty"`
 
@@ -61,6 +64,10 @@ type AcceptLoginRequest struct {
 func (m *AcceptLoginRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAmr(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateSubject(formats); err != nil {
 		res = append(res, err)
 	}
@@ -68,6 +75,22 @@ func (m *AcceptLoginRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *AcceptLoginRequest) validateAmr(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Amr) { // not required
+		return nil
+	}
+
+	if err := m.Amr.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amr")
+		}
+		return err
+	}
+
 	return nil
 }
 

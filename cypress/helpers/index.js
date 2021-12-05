@@ -59,15 +59,17 @@ const getClient = (id) =>
 
 export const createGrant = (grant) =>
   cy
-    .request('POST', Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers', JSON.stringify(grant))
+    .request(
+      'POST',
+      Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers',
+      JSON.stringify(grant)
+    )
     .then((response) => {
       const grantID = response.body.id
       getGrant(grantID).then((actual) => {
         if (actual.id !== grantID) {
           return Promise.reject(
-            new Error(
-              `Expected id's to match: ${actual.id} !== ${grantID}`
-            )
+            new Error(`Expected id's to match: ${actual.id} !== ${grantID}`)
           )
         }
         return Promise.resolve(response)
@@ -76,23 +78,32 @@ export const createGrant = (grant) =>
 
 export const getGrant = (grantID) =>
   cy
-    .request('GET', Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers/' + grantID)
+    .request(
+      'GET',
+      Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers/' + grantID
+    )
     .then(({ body }) => body)
 
 export const deleteGrants = () =>
-  cy.request(Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers').then(({ body = [] }) => {
-    ;(body || []).forEach(({ id }) => deleteGrant(id))
-  })
+  cy
+    .request(Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers')
+    .then(({ body = [] }) => {
+      ;(body || []).forEach(({ id }) => deleteGrant(id))
+    })
 
 const deleteGrant = (id) =>
-  cy.request('DELETE', Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers/' + id)
+  cy.request(
+    'DELETE',
+    Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers/' + id
+  )
 
 export const publicJwk = {
-    kid: 'token-service-key',
-    kty: 'RSA',
-    alg: 'RS256',
-    n: 'xbOXL8LDbB8hz4fe6__qpESz5GqX0IjH9lRIywG1xj7_w9UXnds5oZpXp0L4TM7B9j0na6_wIwcnfTlQr1cW3LHJXjzPS19zK5rrvB5eabNhtv4yIyH2DSfkI5J3y0bmfY74_J_rDFtQ1PdpfMzdF5cceYvw05B3Q6naPwPN_86GjOkxBWeBZ1-jL5-7cpbbAfeICjEEBsKDX0j-2ZyKpQ2r4jrxwxDF-J3Xsf6ieRKHggQfG-_xMucz40j7t_s-ttE8LoOm9Mmg0gl6vsfhL9rBvUiW-FLCgCqAKSB9a4JHp4_cgsUUR4TsPrJXTGXDFPoqd63S4ZLkCqOeFLOMUx7zVM_gVyyDIbfXWG2HRt6IbEiU8-A-irw0PtPKKiZ0mue2DT3gbvRJlKpL4RG8Obhlaxzf1eQ9jLx15_DoJt9M8zrK9m99YNRMBeJWwJ-RaUv0odpMkIMawH-ly0IO4Kc6fV2g0PK0f4lBnoHze802Y5SQfN19D3GaL93xlHDTHIsX_q0ICyQzupHjQeFHSa9ku0mA36p40lE3Ejpxjbx1BNAvwozGIE7OuovtUgnaodzpRp5HMrCS5YSGE0LtpTgyEibrG3pA12tSvQW3WDeB8qx4dPBBo917ujdgO23p9ZYm96ohZMUOSR_ItX7n3Q4N6W490YrNgj6c-r9kfWk',
-    e: 'AQAB'
+  kid: 'token-service-key',
+  kty: 'RSA',
+  alg: 'RS256',
+  n:
+    'xbOXL8LDbB8hz4fe6__qpESz5GqX0IjH9lRIywG1xj7_w9UXnds5oZpXp0L4TM7B9j0na6_wIwcnfTlQr1cW3LHJXjzPS19zK5rrvB5eabNhtv4yIyH2DSfkI5J3y0bmfY74_J_rDFtQ1PdpfMzdF5cceYvw05B3Q6naPwPN_86GjOkxBWeBZ1-jL5-7cpbbAfeICjEEBsKDX0j-2ZyKpQ2r4jrxwxDF-J3Xsf6ieRKHggQfG-_xMucz40j7t_s-ttE8LoOm9Mmg0gl6vsfhL9rBvUiW-FLCgCqAKSB9a4JHp4_cgsUUR4TsPrJXTGXDFPoqd63S4ZLkCqOeFLOMUx7zVM_gVyyDIbfXWG2HRt6IbEiU8-A-irw0PtPKKiZ0mue2DT3gbvRJlKpL4RG8Obhlaxzf1eQ9jLx15_DoJt9M8zrK9m99YNRMBeJWwJ-RaUv0odpMkIMawH-ly0IO4Kc6fV2g0PK0f4lBnoHze802Y5SQfN19D3GaL93xlHDTHIsX_q0ICyQzupHjQeFHSa9ku0mA36p40lE3Ejpxjbx1BNAvwozGIE7OuovtUgnaodzpRp5HMrCS5YSGE0LtpTgyEibrG3pA12tSvQW3WDeB8qx4dPBBo917ujdgO23p9ZYm96ohZMUOSR_ItX7n3Q4N6W490YrNgj6c-r9kfWk',
+  e: 'AQAB'
 }
 export const privatePem = `-----BEGIN RSA PRIVATE KEY-----
 MIIJKQIBAAKCAgEAxbOXL8LDbB8hz4fe6//qpESz5GqX0IjH9lRIywG1xj7/w9UX

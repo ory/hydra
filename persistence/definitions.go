@@ -5,8 +5,8 @@ import (
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
-	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/popx"
 

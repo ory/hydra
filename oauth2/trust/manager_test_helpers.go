@@ -151,7 +151,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(m GrantManager) func(t *testing.
 		require.NoError(t, err)
 		assert.Equal(t, 2, count)
 
-		err = m.FlushInactiveGrants(context.TODO(), grant2.ExpiresAt, 1000,100)
+		err = m.FlushInactiveGrants(context.TODO(), grant2.ExpiresAt, 1000, 100)
 		require.NoError(t, err)
 
 		count, err = m.CountGrants(context.TODO())

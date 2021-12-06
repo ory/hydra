@@ -84,10 +84,7 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		}
 
 		if m.C.HsmEnabled() {
-			m.defaultKeyManager, err = hsm.NewKeyManager(m.HsmContext())
-			if err != nil {
-				return err
-			}
+			m.defaultKeyManager = hsm.NewKeyManager(m.HsmContext())
 		} else {
 			m.defaultKeyManager = m.persister
 		}

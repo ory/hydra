@@ -41,10 +41,10 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context) (*KeyManager, error) {
+func NewKeyManager(hsm Context) *KeyManager {
 	return &KeyManager{
 		Context: hsm,
-	}, nil
+	}
 }
 
 func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {

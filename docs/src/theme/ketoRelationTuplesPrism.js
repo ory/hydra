@@ -44,8 +44,7 @@ export default (prism) =>
   (prism.languages['keto-relation-tuples'] = {
     comment: /\/\/.*(\n|$)/,
     'relation-tuple': {
-      pattern:
-        /([^:#@()\n]+:)?([^:#@()\n]+)#([^:#@()\n]+)@?((\(([^:#@()\n]+:)?([^:#@()\n]+)#([^:#@()\n]*)\))|([^:#@()\n]+))/,
+      pattern: /([^:#@()\n]+:)?([^:#@()\n]+)#([^:#@()\n]+)@?((\(([^:#@()\n]+:)?([^:#@()\n]+)#([^:#@()\n]*)\))|([^:#@()\n]+))/,
       inside: {
         namespace,
         object,

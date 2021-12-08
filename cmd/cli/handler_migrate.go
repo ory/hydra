@@ -100,7 +100,10 @@ func (mg migrationGroup) generateSQL(sourceFS fs.FS, target string) error {
 			} else {
 				name = fmt.Sprintf("%s%06d_%s.%s.%s.sql", mg.ID, i, mg.Name, m.Dialect, m.Direction)
 			}
-			os.WriteFile(filepath.Join(target, name), fragment, 0644)
+			dst := filepath.Join(target, name)
+			if err = os.WriteFile(dst, fragment, 0644); err != nil {
+				return errors.WithStack(errors.Errorf("failed to write file %s", dst))
+			}
 		}
 	}
 	return nil
@@ -131,7 +134,11 @@ func parseMigration(filename string) (*migration, error) {
 
 func readMigrations(migrationSourceFS fs.FS, expectedDialects []string) (map[string]*migrationGroup, error) {
 	mgs := make(map[string]*migrationGroup)
-	err := fs.WalkDir(migrationSourceFS, ".", func(p string, d fs.DirEntry, err error) error {
+	err := fs.WalkDir(migrationSourceFS, ".", func(p string, d fs.DirEntry, err2 error) error {
+		if err2 != nil {
+			fmt.Println("Warning: unexpected error " + err2.Error())
+			return nil
+		}
 		if d.IsDir() {
 			return nil
 		}

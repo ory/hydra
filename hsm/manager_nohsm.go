@@ -27,10 +27,10 @@ type KeyManager struct {
 
 var _ jwk.Manager = &KeyManager{}
 
-var ErrOpSysNotSupported = errors.New("Hardware Security Module is not supported on this platform (build tag 'hsm')")
+var ErrOpSysNotSupported = errors.New("Hardware Security Module is not supported on this platform.")
 
 func NewContext(c *config.Provider, l *logrusx.Logger) Context {
-	l.Fatalf("Hardware Security Module is not supported on this platform (build tag 'hsm')")
+	l.Fatalf("Hardware Security Module is not supported on this platform.")
 	return nil
 }
 

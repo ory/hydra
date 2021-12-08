@@ -117,6 +117,11 @@ MIGRATION_TARGETS=$(addprefix $(MIGRATIONS_DST_DIR), $(MIGRATION_NAMES))
 $(MIGRATION_TARGETS): $(MIGRATIONS_DST_DIR)%:
 	go run . migrate gen $(MIGRATIONS_SRC_DIR)$* $(MIGRATIONS_DST_DIR)
 
+MIGRATION_CLEAN_TARGETS=$(addsuffix -clean, $(MIGRATION_TARGETS))
+.PHONY: $(MIGRATION_CLEAN_TARGETS)
+$(MIGRATION_CLEAN_TARGETS): $(MIGRATIONS_DST_DIR)%:
+	find $(MIGRATIONS_DST_DIR) -type f -name $$(echo "$*" | cut -c1-14)* -delete
+
 .PHONY: install-stable
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)

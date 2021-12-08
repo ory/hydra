@@ -170,9 +170,9 @@ type Flow struct {
 	// ConsentSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
 	// consent request using the usual API call.
-	ConsentSkip     bool   `db:"consent_skip"`
-	ConsentVerifier string `db:"consent_verifier"`
-	ConsentCSRF     string `db:"consent_csrf"`
+	ConsentSkip     bool             `db:"consent_skip"`
+	ConsentVerifier sqlxx.NullString `db:"consent_verifier"`
+	ConsentCSRF     sqlxx.NullString `db:"consent_csrf"`
 
 	// GrantedScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
 	GrantedScope sqlxx.StringSlicePipeDelimiter `db:"granted_scope"`
@@ -186,7 +186,7 @@ type Flow struct {
 
 	// ConsentRememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the
 	// authorization will be remembered indefinitely.
-	ConsentRememberFor int `db:"consent_remember_for"`
+	ConsentRememberFor *int `db:"consent_remember_for"`
 
 	// ConsentHandledAt contains the timestamp the consent request was handled.
 	ConsentHandledAt sqlxx.NullTime `db:"consent_handled_at"`
@@ -306,11 +306,15 @@ func (f *Flow) InitializeConsent() error {
 }
 
 func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
+	if time.Time(r.HandledAt).IsZero() {
+		return errors.New("refusing to handle a consent request with null HandledAt")
+	}
+
 	if f.ConsentWasHandled {
 		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
 	}
-	if f.State != FlowStateConsentUnused {
-		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateConsentUnused, f.State)
+	if f.State != FlowStateConsentInitialized && f.State != FlowStateConsentUnused {
+		return errors.Errorf("invalid flow state: expected %d or %d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, f.State)
 	}
 	if f.ConsentChallengeID.String() != r.ID {
 		return errors.Errorf("flow.ConsentChallengeID %s doesn't match HandledConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
@@ -318,12 +322,14 @@ func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
 
 	if r.WasHandled {
 		f.State = FlowStateConsentUsed
+	} else {
+		f.State = FlowStateConsentUnused
 	}
 
 	f.GrantedScope = r.GrantedScope
 	f.GrantedAudience = r.GrantedAudience
 	f.ConsentRemember = r.Remember
-	f.ConsentRememberFor = r.RememberFor
+	f.ConsentRememberFor = &r.RememberFor
 	f.ConsentHandledAt = r.HandledAt
 	f.ConsentWasHandled = r.WasHandled
 	f.ConsentError = r.Error
@@ -366,21 +372,25 @@ func (f *Flow) GetConsentRequest() *consent.ConsentRequest {
 		Context:                f.Context,
 		WasHandled:             f.ConsentWasHandled,
 		ForceSubjectIdentifier: f.ForceSubjectIdentifier,
-		Verifier:               f.ConsentVerifier,
-		CSRF:                   f.ConsentCSRF,
+		Verifier:               f.ConsentVerifier.String(),
+		CSRF:                   f.ConsentCSRF.String(),
 		AuthenticatedAt:        f.LoginAuthenticatedAt,
 		RequestedAt:            f.RequestedAt,
 	}
 }
 
 func (f *Flow) GetHandledConsentRequest() *consent.HandledConsentRequest {
+	crf := 0
+	if f.ConsentRememberFor != nil {
+		crf = *f.ConsentRememberFor
+	}
 	return &consent.HandledConsentRequest{
 		ID:                 f.ConsentChallengeID.String(),
 		GrantedScope:       f.GrantedScope,
 		GrantedAudience:    f.GrantedAudience,
 		Session:            &consent.ConsentRequestSessionData{AccessToken: f.SessionAccessToken, IDToken: f.SessionIDToken},
 		Remember:           f.ConsentRemember,
-		RememberFor:        f.ConsentRememberFor,
+		RememberFor:        crf,
 		HandledAt:          f.ConsentHandledAt,
 		WasHandled:         f.ConsentWasHandled,
 		ConsentRequest:     f.GetConsentRequest(),

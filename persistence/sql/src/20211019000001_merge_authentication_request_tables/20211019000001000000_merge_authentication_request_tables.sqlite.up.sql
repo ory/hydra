@@ -1,3 +1,5 @@
+-- TODO use nulls instead of default values
+-- TODO split the consent initialized state into two states: login used and consent initialized
 CREATE TABLE hydra_oauth2_flow
 (
     login_challenge           VARCHAR(40)  NOT NULL PRIMARY KEY,
@@ -9,10 +11,10 @@ CREATE TABLE hydra_oauth2_flow
     login_skip                INTEGER      NOT NULL,
     client_id                 VARCHAR(255) NOT NULL REFERENCES hydra_client (id) ON DELETE CASCADE,
     requested_at              TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    login_initialized_at      TIMESTAMP    NULL,
     oidc_context              TEXT         NOT NULL,
     login_session_id          VARCHAR(40)  NULL REFERENCES hydra_oauth2_authentication_session (id) ON DELETE CASCADE DEFAULT '',
     requested_at_audience     TEXT         NULL DEFAULT '',
+    login_initialized_at      TIMESTAMP    NULL,
 
     state                     INTEGER      NOT NULL DEFAULT 0,
 
@@ -27,19 +29,19 @@ CREATE TABLE hydra_oauth2_flow
     amr                       TEXT         NULL DEFAULT '',
 
     consent_challenge_id      VARCHAR(40)  NULL,
-    consent_skip              INTEGER      NOT NULL,
-    consent_verifier          VARCHAR(40)  NOT NULL,
-    consent_csrf              VARCHAR(40)  NOT NULL,
+    consent_skip              INTEGER      NULL DEFAULT false,
+    consent_verifier          VARCHAR(40)  NULL,
+    consent_csrf              VARCHAR(40)  NULL,
 
-    granted_scope             TEXT        NOT NULL,
+    granted_scope             TEXT        NULL,
     granted_at_audience       TEXT        NULL DEFAULT '',
-    consent_remember          INTEGER     NOT NULL,
-    consent_remember_for      INTEGER     NOT NULL,
+    consent_remember          INTEGER     NULL DEFAULT 0,
+    consent_remember_for      INTEGER     NULL,
     consent_handled_at        TIMESTAMP   NULL,
-    consent_was_used          INTEGER     NOT NULL,
-    consent_error             TEXT        NOT NULL,
-    session_id_token          TEXT        NOT NULL,
-    session_access_token      TEXT        NOT NULL,
+    consent_was_used          INTEGER     NOT NULL DEFAULT false,
+    consent_error             TEXT        NULL,
+    session_id_token          TEXT        NULL DEFAULT '{}',
+    session_access_token      TEXT        NULL DEFAULT '{}'
 
     CHECK (
         state = 128 OR
@@ -103,6 +105,7 @@ CREATE TABLE hydra_oauth2_flow
 );
 --split
 INSERT INTO hydra_oauth2_flow (
+    state,
     login_challenge,
     requested_scope,
     login_verifier,
@@ -125,8 +128,32 @@ INSERT INTO hydra_oauth2_flow (
     login_was_used,
     forced_subject_identifier,
     context,
-    amr
+    amr,
+
+    consent_challenge_id,
+    consent_verifier,
+    consent_skip,
+    consent_csrf,
+
+    granted_scope,
+    consent_remember,
+    consent_remember_for,
+    consent_error,
+    session_access_token,
+    session_id_token,
+    consent_was_used,
+    granted_at_audience,
+    consent_handled_at
 ) SELECT
+    case
+        when hydra_oauth2_authentication_request_handled.error IS NOT NULL then 128
+        when hydra_oauth2_consent_request_handled.error IS NOT NULL then 129
+        when hydra_oauth2_consent_request_handled.was_used = true then 5
+        when hydra_oauth2_consent_request_handled.challenge IS NOT NULL then 4
+        when hydra_oauth2_authentication_request_handled.was_used = true then 3
+        when hydra_oauth2_authentication_request_handled.was_used IS NOT NULL then 2
+        else 1
+    end,
     hydra_oauth2_authentication_request.challenge,
     hydra_oauth2_authentication_request.requested_scope,
     hydra_oauth2_authentication_request.verifier,
@@ -147,12 +174,32 @@ INSERT INTO hydra_oauth2_flow (
     hydra_oauth2_authentication_request_handled.acr,
     hydra_oauth2_authentication_request_handled.authenticated_at,
     hydra_oauth2_authentication_request_handled.was_used,
-    hydra_oauth2_authentication_request_handled.forced_subject_identifier,
+    coalesce(hydra_oauth2_consent_request.forced_subject_identifier, hydra_oauth2_authentication_request_handled.forced_subject_identifier),
     hydra_oauth2_authentication_request_handled.context,
-    hydra_oauth2_authentication_request_handled.amr
+    hydra_oauth2_authentication_request_handled.amr,
+
+    hydra_oauth2_consent_request.challenge,
+    hydra_oauth2_consent_request.verifier,
+    coalesce(hydra_oauth2_consent_request.skip, false),
+    hydra_oauth2_consent_request.csrf,
+
+    hydra_oauth2_consent_request_handled.granted_scope,
+    coalesce(hydra_oauth2_consent_request_handled.remember, false),
+    hydra_oauth2_consent_request_handled.remember_for,
+    hydra_oauth2_consent_request_handled.error,
+    coalesce(hydra_oauth2_consent_request_handled.session_access_token, '{}'),
+    coalesce(hydra_oauth2_consent_request_handled.session_id_token, '{}'),
+    coalesce(hydra_oauth2_consent_request_handled.was_used, false),
+    hydra_oauth2_consent_request_handled.granted_at_audience,
+    hydra_oauth2_consent_request_handled.handled_at
 FROM hydra_oauth2_authentication_request
 LEFT JOIN hydra_oauth2_authentication_request_handled
-ON hydra_oauth2_authentication_request_handled.challenge = hydra_oauth2_authentication_request_handled.challenge;
+ON hydra_oauth2_authentication_request.challenge = hydra_oauth2_authentication_request_handled.challenge
+LEFT JOIN hydra_oauth2_consent_request
+ON hydra_oauth2_authentication_request.challenge = hydra_oauth2_consent_request.login_challenge
+LEFT JOIN hydra_oauth2_consent_request_handled
+ON hydra_oauth2_consent_request.challenge = hydra_oauth2_consent_request_handled.challenge;
+
 --split
 CREATE INDEX hydra_oauth2_flow_client_id_idx ON hydra_oauth2_flow (client_id);
 --split

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/ory/x/sqlxx"
@@ -24,11 +25,11 @@ import (
 var _ consent.Manager = &Persister{}
 
 func (p *Persister) RevokeSubjectConsentSession(ctx context.Context, user string) error {
-	return p.transaction(ctx, p.revokeConsentSession("subject = ?", user))
+	return p.transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ?", user))
 }
 
 func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error {
-	return p.transaction(ctx, p.revokeConsentSession("subject = ? AND client_id = ?", user, client))
+	return p.transaction(ctx, p.revokeConsentSession("consent_challenge_id IS NOT NULL AND subject = ? AND client_id = ?", user, client))
 }
 
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
@@ -146,7 +147,7 @@ SET
 	consent_csrf = ?
 WHERE login_challenge = ?;
 `,
-		flow.FlowStateConsentUnused,
+		flow.FlowStateConsentInitialized,
 		sqlxx.NullString(req.ID),
 		req.Skip,
 		req.Verifier,
@@ -333,7 +334,16 @@ func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context,
 		f := &flow.Flow{}
 
 		if err := c.
-			Where("subject = ? AND client_id = ? AND consent_skip=FALSE AND (consent_error='{}' AND consent_remember=TRUE)", subject, client).
+			Where(
+				strings.TrimSpace(fmt.Sprintf(`
+(state = %d OR state = %d) AND
+subject = ? AND
+client_id = ? AND
+consent_skip=FALSE AND
+consent_error='{}' AND
+consent_remember=TRUE`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
+				)),
+				subject, client).
 			Order("requested_at DESC").
 			Limit(1).
 			First(f); err != nil {
@@ -354,7 +364,14 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 	c := p.Connection(ctx)
 
 	if err := c.
-		Where("subject = ? AND consent_skip=FALSE AND consent_error='{}'", subject).
+		Where(
+			strings.TrimSpace(fmt.Sprintf(`
+(state = %d OR state = %d) AND
+subject = ? AND
+consent_skip=FALSE AND
+consent_error='{}'`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
+			)),
+			subject).
 		Order("requested_at DESC").
 		Paginate(offset/limit+1, limit).
 		All(&fs); err != nil {
@@ -374,7 +391,14 @@ func (p *Persister) FindSubjectsGrantedConsentRequests(ctx context.Context, subj
 
 func (p *Persister) CountSubjectsGrantedConsentRequests(ctx context.Context, subject string) (int, error) {
 	n, err := p.Connection(ctx).
-		Where("subject = ? AND consent_skip=FALSE AND consent_error='{}'", subject).
+		Where(
+			strings.TrimSpace(fmt.Sprintf(`
+(state = %d OR state = %d) AND
+subject = ? AND
+consent_skip=FALSE AND
+consent_error='{}'`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
+			)),
+			subject).
 		Count(&flow.Flow{})
 	return n, sqlcon.HandleError(err)
 }

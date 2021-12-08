@@ -120,17 +120,18 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		WasHandled:             true,
 	}
 	lr := &consent.LoginRequest{
-		ID:                   fmt.Sprintf("challenge-%04d", i),
-		RequestedScope:       sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_scope-%04d_1", i)},
-		RequestedAudience:    sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_audience-%04d_1", i)},
-		Skip:                 true,
-		Subject:              fmt.Sprintf("subject-%04d", i),
-		OpenIDConnectContext: &consent.OpenIDConnectContext{Display: fmt.Sprintf("display-%04d", i)},
-		RequestURL:           fmt.Sprintf("http://request/%04d", i),
-		SessionID:            sqlxx.NullString(fmt.Sprintf("auth_session-%04d", i)),
-		Verifier:             fmt.Sprintf("verifier-%04d", i),
-		CSRF:                 fmt.Sprintf("csrf-%04d", i),
-		WasHandled:           true,
+		ID:                     fmt.Sprintf("challenge-%04d", i),
+		RequestedScope:         sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_scope-%04d_1", i)},
+		RequestedAudience:      sqlxx.StringSlicePipeDelimiter{fmt.Sprintf("requested_audience-%04d_1", i)},
+		Skip:                   true,
+		Subject:                fmt.Sprintf("subject-%04d", i),
+		OpenIDConnectContext:   &consent.OpenIDConnectContext{Display: fmt.Sprintf("display-%04d", i)},
+		RequestURL:             fmt.Sprintf("http://request/%04d", i),
+		SessionID:              sqlxx.NullString(fmt.Sprintf("auth_session-%04d", i)),
+		ForceSubjectIdentifier: fmt.Sprintf("force_subject_id-%04d", i),
+		Verifier:               fmt.Sprintf("verifier-%04d", i),
+		CSRF:                   fmt.Sprintf("csrf-%04d", i),
+		WasHandled:             true,
 	}
 	ls := &consent.LoginSession{
 		ID:       fmt.Sprintf("auth_session-%04d", i),
@@ -183,13 +184,14 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 	switch i {
 	case 1:
 		cr.ForceSubjectIdentifier = ""
+		lr.ForceSubjectIdentifier = "" // lr must be consistent with cr because the fields are unified in Flow
 
 		hlr.ForceSubjectIdentifier = ""
 
 		fols = nil
 		fallthrough
 	case 2:
-		cr.LoginChallenge = ""
+		// cr.LoginChallenge = "" // commented out because ConsentRequest is now extracted from Flow which always has a LoginChallenge
 		cr.LoginSessionID = ""
 
 		lr.SessionID = ""
@@ -202,7 +204,7 @@ func expectedConsent(i int) (*consent.ConsentRequest, *consent.LoginRequest, *co
 		hcr.GrantedAudience = sqlxx.StringSlicePipeDelimiter{}
 		fallthrough
 	case 4, 5:
-		cr.ACR = ""
+		// cr.ACR = "" commented out because ConsentRequest is now extracted from Flow and the ACR value comes from HandledLoginRequest
 		fallthrough
 	case 6, 7:
 		cr.Context = sqlxx.JSONRawMessage("{}")

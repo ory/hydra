@@ -27,6 +27,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/x"
@@ -183,6 +184,8 @@ func TestGetConsentRequest(t *testing.T) {
 				require.NoError(t, reg.ConsentManager().CreateConsentRequest(context.Background(), &ConsentRequest{
 					Client:         cl,
 					ID:             challenge,
+					Verifier:       challenge,
+					CSRF:           challenge,
 					LoginChallenge: sqlxx.NullString(lr.ID),
 				}))
 
@@ -190,6 +193,7 @@ func TestGetConsentRequest(t *testing.T) {
 					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
+						HandledAt:  sqlxx.NullTime(time.Now()),
 					})
 					require.NoError(t, err)
 				}

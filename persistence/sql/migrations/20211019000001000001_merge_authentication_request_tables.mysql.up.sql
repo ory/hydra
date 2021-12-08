@@ -27,20 +27,20 @@ INSERT INTO hydra_oauth2_flow (
     context,
     amr,
 
-    consent_challenge_id,
-    consent_verifier,
-    consent_skip,
-    consent_csrf,
+    `consent_challenge_id`,
+    `consent_verifier`,
+    `consent_skip`,
+    `consent_csrf`,
 
-    granted_scope,
-    consent_remember,
-    consent_remember_for,
-    consent_error,
-    session_access_token,
-    session_id_token,
-    consent_was_used,
-    granted_at_audience,
-    consent_handled_at
+    `granted_scope`,
+    `consent_remember`,
+    `consent_remember_for`,
+    `consent_error`,
+    `session_access_token`,
+    `session_id_token`,
+    `consent_was_used`,
+    `granted_at_audience`,
+    `consent_handled_at`
 ) SELECT
     case
         when hydra_oauth2_authentication_request_handled.error IS NOT NULL then 128
@@ -71,22 +71,22 @@ INSERT INTO hydra_oauth2_flow (
     hydra_oauth2_authentication_request_handled.acr,
     hydra_oauth2_authentication_request_handled.authenticated_at,
     hydra_oauth2_authentication_request_handled.was_used,
-    coalesce(hydra_oauth2_consent_request.forced_subject_identifier, hydra_oauth2_authentication_request_handled.forced_subject_identifier),
+    hydra_oauth2_authentication_request_handled.forced_subject_identifier,
     hydra_oauth2_authentication_request_handled.context,
     hydra_oauth2_authentication_request_handled.amr,
 
     hydra_oauth2_consent_request.challenge,
     hydra_oauth2_consent_request.verifier,
-    coalesce(hydra_oauth2_consent_request.skip, false),
+    hydra_oauth2_consent_request.skip,
     hydra_oauth2_consent_request.csrf,
 
     hydra_oauth2_consent_request_handled.granted_scope,
-    coalesce(hydra_oauth2_consent_request_handled.remember, false),
+    hydra_oauth2_consent_request_handled.remember,
     hydra_oauth2_consent_request_handled.remember_for,
     hydra_oauth2_consent_request_handled.error,
-    coalesce(hydra_oauth2_consent_request_handled.session_access_token, '{}'),
-    coalesce(hydra_oauth2_consent_request_handled.session_id_token, '{}'),
-    coalesce(hydra_oauth2_consent_request_handled.was_used, false),
+    hydra_oauth2_consent_request_handled.session_access_token,
+    hydra_oauth2_consent_request_handled.session_id_token,
+    hydra_oauth2_consent_request_handled.was_used,
     hydra_oauth2_consent_request_handled.granted_at_audience,
     hydra_oauth2_consent_request_handled.handled_at
 FROM hydra_oauth2_authentication_request
@@ -96,4 +96,3 @@ LEFT JOIN hydra_oauth2_consent_request
 ON hydra_oauth2_authentication_request.challenge = hydra_oauth2_consent_request.login_challenge
 LEFT JOIN hydra_oauth2_consent_request_handled
 ON hydra_oauth2_consent_request.challenge = hydra_oauth2_consent_request_handled.challenge;
-

@@ -84,8 +84,8 @@ INSERT INTO hydra_oauth2_flow (
     coalesce(hydra_oauth2_consent_request_handled.remember, false),
     hydra_oauth2_consent_request_handled.remember_for,
     hydra_oauth2_consent_request_handled.error,
-    coalesce(hydra_oauth2_consent_request_handled.session_access_token, '{}'),
-    coalesce(hydra_oauth2_consent_request_handled.session_id_token, '{}'),
+    coalesce(hydra_oauth2_consent_request_handled.session_access_token, '{}'::text),
+    coalesce(hydra_oauth2_consent_request_handled.session_id_token, '{}'::text),
     coalesce(hydra_oauth2_consent_request_handled.was_used, false),
     hydra_oauth2_consent_request_handled.granted_at_audience,
     hydra_oauth2_consent_request_handled.handled_at

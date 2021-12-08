@@ -45,7 +45,7 @@ func (f *Flow) setHandledLoginRequest(r *consent.HandledLoginRequest) {
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 }
 
-func (f *Flow) setConsentRequest(r *consent.ConsentRequest) {
+func (f *Flow) setConsentRequest(r consent.ConsentRequest) {
 	f.ConsentChallengeID = sqlxx.NullString(r.ID)
 	f.RequestedScope = r.RequestedScope
 	f.RequestedAudience = r.RequestedAudience
@@ -62,18 +62,18 @@ func (f *Flow) setConsentRequest(r *consent.ConsentRequest) {
 	f.Context = r.Context
 	f.ConsentWasHandled = r.WasHandled
 	f.ForceSubjectIdentifier = r.ForceSubjectIdentifier
-	f.ConsentVerifier = r.Verifier
-	f.ConsentCSRF = r.CSRF
+	f.ConsentVerifier = sqlxx.NullString(r.Verifier)
+	f.ConsentCSRF = sqlxx.NullString(r.CSRF)
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
 	f.RequestedAt = r.RequestedAt
 }
 
-func (f *Flow) setHandledConsentRequest(r *consent.HandledConsentRequest) {
+func (f *Flow) setHandledConsentRequest(r consent.HandledConsentRequest) {
 	f.ConsentChallengeID = sqlxx.NullString(r.ID)
 	f.GrantedScope = r.GrantedScope
 	f.GrantedAudience = r.GrantedAudience
 	f.ConsentRemember = r.Remember
-	f.ConsentRememberFor = r.RememberFor
+	f.ConsentRememberFor = &r.RememberFor
 	f.ConsentHandledAt = r.HandledAt
 	f.ConsentWasHandled = r.WasHandled
 	f.ConsentError = r.Error
@@ -177,7 +177,7 @@ func TestFlow_GetConsentRequest(t *testing.T) {
 		f := Flow{}
 		expected := consent.ConsentRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
-		f.setConsentRequest(&expected)
+		f.setConsentRequest(expected)
 		actual := f.GetConsentRequest()
 		assert.Equal(t, expected, *actual)
 	})
@@ -186,13 +186,13 @@ func TestFlow_GetConsentRequest(t *testing.T) {
 func TestFlow_GetHandledConsentRequest(t *testing.T) {
 	t.Run("GetHandledConsentRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}
-		expected := &consent.HandledConsentRequest{}
+		expected := consent.HandledConsentRequest{}
 		assert.NoError(t, faker.FakeData(&expected))
 		expected.Session = &consent.ConsentRequestSessionData{}
 		expected.ConsentRequest = nil
 		f.setHandledConsentRequest(expected)
 		actual := f.GetHandledConsentRequest()
 		actual.ConsentRequest = nil
-		assert.Equal(t, expected, actual)
+		assert.Equal(t, expected, *actual)
 	})
 }

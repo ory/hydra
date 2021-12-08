@@ -91,19 +91,19 @@ func (mr *MockManagerMockRecorder) DeleteKeySet(ctx, set interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteKeySet", reflect.TypeOf((*MockManager)(nil).DeleteKeySet), ctx, set)
 }
 
-// GenerateKeySet mocks base method.
-func (m *MockManager) GenerateKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+// GenerateAndPersistKeySet mocks base method.
+func (m *MockManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GenerateKeySet", ctx, set, kid, alg, use)
+	ret := m.ctrl.Call(m, "GenerateAndPersistKeySet", ctx, set, kid, alg, use)
 	ret0, _ := ret[0].(*jose.JSONWebKeySet)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GenerateKeySet indicates an expected call of GenerateKeySet.
-func (mr *MockManagerMockRecorder) GenerateKeySet(ctx, set, kid, alg, use interface{}) *gomock.Call {
+// GenerateAndPersistKeySet indicates an expected call of GenerateAndPersistKeySet.
+func (mr *MockManagerMockRecorder) GenerateAndPersistKeySet(ctx, set, kid, alg, use interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateKeySet", reflect.TypeOf((*MockManager)(nil).GenerateKeySet), ctx, set, kid, alg, use)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateAndPersistKeySet", reflect.TypeOf((*MockManager)(nil).GenerateAndPersistKeySet), ctx, set, kid, alg, use)
 }
 
 // GetKey mocks base method.

@@ -44,7 +44,7 @@ var ErrUnsupportedEllipticCurve = &fosite.RFC6749Error{
 
 type (
 	Manager interface {
-		GenerateKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error)
+		GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error)
 
 		AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error
 

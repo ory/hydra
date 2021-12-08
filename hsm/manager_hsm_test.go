@@ -53,7 +53,7 @@ func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
 }
 
-func TestKeyManager_GenerateKeySet(t *testing.T) {
+func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
@@ -218,7 +218,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 			m := &hsm.KeyManager{
 				Context: hsmContext,
 			}
-			got, err := m.GenerateKeySet(tt.args.ctx, tt.args.set, tt.args.kid, tt.args.alg, tt.args.use)
+			got, err := m.GenerateAndPersistKeySet(tt.args.ctx, tt.args.set, tt.args.kid, tt.args.alg, tt.args.use)
 			if tt.wantErr != nil {
 				require.Nil(t, got)
 				require.IsType(t, tt.wantErr, err)
@@ -228,7 +228,7 @@ func TestKeyManager_GenerateKeySet(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GenerateKeySet() got = %v, want %v", got, tt.want)
+				t.Errorf("GenerateAndPersistKeySet() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -17,7 +17,7 @@ import (
 
 var _ jwk.Manager = &Persister{}
 
-func (p *Persister) GenerateKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	generator, found := p.r.KeyGenerators()[alg]
 	if !found {
 		return nil, errorsx.WithStack(jwk.ErrUnsupportedKeyAlgorithm)

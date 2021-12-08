@@ -81,7 +81,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		var IDKS *jose.JSONWebKeySet
 
 		if conf.HsmEnabled() {
-			IDKS, _ = reg.KeyManager().GenerateKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
+			IDKS, _ = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
 		} else {
 			IDKS, _ = testGenerator.Generate("test-id-2", "sig")
 			if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {

@@ -66,20 +66,20 @@ func TestManagers(t *testing.T) {
 						t.Skipf("Skipping test. Not applicable for alg: %s", tc.alg)
 					}
 					if m.Config().HsmEnabled() {
-						t.Run("TestManagerGenerateKeySet", jwk.TestHelperManagerGenerateKeySet(m.KeyManager(), tc.alg))
+						t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerGenerateAndPersistKeySet(m.KeyManager(), tc.alg))
 					} else {
 						kid := uuid.New()
 						ks, err := tc.keyGenerator.Generate(kid, "sig")
 						require.NoError(t, err)
 						t.Run("TestManagerKey", jwk.TestHelperManagerKey(m.KeyManager(), tc.alg, ks, kid))
 						t.Run("TestManagerKeySet", jwk.TestHelperManagerKeySet(m.KeyManager(), tc.alg, ks, kid))
-						t.Run("TestManagerGenerateKeySet", jwk.TestHelperManagerGenerateKeySet(m.KeyManager(), tc.alg))
+						t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerGenerateAndPersistKeySet(m.KeyManager(), tc.alg))
 					}
 				})
 			}
 
-			t.Run("TestManagerGenerateKeySetWithUnsupportedKeyGenerator", func(t *testing.T) {
-				_, err := m.KeyManager().GenerateKeySet(context.TODO(), "foo", "bar", "UNKNOWN", "sig")
+			t.Run("TestManagerGenerateAndPersistKeySetWithUnsupportedKeyGenerator", func(t *testing.T) {
+				_, err := m.KeyManager().GenerateAndPersistKeySet(context.TODO(), "foo", "bar", "UNKNOWN", "sig")
 				require.Error(t, err)
 				assert.IsType(t, errors.WithStack(jwk.ErrUnsupportedKeyAlgorithm), err)
 			})

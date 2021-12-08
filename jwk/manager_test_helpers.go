@@ -154,12 +154,12 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 	}
 }
 
-func TestHelperManagerGenerateKeySet(m Manager, alg string) func(t *testing.T) {
+func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string) func(t *testing.T) {
 	return func(t *testing.T) {
 		_, err := m.GetKeySet(context.TODO(), "foo")
 		require.Error(t, err)
 
-		keys, err := m.GenerateKeySet(context.TODO(), "foo", "bar", alg, "sig")
+		keys, err := m.GenerateAndPersistKeySet(context.TODO(), "foo", "bar", alg, "sig")
 		require.NoError(t, err)
 		genPub, err := FindPublicKey(keys)
 		require.NoError(t, err)

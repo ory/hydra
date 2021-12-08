@@ -48,7 +48,7 @@ func TestRS256JWTStrategy(t *testing.T) {
 	reg := internal.NewRegistryMemory(t, conf)
 	m := reg.KeyManager()
 
-	_, err := m.GenerateKeySet(context.TODO(), "foo-set", "foo", "RS256", "sig")
+	_, err := m.GenerateAndPersistKeySet(context.TODO(), "foo-set", "foo", "RS256", "sig")
 	require.NoError(t, err)
 
 	s, err := NewRS256JWTStrategy(*conf, reg, func() string {
@@ -67,7 +67,7 @@ func TestRS256JWTStrategy(t *testing.T) {
 	kidFoo, err := s.GetPublicKeyID(context.TODO())
 	assert.NoError(t, err)
 
-	_, err = m.GenerateKeySet(context.TODO(), "foo-set", "bar", "RS256", "sig")
+	_, err = m.GenerateAndPersistKeySet(context.TODO(), "foo-set", "bar", "RS256", "sig")
 	require.NoError(t, err)
 
 	a, b, err = s.Generate(context.TODO(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})

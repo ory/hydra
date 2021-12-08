@@ -47,7 +47,7 @@ func NewKeyManager(hsm Context) *KeyManager {
 	}
 }
 
-func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+func (m *KeyManager) GenerateAndPersistKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	m.Lock()
 	defer m.Unlock()
 

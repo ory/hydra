@@ -47,7 +47,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 	keys, err := m.GetKeySet(ctx, set)
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
-		keys, err = m.GenerateKeySet(ctx, set, kid, alg, "sig")
+		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
 			return nil, nil, err
 		}
@@ -65,7 +65,7 @@ func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, 
 		} else {
 			r.Logger().Warnf("Private JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
 		}
-		keys, err = m.GenerateKeySet(ctx, set, kid, alg, "sig")
+		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
 			return nil, nil, err
 		}

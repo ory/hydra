@@ -38,7 +38,7 @@ func NewKeyManager(hsm Context) *KeyManager {
 	return nil
 }
 
-func (m *KeyManager) GenerateKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+func (m *KeyManager) GenerateAndPersistKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	return nil, errors.WithStack(ErrOpSysNotSupported)
 }
 

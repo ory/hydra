@@ -197,7 +197,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 	}
 
-	if keys, err := h.r.KeyManager().GenerateKeySet(r.Context(), set, keyRequest.KeyID, keyRequest.Algorithm, keyRequest.Use); err == nil {
+	if keys, err := h.r.KeyManager().GenerateAndPersistKeySet(r.Context(), set, keyRequest.KeyID, keyRequest.Algorithm, keyRequest.Use); err == nil {
 		keys = ExcludeOpaquePrivateKeys(keys)
 		h.r.Writer().WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 	} else {

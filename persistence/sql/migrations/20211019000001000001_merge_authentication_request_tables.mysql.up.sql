@@ -45,10 +45,11 @@ INSERT INTO hydra_oauth2_flow (
     case
         when hydra_oauth2_authentication_request_handled.error IS NOT NULL then 128
         when hydra_oauth2_consent_request_handled.error IS NOT NULL then 129
-        when hydra_oauth2_consent_request_handled.was_used = true then 5
-        when hydra_oauth2_consent_request_handled.challenge IS NOT NULL then 4
+        when hydra_oauth2_consent_request_handled.was_used = true then 6
+        when hydra_oauth2_consent_request_handled.challenge IS NOT NULL then 5
+        when hydra_oauth2_consent_request.challenge IS NOT NULL then 4
         when hydra_oauth2_authentication_request_handled.was_used = true then 3
-        when hydra_oauth2_authentication_request_handled.was_used IS NOT NULL then 2
+        when hydra_oauth2_authentication_request_handled.challenge IS NOT NULL then 2
         else 1
     end,
     hydra_oauth2_authentication_request.challenge,

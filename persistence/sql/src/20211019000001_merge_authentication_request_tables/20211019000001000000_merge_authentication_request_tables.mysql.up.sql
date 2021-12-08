@@ -102,6 +102,20 @@ CREATE TABLE hydra_oauth2_flow
             consent_challenge_id IS NOT NULL AND
             consent_verifier IS NOT NULL AND
             consent_skip IS NOT NULL AND
+            consent_csrf IS NOT NULL
+        )) OR
+        (state = 6 AND (
+            login_remember IS NOT NULL AND
+            login_remember_for IS NOT NULL AND
+            login_error IS NOT NULL AND
+            acr IS NOT NULL AND
+            login_was_used IS NOT NULL AND
+            context IS NOT NULL AND
+            amr IS NOT NULL AND
+
+            consent_challenge_id IS NOT NULL AND
+            consent_verifier IS NOT NULL AND
+            consent_skip IS NOT NULL AND
             consent_csrf IS NOT NULL AND
 
             granted_scope IS NOT NULL AND
@@ -159,10 +173,11 @@ INSERT INTO hydra_oauth2_flow (
     case
         when hydra_oauth2_authentication_request_handled.error IS NOT NULL then 128
         when hydra_oauth2_consent_request_handled.error IS NOT NULL then 129
-        when hydra_oauth2_consent_request_handled.was_used = true then 5
-        when hydra_oauth2_consent_request_handled.challenge IS NOT NULL then 4
+        when hydra_oauth2_consent_request_handled.was_used = true then 6
+        when hydra_oauth2_consent_request_handled.challenge IS NOT NULL then 5
+        when hydra_oauth2_consent_request.challenge IS NOT NULL then 4
         when hydra_oauth2_authentication_request_handled.was_used = true then 3
-        when hydra_oauth2_authentication_request_handled.was_used IS NOT NULL then 2
+        when hydra_oauth2_authentication_request_handled.challenge IS NOT NULL then 2
         else 1
     end,
     hydra_oauth2_authentication_request.challenge,

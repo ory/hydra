@@ -285,7 +285,7 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 			return sqlcon.HandleError(err)
 		}
 
-		if err := f.InitializeConsent(); err != nil {
+		if err := f.InvalidateLoginRequest(); err != nil {
 			return errorsx.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 		}
 
@@ -510,6 +510,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	WHERE (
 		(state = ` + fmt.Sprint(flow.FlowStateLoginInitialized) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateLoginUnused) + `)
+		OR (state = ` + fmt.Sprint(flow.FlowStateLoginUsed) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateConsentInitialized) + `)
 		OR (state = ` + fmt.Sprint(flow.FlowStateConsentUnused) + `)
 		OR (login_error IS NOT NULL AND login_error <> '{}' AND login_error <> '')

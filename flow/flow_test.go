@@ -139,8 +139,8 @@ func TestFlow_HandleLoginRequest(t *testing.T) {
 	)
 }
 
-func TestFlow_InitializeConsent(t *testing.T) {
-	t.Run("InitializeConsent should transition the flow into FlowStateConsentInitialized", func(t *testing.T) {
+func TestFlow_InvalidateLoginRequest(t *testing.T) {
+	t.Run("InvalidateLoginRequest should transition the flow into FlowStateLoginUsed", func(t *testing.T) {
 		f := NewFlow(&consent.LoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",
@@ -151,11 +151,11 @@ func TestFlow_InitializeConsent(t *testing.T) {
 			Subject:    "t3-sub",
 			WasHandled: false,
 		}))
-		assert.NoError(t, f.InitializeConsent())
-		assert.Equal(t, FlowStateConsentInitialized, f.State)
+		assert.NoError(t, f.InvalidateLoginRequest())
+		assert.Equal(t, FlowStateLoginUsed, f.State)
 		assert.Equal(t, true, f.LoginWasUsed)
 	})
-	t.Run("InitializeConsent should fail when flow.WasHandled is true", func(t *testing.T) {
+	t.Run("InvalidateLoginRequest should fail when flow.LoginWasUsed is true", func(t *testing.T) {
 		f := NewFlow(&consent.LoginRequest{
 			ID:         "t3-id",
 			Subject:    "t3-sub",
@@ -166,7 +166,7 @@ func TestFlow_InitializeConsent(t *testing.T) {
 			Subject:    "t3-sub",
 			WasHandled: true,
 		}))
-		err := f.InitializeConsent()
+		err := f.InvalidateLoginRequest()
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "verifier has already been used")
 	})

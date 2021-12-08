@@ -19,20 +19,36 @@ import (
 //
 //graph TD
 //    LOGIN_INITIALIZED --> LOGIN_UNUSED
-//    LOGIN_UNUSED --> CONSENT_INITIALIZED
+//    LOGIN_UNUSED --> LOGIN_USED
 //    LOGIN_UNUSED --> LOGIN_ERROR
+//    LOGIN_USED --> CONSENT_INITIALIZED
 //    CONSENT_INITIALIZED --> CONSENT_UNUSED
 //    CONSENT_UNUSED --> CONSENT_UNUSED
 //    CONSENT_UNUSED --> CONSENT_USED
 //    CONSENT_UNUSED --> CONSENT_ERROR
 const (
-	FlowStateLoginInitialized   = int16(1)
-	FlowStateLoginUnused        = int16(2)
-	FlowStateConsentInitialized = int16(3)
-	FlowStateConsentUnused      = int16(4)
-	FlowStateConsentUsed        = int16(5)
-	FlowStateLoginError         = int16(128)
-	FlowStateConsentError       = int16(129)
+	// FlowStateLoginInitialized applies before the login app either
+	// accepts or rejects the login request.
+	FlowStateLoginInitialized = int16(1)
+
+	// FlowStateLoginUnused indicates that the login has been authenticated, but
+	// the User Agent hasn't picked up the result yet.
+	FlowStateLoginUnused = int16(2)
+
+	// FlowStateLoginUsed indicates that the User Agent is requesting consent and
+	// Hydra has invalidated the login request. This is a short-lived state
+	// because the transition to FlowStateConsentInitialized should happen while
+	// handling the request that triggered the transition to FlowStateLoginUsed.
+	FlowStateLoginUsed = int16(3)
+
+	// FlowStateConsentInitialized applies when a login is completed and Hydra
+	// hasn't received further instructions from the consent app.
+	FlowStateConsentInitialized = int16(4)
+
+	FlowStateConsentUnused = int16(5)
+	FlowStateConsentUsed   = int16(6)
+	FlowStateLoginError    = int16(128)
+	FlowStateConsentError  = int16(129)
 )
 
 // Flow is an abstraction used in the persistence layer to unify LoginRequest
@@ -293,7 +309,7 @@ func (f *Flow) GetLoginRequest() *consent.LoginRequest {
 
 // InitializeConsent shifts the flow state to FlowStateConsentInitialized. This
 // transition is executed upon login completion.
-func (f *Flow) InitializeConsent() error {
+func (f *Flow) InvalidateLoginRequest() error {
 	if f.State != FlowStateLoginUnused {
 		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginUnused, f.State)
 	}
@@ -301,7 +317,7 @@ func (f *Flow) InitializeConsent() error {
 		return errors.New("login verifier has already been used")
 	}
 	f.LoginWasUsed = true
-	f.State = FlowStateConsentInitialized
+	f.State = FlowStateLoginUsed
 	return nil
 }
 

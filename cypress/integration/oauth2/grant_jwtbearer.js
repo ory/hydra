@@ -4,9 +4,6 @@ import {
   deleteGrants,
   deleteClients,
   prng,
-  privatePem,
-  publicJwk,
-  invalidPrivatePem
 } from '../../helpers'
 
 const dayjs = require('dayjs')
@@ -17,11 +14,48 @@ dayjs.extend(isBetween)
 
 const jwt = require('jsonwebtoken')
 
+
+let testPublicJwk;
+let testPrivatePem;
+let invalidtestPrivatePem
+const initTestKeyPairs = async () => {
+  const algorithm = {
+    name: 'RSASSA-PKCS1-v1_5',
+    modulusLength: 2048,
+    publicExponent: new Uint8Array([1, 0, 1]),
+    hash: 'SHA-256',
+  };
+  const keys = await crypto.subtle.generateKey(algorithm, true, ['sign', 'verify']);
+    
+  // public key to jwk
+  const publicJwk = await crypto.subtle.exportKey("jwk", keys.publicKey);
+  publicJwk.kid = 'token-service-key';
+
+  // private key to pem
+  const exportedPK = await crypto.subtle.exportKey("pkcs8", keys.privateKey);
+  const exportedAsBase64 = Buffer.from(exportedPK).toString('base64');
+  const privatePem = `-----BEGIN PRIVATE KEY-----\n${exportedAsBase64}\n-----END PRIVATE KEY-----`;
+
+  // create another private key to test invalid signatures
+  const invalidKeys = await crypto.subtle.generateKey(algorithm, true, ['sign', 'verify']);
+  const invalidPK = await crypto.subtle.exportKey("pkcs8", invalidKeys.privateKey);
+  const invalidAsBase64 = Buffer.from(invalidPK).toString('base64');
+  const invalidPrivatePem = `-----BEGIN PRIVATE KEY-----\n${invalidAsBase64}\n-----END PRIVATE KEY-----`;
+
+  testPublicJwk = publicJwk;
+  testPrivatePem = privatePem;
+  invalidtestPrivatePem = invalidPrivatePem;
+};
+
 describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   beforeEach(() => {
     deleteGrants()
     deleteClients()
-  })
+  });
+
+  before(() => {
+    return cy.wrap(initTestKeyPairs());
+  });
 
   const tokenUrl = `${Cypress.env('public_url')}/oauth2/token`
 
@@ -38,7 +72,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
     issuer: prng(),
     subject: subject,
     scope: ['foo', 'openid', 'offline_access'],
-    jwk: publicJwk,
+    jwk: testPublicJwk,
     expires_at: dayjs().utc().add(1, 'year').set('millisecond', 0).toISOString()
   })
 
@@ -61,7 +95,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
     const grant = gr(prng())
     createGrant(grant)
 
-    const assertion = jwt.sign(jwtAssertion(grant), privatePem, {
+    const assertion = jwt.sign(jwtAssertion(grant), testPrivatePem, {
       algorithm: 'RS256'
     })
 
@@ -95,7 +129,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
     const grant = gr(prng())
     createGrant(grant)
 
-    const assertion = jwt.sign(jwtAssertion(grant), privatePem, {
+    const assertion = jwt.sign(jwtAssertion(grant), testPrivatePem, {
       algorithm: 'RS256'
     })
 
@@ -125,7 +159,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     var ja = jwtAssertion(grant)
     delete ja['jti']
-    const assertion = jwt.sign(ja, privatePem, { algorithm: 'RS256' })
+    const assertion = jwt.sign(ja, testPrivatePem, { algorithm: 'RS256' })
 
     // first token request should work fine
     cy.request({
@@ -155,7 +189,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
     createGrant(grant)
 
     const jwt1 = jwtAssertion(grant)
-    const assertion1 = jwt.sign(jwt1, privatePem, { algorithm: 'RS256' })
+    const assertion1 = jwt.sign(jwt1, testPrivatePem, { algorithm: 'RS256' })
 
     // first token request should work fine
     cy.request({
@@ -182,7 +216,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     const assertion2 = jwt.sign(
       jwtAssertion(grant, { jti: jwt1['jti'] }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 
@@ -215,7 +249,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     var ja = jwtAssertion(grant)
     delete ja['iat']
-    const assertion = jwt.sign(ja, privatePem, {
+    const assertion = jwt.sign(ja, testPrivatePem, {
       algorithm: 'RS256',
       noTimestamp: true
     })
@@ -247,7 +281,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
     const grant = gr(prng())
     createGrant(grant)
 
-    const assertion = jwt.sign(jwtAssertion(grant), invalidPrivatePem, {
+    const assertion = jwt.sign(jwtAssertion(grant), invalidtestPrivatePem, {
       algorithm: 'RS256'
     })
 
@@ -279,7 +313,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     const assertion = jwt.sign(
       jwtAssertion(grant, { sub: 'invalid_subject' }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 
@@ -311,7 +345,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     const assertion = jwt.sign(
       jwtAssertion(grant, { iss: 'invalid_issuer' }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 
@@ -343,7 +377,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     const assertion = jwt.sign(
       jwtAssertion(grant, { aud: 'invalid_audience' }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 
@@ -377,7 +411,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
       jwtAssertion(grant, {
         exp: dayjs().utc().subtract(1, 'minute').set('millisecond', 0).unix()
       }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 
@@ -411,7 +445,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
       jwtAssertion(grant, {
         nbf: dayjs().utc().add(1, 'minute').set('millisecond', 0).unix()
       }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 
@@ -445,7 +479,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
       jwtAssertion(grant, {
         nbf: dayjs().utc().subtract(1, 'minute').set('millisecond', 0).unix()
       }),
-      privatePem,
+      testPrivatePem,
       { algorithm: 'RS256' }
     )
 

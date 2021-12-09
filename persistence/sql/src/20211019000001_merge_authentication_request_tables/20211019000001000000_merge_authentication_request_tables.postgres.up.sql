@@ -1,5 +1,3 @@
--- TODO use nulls instead of default values
--- TODO split the consent initialized state into two states: login used and consent initialized
 CREATE TABLE hydra_oauth2_flow
 (
     login_challenge           character varying(40) NOT NULL,
@@ -16,7 +14,7 @@ CREATE TABLE hydra_oauth2_flow
     requested_at_audience     text DEFAULT ''::text,
     login_initialized_at      timestamp without time zone,
 
-    state                     INTEGER      NOT NULL DEFAULT 0,
+    state                     INTEGER      NOT NULL,
 
     login_remember boolean,
     login_remember_for integer,

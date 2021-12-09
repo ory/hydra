@@ -1,5 +1,3 @@
--- TODO use nulls instead of default values
--- TODO split the consent initialized state into two states: login used and consent initialized
 CREATE TABLE hydra_oauth2_flow
 (
     `login_challenge` varchar(40) NOT NULL,
@@ -15,7 +13,8 @@ CREATE TABLE hydra_oauth2_flow
     `oidc_context` text NOT NULL,
     `login_session_id` varchar(40),
     `requested_at_audience` text NOT NULL,
-    `state` smallint NOT NULL DEFAULT 0,
+
+    `state` smallint NOT NULL,
 
     `login_remember` tinyint(1) NOT NULL,
     `login_remember_for` int(11) NOT NULL,

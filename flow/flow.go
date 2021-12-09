@@ -41,8 +41,8 @@ const (
 	// handling the request that triggered the transition to FlowStateLoginUsed.
 	FlowStateLoginUsed = int16(3)
 
-	// FlowStateConsentInitialized applies when a login is completed and Hydra
-	// hasn't received further instructions from the consent app.
+	// FlowStateConsentInitialized applies while Hydra waits for a consent request
+	// to be accepted or rejected.
 	FlowStateConsentInitialized = int16(4)
 
 	FlowStateConsentUnused = int16(5)
@@ -307,7 +307,7 @@ func (f *Flow) GetLoginRequest() *consent.LoginRequest {
 	}
 }
 
-// InitializeConsent shifts the flow state to FlowStateConsentInitialized. This
+// InvalidateLoginRequest shifts the flow state to FlowStateLoginUsed. This
 // transition is executed upon login completion.
 func (f *Flow) InvalidateLoginRequest() error {
 	if f.State != FlowStateLoginUnused {

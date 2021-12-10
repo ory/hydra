@@ -53,7 +53,6 @@ require (
 	github.com/rs/cors v1.8.0
 	github.com/sawadashota/encrypta v0.0.2
 	github.com/sirupsen/logrus v1.8.1
-	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/gjson v1.9.4
@@ -66,3 +65,5 @@ require (
 	gopkg.in/DataDog/dd-trace-go.v1 v1.33.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
+
+replace github.com/ory/fosite => github.com/TinkoffCreditSystems/fosite v0.36.1-0.20211210082207-5b43849cbc5f

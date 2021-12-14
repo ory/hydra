@@ -1,6 +1,6 @@
 export const prng = () => {
-  var array = new Uint32Array(2);
-  crypto.getRandomValues(array);
+  var array = new Uint32Array(2)
+  crypto.getRandomValues(array)
 
   return `${array[0].toString()}${array[1].toString()}`
 }

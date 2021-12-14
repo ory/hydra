@@ -3,7 +3,7 @@ import {
   createGrant,
   deleteGrants,
   deleteClients,
-  prng,
+  prng
 } from '../../helpers'
 
 const dayjs = require('dayjs')
@@ -14,48 +14,56 @@ dayjs.extend(isBetween)
 
 const jwt = require('jsonwebtoken')
 
-
-let testPublicJwk;
-let testPrivatePem;
+let testPublicJwk
+let testPrivatePem
 let invalidtestPrivatePem
 const initTestKeyPairs = async () => {
   const algorithm = {
     name: 'RSASSA-PKCS1-v1_5',
     modulusLength: 2048,
     publicExponent: new Uint8Array([1, 0, 1]),
-    hash: 'SHA-256',
-  };
-  const keys = await crypto.subtle.generateKey(algorithm, true, ['sign', 'verify']);
-    
+    hash: 'SHA-256'
+  }
+  const keys = await crypto.subtle.generateKey(algorithm, true, [
+    'sign',
+    'verify'
+  ])
+
   // public key to jwk
-  const publicJwk = await crypto.subtle.exportKey("jwk", keys.publicKey);
-  publicJwk.kid = 'token-service-key';
+  const publicJwk = await crypto.subtle.exportKey('jwk', keys.publicKey)
+  publicJwk.kid = 'token-service-key'
 
   // private key to pem
-  const exportedPK = await crypto.subtle.exportKey("pkcs8", keys.privateKey);
-  const exportedAsBase64 = Buffer.from(exportedPK).toString('base64');
-  const privatePem = `-----BEGIN PRIVATE KEY-----\n${exportedAsBase64}\n-----END PRIVATE KEY-----`;
+  const exportedPK = await crypto.subtle.exportKey('pkcs8', keys.privateKey)
+  const exportedAsBase64 = Buffer.from(exportedPK).toString('base64')
+  const privatePem = `-----BEGIN PRIVATE KEY-----\n${exportedAsBase64}\n-----END PRIVATE KEY-----`
 
   // create another private key to test invalid signatures
-  const invalidKeys = await crypto.subtle.generateKey(algorithm, true, ['sign', 'verify']);
-  const invalidPK = await crypto.subtle.exportKey("pkcs8", invalidKeys.privateKey);
-  const invalidAsBase64 = Buffer.from(invalidPK).toString('base64');
-  const invalidPrivatePem = `-----BEGIN PRIVATE KEY-----\n${invalidAsBase64}\n-----END PRIVATE KEY-----`;
+  const invalidKeys = await crypto.subtle.generateKey(algorithm, true, [
+    'sign',
+    'verify'
+  ])
+  const invalidPK = await crypto.subtle.exportKey(
+    'pkcs8',
+    invalidKeys.privateKey
+  )
+  const invalidAsBase64 = Buffer.from(invalidPK).toString('base64')
+  const invalidPrivatePem = `-----BEGIN PRIVATE KEY-----\n${invalidAsBase64}\n-----END PRIVATE KEY-----`
 
-  testPublicJwk = publicJwk;
-  testPrivatePem = privatePem;
-  invalidtestPrivatePem = invalidPrivatePem;
-};
+  testPublicJwk = publicJwk
+  testPrivatePem = privatePem
+  invalidtestPrivatePem = invalidPrivatePem
+}
 
 describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   beforeEach(() => {
     deleteGrants()
     deleteClients()
-  });
+  })
 
   before(() => {
-    return cy.wrap(initTestKeyPairs());
-  });
+    return cy.wrap(initTestKeyPairs())
+  })
 
   const tokenUrl = `${Cypress.env('public_url')}/oauth2/token`
 

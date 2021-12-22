@@ -4,6 +4,7 @@ title: Migrating to Hydra 2.x
 ---
 
 Assumptions:
+
 - You are performing this migration offline as opposed to on a live database
 - The database is backed up
 
@@ -16,12 +17,12 @@ The queries in this guide are written in the Postgres SQL dialect.
 ## Sanity check queries
 
 The query displays the numbers of consents that will be deleted by the
-migration, grouped by month. Make sure that you are happy with these
-consents being deleted before you continue.
+migration, grouped by month. Make sure that you are happy with these consents
+being deleted before you continue.
 
 We assume that only a very small number of sessions, issued by pre-1.0 Hydra,
-will be affected. Please contact us if this assumption doesn't apply or if
-the deletion adversely affects your deployment.
+will be affected. Please contact us if this assumption doesn't apply or if the
+deletion adversely affects your deployment.
 
 ```
 SELECT

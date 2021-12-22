@@ -193,7 +193,7 @@ func (p *Persister) CreateLoginRequest(ctx context.Context, req *consent.LoginRe
 func (p *Persister) GetFlow(ctx context.Context, challenge string) (*flow.Flow, error) {
 	var f flow.Flow
 	return &f, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := (&f).FindInDB(c, challenge); err != nil {
+		if err := c.Find(&f, challenge); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return errorsx.WithStack(x.ErrNotFound)
 			}
@@ -208,7 +208,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, challenge string) (*con
 	var lr *consent.LoginRequest
 	return lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		f := &flow.Flow{}
-		if err := f.FindInDB(c, challenge); err != nil {
+		if err := c.Find(f, challenge); err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return errorsx.WithStack(x.ErrNotFound)
 			}

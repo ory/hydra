@@ -422,10 +422,6 @@ func (_ Flow) TableName() string {
 	return "hydra_oauth2_flow"
 }
 
-func (f *Flow) FindInDB(c *pop.Connection, id string) error {
-	return c.Find(f, id)
-}
-
 // FindByConsentChallengeID retrieves a flow given its consent challenge ID.
 func (f *Flow) FindByConsentChallengeID(c *pop.Connection, id string) error {
 	return c.Where("consent_challenge_id = ?", id).First(f)

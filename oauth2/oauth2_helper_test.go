@@ -24,9 +24,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/x/sqlxx"
-	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"

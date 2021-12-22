@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/ory/hydra/cmd/cli"
 	"github.com/spf13/cobra"
+
+	"github.com/ory/hydra/cmd/cli"
 )
 
 func NewMigrateGenCmd() *cobra.Command {

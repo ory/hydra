@@ -11,8 +11,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ory/x/configx"
 	"github.com/pkg/errors"
+
+	"github.com/ory/x/configx"
 
 	"github.com/ory/x/errorsx"
 

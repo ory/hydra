@@ -508,11 +508,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	SELECT login_challenge
 	FROM hydra_oauth2_flow
 	WHERE (
-		(state = ` + fmt.Sprint(flow.FlowStateLoginInitialized) + `)
-		OR (state = ` + fmt.Sprint(flow.FlowStateLoginUnused) + `)
-		OR (state = ` + fmt.Sprint(flow.FlowStateLoginUsed) + `)
-		OR (state = ` + fmt.Sprint(flow.FlowStateConsentInitialized) + `)
-		OR (state = ` + fmt.Sprint(flow.FlowStateConsentUnused) + `)
+		(state != ?)
 		OR (login_error IS NOT NULL AND login_error <> '{}' AND login_error <> '')
 		OR (consent_error IS NOT NULL AND consent_error <> '{}' AND consent_error <> '')
 	)
@@ -528,7 +524,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - flow.consent_error has valid error (consent rejected)
 	// AND timed-out
 	// - flow.requested_at < minimum of ttl.login_consent_request and notAfter
-	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, limit), notAfter)
+	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, limit), flow.FlowStateConsentUsed, notAfter)
 
 	if err := q.All(&challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")

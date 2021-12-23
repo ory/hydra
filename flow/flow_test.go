@@ -2,7 +2,10 @@ package flow
 
 import (
 	"testing"
+	"time"
 
+	"github.com/instana/testify/require"
+	"github.com/mohae/deepcopy"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/bxcodec/faker/v3"
@@ -184,6 +187,58 @@ func TestFlow_GetConsentRequest(t *testing.T) {
 		actual := f.GetConsentRequest()
 		assert.Equal(t, expected, *actual)
 	})
+}
+
+func TestFlow_HandleConsentRequest(t *testing.T) {
+	f := Flow{}
+	require.NoError(t, faker.FakeData(&f))
+
+	expected := consent.HandledConsentRequest{}
+	require.NoError(t, faker.FakeData(&expected))
+
+	expected.ID = string(f.ConsentChallengeID)
+	expected.HandledAt = sqlxx.NullTime(time.Now())
+	expected.RequestedAt = f.RequestedAt
+	expected.Session = &consent.ConsentRequestSessionData{
+		IDToken:     sqlxx.MapStringInterface{"claim1": "value1", "claim2": "value2"},
+		AccessToken: sqlxx.MapStringInterface{"claim3": "value3", "claim4": "value4"},
+	}
+	expected.SessionIDToken = expected.Session.IDToken
+	expected.SessionAccessToken = expected.Session.AccessToken
+
+	f.State = FlowStateConsentInitialized
+	f.ConsentWasHandled = false
+
+	fGood := deepcopy.Copy(f).(Flow)
+	eGood := deepcopy.Copy(expected).(consent.HandledConsentRequest)
+	require.NoError(t, f.HandleConsentRequest(&expected))
+
+	t.Run("HandleConsentRequest should fail when already handled", func(t *testing.T) {
+		fBad := deepcopy.Copy(fGood).(Flow)
+		fBad.ConsentWasHandled = true
+		require.Error(t, fBad.HandleConsentRequest(&expected))
+	})
+
+	t.Run("HandleConsentRequest should fail when State is FlowStateLoginUsed", func(t *testing.T) {
+		fBad := deepcopy.Copy(fGood).(Flow)
+		fBad.State = FlowStateLoginUsed
+		require.Error(t, fBad.HandleConsentRequest(&expected))
+	})
+
+	t.Run("HandleConsentRequest should fail when HandledAt in its argument is zero", func(t *testing.T) {
+		f := deepcopy.Copy(fGood).(Flow)
+		eBad := deepcopy.Copy(eGood).(consent.HandledConsentRequest)
+		eBad.HandledAt = sqlxx.NullTime(time.Time{})
+		require.Error(t, f.HandleConsentRequest(&eBad))
+	})
+
+	require.NoError(t, fGood.HandleConsentRequest(&expected))
+
+	actual := f.GetHandledConsentRequest()
+	require.NotNil(t, actual.ConsentRequest)
+	expected.ConsentRequest = nil
+	actual.ConsentRequest = nil
+	require.Equal(t, &expected, actual)
 }
 
 func TestFlow_GetHandledConsentRequest(t *testing.T) {

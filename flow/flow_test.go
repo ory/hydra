@@ -79,6 +79,8 @@ func (f *Flow) setHandledConsentRequest(r consent.HandledConsentRequest) {
 	f.ConsentError = r.Error
 	f.RequestedAt = r.RequestedAt
 	f.LoginAuthenticatedAt = r.AuthenticatedAt
+	f.SessionIDToken = r.SessionIDToken
+	f.SessionAccessToken = r.SessionAccessToken
 }
 
 func TestFlow_GetLoginRequest(t *testing.T) {
@@ -99,6 +101,7 @@ func TestFlow_GetHandledLoginRequest(t *testing.T) {
 		assert.NoError(t, faker.FakeData(&expected))
 		f.setHandledLoginRequest(&expected)
 		actual := f.GetHandledLoginRequest()
+		assert.NotNil(t, actual.LoginRequest)
 		expected.LoginRequest = nil
 		actual.LoginRequest = nil
 		assert.Equal(t, expected, actual)
@@ -187,12 +190,22 @@ func TestFlow_GetHandledConsentRequest(t *testing.T) {
 	t.Run("GetHandledConsentRequest should set all fields on its return value", func(t *testing.T) {
 		f := Flow{}
 		expected := consent.HandledConsentRequest{}
+
 		assert.NoError(t, faker.FakeData(&expected))
-		expected.Session = &consent.ConsentRequestSessionData{}
 		expected.ConsentRequest = nil
+		expected.Session = &consent.ConsentRequestSessionData{
+			IDToken:     sqlxx.MapStringInterface{"claim1": "value1", "claim2": "value2"},
+			AccessToken: sqlxx.MapStringInterface{"claim3": "value3", "claim4": "value4"},
+		}
+		expected.SessionIDToken = expected.Session.IDToken
+		expected.SessionAccessToken = expected.Session.AccessToken
+
 		f.setHandledConsentRequest(expected)
 		actual := f.GetHandledConsentRequest()
+
+		assert.NotNil(t, actual.ConsentRequest)
 		actual.ConsentRequest = nil
+
 		assert.Equal(t, expected, *actual)
 	})
 }

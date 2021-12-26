@@ -49,10 +49,10 @@ Clients using this grant must be authenticated.
 
 Before using this grant type, you must establish a trust relationship in Ory
 Hydra. This involves registering the issuer, subject, and the public key at Ory
-Hydra:
+Hydra's Admin Endpoint:
 
 ```
-POST /trust/grants/jwt-bearer/issuers
+POST https://<admin.ory-hydra>/trust/grants/jwt-bearer/issuers
 Content-Type: application/json
 
 {
@@ -96,7 +96,7 @@ which has the claims
 }
 ```
 
-to be exchanged for an OAuth2 Access Token (the `scoe` parameter is optional!)
+to be exchanged for an OAuth2 Access Token (the `scope` parameter is optional!)
 
 ```
 POST /oauth2/token HTTP/1.1

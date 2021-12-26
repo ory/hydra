@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS hydra_oauth2_trusted_jwt_bearer_issuer
 (
-    id         UUID                                PRIMARY KEY,
+    id         VARCHAR(36)                         PRIMARY KEY,
     issuer     VARCHAR(255)                        NOT NULL,
     subject    VARCHAR(255)                        NOT NULL,
     scope      TEXT                                NOT NULL,

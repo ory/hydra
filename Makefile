@@ -59,7 +59,7 @@ test-resetdb: node_modules
 		docker rm -f hydra_test_database_mysql || true
 		docker rm -f hydra_test_database_postgres || true
 		docker rm -f hydra_test_database_cockroach || true
-		docker run --rm --name hydra_test_database_mysql -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
+		docker run --rm --name hydra_test_database_mysql --platform linux/amd64 -p 3444:3306 -e MYSQL_ROOT_PASSWORD=secret -d mysql:5.7
 		docker run --rm --name hydra_test_database_postgres -p 3445:5432 -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=postgres -d postgres:9.6
 		docker run --rm --name hydra_test_database_cockroach -p 3446:26257 -d cockroachdb/cockroach:v20.2.6 start-single-node --insecure
 
@@ -71,14 +71,10 @@ docker:
 .PHONY: e2e
 e2e: node_modules test-resetdb
 		source ./scripts/test-env.sh
-		./test/e2e/circle-ci.bash memory
-		./test/e2e/circle-ci.bash memory-jwt
-		./test/e2e/circle-ci.bash postgres
-		./test/e2e/circle-ci.bash postgres-jwt
-		./test/e2e/circle-ci.bash mysql
-		./test/e2e/circle-ci.bash mysql-jwt
-		./test/e2e/circle-ci.bash cockroach
-		./test/e2e/circle-ci.bash cockroach-jwt
+		for db in memory postgres mysql cockroach; do \
+			./test/e2e/circle-ci.bash "$${db}"; \
+			./test/e2e/circle-ci.bash "$${db}" --jwt; \
+		done
 
 # Runs tests in short mode, without database adapters
 .PHONY: quicktest

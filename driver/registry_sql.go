@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
 
 	"github.com/luna-duclos/instrumentedsql"
@@ -121,5 +122,9 @@ func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
+	return m.Persister()
+}
+
+func (m *RegistrySQL) GrantManager() trust.GrantManager {
 	return m.Persister()
 }

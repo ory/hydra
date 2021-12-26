@@ -12,6 +12,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x/oauth2cors"
 
 	"github.com/ory/hydra/persistence"
@@ -46,6 +47,8 @@ type RegistryBase struct {
 	C            *config.Provider
 	ch           *client.Handler
 	fh           fosite.Hasher
+	jwtGrantH    *trust.Handler
+	jwtGrantV    *trust.GrantValidator
 	kh           *jwk.Handler
 	cv           *client.Validator
 	hh           *healthx.Handler
@@ -108,6 +111,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.ClientHandler().SetRoutes(admin)
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.JWTGrantHandler().SetRoutes(admin)
 }
 
 func (m *RegistryBase) BuildVersion() string {
@@ -187,6 +191,20 @@ func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	return m.kh
 }
 
+func (m *RegistryBase) JWTGrantHandler() *trust.Handler {
+	if m.jwtGrantH == nil {
+		m.jwtGrantH = trust.NewHandler(m.r)
+	}
+	return m.jwtGrantH
+}
+
+func (m *RegistryBase) GrantValidator() *trust.GrantValidator {
+	if m.jwtGrantV == nil {
+		m.jwtGrantV = trust.NewGrantValidator()
+	}
+	return m.jwtGrantV
+}
+
 func (m *RegistryBase) HealthHandler() *healthx.Handler {
 	if m.hh == nil {
 		m.hh = healthx.NewHandler(m.Writer(), m.buildVersion, healthx.ReadyCheckers{
@@ -258,20 +276,24 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 
 func (m *RegistryBase) oAuth2Config() *compose.Config {
 	return &compose.Config{
-		AccessTokenLifespan:            m.C.AccessTokenLifespan(),
-		RefreshTokenLifespan:           m.C.RefreshTokenLifespan(),
-		AuthorizeCodeLifespan:          m.C.AuthCodeLifespan(),
-		IDTokenLifespan:                m.C.IDTokenLifespan(),
-		IDTokenIssuer:                  m.C.IssuerURL().String(),
-		HashCost:                       m.C.BCryptCost(),
-		ScopeStrategy:                  m.ScopeStrategy(),
-		SendDebugMessagesToClients:     m.C.ShareOAuth2Debug(),
-		UseLegacyErrorFormat:           m.C.OAuth2LegacyErrors(),
-		EnforcePKCE:                    m.C.PKCEEnforced(),
-		EnforcePKCEForPublicClients:    m.C.EnforcePKCEForPublicClients(),
-		EnablePKCEPlainChallengeMethod: false,
-		TokenURL:                       urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
-		RedirectSecureChecker:          x.IsRedirectURISecure(m.C),
+		AccessTokenLifespan:                  m.C.AccessTokenLifespan(),
+		RefreshTokenLifespan:                 m.C.RefreshTokenLifespan(),
+		AuthorizeCodeLifespan:                m.C.AuthCodeLifespan(),
+		IDTokenLifespan:                      m.C.IDTokenLifespan(),
+		IDTokenIssuer:                        m.C.IssuerURL().String(),
+		HashCost:                             m.C.BCryptCost(),
+		ScopeStrategy:                        m.ScopeStrategy(),
+		SendDebugMessagesToClients:           m.C.ShareOAuth2Debug(),
+		UseLegacyErrorFormat:                 m.C.OAuth2LegacyErrors(),
+		EnforcePKCE:                          m.C.PKCEEnforced(),
+		EnforcePKCEForPublicClients:          m.C.EnforcePKCEForPublicClients(),
+		EnablePKCEPlainChallengeMethod:       false,
+		TokenURL:                             urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
+		RedirectSecureChecker:                x.IsRedirectURISecure(m.C),
+		GrantTypeJWTBearerCanSkipClientAuth:  false,
+		GrantTypeJWTBearerIDOptional:         m.C.GrantTypeJWTBearerIDOptional(),
+		GrantTypeJWTBearerIssuedDateOptional: m.C.GrantTypeJWTBearerIssuedDateOptional(),
+		GrantTypeJWTBearerMaxDuration:        m.C.GrantTypeJWTBearerMaxDuration(),
 	}
 }
 
@@ -326,6 +348,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			compose.OAuth2TokenRevocationFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2PKCEFactory,
+			compose.RFC7523AssertionGrantFactory,
 		)
 	}
 	return m.fop

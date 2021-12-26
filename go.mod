@@ -3,6 +3,7 @@ module github.com/ory/hydra
 go 1.16
 
 replace (
+	github.com/bradleyjkemp/cupaloy/v2 => github.com/aeneasr/cupaloy/v2 v2.6.1-0.20210924214125-3dfdd01210a3
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
@@ -14,6 +15,7 @@ replace (
 )
 
 require (
+	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.2+incompatible

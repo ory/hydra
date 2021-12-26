@@ -46,6 +46,7 @@
         "items": [
           "advanced",
           "guides/oauth2-clients",
+          "guides/oauth2-grant-type-jwt-bearer",
           "guides/common-oauth2-openid-connect-flows",
           "guides/using-oauth2",
           "guides/token-expiration",

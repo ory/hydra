@@ -7,6 +7,7 @@ import (
 
 	"github.com/ory/hydra/hsm"
 
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
 
 	"github.com/luna-duclos/instrumentedsql"
@@ -134,5 +135,9 @@ func (m *RegistrySQL) KeyManager() jwk.Manager {
 }
 
 func (m *RegistrySQL) SoftwareKeyManager() jwk.Manager {
+	return m.Persister()
+}
+
+func (m *RegistrySQL) GrantManager() trust.GrantManager {
 	return m.Persister()
 }

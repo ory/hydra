@@ -45,6 +45,10 @@ type ClientService interface {
 
 	DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAuth2TokenNoContent, error)
 
+	DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams) (*DeleteTrustedJwtGrantIssuerNoContent, error)
+
+	FlushInactiveJwtBearerGrants(params *FlushInactiveJwtBearerGrantsParams) (*FlushInactiveJwtBearerGrantsNoContent, error)
+
 	FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams) (*FlushInactiveOAuth2TokensNoContent, error)
 
 	GetConsentRequest(params *GetConsentRequestParams) (*GetConsentRequestOK, error)
@@ -59,6 +63,8 @@ type ClientService interface {
 
 	GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2ClientOK, error)
 
+	GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams) (*GetTrustedJwtGrantIssuerOK, error)
+
 	GetVersion(params *GetVersionParams) (*GetVersionOK, error)
 
 	IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams) (*IntrospectOAuth2TokenOK, error)
@@ -68,6 +74,8 @@ type ClientService interface {
 	ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2ClientsOK, error)
 
 	ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams) (*ListSubjectConsentSessionsOK, error)
+
+	ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams) (*ListTrustedJwtGrantIssuersOK, error)
 
 	PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth2ClientOK, error)
 
@@ -80,6 +88,8 @@ type ClientService interface {
 	RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams) (*RevokeAuthenticationSessionNoContent, error)
 
 	RevokeConsentSessions(params *RevokeConsentSessionsParams) (*RevokeConsentSessionsNoContent, error)
+
+	TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams) (*TrustJwtGrantIssuerCreated, error)
 
 	UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWebKeyOK, error)
 
@@ -455,6 +465,84 @@ func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAut
 }
 
 /*
+  DeleteTrustedJwtGrantIssuer deletes a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+
+Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+for OAuth 2.0 Client Authentication and Authorization Grant.
+*/
+func (a *Client) DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams) (*DeleteTrustedJwtGrantIssuerNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteTrustedJwtGrantIssuerParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "deleteTrustedJwtGrantIssuer",
+		Method:             "DELETE",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DeleteTrustedJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteTrustedJwtGrantIssuerNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  FlushInactiveJwtBearerGrants flushes expired jwt bearer grants
+
+  This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be
+not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
+automatically when performing the refresh flow.
+*/
+func (a *Client) FlushInactiveJwtBearerGrants(params *FlushInactiveJwtBearerGrantsParams) (*FlushInactiveJwtBearerGrantsNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewFlushInactiveJwtBearerGrantsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "flushInactiveJwtBearerGrants",
+		Method:             "POST",
+		PathPattern:        "/grants/jwt-bearer/flush",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &FlushInactiveJwtBearerGrantsReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*FlushInactiveJwtBearerGrantsNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for flushInactiveJwtBearerGrants: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   FlushInactiveOAuth2Tokens flushes expired o auth2 access tokens
 
   This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
@@ -728,6 +816,43 @@ func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2Clien
 }
 
 /*
+  GetTrustedJwtGrantIssuer gets a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+*/
+func (a *Client) GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams) (*GetTrustedJwtGrantIssuerOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetTrustedJwtGrantIssuerParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getTrustedJwtGrantIssuer",
+		Method:             "GET",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetTrustedJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetTrustedJwtGrantIssuerOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for getTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   GetVersion gets service version
 
   This endpoint returns the service version typically notated using semantic versioning.
@@ -928,6 +1053,42 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for listSubjectConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  ListTrustedJwtGrantIssuers lists trusted o auth2 j w t bearer grant type issuers
+
+  Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
+*/
+func (a *Client) ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams) (*ListTrustedJwtGrantIssuersOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListTrustedJwtGrantIssuersParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "listTrustedJwtGrantIssuers",
+		Method:             "GET",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &ListTrustedJwtGrantIssuersReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListTrustedJwtGrantIssuersOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listTrustedJwtGrantIssuers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -1177,6 +1338,44 @@ func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*Re
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for revokeConsentSessions: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  TrustJwtGrantIssuer trusts an o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to establish a trust relationship for a JWT issuer
+to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
+*/
+func (a *Client) TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams) (*TrustJwtGrantIssuerCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewTrustJwtGrantIssuerParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "trustJwtGrantIssuer",
+		Method:             "POST",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &TrustJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*TrustJwtGrantIssuerCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for trustJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

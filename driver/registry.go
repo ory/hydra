@@ -5,6 +5,8 @@ import (
 
 	"github.com/ory/hydra/hsm"
 
+	"github.com/ory/hydra/oauth2/trust"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/errorsx"
@@ -34,6 +36,7 @@ type Registry interface {
 
 	Init(ctx context.Context) error
 
+	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.Provider) Registry
 	WithLogger(l *logrusx.Logger) Registry
 	WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry
@@ -46,6 +49,7 @@ type Registry interface {
 	client.Registry
 	consent.Registry
 	jwk.Registry
+	trust.Registry
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
@@ -74,7 +78,7 @@ func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logg
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
 
-	registry = registry.WithLogger(l).WithConfig(c)
+	registry = registry.WithLogger(l).WithConfig(c).WithBuildInfo(config.Version, config.Commit, config.Date)
 
 	if err := registry.Init(ctx); err != nil {
 		return nil, err

@@ -70,6 +70,9 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
+	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
+	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
+	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
 )
 
@@ -458,4 +461,16 @@ func (p *Provider) HsmPin() string {
 
 func (p *Provider) HsmTokenLabel() string {
 	return p.p.String(HsmTokenLabel)
+}
+
+func (p *Provider) GrantTypeJWTBearerIDOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTIDOptional)
+}
+
+func (p *Provider) GrantTypeJWTBearerIssuedDateOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTIssuedDateOptional)
+}
+
+func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
+	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
 }

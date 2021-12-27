@@ -215,7 +215,8 @@ func getKeySetAttributes(m *KeyManager, key crypto11.Signer, kid []byte) (string
 	switch k := key.Public().(type) {
 	case *rsa.PublicKey:
 		alg = "RS256"
-		// TODO: Should we validate minimal key length by checking CKA_MODULUS_BITS?
+		// TODO Should we validate minimal key length by checking CKA_MODULUS_BITS?
+		// TODO see https://github.com/ory/hydra/issues/2905
 	case *ecdsa.PublicKey:
 		if k.Curve == elliptic.P521() {
 			alg = "ES512"

@@ -39,6 +39,14 @@ New feature or request.
 - [ ] Make cookies with SameSite=None secure by default or using the
       configuration flag
       ([hydra#1844](https://github.com/ory/hydra/issues/1844))
+- [ ] Refactor SQL Migration tests to match new system
+      ([hydra#2901](https://github.com/ory/hydra/issues/2901)) -
+      [@Grant Zvolský](https://github.com/grantzvolsky),
+      [@hackerman](https://github.com/aeneasr)
+- [ ] Consider recreating Hydra V2 database model instead of migrations
+      ([hydra#2902](https://github.com/ory/hydra/issues/2902)) -
+      [@Grant Zvolský](https://github.com/grantzvolsky),
+      [@hackerman](https://github.com/aeneasr)
 
 ## [v1.11](https://github.com/ory/hydra/milestone/39)
 

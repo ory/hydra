@@ -16,7 +16,6 @@ replace (
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
-	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.2+incompatible

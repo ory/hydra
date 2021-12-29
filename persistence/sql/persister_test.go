@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/pborman/uuid"
+
+	"github.com/ory/hydra/oauth2/trust"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal/testhelpers"
@@ -42,22 +45,28 @@ func TestManagers(t *testing.T) {
 		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(m.Config(), m.ConsentManager(), m.ClientManager(), m.OAuth2Storage()))
 
 		t.Run("package=jwk/manager="+k, func(t *testing.T) {
-			var testGenerator = &jwk.RS256Generator{}
+			testGenerators := new(driver.RegistryBase).KeyGenerators()
+			for algo, testGenerator := range testGenerators {
+				t.Run("TestManagerKey", func(t *testing.T) {
+					ks, err := testGenerator.Generate("TestManagerKey", "sig")
+					require.NoError(t, err)
 
-			t.Run("TestManagerKey", func(t *testing.T) {
-				ks, err := testGenerator.Generate("TestManagerKey", "sig")
-				require.NoError(t, err)
+					jwk.TestHelperManagerKey(m.KeyManager(), algo, ks, uuid.New())
+				})
 
-				jwk.TestHelperManagerKey(m.KeyManager(), ks, uuid.New())
-			})
+				t.Run("TestManagerKeySet", func(t *testing.T) {
+					ks, err := testGenerator.Generate("TestManagerKeySet", "sig")
+					require.NoError(t, err)
+					ks.Key("private")
 
-			t.Run("TestManagerKeySet", func(t *testing.T) {
-				ks, err := testGenerator.Generate("TestManagerKeySet", "sig")
-				require.NoError(t, err)
-				ks.Key("private")
+					jwk.TestHelperManagerKeySet(m.KeyManager(), algo, ks, uuid.New())
+				})
+			}
+		})
 
-				jwk.TestHelperManagerKeySet(m.KeyManager(), ks, uuid.New())
-			})
+		t.Run("package=grant/trust/manager="+k, func(t *testing.T) {
+			t.Run("case=create-get-delete", trust.TestHelperGrantManagerCreateGetDeleteGrant(m.GrantManager()))
+			t.Run("case=errors", trust.TestHelperGrantManagerErrors(m.GrantManager()))
 		})
 	}
 }

@@ -7,14 +7,15 @@
     <a href="https://www.ory.sh/hydra/docs/index">Guide</a> |
     <a href="https://www.ory.sh/hydra/docs/reference/api">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
-    <a href="https://opencollective.com/ory">Support this project!</a>
+    <a href="https://opencollective.com/ory">Support this project!</a><br/><br/>
+    <a href="https://www.ory.sh/jobs/">Work in Open Source, Ory is hiring!</a>
 </h4>
 
 ---
 
 <p align="left">
     <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
-    <a href="https://coveralls.io/github/ory/hydra?branch=master"> <img src="https://coveralls.io/repos/ory/hydra/badge.svg?branch=master&service=github" alt="Coverage Status"></a>
+    <a href="https://codecov.io/gh/ory/hydra"><img src="https://codecov.io/gh/ory/hydra/branch/master/graph/badge.svg?token=y4fVk2Of8a"/></a>
     <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
     <a href="https://pkg.go.dev/github.com/ory/hydra"><img src="https://pkg.go.dev/badge/www.github.com/ory/hydra" alt="PkgGoDev"></a>
     <a href="https://bestpractices.coreinfrastructure.org/projects/364"><img src="https://bestpractices.coreinfrastructure.org/projects/364/badge" alt="CII Best Practices"></a>
@@ -35,7 +36,7 @@ If you're looking to jump straight into it, go ahead:
 - [Install and Set Up ORY Hydra](https://www.ory.sh/docs/hydra/configure-deploy): An advanced look at installation options and interaction with ORY Hydra.
 - [Integrating your Login and Consent UI with ORY Hydra](https://www.ory.sh/docs/hydra/oauth2): The go-to place if you wish to adopt ORY Hydra in your new or existing stack.
 
-Besides mitigating various attack vectors, such as database compromisation and OAuth 2.0 weaknesses, ORY Hydra is also
+Besides mitigating various attack vectors, such as a compromised database and OAuth 2.0 weaknesses, ORY Hydra is also
 able to securely manage JSON Web Keys.
 [Click here](https://www.ory.sh/docs/next/hydra/security-architecture) to read more about security.
 
@@ -91,7 +92,7 @@ Implementing and using OAuth2 without understanding the whole specification is c
 SDKs are being used. The primary goal of ORY Hydra is to make OAuth 2.0 and OpenID Connect 1.0 better accessible.
 
 ORY Hydra implements the flows described in OAuth2 and OpenID Connect 1.0 without forcing you to use a "Hydra User Management"
-or some template engine or a predefined front-end. Instead it relies on HTTP redirection and cryptographic methods
+or some template engine or a predefined front-end. Instead, it relies on HTTP redirection and cryptographic methods
 to verify user consent allowing you to use ORY Hydra with any authentication endpoint, be it [authboss](https://github.com/go-authboss/authboss), [User Frosting](https://www.userfrosting.com/) or your proprietary Java authentication.
 
 ### Who's using it?
@@ -138,12 +139,6 @@ that your company deserves a spot here, reach out to
         </tr>
         <tr>
             <td>Sponsor</td>
-            <td>ThoughtWorks</td>
-            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/tw.svg" alt="ThoughtWorks"></td>
-            <td><a href="https://www.thoughtworks.com/">thoughtworks.com</a></td>
-        </tr>
-        <tr>
-            <td>Sponsor</td>
             <td>Tulip</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/tulip.svg" alt="Tulip Retail"></td>
             <td><a href="https://tulip.com/">tulip.com</a></td>
@@ -153,12 +148,6 @@ that your company deserves a spot here, reach out to
             <td>Cashdeck / All My Funds</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/allmyfunds.svg" alt="All My Funds"></td>
             <td><a href="https://cashdeck.com.au/">cashdeck.com.au</a></td>
-        </tr>
-        <tr>
-            <td>Sponsor</td>
-            <td>3Rein</td>
-            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/3R-horiz.svg" alt="3Rein"></td>
-            <td><a href="https://3rein.com/">3rein.com</a></td>
         </tr>
         <tr>
             <td>Contributor</td>
@@ -183,14 +172,14 @@ that your company deserves a spot here, reach out to
             <td>DataDetect</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/datadetect.svg" alt="Datadetect"></td>
             <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Sainsbury's</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/sainsburys.svg" alt="Sainsbury's"></td>
             <td><a href="https://www.sainsburys.co.uk/">sainsburys.co.uk</a></td>
         </tr>
-                <tr>
+        <tr>
             <td>Adopter *</td>
             <td>Contraste</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/contraste.svg" alt="Contraste"></td>
@@ -201,7 +190,7 @@ that your company deserves a spot here, reach out to
             <td>Reyah</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/reyah.svg" alt="Reyah"></td>
             <td><a href="https://reyah.eu/">reyah.eu</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Zero</td>
@@ -213,6 +202,30 @@ that your company deserves a spot here, reach out to
             <td>Padis</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/padis.svg" alt="Padis"></td>
             <td><a href="https://padis.io/">padis.io</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Cloudbear</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/cloudbear.svg" alt="Cloudbear"></td>
+            <td><a href="https://cloudbear.eu/">cloudbear.eu</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Security Onion Solutions</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/securityonion.svg" alt="Security Onion Solutions"></td>
+            <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
+        </tr>        
+        <tr>
+            <td>Adopter *</td>
+            <td>Factly</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/factly.svg" alt="Factly"></td>
+            <td><a href="https://factlylabs.com/">factlylabs.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Nortal</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/nortal.svg" alt="Nortal"></td>
+            <td><a href="https://nortal.com/">nortal.com</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
@@ -237,7 +250,7 @@ that your company deserves a spot here, reach out to
 
 We also want to thank all individual contributors
 
-<a href="https://opencollective.com/ory" target="_blank"><img src="https://opencollective.com/ory/contributors.svg?width=890&button=false" /></a>
+<a href="https://opencollective.com/ory" target="_blank"><img src="https://opencollective.com/ory/contributors.svg?width=890&limit=714&button=false" /></a>
 
 as well as all of our backers
 
@@ -252,26 +265,6 @@ TheCrealm.
 
 <!--END ADOPTERS-->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -282,6 +275,7 @@ ORY Hydra implements Open Standards set by the IETF:
 * [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662)
 * [OAuth 2.0 for Native Apps](https://tools.ietf.org/html/draft-ietf-oauth-native-apps-10)
 * [Proof Key for Code Exchange by OAuth Public Clients](https://tools.ietf.org/html/rfc7636)
+* [JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7523)
 
 and the OpenID Foundation:
 
@@ -312,7 +306,7 @@ To obtain certification, we deployed the [reference user login and consent app](
 
 ## Quickstart
 
-This section is a quickstart guide to working with ORY Hydra. In-depth docs are available as well:
+This section is a starter guide to working with ORY Hydra. In-depth docs are available as well:
 
 * The documentation is available [here](https://www.ory.sh/docs/next/hydra).
 * The REST API documentation is available [here](https://www.ory.sh/docs/next/hydra/sdk/api).
@@ -343,7 +337,7 @@ design:
 - Scales without effort
 - Minimize room for human and network errors
 
-Ory's architecture designed to run best on a Container Orchestration Systems
+Ory's architecture is designed to run best on a Container Orchestration system
 such as Kubernetes, CloudFoundry, OpenShift, and similar projects. Binaries are
 small (5-15MB) and available for all popular processor types (ARM, AMD64, i386)
 and operating systems (FreeBSD, Linux, macOS, Windows) without system
@@ -356,7 +350,7 @@ Management system that is built according to
 [cloud architecture best practices](https://www.ory.sh/docs/next/ecosystem/software-architecture-philosophy).
 It implements core use cases that almost every software application needs to
 deal with: Self-service Login and Registration, Multi-Factor Authentication
-(MFA/2FA), Account Recovery and Verification, Profile and Account Management.
+(MFA/2FA), Account Recovery and Verification, Profile, and Account Management.
 
 ### Ory Hydra: OAuth2 & OpenID Connect Server
 
@@ -530,7 +524,7 @@ you are trying to fix something very specific and need the database tests all th
 suggest that you initialize the databases with:
 
 ```shell script
-make resetdb
+make test-resetdb
 export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true'
 export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable'
 export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
@@ -566,7 +560,7 @@ type of tests very difficult, but thankfully you can run the e2e test in the bro
 or if you would like to test one of the databases:
 
 ```shell script
-make resetdb
+make test-resetdb
 export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true'
 export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable'
 export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'

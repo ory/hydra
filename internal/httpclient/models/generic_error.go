@@ -20,6 +20,7 @@ import (
 type GenericError struct {
 
 	// The status code
+	//
 	// Example: 404
 	Code int64 `json:"code,omitempty"`
 
@@ -27,6 +28,7 @@ type GenericError struct {
 	//
 	// This field is often not exposed to protect against leaking
 	// sensitive information.
+	//
 	// Example: SQL field \"foo\" is not a bool.
 	Debug string `json:"debug,omitempty"`
 
@@ -36,11 +38,13 @@ type GenericError struct {
 	// Error message
 	//
 	// The error's message.
+	//
 	// Example: The resource could not be found
 	// Required: true
 	Message *string `json:"message"`
 
 	// A human-readable reason for the error
+	//
 	// Example: User with ID 1234 does not exist.
 	Reason string `json:"reason,omitempty"`
 

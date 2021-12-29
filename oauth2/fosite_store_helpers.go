@@ -29,6 +29,11 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v5"
+	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/fosite/handler/rfc7523"
+
+	"github.com/ory/hydra/oauth2/trust"
 
 	"github.com/ory/hydra/x"
 
@@ -180,6 +185,7 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testFositeStoreClientAssertionJWTValid/db=%s", k), testFositeStoreClientAssertionJWTValid(store))
 	t.Run(fmt.Sprintf("case=testHelperDeleteAccessTokens/db=%s", k), testHelperDeleteAccessTokens(store))
 	t.Run(fmt.Sprintf("case=testHelperRevokeAccessToken/db=%s", k), testHelperRevokeAccessToken(store))
+	t.Run(fmt.Sprintf("case=testFositeJWTBearerGrantStorage/db=%s", k), testFositeJWTBearerGrantStorage(store))
 }
 
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
@@ -659,7 +665,7 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			jti := NewBlacklistedJTI("already set jti", time.Now().Add(time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
-			assert.True(t, errors.Is(store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown))
+			assert.ErrorIs(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown)
 		})
 
 		t.Run("case=deletes expired JTIs", func(t *testing.T) {
@@ -720,6 +726,175 @@ func testFositeStoreClientAssertionJWTValid(m InternalRegistry) func(*testing.T)
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
 			assert.NoError(t, store.ClientAssertionJWTValid(context.Background(), jti.JTI))
+		})
+	}
+}
+
+func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
+	return func(t *testing.T) {
+		grantManager := x.GrantManager()
+		keyManager := x.KeyManager()
+		keyGenerators := x.KeyGenerators()
+		keyGenerator, ok := keyGenerators[string(jose.RS256)]
+		require.True(t, ok)
+		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
+
+		t.Run("case=associated key added with grant", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("token-service-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "token-service"
+			subject := "bob@example.com"
+			grant := trust.Grant{
+				ID:        uuid.New(),
+				Issuer:    issuer,
+				Subject:   subject,
+				Scope:     []string{"openid", "offline"},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt: time.Now().UTC().Round(time.Second),
+				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			storedKeySet, err := grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			require.NoError(t, err)
+			require.Len(t, storedKeySet.Keys, 0)
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			storedKeySet, err = grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			require.NoError(t, err)
+			assert.Len(t, storedKeySet.Keys, 1)
+
+			storedKey, err := grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+			assert.Equal(t, publicKey.KeyID, storedKey.KeyID)
+			assert.Equal(t, publicKey.Use, storedKey.Use)
+			assert.Equal(t, publicKey.Key, storedKey.Key)
+
+			storedScopes, err := grantStorage.GetPublicKeyScopes(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+			assert.Equal(t, grant.Scope, storedScopes)
+
+			storedKeySet, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+			assert.Equal(t, publicKey.KeyID, storedKeySet.Keys[0].KeyID)
+			assert.Equal(t, publicKey.Use, storedKeySet.Keys[0].Use)
+			assert.Equal(t, publicKey.Key, storedKeySet.Keys[0].Key)
+		})
+
+		t.Run("case=only associated key returns", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("some-key", "sig")
+			require.NoError(t, err)
+
+			err = keyManager.AddKeySet(context.TODO(), "some-set", keySet)
+			require.NoError(t, err)
+
+			keySet, err = keyGenerator.Generate("maria-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "maria"
+			subject := "maria@example.com"
+			grant := trust.Grant{
+				ID:        uuid.New(),
+				Issuer:    issuer,
+				Subject:   subject,
+				Scope:     []string{"openid"},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt: time.Now().UTC().Round(time.Second),
+				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			storedKeySet, err := grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			require.NoError(t, err)
+			assert.Len(t, storedKeySet.Keys, 1)
+			assert.Equal(t, publicKey.KeyID, storedKeySet.Keys[0].KeyID)
+			assert.Equal(t, publicKey.Use, storedKeySet.Keys[0].Use)
+			assert.Equal(t, publicKey.Key, storedKeySet.Keys[0].Key)
+
+			storedKeySet, err = grantStorage.GetPublicKeys(context.TODO(), issuer, "non-existing-subject")
+			require.NoError(t, err)
+			assert.Len(t, storedKeySet.Keys, 0)
+
+			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "non-existing-subject", publicKey.KeyID)
+			require.Error(t, err)
+		})
+
+		t.Run("case=associated key is deleted, when granted is deleted", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("hackerman-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "aeneas"
+			subject := "aeneas@example.com"
+			grant := trust.Grant{
+				ID:        uuid.New(),
+				Issuer:    issuer,
+				Subject:   subject,
+				Scope:     []string{"openid", "offline"},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt: time.Now().UTC().Round(time.Second),
+				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, grant.PublicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+
+			err = grantManager.DeleteGrant(context.TODO(), grant.ID)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			assert.Error(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			assert.Error(t, err)
+		})
+
+		t.Run("case=associated grant is deleted, when key is deleted", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("vladimir-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "vladimir"
+			subject := "vladimir@example.com"
+			grant := trust.Grant{
+				ID:        uuid.New(),
+				Issuer:    issuer,
+				Subject:   subject,
+				Scope:     []string{"openid", "offline"},
+				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt: time.Now().UTC().Round(time.Second),
+				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+
+			err = keyManager.DeleteKey(context.TODO(), issuer, publicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = keyManager.GetKey(context.TODO(), issuer, publicKey.KeyID)
+			assert.Error(t, err)
+
+			_, err = grantManager.GetConcreteGrant(context.TODO(), grant.ID)
+			assert.Error(t, err)
 		})
 	}
 }

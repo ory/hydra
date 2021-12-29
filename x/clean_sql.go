@@ -24,6 +24,7 @@ func CleanSQL(t *testing.T, db *sqlx.DB) {
 		"hydra_oauth2_obfuscated_authentication_session",
 		"hydra_oauth2_logout_request",
 		"hydra_oauth2_jti_blacklist",
+		"hydra_oauth2_trusted_jwt_bearer_issuer",
 		"hydra_jwk",
 		"hydra_client",
 		// Migrations
@@ -56,6 +57,7 @@ func CleanSQLPop(t *testing.T, c *pop.Connection) {
 		"hydra_oauth2_obfuscated_authentication_session",
 		"hydra_oauth2_logout_request",
 		"hydra_oauth2_jti_blacklist",
+		"hydra_oauth2_trusted_jwt_bearer_issuer",
 		"hydra_jwk",
 		"hydra_client",
 		// Migrations

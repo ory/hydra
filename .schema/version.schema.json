@@ -51,20 +51,6 @@
                 {
                     "properties": {
                         "version": {
-                            "const": "v1.9.0-alpha.0.pre.2"
-                        }
-                    }
-                },
-                {
-                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.0-alpha.0.pre.2/.schema/config.schema.json"
-                }
-            ]
-        },
-        {
-            "allOf": [
-                {
-                    "properties": {
-                        "version": {
                             "const": "v1.9.0-alpha.1"
                         }
                     }
@@ -163,20 +149,6 @@
                 {
                     "properties": {
                         "version": {
-                            "const": "v1.9.3-pre.5"
-                        }
-                    }
-                },
-                {
-                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.9.3-pre.5/.schema/config.schema.json"
-                }
-            ]
-        },
-        {
-            "allOf": [
-                {
-                    "properties": {
-                        "version": {
                             "const": "v1.10.1"
                         }
                     }
@@ -205,40 +177,12 @@
                 {
                     "properties": {
                         "version": {
-                            "const": "v1.10.3-pre.1"
-                        }
-                    }
-                },
-                {
-                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.3-pre.1/spec/config.json"
-                }
-            ]
-        },
-        {
-            "allOf": [
-                {
-                    "properties": {
-                        "version": {
                             "const": "v1.10.3"
                         }
                     }
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.3/spec/config.json"
-                }
-            ]
-        },
-        {
-            "allOf": [
-                {
-                    "properties": {
-                        "version": {
-                            "const": "v1.10.5-pre.1"
-                        }
-                    }
-                },
-                {
-                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.5-pre.1/spec/config.json"
                 }
             ]
         },
@@ -267,6 +211,20 @@
                 },
                 {
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.6/spec/config.json"
+                }
+            ]
+        },
+        {
+            "allOf": [
+                {
+                    "properties": {
+                        "version": {
+                            "const": "v1.10.7"
+                        }
+                    }
+                },
+                {
+                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.7/spec/config.json"
                 }
             ]
         }

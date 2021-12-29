@@ -397,83 +397,10 @@
         }
       }
     },
-    "/connect/register": {
-      "get": {
-        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Get an OAuth 2.0 Client.",
-        "operationId": "getOAuth2ClientPublic",
-        "responses": {
-          "200": {
-            "description": "oAuth2Client",
-            "schema": {
-              "$ref": "#/definitions/oAuth2Client"
-            }
-          },
-          "401": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "put": {
-        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Update an OAuth 2.0 Client",
-        "operationId": "updateOAuth2ClientPublic",
-        "responses": {
-          "200": {
-            "description": "oAuth2Client",
-            "schema": {
-              "$ref": "#/definitions/oAuth2Client"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
+    "/grants/jwt-bearer/flush": {
       "post": {
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.",
+        "description": "This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
         "consumes": [
-          "application/json"
-        ],
-        "produces": [
           "application/json"
         ],
         "schemes": [
@@ -481,63 +408,22 @@
           "https"
         ],
         "tags": [
-          "public"
+          "admin"
         ],
-        "summary": "Create an OAuth 2.0 Client",
-        "operationId": "createOAuth2ClientPublic",
-        "responses": {
-          "201": {
-            "description": "oAuth2Client",
+        "summary": "Flush Expired jwt-bearer grants.",
+        "operationId": "flushInactiveJwtBearerGrants",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
             "schema": {
-              "$ref": "#/definitions/oAuth2Client"
-            }
-          },
-          "400": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "409": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/flushInactiveJwtBearerGrantsParams"
             }
           }
-        }
-      },
-      "delete": {
-        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.",
-        "consumes": [
-          "application/json"
         ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "public"
-        ],
-        "summary": "Deletes an OAuth 2.0 Client",
-        "operationId": "deleteOAuth2ClientPublic",
         "responses": {
           "204": {
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
           },
           "500": {
             "description": "genericError",
@@ -2005,6 +1891,208 @@
         }
       }
     },
+    "/trust/grants/jwt-bearer/issuers": {
+      "get": {
+        "description": "Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
+        "operationId": "listTrustedJwtGrantIssuers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned.",
+            "name": "issuer",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The maximum amount of policies returned, upper bound is 500 policies",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedJwtGrantIssuers",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuers"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "trustJwtGrantIssuer",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/trustJwtGrantIssuerBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "trustedJwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuer"
+            }
+          },
+          "400": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "409": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
+    "/trust/grants/jwt-bearer/issuers/{id}": {
+      "get": {
+        "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "getTrustedJwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedJwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuer"
+            }
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.\n\nOnce deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization Grant.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "admin"
+        ],
+        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "deleteTrustedJwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
     "/userinfo": {
       "get": {
         "security": [
@@ -2663,7 +2751,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -2734,6 +2822,9 @@
           "description": "ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
         },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
         },
@@ -2779,6 +2870,9 @@
         "acr": {
           "description": "ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it\nto express that, for example, a user authenticated using two factor authentication.",
           "type": "string"
+        },
+        "amr": {
+          "$ref": "#/definitions/StringSlicePipeDelimiter"
         },
         "challenge": {
           "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -2834,6 +2928,16 @@
           "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!",
           "type": "object",
           "additionalProperties": true
+        }
+      }
+    },
+    "flushInactiveJwtBearerGrantsParams": {
+      "type": "object",
+      "properties": {
+        "notAfter": {
+          "description": "The \"notAfter\" sets after which point grants should not be flushed. This is useful when you want to keep a history\nof recently added grants.",
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
@@ -2949,7 +3053,7 @@
       ],
       "properties": {
         "alg": {
-          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES512\", \"HS512\", and \"HS256\"",
+          "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
           "type": "string"
         },
         "kid": {
@@ -3379,6 +3483,111 @@
           "description": "Original request URL to which you should redirect the user if request was already handled.",
           "type": "string"
         }
+      }
+    },
+    "trustJwtGrantIssuerBody": {
+      "type": "object",
+      "required": [
+        "issuer",
+        "subject",
+        "scope",
+        "jwk",
+        "expires_at"
+      ],
+      "properties": {
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "jwk": {
+          "$ref": "#/definitions/JSONWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "openid",
+            "offline"
+          ]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedJsonWebKey": {
+      "type": "object",
+      "properties": {
+        "kid": {
+          "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426655440000"
+        },
+        "set": {
+          "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        }
+      }
+    },
+    "trustedJwtGrantIssuer": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "The \"created_at\" indicates, when grant was created.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "public_key": {
+          "$ref": "#/definitions/trustedJsonWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "openid",
+            "offline"
+          ]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedJwtGrantIssuers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/trustedJwtGrantIssuer"
       }
     },
     "userinfoResponse": {

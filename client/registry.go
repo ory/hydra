@@ -16,4 +16,5 @@ type Registry interface {
 	ClientManager() Manager
 	ClientHasher() fosite.Hasher
 	OpenIDJWTStrategy() jwk.JWTStrategy
+	x.ClientAuthenticatorProvider
 }

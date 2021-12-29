@@ -22,11 +22,9 @@ package client
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/ory/x/errorsx"
@@ -105,11 +103,15 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route POST /connect/register public createOAuth2ClientPublic
+// swagger:route POST /connect/register public selfServiceCreateOAuth2Client
 //
-// Create an OAuth 2.0 Client
+// Register an OAuth 2.0 Client using OpenID Dynamic Client Registration
 //
-// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.
+// This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is facing the public internet. This
+// feature needs to be enabled in the configuration.
+//
+// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be
+// generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.
 //
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.
 //
@@ -162,7 +164,6 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request, f func(*Client)
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
 	}
-
 	c.Secret = ""
 	if !c.IsPublic() {
 		c.Secret = secret
@@ -279,9 +280,12 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 	return nil
 }
 
-// swagger:route PUT/connect/register public updateOAuth2ClientPublic
+// swagger:route PUT/connect/register public selfServiceUpdateOAuth2Client
 //
-// Update an OAuth 2.0 Client
+// Register an OAuth 2.0 Client using OpenID Dynamic Client Registration
+//
+// This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is facing the public internet and can be
+// used in self-service. This feature needs to be enabled in the configuration.
 //
 // Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
@@ -299,8 +303,15 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 //       200: oAuth2Client
 //       500: genericError
 func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var c Client
+	client, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.Form)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.
+			WithTrace(err).
+			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials").WithDebug(err.Error())))
+		return
+	}
 
+	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -311,12 +322,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 		secret = c.Secret
 	}
 
-	c.OutfacingID = r.URL.Query().Get("client_id")
-	if err := h.ValidateDynClientRegistrationAuthorization(r, c); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
-		return
-	}
-
+	c.OutfacingID = client.GetID()
 	if err := h.r.ClientValidator().ValidateDynamicRegistration(&c); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -443,7 +449,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /connect/register public getOAuth2ClientPublic
+// swagger:route GET /connect/register public selfServiceGetOAuth2Client
 //
 // Get an OAuth 2.0 Client.
 //
@@ -465,17 +471,18 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //       401: genericError
 //       500: genericError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = r.URL.Query().Get("client_id")
-
-	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	client, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.Form)
 	if err != nil {
-		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
-		h.r.Writer().WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.
+			WithTrace(err).
+			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials").WithDebug(err.Error())))
 		return
 	}
 
-	if err := h.ValidateDynClientRegistrationAuthorization(r, *c); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), client.GetID())
+	if err != nil {
+		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
+		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
@@ -506,7 +513,6 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 //       500: jsonError
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
-
 	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -515,9 +521,12 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /connect/register public deleteOAuth2ClientPublic
+// swagger:route DELETE /connect/register public selfServiceDeleteOAuth2Client
 //
-// Deletes an OAuth 2.0 Client
+// Deletes an OAuth 2.0 Client using OpenID Dynamic Client Registration
+//
+// This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is facing the public internet and can be
+// used in self-service. This feature needs to be enabled in the configuration.
 //
 // Delete an existing OAuth 2.0 Client by its ID.
 //
@@ -536,59 +545,18 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       404: genericError
 //       500: genericError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id = r.URL.Query().Get("client_id")
-
-	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
+	client, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.Form)
 	if err != nil {
-		err = herodot.ErrUnauthorized.WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials")
-		h.r.Writer().WriteError(w, r, err)
+		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.
+			WithTrace(err).
+			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials").WithDebug(err.Error())))
 		return
 	}
 
-	if err := h.ValidateDynClientRegistrationAuthorization(r, *c); err != nil {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusUnauthorized, err)
-		return
-	}
-
-	if err := h.r.ClientManager().DeleteClient(r.Context(), id); err != nil {
+	if err := h.r.ClientManager().DeleteClient(r.Context(), client.GetID()); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *Handler) ValidateDynClientRegistrationAuthorization(r *http.Request, c Client) error {
-
-	basicAuth := getBasicAuth(r)
-	if basicAuth == "" {
-		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-	}
-	sDec, err := base64.StdEncoding.DecodeString(basicAuth)
-	if err != nil {
-		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-	}
-	split := strings.SplitN(string(sDec), ":", 2)
-	if len(split) != 2 {
-		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-	}
-	if c.OutfacingID != split[0] {
-		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-	}
-	_, err = h.r.ClientManager().Authenticate(r.Context(), split[0], []byte(split[1]))
-	if err != nil {
-		return herodot.ErrUnauthorized.WithReason("Invalid authorization")
-	}
-	return nil
-}
-
-func getBasicAuth(req *http.Request) string {
-	auth := req.Header.Get("Authorization")
-	split := strings.SplitN(auth, " ", 2)
-	if len(split) != 2 || !strings.EqualFold(split[0], "Basic") {
-		// Nothing in Authorization header
-		return ""
-	}
-
-	return split[1]
 }

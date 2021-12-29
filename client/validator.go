@@ -187,12 +187,12 @@ func (v *Validator) Validate(c *Client) error {
 }
 
 func (v *Validator) ValidateDynamicRegistration(c *Client) error {
-
 	if c.Metadata != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.
 			WithHint(`metadata cannot be set for dynamic client registration'`),
 		)
 	}
+
 	return v.Validate(c)
 }
 

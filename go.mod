@@ -17,6 +17,7 @@ require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/evanphx/json-patch v4.11.0+incompatible
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-openapi/errors v0.20.1
 	github.com/go-openapi/runtime v0.20.0

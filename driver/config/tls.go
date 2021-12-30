@@ -24,7 +24,7 @@ const (
 type TLSConfig interface {
 	Enabled() bool
 	AllowTerminationFrom() []string
-	Certificate() ([]tls.Certificate, error)
+	Certificate() ([]tls.Certificate, *CertLocation, error)
 }
 
 func (p *Provider) TLS(iface ServeInterface) TLSConfig {
@@ -65,8 +65,17 @@ func (c *tlsConfig) AllowTerminationFrom() []string {
 	return c.allowTerminationFrom
 }
 
-func (c *tlsConfig) Certificate() ([]tls.Certificate, error) {
-	return tlsx.Certificate(c.certString, c.keyString, c.certPath, c.keyPath)
+type CertLocation struct {
+	CertPath string
+	KeyPath  string
+}
+
+func (c *tlsConfig) Certificate() ([]tls.Certificate, *CertLocation, error) {
+	certs, err := tlsx.Certificate(c.certString, c.keyString, c.certPath, c.keyPath)
+	if c.certString != "" && c.keyString != "" {
+		return certs, nil, err
+	}
+	return certs, &CertLocation{CertPath: c.certPath, KeyPath: c.keyPath}, err
 }
 
 func (p *Provider) forcedHTTP() bool {

@@ -300,7 +300,7 @@ func serve(
 	handler http.Handler,
 	address string,
 	permission *configx.UnixPermission,
-	cert []tls.Certificate,
+	getCert func(*tls.ClientHelloInfo) (*tls.Certificate, error),
 ) {
 	defer wg.Done()
 
@@ -308,7 +308,7 @@ func serve(
 		Handler: handler,
 		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
 		TLSConfig: &tls.Config{
-			Certificates: cert,
+			GetCertificate: getCert,
 		},
 	})
 

@@ -27,6 +27,10 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"path"
+	"runtime"
+	"sync"
+	"time"
 
 	"gopkg.in/square/go-jose.v2"
 
@@ -39,6 +43,8 @@ import (
 	"github.com/ory/x/tlsx"
 
 	"github.com/ory/hydra/jwk"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 const (
@@ -54,11 +60,11 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.CertificateThumbprintSHA1 = sig1[:]
 }
 
-func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
-	cert, err := d.Config().TLS(iface).Certificate()
+func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+	cert, location, err := d.Config().TLS(iface).Certificate()
 
 	if err == nil {
-		return cert
+		return newCertificatesProvider(cert, location, d, iface).getCertificate
 	} else if !errors.Is(err, tlsx.ErrNoCertificatesConfigured) {
 		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
@@ -100,5 +106,140 @@ func GetOrCreateTLSCertificate(cmd *cobra.Command, d driver.Registry, iface conf
 		d.Logger().WithError(err).Fatalf("Could not decode certificate")
 	}
 
-	return []tls.Certificate{ct}
+	return func(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+		return &ct, nil
+	}
+}
+
+type certificatesProvider struct {
+	certs        []tls.Certificate
+	mu           sync.Mutex
+	iface        config.ServeInterface
+	certLocation *config.CertLocation
+	d            driver.Registry
+	watcher      *fsnotify.Watcher
+}
+
+func newCertificatesProvider(certs []tls.Certificate, certLocation *config.CertLocation, d driver.Registry, iface config.ServeInterface) *certificatesProvider {
+	ret := &certificatesProvider{
+		certLocation: certLocation,
+		d:            d,
+		iface:        iface,
+	}
+	ret.load(certs)
+	if certLocation != nil {
+		ret.watchCertificatesChanges()
+	}
+
+	runtime.SetFinalizer(ret, func(ret *certificatesProvider) { ret.stop() })
+
+	return ret
+}
+
+func (p *certificatesProvider) load(certs []tls.Certificate) {
+	for i := range certs {
+		tlsCert := &certs[i]
+		if tlsCert.Leaf != nil {
+			continue
+		}
+		for _, bCert := range tlsCert.Certificate {
+			cert, _ := x509.ParseCertificate(bCert)
+			if !cert.IsCA {
+				tlsCert.Leaf = cert
+			}
+		}
+	}
+
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.certs = certs
+}
+
+func (p *certificatesProvider) watchCertificatesChanges() {
+	var err error
+	p.watcher, err = fsnotify.NewWatcher()
+	if err != nil {
+		p.d.Logger().WithError(err).Fatalf("Could not activate certificate change watcher")
+	}
+
+	go func() {
+		p.d.Logger().Infof("Starting tls certificate auto-refresh")
+		for {
+			select {
+			case _, ok := <-p.watcher.Events:
+				if !ok {
+					return
+				}
+
+				p.waitForAllFilesChanges()
+
+				p.d.Logger().Infof("TLS certificates changed, updating")
+				certs, _, err := p.d.Config().TLS(p.iface).Certificate()
+				if err != nil {
+					p.d.Logger().WithError(err).Fatalf("Error in the new tls certificates")
+					return
+				}
+				p.load(certs)
+			case err, ok := <-p.watcher.Errors:
+				if !ok {
+					return
+				}
+				p.d.Logger().WithError(err).Fatalf("Error occured in the tls certificate change watcher")
+			}
+		}
+	}()
+
+	certPath := path.Dir(p.certLocation.CertPath)
+	keyPath := path.Dir(p.certLocation.KeyPath)
+
+	err = p.watcher.Add(certPath)
+	if err != nil {
+		p.d.Logger().WithError(err).Fatalf("Error watching the certFolder for tls certificate change")
+	}
+
+	if certPath != keyPath {
+		err = p.watcher.Add(keyPath)
+		if err != nil {
+			p.d.Logger().WithError(err).Fatalf("Error watching the keyFolder for tls certificate change")
+		}
+	}
+}
+
+func (p *certificatesProvider) waitForAllFilesChanges() {
+	flushUntil := time.After(2 * time.Second)
+	p.d.Logger().Infof("TLS certificates files changed, waiting for changes to finish")
+	stop := false
+	for {
+		select {
+		case <-flushUntil:
+			stop = true
+		case <-p.watcher.Events:
+			continue
+		}
+
+		if stop {
+			break
+		}
+	}
+}
+
+func (p *certificatesProvider) getCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if hello != nil {
+		for _, cert := range p.certs {
+			if cert.Leaf != nil && cert.Leaf.VerifyHostname(hello.ServerName) == nil {
+				return &cert, nil
+			}
+		}
+	}
+	return &p.certs[0], nil
+}
+
+func (p *certificatesProvider) stop() {
+	if p.watcher != nil {
+		p.watcher.Close()
+		p.watcher = nil
+	}
 }

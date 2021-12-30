@@ -47,6 +47,8 @@ New feature or request.
       ([hydra#2902](https://github.com/ory/hydra/issues/2902)) -
       [@Grant Zvolský](https://github.com/grantzvolsky),
       [@hackerman](https://github.com/aeneasr)
+- [ ] Rename SDK methods to follow our OpenAPI spec guide
+      ([hydra#2908](https://github.com/ory/hydra/issues/2908))
 
 ## [v1.11](https://github.com/ory/hydra/milestone/39)
 

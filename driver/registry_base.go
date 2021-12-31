@@ -501,3 +501,7 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	}
 	return m.arhs
 }
+
+func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
+	return m.OAuth2Provider().(*fosite.Fosite)
+}

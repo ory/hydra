@@ -2,9 +2,10 @@ package x
 
 import (
 	"context"
-	"github.com/ory/fosite"
 	"net/http"
 	"net/url"
+
+	"github.com/ory/fosite"
 )
 
 type ClientAuthenticatorProvider interface {

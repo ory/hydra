@@ -1,207 +1,237 @@
-/*
- * Copyright © 2015-2018 Javier Viera <javier.viera@mindcurv.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @author		Javier Viera <javier.viera@mindcurv.com>
- * @Copyright 	2017-2018 Javier Viera <javier.viera@mindcurv.com>
- * @license 	Apache-2.0
- */
-
 package client_test
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/julienschmidt/httprouter"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/x/urlx"
+	"github.com/ory/hydra/x"
+	"github.com/ory/x/snapshotx"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/internal"
 )
 
-func TestValidateDynClientRegistrationAuthorizationBadReq(t *testing.T) {
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	c := client.Client{OutfacingID: "someid"}
-	u := "https://www.something.com"
-	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	err := h.ValidateDynClientRegistrationAuthorization(hr, c)
-	require.EqualValues(t, "The request could not be authorized", err.Error())
+type responseSnapshot struct {
+	Body   json.RawMessage `json:"body"`
+	Status int             `json:"status"`
 }
 
-func TestValidateDynClientRegistrationAuthorizationBadBasicAuthNoBase64(t *testing.T) {
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	c := client.Client{OutfacingID: "someid"}
-	u := "https://www.something.com"
-	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	hr.Header.Add("Authorization", "Basic something")
-	err := h.ValidateDynClientRegistrationAuthorization(hr, c)
-	require.EqualValues(t, "The request could not be authorized", err.Error())
-}
-
-func TestValidateDynClientRegistrationAuthorizationBadBasicAuthKo(t *testing.T) {
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	c := client.Client{OutfacingID: "client"}
-	u := "https://www.something.com"
-	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	hr.Header.Add("Authorization", "Basic Y2xpZW50OnNlY3JldA==")
-	err := h.ValidateDynClientRegistrationAuthorization(hr, c)
-	require.EqualValues(t, "The request could not be authorized", err.Error())
-}
-
-func TestCreateOk(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
+func newResponseSnapshot(body string, res *http.Response) *responseSnapshot {
+	return &responseSnapshot{
+		Body:   json.RawMessage(body),
+		Status: res.StatusCode,
 	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.Create(rr, req, nil)
-	require.EqualValues(t, http.StatusCreated, rr.Result().StatusCode)
 }
 
-func TestCreateDynamicRegistrationOk(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
-	}
-	rr := httptest.NewRecorder()
+func TestHandler(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
 	h := client.NewHandler(reg)
-	h.CreateDynamicRegistration(rr, req, nil)
-	require.EqualValues(t, http.StatusCreated, rr.Result().StatusCode)
-}
 
-func TestUpdateKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
+	newServer := func(t *testing.T, dynamicEnabled bool) (*httptest.Server, *http.Client) {
+		router := httprouter.New()
+		h.SetRoutes(&x.RouterAdmin{Router: router}, &x.RouterPublic{Router: router}, dynamicEnabled)
+		ts := httptest.NewServer(router)
+		t.Cleanup(ts.Close)
+		return ts, ts.Client()
 	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.Update(rr, req, nil)
-	require.EqualValues(t, http.StatusNotFound, rr.Result().StatusCode)
-}
 
-func TestPatchKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
+	fetch := func(t *testing.T, url string) (string, *http.Response) {
+		res, err := http.Get(url)
+		require.NoError(t, err)
+		defer res.Body.Close()
+		body, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		return string(body), res
 	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.Patch(rr, req, nil)
-	require.EqualValues(t, http.StatusNotFound, rr.Result().StatusCode)
-}
 
-func TestUpdateDynamicRegistrationKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
+	fetchWithAuth := func(t *testing.T, method, url, username, password string, body io.Reader) (string, *http.Response) {
+		r, err := http.NewRequest(method, url, body)
+		require.NoError(t, err)
+		r.SetBasicAuth(username, password)
+		res, err := http.DefaultClient.Do(r)
+		require.NoError(t, err)
+		defer res.Body.Close()
+		out, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		return string(out), res
 	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.UpdateDynamicRegistration(rr, req, nil)
-	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
-}
 
-func TestListOk(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
+	makeJSON := func(t *testing.T, ts *httptest.Server, method string, path string, body interface{}) (string, *http.Response) {
+		var b bytes.Buffer
+		require.NoError(t, json.NewEncoder(&b).Encode(body))
+		r, err := http.NewRequest(method, ts.URL+path, &b)
+		require.NoError(t, err)
+		r.Header.Set("Content-Type", "application/json")
+		res, err := ts.Client().Do(r)
+		require.NoError(t, err)
+		defer res.Body.Close()
+		rb, err := io.ReadAll(res.Body)
+		require.NoError(t, err)
+		return string(rb), res
 	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.List(rr, req, nil)
-	require.EqualValues(t, http.StatusOK, rr.Result().StatusCode)
-}
 
-func TestGetKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
-	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.Get(rr, req, nil)
-	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
-}
+	t.Run("selfservice disabled", func(t *testing.T) {
+		ts, hc := newServer(t, false)
 
-func TestGetDynamicRegistrationKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
-	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.GetDynamicRegistration(rr, req, nil)
-	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
-}
+		for _, method := range []string{"GET", "POST", "PUT", "DELETE"} {
+			t.Run("method="+method, func(t *testing.T) {
+				req, err := http.NewRequest(method, ts.URL+client.DynClientsHandlerPath, nil)
+				require.NoError(t, err)
 
-func TestDeleteKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
-	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.Delete(rr, req, nil)
-	require.EqualValues(t, http.StatusNotFound, rr.Result().StatusCode)
-}
+				res, err := hc.Do(req)
+				require.NoError(t, err)
+				require.Equal(t, http.StatusNotFound, res.StatusCode)
+			})
+		}
+	})
 
-func TestDeleteDynamicRegistrationKo(t *testing.T) {
-	u := "https://www.something.com"
-	var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-	req, err := http.NewRequest("POST", u, bytes.NewBuffer(jsonStr))
-	if err != nil {
-		panic(err)
-	}
-	rr := httptest.NewRecorder()
-	reg := internal.NewMockedRegistry(t)
-	h := client.NewHandler(reg)
-	h.DeleteDynamicRegistration(rr, req, nil)
-	require.EqualValues(t, http.StatusUnauthorized, rr.Result().StatusCode)
+	t.Run("case=selfservice with incorrect or missing auth", func(t *testing.T) {
+		ts, hc := newServer(t, true)
+		expected := &client.Client{
+			OutfacingID:             "incorrect-missing-client",
+			Secret:                  "averylongsecret",
+			RedirectURIs:            []string{"http://localhost:3000/cb"},
+			TokenEndpointAuthMethod: "client_secret_basic",
+		}
+		body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
+		require.Equal(t, http.StatusCreated, res.StatusCode, body)
+
+		// Create the second client
+		secondClient := &client.Client{
+			OutfacingID:  "second-existing-client",
+			Secret:       "averylongsecret",
+			RedirectURIs: []string{"http://localhost:3000/cb"},
+		}
+		body, res = makeJSON(t, ts, "POST", client.ClientsHandlerPath, secondClient)
+		require.Equal(t, http.StatusCreated, res.StatusCode, body)
+
+		t.Run("endpoint=selfservice", func(t *testing.T) {
+			for _, method := range []string{"GET", "DELETE", "PUT"} {
+				t.Run("method="+method, func(t *testing.T) {
+					t.Run("without auth", func(t *testing.T) {
+						req, err := http.NewRequest(method, ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, nil)
+						require.NoError(t, err)
+
+						res, err := hc.Do(req)
+						require.NoError(t, err)
+						defer res.Body.Close()
+
+						body, err := io.ReadAll(res.Body)
+						require.NoError(t, err)
+
+						snapshotx.SnapshotTExcept(t, newResponseSnapshot(string(body), res), nil)
+					})
+
+					t.Run("without incorrect auth", func(t *testing.T) {
+						body, res := fetchWithAuth(t, method, ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, "incorrect", nil)
+						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+						snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+					})
+
+					t.Run("with a different client auth", func(t *testing.T) {
+						body, res = fetchWithAuth(t, method, ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, secondClient.OutfacingID, secondClient.Secret, nil)
+						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
+						snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+					})
+				})
+			}
+		})
+	})
+
+	t.Run("common", func(t *testing.T) {
+		ts, _ := newServer(t, true)
+		t.Run("case=create clients", func(t *testing.T) {
+			for k, tc := range []struct {
+				d          string
+				payload    *client.Client
+				path       string
+				statusCode int
+			}{
+				{
+					d: "standard",
+					payload: &client.Client{
+						OutfacingID:  "standard-client",
+						Secret:       "averylongsecret",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusCreated,
+				},
+				{
+					d: "metadata fails",
+					payload: &client.Client{
+						OutfacingID:  "standard-client",
+						Secret:       "averylongsecret",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+						Metadata:     []byte(`{"foo":"bar"}`),
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusBadRequest,
+				},
+				{
+					d: "short secret fails",
+					payload: &client.Client{
+						OutfacingID:  "standard-client",
+						Secret:       "short",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+					},
+					path:       client.DynClientsHandlerPath,
+					statusCode: http.StatusBadRequest,
+				},
+			} {
+				t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
+					body, res := makeJSON(t, ts, "POST", tc.path, tc.payload)
+					require.Equal(t, tc.statusCode, res.StatusCode, body)
+					snapshotx.SnapshotTExcept(t, json.RawMessage(body), []string{"updated_at", "created_at"})
+				})
+			}
+		})
+
+		t.Run("case=fetching client which does not exist", func(t *testing.T) {
+			for _, path := range []string{
+				client.DynClientsHandlerPath + "?client_id=foo",
+				client.ClientsHandlerPath + "/foo",
+			} {
+				t.Run("path="+path, func(t *testing.T) {
+					body, res := fetch(t, ts.URL+path)
+					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+				})
+			}
+		})
+
+		t.Run("case=fetching client existing", func(t *testing.T) {
+			expected := &client.Client{
+				OutfacingID:             "existing-client",
+				Secret:                  "averylongsecret",
+				RedirectURIs:            []string{"http://localhost:3000/cb"},
+				TokenEndpointAuthMethod: "client_secret_basic",
+			}
+			body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
+			require.Equal(t, http.StatusCreated, res.StatusCode, body)
+
+			t.Run("endpoint=admin", func(t *testing.T) {
+				body, res := fetch(t, ts.URL+client.ClientsHandlerPath+"/"+expected.OutfacingID)
+				assert.Equal(t, http.StatusOK, res.StatusCode)
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
+			})
+
+			t.Run("endpoint=selfservice", func(t *testing.T) {
+				t.Run("with correct client auth", func(t *testing.T) {
+					body, res = fetchWithAuth(t, "GET", ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, expected.Secret, nil)
+					assert.Equal(t, http.StatusOK, res.StatusCode)
+					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
+				})
+			})
+		})
+	})
 }

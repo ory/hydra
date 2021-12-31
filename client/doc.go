@@ -29,7 +29,7 @@
 
 package client
 
-// swagger:parameters createOAuth2Client
+// swagger:parameters createOAuth2Client selfServiceCreateOAuth2Client
 type swaggerCreateClientPayload struct {
 	// in: body
 	// required: true
@@ -47,11 +47,11 @@ type swaggerUpdateClientPayload struct {
 	Body Client
 }
 
-// swagger:parameters updateDynOAuth2Client
+// swagger:parameters selfServiceUpdateOAuth2Client
 type swaggerUpdateDynClientPayload struct {
-	// in: path
+	// in: query
 	// required: true
-	ID string `json:"id"`
+	ID string `json:"client_id"`
 
 	// in: body
 	// required: true
@@ -115,10 +115,9 @@ type swaggerGetOAuth2Client struct {
 
 // swagger:parameters getDynOAuth2Client
 type swaggerGetDynOAuth2Client struct {
-	// The id of the OAuth 2.0 Client.
-	//
-	// in: path
-	ID string `json:"id"`
+	// in: query
+	// required: true
+	ID string `json:"client_id"`
 }
 
 // swagger:parameters deleteOAuth2Client
@@ -129,10 +128,9 @@ type swaggerDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:parameters deleteDynOAuth2Client
+// swagger:parameters selfServiceDeleteOAuth2Client
 type swaggerDeleteDynOAuth2Client struct {
-	// The id of the OAuth 2.0 Client.
-	//
-	// in: path
-	ID string `json:"id"`
+	// in: query
+	// required: true
+	ID string `json:"client_id"`
 }

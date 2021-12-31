@@ -1,0 +1,4 @@
+{
+  "error": "invalid_client_metadata",
+  "error_description": "The value of one of the Client Metadata fields is invalid and the server has rejected this request. Note that an Authorization Server MAY choose to substitute a valid value for any requested parameter of a Client's Metadata. metadata cannot be set for dynamic client registration'"
+}

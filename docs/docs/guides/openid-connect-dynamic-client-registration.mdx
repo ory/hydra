@@ -1,0 +1,90 @@
+---
+id: openid-connect-dynamic-client-registration
+title: OpenID Connect Dynamic Client Registration
+---
+
+Ory Hydra is capable of exposing [OpenID Connect Dynamic Client Registration](https://openid.net/specs/openid-connect-registration-1_0.html).
+This feature allows anonymous users to create OAuth2 Clients in self-service, without administrative privileges.
+
+This is particularly useful if you are running a public service and want users to be able to create their own OAuth2 clients easily.
+
+To enable this feature, set the following configuration option:
+
+```yaml
+oidc:
+  dynamic_client_registration:
+    enabled: true
+```
+
+Enabling this feature will add listeners to the following four routes at the public endpoint:
+
+- `POST /openid/register` - Register a new OAuth2 Client;
+- `GET /openid/register?client_id=...` - Fetch the OAuth2 Client;
+- `PUT /openid/register?client_id=...` - Update the OAuth2 Client;
+- `DELETE /openid/register?client_id=...` - Delete the OAuth2 Client;
+
+## Register OAuth2 & OpenID Connect Clients
+
+If OpenID Connect Dynamic Client Registration is enabled, registering a new OAuth2 Client is as simple as:
+
+```
+POST /openid/register
+Content-Type: application/json
+
+{
+  "client_id": "...",
+  ...
+}
+```
+
+Please note that it is not possible to set OAuth2 Client Metadata using this endpoint. Metadata is a protected
+field and can only be set using the administrative endpoint! OAuth2 Client Metadata can also not be read using OpenID Connect Dynamic Client Registration endpoints!
+
+## Manage OAuth2 & OpenID Connect Clients
+
+All endpoints except the `POST` one require the client to authenticate with its primary credentials. For example,
+if the OAuth2 Client has `token_endpoint_auth_method=client_secret_basic` then it will require the client to authenticate
+using basic authorization when, for example, updating information:
+
+```
+PUT /openid/register?client_id=...
+Authorization: Basic <base64(client_id:client_secret)>
+Content-Type: application/json
+
+{
+  "redirect_uris": [...]
+  ...
+}
+```
+
+If the OAuth2 Client uses `client_secret_post` as the auth method, you need to supply the client secret as a query parameter:
+
+```
+PUT /openid/register?client_id=...&client_secret=...
+Content-Type: application/json
+
+{
+  "redirect_uris": [...]
+  ...
+}
+```
+
+If the OAuth2 Client uses `private_key_jwt` as the auth method, you supply the appropriate assertion as a query parameter as well:
+
+```
+PUT /openid/register?client_id=...&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion=...
+Content-Type: application/json
+
+{
+  "redirect_uris": [...]
+  ...
+}
+```
+
+:::info
+
+It is not possible to manage the OAuth2 Clients with `token_endpoint_auth_method=none` through the API! These clients can only be managed
+using administrative endpoints.
+
+:::
+

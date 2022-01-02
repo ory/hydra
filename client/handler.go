@@ -75,9 +75,12 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 //
 // Create an OAuth 2.0 Client
 //
-// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
+// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret
+// will be generated. The secret will be returned in the response and you will not be able to retrieve it later on.
+// Write the secret down and keep it somwhere safe.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Consumes:
 //     - application/json
@@ -104,13 +107,14 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //
 // Register an OAuth 2.0 Client using OpenID Dynamic Client Registration
 //
-// This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is facing the public internet. This
-// feature needs to be enabled in the configuration.
+// This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
+// public internet directly and can be used in self-service. It implements the OpenID Connect
+// Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+// is disabled by default. It can be enabled by an administrator.
 //
 // Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be
-// generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somewhere safe.
-//
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well.
+// generated. The secret will be returned in the response and you will not be able to retrieve it later on.
+// Write the secret down and keep it somewhere safe.
 //
 //
 //     Consumes:
@@ -170,9 +174,11 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request, validator func(
 //
 // Update an OAuth 2.0 Client
 //
-// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.
+// This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Consumes:
 //     - application/json
@@ -189,12 +195,12 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
 	c.OutfacingID = ps.ByName("id")
-	if err := h.updateClient(r.Context(), &c); err != nil {
+	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -202,12 +208,13 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.r.Writer().Write(w, r, &c)
 }
 
-func (h *Handler) updateClient(ctx context.Context, c *Client) error {
+func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(*Client) error) error {
 	var secret string
 	if len(c.Secret) > 0 {
 		secret = c.Secret
 	}
-	if err := h.r.ClientValidator().Validate(c); err != nil {
+
+	if err := validator(c); err != nil {
 		return err
 	}
 
@@ -221,14 +228,22 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 
 // swagger:route PUT /connect/register public selfServiceUpdateOAuth2Client
 //
-// Register an OAuth 2.0 Client using OpenID Dynamic Client Registration
+// Update an OAuth 2.0 Client using OpenID Dynamic Client Registration
 //
-// This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is facing the public internet and can be
-// used in self-service. This feature needs to be enabled in the configuration.
+// This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
+// public internet directly and can be used in self-service. It implements the OpenID Connect
+// Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+// is disabled by default. It can be enabled by an administrator.
 //
-// Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+// If you pass `client_secret` the secret will be updated and returned via the API.
+// This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
+// To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+// uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+// If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+//
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Consumes:
 //     - application/json
@@ -243,15 +258,8 @@ func (h *Handler) updateClient(ctx context.Context, c *Client) error {
 //       default: jsonError
 //
 func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.Form)
+	client, err := h.validDynamicAuth(r)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.
-			WithTrace(err).
-			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials").WithDebug(err.Error())))
-		return
-	}
-
-	if err := h.checkID(client, r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -262,24 +270,12 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	var secret string
-	if len(c.Secret) > 0 {
-		secret = c.Secret
-	}
-
 	c.OutfacingID = client.GetID()
-	if err := h.r.ClientValidator().ValidateDynamicRegistration(&c); err != nil {
+	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	c.UpdatedAt = time.Now().UTC().Round(time.Second)
-	if err := h.r.ClientManager().UpdateClient(r.Context(), &c); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	c.Secret = secret
 	h.r.Writer().Write(w, r, &c)
 }
 
@@ -287,9 +283,12 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 //
 // Patch an OAuth 2.0 Client
 //
-// Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+// Patch an existing OAuth 2.0 Client. If you pass `client_secret`
+// the secret will be updated and returned via the API. This is the
+// only time you will be able to retrieve the client secret, so write it down and keep it safe.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Consumes:
 //     - application/json
@@ -331,7 +330,7 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		c.Secret = ""
 	}
 
-	if err := h.updateClient(r.Context(), c); err != nil {
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -362,9 +361,13 @@ type Filter struct {
 //
 // List OAuth 2.0 Clients
 //
-// This endpoint lists all clients in the database, and never returns client secrets. As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients, but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
+// This endpoint lists all clients in the database, and never returns client secrets.
+// As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,
+// but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+//
 // The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
 //
@@ -415,12 +418,12 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 // swagger:route GET /clients/{id} admin getOAuth2Client
 //
-// Get an OAuth 2.0 Client.
+// Get an OAuth 2.0 Client
 //
-// Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
+// Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
-//
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Consumes:
 //     - application/json
@@ -448,12 +451,19 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 // swagger:route GET /connect/register public selfServiceGetOAuth2Client
 //
-// Get an OAuth 2.0 Client.
+// Get an OAuth 2.0 Client using OpenID Dynamic Client Registration
 //
-// Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
+// This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
+// public internet directly and can be used in self-service. It implements the OpenID Connect
+// Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+// is disabled by default. It can be enabled by an administrator.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
+// To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+// uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+// If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
 //
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Consumes:
 //     - application/json
@@ -467,15 +477,8 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //       200: oAuth2Client
 //       default: jsonError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.Form)
+	client, err := h.validDynamicAuth(r)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.
-			WithTrace(err).
-			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials").WithDebug(err.Error())))
-		return
-	}
-
-	if err := h.checkID(client, r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -498,7 +501,10 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 //
 // Delete an existing OAuth 2.0 Client by its ID.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+//
+// Make sure that this endpoint is well protected and only callable by first-party components.
 //
 //     Consumes:
 //     - application/json
@@ -525,15 +531,17 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //
 // Deletes an OAuth 2.0 Client using OpenID Dynamic Client Registration
 //
-// This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is facing the public internet and can be
-// used in self-service. This feature needs to be enabled in the configuration.
+// This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
+// public internet directly and can be used in self-service. It implements the OpenID Connect
+// Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+// is disabled by default. It can be enabled by an administrator.
 //
-// Delete an existing OAuth 2.0 Client by its ID.
+// To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+// uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+// If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
 //
-// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected.
-//
-//     Consumes:
-//     - application/json
+// OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+// generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
 //     Produces:
 //     - application/json
@@ -544,15 +552,8 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       204: emptyResponse
 //       default: jsonError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.Form)
+	client, err := h.validDynamicAuth(r)
 	if err != nil {
-		h.r.Writer().WriteError(w, r, errors.WithStack(herodot.ErrUnauthorized.
-			WithTrace(err).
-			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials.").WithDebug(err.Error())))
-		return
-	}
-
-	if err := h.checkID(client, r); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -565,10 +566,22 @@ func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) checkID(c fosite.Client, r *http.Request) error {
-	if r.URL.Query().Get("client_id") != c.GetID() {
-		return errors.WithStack(herodot.ErrUnauthorized.WithReason("The OAuth 2.0 Client ID from the path does not match the OAuth 2.0 Client used to authenticate the request."))
+func (h *Handler) validDynamicAuth(r *http.Request) (fosite.Client, error) {
+	// We use the query parameters instead of the body because the body is not available in this context.
+	c, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.URL.Query())
+	if err != nil {
+		return nil, herodot.ErrUnauthorized.
+			WithTrace(err).
+			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials.").WithDebug(err.Error())
 	}
 
-	return nil
+	if r.URL.Query().Get("client_id") != c.GetID() {
+		return nil, errors.WithStack(herodot.ErrUnauthorized.WithReason("The OAuth 2.0 Client ID from the path does not match the OAuth 2.0 Client used to authenticate the request."))
+	}
+
+	if c.(fosite.OpenIDConnectClient).GetTokenEndpointAuthMethod() == "none" {
+		return nil, errors.WithStack(herodot.ErrUnauthorized.WithReason("Public OAuth 2.0 Clients can not be managed using OpenID Connect Dynamic Client Registration."))
+	}
+
+	return c, nil
 }

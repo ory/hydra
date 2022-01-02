@@ -29,20 +29,15 @@ func (o *DeleteOAuth2ClientReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return result, nil
-	case 404:
-		result := NewDeleteOAuth2ClientNotFound()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 500:
-		result := NewDeleteOAuth2ClientInternalServerError()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		result := NewDeleteOAuth2ClientDefault(response.Code())
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
+		return nil, result
 	}
 }
 
@@ -51,9 +46,9 @@ func NewDeleteOAuth2ClientNoContent() *DeleteOAuth2ClientNoContent {
 	return &DeleteOAuth2ClientNoContent{}
 }
 
-/* DeleteOAuth2ClientNoContent describes a response with status code 204, with default header values.
+/*DeleteOAuth2ClientNoContent handles this case with default header values.
 
- Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteOAuth2ClientNoContent struct {
@@ -68,59 +63,37 @@ func (o *DeleteOAuth2ClientNoContent) readResponse(response runtime.ClientRespon
 	return nil
 }
 
-// NewDeleteOAuth2ClientNotFound creates a DeleteOAuth2ClientNotFound with default headers values
-func NewDeleteOAuth2ClientNotFound() *DeleteOAuth2ClientNotFound {
-	return &DeleteOAuth2ClientNotFound{}
-}
-
-/* DeleteOAuth2ClientNotFound describes a response with status code 404, with default header values.
-
-jsonError
-*/
-type DeleteOAuth2ClientNotFound struct {
-	Payload *models.JSONError
-}
-
-func (o *DeleteOAuth2ClientNotFound) Error() string {
-	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientNotFound  %+v", 404, o.Payload)
-}
-func (o *DeleteOAuth2ClientNotFound) GetPayload() *models.JSONError {
-	return o.Payload
-}
-
-func (o *DeleteOAuth2ClientNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.JSONError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
+// NewDeleteOAuth2ClientDefault creates a DeleteOAuth2ClientDefault with default headers values
+func NewDeleteOAuth2ClientDefault(code int) *DeleteOAuth2ClientDefault {
+	return &DeleteOAuth2ClientDefault{
+		_statusCode: code,
 	}
-
-	return nil
 }
 
-// NewDeleteOAuth2ClientInternalServerError creates a DeleteOAuth2ClientInternalServerError with default headers values
-func NewDeleteOAuth2ClientInternalServerError() *DeleteOAuth2ClientInternalServerError {
-	return &DeleteOAuth2ClientInternalServerError{}
-}
-
-/* DeleteOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
+/*DeleteOAuth2ClientDefault handles this case with default header values.
 
 jsonError
 */
-type DeleteOAuth2ClientInternalServerError struct {
+type DeleteOAuth2ClientDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *DeleteOAuth2ClientInternalServerError) Error() string {
-	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the delete o auth2 client default response
+func (o *DeleteOAuth2ClientDefault) Code() int {
+	return o._statusCode
 }
-func (o *DeleteOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
+
+func (o *DeleteOAuth2ClientDefault) Error() string {
+	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2Client default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *DeleteOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *DeleteOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *DeleteOAuth2ClientDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

@@ -91,7 +91,7 @@
     },
     "/clients": {
       "get": {
-        "description": "This endpoint lists all clients in the database, and never returns client secrets. As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients, but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/clients?limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
+        "description": "This endpoint lists all clients in the database, and never returns client secrets.\nAs a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,\nbut it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/clients?limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
         "consumes": [
           "application/json"
         ],
@@ -145,7 +145,7 @@
               }
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -154,7 +154,7 @@
         }
       },
       "post": {
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret\nwill be generated. The secret will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
         ],
@@ -187,19 +187,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "400": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "409": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -210,7 +198,7 @@
     },
     "/clients/{id}": {
       "get": {
-        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
         ],
@@ -224,7 +212,7 @@
         "tags": [
           "admin"
         ],
-        "summary": "Get an OAuth 2.0 Client.",
+        "summary": "Get an OAuth 2.0 Client",
         "operationId": "getOAuth2Client",
         "parameters": [
           {
@@ -242,13 +230,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "401": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -257,7 +239,7 @@
         }
       },
       "put": {
-        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
         ],
@@ -296,7 +278,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -305,7 +287,7 @@
         }
       },
       "delete": {
-        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nMake sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": [
           "application/json"
         ],
@@ -334,13 +316,7 @@
           "204": {
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
-          "404": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -349,7 +325,7 @@
         }
       },
       "patch": {
-        "description": "Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Patch an existing OAuth 2.0 Client. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
         ],
@@ -388,7 +364,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -397,10 +373,13 @@
         }
       }
     },
-    "/grants/jwt-bearer/flush": {
-      "post": {
-        "description": "This endpoint flushes expired jwt-bearer grants from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
+    "/connect/register": {
+      "get": {
+        "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
+          "application/json"
+        ],
+        "produces": [
           "application/json"
         ],
         "schemes": [
@@ -408,27 +387,145 @@
           "https"
         ],
         "tags": [
-          "admin"
+          "public"
         ],
-        "summary": "Flush Expired jwt-bearer grants.",
-        "operationId": "flushInactiveJwtBearerGrants",
+        "summary": "Get an OAuth 2.0 Client using OpenID Dynamic Client Registration",
+        "operationId": "selfServiceGetOAuth2Client",
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nIf you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "public"
+        ],
+        "summary": "Update an OAuth 2.0 Client using OpenID Dynamic Client Registration",
+        "operationId": "selfServiceUpdateOAuth2Client",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "client_id",
+            "in": "query",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nCreate a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be\ngenerated. The secret will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somewhere safe.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "public"
+        ],
+        "summary": "Register an OAuth 2.0 Client using OpenID Dynamic Client Registration",
+        "operationId": "selfServiceCreateOAuth2Client",
         "parameters": [
           {
             "name": "Body",
             "in": "body",
+            "required": true,
             "schema": {
-              "$ref": "#/definitions/flushInactiveJwtBearerGrantsParams"
+              "$ref": "#/definitions/oAuth2Client"
             }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "public"
+        ],
+        "summary": "Deletes an OAuth 2.0 Client using OpenID Dynamic Client Registration",
+        "operationId": "selfServiceDeleteOAuth2Client",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "client_id",
+            "in": "query",
+            "required": true
           }
         ],
         "responses": {
           "204": {
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
-          "500": {
-            "description": "genericError",
+          "default": {
+            "description": "jsonError",
             "schema": {
-              "$ref": "#/definitions/genericError"
+              "$ref": "#/definitions/jsonError"
             }
           }
         }
@@ -2751,7 +2848,7 @@
           }
         },
         "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide, or `local` for machine level.",
+          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
           "type": "string"
         },
         "Status": {
@@ -2931,16 +3028,6 @@
         }
       }
     },
-    "flushInactiveJwtBearerGrantsParams": {
-      "type": "object",
-      "properties": {
-        "notAfter": {
-          "description": "The \"notAfter\" sets after which point grants should not be flushed. This is useful when you want to keep a history\nof recently added grants.",
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "flushInactiveOAuth2TokensRequest": {
       "type": "object",
       "properties": {
@@ -2972,6 +3059,10 @@
           "description": "Further error details",
           "type": "object",
           "additionalProperties": true
+        },
+        "id": {
+          "description": "The error ID\n\nUseful when trying to identify various errors in application logic.",
+          "type": "string"
         },
         "message": {
           "description": "Error message\n\nThe error's message.",

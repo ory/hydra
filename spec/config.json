@@ -357,12 +357,6 @@
             },
             "tls": {
               "$ref": "#/definitions/tls_config"
-            },
-            "allow_dynamic_registration": {
-              "type": "boolean",
-              "additionalProperties": false,
-              "description": "Allow oidc dynamic client registration.",
-              "default": false
             }
           }
         },
@@ -563,6 +557,17 @@
       "additionalProperties": false,
       "description": "Configures OpenID Connect features.",
       "properties": {
+        "dynamic_client_registration": {
+          "title": "Configure OpenID Connect Dynamic Client Registration",
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Enable dynamic client registration.",
+              "default": false
+            }
+          },
+          "additionalProperties": false
+        },
         "subject_identifiers": {
           "type": "object",
           "additionalProperties": false,

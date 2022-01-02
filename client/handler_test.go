@@ -80,6 +80,11 @@ func TestHandler(t *testing.T) {
 		return string(rb), res
 	}
 
+	createClient := func(t *testing.T, c *client.Client, ts *httptest.Server, path string) {
+		body, res := makeJSON(t, ts, "POST", path, c)
+		require.Equal(t, http.StatusCreated, res.StatusCode, body)
+	}
+
 	t.Run("selfservice disabled", func(t *testing.T) {
 		ts, hc := newServer(t, false)
 
@@ -103,8 +108,7 @@ func TestHandler(t *testing.T) {
 			RedirectURIs:            []string{"http://localhost:3000/cb"},
 			TokenEndpointAuthMethod: "client_secret_basic",
 		}
-		body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
-		require.Equal(t, http.StatusCreated, res.StatusCode, body)
+		createClient(t, expected, ts, client.ClientsHandlerPath)
 
 		// Create the second client
 		secondClient := &client.Client{
@@ -112,8 +116,7 @@ func TestHandler(t *testing.T) {
 			Secret:       "averylongsecret",
 			RedirectURIs: []string{"http://localhost:3000/cb"},
 		}
-		body, res = makeJSON(t, ts, "POST", client.ClientsHandlerPath, secondClient)
-		require.Equal(t, http.StatusCreated, res.StatusCode, body)
+		createClient(t, secondClient, ts, client.ClientsHandlerPath)
 
 		t.Run("endpoint=selfservice", func(t *testing.T) {
 			for _, method := range []string{"GET", "DELETE", "PUT"} {
@@ -139,7 +142,7 @@ func TestHandler(t *testing.T) {
 					})
 
 					t.Run("with a different client auth", func(t *testing.T) {
-						body, res = fetchWithAuth(t, method, ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, secondClient.OutfacingID, secondClient.Secret, nil)
+						body, res := fetchWithAuth(t, method, ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, secondClient.OutfacingID, secondClient.Secret, nil)
 						assert.Equal(t, http.StatusUnauthorized, res.StatusCode)
 						snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
 					})
@@ -150,6 +153,14 @@ func TestHandler(t *testing.T) {
 
 	t.Run("common", func(t *testing.T) {
 		ts, _ := newServer(t, true)
+		expected := &client.Client{
+			OutfacingID:             "existing-client",
+			Secret:                  "averylongsecret",
+			RedirectURIs:            []string{"http://localhost:3000/cb"},
+			TokenEndpointAuthMethod: "client_secret_basic",
+		}
+		createClient(t, expected, ts, client.ClientsHandlerPath)
+
 		t.Run("case=create clients", func(t *testing.T) {
 			for k, tc := range []struct {
 				d          string
@@ -158,9 +169,9 @@ func TestHandler(t *testing.T) {
 				statusCode int
 			}{
 				{
-					d: "standard",
+					d: "basic dynamic client registration",
 					payload: &client.Client{
-						OutfacingID:  "standard-client",
+						OutfacingID:  "create-client-1",
 						Secret:       "averylongsecret",
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
@@ -168,9 +179,20 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusCreated,
 				},
 				{
-					d: "metadata fails",
+					d: "basic admin registration",
 					payload: &client.Client{
-						OutfacingID:  "standard-client",
+						OutfacingID:  "create-client-2",
+						Secret:       "averylongsecret",
+						RedirectURIs: []string{"http://localhost:3000/cb"},
+						Metadata:     []byte(`{"foo":"bar"}`),
+					},
+					path:       client.ClientsHandlerPath,
+					statusCode: http.StatusCreated,
+				},
+				{
+					d: "metadata fails for dynamic client registration",
+					payload: &client.Client{
+						OutfacingID:  "create-client-3",
 						Secret:       "averylongsecret",
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 						Metadata:     []byte(`{"foo":"bar"}`),
@@ -181,7 +203,7 @@ func TestHandler(t *testing.T) {
 				{
 					d: "short secret fails",
 					payload: &client.Client{
-						OutfacingID:  "standard-client",
+						OutfacingID:  "create-client-4",
 						Secret:       "short",
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
@@ -197,28 +219,48 @@ func TestHandler(t *testing.T) {
 			}
 		})
 
-		t.Run("case=fetching client which does not exist", func(t *testing.T) {
+		t.Run("case=fetching non-existing client", func(t *testing.T) {
 			for _, path := range []string{
 				client.DynClientsHandlerPath + "?client_id=foo",
 				client.ClientsHandlerPath + "/foo",
 			} {
 				t.Run("path="+path, func(t *testing.T) {
-					body, res := fetch(t, ts.URL+path)
+					body, res := fetchWithAuth(t, "GET", ts.URL+path, expected.OutfacingID, expected.Secret, nil)
 					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
 				})
 			}
 		})
 
-		t.Run("case=fetching client existing", func(t *testing.T) {
-			expected := &client.Client{
-				OutfacingID:             "existing-client",
-				Secret:                  "averylongsecret",
-				RedirectURIs:            []string{"http://localhost:3000/cb"},
-				TokenEndpointAuthMethod: "client_secret_basic",
+		t.Run("case=updating non-existing client", func(t *testing.T) {
+			for _, path := range []string{
+				client.DynClientsHandlerPath + "?client_id=foo",
+				client.ClientsHandlerPath + "/foo",
+			} {
+				t.Run("path="+path, func(t *testing.T) {
+					body, res := fetchWithAuth(t, "PUT", ts.URL+path, expected.OutfacingID, expected.Secret, bytes.NewBufferString("{}"))
+					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+				})
 			}
-			body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
-			require.Equal(t, http.StatusCreated, res.StatusCode, body)
+		})
 
+		t.Run("case=delete non-existing client", func(t *testing.T) {
+			for _, path := range []string{
+				client.DynClientsHandlerPath + "?client_id=foo",
+				client.ClientsHandlerPath + "/foo",
+			} {
+				t.Run("path="+path, func(t *testing.T) {
+					body, res := fetchWithAuth(t, "DELETE", ts.URL+path, expected.OutfacingID, expected.Secret, nil)
+					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+				})
+			}
+		})
+
+		t.Run("case=patching non-existing client", func(t *testing.T) {
+			body, res := fetchWithAuth(t, "PATCH", ts.URL+client.ClientsHandlerPath+"/foo", expected.OutfacingID, expected.Secret, nil)
+			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+		})
+
+		t.Run("case=fetching existing client", func(t *testing.T) {
 			t.Run("endpoint=admin", func(t *testing.T) {
 				body, res := fetch(t, ts.URL+client.ClientsHandlerPath+"/"+expected.OutfacingID)
 				assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -226,12 +268,169 @@ func TestHandler(t *testing.T) {
 			})
 
 			t.Run("endpoint=selfservice", func(t *testing.T) {
-				t.Run("with correct client auth", func(t *testing.T) {
-					body, res = fetchWithAuth(t, "GET", ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, expected.Secret, nil)
-					assert.Equal(t, http.StatusOK, res.StatusCode)
-					snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
-				})
+				body, res := fetchWithAuth(t, "GET", ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, expected.Secret, nil)
+				assert.Equal(t, http.StatusOK, res.StatusCode)
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
 			})
+		})
+
+		t.Run("case=updating existing client fails with metadat on self service", func(t *testing.T) {
+			expected := &client.Client{
+				OutfacingID:             "update-existing-client-selfservice-metadata",
+				Secret:                  "averylongsecret",
+				RedirectURIs:            []string{"http://localhost:3000/cb"},
+				TokenEndpointAuthMethod: "client_secret_basic",
+			}
+			createClient(t, expected, ts, client.ClientsHandlerPath)
+
+			// Possible to update the secret
+			expected.Metadata = []byte(`{"foo":"bar"}`)
+			payload, err := json.Marshal(expected)
+			require.NoError(t, err)
+
+			body, res := fetchWithAuth(t, "PUT", ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, expected.Secret, bytes.NewReader(payload))
+			assert.Equal(t, http.StatusBadRequest, res.StatusCode)
+			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+		})
+
+		t.Run("case=updating existing client", func(t *testing.T) {
+			t.Run("endpoint=admin", func(t *testing.T) {
+				expected := &client.Client{
+					OutfacingID:             "update-existing-client-admin",
+					Secret:                  "averylongsecret",
+					RedirectURIs:            []string{"http://localhost:3000/cb"},
+					TokenEndpointAuthMethod: "client_secret_basic",
+				}
+				createClient(t, expected, ts, client.ClientsHandlerPath)
+
+				expected.RedirectURIs = append(expected.RedirectURIs, "https://foobar.com")
+				body, res := makeJSON(t, ts, "PUT", client.ClientsHandlerPath+"/"+expected.OutfacingID, expected)
+				assert.Equal(t, http.StatusOK, res.StatusCode)
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
+			})
+
+			t.Run("endpoint=selfservice", func(t *testing.T) {
+				expected := &client.Client{
+					OutfacingID:             "update-existing-client-selfservice",
+					Secret:                  "averylongsecret",
+					RedirectURIs:            []string{"http://localhost:3000/cb"},
+					TokenEndpointAuthMethod: "client_secret_basic",
+				}
+				createClient(t, expected, ts, client.ClientsHandlerPath)
+
+				// Possible to update the secret
+				expected.Secret = "anothersecret"
+				expected.RedirectURIs = append(expected.RedirectURIs, "https://foobar.com")
+				payload, err := json.Marshal(expected)
+				require.NoError(t, err)
+
+				body, res := fetchWithAuth(t, "PUT", ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, "averylongsecret", bytes.NewReader(payload))
+				assert.Equal(t, http.StatusOK, res.StatusCode)
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), []string{"body.created_at", "body.updated_at"})
+			})
+		})
+
+		t.Run("case=delete existing client", func(t *testing.T) {
+			t.Run("endpoint=admin", func(t *testing.T) {
+				expected := &client.Client{
+					OutfacingID:             "delete-existing-client-admin",
+					Secret:                  "averylongsecret",
+					RedirectURIs:            []string{"http://localhost:3000/cb"},
+					TokenEndpointAuthMethod: "client_secret_basic",
+				}
+				body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
+				require.Equal(t, http.StatusCreated, res.StatusCode, body)
+
+				_, res = makeJSON(t, ts, "DELETE", client.ClientsHandlerPath+"/"+expected.OutfacingID, nil)
+				assert.Equal(t, http.StatusNoContent, res.StatusCode)
+			})
+
+			t.Run("endpoint=selfservice", func(t *testing.T) {
+				expected := &client.Client{
+					OutfacingID:             "delete-existing-client-selfservice",
+					Secret:                  "averylongsecret",
+					RedirectURIs:            []string{"http://localhost:3000/cb"},
+					TokenEndpointAuthMethod: "client_secret_basic",
+				}
+				body, res := makeJSON(t, ts, "POST", client.ClientsHandlerPath, expected)
+				require.Equal(t, http.StatusCreated, res.StatusCode, body)
+
+				_, res = fetchWithAuth(t, "DELETE", ts.URL+client.DynClientsHandlerPath+"?client_id="+expected.OutfacingID, expected.OutfacingID, "averylongsecret", nil)
+				assert.Equal(t, http.StatusNoContent, res.StatusCode)
+			})
+		})
+
+		t.Run("case=fetch with different self-service auth methods", func(t *testing.T) {
+			for k, tc := range []struct {
+				c  *client.Client
+				r  func(t *testing.T, r *http.Request, c *client.Client)
+				es int
+			}{
+				{
+					c: &client.Client{
+						OutfacingID:             "get-client-auth-1",
+						Secret:                  "averylongsecret",
+						RedirectURIs:            []string{"http://localhost:3000/cb"},
+						TokenEndpointAuthMethod: "client_secret_basic",
+					},
+					r: func(t *testing.T, r *http.Request, c *client.Client) {
+						r.SetBasicAuth(c.OutfacingID, c.Secret)
+					},
+					es: http.StatusOK,
+				},
+				{
+					c: &client.Client{
+						OutfacingID:             "get-client-auth-2",
+						RedirectURIs:            []string{"http://localhost:3000/cb"},
+						TokenEndpointAuthMethod: "none",
+					},
+					r: func(t *testing.T, r *http.Request, c *client.Client) {
+						r.SetBasicAuth(c.OutfacingID, "")
+					},
+					es: http.StatusUnauthorized,
+				},
+				{
+					c: &client.Client{
+						OutfacingID:             "get-client-auth-3",
+						RedirectURIs:            []string{"http://localhost:3000/cb"},
+						TokenEndpointAuthMethod: "none",
+					},
+					r: func(t *testing.T, r *http.Request, c *client.Client) {
+						r.SetBasicAuth(c.OutfacingID, "random")
+					},
+					es: http.StatusUnauthorized,
+				},
+				{
+					c: &client.Client{
+						OutfacingID:             "get-client-auth-4",
+						Secret:                  "averylongsecret",
+						RedirectURIs:            []string{"http://localhost:3000/cb"},
+						TokenEndpointAuthMethod: "client_secret_post",
+					},
+					r: func(t *testing.T, r *http.Request, c *client.Client) {
+						q := r.URL.Query()
+						q.Set("client_secret", c.Secret)
+						r.URL.RawQuery = q.Encode()
+					},
+					es: http.StatusOK,
+				},
+			} {
+				t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+					createClient(t, tc.c, ts, client.ClientsHandlerPath)
+					req, err := http.NewRequest("GET", ts.URL+client.DynClientsHandlerPath+"?client_id="+tc.c.OutfacingID, nil)
+					require.NoError(t, err)
+					tc.r(t, req, tc.c)
+
+					res, err := ts.Client().Do(req)
+					assert.Equal(t, tc.es, res.StatusCode)
+					require.NoError(t, err)
+
+					body, err := io.ReadAll(res.Body)
+					require.NoError(t, err)
+
+					snapshotx.SnapshotTExcept(t, newResponseSnapshot(string(body), res), []string{"body.created_at", "body.updated_at"})
+				})
+			}
 		})
 	})
 }

@@ -1,5 +1,5 @@
 {
-  "client_id": "standard-client",
+  "client_id": "create-client-1",
   "client_name": "",
   "client_secret": "averylongsecret",
   "redirect_uris": [

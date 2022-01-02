@@ -27,7 +27,6 @@ serve:
       debug: false
     access_log:
       disable_for_health: false
-    allow_dynamic_registration: false
   admin:
     port: 2
     host: localhost
@@ -87,6 +86,7 @@ oidc:
     pairwise:
       salt: random_salt
   dynamic_client_registration:
+    enabled: false
     default_scope:
       - whatever
 

@@ -131,7 +131,7 @@ func TestClientSDK(t *testing.T) {
 		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID("unknown"))
 		require.Error(t, err)
 		assert.Empty(t, gresult)
-		assert.True(t, strings.Contains(err.Error(), "401"))
+		assert.True(t, strings.Contains(err.Error(), "404"), err.Error())
 
 		// listing clients returns the only added one
 		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(100)))

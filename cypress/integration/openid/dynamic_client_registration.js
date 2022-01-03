@@ -24,9 +24,12 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
     }).then((response) => {
       cy.request({
         method: 'GET',
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id,
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id,
         headers: {
-          Authorization: 'Bearer ' + response.body.registration_access_token,
+          Authorization: 'Bearer ' + response.body.registration_access_token
         }
       }).then((response) => {
         expect(response.body.client_name).to.equal('clientName')
@@ -45,7 +48,10 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
       cy.request({
         method: 'GET',
         failOnStatusCode: false,
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id,
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id
       }).then((response) => {
         expect(response.status).to.eq(401)
       })
@@ -63,9 +69,12 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
       cy.request({
         method: 'PUT',
         failOnStatusCode: false,
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id,
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id,
         headers: {
-          Authorization: 'Bearer ' + response.body.registration_access_token,
+          Authorization: 'Bearer ' + response.body.registration_access_token
         },
         body: {
           client_id: 'clientid',
@@ -90,9 +99,12 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
       cy.request({
         method: 'PUT',
         failOnStatusCode: false,
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id,
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id,
         headers: {
-          Authorization: 'Bearer ' + response.body.registration_access_token,
+          Authorization: 'Bearer ' + response.body.registration_access_token
         },
         body: {
           client_id: 'clientid',
@@ -119,7 +131,10 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
       cy.request({
         method: 'PUT',
         failOnStatusCode: false,
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id
       }).then((response) => {
         expect(response.status).to.eq(401)
       })
@@ -138,7 +153,10 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
       cy.request({
         method: 'DELETE',
         failOnStatusCode: false,
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id,
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id
       }).then((response) => {
         expect(response.status).to.eq(401)
       })
@@ -157,9 +175,12 @@ describe('OAuth2 / OpenID Connect Dynamic Client Registration', function () {
       cy.request({
         method: 'DELETE',
         failOnStatusCode: false,
-        url: Cypress.env('public_url') + '/oauth2/register/' + response.body.client_id,
+        url:
+          Cypress.env('public_url') +
+          '/oauth2/register/' +
+          response.body.client_id,
         headers: {
-          Authorization: 'Bearer ' + response.body.registration_access_token,
+          Authorization: 'Bearer ' + response.body.registration_access_token
         }
       }).then((response) => {
         expect(response.status).to.eq(204)

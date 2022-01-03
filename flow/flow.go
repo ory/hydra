@@ -47,8 +47,20 @@ const (
 
 	FlowStateConsentUnused = int16(5)
 	FlowStateConsentUsed   = int16(6)
-	FlowStateLoginError    = int16(128)
-	FlowStateConsentError  = int16(129)
+
+	// TODO: Refactor error handling to persist error codes instead of JSON
+	// strings. Currently we persist errors as JSON strings in the LoginError
+	// and ConsentError fields. This shouldn't be necessary because the different
+	// errors are enumerable; most of them have error codes defined in Fosite. It
+	// is possible to define a mapping between error codes and the metadata that
+	// is currently persisted with each erred Flow. This mapping would be used in
+	// GetConsentRequest, HandleConsentRequest, GetHandledLoginRequest, etc. An
+	// ErrorContext field can be introduced later if it becomes necessary.
+	// If the above is implemented, merge the LoginError and ConsentError fields
+	// and use the following FlowStates when converting to/from
+	// [Handled]{Login|Consent}Request:
+	FlowStateLoginError   = int16(128)
+	FlowStateConsentError = int16(129)
 )
 
 // Flow is an abstraction used in the persistence layer to unify LoginRequest
@@ -252,7 +264,11 @@ func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 		return errors.Errorf("flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier)
 	}
 
-	f.State = FlowStateLoginUnused // TODO FlowStateError if h.Error != nil
+	if h.Error != nil {
+		f.State = FlowStateLoginError
+	} else {
+		f.State = FlowStateLoginUnused
+	}
 	f.ID = h.ID
 	f.Subject = h.Subject
 	f.ForceSubjectIdentifier = h.ForceSubjectIdentifier
@@ -310,8 +326,8 @@ func (f *Flow) GetLoginRequest() *consent.LoginRequest {
 // InvalidateLoginRequest shifts the flow state to FlowStateLoginUsed. This
 // transition is executed upon login completion.
 func (f *Flow) InvalidateLoginRequest() error {
-	if f.State != FlowStateLoginUnused {
-		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginUnused, f.State)
+	if f.State != FlowStateLoginUnused && f.State != FlowStateLoginError {
+		return errors.Errorf("invalid flow state: expected %d or %d, got %d", FlowStateLoginUnused, FlowStateLoginError, f.State)
 	}
 	if f.LoginWasUsed {
 		return errors.New("login verifier has already been used")
@@ -329,14 +345,16 @@ func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
 	if f.ConsentWasHandled {
 		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
 	}
-	if f.State != FlowStateConsentInitialized && f.State != FlowStateConsentUnused {
-		return errors.Errorf("invalid flow state: expected %d or %d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, f.State)
+	if f.State != FlowStateConsentInitialized && f.State != FlowStateConsentUnused && f.State != FlowStateConsentError {
+		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
 	if f.ConsentChallengeID.String() != r.ID {
 		return errors.Errorf("flow.ConsentChallengeID %s doesn't match HandledConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
 	}
 
-	if r.WasHandled {
+	if r.Error != nil {
+		f.State = FlowStateConsentError
+	} else if r.WasHandled {
 		f.State = FlowStateConsentUsed
 	} else {
 		f.State = FlowStateConsentUnused
@@ -361,8 +379,8 @@ func (f *Flow) InvalidateConsentRequest() error {
 	if f.ConsentWasHandled {
 		return errors.New("consent verifier has already been used")
 	}
-	if f.State != FlowStateConsentUnused {
-		return errors.Errorf("unexpected flow state: expected %d, got %d", FlowStateConsentUnused, f.State)
+	if f.State != FlowStateConsentUnused && f.State != FlowStateConsentError {
+		return errors.Errorf("unexpected flow state: expected %d or %d, got %d", FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
 
 	f.ConsentWasHandled = true

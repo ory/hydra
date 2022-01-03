@@ -15,7 +15,6 @@ replace (
 )
 
 require (
-	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/evanphx/json-patch v4.9.0+incompatible
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
@@ -47,7 +46,7 @@ require (
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.12
-	github.com/ory/x v0.0.303
+	github.com/ory/x v0.0.330
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1

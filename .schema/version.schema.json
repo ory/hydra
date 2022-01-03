@@ -213,6 +213,20 @@
                     "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.6/spec/config.json"
                 }
             ]
+        },
+        {
+            "allOf": [
+                {
+                    "properties": {
+                        "version": {
+                            "const": "v1.10.7"
+                        }
+                    }
+                },
+                {
+                    "$ref": "https://raw.githubusercontent.com/ory/hydra/v1.10.7/spec/config.json"
+                }
+            ]
         }
     ]
 }

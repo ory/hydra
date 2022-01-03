@@ -1,7 +1,0 @@
-{
-  "body": {
-    "error": "The request could not be authorized",
-    "error_description": "The OAuth 2.0 Client ID from the path does not match the OAuth 2.0 Client used to authenticate the request."
-  },
-  "status": 401
-}

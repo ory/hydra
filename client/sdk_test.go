@@ -80,12 +80,13 @@ func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
+	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
 	r := internal.NewRegistryMemory(t, conf)
 
 	routerAdmin := x.NewRouterAdmin()
 	routerPublic := x.NewRouterPublic()
 	handler := client.NewHandler(r)
-	handler.SetRoutes(routerAdmin, routerPublic, true)
+	handler.SetRoutes(routerAdmin, routerPublic)
 	server := httptest.NewServer(routerAdmin)
 
 	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})

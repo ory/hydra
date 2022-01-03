@@ -4,9 +4,14 @@ title: OpenID Connect Dynamic Client Registration
 ---
 
 Ory Hydra is capable of exposing
-[OpenID Connect Dynamic Client Registration](https://openid.net/specs/openid-connect-registration-1_0.html).
-This feature allows anonymous users to create OAuth2 Clients in self-service,
-without administrative privileges.
+
+- [OpenID Connect Dynamic Client Registration](https://openid.net/specs/openid-connect-registration-1_0.html)
+- [OAuth 2.0 Dynamic Client Registration Protocol](https://datatracker.ietf.org/doc/html/rfc7591)
+- [OAuth 2.0 Dynamic Client Registration Management Protocol](https://datatracker.ietf.org/doc/html/rfc7592)
+
+endpoints and capabilities. This feature allows third parties to create OAuth2
+Clients in self-service, without administrative privileges. The feature is
+disabled by default!
 
 This is particularly useful if you are running a public service and want users
 to be able to create their own OAuth2 clients easily.
@@ -23,9 +28,9 @@ Enabling this feature will add listeners to the following four routes at the
 public endpoint:
 
 - `POST /openid/register` - Register a new OAuth2 Client;
-- `GET /openid/register?client_id=...` - Fetch the OAuth2 Client;
-- `PUT /openid/register?client_id=...` - Update the OAuth2 Client;
-- `DELETE /openid/register?client_id=...` - Delete the OAuth2 Client;
+- `GET /openid/register/<client_id>` - Fetch the OAuth2 Client;
+- `PUT /openid/register/<client_id>` - Update the OAuth2 Client;
+- `DELETE /openid/register/<client_id>` - Delete the OAuth2 Client;
 
 ## Register OAuth2 & OpenID Connect Clients
 
@@ -38,26 +43,35 @@ Content-Type: application/json
 
 {
   "client_id": "...",
+  "registration_access_token": "...",
   ...
 }
 ```
 
-Please note that it is not possible to set OAuth2 Client Metadata using this
-endpoint. Metadata is a protected field and can only be set using the
+:::note
+
+The `registration_access_token` will only be sent once! You need to store this
+token in a secure location. This token will be used to update the OAuth2 Client.
+
+:::
+
+Please note that it is not possible to set OAuth2 Client Metadata, the OAuth2
+Client ID nor the OAuth2 Client Secret using this endpoint. This ensure that
+third parties follow the strict security guidlines of the system.
+
+The metadata field is protected and privileged and can only be set using the
 administrative endpoint! OAuth2 Client Metadata can also not be read using
 OpenID Connect Dynamic Client Registration endpoints!
 
 ## Manage OAuth2 & OpenID Connect Clients
 
-All endpoints except the `POST` one require the client to authenticate with its
-primary credentials. For example, if the OAuth2 Client has
-`token_endpoint_auth_method=client_secret_basic` then it will require the client
-to authenticate using basic authorization when, for example, updating
-information:
+The `POST` endpoint requires the client to authenticate with the
+`registration_access_token` regardless of the `token_endpoint_auth_method`. It
+can be used to update the OAuth2 Client.
 
 ```
-PUT /openid/register?client_id=...
-Authorization: Basic <base64(client_id:client_secret)>
+PUT /openid/register/{client_id}
+Authorization: Bearer <registration_access_token>
 Content-Type: application/json
 
 {
@@ -66,36 +80,47 @@ Content-Type: application/json
 }
 ```
 
-If the OAuth2 Client uses `client_secret_post` as the auth method, you need to
-supply the client secret as a query parameter:
+The response will include the updated OAuth2 Client.
 
-```
-PUT /openid/register?client_id=...&client_secret=...
-Content-Type: application/json
+:::note
 
-{
-  "redirect_uris": [...]
-  ...
-}
-```
-
-If the OAuth2 Client uses `private_key_jwt` as the auth method, you supply the
-appropriate assertion as a query parameter as well:
-
-```
-PUT /openid/register?client_id=...&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion=...
-Content-Type: application/json
-
-{
-  "redirect_uris": [...]
-  ...
-}
-```
-
-:::info
-
-It is not possible to manage the OAuth2 Clients with
-`token_endpoint_auth_method=none` through the API! These clients can only be
-managed using administrative endpoints.
+When updating the OAuth2 Client, the server will respond with a new registration
+access token. The old one will become invalid!
 
 :::
+
+```
+{
+  "client_id": "...",
+  "registration_access_token": "..."
+  ...
+}
+```
+
+## Get OAuth2 & OpenID Connect Clients
+
+The `GET` endpoint requires the client to authenticate with the
+`registration_access_token` regardless of the `token_endpoint_auth_method`. It
+can be used to retrieve the OAuth2 Client.
+
+```
+GET /openid/register/{client_id}
+Authorization: Bearer <registration_access_token>
+Content-Type: application/json
+
+{
+  "redirect_uris": [...]
+  ...
+}
+```
+
+## Delete OAuth2 & OpenID Connect Clients
+
+The `DELETE` endpoint requires the client to authenticate with the
+`registration_access_token` regardless of the `token_endpoint_auth_method`. It
+can be used to delete the OAuth2 Client.
+
+```
+DELETE /openid/register/{client_id}
+Authorization: Bearer <registration_access_token>
+```

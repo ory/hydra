@@ -22,10 +22,15 @@ package client
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/pborman/uuid"
+
+	"github.com/ory/x/urlx"
 
 	"github.com/ory/fosite"
 
@@ -46,7 +51,7 @@ type Handler struct {
 
 const (
 	ClientsHandlerPath    = "/clients"
-	DynClientsHandlerPath = "/connect/register"
+	DynClientsHandlerPath = "/oauth2/register"
 )
 
 func NewHandler(r InternalRegistry) *Handler {
@@ -55,7 +60,7 @@ func NewHandler(r InternalRegistry) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynamicRegistration bool) {
+func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.GET(ClientsHandlerPath, h.List)
 	admin.POST(ClientsHandlerPath, h.Create)
 	admin.GET(ClientsHandlerPath+"/:id", h.Get)
@@ -63,11 +68,11 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 	admin.PATCH(ClientsHandlerPath+"/:id", h.Patch)
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 
-	if dynamicRegistration {
+	if h.r.Config().PublicAllowDynamicRegistration() {
 		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
-		public.GET(DynClientsHandlerPath, h.GetDynamicRegistration)
-		public.PUT(DynClientsHandlerPath, h.UpdateDynamicRegistration)
-		public.DELETE(DynClientsHandlerPath, h.DeleteDynamicRegistration)
+		public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
+		public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
+		public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
 	}
 }
 
@@ -94,7 +99,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, dynami
 //       201: oAuth2Client
 //       default: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c, err := h.create(w, r, h.r.ClientValidator().Validate)
+	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -103,17 +108,20 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route POST /connect/register public selfServiceCreateOAuth2Client
+// swagger:route POST /connect/register public dynamicClientRegistrationCreateOAuth2Client
 //
-// Register an OAuth 2.0 Client using OpenID Dynamic Client Registration
+// Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
 // This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
 // Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
 // is disabled by default. It can be enabled by an administrator.
 //
-// Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be
-// generated. The secret will be returned in the response and you will not be able to retrieve it later on.
+// Please note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those
+// values will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or
+// `client_secret_post`.
+//
+// The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
 // Write the secret down and keep it somewhere safe.
 //
 //
@@ -129,7 +137,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //       201: oAuth2Client
 //       default: jsonError
 func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	c, err := h.create(w, r, h.r.ClientValidator().ValidateDynamicRegistration)
+	c, err := h.CreateClient(r, h.r.ClientValidator().ValidateDynamicRegistration, true)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -138,11 +146,16 @@ func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-func (h *Handler) create(w http.ResponseWriter, r *http.Request, validator func(*Client) error) (*Client, error) {
+func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		return nil, err
+	}
+
+	if isDynamic {
+		c.OutfacingID = uuid.New()
+		c.Secret = ""
 	}
 
 	if len(c.Secret) == 0 {
@@ -160,6 +173,16 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request, validator func(
 	secret := c.Secret
 	c.CreatedAt = time.Now().UTC().Round(time.Second)
 	c.UpdatedAt = c.CreatedAt
+
+	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	c.RegistrationAccessToken = token
+	c.RegistrationAccessTokenSignature = signature
+	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(), DynClientsHandlerPath+"/"+c.OutfacingID).String()
+
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
 	}
@@ -226,9 +249,9 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(*C
 	return nil
 }
 
-// swagger:route PUT /connect/register public selfServiceUpdateOAuth2Client
+// swagger:route PUT /connect/register/{id} public dynamicClientRegistrationUpdateOAuth2Client
 //
-// Update an OAuth 2.0 Client using OpenID Dynamic Client Registration
+// Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
 // This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
@@ -258,7 +281,7 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(*C
 //       default: jsonError
 //
 func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client, err := h.validDynamicAuth(r)
+	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -266,9 +289,18 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
 		return
 	}
+
+	// Regenerate the registration access token
+	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
+	c.RegistrationAccessToken = token
+	c.RegistrationAccessTokenSignature = signature
 
 	c.OutfacingID = client.GetID()
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
@@ -449,9 +481,9 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /connect/register public selfServiceGetOAuth2Client
+// swagger:route GET /connect/register/{id} public dynamicClientRegistrationGetOAuth2Client
 //
-// Get an OAuth 2.0 Client using OpenID Dynamic Client Registration
+// Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
 // This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
@@ -477,7 +509,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //       200: oAuth2Client
 //       default: jsonError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client, err := h.validDynamicAuth(r)
+	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -527,9 +559,9 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /connect/register public selfServiceDeleteOAuth2Client
+// swagger:route DELETE /connect/register/{id} public dynamicClientRegistrationDeleteOAuth2Client
 //
-// Deletes an OAuth 2.0 Client using OpenID Dynamic Client Registration
+// Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
 // This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
 // public internet directly and can be used in self-service. It implements the OpenID Connect
@@ -552,7 +584,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //       204: emptyResponse
 //       default: jsonError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	client, err := h.validDynamicAuth(r)
+	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -566,21 +598,25 @@ func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *Handler) validDynamicAuth(r *http.Request) (fosite.Client, error) {
-	// We use the query parameters instead of the body because the body is not available in this context.
-	c, err := h.r.ClientAuthenticator().AuthenticateClient(r.Context(), r, r.URL.Query())
+func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosite.Client, error) {
+	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), ps.ByName("id"))
 	if err != nil {
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).
-			WithReason("The requested OAuth 2.0 client does not exist or you did not provide the necessary credentials.").WithDebug(err.Error())
+			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
-	if r.URL.Query().Get("client_id") != c.GetID() {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.WithReason("The OAuth 2.0 Client ID from the path does not match the OAuth 2.0 Client used to authenticate the request."))
+	token := fosite.AccessTokenFromRequest(r)
+	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(token); err != nil {
+		return nil, herodot.ErrUnauthorized.
+			WithTrace(err).
+			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
 	}
 
-	if c.(fosite.OpenIDConnectClient).GetTokenEndpointAuthMethod() == "none" {
-		return nil, errors.WithStack(herodot.ErrUnauthorized.WithReason("Public OAuth 2.0 Clients can not be managed using OpenID Connect Dynamic Client Registration."))
+	signature := h.r.OAuth2HMACStrategy().Enigma.Signature(token)
+	if subtle.ConstantTimeCompare([]byte(c.RegistrationAccessTokenSignature), []byte(signature)) == 0 {
+		return nil, errors.WithStack(herodot.ErrUnauthorized.
+			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("Registration access tokens do not match."))
 	}
 
 	return c, nil

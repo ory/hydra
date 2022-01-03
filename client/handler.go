@@ -155,7 +155,9 @@ func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, i
 
 	if isDynamic {
 		c.OutfacingID = uuid.New()
-		c.Secret = ""
+		if c.Secret != "" {
+			return nil, errorsx.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
+		}
 	}
 
 	if len(c.Secret) == 0 {
@@ -290,6 +292,11 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	var c Client
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body. Is it valid JSON?").WithDebug(err.Error())))
+		return
+	}
+
+	if c.Secret != "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret.")))
 		return
 	}
 
@@ -604,6 +611,11 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
+	}
+
+	if len(c.RegistrationAccessTokenSignature) == 0 {
+		return nil, errors.WithStack(herodot.ErrUnauthorized.
+			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug("The OAuth2 Client does not have a registration access token."))
 	}
 
 	token := fosite.AccessTokenFromRequest(r)

@@ -2,7 +2,6 @@
   "body": {
     "client_id": "update-existing-client-selfservice",
     "client_name": "",
-    "client_secret": "anothersecret",
     "redirect_uris": [
       "http://localhost:3000/cb",
       "https://foobar.com"

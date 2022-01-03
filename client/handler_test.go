@@ -41,7 +41,7 @@ func TestHandler(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
 	h := client.NewHandler(reg)
 
-	t.Run("create client", func(t *testing.T) {
+	t.Run("create client registration tokens", func(t *testing.T) {
 		for k, tc := range []struct {
 			c       *client.Client
 			dynamic bool
@@ -51,7 +51,6 @@ func TestHandler(t *testing.T) {
 			{c: &client.Client{OutfacingID: "create-client-1"}},
 			{c: &client.Client{Secret: "create-client-2"}},
 			{c: &client.Client{OutfacingID: "create-client-3"}, dynamic: true},
-			{c: &client.Client{Secret: "create-client-4"}, dynamic: true},
 		} {
 			t.Run(fmt.Sprintf("case=%d/dynamic=%v", k, tc.dynamic), func(t *testing.T) {
 				var b bytes.Buffer
@@ -252,7 +251,6 @@ func TestHandler(t *testing.T) {
 					d: "basic dynamic client registration",
 					payload: &client.Client{
 						OutfacingID:  "create-client-1",
-						Secret:       "averylongsecret",
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
 					path:       client.DynClientsHandlerPath,
@@ -273,7 +271,6 @@ func TestHandler(t *testing.T) {
 					d: "metadata fails for dynamic client registration",
 					payload: &client.Client{
 						OutfacingID:  "create-client-3",
-						Secret:       "averylongsecret",
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 						Metadata:     []byte(`{"foo":"bar"}`),
 					},
@@ -291,14 +288,14 @@ func TestHandler(t *testing.T) {
 					statusCode: http.StatusBadRequest,
 				},
 				{
-					d: "short secret succeeds for selfservice because it is overwritten",
+					d: "basic dynamic client registration",
 					payload: &client.Client{
-						OutfacingID:  "create-client-4",
-						Secret:       "short",
+						OutfacingID:  "create-client-5",
+						Secret:       "averylongsecret",
 						RedirectURIs: []string{"http://localhost:3000/cb"},
 					},
 					path:       client.DynClientsHandlerPath,
-					statusCode: http.StatusCreated,
+					statusCode: http.StatusForbidden,
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/description=%s", k, tc.d), func(t *testing.T) {
@@ -395,6 +392,7 @@ func TestHandler(t *testing.T) {
 
 			// Possible to update the secret
 			expected.Metadata = []byte(`{"foo":"bar"}`)
+			expected.Secret = ""
 			payload, err := json.Marshal(expected)
 			require.NoError(t, err)
 
@@ -429,8 +427,8 @@ func TestHandler(t *testing.T) {
 				actual := createClient(t, expected, ts, client.ClientsHandlerPath)
 
 				// Possible to update the secret
-				expected.Secret = "anothersecret"
 				expected.RedirectURIs = append(expected.RedirectURIs, "https://foobar.com")
+				expected.Secret = ""
 				payload, err := json.Marshal(expected)
 				require.NoError(t, err)
 
@@ -448,6 +446,35 @@ func TestHandler(t *testing.T) {
 				assert.Equal(t, http.StatusOK, res.StatusCode)
 				assert.Empty(t, gjson.Get(body, "registration_access_token").String())
 			})
+
+			t.Run("endpoint=dynamic client registration does not allow changing the secret", func(t *testing.T) {
+				expected := &client.Client{
+					OutfacingID:             "update-existing-client-no-secret-change",
+					RedirectURIs:            []string{"http://localhost:3000/cb"},
+					TokenEndpointAuthMethod: "client_secret_basic",
+				}
+				actual := createClient(t, expected, ts, client.ClientsHandlerPath)
+
+				// Possible to update the secret
+				expected.Secret = "anothersecret"
+				expected.RedirectURIs = append(expected.RedirectURIs, "https://foobar.com")
+				payload, err := json.Marshal(expected)
+				require.NoError(t, err)
+
+				originalRAT := gjson.Get(actual, "registration_access_token").String()
+				body, res := fetchWithBearerAuth(t, "PUT", ts.URL+client.DynClientsHandlerPath+"/"+expected.OutfacingID, originalRAT, bytes.NewReader(payload))
+				assert.Equal(t, http.StatusForbidden, res.StatusCode)
+				snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
+			})
+		})
+
+		t.Run("case=creating a client dynamically does not allow setting the secret", func(t *testing.T) {
+			body, res := makeJSON(t, ts, "POST", client.DynClientsHandlerPath, &client.Client{
+				TokenEndpointAuthMethod: "client_secret_basic",
+				Secret:                  "foobarbaz",
+			})
+			require.Equal(t, http.StatusForbidden, res.StatusCode, body)
+			snapshotx.SnapshotTExcept(t, newResponseSnapshot(body, res), nil)
 		})
 
 		t.Run("case=delete existing client", func(t *testing.T) {

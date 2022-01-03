@@ -139,6 +139,12 @@ New feature or request.
 - [x] Prometheus endpoint should not require x-forwarded-proto header
       ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 
+#### Pull Requests
+
+- [ ] feat: OpenID Connect Dynamic Client Registration
+      ([hydra#2909](https://github.com/ory/hydra/pull/2909)) -
+      [@hackerman](https://github.com/aeneasr)
+
 ### [Docs](https://github.com/ory/hydra/labels/docs)
 
 Affects documentation.

@@ -174,7 +174,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, i
 	c.CreatedAt = time.Now().UTC().Round(time.Second)
 	c.UpdatedAt = c.CreatedAt
 
-	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
+	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(r.Context(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -294,7 +294,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Regenerate the registration access token
-	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
+	token, signature, err := h.r.OAuth2HMACStrategy().GenerateAccessToken(r.Context(), nil)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return

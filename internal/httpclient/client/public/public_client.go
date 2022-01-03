@@ -31,6 +31,14 @@ type ClientService interface {
 
 	DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams) (*DiscoverOpenIDConfigurationOK, error)
 
+	DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error)
+
+	DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error)
+
+	DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams) (*DynamicClientRegistrationGetOAuth2ClientOK, error)
+
+	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
+
 	IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceReadyOK, error)
 
 	Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*Oauth2TokenOK, error)
@@ -38,14 +46,6 @@ type ClientService interface {
 	OauthAuth(params *OauthAuthParams) error
 
 	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*RevokeOAuth2TokenOK, error)
-
-	SelfServiceCreateOAuth2Client(params *SelfServiceCreateOAuth2ClientParams) (*SelfServiceCreateOAuth2ClientCreated, error)
-
-	SelfServiceDeleteOAuth2Client(params *SelfServiceDeleteOAuth2ClientParams) (*SelfServiceDeleteOAuth2ClientNoContent, error)
-
-	SelfServiceGetOAuth2Client(params *SelfServiceGetOAuth2ClientParams) (*SelfServiceGetOAuth2ClientOK, error)
-
-	SelfServiceUpdateOAuth2Client(params *SelfServiceUpdateOAuth2ClientParams) (*SelfServiceUpdateOAuth2ClientOK, error)
 
 	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error)
 
@@ -125,6 +125,189 @@ func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfiguration
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for discoverOpenIDConfiguration: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
+}
+
+/*
+  DynamicClientRegistrationCreateOAuth2Client registers an o auth 2 0 client using the open ID o auth2 dynamic client registration management protocol
+
+  This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
+public internet directly and can be used in self-service. It implements the OpenID Connect
+Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+is disabled by default. It can be enabled by an administrator.
+
+Please note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those
+values will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or
+`client_secret_post`.
+
+The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
+Write the secret down and keep it somewhere safe.
+*/
+func (a *Client) DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDynamicClientRegistrationCreateOAuth2ClientParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "dynamicClientRegistrationCreateOAuth2Client",
+		Method:             "POST",
+		PathPattern:        "/connect/register",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DynamicClientRegistrationCreateOAuth2ClientReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DynamicClientRegistrationCreateOAuth2ClientCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DynamicClientRegistrationCreateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  DynamicClientRegistrationDeleteOAuth2Client deletes an o auth 2 0 client using the open ID o auth2 dynamic client registration management protocol
+
+  This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
+public internet directly and can be used in self-service. It implements the OpenID Connect
+Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+is disabled by default. It can be enabled by an administrator.
+
+To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+*/
+func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDynamicClientRegistrationDeleteOAuth2ClientParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "dynamicClientRegistrationDeleteOAuth2Client",
+		Method:             "DELETE",
+		PathPattern:        "/connect/register/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DynamicClientRegistrationDeleteOAuth2ClientReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DynamicClientRegistrationDeleteOAuth2ClientNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DynamicClientRegistrationDeleteOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  DynamicClientRegistrationGetOAuth2Client gets an o auth 2 0 client using the open ID o auth2 dynamic client registration management protocol
+
+  This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
+public internet directly and can be used in self-service. It implements the OpenID Connect
+Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+is disabled by default. It can be enabled by an administrator.
+
+To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+*/
+func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams) (*DynamicClientRegistrationGetOAuth2ClientOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDynamicClientRegistrationGetOAuth2ClientParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "dynamicClientRegistrationGetOAuth2Client",
+		Method:             "GET",
+		PathPattern:        "/connect/register/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DynamicClientRegistrationGetOAuth2ClientReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DynamicClientRegistrationGetOAuth2ClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DynamicClientRegistrationGetOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  DynamicClientRegistrationUpdateOAuth2Client updates an o auth 2 0 client using the open ID o auth2 dynamic client registration management protocol
+
+  This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
+public internet directly and can be used in self-service. It implements the OpenID Connect
+Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+is disabled by default. It can be enabled by an administrator.
+
+If you pass `client_secret` the secret will be updated and returned via the API.
+This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+
+To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+*/
+func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDynamicClientRegistrationUpdateOAuth2ClientParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "dynamicClientRegistrationUpdateOAuth2Client",
+		Method:             "PUT",
+		PathPattern:        "/connect/register/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DynamicClientRegistrationUpdateOAuth2ClientReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DynamicClientRegistrationUpdateOAuth2ClientOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DynamicClientRegistrationUpdateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -284,186 +467,6 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for revokeOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
-}
-
-/*
-  SelfServiceCreateOAuth2Client registers an o auth 2 0 client using open ID dynamic client registration
-
-  This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be
-generated. The secret will be returned in the response and you will not be able to retrieve it later on.
-Write the secret down and keep it somewhere safe.
-*/
-func (a *Client) SelfServiceCreateOAuth2Client(params *SelfServiceCreateOAuth2ClientParams) (*SelfServiceCreateOAuth2ClientCreated, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewSelfServiceCreateOAuth2ClientParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "selfServiceCreateOAuth2Client",
-		Method:             "POST",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &SelfServiceCreateOAuth2ClientReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*SelfServiceCreateOAuth2ClientCreated)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*SelfServiceCreateOAuth2ClientDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-  SelfServiceDeleteOAuth2Client deletes an o auth 2 0 client using open ID dynamic client registration
-
-  This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-*/
-func (a *Client) SelfServiceDeleteOAuth2Client(params *SelfServiceDeleteOAuth2ClientParams) (*SelfServiceDeleteOAuth2ClientNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewSelfServiceDeleteOAuth2ClientParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "selfServiceDeleteOAuth2Client",
-		Method:             "DELETE",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &SelfServiceDeleteOAuth2ClientReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*SelfServiceDeleteOAuth2ClientNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*SelfServiceDeleteOAuth2ClientDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-  SelfServiceGetOAuth2Client gets an o auth 2 0 client using open ID dynamic client registration
-
-  This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-*/
-func (a *Client) SelfServiceGetOAuth2Client(params *SelfServiceGetOAuth2ClientParams) (*SelfServiceGetOAuth2ClientOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewSelfServiceGetOAuth2ClientParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "selfServiceGetOAuth2Client",
-		Method:             "GET",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &SelfServiceGetOAuth2ClientReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*SelfServiceGetOAuth2ClientOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*SelfServiceGetOAuth2ClientDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-  SelfServiceUpdateOAuth2Client updates an o auth 2 0 client using open ID dynamic client registration
-
-  This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
-public internet directly and can be used in self-service. It implements the OpenID Connect
-Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-is disabled by default. It can be enabled by an administrator.
-
-If you pass `client_secret` the secret will be updated and returned via the API.
-This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
-
-To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-*/
-func (a *Client) SelfServiceUpdateOAuth2Client(params *SelfServiceUpdateOAuth2ClientParams) (*SelfServiceUpdateOAuth2ClientOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewSelfServiceUpdateOAuth2ClientParams()
-	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
-		ID:                 "selfServiceUpdateOAuth2Client",
-		Method:             "PUT",
-		PathPattern:        "/connect/register",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &SelfServiceUpdateOAuth2ClientReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	})
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*SelfServiceUpdateOAuth2ClientOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*SelfServiceUpdateOAuth2ClientDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*

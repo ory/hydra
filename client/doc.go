@@ -29,8 +29,8 @@
 
 package client
 
-// swagger:parameters createOAuth2Client selfServiceCreateOAuth2Client
-type swaggerCreateClientPayload struct {
+// swagger:parameters createOAuth2Client dynamicClientRegistrationCreateOAuth2Client
+type dynamicClientRegistrationCreateOAuth2Client struct {
 	// in: body
 	// required: true
 	Body Client
@@ -47,11 +47,11 @@ type swaggerUpdateClientPayload struct {
 	Body Client
 }
 
-// swagger:parameters selfServiceUpdateOAuth2Client
-type swaggerUpdateDynClientPayload struct {
-	// in: query
+// swagger:parameters dynamicClientRegistrationUpdateOAuth2Client
+type dynamicClientRegistrationUpdateOAuth2Client struct {
+	// in: path
 	// required: true
-	ID string `json:"client_id"`
+	ID string `json:"id"`
 
 	// in: body
 	// required: true
@@ -113,11 +113,11 @@ type swaggerGetOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:parameters getDynOAuth2Client
-type swaggerGetDynOAuth2Client struct {
-	// in: query
+// swagger:parameters dynamicClientRegistrationGetOAuth2Client
+type dynamicClientRegistrationGetOAuth2Client struct {
+	// in: path
 	// required: true
-	ID string `json:"client_id"`
+	ID string `json:"id"`
 }
 
 // swagger:parameters deleteOAuth2Client
@@ -128,9 +128,9 @@ type swaggerDeleteOAuth2Client struct {
 	ID string `json:"id"`
 }
 
-// swagger:parameters selfServiceDeleteOAuth2Client
-type swaggerDeleteDynOAuth2Client struct {
-	// in: query
+// swagger:parameters dynamicClientRegistrationDeleteOAuth2Client
+type dynamicClientRegistrationDeleteOAuth2Client struct {
+	// in: path
 	// required: true
-	ID string `json:"client_id"`
+	ID string `json:"id"`
 }

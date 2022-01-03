@@ -102,7 +102,7 @@ func (mg migrationGroup) generateSQL(sourceFS fs.FS, target string) error {
 				name = fmt.Sprintf("%s%06d_%s.%s.%s.sql", mg.ID, i, mg.Name, m.Dialect, m.Direction)
 			}
 			dst := filepath.Join(target, name)
-			if err = os.WriteFile(dst, fragment, 0644); err != nil {
+			if err = os.WriteFile(dst, fragment, 0600); err != nil {
 				return errors.WithStack(errors.Errorf("failed to write file %s", dst))
 			}
 		}

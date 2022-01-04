@@ -49,6 +49,8 @@ New feature or request.
       [@hackerman](https://github.com/aeneasr)
 - [ ] Rename SDK methods to follow our OpenAPI spec guide
       ([hydra#2908](https://github.com/ory/hydra/issues/2908))
+- [ ] No longer allow users to set the client ID
+      ([hydra#2911](https://github.com/ory/hydra/issues/2911))
 
 ## [v1.11](https://github.com/ory/hydra/milestone/39)
 
@@ -141,7 +143,8 @@ New feature or request.
 
 #### Pull Requests
 
-- [ ] feat: OpenID Connect Dynamic Client Registration
+- [ ] feat: OpenID Connect Dynamic Client Registration and OAuth2 Dynamic Client
+      Registration Protocol
       ([hydra#2909](https://github.com/ory/hydra/pull/2909)) -
       [@hackerman](https://github.com/aeneasr)
 

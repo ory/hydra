@@ -115,6 +115,11 @@ func TestClientSDK(t *testing.T) {
 		result.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, result.Payload.CreatedAt)
 		result.Payload.CreatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, result.Payload.RegistrationAccessToken)
+		assert.NotEmpty(t, result.Payload.RegistrationClientURI)
+		result.Payload.RegistrationAccessToken = ""
+		result.Payload.RegistrationClientURI = ""
+
 		assert.EqualValues(t, compareClient, result.Payload)
 		assert.EqualValues(t, "bar", result.Payload.Metadata.(map[string]interface{})["foo"])
 

@@ -60,7 +60,10 @@ for the dynamic client registration delete o auth2 client operation typically th
 */
 type DynamicClientRegistrationDeleteOAuth2ClientParams struct {
 
-	/*ID*/
+	/*ID
+	  The id of the OAuth 2.0 Client.
+
+	*/
 	ID string
 
 	timeout    time.Duration

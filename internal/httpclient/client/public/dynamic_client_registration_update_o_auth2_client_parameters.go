@@ -64,7 +64,10 @@ type DynamicClientRegistrationUpdateOAuth2ClientParams struct {
 
 	/*Body*/
 	Body *models.OAuth2Client
-	/*ID*/
+	/*ID
+	  The id of the OAuth 2.0 Client.
+
+	*/
 	ID string
 
 	timeout    time.Duration

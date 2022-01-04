@@ -690,20 +690,6 @@ serve:
         #
         path: /path/to/file.pem
 
-    ## allow_dynamic_registration ##
-    #
-    # Allow oidc dynamic client registration.
-    #
-    # Default value: false
-    #
-    # Set this value using environment variables on
-    # - Linux/macOS:
-    #    $ export SERVE_PUBLIC_ALLOW_DYNAMIC_REGISTRATION=<value>
-    # - Windows Command Line (CMD):
-    #    > set SERVE_PUBLIC_ALLOW_DYNAMIC_REGISTRATION=<value>
-    #
-    allow_dynamic_registration: false
-
     ## port ##
     #
     # Default value: 4444
@@ -902,6 +888,20 @@ oidc:
       - openid
       - offline
       - offline_access
+
+    ## enabled ##
+    #
+    # Enable dynamic client registration.
+    #
+    # Default value: false
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    # - Windows Command Line (CMD):
+    #    > set OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    #
+    enabled: false
 
   ## subject_identifiers ##
   #
@@ -1322,6 +1322,56 @@ oauth2:
     #    > set OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_ALLOWED_SCOPE=<value>
     #
     default_grant_allowed_scope: false
+
+  ## grant ##
+  #
+  grant:
+    ## jwt ##
+    #
+    # Authorization Grants using JWT configuration
+    #
+    jwt:
+      ## iat_optional ##
+      #
+      # If false, IAT claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      #
+      iat_optional: false
+
+      ## max_ttl ##
+      #
+      # Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.
+      #
+      # Default value: 720h
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      #
+      max_ttl: 1h
+
+      ## jti_optional ##
+      #
+      # If false, JTI claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      #
+      jti_optional: false
 
   ## refresh_token_hook ##
   #

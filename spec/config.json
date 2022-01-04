@@ -618,6 +618,11 @@
           "additionalProperties": false,
           "description": "Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).",
           "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable dynamic client registration.",
+              "default": false
+            },
             "default_scope": {
               "type": "array",
               "description": "The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the \"scope\" key in the registration payload, effectively disabling the concept of whitelisted scopes.",

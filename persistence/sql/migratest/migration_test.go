@@ -3,10 +3,12 @@ package migratest
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/ory/x/configx"
 
+	"github.com/ory/hydra/flow"
 	"github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/persistence/sql"
 
@@ -63,7 +65,7 @@ func TestMigrations(t *testing.T) {
 				driver.DisableValidation(),
 			)
 
-			tm := popx.NewTestMigrator(t, c, "../migrations", "./testdata", d.Logger())
+			tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), d.Logger())
 			require.NoError(t, tm.Up(context.Background()))
 
 			var lastClient *client.Client
@@ -116,14 +118,17 @@ func TestMigrations(t *testing.T) {
 					require.NoError(t, c.Find(als, els.ID))
 					assertEqualLoginSessions(t, els, als)
 
-					ahcr := &consent.HandledConsentRequest{}
-					require.NoError(t, c.Q().Where("challenge = ?", ehcr.ID).First(ahcr))
-					require.NoError(t, ehcr.AfterFind(c))
+					f := &flow.Flow{}
+					require.NoError(t, c.Q().Where("consent_challenge_id = ?", ehcr.ID).First(f))
+					ahcr := f.GetHandledConsentRequest()
+					ahcr.Session = nil
+					ahcr.ConsentRequest = nil
 					assertEqualHandledConsentRequests(t, ehcr, ahcr)
 
-					ahlr := &consent.HandledLoginRequest{}
-					require.NoError(t, c.Q().Where("challenge = ?", ehlr.ID).First(ahlr))
-					assertEqualHandledLoginRequests(t, ehlr, ahlr)
+					require.NoError(t, c.Q().Where("login_challenge = ?", ehlr.ID).First(f))
+					ahlr := f.GetHandledLoginRequest()
+					ahlr.LoginRequest = nil
+					assertEqualHandledLoginRequests(t, ehlr, &ahlr)
 
 					if efols != nil {
 						afols, err := d.ConsentManager().GetForcedObfuscatedLoginSession(context.Background(), lastClient.OutfacingID, efols.SubjectObfuscated)

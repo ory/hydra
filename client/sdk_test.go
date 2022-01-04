@@ -266,4 +266,23 @@ func TestClientSDK(t *testing.T) {
 		_, err = c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
 		require.Error(t, err)
 	})
+
+	t.Run("case=patch should not alter secret if not requested", func(t *testing.T) {
+		op := "replace"
+		path := "/client_uri"
+		value := "http://foo.bar"
+
+		client := createTestClient("")
+		client.ClientID = "patch3_client"
+		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
+		require.NoError(t, err)
+
+		result1, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		require.NoError(t, err)
+		result2, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		require.NoError(t, err)
+
+		// secret hashes shouldn't change between these PUT calls
+		require.Equal(t, result1.Payload.ClientSecret, result2.Payload.ClientSecret)
+	})
 }

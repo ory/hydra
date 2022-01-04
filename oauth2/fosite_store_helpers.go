@@ -130,8 +130,14 @@ var flushRequests = []*fosite.Request{
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{OutfacingID: "foobar"}
 	cr := &consent.ConsentRequest{
-		Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), LoginChallenge: sqlxx.NullString(id),
-		ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now(),
+		Client:               cl,
+		OpenIDConnectContext: new(consent.OpenIDConnectContext),
+		LoginChallenge:       sqlxx.NullString(id),
+		ID:                   id,
+		Verifier:             id,
+		CSRF:                 id,
+		AuthenticatedAt:      sqlxx.NullTime(time.Now()),
+		RequestedAt:          time.Now(),
 	}
 
 	if createClient {
@@ -659,7 +665,7 @@ func testFositeStoreSetClientAssertionJWT(m InternalRegistry) func(*testing.T) {
 			jti := NewBlacklistedJTI("already set jti", time.Now().Add(time.Minute))
 			require.NoError(t, store.SetClientAssertionJWTRaw(context.Background(), jti))
 
-			assert.True(t, errors.Is(store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown))
+			assert.ErrorIs(t, store.SetClientAssertionJWT(context.Background(), jti.JTI, jti.Expiry), fosite.ErrJTIKnown)
 		})
 
 		t.Run("case=deletes expired JTIs", func(t *testing.T) {

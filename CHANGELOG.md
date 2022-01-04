@@ -595,6 +595,11 @@
 
 # [0.0.0](https://github.com/ory/hydra/compare/v1.10.6...v0.0.0) (2021-09-28)
 
+## Breaking Changes
+
+This patch merges four SQL Tables into a new table, deleting the old tables in the process. The migrations in this patch are expected to be applied offline. Please be aware that *there are no down migrations*, and if something goes wrong, data loss is possible. Always back up your database before applying migrations. For more information, see [Hydra 2.x Migration Guide](https://tld/TODO-MIGRATION-GUIDE).
+
+Rows with NULL login_challenge in `hydra_oauth2_consent_request` and corresponding `hydra_oauth2_consent_request_handled` are deleted as a side effect of the merge migration. This is done with the assumption that only a very small number of sessions, issued by pre-1.0 Hydra, will be affected. Please contact us if this assumption doesn't apply or if the deletion adversely affects your deployment.
 
 ### Bug Fixes
 
@@ -629,6 +634,11 @@
 
 * Support updating keys in CLI ([#2460](https://github.com/ory/hydra/issues/2460)) ([e874f4f](https://github.com/ory/hydra/commit/e874f4f300012f363c0bdf685458d0c56c5a8477)), closes [#2436](https://github.com/ory/hydra/issues/2436)
 
+### Dev Tools
+
+* Introduce the `hydra sql gen` command and a convenience Make target with autocompletion. The command reads migration templates from a source directory and produces migration files in a target directory. Its main function is to split a single source file into multiple files using split marks.
+
+* Introduce the `hack/db-diff.sh` command to generate database schema diffs at different commits. This script is used to view and review the impact of migrations on the database schema.
 
 # [1.10.6](https://github.com/ory/hydra/compare/v1.10.5...v1.10.6) (2021-08-28)
 

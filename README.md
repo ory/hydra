@@ -196,7 +196,7 @@ that your company deserves a spot here, reach out to
             <td>Zero</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/commitzero.svg" alt="Project Zero by Commit"></td>
             <td><a href="https://getzero.dev/">getzero.dev</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Padis</td>
@@ -214,7 +214,7 @@ that your company deserves a spot here, reach out to
             <td>Security Onion Solutions</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/securityonion.svg" alt="Security Onion Solutions"></td>
             <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Adopter *</td>
             <td>Factly</td>
@@ -238,7 +238,7 @@ that your company deserves a spot here, reach out to
             <td>Spiri.bo</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/spiribo.svg" alt="Spiri.bo"></td>
             <td><a href="https://spiri.bo/">spiri.bo</a></td>
-        </tr>        
+        </tr>
         <tr>
             <td>Sponsor</td>
             <td>Strivacity</td>
@@ -274,6 +274,8 @@ ORY Hydra implements Open Standards set by the IETF:
 * [OAuth 2.0 Token Revocation](https://tools.ietf.org/html/rfc7009)
 * [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662)
 * [OAuth 2.0 for Native Apps](https://tools.ietf.org/html/draft-ietf-oauth-native-apps-10)
+* [OAuth 2.0 Dynamic Client Registration Protocol](https://datatracker.ietf.org/doc/html/rfc7591)
+* [OAuth 2.0 Dynamic Client Registration Management Protocol](https://datatracker.ietf.org/doc/html/rfc7592)
 * [Proof Key for Code Exchange by OAuth Public Clients](https://tools.ietf.org/html/rfc7636)
 * [JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7523)
 

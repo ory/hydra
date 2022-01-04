@@ -186,6 +186,16 @@ func (v *Validator) Validate(c *Client) error {
 	return nil
 }
 
+func (v *Validator) ValidateDynamicRegistration(c *Client) error {
+	if c.Metadata != nil {
+		return errorsx.WithStack(ErrInvalidClientMetadata.
+			WithHint(`metadata cannot be set for dynamic client registration'`),
+		)
+	}
+
+	return v.Validate(c)
+}
+
 func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {

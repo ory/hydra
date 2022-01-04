@@ -15,7 +15,7 @@ killall hydra || true
 killall node || true
 
 # Check if any ports that we need are open already
-! nc -zv 127.0.0.1 5000
+! nc -zv 127.0.0.1 5004
 ! nc -zv 127.0.0.1 5001
 ! nc -zv 127.0.0.1 5002
 ! nc -zv 127.0.0.1 5003
@@ -31,12 +31,12 @@ fi
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then
     (cd oauth2-client; npm ci)
 fi
-(cd oauth2-client; ADMIN_URL=http://127.0.0.1:5001 PUBLIC_URL=http://127.0.0.1:5000 PORT=5003 npm run start > ../oauth2-client.e2e.log 2>&1 &)
+(cd oauth2-client; ADMIN_URL=http://127.0.0.1:5001 PUBLIC_URL=http://127.0.0.1:5004 PORT=5003 npm run start > ../oauth2-client.e2e.log 2>&1 &)
 
 # Install consent app
 (cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run consent > ../login-consent-logout.e2e.log 2>&1 &)
 
-export URLS_SELF_ISSUER=http://127.0.0.1:5000
+export URLS_SELF_ISSUER=http://127.0.0.1:5004
 export URLS_CONSENT=http://127.0.0.1:5002/consent
 export URLS_LOGIN=http://127.0.0.1:5002/login
 export URLS_LOGOUT=http://127.0.0.1:5002/logout
@@ -50,11 +50,12 @@ export SERVE_ADMIN_CORS_ALLOWED_METHODS=POST,GET,PUT,DELETE
 export LOG_LEVEL=trace
 export LOG_FORMAT=json
 export OAUTH2_EXPOSE_INTERNAL_ERRORS=1
-export SERVE_PUBLIC_PORT=5000
+export SERVE_PUBLIC_PORT=5004
 export SERVE_ADMIN_PORT=5001
 export LOG_LEAK_SENSITIVE_VALUES=true
 
 export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_fk=true"
+export OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=true
 export TEST_DATABASE="$TEST_DATABASE_SQLITE"
 
 WATCH=no
@@ -96,7 +97,7 @@ done
 
 npm run wait-on -- -l -t 300000 \
   --interval 1000 -s 1 -d 1000 \
-  http-get://localhost:5000/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
+  http-get://localhost:5004/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
 
 if [[ $WATCH = "yes" ]]; then
     (cd ../..; npm run test:watch)

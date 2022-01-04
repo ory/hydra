@@ -1,0 +1,19 @@
+{
+  "client_name": "",
+  "redirect_uris": null,
+  "grant_types": null,
+  "response_types": null,
+  "scope": "",
+  "audience": [],
+  "owner": "",
+  "policy_uri": "",
+  "allowed_cors_origins": [],
+  "tos_uri": "",
+  "client_uri": "",
+  "logo_uri": "",
+  "contacts": null,
+  "client_secret_expires_at": 0,
+  "subject_type": "",
+  "jwks": {},
+  "metadata": {}
+}

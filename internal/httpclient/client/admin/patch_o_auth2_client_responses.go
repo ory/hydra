@@ -29,15 +29,15 @@ func (o *PatchOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return result, nil
-	case 500:
-		result := NewPatchOAuth2ClientInternalServerError()
+	default:
+		result := NewPatchOAuth2ClientDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -74,28 +74,37 @@ func (o *PatchOAuth2ClientOK) readResponse(response runtime.ClientResponse, cons
 	return nil
 }
 
-// NewPatchOAuth2ClientInternalServerError creates a PatchOAuth2ClientInternalServerError with default headers values
-func NewPatchOAuth2ClientInternalServerError() *PatchOAuth2ClientInternalServerError {
-	return &PatchOAuth2ClientInternalServerError{}
+// NewPatchOAuth2ClientDefault creates a PatchOAuth2ClientDefault with default headers values
+func NewPatchOAuth2ClientDefault(code int) *PatchOAuth2ClientDefault {
+	return &PatchOAuth2ClientDefault{
+		_statusCode: code,
+	}
 }
 
-/*PatchOAuth2ClientInternalServerError handles this case with default header values.
+/*PatchOAuth2ClientDefault handles this case with default header values.
 
 jsonError
 */
-type PatchOAuth2ClientInternalServerError struct {
+type PatchOAuth2ClientDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *PatchOAuth2ClientInternalServerError) Error() string {
-	return fmt.Sprintf("[PATCH /clients/{id}][%d] patchOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the patch o auth2 client default response
+func (o *PatchOAuth2ClientDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *PatchOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
+func (o *PatchOAuth2ClientDefault) Error() string {
+	return fmt.Sprintf("[PATCH /clients/{id}][%d] patchOAuth2Client default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *PatchOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *PatchOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *PatchOAuth2ClientDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

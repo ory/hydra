@@ -109,7 +109,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetRoutes(admin)
+	m.ClientHandler().SetRoutes(admin, public)
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.JWTGrantHandler().SetRoutes(admin)
 }
@@ -500,4 +500,8 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 		}
 	}
 	return m.arhs
+}
+
+func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
+	return m.OAuth2Provider().(*fosite.Fosite)
 }

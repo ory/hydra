@@ -357,15 +357,16 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	p.RequestedAt = ar.RequestedAt
 
 	request, err := h.r.ConsentManager().HandleLoginRequest(r.Context(), challenge, &p)
-	if request != nil && errors.Is(err, x.ErrConflict) {
-		ru, err := url.Parse(request.RequestURL)
+	if errors.Is(err, x.ErrConflict) {
+		ru, err := url.Parse(ar.RequestURL)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
 		h.r.Writer().WriteCode(w, r, http.StatusConflict, &RequestWasHandledResponse{
-			RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {request.Verifier}}).String(),
+			RedirectTo: urlx.SetQuery(ru, url.Values{"login_verifier": {ar.Verifier}}).String(),
 		})
+		return
 	} else if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return

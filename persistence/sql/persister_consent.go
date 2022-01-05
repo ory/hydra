@@ -264,7 +264,6 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 		}
 
 		if f.State == flow.FlowStateLoginUnused {
-			lr, _ = p.GetLoginRequest(ctx, challenge)
 			return errorsx.WithStack(x.ErrConflict)
 		} else if err != nil {
 			return err

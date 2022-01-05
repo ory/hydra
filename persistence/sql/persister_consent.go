@@ -262,7 +262,6 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 		if err != nil {
 			return sqlcon.HandleError(err)
 		}
-
 		err = f.HandleLoginRequest(r)
 		if err != nil {
 			return err

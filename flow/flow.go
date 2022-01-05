@@ -1,7 +1,6 @@
 package flow
 
 import (
-	"github.com/ory/x/errorsx"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -256,7 +255,7 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 
 	if f.State == FlowStateLoginUnused {
-		return errorsx.WithStack(x.ErrConflict)
+		return x.ErrConflict
 	} else if f.State != FlowStateLoginInitialized {
 		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
 	}

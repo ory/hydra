@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/x/configx"
 
 	"github.com/ory/hydra/persistence/sql"

@@ -4,12 +4,16 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/gobuffalo/pop/v6"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/x/errorsx"
+
+	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
-	"github.com/pkg/errors"
 )
 
 var _ jwk.Manager = &Persister{}

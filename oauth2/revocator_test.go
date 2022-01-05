@@ -28,6 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/hydra/persistence/sql"
 
 	"github.com/ory/hydra/internal/httpclient/client/public"

@@ -3,6 +3,8 @@ package sql
 import (
 	"context"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"

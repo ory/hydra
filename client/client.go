@@ -24,6 +24,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
+
 	jose "gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
 
 	"github.com/ory/fosite"

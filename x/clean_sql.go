@@ -3,6 +3,8 @@ package x
 import (
 	"testing"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/jmoiron/sqlx"
 )
 

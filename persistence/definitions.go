@@ -3,6 +3,8 @@ package persistence
 import (
 	"context"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"

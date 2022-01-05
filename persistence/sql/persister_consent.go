@@ -266,6 +266,14 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 		if err != nil {
 			return sqlcon.HandleError(err)
 		}
+
+		if f.State == flow.FlowStateLoginUnused {
+			lr, _ = p.GetLoginRequest(ctx, challenge)
+			return errorsx.WithStack(x.ErrConflict)
+		} else if err != nil {
+			return err
+		}
+
 		err = f.HandleLoginRequest(r)
 		if err != nil {
 			return err

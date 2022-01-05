@@ -6,13 +6,10 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/gobuffalo/pop/v5"
-	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
-
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/sqlcon"
+	"github.com/pkg/errors"
 )
 
 var _ jwk.Manager = &Persister{}

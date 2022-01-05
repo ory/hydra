@@ -13,7 +13,6 @@ import (
 
 	"github.com/ory/x/resilience"
 
-	"github.com/gobuffalo/pop/v5"
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/ory/hydra/persistence/sql"

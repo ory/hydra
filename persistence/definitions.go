@@ -9,8 +9,6 @@ import (
 	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/popx"
-
-	"github.com/gobuffalo/pop/v5"
 )
 
 type (

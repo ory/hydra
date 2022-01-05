@@ -5,8 +5,6 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/gobuffalo/pop/v5"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/x/sqlcon"

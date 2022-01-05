@@ -16,7 +16,6 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"

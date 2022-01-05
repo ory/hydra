@@ -28,9 +28,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gobuffalo/pop/v5"
-	"gopkg.in/square/go-jose.v2"
-
 	"github.com/ory/fosite/handler/rfc7523"
 
 	"github.com/ory/hydra/oauth2/trust"

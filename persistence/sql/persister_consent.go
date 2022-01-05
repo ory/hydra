@@ -10,7 +10,6 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"

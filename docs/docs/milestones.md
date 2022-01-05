@@ -143,7 +143,7 @@ New feature or request.
 
 #### Pull Requests
 
-- [ ] feat: OpenID Connect Dynamic Client Registration and OAuth2 Dynamic Client
+- [x] feat: OpenID Connect Dynamic Client Registration and OAuth2 Dynamic Client
       Registration Protocol
       ([hydra#2909](https://github.com/ory/hydra/pull/2909)) -
       [@hackerman](https://github.com/aeneasr)

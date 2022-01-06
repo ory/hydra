@@ -17,69 +17,89 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewListTrustedJwtGrantIssuersParams creates a new ListTrustedJwtGrantIssuersParams object
-// with the default values initialized.
+// NewListTrustedJwtGrantIssuersParams creates a new ListTrustedJwtGrantIssuersParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewListTrustedJwtGrantIssuersParams() *ListTrustedJwtGrantIssuersParams {
-	var ()
 	return &ListTrustedJwtGrantIssuersParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewListTrustedJwtGrantIssuersParamsWithTimeout creates a new ListTrustedJwtGrantIssuersParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewListTrustedJwtGrantIssuersParamsWithTimeout(timeout time.Duration) *ListTrustedJwtGrantIssuersParams {
-	var ()
 	return &ListTrustedJwtGrantIssuersParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewListTrustedJwtGrantIssuersParamsWithContext creates a new ListTrustedJwtGrantIssuersParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewListTrustedJwtGrantIssuersParamsWithContext(ctx context.Context) *ListTrustedJwtGrantIssuersParams {
-	var ()
 	return &ListTrustedJwtGrantIssuersParams{
-
 		Context: ctx,
 	}
 }
 
 // NewListTrustedJwtGrantIssuersParamsWithHTTPClient creates a new ListTrustedJwtGrantIssuersParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewListTrustedJwtGrantIssuersParamsWithHTTPClient(client *http.Client) *ListTrustedJwtGrantIssuersParams {
-	var ()
 	return &ListTrustedJwtGrantIssuersParams{
 		HTTPClient: client,
 	}
 }
 
-/*ListTrustedJwtGrantIssuersParams contains all the parameters to send to the API endpoint
-for the list trusted jwt grant issuers operation typically these are written to a http.Request
+/* ListTrustedJwtGrantIssuersParams contains all the parameters to send to the API endpoint
+   for the list trusted jwt grant issuers operation.
+
+   Typically these are written to a http.Request.
 */
 type ListTrustedJwtGrantIssuersParams struct {
 
-	/*Issuer
-	  If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
+	/* Issuer.
 
+	   If optional "issuer" is supplied, only jwt-bearer grants with this issuer will be returned.
 	*/
 	Issuer *string
-	/*Limit
-	  The maximum amount of policies returned, upper bound is 500 policies
 
+	/* Limit.
+
+	   The maximum amount of policies returned, upper bound is 500 policies
+
+	   Format: int64
 	*/
 	Limit *int64
-	/*Offset
-	  The offset from where to start looking.
 
+	/* Offset.
+
+	   The offset from where to start looking.
+
+	   Format: int64
 	*/
 	Offset *int64
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the list trusted jwt grant issuers params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *ListTrustedJwtGrantIssuersParams) WithDefaults() *ListTrustedJwtGrantIssuersParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the list trusted jwt grant issuers params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *ListTrustedJwtGrantIssuersParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the list trusted jwt grant issuers params
@@ -160,48 +180,51 @@ func (o *ListTrustedJwtGrantIssuersParams) WriteToRequest(r runtime.ClientReques
 
 		// query param issuer
 		var qrIssuer string
+
 		if o.Issuer != nil {
 			qrIssuer = *o.Issuer
 		}
 		qIssuer := qrIssuer
 		if qIssuer != "" {
+
 			if err := r.SetQueryParam("issuer", qIssuer); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	if o.Limit != nil {
 
 		// query param limit
 		var qrLimit int64
+
 		if o.Limit != nil {
 			qrLimit = *o.Limit
 		}
 		qLimit := swag.FormatInt64(qrLimit)
 		if qLimit != "" {
+
 			if err := r.SetQueryParam("limit", qLimit); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	if o.Offset != nil {
 
 		// query param offset
 		var qrOffset int64
+
 		if o.Offset != nil {
 			qrOffset = *o.Offset
 		}
 		qOffset := swag.FormatInt64(qrOffset)
 		if qOffset != "" {
+
 			if err := r.SetQueryParam("offset", qOffset); err != nil {
 				return err
 			}
 		}
-
 	}
 
 	if len(res) > 0 {

@@ -18,66 +18,82 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewUpdateJSONWebKeyParams creates a new UpdateJSONWebKeyParams object
-// with the default values initialized.
+// NewUpdateJSONWebKeyParams creates a new UpdateJSONWebKeyParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewUpdateJSONWebKeyParams() *UpdateJSONWebKeyParams {
-	var ()
 	return &UpdateJSONWebKeyParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewUpdateJSONWebKeyParamsWithTimeout creates a new UpdateJSONWebKeyParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewUpdateJSONWebKeyParamsWithTimeout(timeout time.Duration) *UpdateJSONWebKeyParams {
-	var ()
 	return &UpdateJSONWebKeyParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewUpdateJSONWebKeyParamsWithContext creates a new UpdateJSONWebKeyParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewUpdateJSONWebKeyParamsWithContext(ctx context.Context) *UpdateJSONWebKeyParams {
-	var ()
 	return &UpdateJSONWebKeyParams{
-
 		Context: ctx,
 	}
 }
 
 // NewUpdateJSONWebKeyParamsWithHTTPClient creates a new UpdateJSONWebKeyParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewUpdateJSONWebKeyParamsWithHTTPClient(client *http.Client) *UpdateJSONWebKeyParams {
-	var ()
 	return &UpdateJSONWebKeyParams{
 		HTTPClient: client,
 	}
 }
 
-/*UpdateJSONWebKeyParams contains all the parameters to send to the API endpoint
-for the update Json web key operation typically these are written to a http.Request
+/* UpdateJSONWebKeyParams contains all the parameters to send to the API endpoint
+   for the update Json web key operation.
+
+   Typically these are written to a http.Request.
 */
 type UpdateJSONWebKeyParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.JSONWebKey
-	/*Kid
-	  The kid of the desired key
 
+	/* Kid.
+
+	   The kid of the desired key
 	*/
 	Kid string
-	/*Set
-	  The set
 
+	/* Set.
+
+	   The set
 	*/
 	Set string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the update Json web key params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *UpdateJSONWebKeyParams) WithDefaults() *UpdateJSONWebKeyParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the update Json web key params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *UpdateJSONWebKeyParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the update Json web key params
@@ -153,7 +169,6 @@ func (o *UpdateJSONWebKeyParams) WriteToRequest(r runtime.ClientRequest, reg str
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

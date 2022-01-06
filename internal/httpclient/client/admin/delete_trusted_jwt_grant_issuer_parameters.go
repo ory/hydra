@@ -16,59 +16,73 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewDeleteTrustedJwtGrantIssuerParams creates a new DeleteTrustedJwtGrantIssuerParams object
-// with the default values initialized.
+// NewDeleteTrustedJwtGrantIssuerParams creates a new DeleteTrustedJwtGrantIssuerParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDeleteTrustedJwtGrantIssuerParams() *DeleteTrustedJwtGrantIssuerParams {
-	var ()
 	return &DeleteTrustedJwtGrantIssuerParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDeleteTrustedJwtGrantIssuerParamsWithTimeout creates a new DeleteTrustedJwtGrantIssuerParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDeleteTrustedJwtGrantIssuerParamsWithTimeout(timeout time.Duration) *DeleteTrustedJwtGrantIssuerParams {
-	var ()
 	return &DeleteTrustedJwtGrantIssuerParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDeleteTrustedJwtGrantIssuerParamsWithContext creates a new DeleteTrustedJwtGrantIssuerParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDeleteTrustedJwtGrantIssuerParamsWithContext(ctx context.Context) *DeleteTrustedJwtGrantIssuerParams {
-	var ()
 	return &DeleteTrustedJwtGrantIssuerParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDeleteTrustedJwtGrantIssuerParamsWithHTTPClient creates a new DeleteTrustedJwtGrantIssuerParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDeleteTrustedJwtGrantIssuerParamsWithHTTPClient(client *http.Client) *DeleteTrustedJwtGrantIssuerParams {
-	var ()
 	return &DeleteTrustedJwtGrantIssuerParams{
 		HTTPClient: client,
 	}
 }
 
-/*DeleteTrustedJwtGrantIssuerParams contains all the parameters to send to the API endpoint
-for the delete trusted jwt grant issuer operation typically these are written to a http.Request
+/* DeleteTrustedJwtGrantIssuerParams contains all the parameters to send to the API endpoint
+   for the delete trusted jwt grant issuer operation.
+
+   Typically these are written to a http.Request.
 */
 type DeleteTrustedJwtGrantIssuerParams struct {
 
-	/*ID
-	  The id of the desired grant
+	/* ID.
 
+	   The id of the desired grant
 	*/
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the delete trusted jwt grant issuer params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DeleteTrustedJwtGrantIssuerParams) WithDefaults() *DeleteTrustedJwtGrantIssuerParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the delete trusted jwt grant issuer params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DeleteTrustedJwtGrantIssuerParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the delete trusted jwt grant issuer params

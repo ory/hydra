@@ -16,59 +16,73 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewGetJSONWebKeySetParams creates a new GetJSONWebKeySetParams object
-// with the default values initialized.
+// NewGetJSONWebKeySetParams creates a new GetJSONWebKeySetParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewGetJSONWebKeySetParams() *GetJSONWebKeySetParams {
-	var ()
 	return &GetJSONWebKeySetParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewGetJSONWebKeySetParamsWithTimeout creates a new GetJSONWebKeySetParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewGetJSONWebKeySetParamsWithTimeout(timeout time.Duration) *GetJSONWebKeySetParams {
-	var ()
 	return &GetJSONWebKeySetParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewGetJSONWebKeySetParamsWithContext creates a new GetJSONWebKeySetParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewGetJSONWebKeySetParamsWithContext(ctx context.Context) *GetJSONWebKeySetParams {
-	var ()
 	return &GetJSONWebKeySetParams{
-
 		Context: ctx,
 	}
 }
 
 // NewGetJSONWebKeySetParamsWithHTTPClient creates a new GetJSONWebKeySetParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewGetJSONWebKeySetParamsWithHTTPClient(client *http.Client) *GetJSONWebKeySetParams {
-	var ()
 	return &GetJSONWebKeySetParams{
 		HTTPClient: client,
 	}
 }
 
-/*GetJSONWebKeySetParams contains all the parameters to send to the API endpoint
-for the get Json web key set operation typically these are written to a http.Request
+/* GetJSONWebKeySetParams contains all the parameters to send to the API endpoint
+   for the get Json web key set operation.
+
+   Typically these are written to a http.Request.
 */
 type GetJSONWebKeySetParams struct {
 
-	/*Set
-	  The set
+	/* Set.
 
+	   The set
 	*/
 	Set string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the get Json web key set params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetJSONWebKeySetParams) WithDefaults() *GetJSONWebKeySetParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the get Json web key set params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *GetJSONWebKeySetParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the get Json web key set params

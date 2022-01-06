@@ -46,9 +46,9 @@ func NewDynamicClientRegistrationDeleteOAuth2ClientNoContent() *DynamicClientReg
 	return &DynamicClientRegistrationDeleteOAuth2ClientNoContent{}
 }
 
-/*DynamicClientRegistrationDeleteOAuth2ClientNoContent handles this case with default header values.
+/* DynamicClientRegistrationDeleteOAuth2ClientNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DynamicClientRegistrationDeleteOAuth2ClientNoContent struct {
@@ -70,7 +70,7 @@ func NewDynamicClientRegistrationDeleteOAuth2ClientDefault(code int) *DynamicCli
 	}
 }
 
-/*DynamicClientRegistrationDeleteOAuth2ClientDefault handles this case with default header values.
+/* DynamicClientRegistrationDeleteOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
@@ -88,7 +88,6 @@ func (o *DynamicClientRegistrationDeleteOAuth2ClientDefault) Code() int {
 func (o *DynamicClientRegistrationDeleteOAuth2ClientDefault) Error() string {
 	return fmt.Sprintf("[DELETE /connect/register/{id}][%d] dynamicClientRegistrationDeleteOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *DynamicClientRegistrationDeleteOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }

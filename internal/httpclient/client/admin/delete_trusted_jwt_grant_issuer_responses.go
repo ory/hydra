@@ -41,9 +41,8 @@ func (o *DeleteTrustedJwtGrantIssuerReader) ReadResponse(response runtime.Client
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,9 +51,9 @@ func NewDeleteTrustedJwtGrantIssuerNoContent() *DeleteTrustedJwtGrantIssuerNoCon
 	return &DeleteTrustedJwtGrantIssuerNoContent{}
 }
 
-/*DeleteTrustedJwtGrantIssuerNoContent handles this case with default header values.
+/* DeleteTrustedJwtGrantIssuerNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteTrustedJwtGrantIssuerNoContent struct {
@@ -74,7 +73,7 @@ func NewDeleteTrustedJwtGrantIssuerNotFound() *DeleteTrustedJwtGrantIssuerNotFou
 	return &DeleteTrustedJwtGrantIssuerNotFound{}
 }
 
-/*DeleteTrustedJwtGrantIssuerNotFound handles this case with default header values.
+/* DeleteTrustedJwtGrantIssuerNotFound describes a response with status code 404, with default header values.
 
 genericError
 */
@@ -85,7 +84,6 @@ type DeleteTrustedJwtGrantIssuerNotFound struct {
 func (o *DeleteTrustedJwtGrantIssuerNotFound) Error() string {
 	return fmt.Sprintf("[DELETE /trust/grants/jwt-bearer/issuers/{id}][%d] deleteTrustedJwtGrantIssuerNotFound  %+v", 404, o.Payload)
 }
-
 func (o *DeleteTrustedJwtGrantIssuerNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -107,7 +105,7 @@ func NewDeleteTrustedJwtGrantIssuerInternalServerError() *DeleteTrustedJwtGrantI
 	return &DeleteTrustedJwtGrantIssuerInternalServerError{}
 }
 
-/*DeleteTrustedJwtGrantIssuerInternalServerError handles this case with default header values.
+/* DeleteTrustedJwtGrantIssuerInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -118,7 +116,6 @@ type DeleteTrustedJwtGrantIssuerInternalServerError struct {
 func (o *DeleteTrustedJwtGrantIssuerInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /trust/grants/jwt-bearer/issuers/{id}][%d] deleteTrustedJwtGrantIssuerInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *DeleteTrustedJwtGrantIssuerInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

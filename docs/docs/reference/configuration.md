@@ -1609,6 +1609,7 @@ tracing:
   # - datadog
   # - elastic-apm
   # - instana
+  # - otel
   #
   # Examples:
   # - jaeger

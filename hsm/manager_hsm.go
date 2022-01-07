@@ -29,11 +29,10 @@ import (
 )
 
 type KeyManager struct {
+	jwk.Manager
 	sync.RWMutex
 	Context
 }
-
-var _ jwk.Manager = &KeyManager{}
 
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	CodeField:        http.StatusBadRequest,

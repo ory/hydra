@@ -21,11 +21,10 @@ type Context interface {
 }
 
 type KeyManager struct {
+	jwk.Manager
 	sync.RWMutex
 	Context
 }
-
-var _ jwk.Manager = &KeyManager{}
 
 var ErrOpSysNotSupported = errors.New("Hardware Security Module is not supported on this platform.")
 

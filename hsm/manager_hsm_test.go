@@ -49,7 +49,7 @@ func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
 	reg.WithHsmContext(mockHsmContext)
 	err := reg.Init(context.Background())
 	assert.NoError(t, err)
-	assert.IsType(t, &hsm.KeyManager{}, reg.KeyManager())
+	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
 }
 

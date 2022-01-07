@@ -979,7 +979,8 @@
             "zipkin",
             "datadog",
             "elastic-apm",
-            "instana"
+            "instana",
+            "otel"
           ],
           "examples": [
             "jaeger"

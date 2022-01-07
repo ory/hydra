@@ -40,7 +40,9 @@ services:
       # - ELASTIC_APM_SERVICE_NAME="ORY Hydra"
       # - ELASTIC_APM_SERVICE_VERSION="1.9.0"
       # - ELASTIC_APM_ENVIRONMENT="devel"
-
+      ### Opentelemetry ###
+      ### See env vars here: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md ###
+      # - OTEL_SERVICE_NAME="ORY Hydra"
   jaeger:
     image: jaegertracing/all-in-one:1.19.2
     ports:

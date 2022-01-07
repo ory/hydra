@@ -16,64 +16,79 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewDeleteJSONWebKeyParams creates a new DeleteJSONWebKeyParams object
-// with the default values initialized.
+// NewDeleteJSONWebKeyParams creates a new DeleteJSONWebKeyParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDeleteJSONWebKeyParams() *DeleteJSONWebKeyParams {
-	var ()
 	return &DeleteJSONWebKeyParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDeleteJSONWebKeyParamsWithTimeout creates a new DeleteJSONWebKeyParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDeleteJSONWebKeyParamsWithTimeout(timeout time.Duration) *DeleteJSONWebKeyParams {
-	var ()
 	return &DeleteJSONWebKeyParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDeleteJSONWebKeyParamsWithContext creates a new DeleteJSONWebKeyParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDeleteJSONWebKeyParamsWithContext(ctx context.Context) *DeleteJSONWebKeyParams {
-	var ()
 	return &DeleteJSONWebKeyParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDeleteJSONWebKeyParamsWithHTTPClient creates a new DeleteJSONWebKeyParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDeleteJSONWebKeyParamsWithHTTPClient(client *http.Client) *DeleteJSONWebKeyParams {
-	var ()
 	return &DeleteJSONWebKeyParams{
 		HTTPClient: client,
 	}
 }
 
-/*DeleteJSONWebKeyParams contains all the parameters to send to the API endpoint
-for the delete Json web key operation typically these are written to a http.Request
+/* DeleteJSONWebKeyParams contains all the parameters to send to the API endpoint
+   for the delete Json web key operation.
+
+   Typically these are written to a http.Request.
 */
 type DeleteJSONWebKeyParams struct {
 
-	/*Kid
-	  The kid of the desired key
+	/* Kid.
 
+	   The kid of the desired key
 	*/
 	Kid string
-	/*Set
-	  The set
 
+	/* Set.
+
+	   The set
 	*/
 	Set string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the delete Json web key params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DeleteJSONWebKeyParams) WithDefaults() *DeleteJSONWebKeyParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the delete Json web key params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DeleteJSONWebKeyParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the delete Json web key params

@@ -16,59 +16,73 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewDeleteOAuth2ClientParams creates a new DeleteOAuth2ClientParams object
-// with the default values initialized.
+// NewDeleteOAuth2ClientParams creates a new DeleteOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDeleteOAuth2ClientParams() *DeleteOAuth2ClientParams {
-	var ()
 	return &DeleteOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDeleteOAuth2ClientParamsWithTimeout creates a new DeleteOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDeleteOAuth2ClientParamsWithTimeout(timeout time.Duration) *DeleteOAuth2ClientParams {
-	var ()
 	return &DeleteOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDeleteOAuth2ClientParamsWithContext creates a new DeleteOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDeleteOAuth2ClientParamsWithContext(ctx context.Context) *DeleteOAuth2ClientParams {
-	var ()
 	return &DeleteOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDeleteOAuth2ClientParamsWithHTTPClient creates a new DeleteOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDeleteOAuth2ClientParamsWithHTTPClient(client *http.Client) *DeleteOAuth2ClientParams {
-	var ()
 	return &DeleteOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*DeleteOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the delete o auth2 client operation typically these are written to a http.Request
+/* DeleteOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the delete o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type DeleteOAuth2ClientParams struct {
 
-	/*ID
-	  The id of the OAuth 2.0 Client.
+	/* ID.
 
+	   The id of the OAuth 2.0 Client.
 	*/
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the delete o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DeleteOAuth2ClientParams) WithDefaults() *DeleteOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the delete o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DeleteOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the delete o auth2 client params

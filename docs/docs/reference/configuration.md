@@ -715,29 +715,67 @@ serve:
 dsn: ''
 
 ## hsm ##
-# Configures Hardware Security Module for hydra.openid.id-token, hydra.jwt.access-token keys
-# Either slot or token_label must be set. If token_label is set, then first slot in index with this label is used.
 #
-# Set this value using environment variables on
-# - Linux/macOS:
-#  $ export HSM_ENABLED=<value>
-#  $ export HSM_LIBRARY=<value>
-#	 $ export HSM_PIN=<value>
-#	 $ export HSM_SLOT=<value>
-#	 $ export HSM_TOKEN_LABEL=<value>
-# - Windows Command Line (CMD):
-#    > set HSM_ENABLED=<value>
-#    > set HSM_LIBRARY=<value>
-#    > set HSM_PIN=<value>
-#    > set HSM_SLOT=<value>
-#    > set HSM_TOKEN_LABEL=<value>
+# Configures Hardware Security Module.
 #
 hsm:
+  ## library ##
+  #
+  # Full path (including file extension) of the HSM vendor PKCS#11 library
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_LIBRARY=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_LIBRARY=<value>
+  #
+  library: ''
+
+  ## pin ##
+  #
+  # PIN code for token operations
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_PIN=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_PIN=<value>
+  #
+  pin: ''
+
+  ## slot ##
+  #
+  # Slot ID of the token to use (if label is not specified)
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_SLOT=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_SLOT=<value>
+  #
+  slot: -100000000
+
+  ## token_label ##
+  #
+  # Label of the token to use (if slot is not specified). If both slot and label are set, token label takes preference over slot. In this case first slot, that contains this label is used.
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_TOKEN_LABEL=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_TOKEN_LABEL=<value>
+  #
+  token_label: ''
+
+  ## enabled ##
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_ENABLED=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_ENABLED=<value>
+  #
   enabled: false
-  library: /path/to/hsm-vendor/library.so
-  pin: partition-pin-code
-  slot: 0
-  token_label: hydra
 
 ## webfinger ##
 #

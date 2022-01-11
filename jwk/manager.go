@@ -22,16 +22,37 @@ package jwk
 
 import (
 	"context"
+	"net/http"
 	"time"
+
+	"github.com/ory/fosite"
 
 	jose "gopkg.in/square/go-jose.v2"
 )
 
+var ErrUnsupportedKeyAlgorithm = &fosite.RFC6749Error{
+	CodeField:        http.StatusBadRequest,
+	ErrorField:       http.StatusText(http.StatusBadRequest),
+	DescriptionField: "Unsupported key algorithm",
+}
+
+var ErrUnsupportedEllipticCurve = &fosite.RFC6749Error{
+	CodeField:        http.StatusBadRequest,
+	ErrorField:       http.StatusText(http.StatusBadRequest),
+	DescriptionField: "Unsupported elliptic curve",
+}
+
 type (
 	Manager interface {
+		GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error)
+
 		AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error
 
 		AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error
+
+		UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error
+
+		UpdateKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error
 
 		GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error)
 

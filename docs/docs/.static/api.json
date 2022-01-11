@@ -526,7 +526,7 @@
         }
       },
       "put": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well. This method is not supported when Hardware Security Module is enabled.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -577,7 +577,7 @@
         }
       },
       "post": {
-        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA, EdDSA). When Hardware Security Module is enabled, then only RS256, ECDSA key strategies are available. If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -716,7 +716,7 @@
         }
       },
       "put": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well. This method is not supported when Hardware Security Module is enabled.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],

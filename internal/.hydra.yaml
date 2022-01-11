@@ -64,6 +64,9 @@ serve:
 
 dsn: memory
 
+hsm:
+  enabled: false
+
 webfinger:
   jwks:
     broadcast_keys:

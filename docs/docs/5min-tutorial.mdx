@@ -77,6 +77,15 @@ $ docker-compose -f quickstart.yml \
   up --build
 ```
 
+If you want to test Hardware Security Module add `-f quickstart-hsm.yml`. For
+more information head over to [HSM support](hsm-support).
+
+```shell script
+$ docker-compose -f quickstart.yml \
+    -f quickstart-hsm.yml \
+    up --build
+```
+
 Let's confirm that everything is working by creating an OAuth 2.0 Client.
 
 Note: The following commands run Hydra inside Docker. If you have the ORY Hydra
@@ -186,9 +195,8 @@ $ docker-compose -f quickstart.yml rm -f -v
 
 ### Quickstart Configuration
 
-In this tutorial we use a simplified configuration.  
-You can find it in
-[`contrib/quickstart/5-min/hydra.yml`](https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml).  
+In this tutorial we use a simplified configuration. You can find it in
+[`contrib/quickstart/5-min/hydra.yml`](https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml).
 The configuration gets loaded in docker-compose as specified in the
 [`quickstart.yml`](https://github.com/ory/hydra/blob/master/quickstart.yml).
 

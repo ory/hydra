@@ -41,6 +41,7 @@ type (
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
 		KeyCipher() *jwk.AEAD
+		KeyGenerators() map[string]jwk.KeyGenerator
 		x.RegistryLogger
 		x.TracingProvider
 	}

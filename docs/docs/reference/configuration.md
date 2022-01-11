@@ -714,6 +714,31 @@ serve:
 #
 dsn: ''
 
+## hsm ##
+# Configures Hardware Security Module for hydra.openid.id-token, hydra.jwt.access-token keys
+# Either slot or token_label must be set. If token_label is set, then first slot in index with this label is used.
+#
+# Set this value using environment variables on
+# - Linux/macOS:
+#  $ export HSM_ENABLED=<value>
+#  $ export HSM_LIBRARY=<value>
+#	 $ export HSM_PIN=<value>
+#	 $ export HSM_SLOT=<value>
+#	 $ export HSM_TOKEN_LABEL=<value>
+# - Windows Command Line (CMD):
+#    > set HSM_ENABLED=<value>
+#    > set HSM_LIBRARY=<value>
+#    > set HSM_PIN=<value>
+#    > set HSM_SLOT=<value>
+#    > set HSM_TOKEN_LABEL=<value>
+#
+hsm:
+  enabled: false
+  library: /path/to/hsm-vendor/library.so
+  pin: partition-pin-code
+  slot: 0
+  token_label: hydra
+
 ## webfinger ##
 #
 # Configures ./well-known/ settings.

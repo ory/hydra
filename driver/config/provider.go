@@ -61,6 +61,7 @@ const (
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
+	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
 	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
 	KeyLogLevel                                  = "log.level"
@@ -228,6 +229,10 @@ func (p *Provider) CookieSameSiteMode() http.SameSite {
 		}
 		return http.SameSiteDefaultMode
 	}
+}
+
+func (p *Provider) PublicAllowDynamicRegistration() bool {
+	return p.p.Bool(KeyPublicAllowDynamicRegistration)
 }
 
 func (p *Provider) CookieSameSiteLegacyWorkaround() bool {

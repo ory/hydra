@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
 
 	jose "gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
 
@@ -198,6 +198,15 @@ type Client struct {
 
 	// Metadata is arbitrary data.
 	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
+
+	// RegistrationAccessTokenSignature is contains the signature of the registration token for managing the OAuth2 Client.
+	RegistrationAccessTokenSignature string `json:"-" db:"registration_access_token_signature"`
+
+	// RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.
+	RegistrationAccessToken string `json:"registration_access_token,omitempty" db:"-"`
+
+	// RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
+	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
 }
 
 func (Client) TableName() string {

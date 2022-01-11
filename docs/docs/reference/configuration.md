@@ -914,6 +914,20 @@ oidc:
       - offline
       - offline_access
 
+    ## enabled ##
+    #
+    # Enable dynamic client registration.
+    #
+    # Default value: false
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    # - Windows Command Line (CMD):
+    #    > set OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    #
+    enabled: false
+
   ## subject_identifiers ##
   #
   # Configures the Subject Identifier algorithm. For more information please head over to the documentation: https://www.ory.sh/docs/hydra/advanced#subject-identifier-algorithms
@@ -1334,6 +1348,56 @@ oauth2:
     #
     default_grant_allowed_scope: false
 
+  ## grant ##
+  #
+  grant:
+    ## jwt ##
+    #
+    # Authorization Grants using JWT configuration
+    #
+    jwt:
+      ## iat_optional ##
+      #
+      # If false, IAT claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      #
+      iat_optional: false
+
+      ## max_ttl ##
+      #
+      # Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.
+      #
+      # Default value: 720h
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      #
+      max_ttl: 1h
+
+      ## jti_optional ##
+      #
+      # If false, JTI claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      #
+      jti_optional: false
+
   ## refresh_token_hook ##
   #
   # Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.
@@ -1570,6 +1634,7 @@ tracing:
   # - datadog
   # - elastic-apm
   # - instana
+  # - otel
   #
   # Examples:
   # - jaeger

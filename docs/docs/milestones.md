@@ -47,6 +47,10 @@ New feature or request.
       ([hydra#2902](https://github.com/ory/hydra/issues/2902)) -
       [@Grant Zvolský](https://github.com/grantzvolsky),
       [@hackerman](https://github.com/aeneasr)
+- [ ] Rename SDK methods to follow our OpenAPI spec guide
+      ([hydra#2908](https://github.com/ory/hydra/issues/2908))
+- [ ] No longer allow users to set the client ID
+      ([hydra#2911](https://github.com/ory/hydra/issues/2911))
 
 ## [v1.11](https://github.com/ory/hydra/milestone/39)
 
@@ -137,23 +141,12 @@ New feature or request.
 - [x] Prometheus endpoint should not require x-forwarded-proto header
       ([hydra#2072](https://github.com/ory/hydra/issues/2072))
 
-### [Docs](https://github.com/ory/hydra/labels/docs)
+#### Pull Requests
 
-Affects documentation.
-
-#### Issues
-
-- [ ] Add list of possible errors to REST API documentation
-      ([hydra#2166](https://github.com/ory/hydra/issues/2166)) -
-      [@Alano Terblanche](https://github.com/Benehiko)
-- [x] Docs: rendering issue (?) on reference REST API
-      ([hydra#2092](https://github.com/ory/hydra/issues/2092)) -
-      [@Vincent](https://github.com/vinckr)
-- [x] 'make deps' Not work
-      ([hydra#2154](https://github.com/ory/hydra/issues/2154)) -
+- [x] feat: OpenID Connect Dynamic Client Registration and OAuth2 Dynamic Client
+      Registration Protocol
+      ([hydra#2909](https://github.com/ory/hydra/pull/2909)) -
       [@hackerman](https://github.com/aeneasr)
-- [x] Documentation for hydra-clients-import is incorrect
-      ([hydra#2732](https://github.com/ory/hydra/issues/2732))
 
 ### [Rfc](https://github.com/ory/hydra/labels/rfc)
 

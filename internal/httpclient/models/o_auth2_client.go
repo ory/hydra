@@ -111,6 +111,12 @@ type OAuth2Client struct {
 	// redirect uris
 	RedirectUris StringSlicePipeDelimiter `json:"redirect_uris,omitempty"`
 
+	// RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.
+	RegistrationAccessToken string `json:"registration_access_token,omitempty"`
+
+	// RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
+	RegistrationClientURI string `json:"registration_client_uri,omitempty"`
+
 	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
 	// from this Client MUST be rejected, if not signed with this algorithm.
 	RequestObjectSigningAlg string `json:"request_object_signing_alg,omitempty"`

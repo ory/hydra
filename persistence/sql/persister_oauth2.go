@@ -10,11 +10,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite/storage"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 

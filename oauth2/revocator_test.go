@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/persistence/sql"
 

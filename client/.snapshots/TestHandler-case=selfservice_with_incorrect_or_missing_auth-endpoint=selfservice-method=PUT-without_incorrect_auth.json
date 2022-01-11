@@ -1,0 +1,7 @@
+{
+  "body": {
+    "error": "The request could not be authorized",
+    "error_description": "The requested OAuth 2.0 client does not exist or you provided incorrect credentials."
+  },
+  "status": 401
+}

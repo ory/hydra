@@ -1,0 +1,28 @@
+{
+  "body": {
+    "client_id": "update-existing-client-selfservice",
+    "client_name": "",
+    "redirect_uris": [
+      "http://localhost:3000/cb",
+      "https://foobar.com"
+    ],
+    "grant_types": null,
+    "response_types": null,
+    "scope": "offline_access offline openid",
+    "audience": [],
+    "owner": "",
+    "policy_uri": "",
+    "allowed_cors_origins": [],
+    "tos_uri": "",
+    "client_uri": "",
+    "logo_uri": "",
+    "contacts": null,
+    "client_secret_expires_at": 0,
+    "subject_type": "public",
+    "jwks": {},
+    "token_endpoint_auth_method": "client_secret_basic",
+    "userinfo_signed_response_alg": "none",
+    "metadata": {}
+  },
+  "status": 200
+}

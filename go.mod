@@ -25,7 +25,7 @@ require (
 	github.com/go-openapi/swag v0.19.15
 	github.com/go-openapi/validate v0.20.1
 	github.com/go-swagger/go-swagger v0.26.1
-	github.com/gobuffalo/pop/v5 v5.3.4
+	github.com/gobuffalo/pop/v6 v6.0.1
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/golang/mock v1.6.0
@@ -48,7 +48,7 @@ require (
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.12
-	github.com/ory/x v0.0.303
+	github.com/ory/x v0.0.331
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1

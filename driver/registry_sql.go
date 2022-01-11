@@ -7,6 +7,8 @@ import (
 
 	"github.com/ory/hydra/hsm"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
 
@@ -15,7 +17,6 @@ import (
 
 	"github.com/ory/x/resilience"
 
-	"github.com/gobuffalo/pop/v5"
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/ory/hydra/persistence/sql"

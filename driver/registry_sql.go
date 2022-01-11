@@ -55,8 +55,8 @@ func NewRegistrySQL() *RegistrySQL {
 }
 
 // SetConfig used for testing only.
-func(m *RegistrySQL) SetConfig(key string, value interface{}) {
-	m.C.Set(key,value)
+func (m *RegistrySQL) SetConfig(key string, value interface{}) {
+	m.C.Set(key, value)
 }
 
 func (m *RegistrySQL) Init(ctx context.Context) error {

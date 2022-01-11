@@ -425,13 +425,13 @@ func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, requ
 	}
 
 	var inGracePeriod bool
-	if inGracePeriod,err = p.getRefreshTokenGracePeriodStatusBySignature(ctx, signature); err != nil {
+	if inGracePeriod, err = p.getRefreshTokenGracePeriodStatusBySignature(ctx, signature); err != nil {
 		p.l.Errorf("signature: %s in_grace_period status not found. grace period not applied", signature)
 		return errors.WithStack(err)
 	}
 
 	requesterSession := requester.GetSession()
-	if ! inGracePeriod {
+	if !inGracePeriod {
 		requesterSession.SetExpiresAt(fosite.RefreshToken, time.Now().UTC().Add(gracePeriod))
 		if err = p.updateRefreshSession(ctx, requestId, requesterSession, true); err != nil {
 			p.l.Errorf("failed to update session with signature: %s", signature)

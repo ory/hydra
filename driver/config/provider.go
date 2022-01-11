@@ -481,6 +481,6 @@ func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
 	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
 }
 
-func(p *Provider) RefreshTokenRotationGracePeriod() time.Duration {
+func (p *Provider) RefreshTokenRotationGracePeriod() time.Duration {
 	return p.p.DurationF(KeyRefreshTokenRotationGracePeriod, 0)
 }

@@ -190,7 +190,6 @@ func TestHelperRunner(t *testing.T, store InternalRegistry, k string) {
 	t.Run(fmt.Sprintf("case=testHelperRevokeRefreshTokenMaybeGracePeriod/db=%s", k), testHelperRevokeRefreshTokenMaybeGracePeriod(store))
 }
 
-
 func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.T) {
 	return func(t *testing.T) {
 		requestId := uuid.New()
@@ -419,7 +418,7 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 
 func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
 
-	setConfig := func(registry InternalRegistry, key string, value interface{}){
+	setConfig := func(registry InternalRegistry, key string, value interface{}) {
 		r := reflect.ValueOf(registry)
 		updateConfig := r.MethodByName("SetConfig")
 		updateConfig.Call([]reflect.Value{
@@ -451,7 +450,6 @@ func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *te
 			assert.True(t, errors.Is(err, fosite.ErrInactiveToken))
 		})
 
-
 		t.Run("refresh token enters grace period when configured,", func(t *testing.T) {
 
 			// SETUP
@@ -468,7 +466,7 @@ func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *te
 			assert.NoError(t, err, "precondition failed: could not create refresh token session")
 
 			// ACT
-			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx,defaultRequest.GetID(), refreshTokenSession)
+			err = m.RevokeRefreshTokenMaybeGracePeriod(ctx, defaultRequest.GetID(), refreshTokenSession)
 
 			assert.NoError(t, err)
 

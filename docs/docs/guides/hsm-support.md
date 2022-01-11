@@ -9,6 +9,15 @@ also known as Cryptoki, is one of the Public Key Cryptography Standards
 developed by RSA Security. PKCS#11 defines the interface between an application
 and a cryptographic device.
 
+:::note
+
+If a key is not found in the Hardware Security Module, the regular Software Key
+Manager with AES-GCM software encryption will be used as a fallback. Storing
+keys will always use the Software Key Manager as it is not possible to add keys
+to a Hardware Security Module.
+
+:::
+
 PKCS#11 is used as a low-level interface to perform cryptographic operations
 without the need for the application to directly interface a device through its
 driver. PKCS#11 represents cryptographic devices using a common model referred

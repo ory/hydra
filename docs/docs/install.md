@@ -46,7 +46,7 @@ $ hydra help
 You can install ORY Hydra using [scoop](https://scoop.sh) on Windows:
 
 ```shell
-> scoop bucket add ory-hydra https://github.com/ory/scoop-hydra.git
+> scoop bucket add ory https://github.com/ory/scoop.git
 > scoop install hydra
 > hydra help
 ```

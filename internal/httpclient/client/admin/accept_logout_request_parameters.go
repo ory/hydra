@@ -16,56 +16,70 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewAcceptLogoutRequestParams creates a new AcceptLogoutRequestParams object
-// with the default values initialized.
+// NewAcceptLogoutRequestParams creates a new AcceptLogoutRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewAcceptLogoutRequestParams() *AcceptLogoutRequestParams {
-	var ()
 	return &AcceptLogoutRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewAcceptLogoutRequestParamsWithTimeout creates a new AcceptLogoutRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewAcceptLogoutRequestParamsWithTimeout(timeout time.Duration) *AcceptLogoutRequestParams {
-	var ()
 	return &AcceptLogoutRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewAcceptLogoutRequestParamsWithContext creates a new AcceptLogoutRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewAcceptLogoutRequestParamsWithContext(ctx context.Context) *AcceptLogoutRequestParams {
-	var ()
 	return &AcceptLogoutRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewAcceptLogoutRequestParamsWithHTTPClient creates a new AcceptLogoutRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewAcceptLogoutRequestParamsWithHTTPClient(client *http.Client) *AcceptLogoutRequestParams {
-	var ()
 	return &AcceptLogoutRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*AcceptLogoutRequestParams contains all the parameters to send to the API endpoint
-for the accept logout request operation typically these are written to a http.Request
+/* AcceptLogoutRequestParams contains all the parameters to send to the API endpoint
+   for the accept logout request operation.
+
+   Typically these are written to a http.Request.
 */
 type AcceptLogoutRequestParams struct {
 
-	/*LogoutChallenge*/
+	// LogoutChallenge.
 	LogoutChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the accept logout request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *AcceptLogoutRequestParams) WithDefaults() *AcceptLogoutRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the accept logout request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *AcceptLogoutRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the accept logout request params
@@ -124,6 +138,7 @@ func (o *AcceptLogoutRequestParams) WriteToRequest(r runtime.ClientRequest, reg 
 	qrLogoutChallenge := o.LogoutChallenge
 	qLogoutChallenge := qrLogoutChallenge
 	if qLogoutChallenge != "" {
+
 		if err := r.SetQueryParam("logout_challenge", qLogoutChallenge); err != nil {
 			return err
 		}

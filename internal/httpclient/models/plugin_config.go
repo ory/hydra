@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -161,6 +162,8 @@ func (m *PluginConfig) validateArgs(formats strfmt.Registry) error {
 		if err := m.Args.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("Args")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Args")
 			}
 			return err
 		}
@@ -211,6 +214,8 @@ func (m *PluginConfig) validateEnv(formats strfmt.Registry) error {
 			if err := m.Env[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Env" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("Env" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -231,6 +236,8 @@ func (m *PluginConfig) validateInterface(formats strfmt.Registry) error {
 		if err := m.Interface.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("Interface")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Interface")
 			}
 			return err
 		}
@@ -258,6 +265,8 @@ func (m *PluginConfig) validateLinux(formats strfmt.Registry) error {
 		if err := m.Linux.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("Linux")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Linux")
 			}
 			return err
 		}
@@ -281,6 +290,8 @@ func (m *PluginConfig) validateMounts(formats strfmt.Registry) error {
 			if err := m.Mounts[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Mounts" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("Mounts" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -301,6 +312,8 @@ func (m *PluginConfig) validateNetwork(formats strfmt.Registry) error {
 		if err := m.Network.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("Network")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Network")
 			}
 			return err
 		}
@@ -328,7 +341,6 @@ func (m *PluginConfig) validatePropagatedMount(formats strfmt.Registry) error {
 }
 
 func (m *PluginConfig) validateUser(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.User) { // not required
 		return nil
 	}
@@ -337,6 +349,8 @@ func (m *PluginConfig) validateUser(formats strfmt.Registry) error {
 		if err := m.User.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("User")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("User")
 			}
 			return err
 		}
@@ -355,7 +369,6 @@ func (m *PluginConfig) validateWorkDir(formats strfmt.Registry) error {
 }
 
 func (m *PluginConfig) validateRootfs(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Rootfs) { // not required
 		return nil
 	}
@@ -364,6 +377,186 @@ func (m *PluginConfig) validateRootfs(formats strfmt.Registry) error {
 		if err := m.Rootfs.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("rootfs")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("rootfs")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this plugin config based on the context it is used
+func (m *PluginConfig) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateArgs(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateEnv(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateInterface(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateLinux(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateMounts(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateNetwork(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateUser(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRootfs(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *PluginConfig) contextValidateArgs(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Args != nil {
+		if err := m.Args.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("Args")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Args")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateEnv(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Env); i++ {
+
+		if m.Env[i] != nil {
+			if err := m.Env[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("Env" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("Env" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateInterface(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Interface != nil {
+		if err := m.Interface.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("Interface")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Interface")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateLinux(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Linux != nil {
+		if err := m.Linux.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("Linux")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Linux")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateMounts(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Mounts); i++ {
+
+		if m.Mounts[i] != nil {
+			if err := m.Mounts[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("Mounts" + "." + strconv.Itoa(i))
+				} else if ce, ok := err.(*errors.CompositeError); ok {
+					return ce.ValidateName("Mounts" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateNetwork(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Network != nil {
+		if err := m.Network.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("Network")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("Network")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateUser(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.User != nil {
+		if err := m.User.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("User")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("User")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PluginConfig) contextValidateRootfs(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Rootfs != nil {
+		if err := m.Rootfs.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("rootfs")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("rootfs")
 			}
 			return err
 		}

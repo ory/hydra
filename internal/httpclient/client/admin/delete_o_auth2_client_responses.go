@@ -46,9 +46,9 @@ func NewDeleteOAuth2ClientNoContent() *DeleteOAuth2ClientNoContent {
 	return &DeleteOAuth2ClientNoContent{}
 }
 
-/*DeleteOAuth2ClientNoContent handles this case with default header values.
+/* DeleteOAuth2ClientNoContent describes a response with status code 204, with default header values.
 
-Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+ Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
 typically 201.
 */
 type DeleteOAuth2ClientNoContent struct {
@@ -70,7 +70,7 @@ func NewDeleteOAuth2ClientDefault(code int) *DeleteOAuth2ClientDefault {
 	}
 }
 
-/*DeleteOAuth2ClientDefault handles this case with default header values.
+/* DeleteOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
@@ -88,7 +88,6 @@ func (o *DeleteOAuth2ClientDefault) Code() int {
 func (o *DeleteOAuth2ClientDefault) Error() string {
 	return fmt.Sprintf("[DELETE /clients/{id}][%d] deleteOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *DeleteOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }

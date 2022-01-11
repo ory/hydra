@@ -18,61 +18,76 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewDynamicClientRegistrationUpdateOAuth2ClientParams creates a new DynamicClientRegistrationUpdateOAuth2ClientParams object
-// with the default values initialized.
+// NewDynamicClientRegistrationUpdateOAuth2ClientParams creates a new DynamicClientRegistrationUpdateOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDynamicClientRegistrationUpdateOAuth2ClientParams() *DynamicClientRegistrationUpdateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationUpdateOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDynamicClientRegistrationUpdateOAuth2ClientParamsWithTimeout creates a new DynamicClientRegistrationUpdateOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDynamicClientRegistrationUpdateOAuth2ClientParamsWithTimeout(timeout time.Duration) *DynamicClientRegistrationUpdateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationUpdateOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDynamicClientRegistrationUpdateOAuth2ClientParamsWithContext creates a new DynamicClientRegistrationUpdateOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDynamicClientRegistrationUpdateOAuth2ClientParamsWithContext(ctx context.Context) *DynamicClientRegistrationUpdateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationUpdateOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDynamicClientRegistrationUpdateOAuth2ClientParamsWithHTTPClient creates a new DynamicClientRegistrationUpdateOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDynamicClientRegistrationUpdateOAuth2ClientParamsWithHTTPClient(client *http.Client) *DynamicClientRegistrationUpdateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationUpdateOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*DynamicClientRegistrationUpdateOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the dynamic client registration update o auth2 client operation typically these are written to a http.Request
+/* DynamicClientRegistrationUpdateOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the dynamic client registration update o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type DynamicClientRegistrationUpdateOAuth2ClientParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.OAuth2Client
-	/*ID
-	  The id of the OAuth 2.0 Client.
 
+	/* ID.
+
+	   The id of the OAuth 2.0 Client.
 	*/
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the dynamic client registration update o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationUpdateOAuth2ClientParams) WithDefaults() *DynamicClientRegistrationUpdateOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the dynamic client registration update o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationUpdateOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the dynamic client registration update o auth2 client params
@@ -137,7 +152,6 @@ func (o *DynamicClientRegistrationUpdateOAuth2ClientParams) WriteToRequest(r run
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

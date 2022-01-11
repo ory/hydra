@@ -626,6 +626,14 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	for _, hook := range h.r.AccessRequestHooks() {
+		if err := hook(ctx, accessRequest); err != nil {
+			h.logOrAudit(err, r)
+			h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+			return
+		}
+	}
+
 	accessResponse, err := h.r.OAuth2Provider().NewAccessResponse(ctx, accessRequest)
 
 	if err != nil {
@@ -722,6 +730,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		RequestedAt:                         session.RequestedAt,
 		Extra:                               session.Session.IDToken,
 		AuthenticationContextClassReference: session.ConsentRequest.ACR,
+		AuthenticationMethodsReferences:     session.ConsentRequest.AMR,
 
 		// These are required for work around https://github.com/ory/fosite/issues/530
 		Nonce:    authorizeRequest.GetRequestForm().Get("nonce"),

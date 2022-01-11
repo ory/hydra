@@ -28,9 +28,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ory/x/errorsx"
+	"github.com/gobuffalo/pop/v6"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -299,6 +299,12 @@ type HandledLoginRequest struct {
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
 	ACR string `json:"acr" db:"acr"`
+
+	// AMR sets the Authentication Methods References value for this
+	// authentication session. You can use it to specify the method a user used to
+	// authenticate. For example, if the acr indicates a user used two factor
+	// authentication, the amr can express they used a software-secured key.
+	AMR sqlxx.StringSlicePipeDelimiter `json:"amr" db:"amr"`
 
 	// Subject is the user ID of the end-user that authenticated.
 	//
@@ -627,6 +633,12 @@ type ConsentRequest struct {
 	// ACR represents the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it
 	// to express that, for example, a user authenticated using two factor authentication.
 	ACR string `json:"acr" db:"acr"`
+
+	// AMR is the Authentication Methods References value for this
+	// authentication session. You can use it to specify the method a user used to
+	// authenticate. For example, if the acr indicates a user used two factor
+	// authentication, the amr can express they used a software-secured key.
+	AMR sqlxx.StringSlicePipeDelimiter `json:"amr" db:"amr"`
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
 	Context sqlxx.JSONRawMessage `json:"context,omitempty" db:"context"`

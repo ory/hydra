@@ -64,6 +64,9 @@ serve:
 
 dsn: memory
 
+hsm:
+  enabled: false
+
 webfinger:
   jwks:
     broadcast_keys:
@@ -86,6 +89,7 @@ oidc:
     pairwise:
       salt: random_salt
   dynamic_client_registration:
+    enabled: false
     default_scope:
       - whatever
 

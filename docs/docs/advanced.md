@@ -184,128 +184,63 @@ compatibility):
 }
 ```
 
+#### Updating claims at token refresh
+
+Hydra can be configured to retrieve updated token claims from an endpoint at
+token refresh, which provides updated claims for a given subject and scopes.
+This is similar to accepting consent request, where the application provides the
+session data by calling Hydra Admin API.
+
+:::note
+
+This endpoint is called _before_ any logic in Ory Hydra is executed. If the
+hook, for example, returns an error, the refresh token will remain unused!
+
+:::note
+
+You can configure `oauth2.refresh_token_hook` config key:
+
+```yaml
+oauth2:
+  refresh_token_hook: https://my-example.app/token-refresh-hook
+```
+
+Hydra makes a `POST` request to this hook with the following payload:
+
+```json
+{
+  "subject": "foo",
+  "client_id": "bar",
+  "granted_scopes": ["openid", "offline"],
+  "granted_audience": []
+}
+```
+
+Hook has to respond with `200 OK` and updated session data (i.e. "extra" claims)
+for a token refresh to continue:
+
+```json
+{
+  "session": {
+    "access_token": {
+      "foo": "bar"
+    },
+    "id_token": {
+      "bar": "baz"
+    }
+  }
+}
+```
+
+This will overwrite existing session data from the original consent request.
+
+Hydra will gracefully deny refresh requests if the hook responds with
+`403 Forbidden`. Any other response from the hook will fail refresh requests.
+
 ### OAuth 2.0 Client Authentication with private/public keypairs
 
-ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA
-private/public keypairs with currently supported signing algorithms:
-
-- RS256 (default), RS384, RS512
-- PS256, PS384, PS512
-- ES256, ES384, ES512
-
-This authentication method replaces the classic HTTP Basic Authorization and
-HTTP POST Authorization schemes. Instead of sending the `client_id` and
-`client_secret`, you authenticate the client with a signed JSON Web Token.
-
-To enable this feature for a specific OAuth 2.0 Client, you must set
-`token_endpoint_auth_method` to `private_key_jwt` and register the public key of
-the RSA/ECDSA signing key either using the `jwks_uri` or `jwks` fields of the
-client.
-
-When authenticating the client at the token endpoint, you generate and sign
-(with the RSA/ECDSA private key) a JSON Web Token with the following claims:
-
-- `iss`: REQUIRED. Issuer. This MUST contain the client_id of the OAuth Client.
-- `sub`: REQUIRED. Subject. This MUST contain the client_id of the OAuth Client.
-- `aud`: REQUIRED. Audience. The aud (audience) Claim. Value that identifies the
-  Authorization Server (ORY Hydra) as an intended audience. The Authorization
-  Server MUST verify that it is an intended audience for the token. The Audience
-  SHOULD be the URL of the Authorization Server's Token Endpoint.
-- `jti`: REQUIRED. JWT ID. A unique identifier for the token, which can be used
-  to prevent reuse of the token. These tokens MUST only be used once, unless
-  conditions for reuse were negotiated between the parties; any such negotiation
-  is beyond the scope of this specification.
-- `exp`: REQUIRED. Expiration time on or after which the ID Token MUST NOT be
-  accepted for processing.
-- `iat`: OPTIONAL. Time at which the JWT was issued.
-
-When making a request to the `/oauth2/token` endpoint, you include
-`client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
-and `client_assertion=<signed-jwt>` in the request body:
-
-```
-POST /oauth2/token HTTP/1.1
-Host: my-hydra.com
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=authorization_code&
-code=i1WsRn1uB1&
-client_id=s6BhdRkqt3&
-client_assertion_type=
-urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer&
-client_assertion=PHNhbWxwOl ... ZT
-```
-
-Here's what a client with a `jwks` containing one RSA public key looks like:
-
-```json
-{
-  "client_id": "rsa-client-jwks",
-  "jwks": {
-    "keys": [
-      {
-        "kty": "RSA",
-        "n": "jL7h5wc-yeMUsHGJHc0xe9SbTdaLKXMHvcIHQck20Ji7SvrHPdTDQTvZtTDS_wJYbeShcCrliHvbJRSZhtEe0mPJpyWg3O_HkKy6_SyHepLK-_BR7HfcXYB6pVJCG3BW-lVMY7gl5sULFA74kNZH50h8hdmyWC9JgOHn0n3YLdaxSWlhctuwNPSwqwzY4qtN7_CZub81SXWpKiwj4UpyB10b8rM8qn35FS1hfsaFCVi0gQpd4vFDgFyqqpmiwq8oMr8RZ2mf0NMKCP3RXnMhy9Yq8O7lgG2t6g1g9noWbzZDUZNc54tv4WGFJ_rJZRz0jE_GR6v5sdqsDTdjFquPlQ",
-        "e": "AQAB",
-        "use": "sig",
-        "kid": "rsa-jwk"
-      }
-    ]
-  },
-  "token_endpoint_auth_method": "private_key_jwt",
-  "token_endpoint_auth_signing_alg": "RS256"
-}
-```
-
-And here is how it looks like for a `jwks` including an ECDSA public key:
-
-```json
-{
-  "client_id": "ecdsa-client-jwks",
-  "jwks": {
-    "keys": [
-      {
-        "kty": "EC",
-        "use": "sig",
-        "crv": "P-256",
-        "kid": "ecdsa-jwk",
-        "x": "nQjdhpecjZRlworpYk_TJAQBe4QbS8IwHY1DWkfR0w0",
-        "y": "UQfLzHxhc4i3EETUeaAS1vDVFJ-Y01hIESiXqqS86Vc"
-      }
-    ]
-  },
-  "token_endpoint_auth_method": "private_key_jwt",
-  "token_endpoint_auth_signing_alg": "ES256"
-}
-```
-
-And with `jwks_uri`:
-
-```json
-{
-  "client_id": "client-jwks-uri",
-  "jwks_uri": "http://path-to-my-public/keys.json",
-  "token_endpoint_auth_method": "private_key_jwt",
-  "token_endpoint_auth_signing_alg": "RS256"
-}
-```
-
-The `jwks_uri` must return a JSON object containing the public keys associated
-with the OAuth 2.0 Client:
-
-```json
-{
-  "keys": [
-    {
-      "kty": "RSA",
-      "n": "jL7h5wc-yeMUsHGJHc0xe9SbTdaLKXMHvcIHQck20Ji7SvrHPdTDQTvZtTDS_wJYbeShcCrliHvbJRSZhtEe0mPJpyWg3O_HkKy6_SyHepLK-_BR7HfcXYB6pVJCG3BW-lVMY7gl5sULFA74kNZH50h8hdmyWC9JgOHn0n3YLdaxSWlhctuwNPSwqwzY4qtN7_CZub81SXWpKiwj4UpyB10b8rM8qn35FS1hfsaFCVi0gQpd4vFDgFyqqpmiwq8oMr8RZ2mf0NMKCP3RXnMhy9Yq8O7lgG2t6g1g9noWbzZDUZNc54tv4WGFJ_rJZRz0jE_GR6v5sdqsDTdjFquPlQ",
-      "e": "AQAB",
-      "use": "sig",
-      "kid": "rsa-jwk"
-    }
-  ]
-}
-```
+Please head over to the
+[RFC7523 Documentation](guides/oauth2-grant-type-jwt-bearer.mdx).
 
 ## OpenID Connect
 

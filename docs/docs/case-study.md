@@ -25,7 +25,7 @@ many reasons to do this:
   weakens or even disables important anti-CSRF measures.
 
 These are only a couple of reasons to use OAuth2. You might decide to use OAuth2
-as your only authorization workflow, thus minimizing maintainance overhead while
+as your only authorization workflow, thus minimizing maintenance overhead while
 always being able to support third party applications. With OpenID Connect, you
 can delegate authentication as well!
 

@@ -28,6 +28,7 @@ import (
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/handler/pkce"
+	"github.com/ory/fosite/handler/rfc7523"
 )
 
 type FositeStorer interface {
@@ -36,6 +37,7 @@ type FositeStorer interface {
 	oauth2.TokenRevocationStorage
 	openid.OpenIDConnectRequestStorage
 	pkce.PKCERequestStorage
+	rfc7523.RFC7523KeyStorage
 
 	// flush the access token requests from the database.
 	// no data will be deleted after the 'notAfter' timeframe.

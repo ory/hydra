@@ -245,6 +245,32 @@
           }
         }
       }
+    },
+    "grantJwt": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Authorization Grants using JWT configuration",
+      "properties": {
+        "jti_optional": {
+          "type": "boolean",
+          "description": "If false, JTI claim must be present in JWT assertion.",
+          "default": false
+        },
+        "iat_optional": {
+          "type": "boolean",
+          "description": "If false, IAT claim must be present in JWT assertion.",
+          "default": false
+        },
+        "max_ttl": {
+          "description": "Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.",
+          "default": "720h",
+          "allOf": [
+            {
+              "$ref": "#/definitions/duration"
+            }
+          ]
+        }
+      }
     }
   },
   "properties": {
@@ -425,6 +451,32 @@
       "type": "string",
       "description": "Sets the data source name. This configures the backend where ORY Hydra persists data. If dsn is \"memory\", data will be written to memory and is lost when you restart this instance. ORY Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
     },
+    "hsm": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures Hardware Security Module.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "library": {
+          "type": "string",
+          "description": "Full path (including file extension) of the HSM vendor PKCS#11 library"
+        },
+        "pin": {
+          "type": "string",
+          "description": "PIN code for token operations"
+        },
+        "slot": {
+          "type": "integer",
+          "description": "Slot ID of the token to use (if label is not specified)"
+        },
+        "token_label": {
+          "type": "string",
+          "description": "Label of the token to use (if slot is not specified). If both slot and label are set, token label takes preference over slot. In this case first slot, that contains this label is used."
+        }
+      }
+    },
     "webfinger": {
       "type": "object",
       "additionalProperties": false,
@@ -592,6 +644,11 @@
           "additionalProperties": false,
           "description": "Configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...).",
           "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable dynamic client registration.",
+              "default": false
+            },
             "default_scope": {
               "type": "array",
               "description": "The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients. Keep in mind that users can overwrite this default by setting the \"scope\" key in the registration payload, effectively disabling the concept of whitelisted scopes.",
@@ -868,6 +925,23 @@
             }
           }
         },
+        "grant": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "jwt": {
+              "$ref": "#/definitions/grantJwt"
+            }
+          }
+        },
+        "refresh_token_hook": {
+          "type": "string",
+          "description": "Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.",
+          "format": "uri",
+          "examples": [
+            "https://my-example.app/token-refresh-hook"
+          ]
+        },
         "refresh_token_rotation": {
         "type": "object",
         "properties": {
@@ -945,7 +1019,8 @@
             "zipkin",
             "datadog",
             "elastic-apm",
-            "instana"
+            "instana",
+            "otel"
           ],
           "examples": [
             "jaeger"

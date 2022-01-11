@@ -7,9 +7,6 @@ title: Configuration
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
 
-If file `$HOME/.hydra.yaml` exists, it will be used as a configuration file
-which supports all configuration settings listed below.
-
 You can load the config file from another source using the
 `-c path/to/config.yaml` or `--config path/to/config.yaml` flag:
 `hydra --config path/to/config.yaml`.
@@ -717,6 +714,31 @@ serve:
 #
 dsn: ''
 
+## hsm ##
+# Configures Hardware Security Module for hydra.openid.id-token, hydra.jwt.access-token keys
+# Either slot or token_label must be set. If token_label is set, then first slot in index with this label is used.
+#
+# Set this value using environment variables on
+# - Linux/macOS:
+#  $ export HSM_ENABLED=<value>
+#  $ export HSM_LIBRARY=<value>
+#	 $ export HSM_PIN=<value>
+#	 $ export HSM_SLOT=<value>
+#	 $ export HSM_TOKEN_LABEL=<value>
+# - Windows Command Line (CMD):
+#    > set HSM_ENABLED=<value>
+#    > set HSM_LIBRARY=<value>
+#    > set HSM_PIN=<value>
+#    > set HSM_SLOT=<value>
+#    > set HSM_TOKEN_LABEL=<value>
+#
+hsm:
+  enabled: false
+  library: /path/to/hsm-vendor/library.so
+  pin: partition-pin-code
+  slot: 0
+  token_label: hydra
+
 ## webfinger ##
 #
 # Configures ./well-known/ settings.
@@ -891,6 +913,20 @@ oidc:
       - openid
       - offline
       - offline_access
+
+    ## enabled ##
+    #
+    # Enable dynamic client registration.
+    #
+    # Default value: false
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    # - Windows Command Line (CMD):
+    #    > set OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    #
+    enabled: false
 
   ## subject_identifiers ##
   #
@@ -1312,6 +1348,71 @@ oauth2:
     #
     default_grant_allowed_scope: false
 
+  ## grant ##
+  #
+  grant:
+    ## jwt ##
+    #
+    # Authorization Grants using JWT configuration
+    #
+    jwt:
+      ## iat_optional ##
+      #
+      # If false, IAT claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      #
+      iat_optional: false
+
+      ## max_ttl ##
+      #
+      # Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.
+      #
+      # Default value: 720h
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      #
+      max_ttl: 1h
+
+      ## jti_optional ##
+      #
+      # If false, JTI claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      #
+      jti_optional: false
+
+  ## refresh_token_hook ##
+  #
+  # Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.
+  #
+  # Examples:
+  # - https://my-example.app/token-refresh-hook
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  # - Windows Command Line (CMD):
+  #    > set OAUTH2_REFRESH_TOKEN_HOOK=<value>
+  #
+  refresh_token_hook: https://my-example.app/token-refresh-hook
+
   ## expose_internal_errors ##
   #
   # Set this to true if you want to share error debugging information with your OAuth 2.0 clients. Keep in mind that debug information is very valuable when dealing with errors, but might also expose database error codes and similar errors.
@@ -1549,6 +1650,7 @@ tracing:
   # - datadog
   # - elastic-apm
   # - instana
+  # - otel
   #
   # Examples:
   # - jaeger

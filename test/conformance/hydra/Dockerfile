@@ -1,4 +1,4 @@
-FROM golang:1.16-buster AS builder
+FROM golang:1.17-buster AS builder
 
 RUN apt-get update && \
   apt-get install -y git gcc bash ssl-cert ca-certificates
@@ -19,8 +19,7 @@ RUN go build -tags sqlite -o /usr/bin/hydra
 
 VOLUME /var/lib/sqlite
 
-# Exposing the ory home directory to simplify passing in hydra configuration (e.g. if the file $HOME/.hydra.yaml
-# exists, it will be automatically used as the configuration file).
+# Exposing the ory home directory
 VOLUME /home/ory
 
 # Declare the standard ports used by hydra (4433 for public service endpoint, 4434 for admin service endpoint)

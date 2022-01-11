@@ -3,7 +3,7 @@ name: Generate and Publish Milestone Document
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
 
 jobs:
   milestone:
@@ -23,8 +23,8 @@ jobs:
       - name: Commit Milestone Documentation
         uses: EndBug/add-and-commit@v4.4.0
         with:
-          message: "autogen(docs): update milestone document"
+          message: 'autogen(docs): update milestone document'
           author_name: aeneasr
-          author_email: "3372410+aeneasr@users.noreply.github.com"
+          author_email: '3372410+aeneasr@users.noreply.github.com'
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_PRIVILEGED }}

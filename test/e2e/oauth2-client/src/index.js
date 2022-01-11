@@ -25,8 +25,8 @@ const isStatusOk = (res) =>
       )
 
 const config = {
-  url: process.env.AUTHORIZATION_SERVER_URL || 'http://127.0.0.1:5000/',
-  public: process.env.PUBLIC_URL || 'http://127.0.0.1:5000/',
+  url: process.env.AUTHORIZATION_SERVER_URL || 'http://127.0.0.1:5004/',
+  public: process.env.PUBLIC_URL || 'http://127.0.0.1:5004/',
   admin: process.env.ADMIN_URL || 'http://127.0.0.1:5001/',
   port: parseInt(process.env.PORT) || 5003
 }

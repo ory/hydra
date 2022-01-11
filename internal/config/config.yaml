@@ -267,6 +267,15 @@ dsn: memory
 # dsn: postgres://user:password@host:123/database
 # dsn: mysql://user:password@tcp(host:123)/database
 
+# hsm configures Hardware Security Module for hydra.openid.id-token, hydra.jwt.access-token keys
+# Either slot or token_label must be set. If token_label is set, then first slot in index with this label is used.
+hsm:
+  enabled: false
+  library: /path/to/hsm-vendor/library.so
+  pin: token-pin-code
+  slot: 0
+  token_label: hydra
+
 # webfinger configures ./well-known/ settings
 webfinger:
   # jwks configures the /.well-known/jwks.json endpoint.
@@ -313,6 +322,7 @@ oidc:
 
   # dynamic_client_registration configures OpenID Connect Dynamic Client Registration (exposed as admin endpoints /clients/...)
   dynamic_client_registration:
+    enabled: false
 
     # The OpenID Connect Dynamic Client Registration specification has no concept of whitelisting OAuth 2.0 Scope. If you
     # want to expose Dynamic Client Registration, you should set the default scope enabled for newly registered clients.

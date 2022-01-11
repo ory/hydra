@@ -12,6 +12,7 @@ type InternalRegistry interface {
 
 type Registry interface {
 	KeyManager() Manager
+	SoftwareKeyManager() Manager
 	KeyGenerators() map[string]KeyGenerator
 	KeyCipher() *AEAD
 }

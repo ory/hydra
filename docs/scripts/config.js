@@ -11,7 +11,7 @@ const { execSync } = require('child_process')
 const fetch = require('node-fetch')
 
 const oryXVersion = execSync(
-  "cd ..; go list -f '{{.Module.Version}}' -find github.com/ory/x"
+  "cd ..; go list -f '{{.Version}}' -m github.com/ory/x"
 )
   .toString('utf-8')
   .trim()
@@ -219,9 +219,6 @@ title: Configuration
 <!-- THIS FILE IS BEING AUTO-GENERATED. DO NOT MODIFY IT AS ALL CHANGES WILL BE OVERWRITTEN.
 OPEN AN ISSUE IF YOU WOULD LIKE TO MAKE ADJUSTMENTS HERE AND MAINTAINERS WILL HELP YOU LOCATE THE RIGHT
 FILE -->
-
-If file \`$HOME/.${config.projectSlug}.yaml\` exists, it will be used as a configuration file which supports all
-configuration settings listed below.
 
 You can load the config file from another source using the \`-c path/to/config.yaml\` or \`--config path/to/config.yaml\`
 flag: \`${config.projectSlug} --config path/to/config.yaml\`.

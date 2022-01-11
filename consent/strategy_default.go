@@ -549,6 +549,7 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		&ConsentRequest{
 			ID:                     challenge,
 			ACR:                    as.ACR,
+			AMR:                    as.AMR,
 			Verifier:               verifier,
 			CSRF:                   csrf,
 			Skip:                   skip,

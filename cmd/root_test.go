@@ -30,6 +30,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/hydra/internal"
+
 	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
 
@@ -73,6 +75,7 @@ func init() {
 func TestExecute(t *testing.T) {
 	frontend := fmt.Sprintf("https://localhost:%d/", frontendPort)
 	backend := fmt.Sprintf("https://localhost:%d/", backendPort)
+	conf := internal.NewConfigurationWithDefaults()
 
 	rootCmd := NewRootCmd()
 
@@ -80,6 +83,7 @@ func TestExecute(t *testing.T) {
 		args      []string
 		wait      func() bool
 		expectErr bool
+		skipTest  bool
 	}{
 		{
 			args: []string{"serve", "all", "--sqa-opt-out"},
@@ -116,13 +120,15 @@ func TestExecute(t *testing.T) {
 		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "public-foo"}},
 		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "confidential-foo", "--pgp-key", base64EncodedPGPPublicKey(t), "--grant-types", "client_credentials", "--response-types", "token"}},
 		{args: []string{"clients", "delete", "--skip-tls-verify", "--endpoint", backend, "public-foo"}},
-		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "HS256"}},
+		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "RS256"}},
+		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "HS256"}, skipTest: conf.HsmEnabled()},
 		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},
 		// {args: []string{"keys", "rotate", "--skip-tls-verify", "--endpoint", backend, "foo"}},
 		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},
 		{args: []string{"keys", "delete", "--skip-tls-verify", "--endpoint", backend, "foo"}},
-		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}},
-		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}},
+		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}, skipTest: conf.HsmEnabled()},
+		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}, skipTest: conf.HsmEnabled()},
+		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}, skipTest: conf.HsmEnabled()},
 		{args: []string{"token", "revoke", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
 		{args: []string{"token", "client", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
 		{args: []string{"help", "migrate", "sql"}},
@@ -132,6 +138,10 @@ func TestExecute(t *testing.T) {
 		rootCmd.SetArgs(c.args)
 
 		t.Run(fmt.Sprintf("command=%v", c.args), func(t *testing.T) {
+			if c.skipTest {
+				t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled")
+			}
+
 			if c.wait != nil {
 				go func() {
 					assert.Nil(t, rootCmd.Execute())

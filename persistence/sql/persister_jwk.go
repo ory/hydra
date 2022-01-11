@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/gobuffalo/pop/v6"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/x/errorsx"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
@@ -16,6 +17,25 @@ import (
 )
 
 var _ jwk.Manager = &Persister{}
+
+func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+	generator, found := p.r.KeyGenerators()[alg]
+	if !found {
+		return nil, errorsx.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
+	}
+
+	keys, err := generator.Generate(kid, use)
+	if err != nil {
+		return nil, err
+	}
+
+	err = p.AddKeySet(ctx, set, keys)
+	if err != nil {
+		return nil, err
+	}
+
+	return keys, nil
+}
 
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
@@ -57,6 +77,30 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 			}); err != nil {
 				return sqlcon.HandleError(err)
 			}
+		}
+		return nil
+	})
+}
+
+func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
+			return err
+		}
+		if err := p.AddKey(ctx, set, key); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.DeleteKeySet(ctx, set); err != nil {
+			return err
+		}
+		if err := p.AddKeySet(ctx, set, keySet); err != nil {
+			return err
 		}
 		return nil
 	})

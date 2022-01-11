@@ -3,7 +3,10 @@ package migratest
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
+
+	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/x/configx"
 
@@ -15,7 +18,6 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
@@ -62,7 +64,7 @@ func TestMigrations(t *testing.T) {
 				driver.DisableValidation(),
 			)
 
-			tm := popx.NewTestMigrator(t, c, "../migrations", "./testdata", d.Logger())
+			tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), d.Logger())
 			require.NoError(t, tm.Up(context.Background()))
 
 			var lastClient *client.Client

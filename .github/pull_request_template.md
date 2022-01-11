@@ -13,11 +13,15 @@ behavior please do baz.
 ## Related issue(s)
 
 <!--
-Please link the GitHub issue this pull request resolves in the format of `#1234`. If you discussed this change
-with a maintainer, please mention her/him using the `@` syntax (e.g. `@aeneasr`).
+If this pull request
 
-If this change neither resolves an existing issue nor has sign-off from one of the maintainers, there is a
-chance substantial changes will be requested or that the changes will be rejected.
+1. is a fix for a known bug, link the issue where the bug was reported in the format of `#1234`;
+2. is a fix for a previously unknown bug, explain the bug and how to reproduce it in this pull request;
+2. implements a new feature, link the issue containing the design document in the format of `#1234`;
+3. improves the documentation, no issue reference is required.
+
+Pull requests introducing new features, which do not have a design document linked are more likely to be rejected and take on average 2-8 weeks longer to
+get merged.
 
 You can discuss changes with maintainers either in the Github Discusssions in this repository or
 join the [Ory Chat](https://www.ory.sh/chat).
@@ -34,6 +38,8 @@ If you're unsure about any of them, don't hesitate to ask. We're here to help!
 -->
 
 - [ ] I have read the [contributing guidelines](../blob/master/CONTRIBUTING.md).
+- [ ] I have referenced an issue containing the design document if my change
+      introduces a new feature.
 - [ ] I am following the
       [contributing code guidelines](../blob/master/CONTRIBUTING.md#contributing-code).
 - [ ] I have read the [security policy](../security/policy).

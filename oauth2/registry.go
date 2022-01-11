@@ -6,11 +6,14 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
 )
 
 type InternalRegistry interface {
 	client.Registry
+	jwk.Registry
+	trust.Registry
 	x.RegistryWriter
 	x.RegistryLogger
 	consent.Registry
@@ -27,4 +30,6 @@ type Registry interface {
 	OpenIDJWTStrategy() jwk.JWTStrategy
 
 	OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator
+
+	AccessRequestHooks() []AccessRequestHook
 }

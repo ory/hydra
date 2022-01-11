@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source $HOME/.profile
+# shellcheck disable=SC1090,SC1091
+source "$HOME"/.profile
 
 hydra clients delete \
     --endpoint http://localhost:9000 \

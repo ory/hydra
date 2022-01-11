@@ -2,7 +2,7 @@
 id: hydra-clients-import
 title: hydra clients import
 description:
-  hydra clients import Imports cryptographic keys of any format to the JSON Web
+  hydra clients import Imports OAuth 2.0 Clients from one or more JSON files of any format to the JSON Web
   Key Store
 ---
 
@@ -14,11 +14,11 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 ## hydra clients import
 
-Imports cryptographic keys of any format to the JSON Web Key Store
+Imports OAuth 2.0 Clients from one or more JSON files to the JSON Web Key Store
 
 ### Synopsis
 
-This command allows you to import cryptographic keys to the JSON Web Key Store.
+This command allows you to import OAuth 2.0 Clients from one or more JSON files to the JSON Web Key Store.
 
 Currently supported formats are raw JSON Web Keys or PEM/DER encoded data. If
 the JSON Web Key Set exists already, the imported keys will be added to that

@@ -1,0 +1,39 @@
+{
+  "client_id": "client-0007",
+  "client_name": "Client 0007",
+  "client_secret": "secret-0007",
+  "redirect_uris": [
+    "http://redirect/0007_1"
+  ],
+  "grant_types": [
+    "grant-0007_1"
+  ],
+  "response_types": [
+    "response-0007_1"
+  ],
+  "scope": "scope-0007",
+  "audience": [],
+  "owner": "owner-0007",
+  "policy_uri": "http://policy/0007",
+  "allowed_cors_origins": [],
+  "tos_uri": "http://tos/0007",
+  "client_uri": "http://client/0007",
+  "logo_uri": "http://logo/0007",
+  "contacts": [
+    "contact-0007_1"
+  ],
+  "client_secret_expires_at": 0,
+  "subject_type": "subject-0007",
+  "sector_identifier_uri": "http://sector_id/0007",
+  "jwks_uri": "http://jwks/0007",
+  "jwks": {},
+  "token_endpoint_auth_method": "token_auth-0007",
+  "request_uris": [
+    "http://request/0007_1"
+  ],
+  "request_object_signing_alg": "r_alg-0007",
+  "userinfo_signed_response_alg": "u_alg-0007",
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "metadata": {}
+}

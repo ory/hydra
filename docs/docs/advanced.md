@@ -59,7 +59,7 @@ consent request:
 
 ```
 hydra.acceptConsentRequest(challenge, {
-  // ORY Hydra checks if requested audiences are allowed by the client, so we can simply echo this.
+  // Ory Hydra checks if requested audiences are allowed by the client, so we can simply echo this.
   grant_audience: {
     access_token: response.requested_access_token_audience,
     // or, for example:
@@ -91,7 +91,7 @@ not exist for this flow.
 
 ### JSON Web Tokens
 
-ORY Hydra issues opaque OAuth 2.0 Access Tokens per default for the following
+Ory Hydra issues opaque OAuth 2.0 Access Tokens per default for the following
 reasons:
 
 1. **OAuth 2.0 Access Tokens represent internal state but are public
@@ -113,14 +113,14 @@ reasons:
 4. **Certain OpenID Connect features will not work** when using JSON Web Tokens
    as Access Tokens, such as the pairwise subject identifier algorithm.
 5. **There is a better solution: Use
-   [ORY Oathkeeper](https://github.com/ory/oathkeeper)!** ORY Oathkeeper is a
-   proxy you deploy in front of your services. It will "convert" ORY Hydra's
+   [Ory Oathkeeper](https://github.com/ory/oathkeeper)!** Ory Oathkeeper is a
+   proxy you deploy in front of your services. It will "convert" Ory Hydra's
    opaque Access Tokens into JSON Web Tokens for your backend services. This
    allows your services to work without additional REST Calls while solving all
    previous points. **We really recommend this option if you want JWTs!**
 
-If you are not convinced that ORY Oathkeeper is the right tool for the job, you
-can still enable JSON Web Tokens in ORY Hydra by setting:
+If you are not convinced that Ory Oathkeeper is the right tool for the job, you
+can still enable JSON Web Tokens in Ory Hydra by setting:
 
 ```yaml
 strategies:
@@ -136,7 +136,7 @@ token's expiry.
 
 #### JSON Web Token Validation
 
-You can validate JSON Web Tokens issued by ORY Hydra by pointing your `jwt`
+You can validate JSON Web Tokens issued by Ory Hydra by pointing your `jwt`
 library (e.g. [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa)) to
 `http://ory-hydra-public-api/.well-known/jwks.json`. All necessary keys are
 available there.
@@ -280,14 +280,14 @@ oidc:
 ```
 
 **This value should not be changed once set in production. Changing it will
-cause all client applications to receive new user IDs from ORY Hydra which will
+cause all client applications to receive new user IDs from Ory Hydra which will
 lead to serious complications with authentication on their side!**
 
 Each OAuth 2.0 Client has a configuration field `subject_type`. The value of
 that `subject_type` is either `public` or `pairwise`. If the identifier
-algorithm is enabled, ORY Hydra will choose the right strategy automatically.
+algorithm is enabled, Ory Hydra will choose the right strategy automatically.
 
-While ORY Hydra handles `sub` obfuscation out of the box, you may also override
+While Ory Hydra handles `sub` obfuscation out of the box, you may also override
 this value with your own obfuscated `sub` value by setting
 `force_subject_identifier` when accepting the login challenge in your user login
 app.

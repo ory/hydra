@@ -17,7 +17,7 @@ Parent command for starting public and administrative HTTP/2 APIs
 
 ### Synopsis
 
-ORY Hydra exposes two ports, a public and an administrative port. The public
+Ory Hydra exposes two ports, a public and an administrative port. The public
 port is responsible for handling requests from the public internet, such as the
 OAuth 2.0 Authorize and Token URLs. The administrative port handles
 administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys,
@@ -37,7 +37,7 @@ All sub-commands share command line flags and configuration options.
 
 ## Configuration
 
-ORY Hydra can be configured using environment variables as well as a
+Ory Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 
@@ -55,7 +55,7 @@ configuration documentation:
 
 ### SEE ALSO
 
-- [hydra](hydra) - Run and manage ORY Hydra
+- [hydra](hydra) - Run and manage Ory Hydra
 - [hydra serve admin](hydra-serve-admin) - Serves Administrative HTTP/2 APIs
 - [hydra serve all](hydra-serve-all) - Serves both public and administrative
   HTTP/2 APIs

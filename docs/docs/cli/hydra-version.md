@@ -28,4 +28,4 @@ hydra version [flags]
 
 ### SEE ALSO
 
-- [hydra](hydra) - Run and manage ORY Hydra
+- [hydra](hydra) - Run and manage Ory Hydra

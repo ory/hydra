@@ -3,13 +3,13 @@ id: kubernetes-helm-chart
 title: Kubernetes Helm Chart
 ---
 
-The ORY Hydra Helm Chart helps you deploy ORY Hydra on Kubernetes using Helm.
+The Ory Hydra Helm Chart helps you deploy Ory Hydra on Kubernetes using Helm.
 The source code is available on
 [github.com/ory/k8s](https://github.com/ory/k8s).
 
 ## Installation
 
-To install ORY Hydra, the following
+To install Ory Hydra, the following
 [configuration values](../reference/configuration.md) must be set:
 
 - `hydra.config.dsn`
@@ -22,7 +22,7 @@ To install ORY Hydra, the following
 > `hydra.existingSecret` is empty, a secret is generated automatically. The
 > generated secret is cryptographically secure, and 32 signs long.
 
-If you wish to install ORY Hydra with an in-memory database, a cryptographically
+If you wish to install Ory Hydra with an in-memory database, a cryptographically
 strong secret, a Login and Consent provider located at `https://my-idp/` run:
 
 ```bash
@@ -64,7 +64,7 @@ $ helm install \
 
 ### With SQL Database
 
-To run ORY Hydra against a SQL database, set the connection string. For example:
+To run Ory Hydra against a SQL database, set the connection string. For example:
 
 ```bash
 $ helm install \
@@ -90,7 +90,7 @@ $ helm upgrade pg-sqlproxy rimusz/gcloud-sqlproxy --namespace sqlproxy \
     ...
 ```
 
-When bringing up ORY Hydra, set the host to `pg-sqlproxy-gcloud-sqlproxy` as
+When bringing up Ory Hydra, set the host to `pg-sqlproxy-gcloud-sqlproxy` as
 documented
 [here](https://github.com/rimusz/charts/tree/master/stable/gcloud-sqlproxy#installing-the-chart):
 
@@ -103,7 +103,7 @@ $ helm install \
 
 ## Configuration
 
-You can pass your [ORY Hydra configuration file](../reference/configuration.md)
+You can pass your [Ory Hydra configuration file](../reference/configuration.md)
 by creating a yaml file with key `hydra.config`
 
 ```yaml
@@ -152,14 +152,14 @@ with hostnames
 
 - `http://hydra-example-admin` corresponding to deployment name
   `--name hydra-example` (see next code sample) with suffix `-admin` which is
-  the hostname of the ORY Hydra Admin API Service.
+  the hostname of the Ory Hydra Admin API Service.
 - `https://public.hydra.localhost/` which is the default value for
   `ingress.public.hosts[0].host` from `ory/hydra` ( see next code sample).
 
-Next install ORY Hydra. Please note that SSL is disabled using
+Next install Ory Hydra. Please note that SSL is disabled using
 `--set hydra.dangerousForceHttp=true` which should never be done when working
 outside of `localhost` and only for testing and demonstration purposes. Install
-the ORY Hydra Helm Chart
+the Ory Hydra Helm Chart
 
 ```bash
 $ helm install hydra-example ory/hydra \
@@ -226,7 +226,7 @@ http://public.hydra.localhost/.well-known/openid-configuration
 ```
 
 Next, you can follow the [5 Minute Tutorial](../5min-tutorial.mdx), skipping the
-`git` and `docker-compose` set up sections. Assuming you have ORY Hydra
+`git` and `docker-compose` set up sections. Assuming you have Ory Hydra
 installed locally, you can rewrite commands from, for example,
 
 ```bash

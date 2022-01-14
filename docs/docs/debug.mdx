@@ -11,19 +11,19 @@ resolve certain issues.
 
 There are three things you can do to quickly debug any issue:
 
-1. Check the logs. ORY Hydra has extensive logging and you will find the issue
+1. Check the logs. Ory Hydra has extensive logging and you will find the issue
    most likely in the logs. Here is an example log line for a client that
    requested a redirect URL that did not match the whitelisted redirect URLS:
    `time="2018-08-07T16:01:16Z" level=error msg="An error occurred" description="The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed" error=invalid_request hint="The \"redirect_uri\" parameter does not match any of the OAuth 2.0 Client's pre-registered redirect urls."`
 2. Check the URL because of two reasons:
-   1. ORY Hydra sends `error_hint`, `error`, `error_description`, `error_debug`
+   1. Ory Hydra sends `error_hint`, `error`, `error_description`, `error_debug`
       in the URL. You will find the cause of the error most likely in there.
    2. You are maybe in the wrong URL. Make sure the host and port and path is
       correct. This happens often, especially when you're just starting out and
       experimenting
 3. Set environment variable `OAUTH2_EXPOSE_INTERNAL_ERRORS=true`. Do not do this
    in production, it is possible, though unlikely, that important data leaks
-   with this. If set to true, ORY Hydra will set the `error_debug` query
+   with this. If set to true, Ory Hydra will set the `error_debug` query
    parameter if debug information is available.
 4. If you're just starting out and experimenting your docker set up does not
    work at all:

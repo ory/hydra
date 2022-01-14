@@ -19,7 +19,7 @@ Create a new OAuth 2.0 Client
 This command creates an OAuth 2.0 Client which can be used to perform various
 OAuth 2.0 Flows like the Authorize Code, Implicit, Refresh flow.
 
-ORY Hydra implements the OpenID Connect Dynamic Client registration
+Ory Hydra implements the OpenID Connect Dynamic Client registration
 specification. Most flags are supported by this command as well.
 
 Example: hydra clients create -n &#34;my app&#34; -c http://localhost/cb -g
@@ -68,7 +68,7 @@ hydra clients create [flags]
 
 ```
       --access-token string    Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN
-      --endpoint string        Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket
+      --endpoint string        Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket
       --fail-after duration    Stop retrying after the specified duration (default 1m0s)
       --fake-tls-termination   Fake tls termination by adding &#34;X-Forwarded-Proto: https&#34; to http headers
       --skip-tls-verify        Foolishly accept TLS certificates signed by unknown certificate authorities

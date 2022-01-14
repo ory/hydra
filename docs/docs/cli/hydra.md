@@ -1,7 +1,7 @@
 ---
 id: hydra
 title: hydra
-description: hydra Run and manage ORY Hydra
+description: hydra Run and manage Ory Hydra
 ---
 
 <!--
@@ -12,7 +12,7 @@ To improve this file please make your change against the appropriate "./cmd/*.go
 
 ## hydra
 
-Run and manage ORY Hydra
+Run and manage Ory Hydra
 
 ### Options
 

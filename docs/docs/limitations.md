@@ -3,12 +3,12 @@ id: limitations
 title: Limitations
 ---
 
-ORY Hydra tries to solve all of OAuth 2.0 and OpenID Connect uses. There are,
+Ory Hydra tries to solve all of OAuth 2.0 and OpenID Connect uses. There are,
 however, some limitations.
 
 ## MySQL <= 5.6 / MariaDB
 
-ORY Hydra has issues with MySQL <= 5.6 (but not MySQL 5.7+) and certain MariaDB
+Ory Hydra has issues with MySQL <= 5.6 (but not MySQL 5.7+) and certain MariaDB
 versions. Read more about this [here](https://github.com/ory/hydra/issues/377).
 Our recommendation is to use MySQL 5.7+ or PostgreSQL.
 
@@ -37,7 +37,7 @@ For more information on this topic we recommend reading:
 
 ## Resource Owner Password Credentials Grant Type (ROPC)
 
-ORY Hydra does not and will not implement the Resource Owner Password
+Ory Hydra does not and will not implement the Resource Owner Password
 Credentials Grant Type. Read on for context.
 
 ### Overview

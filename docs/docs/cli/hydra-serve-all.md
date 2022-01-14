@@ -33,7 +33,7 @@ line flags, which are listed below the controls section.
 
 ## Configuration
 
-ORY Hydra can be configured using environment variables as well as a
+Ory Hydra can be configured using environment variables as well as a
 configuration file. For more information on configuration options, open the
 configuration documentation:
 

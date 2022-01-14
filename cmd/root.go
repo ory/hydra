@@ -31,7 +31,7 @@ import (
 func NewRootCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "hydra",
-		Short: "Run and manage ORY Hydra",
+		Short: "Run and manage Ory Hydra",
 	}
 	RegisterCommandRecursive(cmd)
 	return cmd

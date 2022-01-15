@@ -4,10 +4,10 @@ title: OAuth 2.0
 ---
 
 This section describes on a high level what OAuth 2.0 is and how it works.
-Please keep in mind that ORY Hydra is a technology targeted at professionals
+Please keep in mind that Ory Hydra is a technology targeted at professionals
 using OAuth 2.0 on a regular basis. While we try to cover some of the concepts,
 OAuth 2.0 and OpenID knowledge is expected from you in order to understand and
-use ORY Hydra to its fullest potential.
+use Ory Hydra to its fullest potential.
 
 If you are new to these topics we recommend watching the following talk
 
@@ -31,7 +31,7 @@ If you are not building a system that involves third parties - for example a
 third party company (CircleCI) using your (GitHub) APIs - but instead are
 looking to solve "Single Sign On", mobile / single page app authentication, or
 generally "I want an API token after someone logs in", take a look at
-[ORY Kratos](https://www.ory.sh/kratos) instead!
+[Ory Kratos](https://www.ory.sh/kratos) instead!
 
 :::
 
@@ -78,7 +78,7 @@ of _resource owner_. Here is a full list of terms.
    particular actions (the granted "scopes" like read photos or write messages).
    This guide refers to resource owners as _users_ or _end users_.
 2. The **OAuth 2.0 Authorization Server** implements the OAuth 2.0 protocol (and
-   optionally OpenID Connect). In our case, this is **ORY Hydra**.
+   optionally OpenID Connect). In our case, this is **Ory Hydra**.
 3. The **resource provider** is the service that hosts (provides) the resources.
    These resources (e.g. blog articles, printers, todo lists) are owned by a
    resource owner (user) mentioned above.
@@ -96,7 +96,7 @@ of _resource owner_. Here is a full list of terms.
 A typical OAuth 2.0 flow looks as follows:
 
 1. A developer registers an OAuth 2.0 Client (external application) with the
-   Authorization Server (ORY Hydra) the intention to obtain information on
+   Authorization Server (Ory Hydra) the intention to obtain information on
    behalf of a user.
 2. The application UI asks the user to authorize the application to access
    information/data on his/her behalf.
@@ -140,7 +140,7 @@ the end-user. For example, a specific token might be allowed to access public
 pictures, but not private ones. The granted permissions are established during
 the consent screen.
 
-ORY Hydra has pre-defined OAuth 2.0 Scope values:
+Ory Hydra has pre-defined OAuth 2.0 Scope values:
 
 - `offline_access`: Include this scope if you wish to receive a refresh token
 - `openid`: Include this scope if you wish to perform an OpenID Connect request.
@@ -227,5 +227,5 @@ method to convey information about the authorization context of the token from
 the authorization server to the protected resource.
 
 The usage of an access token or client credentials is required to access the
-endpoint. ORY Hydra will however accept any valid token or valid credentials as
+endpoint. Ory Hydra will however accept any valid token or valid credentials as
 there is no built-in access control.

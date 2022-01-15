@@ -55,7 +55,7 @@ var tokenUserWelcome = template.Must(template.New("").Parse(`<html>
 <p>This is an example app which emulates an OAuth 2.0 consumer application. Usually, this would be your web or mobile
     application and would use an <a href="https://oauth.net/code/">OAuth 2.0</a> or <a href="https://oauth.net/code/">OpenID
         Connect</a> library.</p>
-<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (ORY
+<p>This example requests an OAuth 2.0 Access, Refresh, and OpenID Connect ID Token from the OAuth 2.0 Server (Ory
     Hydra).
     To initiate the flow, click the "Authorize Application" button.</p>
 <p><a href="{{ .URL }}">Authorize application</a></p>
@@ -93,7 +93,7 @@ func NewTokenUserCmd() *cobra.Command {
 		Use:   "user",
 		Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
 		Long: `Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
-This command will help you to see if ORY Hydra has been configured properly.
+This command will help you to see if Ory Hydra has been configured properly.
 
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success, unless if the --no-shutdown flag is provided.`,
@@ -303,7 +303,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
 	cmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	cmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
-	cmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+	cmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_URL")
 	cmd.Flags().Bool("https", false, "Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command")
 
 	return cmd

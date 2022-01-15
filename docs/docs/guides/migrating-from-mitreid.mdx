@@ -46,11 +46,11 @@ curl -X POST  http://127.0.0.1/mitreid-server/token -H "Authorization: $AUTH" --
 
 The last pitfall found during the migration was the difference of behaviour when
 performing the `client_credentials` grant without specifying a scope. By default
-ORY Hydra returns an empty scope, but MITREid grants the default scope for the
+Ory Hydra returns an empty scope, but MITREid grants the default scope for the
 OAuth 2.0 Client.
 
-To change the behaviour in ORY Hydra, either set environment variable
-`OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=true` or alternatively add to ORY
+To change the behaviour in Ory Hydra, either set environment variable
+`OAUTH2_CLIENT_CREDENTIALS_DEFAULT_GRANT_SCOPE=true` or alternatively add to Ory
 Hydra's configuration file:
 
 ```yaml title="path/to/hydra.yaml"
@@ -59,5 +59,5 @@ oauth2:
     default_grant_allowed_scope: true
 ```
 
-Once set, ORY Hydra will behave like MITREid and grant the OAuth2 Client's scope
+Once set, Ory Hydra will behave like MITREid and grant the OAuth2 Client's scope
 when an empty scope is requested for a `client_credentials` grant.

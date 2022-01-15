@@ -5,7 +5,7 @@ title: Do You Need OAuth2?
 
 OAuth2 and OpenID Connect is all the rage with big platforms (Google, Facebook,
 GitHub) and identity SaaS products (Okta, Auth0) which is why you probably ended
-up at ORY Hydra. But before you start hacking away, the best use of your time
+up at Ory Hydra. But before you start hacking away, the best use of your time
 right now is to re-evaluate if you really need OAuth2 and OpenID Connect.
 
 To do so, we will cover common misunderstandings and misconceptions about OAuth2
@@ -15,19 +15,19 @@ in this document and guidance on what to do instead!
 
 If you are looking for a system that implements registration, login, password
 reset, social sign in, profile management, 2fa, and more, check out
-[ORY Kratos](https://www.ory.sh/kratos) first!
+[Ory Kratos](https://www.ory.sh/kratos) first!
 
 :::
 
 ## What it's Good for
 
 If you are like GitHub and you want to enable people not associated with your
-company like CircleCi or TravisCI to have access to your user's data, ORY Hydra
+company like CircleCi or TravisCI to have access to your user's data, Ory Hydra
 is the right tool for you.
 
 If you want apps and websites you don't own to use your application as a
 potential sign in (e.g. be listed alongside "Sign in with Google", "Sign in with
-Apple"), ORY Hydra is the right tool for you.
+Apple"), Ory Hydra is the right tool for you.
 
 If you use an API that works with OAuth2 or OpenID Connect, then of course you
 need to use that API - but then you are on the OAuth2 / OpenID Connect client
@@ -35,7 +35,7 @@ side!
 
 If you want a system for user registration, password recovery, login form,
 session management and user settings, then don't start with OAuth2 right away.
-It is recommended to use [ORY Kratos](https://www.ory.sh/kratos) for your basic
+It is recommended to use [Ory Kratos](https://www.ory.sh/kratos) for your basic
 user management needs and then figure out if you still need OAuth2.
 
 ## OAuth2 and OpenID Connect do not Solve Registration, Password Reset, ...
@@ -50,7 +50,7 @@ establish that **you need a method for users to sign in**.
 
 If you are wondering what password hashing algorithm to use, or how your users
 sign up for your platform, then you don't need OAuth2 or OpenID Connect right
-now. Instead, you should give [ORY Kratos](https://www.ory.sh/kratos/) a spin,
+now. Instead, you should give [Ory Kratos](https://www.ory.sh/kratos/) a spin,
 which aims to solve exactly that.
 
 ## Access and Refresh Tokens are not Sessions!
@@ -60,7 +60,7 @@ With OAuth2 and OpenID Connect you end up with three session layers:
 - Your **Application's Session Manager** keeps track of the user within your
   application. You will use OpenID Connect to initiate and complete the login,
   but your application needs to store and track and invalidate the session.
-- ORY Hydra maintains a session cookie. When a user signs in, the cookie will be
+- Ory Hydra maintains a session cookie. When a user signs in, the cookie will be
   set for that user. This allows the next OAuth2 request to complete without
   requesting the user to sign in again.
 - Optionally - If your application connects to a third-party identity provider
@@ -105,11 +105,11 @@ Now you should be at a point where
 
 1. you realize that you only want to solve sign up, login, session management
    and that you don't need OAuth2 - your next step in this case should be to
-   check out [ORY Kratos](https://www.ory.sh/kratos/) which does solve all of
+   check out [Ory Kratos](https://www.ory.sh/kratos/) which does solve all of
    that;
 2. you are reaffirmed that you need OAuth2 and OpenID connect because you want
    developers you don't know to interact with your users and your users' data -
-   in which case ORY Hydra is a great fit for you!
+   in which case Ory Hydra is a great fit for you!
 
 ## "But Google/Facebook/... use OAuth2 and OpenID Connect"
 
@@ -152,12 +152,12 @@ amongst others:
   [iOS Swift - Facebook Login](https://auth0.com/docs/quickstart/native/ios-swift-facebook-login#before-you-start)).
 
 We picked Auth0 docs a lot because they explain the caveats of using OAuth2 and
-OpenID Connect well. These limitations apply to all software (e.g. ORY Hydra,
+OpenID Connect well. These limitations apply to all software (e.g. Ory Hydra,
 Okta, Keycloak, ...) that use OAuth2 and OpenID Connect as their primary
 protocols.
 
 If all you need is user registration, log in, user settings, and similar flows -
-check out [ORY Kratos](https://www.ory.sh/kratos/)!
+check out [Ory Kratos](https://www.ory.sh/kratos/)!
 
 ## You must Ensure Secure Storage of Access and Refresh Tokens
 
@@ -173,7 +173,7 @@ Storing access and refresh tokens involves tradeoffs:
 On top of that, you need to refresh tokens when they expire which may become
 very complex in scenarios where you have more than one HTTP request using the
 access token. This is especially true for systems that have refresh tokens which
-are valid for one use only (e.g. ORY Hydra, Auth0, ...).
+are valid for one use only (e.g. Ory Hydra, Auth0, ...).
 
 **Cookies are great** and a common misconception is that cookies are less secure
 than tokens or less usable. For 95% of web applications it is enough to work
@@ -186,7 +186,7 @@ mobile app. And that's great, because the browser takes care of:
 - Smaller CSRF attack surface with the new `SameSite` directive;
 - The domain model (cookies are isolated per domain);
 
-[ORY Kratos](https://www.ory.sh/kratos/) works both with tokens and cookies.
+[Ory Kratos](https://www.ory.sh/kratos/) works both with tokens and cookies.
 Implementing login does not involve any manual token handling - just log in and
 you're done!
 

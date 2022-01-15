@@ -11,7 +11,7 @@ OAuth2 and OpenID Connect require an authenticated End-User session for all
 OAuth2 / OpenID Connect flows except the `client_credentials` flow which does
 not involve End-Users.
 
-ORY Hydra does not contain a database with End-Users but instead uses HTTP
+Ory Hydra does not contain a database with End-Users but instead uses HTTP
 Redirection to "delegate" the login flow to another app - we call this the Login
 & Consent App.
 
@@ -31,21 +31,21 @@ Redirects when performing the OAuth2 flow:
 
 <Mermaid
   chart={`sequenceDiagram
-    OAuth2 Client->>ORY Hydra: Initiates OAuth2 Authorize Code or Implicit Flow
-    ORY Hydra-->>ORY Hydra: No end user session available (not authenticated)
-    ORY Hydra->>Login Endpoint: Redirects end user with login challenge
-    Login Endpoint-->ORY Hydra: Fetches login info
+    OAuth2 Client->>Ory Hydra: Initiates OAuth2 Authorize Code or Implicit Flow
+    Ory Hydra-->>Ory Hydra: No end user session available (not authenticated)
+    Ory Hydra->>Login Endpoint: Redirects end user with login challenge
+    Login Endpoint-->Ory Hydra: Fetches login info
     Login Endpoint-->>Login Endpoint: Authenticates user with credentials
-    Login Endpoint-->ORY Hydra: Transmits login info and receives redirect url with login verifier
-    Login Endpoint->>ORY Hydra: Redirects end user to redirect url with login verifier
-    ORY Hydra-->>ORY Hydra: First time that client asks user for permissions
-    ORY Hydra->>Consent Endpoint: Redirects end user with consent challenge
-    Consent Endpoint-->ORY Hydra: Fetches consent info (which user, what app, what scopes)
+    Login Endpoint-->Ory Hydra: Transmits login info and receives redirect url with login verifier
+    Login Endpoint->>Ory Hydra: Redirects end user to redirect url with login verifier
+    Ory Hydra-->>Ory Hydra: First time that client asks user for permissions
+    Ory Hydra->>Consent Endpoint: Redirects end user with consent challenge
+    Consent Endpoint-->Ory Hydra: Fetches consent info (which user, what app, what scopes)
     Consent Endpoint-->>Consent Endpoint: Asks for end user's permission to grant application access
-    Consent Endpoint-->ORY Hydra: Transmits consent result and receives redirect url with consent verifier
-    Consent Endpoint->>ORY Hydra: Redirects to redirect url with consent verifier
-    ORY Hydra-->>ORY Hydra: Verifies grant
-    ORY Hydra->>OAuth2 Client: Transmits authorization code/token`}
+    Consent Endpoint-->Ory Hydra: Transmits consent result and receives redirect url with consent verifier
+    Consent Endpoint->>Ory Hydra: Redirects to redirect url with consent verifier
+    Ory Hydra-->>Ory Hydra: Verifies grant
+    Ory Hydra->>OAuth2 Client: Transmits authorization code/token`}
 />
 
 ## Initiating the OAuth 2.0 / OpenID Connect Flow
@@ -61,8 +61,8 @@ that URL.
 
 This guide uses URLs from the [5 Minute Tutorial](../5min-tutorial.mdx):
 
-- ORY Hydra Public Endpoint: http://127.0.0.1:4444
-- ORY Hydra Admin Endpoint: http://127.0.0.1:4445
+- Ory Hydra Public Endpoint: http://127.0.0.1:4444
+- Ory Hydra Admin Endpoint: http://127.0.0.1:4445
 
 When translating this guide into your own environment, make sure to use the
 correct endpoint for your interactions.
@@ -87,7 +87,7 @@ correct endpoint for your interactions.
 <a
   href="https://<hydra-public>/oauth2/auth?client_id=...&response_type=...&scope=..."
 >
-  Login in with ORY Hydra</a
+  Login in with Ory Hydra</a
 >
 ```
 
@@ -105,15 +105,15 @@ window.location.href =
 
 ## Redirection to the Login Endpoint
 
-The next task for ORY Hydra is to know the user of the request. To achieve that,
-ORY Hydra checks if a session cookie is set containing information about a
+The next task for Ory Hydra is to know the user of the request. To achieve that,
+Ory Hydra checks if a session cookie is set containing information about a
 previously successful login. Additionally, OpenID Connect parameters
 `id_token_hint`, `prompt`, and `max_age` are evaluated and processed. Depending
 on their values and the login state, the user might need to re-authenticate or
 the flow will fail completely.
 
 To authenticate the user (this happens regardless of whether a session exists
-for the user or not), ORY Hydra redirects the browser to the "Login Endpoint"
+for the user or not), Ory Hydra redirects the browser to the "Login Endpoint"
 established in your config:
 
 ```yaml title="hydra serve all -c path/to/hydra/config.yml
@@ -123,7 +123,7 @@ urls:
   login: https://login-app/login
 ```
 
-ORY Hydra appends a `login_challenge` query parameter to the url. The value is a
+Ory Hydra appends a `login_challenge` query parameter to the url. The value is a
 ID which should later be used by the Login Endpoint to fetch important
 information about the request.
 
@@ -133,34 +133,34 @@ https://login-app/login?login_challenge=7bb518c4eec2454dbb289f5fdb4c0ee2
 
 ### Login Sessions, `prompt`, `max_age`, `id_token_hint`
 
-ORY Hydra keeps track of user sessions. It does so by issuing a cookie which
+Ory Hydra keeps track of user sessions. It does so by issuing a cookie which
 contains the user ID. On subsequent OAuth2 / OpenID Connect flows, the session
 will be checked and the Login Endpoint will be instructed to, for example, show
 the Login HTML Form or skip the Login HTML Form.
 
-ORY Hydra supports the following OpenID Connect query parameters:
+Ory Hydra supports the following OpenID Connect query parameters:
 
 - `prompt` (optional). Space delimited, case sensitive list of ASCII string
   values that specifies whether the Authorization Server prompts the End-User
   for reauthentication and consent.
-  - `prompt=none` instructs ORY Hydra to not display the login or consent user
+  - `prompt=none` instructs Ory Hydra to not display the login or consent user
     interface pages. An error is returned if an End-User is not already
     authenticated or the Client does not have pre-configured consent for the
     requested Claims or does not fulfill other conditions for processing the
     request. The error code will typically be `login_required`,
     `interaction_required`, or another code. This can be used as a method to
     check for existing authentication and/or consent.
-  - `prompt=login` instructs ORY Hydra to force the End-User to log in using the
+  - `prompt=login` instructs Ory Hydra to force the End-User to log in using the
     Login HTML Form in the Login Endpoint.
-  - `prompt=consent` instructs ORY Hydra to force the End-User to re-authorize
+  - `prompt=consent` instructs Ory Hydra to force the End-User to re-authorize
     (give consent) the OAuth2 Client using the
     [Consent HTML Form in the Consent Endpoint](./consent.mdx).
-  - `prompt=select_account` is currently not supported in ORY Hydra, see [#].
+  - `prompt=select_account` is currently not supported in Ory Hydra, see [#].
 - `max_age` (optional) specifies the allowable elapsed time in seconds since the
-  last time the End-User was actively authenticated by ORY Hydra. If the elapsed
+  last time the End-User was actively authenticated by Ory Hydra. If the elapsed
   time is greater than this value, the Login HTML Form must be shown and the
   End-User must re-authenticate.
-- `id_token_hint` (optional) - ID Token previously issued by ORY Hydra being
+- `id_token_hint` (optional) - ID Token previously issued by Ory Hydra being
   passed as a hint about the End-User's current or past authenticated session
   with the Client. If the End-User identified by the ID Token is logged in or is
   logged in by the request, then the Authorization Server returns a positive
@@ -212,7 +212,7 @@ curl "http://127.0.0.1:4445/oauth2/auth/requests/login?login_challenge=7bb518c4e
 ```
 
 Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
-examples using the ORY Hydra SDK in different languages.
+examples using the Ory Hydra SDK in different languages.
 
 </TabItem>
 <TabItem value="json">
@@ -297,7 +297,7 @@ username, or something else that may change over time.
 
   // All values below are optional!
 
-  // Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
+  // Remember, if set to true, tells Ory Hydra to remember this user by telling the user agent (browser) to store
   // a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she will not be asked to log in again.
   "remember": true,
 
@@ -319,10 +319,10 @@ username, or something else that may change over time.
   // user ID refers to the (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg]
   // of the OpenID Connect specification. It allows you to set an obfuscated subject ("user") identifier that is unique
   // to the client. Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token.
-  // It does not change the sub claim in the OAuth 2.0 Introspection. Per default, ORY Hydra handles this value with its own algorithm.
+  // It does not change the sub claim in the OAuth 2.0 Introspection. Per default, Ory Hydra handles this value with its own algorithm.
   // In case you want to set this yourself you can use this field. Please note that setting this field has no effect if pairwise is not
-  // configured in ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via subject_type key in the client's configuration).
-  // Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies that
+  // configured in Ory Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via subject_type key in the client's configuration).
+  // Please also be aware that Ory Hydra is unable to properly compute this value during authentication. This implies that
   // you have to compute this value on every authentication process (probably depending on the client ID or some other unique value).
   // If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
   "force_subject_identifier": "string"
@@ -352,7 +352,7 @@ The server responds with JSON
 which is the URL your application must redirect the End-User's browser to.
 
 Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
-examples using the ORY Hydra SDK in different languages.
+examples using the Ory Hydra SDK in different languages.
 
 ### Rejecting the Login Flow
 
@@ -407,15 +407,15 @@ The server responds with JSON
 which is the URL your application must the End-User's browser to.
 
 Check the ["Implementing the Login Endpoint" Guide](../guides/login.mdx) for
-examples using the ORY Hydra SDK in different languages.
+examples using the Ory Hydra SDK in different languages.
 
 ## Redirection to the Consent Endpoint
 
 Please head over to [Consent Flow](./consent.mdx)!
 
-## Revoking ORY Hydra Login Sessions
+## Revoking Ory Hydra Login Sessions
 
-Revoking a login session will remove all of the user's cookies at ORY Hydra and
+Revoking a login session will remove all of the user's cookies at Ory Hydra and
 will require the user to re-authenticate when performing the next OAuth 2.0
 Authorize Code Flow. Be aware that this option will remove all cookies from all
 devices.

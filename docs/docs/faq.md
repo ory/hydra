@@ -122,7 +122,7 @@ Read [this article](https://www.ory.sh/oauth2-for-mobile-app-spa-browser).
 
 ## How should I run migrations?
 
-Since ORY Hydra 0.8.0, migrations are no longer run automatically on boot. This
+Since Ory Hydra 0.8.0, migrations are no longer run automatically on boot. This
 is required in production environments, because:
 
 1. Although SQL migrations are tested, migrating schemas can cause data loss and
@@ -145,15 +145,15 @@ Thus, to initialize the database schemas, it is required to run
 2. Make a back up of the database.
 3. Run the migration script on a host close to the database (e.g. a virtual
    machine with access to the SQL instance). Schemas are usually backwards
-   compatible, so instances running previous versions of ORY Hydra should keep
+   compatible, so instances running previous versions of Ory Hydra should keep
    working fine. If backwards compatibility is not given, this will be addressed
    in the patch notes.
-4. Upgrade all ORY Hydra instances.
+4. Upgrade all Ory Hydra instances.
 
 ## How can I do this in docker?
 
-Many deployments of ORY Hydra use Docker. Although several options are
-available, we advise to extend the ORY Hydra Docker image
+Many deployments of Ory Hydra use Docker. Although several options are
+available, we advise to extend the Ory Hydra Docker image
 
 **Dockerfile**
 
@@ -166,7 +166,7 @@ ENTRYPOINT hydra migrate sql --yes $DATABASE_URL
 and run it in your infrastructure once.
 
 Additionally, _but not recommended_, it is possible to override the entry point
-of the ORY Hydra Docker image using CLI flag
+of the Ory Hydra Docker image using CLI flag
 `--entrypoint "hydra migrate sql --yes $DATABASE_URL; hydra host"` or with
 `entrypoint: hydra migrate sql $DATABASE_URL; hydra host` set in your docker
 compose config.

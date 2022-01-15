@@ -47,7 +47,7 @@ func Remote(cmd *cobra.Command) string {
 		return strings.TrimRight(endpoint, "/")
 	}
 
-	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where ORY Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL if an administrative command was used.")
+	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where Ory Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL if an administrative command was used.")
 	return ""
 }
 

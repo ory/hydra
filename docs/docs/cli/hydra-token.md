@@ -25,7 +25,7 @@ Issue and Manage OAuth2 tokens
 
 ### SEE ALSO
 
-- [hydra](hydra) - Run and manage ORY Hydra
+- [hydra](hydra) - Run and manage Ory Hydra
 - [hydra token client](hydra-token-client) - An exemplary OAuth 2.0 Client
   performing the OAuth 2.0 Client Credentials Flow
 - [hydra token delete](hydra-token-delete) - Deletes access tokens of a client

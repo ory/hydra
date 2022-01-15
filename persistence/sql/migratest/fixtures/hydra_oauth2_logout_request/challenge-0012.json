@@ -1,0 +1,8 @@
+{
+  "challenge": "challenge-0012",
+  "subject": "subject-0012",
+  "sid": "session_id-0012",
+  "request_url": "http://request/0012",
+  "rp_initiated": true,
+  "client": null
+}

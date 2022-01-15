@@ -83,6 +83,8 @@ func (m *PreviousConsentSession) validateConsentRequest(formats strfmt.Registry)
 		if err := m.ConsentRequest.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("consent_request")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("consent_request")
 			}
 			return err
 		}
@@ -99,6 +101,8 @@ func (m *PreviousConsentSession) validateGrantAccessTokenAudience(formats strfmt
 	if err := m.GrantAccessTokenAudience.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("grant_access_token_audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("grant_access_token_audience")
 		}
 		return err
 	}
@@ -114,6 +118,8 @@ func (m *PreviousConsentSession) validateGrantScope(formats strfmt.Registry) err
 	if err := m.GrantScope.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("grant_scope")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("grant_scope")
 		}
 		return err
 	}
@@ -129,6 +135,8 @@ func (m *PreviousConsentSession) validateHandledAt(formats strfmt.Registry) erro
 	if err := m.HandledAt.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("handled_at")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("handled_at")
 		}
 		return err
 	}
@@ -145,6 +153,8 @@ func (m *PreviousConsentSession) validateSession(formats strfmt.Registry) error 
 		if err := m.Session.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("session")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("session")
 			}
 			return err
 		}
@@ -189,6 +199,8 @@ func (m *PreviousConsentSession) contextValidateConsentRequest(ctx context.Conte
 		if err := m.ConsentRequest.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("consent_request")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("consent_request")
 			}
 			return err
 		}
@@ -202,6 +214,8 @@ func (m *PreviousConsentSession) contextValidateGrantAccessTokenAudience(ctx con
 	if err := m.GrantAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("grant_access_token_audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("grant_access_token_audience")
 		}
 		return err
 	}
@@ -214,6 +228,8 @@ func (m *PreviousConsentSession) contextValidateGrantScope(ctx context.Context, 
 	if err := m.GrantScope.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("grant_scope")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("grant_scope")
 		}
 		return err
 	}
@@ -226,6 +242,8 @@ func (m *PreviousConsentSession) contextValidateHandledAt(ctx context.Context, f
 	if err := m.HandledAt.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("handled_at")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("handled_at")
 		}
 		return err
 	}
@@ -239,6 +257,8 @@ func (m *PreviousConsentSession) contextValidateSession(ctx context.Context, for
 		if err := m.Session.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("session")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("session")
 			}
 			return err
 		}

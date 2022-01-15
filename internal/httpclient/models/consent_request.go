@@ -113,6 +113,8 @@ func (m *ConsentRequest) validateAmr(formats strfmt.Registry) error {
 	if err := m.Amr.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("amr")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("amr")
 		}
 		return err
 	}
@@ -138,6 +140,8 @@ func (m *ConsentRequest) validateClient(formats strfmt.Registry) error {
 		if err := m.Client.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("client")
 			}
 			return err
 		}
@@ -155,6 +159,8 @@ func (m *ConsentRequest) validateOidcContext(formats strfmt.Registry) error {
 		if err := m.OidcContext.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("oidc_context")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidc_context")
 			}
 			return err
 		}
@@ -171,6 +177,8 @@ func (m *ConsentRequest) validateRequestedAccessTokenAudience(formats strfmt.Reg
 	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_access_token_audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_access_token_audience")
 		}
 		return err
 	}
@@ -186,6 +194,8 @@ func (m *ConsentRequest) validateRequestedScope(formats strfmt.Registry) error {
 	if err := m.RequestedScope.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_scope")
 		}
 		return err
 	}
@@ -228,6 +238,8 @@ func (m *ConsentRequest) contextValidateAmr(ctx context.Context, formats strfmt.
 	if err := m.Amr.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("amr")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("amr")
 		}
 		return err
 	}
@@ -241,6 +253,8 @@ func (m *ConsentRequest) contextValidateClient(ctx context.Context, formats strf
 		if err := m.Client.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("client")
 			}
 			return err
 		}
@@ -255,6 +269,8 @@ func (m *ConsentRequest) contextValidateOidcContext(ctx context.Context, formats
 		if err := m.OidcContext.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("oidc_context")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidc_context")
 			}
 			return err
 		}
@@ -268,6 +284,8 @@ func (m *ConsentRequest) contextValidateRequestedAccessTokenAudience(ctx context
 	if err := m.RequestedAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_access_token_audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_access_token_audience")
 		}
 		return err
 	}
@@ -280,6 +298,8 @@ func (m *ConsentRequest) contextValidateRequestedScope(ctx context.Context, form
 	if err := m.RequestedScope.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_scope")
 		}
 		return err
 	}

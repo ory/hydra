@@ -222,6 +222,8 @@ func (m *OAuth2Client) validateAllowedCorsOrigins(formats strfmt.Registry) error
 	if err := m.AllowedCorsOrigins.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("allowed_cors_origins")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("allowed_cors_origins")
 		}
 		return err
 	}
@@ -237,6 +239,8 @@ func (m *OAuth2Client) validateAudience(formats strfmt.Registry) error {
 	if err := m.Audience.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("audience")
 		}
 		return err
 	}
@@ -252,6 +256,8 @@ func (m *OAuth2Client) validateContacts(formats strfmt.Registry) error {
 	if err := m.Contacts.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("contacts")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("contacts")
 		}
 		return err
 	}
@@ -279,6 +285,8 @@ func (m *OAuth2Client) validateGrantTypes(formats strfmt.Registry) error {
 	if err := m.GrantTypes.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("grant_types")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("grant_types")
 		}
 		return err
 	}
@@ -294,6 +302,8 @@ func (m *OAuth2Client) validatePostLogoutRedirectUris(formats strfmt.Registry) e
 	if err := m.PostLogoutRedirectUris.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("post_logout_redirect_uris")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("post_logout_redirect_uris")
 		}
 		return err
 	}
@@ -309,6 +319,8 @@ func (m *OAuth2Client) validateRedirectUris(formats strfmt.Registry) error {
 	if err := m.RedirectUris.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("redirect_uris")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("redirect_uris")
 		}
 		return err
 	}
@@ -324,6 +336,8 @@ func (m *OAuth2Client) validateRequestUris(formats strfmt.Registry) error {
 	if err := m.RequestUris.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("request_uris")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("request_uris")
 		}
 		return err
 	}
@@ -339,6 +353,8 @@ func (m *OAuth2Client) validateResponseTypes(formats strfmt.Registry) error {
 	if err := m.ResponseTypes.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("response_types")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("response_types")
 		}
 		return err
 	}
@@ -417,6 +433,8 @@ func (m *OAuth2Client) contextValidateAllowedCorsOrigins(ctx context.Context, fo
 	if err := m.AllowedCorsOrigins.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("allowed_cors_origins")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("allowed_cors_origins")
 		}
 		return err
 	}
@@ -429,6 +447,8 @@ func (m *OAuth2Client) contextValidateAudience(ctx context.Context, formats strf
 	if err := m.Audience.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("audience")
 		}
 		return err
 	}
@@ -441,6 +461,8 @@ func (m *OAuth2Client) contextValidateContacts(ctx context.Context, formats strf
 	if err := m.Contacts.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("contacts")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("contacts")
 		}
 		return err
 	}
@@ -453,6 +475,8 @@ func (m *OAuth2Client) contextValidateGrantTypes(ctx context.Context, formats st
 	if err := m.GrantTypes.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("grant_types")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("grant_types")
 		}
 		return err
 	}
@@ -465,6 +489,8 @@ func (m *OAuth2Client) contextValidatePostLogoutRedirectUris(ctx context.Context
 	if err := m.PostLogoutRedirectUris.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("post_logout_redirect_uris")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("post_logout_redirect_uris")
 		}
 		return err
 	}
@@ -477,6 +503,8 @@ func (m *OAuth2Client) contextValidateRedirectUris(ctx context.Context, formats 
 	if err := m.RedirectUris.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("redirect_uris")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("redirect_uris")
 		}
 		return err
 	}
@@ -489,6 +517,8 @@ func (m *OAuth2Client) contextValidateRequestUris(ctx context.Context, formats s
 	if err := m.RequestUris.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("request_uris")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("request_uris")
 		}
 		return err
 	}
@@ -501,6 +531,8 @@ func (m *OAuth2Client) contextValidateResponseTypes(ctx context.Context, formats
 	if err := m.ResponseTypes.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("response_types")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("response_types")
 		}
 		return err
 	}

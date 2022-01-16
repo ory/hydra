@@ -77,7 +77,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       const query = qs.parse(search.substr(1))
       expect(query.error).to.equal('invalid_client')
 
-      // Should show ORY Hydra's Error URL because a redirect URL could not be determined
+      // Should show Ory Hydra's Error URL because a redirect URL could not be determined
       expect(port).to.equal(Cypress.env('public_port'))
     })
   })
@@ -173,7 +173,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       expect(query.error).to.equal('invalid_request')
       expect(query.error_description).to.contain('redirect_uri')
 
-      // Should show ORY Hydra's Error URL because a redirect URL could not be determined
+      // Should show Ory Hydra's Error URL because a redirect URL could not be determined
       expect(port).to.equal(Cypress.env('public_port'))
     })
   })

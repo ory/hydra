@@ -1,4 +1,4 @@
-# ORY Hydra Configuration
+# Ory Hydra Configuration
 #
 #
 # !!WARNING!!
@@ -6,8 +6,8 @@
 # are enabled, it will not work out of the box either.
 #
 #
-# ORY Hydra can be configured using a configuration file and passing the file location using `--config path/to/config.yaml`.
-# Per default, ORY Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
+# Ory Hydra can be configured using a configuration file and passing the file location using `--config path/to/config.yaml`.
+# Per default, Ory Hydra will look up and load file ~/.hydra.yaml. All configuration keys can be set using environment
 # variables as well.
 #
 # Setting environment variables is easy:
@@ -86,7 +86,7 @@ serve:
   public:
     # The port to listen on. Defaults to 4444
     port: 4444
-    # The interface or unix socket ORY Hydra should listen and handle public API requests on.
+    # The interface or unix socket Ory Hydra should listen and handle public API requests on.
     # Use the prefix "unix:" to specify a path to a unix socket.
     # Leave empty to listen on all interfaces.
     host: localhost # leave this out or empty to listen on all devices which is the default
@@ -146,7 +146,7 @@ serve:
   admin:
     # The port to listen on. Defaults to 4445
     port: 4445
-    # The interface or unix socket ORY Hydra should listen and handle administrative API requests on.
+    # The interface or unix socket Ory Hydra should listen and handle administrative API requests on.
     # Use the prefix "unix:" to specify a path to a unix socket.
     # Leave empty to listen on all interfaces.
     host: localhost # leave this out or empty to listen on all devices which is the default
@@ -236,7 +236,7 @@ serve:
     # without SameSite as a fallback.
     same_site_legacy_workaround: false
 
-# dsn sets the data source name. This configures the backend where ORY Hydra persists data.
+# dsn sets the data source name. This configures the backend where Ory Hydra persists data.
 #
 ## In-memory database
 #
@@ -245,7 +245,7 @@ serve:
 #
 ## SQL databases
 #
-# ORY Hydra supports popular SQL databases. For more detailed configuration information go to:
+# Ory Hydra supports popular SQL databases. For more detailed configuration information go to:
 # https://www.ory.sh/docs/hydra/dependencies-environment#sql
 #
 ### PostgreSQL (recommended)
@@ -300,7 +300,7 @@ webfinger:
       - read.photos
 
     # A URL of the userinfo endpoint to be advertised at the OpenID Connect
-    # Discovery endpoint /.well-known/openid-configuration. Defaults to ORY Hydra's userinfo endpoint at /userinfo.
+    # Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's userinfo endpoint at /userinfo.
     # Set this value if you want to handle this endpoint yourself.
     userinfo_url: https://example.org/my-custom-userinfo-endpoint
 
@@ -341,7 +341,7 @@ urls:
     # to the public value.
     issuer: https://localhost:4444/
 
-    # This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal
+    # This is the base location of the public endpoints of your Ory Hydra installation. This should typically be equal
     # to the issuer value. If left unspecified, it falls back to the issuer value.
     public: https://localhost:4444/
 
@@ -429,13 +429,13 @@ secrets:
 profiling: cpu
 # profiling: mem
 
-# ORY Hydra supports distributed tracing.
+# Ory Hydra supports distributed tracing.
 tracing:
   # Set this to the tracing backend you wish to use. Currently supports jaeger. If omitted or empty, tracing will
   # be disabled.
   provider: jaeger
   # Specifies the service name to use on the tracer.
-  service_name: ORY Hydra
+  service_name: Ory Hydra
   providers:
     # Configures the jaeger tracing backend.
     jaeger:

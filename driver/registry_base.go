@@ -155,14 +155,14 @@ func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 
 func (m *RegistryBase) Logger() *logrusx.Logger {
 	if m.l == nil {
-		m.l = logrusx.New("ORY Hydra", m.BuildVersion())
+		m.l = logrusx.New("Ory Hydra", m.BuildVersion())
 	}
 	return m.l
 }
 
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
-		m.al = logrusx.NewAudit("ORY Hydra", m.BuildVersion())
+		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
 	}
 	return m.al
 }

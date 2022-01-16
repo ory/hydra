@@ -57,7 +57,7 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		f(o)
 	}
 
-	l := logrusx.New("ORY Hydra", config.Version)
+	l := logrusx.New("Ory Hydra", config.Version)
 	c, err := config.New(l, o.opts...)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to instantiate configuration.")

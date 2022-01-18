@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -21,10 +23,12 @@ type PatchDocument struct {
 	From string `json:"from,omitempty"`
 
 	// The operation to be performed
+	// Example: \"replace\
 	// Required: true
 	Op *string `json:"op"`
 
 	// A JSON-pointer
+	// Example: \"/name\
 	// Required: true
 	Path *string `json:"path"`
 
@@ -65,6 +69,11 @@ func (m *PatchDocument) validatePath(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this patch document based on context it is used
+func (m *PatchDocument) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

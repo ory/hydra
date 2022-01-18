@@ -16,59 +16,73 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewDynamicClientRegistrationDeleteOAuth2ClientParams creates a new DynamicClientRegistrationDeleteOAuth2ClientParams object
-// with the default values initialized.
+// NewDynamicClientRegistrationDeleteOAuth2ClientParams creates a new DynamicClientRegistrationDeleteOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDynamicClientRegistrationDeleteOAuth2ClientParams() *DynamicClientRegistrationDeleteOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationDeleteOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDynamicClientRegistrationDeleteOAuth2ClientParamsWithTimeout creates a new DynamicClientRegistrationDeleteOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDynamicClientRegistrationDeleteOAuth2ClientParamsWithTimeout(timeout time.Duration) *DynamicClientRegistrationDeleteOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationDeleteOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDynamicClientRegistrationDeleteOAuth2ClientParamsWithContext creates a new DynamicClientRegistrationDeleteOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDynamicClientRegistrationDeleteOAuth2ClientParamsWithContext(ctx context.Context) *DynamicClientRegistrationDeleteOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationDeleteOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDynamicClientRegistrationDeleteOAuth2ClientParamsWithHTTPClient creates a new DynamicClientRegistrationDeleteOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDynamicClientRegistrationDeleteOAuth2ClientParamsWithHTTPClient(client *http.Client) *DynamicClientRegistrationDeleteOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationDeleteOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*DynamicClientRegistrationDeleteOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the dynamic client registration delete o auth2 client operation typically these are written to a http.Request
+/* DynamicClientRegistrationDeleteOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the dynamic client registration delete o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type DynamicClientRegistrationDeleteOAuth2ClientParams struct {
 
-	/*ID
-	  The id of the OAuth 2.0 Client.
+	/* ID.
 
+	   The id of the OAuth 2.0 Client.
 	*/
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the dynamic client registration delete o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationDeleteOAuth2ClientParams) WithDefaults() *DynamicClientRegistrationDeleteOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the dynamic client registration delete o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationDeleteOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the dynamic client registration delete o auth2 client params

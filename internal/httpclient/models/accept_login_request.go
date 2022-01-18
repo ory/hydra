@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -34,19 +36,19 @@ type AcceptLoginRequest struct {
 	// Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the
 	// sub claim in the OAuth 2.0 Introspection.
 	//
-	// Per default, Ory Hydra handles this value with its own algorithm. In case you want to set this yourself
+	// Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself
 	// you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in
-	// Ory Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's
+	// ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's
 	// configuration).
 	//
-	// Please also be aware that Ory Hydra is unable to properly compute this value during authentication. This implies
+	// Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies
 	// that you have to compute this value on every authentication process (probably depending on the client ID or some
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
 	ForceSubjectIdentifier string `json:"force_subject_identifier,omitempty"`
 
-	// Remember, if set to true, tells Ory Hydra to remember this user by telling the user agent (browser) to store
+	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
 	Remember bool `json:"remember,omitempty"`
@@ -79,7 +81,6 @@ func (m *AcceptLoginRequest) Validate(formats strfmt.Registry) error {
 }
 
 func (m *AcceptLoginRequest) validateAmr(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Amr) { // not required
 		return nil
 	}
@@ -87,6 +88,8 @@ func (m *AcceptLoginRequest) validateAmr(formats strfmt.Registry) error {
 	if err := m.Amr.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("amr")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("amr")
 		}
 		return err
 	}
@@ -97,6 +100,34 @@ func (m *AcceptLoginRequest) validateAmr(formats strfmt.Registry) error {
 func (m *AcceptLoginRequest) validateSubject(formats strfmt.Registry) error {
 
 	if err := validate.Required("subject", "body", m.Subject); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this accept login request based on the context it is used
+func (m *AcceptLoginRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmr(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *AcceptLoginRequest) contextValidateAmr(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Amr.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amr")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("amr")
+		}
 		return err
 	}
 

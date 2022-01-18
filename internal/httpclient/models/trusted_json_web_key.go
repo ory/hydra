@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -16,14 +18,21 @@ import (
 type TrustedJSONWebKey struct {
 
 	// The "key_id" is key unique identifier (same as kid header in jws/jwt).
+	// Example: 123e4567-e89b-12d3-a456-426655440000
 	Kid string `json:"kid,omitempty"`
 
 	// The "set" is basically a name for a group(set) of keys. Will be the same as "issuer" in grant.
+	// Example: https://jwt-idp.example.com
 	Set string `json:"set,omitempty"`
 }
 
 // Validate validates this trusted Json web key
 func (m *TrustedJSONWebKey) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this trusted Json web key based on context it is used
+func (m *TrustedJSONWebKey) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

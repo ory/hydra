@@ -12,8 +12,8 @@
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Welcome to the ORY Hydra HTTP API documentation. You will find documentation for all HTTP APIs here.",
-    "title": "ORY Hydra",
+    "description": "Welcome to the Ory Hydra HTTP API documentation. You will find documentation for all HTTP APIs here.",
+    "title": "Ory Hydra",
     "version": "latest"
   },
   "basePath": "/",
@@ -602,7 +602,7 @@
     },
     "/keys/{set}": {
       "get": {
-        "description": "This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "This endpoint can be used to retrieve JWK Sets stored in Ory Hydra.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -655,7 +655,7 @@
         }
       },
       "put": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -715,7 +715,7 @@
         }
       },
       "post": {
-        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -775,7 +775,7 @@
         }
       },
       "delete": {
-        "description": "Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -881,7 +881,7 @@
         }
       },
       "put": {
-        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -948,7 +948,7 @@
         }
       },
       "delete": {
-        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
+        "description": "Use this endpoint to delete a single JSON Web Key.\n\nA JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.",
         "consumes": [
           "application/json"
         ],
@@ -1059,7 +1059,7 @@
     },
     "/oauth2/auth/requests/consent": {
       "get": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\nto authenticate the subject and then tell Ory Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells Ory Hydra if the subject accepted\nor rejected the request.",
         "consumes": [
           "application/json"
         ],
@@ -1113,7 +1113,7 @@
     },
     "/oauth2/auth/requests/consent/accept": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.\n\nThis endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider includes additional information, such as session data for access and ID tokens, and if the\nconsent request should be used as basis for future requests.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\nto authenticate the subject and then tell Ory Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells Ory Hydra if the subject accepted\nor rejected the request.\n\nThis endpoint tells Ory Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider includes additional information, such as session data for access and ID tokens, and if the\nconsent request should be used as basis for future requests.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
         "consumes": [
           "application/json"
         ],
@@ -1168,7 +1168,7 @@
     },
     "/oauth2/auth/requests/consent/reject": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\nto authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted\nor rejected the request.\n\nThis endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider must include a reason why the consent was not granted.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\nto authenticate the subject and then tell Ory Hydra now about it. If the subject authenticated, he/she must now be asked if\nthe OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.\n\nThe consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to\ngrant or deny the client access to the requested scope (\"Application my-dropbox-app wants write access to all your private files\").\n\nThe consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent\nprovider uses that challenge to fetch information on the OAuth2 request and then tells Ory Hydra if the subject accepted\nor rejected the request.\n\nThis endpoint tells Ory Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.\nThe consent provider must include a reason why the consent was not granted.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
         "consumes": [
           "application/json"
         ],
@@ -1223,7 +1223,7 @@
     },
     "/oauth2/auth/requests/login": {
       "get": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell Ory Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.",
         "consumes": [
           "application/json"
         ],
@@ -1283,7 +1283,7 @@
     },
     "/oauth2/auth/requests/login/accept": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as\nthe subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting\na cookie.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell Ory Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells Ory Hydra that the subject has successfully authenticated and includes additional information such as\nthe subject's ID and if Ory Hydra should remember the subject's subject agent for future authentication attempts by setting\na cookie.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
         "consumes": [
           "application/json"
         ],
@@ -1350,7 +1350,7 @@
     },
     "/oauth2/auth/requests/login/reject": {
       "put": {
-        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell ORY Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication\nwas be denied.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
+        "description": "When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider\n(sometimes called \"identity provider\") to authenticate the subject and then tell Ory Hydra now about it. The login\nprovider is an web-app you write and host, and it must be able to authenticate (\"show the subject a login screen\")\na subject (in OAuth2 the proper name for subject is \"resource owner\").\n\nThe authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login\nprovider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.\n\nThis endpoint tells Ory Hydra that the subject has not authenticated and includes a reason why the authentication\nwas be denied.\n\nThe response contains a redirect URL which the login provider should redirect the user-agent to.",
         "consumes": [
           "application/json"
         ],
@@ -1468,7 +1468,7 @@
     },
     "/oauth2/auth/requests/logout/accept": {
       "put": {
-        "description": "When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.\nNo body is required.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
+        "description": "When a user or an application requests Ory Hydra to log out a user, this endpoint is used to confirm that logout request.\nNo body is required.\n\nThe response contains a redirect URL which the consent provider should redirect the user-agent to.",
         "produces": [
           "application/json"
         ],
@@ -1513,7 +1513,7 @@
     },
     "/oauth2/auth/requests/logout/reject": {
       "put": {
-        "description": "When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.\nNo body is required.\n\nThe response is empty as the logout provider has to chose what action to perform next.",
+        "description": "When a user or an application requests Ory Hydra to log out a user, this endpoint is used to deny that logout request.\nNo body is required.\n\nThe response is empty as the logout provider has to chose what action to perform next.",
         "produces": [
           "application/json"
         ],
@@ -1669,7 +1669,7 @@
     },
     "/oauth2/auth/sessions/login": {
       "delete": {
-        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect\nFront- or Back-channel logout.",
+        "description": "This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject\nhas to re-authenticate at Ory Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect\nFront- or Back-channel logout.",
         "consumes": [
           "application/json"
         ],
@@ -1862,7 +1862,7 @@
     },
     "/oauth2/sessions/logout": {
       "get": {
-        "description": "This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
+        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
         "schemes": [
           "http",
           "https"
@@ -2800,7 +2800,7 @@
           "$ref": "#/definitions/nullTime"
         },
         "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
+          "description": "Remember, if set to true, tells Ory Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
           "type": "boolean"
         },
         "remember_for": {
@@ -2910,7 +2910,7 @@
           "$ref": "#/definitions/nullTime"
         },
         "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
+          "description": "Remember, if set to true, tells Ory Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
           "type": "boolean"
         },
         "remember_for": {
@@ -2941,11 +2941,11 @@
           "$ref": "#/definitions/JSONRawMessage"
         },
         "force_subject_identifier": {
-          "description": "ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID\nConnect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.\n\nPlease note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the\nsub claim in the OAuth 2.0 Introspection.\n\nPer default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself\nyou can use this field. Please note that setting this field has no effect if `pairwise` is not configured in\nORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's\nconfiguration).\n\nPlease also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies\nthat you have to compute this value on every authentication process (probably depending on the client ID or some\nother unique value).\n\nIf you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.",
+          "description": "ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the\n(Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID\nConnect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.\n\nPlease note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the\nsub claim in the OAuth 2.0 Introspection.\n\nPer default, Ory Hydra handles this value with its own algorithm. In case you want to set this yourself\nyou can use this field. Please note that setting this field has no effect if `pairwise` is not configured in\nOry Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's\nconfiguration).\n\nPlease also be aware that Ory Hydra is unable to properly compute this value during authentication. This implies\nthat you have to compute this value on every authentication process (probably depending on the client ID or some\nother unique value).\n\nIf you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.",
           "type": "string"
         },
         "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she\nwill not be asked to log in again.",
+          "description": "Remember, if set to true, tells Ory Hydra to remember this user by telling the user agent (browser) to store\na cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she\nwill not be asked to log in again.",
           "type": "boolean"
         },
         "remember_for": {

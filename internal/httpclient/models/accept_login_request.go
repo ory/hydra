@@ -34,19 +34,19 @@ type AcceptLoginRequest struct {
 	// Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the
 	// sub claim in the OAuth 2.0 Introspection.
 	//
-	// Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself
+	// Per default, Ory Hydra handles this value with its own algorithm. In case you want to set this yourself
 	// you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in
-	// ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's
+	// Ory Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's
 	// configuration).
 	//
-	// Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies
+	// Please also be aware that Ory Hydra is unable to properly compute this value during authentication. This implies
 	// that you have to compute this value on every authentication process (probably depending on the client ID or some
 	// other unique value).
 	//
 	// If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
 	ForceSubjectIdentifier string `json:"force_subject_identifier,omitempty"`
 
-	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store
+	// Remember, if set to true, tells Ory Hydra to remember this user by telling the user agent (browser) to store
 	// a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she
 	// will not be asked to log in again.
 	Remember bool `json:"remember,omitempty"`

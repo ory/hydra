@@ -990,7 +990,7 @@ This release makes [Dart](https://pub.dev/packages/ory_hydra_client) and [Rust](
 
 # [1.9.0](https://github.com/ory/hydra/compare/v1.9.0-rc.0...v1.9.0) (2021-01-12)
 
-Today, we are very excited to announce the stable release of ORY Hydra 1.9! This release contains significant internal code refactoring, making ORY Hydra more reliable, lightweight, and even more scalable! Also, for the first time ever, **ORY Hydra handled over 13.3 billion API requests in December 2020** in over **23.000 production environments** around the globe.
+Today, we are very excited to announce the stable release of Ory Hydra 1.9! This release contains significant internal code refactoring, making Ory Hydra more reliable, lightweight, and even more scalable! Also, for the first time ever, **Ory Hydra handled over 13.3 billion API requests in December 2020** in over **23.000 production environments** around the globe.
 
 Let's talk features - in a TL;DR overview:
 
@@ -999,22 +999,22 @@ Let's talk features - in a TL;DR overview:
 - Deprecating the existing configuration system [spf13/viper](https://github.com/spf13/viper) and moving to [knadh/koanf](https://github.com/knadh/koanf).
 - Adding OpenID Connect Conformity Test Suite to the CI, guaranteeing that every code change is fully OpenID Connect compliant.
 - Support for the OpenID Connect `response_mode=form_post` Response Mode.
-- Compatibility with MITREid, allowing [easy migration from MITREid to ORY Hydra](https://www.ory.sh/hydra/docs/next/guides/migrating-from-MITREid).
+- Compatibility with MITREid, allowing [easy migration from MITREid to Ory Hydra](https://www.ory.sh/hydra/docs/next/guides/migrating-from-MITREid).
 - The TypeScript SDK moved from **@oryd/hydra-client to @ory/hydra-client**. Please update your dependencies!
 
-If you wish to get into ORY Hydra, check out the new YouTube tutorial:
+If you wish to get into Ory Hydra, check out the new YouTube tutorial:
 
-[![ORY Hydra YouTube Quickstart Tutorial](https://raw.githubusercontent.com/ory/web/master/static/images/newsletter/hydra-1.9.0/YouTube-tutorial-hydra-preview.png)](https://www.youtube.com/watch?v=tlO9p2E501A)
+[![Ory Hydra YouTube Quickstart Tutorial](https://raw.githubusercontent.com/ory/web/master/static/images/newsletter/hydra-1.9.0/YouTube-tutorial-hydra-preview.png)](https://www.youtube.com/watch?v=tlO9p2E501A)
 
 *See you on [slack](https://slack.ory.sh), signed [HACKERMAN](https://github.com/aeneasr).*
 
-**ORY Kratos**
+**Ory Kratos**
 
-We would like to take a bit of your time and introduce you to [ORY Kratos](https://github.com/ory/kratos). ORY Kratos implements all the hard things related to users: [login](https://www.ory.sh/kratos/docs/self-service/flows/user-login), [registration](https://www.ory.sh/kratos/docs/self-service/flows/user-registration), [customizable profile fields](https://www.ory.sh/kratos/docs/concepts/identity-data-model/), [multi-factor authentication scheduled for v0.6](https://www.ory.sh/kratos/docs/self-service/flows/2fa-mfa-multi-factor-authentication), [secure account recovery](https://www.ory.sh/kratos/docs/self-service/flows/account-recovery), [email and SMS verification](https://www.ory.sh/kratos/docs/self-service/flows/verify-email-account-activation), [profile management](https://www.ory.sh/kratos/docs/self-service/flows/user-settings), [session and device management](https://github.com/ory/kratos/issues/655), [user administration](https://www.ory.sh/kratos/docs/admin/managing-users-identities), [social sign in and sign up](https://www.ory.sh/kratos/docs/concepts/credentials/openid-connect-oidc-oauth2/), and much, much more! Everything works with proven and ORY-hardened protocols in the same lightweight fashion you are used to from our other products. And it natively targets mobile, desktop, web, and robots! [ORY Kratos](https://github.com/ory/kratos) is essentially an open-source alternative to Auth0, Okta, and Google Firebase with the added benefit of avoiding the complexity of implementing OAuth2 and OpenID Connect for your first-party apps just to get login to work. So if you are wondering [**whether you really need OAuth2**](https://www.ory.sh/hydra/docs/concepts/before-oauth2), this is worth your time!
+We would like to take a bit of your time and introduce you to [Ory Kratos](https://github.com/ory/kratos). Ory Kratos implements all the hard things related to users: [login](https://www.ory.sh/kratos/docs/self-service/flows/user-login), [registration](https://www.ory.sh/kratos/docs/self-service/flows/user-registration), [customizable profile fields](https://www.ory.sh/kratos/docs/concepts/identity-data-model/), [multi-factor authentication scheduled for v0.6](https://www.ory.sh/kratos/docs/self-service/flows/2fa-mfa-multi-factor-authentication), [secure account recovery](https://www.ory.sh/kratos/docs/self-service/flows/account-recovery), [email and SMS verification](https://www.ory.sh/kratos/docs/self-service/flows/verify-email-account-activation), [profile management](https://www.ory.sh/kratos/docs/self-service/flows/user-settings), [session and device management](https://github.com/ory/kratos/issues/655), [user administration](https://www.ory.sh/kratos/docs/admin/managing-users-identities), [social sign in and sign up](https://www.ory.sh/kratos/docs/concepts/credentials/openid-connect-oidc-oauth2/), and much, much more! Everything works with proven and Ory-hardened protocols in the same lightweight fashion you are used to from our other products. And it natively targets mobile, desktop, web, and robots! [Ory Kratos](https://github.com/ory/kratos) is essentially an open-source alternative to Auth0, Okta, and Google Firebase with the added benefit of avoiding the complexity of implementing OAuth2 and OpenID Connect for your first-party apps just to get login to work. So if you are wondering [**whether you really need OAuth2**](https://www.ory.sh/hydra/docs/concepts/before-oauth2), this is worth your time!
 
-To get a feeling for ORY Kratos, check out our exemplary React Native app (available on [GitHub](https://github.com/ory/kratos-selfservice-ui-react-native), [Android](https://play.google.com/store/apps/details?id=com.ory.kratos_self_service_ui_react_native&hl=en&gl=US) and [iOS](https://apps.apple.com/de/app/ory-profile-app/id1536546333)) demonstrating user registration, login, and profile management. It uses APIs from ORY Cloud, which will be publicly announced this year. If you are interested in becoming an early adopter, [get in touch now](mailto:jared@ory.sh)! We have more super exciting stuff planned!
+To get a feeling for Ory Kratos, check out our exemplary React Native app (available on [GitHub](https://github.com/ory/kratos-selfservice-ui-react-native), [Android](https://play.google.com/store/apps/details?id=com.ory.kratos_self_service_ui_react_native&hl=en&gl=US) and [iOS](https://apps.apple.com/de/app/ory-profile-app/id1536546333)) demonstrating user registration, login, and profile management. It uses APIs from Ory Cloud, which will be publicly announced this year. If you are interested in becoming an early adopter, [get in touch now](mailto:jared@ory.sh)! We have more super exciting stuff planned!
 
-![ORY Kratos User Data Screen for Mobile Applications](https://raw.githubusercontent.com/ory/web/master/static/images/newsletter/kratos-0.5.0/welcome-screen.png)
+![Ory Kratos User Data Screen for Mobile Applications](https://raw.githubusercontent.com/ory/web/master/static/images/newsletter/kratos-0.5.0/welcome-screen.png)
 
 **Changes in-depth**
 
@@ -1024,13 +1024,13 @@ Let's break down the most significant changes in more detail:
 
 1. Configuration sourcing works from all sources (file, env, cli flags) with validation against the configuration schema. This makes changing or updating configuration much easier.
 2. Configuration reloading is improved and works on Kubernetes.
-3. Performance gains remove the need for a cache layer between the configuration system and ORY Hydra.
+3. Performance gains remove the need for a cache layer between the configuration system and Ory Hydra.
 4. Loading of several config files is now possible using the `--config` flag.
 5. Configuration values are now sent to the tracer (e.g. Jaeger) if tracing is enabled.
 
-Please be aware that deprecated configuration flags have been removed with this change. It is also possible that ORY Hydra might complain about an invalid configuration due to a significantly improved validation process.
+Please be aware that deprecated configuration flags have been removed with this change. It is also possible that Ory Hydra might complain about an invalid configuration due to a significantly improved validation process.
 
-**The [OpenID Connect Conformity Test Suite](https://gitlab.com/openid/conformance-suite) is now part of the ORY Hydra CI pipeline.**
+**The [OpenID Connect Conformity Test Suite](https://gitlab.com/openid/conformance-suite) is now part of the Ory Hydra CI pipeline.**
 
 This means every PR and change will be checked for OpenID Connect Compliance. As part of these tests, we uncovered some regression issues which have since been resolved. Please be aware that fields `error_hint` and `error_debug` will no longer be sent. You can re-enable those legacy fields by setting `oauth2.include_legacy_error_fields` to `true`.
 
@@ -1040,11 +1040,11 @@ Support OpenID Connect flows `response_mode=form_post` was added and has been te
 
 **Compatibility with MITREid**
 
-Adds an option that allows granting the OAuth2 Client's authorized scope when performing a `client_credentials` flow without specifying a scope. This enables compatibility with MITREid and allows [migrating from MITREid to ORY Hydra](https://www.ory.sh/hydra/docs/next/guides/migrating-from-MITREid).
+Adds an option that allows granting the OAuth2 Client's authorized scope when performing a `client_credentials` flow without specifying a scope. This enables compatibility with MITREid and allows [migrating from MITREid to Ory Hydra](https://www.ory.sh/hydra/docs/next/guides/migrating-from-MITREid).
 
 **Refactoring the internal DBAL**
 
-We completely refactored the internal database abstraction layer (DBAL). We have been using [gobuffalo/pop](https://github.com/gobuffalo/pop) successfully in [ORY Kratos](https://github.com/ory/kratos) and decided to move the ORY Hydra DBAL to [gobuffalo/pop](https://github.com/gobuffalo/pop) as well. As part of this refactoring, ORY Hydra now supports SQLite for both in-memory as well as on-disk databases, de-duplicating the codebase and allowing for quick and easy persistence in test environments.
+We completely refactored the internal database abstraction layer (DBAL). We have been using [gobuffalo/pop](https://github.com/gobuffalo/pop) successfully in [Ory Kratos](https://github.com/ory/kratos) and decided to move the Ory Hydra DBAL to [gobuffalo/pop](https://github.com/gobuffalo/pop) as well. As part of this refactoring, Ory Hydra now supports SQLite for both in-memory as well as on-disk databases, de-duplicating the codebase and allowing for quick and easy persistence in test environments.
 
 
 
@@ -1060,7 +1060,7 @@ We completely refactored the internal database abstraction layer (DBAL). We have
 
 # [1.9.0-rc.0](https://github.com/ory/hydra/compare/v1.9.0-alpha.4.pre.0...v1.9.0-rc.0) (2021-01-12)
 
-This is a pre-release for ORY Hydra 1.9.0
+This is a pre-release for Ory Hydra 1.9.0
 
 
 
@@ -1112,25 +1112,25 @@ autogen: pin v1.9.0-alpha.4.pre.0 release commit
 
 # [1.9.0-alpha.3](https://github.com/ory/hydra/compare/v1.9.0-alpha.2...v1.9.0-alpha.3) (2020-12-08)
 
-We are excited to present the next big step towards ORY Hydra 1.9! In this release we completely refactored the configuration internals and moved from [spf13/viper](https://github.com/spf13/viper) to [knadh/koanf](https://github.com/knadh/koanf):
+We are excited to present the next big step towards Ory Hydra 1.9! In this release we completely refactored the configuration internals and moved from [spf13/viper](https://github.com/spf13/viper) to [knadh/koanf](https://github.com/knadh/koanf):
 
 1. Configuration sourcing works from all sources (file, env, cli flags) with validation against the configuration schema, greatly improving the developer experience when changing or updating configuration.
 2. Configuration reloading has improved significantly and works excellently on Kubernetes.
-3. Performance gains that remove the need for a cache layer between the configuration system and ORY Hydra.
+3. Performance gains that remove the need for a cache layer between the configuration system and Ory Hydra.
 4. Loading of several config files using the `--config` flag now possible.
 5. Configuration values are now sent to the tracer (e.g. Jaeger) if tracing is enabled.
 
-Please be aware that deprecated configuration flags have finally been removed with this change. It is also possible that ORY Hydra might complain about an invalid configuration due to a significantly improved validation process.
+Please be aware that deprecated configuration flags have finally been removed with this change. It is also possible that Ory Hydra might complain about an invalid configuration due to a significantly improved validation process.
 
-In addition, this release includes the new OpenID Connect Conformity Test Suite as part of the ORY Hydra CI pipeline. This means every PR and change will be checked for OpenID Connect Compliance. As part of these tests, we uncovered some regression issues which have since been resolved. Please be aware that fields `error_hint` and `error_debug` will no longer be sent. You can re-enable those legacy fields by setting `oauth2.include_legacy_error_fields` to `true`.
+In addition, this release includes the new OpenID Connect Conformity Test Suite as part of the Ory Hydra CI pipeline. This means every PR and change will be checked for OpenID Connect Compliance. As part of these tests, we uncovered some regression issues which have since been resolved. Please be aware that fields `error_hint` and `error_debug` will no longer be sent. You can re-enable those legacy fields by setting `oauth2.include_legacy_error_fields` to `true`.
 
 Furthermore, support for OpenID Connect flows `response_mode=form_post` was added and has been tested with the OpenID Connect Conformity Test Suite, making it ready for production.
 
 Several other bugs have been resolved and we have completely overhauled the tests, deprecating test tables in favor of test suites. This greatly improves the readability of our tests and allows new contributors to more easily understand what is going on!
 
-If you wish to get into ORY Hydra, check out the newly published YouTube tutorial:
+If you wish to get into Ory Hydra, check out the newly published YouTube tutorial:
 
-[![ORY Hydra YouTube Quickstart Tutorial](https://raw.githubusercontent.com/ory/web/master/static/images/newsletter/hydra-1.9.0/YouTube-tutorial-hydra-preview.png)](https://www.youtube.com/watch?v=tlO9p2E501A)
+[![Ory Hydra YouTube Quickstart Tutorial](https://raw.githubusercontent.com/ory/web/master/static/images/newsletter/hydra-1.9.0/YouTube-tutorial-hydra-preview.png)](https://www.youtube.com/watch?v=tlO9p2E501A)
 
 
 
@@ -1140,15 +1140,15 @@ After battling with [spf13/viper](https://github.com/spf13/viper) for several ye
 
 1. Configuration sourcing works from all sources (file, env, cli flags) with validation against the configuration schema, greatly improving developer experience when changing or updating configuration.
 2. Configuration reloading has improved significantly and works flawlessly on Kubernetes.
-3. Performance increased dramatically, completely removing the need for a cache layer between the configuration system and ORY Hydra.
+3. Performance increased dramatically, completely removing the need for a cache layer between the configuration system and Ory Hydra.
 4. It is now possible to load several config files using the `--config` flag.
 5. Configuration values are now sent to the tracer (e.g. Jaeger) if tracing is enabled.
 
-Please be aware that deprecated configuration flags have finally been removed with this change. It is also possible that ORY Hydra might complain about an invalid configuration, because the validation process has improved significantly.
+Please be aware that deprecated configuration flags have finally been removed with this change. It is also possible that Ory Hydra might complain about an invalid configuration, because the validation process has improved significantly.
 
 This patch requires running SQL Migrations. Please be aware that a NOT NULL column is being dropped which could require a lot of time when the `authentication_session` table contains a lot of data.
 
-This patch removes `error_hint` and `error_debug` fields from OAuth2 responses. These are now all merged into `error_description` which is according to the OAuth2 and OpenID Connect specification. If you wish to keep the old behavior around, set `oauth2.include_legacy_error_fields` to `true` in your ORY Hydra configuration.
+This patch removes `error_hint` and `error_debug` fields from OAuth2 responses. These are now all merged into `error_description` which is according to the OAuth2 and OpenID Connect specification. If you wish to keep the old behavior around, set `oauth2.include_legacy_error_fields` to `true` in your Ory Hydra configuration.
 
 Applying this patch requires running SQL migrations. The SQL migrations will remove a UNIQUE constraint and add new INDEX to several tables which should speed up certain operations. Please be aware that this might cause certain databases to lock which could be problematic if there are many rows affected.
 
@@ -1278,7 +1278,7 @@ This changes the OAuth2 Token Introspection response to ensure compliance with t
 
 # [1.9.0-alpha.2](https://github.com/ory/hydra/compare/v1.9.0-alpha.1...v1.9.0-alpha.2) (2020-10-29)
 
-This release addresses an issue in the update routine of OAuth2 Clients (see [kratos#2148](https://github.com/ory/hydra/issues/2148)) and adds an option which makes ORY Hydra compatible with MITREid.
+This release addresses an issue in the update routine of OAuth2 Clients (see [kratos#2148](https://github.com/ory/hydra/issues/2148)) and adds an option which makes Ory Hydra compatible with MITREid.
 
 
 
@@ -1316,7 +1316,7 @@ This release addresses an issue in the update routine of OAuth2 Clients (see [kr
 
 # [1.9.0-alpha.1](https://github.com/ory/hydra/compare/v1.8.5...v1.9.0-alpha.1) (2020-10-20)
 
-This release focuses on a complete refactor of the internal database abstraction layer (DBAL). We have been using [gobuffalo/pop](https://github.com/gobuffalo/pop) successfully in [ORY Kratos](https://github.com/ory/kratos) and decided to move the ORY Hydra DBAL to [gobuffalo/pop](https://github.com/gobuffalo/pop) as well. As part of this refactoring, ORY Hydra now supports SQLite for both in-memory as well as on-disk databases, de-duplicating the codebase and allowing for quick and easy persistence in test environments.
+This release focuses on a complete refactor of the internal database abstraction layer (DBAL). We have been using [gobuffalo/pop](https://github.com/gobuffalo/pop) successfully in [Ory Kratos](https://github.com/ory/kratos) and decided to move the Ory Hydra DBAL to [gobuffalo/pop](https://github.com/gobuffalo/pop) as well. As part of this refactoring, Ory Hydra now supports SQLite for both in-memory as well as on-disk databases, de-duplicating the codebase and allowing for quick and easy persistence in test environments.
 
 This is an alpha release as we want to gather feedback from the community regarding performance and other potential issues before tagging the v1.9.0 version branch as stable.
 
@@ -1356,7 +1356,7 @@ This is an alpha release as we want to gather feedback from the community regard
 * Move Dockerfiles to .docker directory ([5508f2a](https://github.com/ory/hydra/commit/5508f2aba6ff56730d402f163e2b41387676a30f))
 * Use gobuffalo/pop for SQL abstraction ([#2059](https://github.com/ory/hydra/issues/2059)) ([56bce67](https://github.com/ory/hydra/commit/56bce678cb8a3e308313895e5fecd9b112ead4ae)), closes [#1730](https://github.com/ory/hydra/issues/1730):
 
-    This patch replaces the existing SQL and memory managers with a pop based persister. Existing SQL migrations are compatible as they have been migrated to the new SQL abstraction in version 1.7.x. As a goodie, ORY Hydra now supports SQLite for both in-memory as well as on-disk (useful for development and very small deployments) databases!
+    This patch replaces the existing SQL and memory managers with a pop based persister. Existing SQL migrations are compatible as they have been migrated to the new SQL abstraction in version 1.7.x. As a goodie, Ory Hydra now supports SQLite for both in-memory as well as on-disk (useful for development and very small deployments) databases!
 
 
 ### Documentation
@@ -1397,7 +1397,7 @@ A few things have changed as part of these patches:
 - OAuth 2.0 Redirection URL error parameters `error_hint`, `error_debug` have been deprecated and are now part of `error_description`. The parameters are still included for compatibility reasons but will be removed in a future release.
 - OAuth 2.0 Error `revocation_client_mismatch` was not standardized and has been removed. Instead, you will now receive `unauthorized_client` with a description explaining why the flow failed.
 
-Additionally, the TypeScript SDK generator has changed from OpenAPI's `typescript-node` to `typescript-axios` making the SDK compatible with both browser as well as node environments, which was not the case previously. Please be aware that some of the SDK's API signatures - especially responses - have changed and check your TypeScript output for instructions on upgrading. You may still use an older version of the SDK as none of ORY Hydra's HTTP APIs have changed.
+Additionally, the TypeScript SDK generator has changed from OpenAPI's `typescript-node` to `typescript-axios` making the SDK compatible with both browser as well as node environments, which was not the case previously. Please be aware that some of the SDK's API signatures - especially responses - have changed and check your TypeScript output for instructions on upgrading. You may still use an older version of the SDK as none of Ory Hydra's HTTP APIs have changed.
 
 Due to several complex CI issues and regressions, build versions v1.8.0 - v1.8.4 failed. v1.8.5 the first and only stable release in the current 1.8.x branch.
 
@@ -1445,7 +1445,7 @@ A few things have changed as part of these patches:
 - OAuth2 Redirection URL error parameters `error_hint`, `error_debug` have been deprecated and are now part of `error_description`. The parameters are still included for compatibility reasons but will be removed in a future release.
 - OAuth2 Error `revocation_client_mismatch` was not standardized and has been removed. Instead, you will now receive `unauthorized_client` with a description explaning why the flow failed.
 
-Additionally, the TypeScript SDK generator has changed from OpenAPI's `typescript-node` to `typescript-axios` making the SDK compatible with both browser as well as node environments, which was not the case previously. Please be aware that some of the SDK's API signatures - especially responses - have changed and check your TypeScript output for instructions on upgrading. You may still use an older version of the SDK as none of ORY Hydra's HTTP APIs have changed.
+Additionally, the TypeScript SDK generator has changed from OpenAPI's `typescript-node` to `typescript-axios` making the SDK compatible with both browser as well as node environments, which was not the case previously. Please be aware that some of the SDK's API signatures - especially responses - have changed and check your TypeScript output for instructions on upgrading. You may still use an older version of the SDK as none of Ory Hydra's HTTP APIs have changed.
 
 New features have been added and bugs have been closed. No migrations are required when applying this release. Please check the list below for an in-depth overview.
 
@@ -1613,7 +1613,7 @@ Never apply SQL migrations without backing up your database prior.
 
 # [1.7.0](https://github.com/ory/hydra/compare/v1.6.0...v1.7.0) (2020-08-14)
 
-The new SameSite attribute is now enforced on Google Chrome and may cause issues with your current ORY Hydra deployment:
+The new SameSite attribute is now enforced on Google Chrome and may cause issues with your current Ory Hydra deployment:
 
 `SameSite=None` no longer works without `secure` flag cookies. If you are using the `--dangerous-force-http` flag and have not configured `SameSite=Lax` your users will no longer be able to perform OAuth2 flows.
 
@@ -1624,7 +1624,7 @@ The next FireFox release will follow this implementation as well. To prevent you
 
 By applying this release, the above recommendations will be set per default, for example using `Lax` when `--dangerous-force-http` is set.
 
-Many of you reached out in the past asking about managed / SaaS offerings from ORY, for more support, automated updates, and automated fixes for issues like the `SameSite` behavior above. We would like to invite those interested in that kind of an offering and service to engage in a dialogue to better help us understand how you are using ORY, what requirements your businesses have and how we can better help and service you. Together, we can shape some of this journey together. If you like to be part of this conversation please send an email to jared@ory.sh so we can get in touch directly and begin talking about what an ideal and fully supported offering from ORY would look like for you.
+Many of you reached out in the past asking about managed / SaaS offerings from Ory, for more support, automated updates, and automated fixes for issues like the `SameSite` behavior above. We would like to invite those interested in that kind of an offering and service to engage in a dialogue to better help us understand how you are using Ory, what requirements your businesses have and how we can better help and service you. Together, we can shape some of this journey together. If you like to be part of this conversation please send an email to jared@ory.sh so we can get in touch directly and begin talking about what an ideal and fully supported offering from Ory would look like for you.
 
 This patch additionally includes a breaking API change for the "Revoke Consent Sessions API endpoint" - please check the breaking changes below. Bugfixes are included in this release as well - such as pretty JSON format logging, fixes to Jaeger configuration, and more!
 
@@ -1696,7 +1696,7 @@ Previously, '/oauth2/auth/sessions/consent?subject=foo@bar.com' would revoke all
 
 # [1.6.0](https://github.com/ory/hydra/compare/v1.5.2...v1.6.0) (2020-07-20)
 
-We focused on reworking the ORY Hydra documentation in this release.
+We focused on reworking the Ory Hydra documentation in this release.
 
 Even though no breaking changes were introduced with this release, we decided
 to bump to the next minor (1.6) version to signal the significance of the
@@ -1789,8 +1789,8 @@ The 1.5.1 release includes several big changes to the internal code base and int
 * introduces Zipkin tracing support;
 * improves the documentation in several locations;
 * greatly improves structured logging output;
-* supports unix sockets in the ORY Hydra CLI;
-* uses the new ORY CLI as part of the toolchain;
+* supports unix sockets in the Ory Hydra CLI;
+* uses the new Ory CLI as part of the toolchain;
 * and resolves several other bugs and issues!
 
 We would like to thank our amazing community and all contributors that have helped in making this release possible (in no particular order):
@@ -1831,8 +1831,8 @@ The 1.5 release includes several big changes to the internal code base and intro
 * introduces Zipkin tracing support;
 * improves the documentation in several locations;
 * greatly improves structured logging output;
-* supports unix sockets in the ORY Hydra CLI;
-* uses the new ORY CLI as part of the toolchain;
+* supports unix sockets in the Ory Hydra CLI;
+* uses the new Ory CLI as part of the toolchain;
 * and resolves several other bugs and issues!
 
 We would like to thank our amazing community and all contributors that have helped in making this release possible (in no particular order):
@@ -3496,7 +3496,7 @@ ci: Use yaml in configuration docs runner
 * Add shell installer to repo for curl | bash (#1330) ([13f297f](https://github.com/ory/hydra/commit/13f297f340e06af01f6f56967cecf6c7b8cce1a3)), closes [#1330](https://github.com/ory/hydra/issues/1330)
 * Improve configuration and service management (#1314) ([95a51de](https://github.com/ory/hydra/commit/95a51deb3100034db5c6d98bbd7838a3b43249ce)), closes [#1314](https://github.com/ory/hydra/issues/1314) [#1316](https://github.com/ory/hydra/issues/1316) [#1327](https://github.com/ory/hydra/issues/1327) [#1244](https://github.com/ory/hydra/issues/1244) [#1289](https://github.com/ory/hydra/issues/1289) [#1309](https://github.com/ory/hydra/issues/1309) [#1107](https://github.com/ory/hydra/issues/1107) [#1196](https://github.com/ory/hydra/issues/1196) [#1121](https://github.com/ory/hydra/issues/1121):
 
-    This patch significantly refactors internal configuration and service management with the goal of making configuration changes possible without service restarts. This patch prepares the possibility to configure ORY Hydra from a remote source (etcd, consul) and watch for changes. This patch also introduces the possibility to configure ORY Hydra from a configuration file on top of environment variables.
+    This patch significantly refactors internal configuration and service management with the goal of making configuration changes possible without service restarts. This patch prepares the possibility to configure Ory Hydra from a remote source (etcd, consul) and watch for changes. This patch also introduces the possibility to configure Ory Hydra from a configuration file on top of environment variables.
     
     The following issues have been fixed as well:
 
@@ -3994,13 +3994,13 @@ Signed-off-by: arekkas <aeneas@ory.am>
 * Add scope to introspection test suite ([#941](https://github.com/ory/hydra/issues/941)) ([2bf24b9](https://github.com/ory/hydra/commit/2bf24b9d92eb989d8079a0a73c2a6b3147bc64ca))
 * Adds JWT Access Token strategy ([c932ab4](https://github.com/ory/hydra/commit/c932ab4571f1ae75c526e9b19d5a7c60d533ca41)), closes [#248](https://github.com/ory/hydra/issues/248):
 
-    This patch adds the (experimental) ability to issue JSON Web Tokens instead of ORY Hydra's opaque access tokens. Please be aware that this feature has had little real-world and unit testing and may not be suitable for production.
+    This patch adds the (experimental) ability to issue JSON Web Tokens instead of Ory Hydra's opaque access tokens. Please be aware that this feature has had little real-world and unit testing and may not be suitable for production.
     
     Simple integration tests using the JWT strategy have been added to ensure functionality.
     
     To use the new JWT strategy, set environment variable `OAUTH2_ACCESS_TOKEN_STRATEGY` to `jwt`. For example: `export OAUTH2_ACCESS_TOKEN_STRATEGY=jwt`.
     
-    Please be aware that we (ORY) do not recommend using the JWT strategy for various reasons. If you can, use the default and recommended "opaque" strategy instead.
+    Please be aware that we (Ory) do not recommend using the JWT strategy for various reasons. If you can, use the default and recommended "opaque" strategy instead.
 
 * Adds subject_type support to oidc discovery ([78e6552](https://github.com/ory/hydra/commit/78e65521c2224e24f670771472fd760067b5ce0a)), closes [#950](https://github.com/ory/hydra/issues/950)
 * Deprecate `public` flag ([8f71806](https://github.com/ory/hydra/commit/8f7180696d23a68fd73bcec7f1ef46078f34c6dd)), closes [#938](https://github.com/ory/hydra/issues/938):
@@ -4336,11 +4336,11 @@ docs: Add oidc conformity docs
 
 * Removes policy, warden and groups from this project ([3d0bf0b](https://github.com/ory/hydra/commit/3d0bf0bda5ea2bd73f9fed96e2aa7c1017638555)), closes [#807](https://github.com/ory/hydra/issues/807):
 
-    We have learned a lot over the last year in terms of how ORY Hydra is being used. Initially, we wanted to avoid the problems facing popular databases like MongoDB or others, which did not include authentication for their management APIs.
+    We have learned a lot over the last year in terms of how Ory Hydra is being used. Initially, we wanted to avoid the problems facing popular databases like MongoDB or others, which did not include authentication for their management APIs.
     
-    For this reason, the Warden API was born and primarily used internally and exposed via HTTP. We learned that access control policies are well received, but also add additional complexity to understanding the software. While we firmly believe that these policies implement best practices for access control in complex systems, we do understand that they add a barrier to getting started with ORY Hydra.
+    For this reason, the Warden API was born and primarily used internally and exposed via HTTP. We learned that access control policies are well received, but also add additional complexity to understanding the software. While we firmly believe that these policies implement best practices for access control in complex systems, we do understand that they add a barrier to getting started with Ory Hydra.
     
-    For this reason we are planning on moving the Warden API from this project to ORY Oathkeeper or potentially it's own server. We would add a migration path for existing policy definitions to the new service. The default docker image would combine the services in such a way, that ORY Hydra is protected. We would additionally have an (insecure) docker image without authentication which can be used for testing.
+    For this reason we are planning on moving the Warden API from this project to Ory Oathkeeper or potentially it's own server. We would add a migration path for existing policy definitions to the new service. The default docker image would combine the services in such a way, that Ory Hydra is protected. We would additionally have an (insecure) docker image without authentication which can be used for testing.
     
     This also opens up the possibility of having more access control mechanisms than access control policies. For example, we can add ACL and RBAC and other mechanisms too.
     
@@ -4382,7 +4382,7 @@ docs: Add oidc conformity docs
 * Deprecates connect command and introduces configurable credentials ([0b5f466](https://github.com/ory/hydra/commit/0b5f4666d86f8460003260f68dc5e1e029c5834c)), closes [#841](https://github.com/ory/hydra/issues/841) [#840](https://github.com/ory/hydra/issues/840):
 
     This patch deprecates the `hydra connect` command as internal
-    access control has been removed from ORY Hydra and this command
+    access control has been removed from Ory Hydra and this command
     no longer serves any purpose.
     
     Instead, all commands are supplied with environment variables `HYDRA_URL`,
@@ -4419,7 +4419,7 @@ docs: Add oidc conformity docs
     and the new flow is a huge step towards OpenID Connect Certification.
     
     Besides easier implementation on the (previously known as) consent app,
-    this patch introduces a new set of features which lets ORY Hydra
+    this patch introduces a new set of features which lets Ory Hydra
     detect previous logins and previously accepted consent requests. In turn,
     the user does not need to login or consent on every OAuth2 Authorize Code
     Flow.
@@ -4641,7 +4641,7 @@ Signed-off-by: Euan Kemp <euank@euank.com>
 * Forces JWK to have a unique ID ([acd0107](https://github.com/ory/hydra/commit/acd010726b5fc6367f317ff8b0cad3fbd036747c)), closes [#589](https://github.com/ory/hydra/issues/589):
 
     Previously, JSON Web Keys did not have to specify a unique id. JWKs
-    generated by ORY Hydra typically only used `public` or `private`
+    generated by Ory Hydra typically only used `public` or `private`
     as KeyID. This patch changes that and appends a unique id if no
     KeyID was given. To be able to separate between public and private key
     pairs in resource name, the public/private convention was kept.
@@ -5121,7 +5121,7 @@ Signed-off-by: Euan Kemp <euank@euank.com>
 * Forces JWK to have a unique ID ([acd0107](https://github.com/ory/hydra/commit/acd010726b5fc6367f317ff8b0cad3fbd036747c)), closes [#589](https://github.com/ory/hydra/issues/589):
 
     Previously, JSON Web Keys did not have to specify a unique id. JWKs
-    generated by ORY Hydra typically only used `public` or `private`
+    generated by Ory Hydra typically only used `public` or `private`
     as KeyID. This patch changes that and appends a unique id if no
     KeyID was given. To be able to separate between public and private key
     pairs in resource name, the public/private convention was kept.

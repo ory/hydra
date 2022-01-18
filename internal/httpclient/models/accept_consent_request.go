@@ -26,7 +26,7 @@ type AcceptConsentRequest struct {
 	// Format: date-time
 	HandledAt NullTime `json:"handled_at,omitempty"`
 
-	// Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
+	// Remember, if set to true, tells Ory Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.
 	Remember bool `json:"remember,omitempty"`
 

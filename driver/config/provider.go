@@ -264,7 +264,7 @@ func (p *Provider) ScopeStrategy() string {
 }
 
 func (p *Provider) Tracing() *tracing.Config {
-	return p.p.TracingConfig("ORY Hydra")
+	return p.p.TracingConfig("Ory Hydra")
 }
 
 func (p *Provider) GetCookieSecrets() [][]byte {

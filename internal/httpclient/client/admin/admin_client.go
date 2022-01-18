@@ -101,18 +101,18 @@ type ClientService interface {
 /*
   AcceptConsentRequest accepts a consent request
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+to authenticate the subject and then tell Ory Hydra now about it. If the subject authenticated, he/she must now be asked if
 the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 
 The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 
 The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
+provider uses that challenge to fetch information on the OAuth2 request and then tells Ory Hydra if the subject accepted
 or rejected the request.
 
-This endpoint tells ORY Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
+This endpoint tells Ory Hydra that the subject has authorized the OAuth 2.0 client to access resources on his/her behalf.
 The consent provider includes additional information, such as session data for access and ID tokens, and if the
 consent request should be used as basis for future requests.
 
@@ -152,16 +152,16 @@ func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*Acce
 /*
   AcceptLoginRequest accepts a login request
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+(sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
 provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
 a subject (in OAuth2 the proper name for subject is "resource owner").
 
 The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 
-This endpoint tells ORY Hydra that the subject has successfully authenticated and includes additional information such as
-the subject's ID and if ORY Hydra should remember the subject's subject agent for future authentication attempts by setting
+This endpoint tells Ory Hydra that the subject has successfully authenticated and includes additional information such as
+the subject's ID and if Ory Hydra should remember the subject's subject agent for future authentication attempts by setting
 a cookie.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
@@ -200,7 +200,7 @@ func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLo
 /*
   AcceptLogoutRequest accepts a logout request
 
-  When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
+  When a user or an application requests Ory Hydra to log out a user, this endpoint is used to confirm that logout request.
 No body is required.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
@@ -241,7 +241,7 @@ func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*Accept
 
   This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
 func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams) (*CreateJSONWebKeySetCreated, error) {
 	// TODO: Validate the params before sending
@@ -319,7 +319,7 @@ func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOA
 
   Use this endpoint to delete a single JSON Web Key.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
 func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWebKeyNoContent, error) {
 	// TODO: Validate the params before sending
@@ -357,7 +357,7 @@ func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWe
 
   Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
 func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams) (*DeleteJSONWebKeySetNoContent, error) {
 	// TODO: Validate the params before sending
@@ -547,15 +547,15 @@ func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensPara
 /*
   GetConsentRequest gets consent request information
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+to authenticate the subject and then tell Ory Hydra now about it. If the subject authenticated, he/she must now be asked if
 the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 
 The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 
 The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
+provider uses that challenge to fetch information on the OAuth2 request and then tells Ory Hydra if the subject accepted
 or rejected the request.
 */
 func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsentRequestOK, error) {
@@ -628,9 +628,9 @@ func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams) (*GetJSONWebKeyOK, e
 /*
   GetJSONWebKeySet retrieves a JSON web key set
 
-  This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
+  This endpoint can be used to retrieve JWK Sets stored in Ory Hydra.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
 func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKeySetOK, error) {
 	// TODO: Validate the params before sending
@@ -666,8 +666,8 @@ func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKe
 /*
   GetLoginRequest gets a login request
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+(sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
 provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
 a subject (in OAuth2 the proper name for subject is "resource owner").
 
@@ -1102,18 +1102,18 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth
 /*
   RejectConsentRequest rejects a consent request
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+to authenticate the subject and then tell Ory Hydra now about it. If the subject authenticated, he/she must now be asked if
 the OAuth 2.0 Client which initiated the flow should be allowed to access the resources on the subject's behalf.
 
 The consent provider which handles this request and is a web app implemented and hosted by you. It shows a subject interface which asks the subject to
 grant or deny the client access to the requested scope ("Application my-dropbox-app wants write access to all your private files").
 
 The consent challenge is appended to the consent provider's URL to which the subject's user-agent (browser) is redirected to. The consent
-provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
+provider uses that challenge to fetch information on the OAuth2 request and then tells Ory Hydra if the subject accepted
 or rejected the request.
 
-This endpoint tells ORY Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
+This endpoint tells Ory Hydra that the subject has not authorized the OAuth 2.0 client to access resources on his/her behalf.
 The consent provider must include a reason why the consent was not granted.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
@@ -1152,15 +1152,15 @@ func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams) (*Reje
 /*
   RejectLoginRequest rejects a login request
 
-  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-(sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+  When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+(sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
 provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
 a subject (in OAuth2 the proper name for subject is "resource owner").
 
 The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 
-This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
+This endpoint tells Ory Hydra that the subject has not authenticated and includes a reason why the authentication
 was be denied.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
@@ -1199,7 +1199,7 @@ func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLo
 /*
   RejectLogoutRequest rejects a logout request
 
-  When a user or an application requests ORY Hydra to log out a user, this endpoint is used to deny that logout request.
+  When a user or an application requests Ory Hydra to log out a user, this endpoint is used to deny that logout request.
 No body is required.
 
 The response is empty as the logout provider has to chose what action to perform next.
@@ -1239,7 +1239,7 @@ func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*Reject
   RevokeAuthenticationSession invalidates all login sessions of a certain user invalidates a subject s authentication session
 
   This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
-has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
+has to re-authenticate at Ory Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
 Front- or Back-channel logout.
 */
 func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams) (*RevokeAuthenticationSessionNoContent, error) {
@@ -1353,7 +1353,7 @@ func (a *Client) TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams) (*TrustJ
 
   Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
 func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWebKeyOK, error) {
 	// TODO: Validate the params before sending
@@ -1391,7 +1391,7 @@ func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWe
 
   Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. Ory Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
 func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams) (*UpdateJSONWebKeySetOK, error) {
 	// TODO: Validate the params before sending

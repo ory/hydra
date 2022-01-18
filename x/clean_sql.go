@@ -27,6 +27,7 @@ func CleanSQLPop(t *testing.T, c *pop.Connection) {
 		"hydra_client_migration",
 		"hydra_oauth2_migration",
 		"hydra_jwk_migration",
+		"networks",
 		"schema_migration",
 	} {
 		if err := c.RawQuery("DROP TABLE IF EXISTS " + tb).Exec(); err != nil {

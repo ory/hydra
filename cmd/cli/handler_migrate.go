@@ -113,7 +113,7 @@ func (mg migrationGroup) generateSQL(sourceFS fs.FS, target string) error {
 func parseMigration(filename string) (*migration, error) {
 	matches := mrx.FindAllStringSubmatch(filename, -1)
 	if matches == nil {
-		return nil, errors.Errorf("failed to parse migration %s", filename)
+		return nil, errors.Errorf("failed to parse migration filename; %s does not match pattern ", filename, mrx.String())
 	}
 	if len(matches) != 1 && len(matches[0]) != 5 {
 		return nil, errors.Errorf("invalid migration %s; expected %s", filename, mrx.String())

@@ -16,6 +16,7 @@ import (
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/x/configx"
+	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/flow"
@@ -291,13 +292,23 @@ func TestMigrations2(t *testing.T) {
 					}
 				})
 
+				t.Run("case=networks", func(t *testing.T) {
+					ns := []networkx.Network{}
+					c.RawQuery("SELECT * FROM networks").All(&ns)
+					require.Equal(t, 1, len(ns))
+					for _, n := range ns {
+						require.NotZero(t, n.CreatedAt)
+						require.NotZero(t, n.UpdatedAt)
+						CompareWithFixture(t, n, "networks", n.ID.String())
+					}
+				})
+
 			})
 		}
 	}
 
 	for db, c := range connections {
 		t.Run(fmt.Sprintf("database=%s", db), test(db, c))
-		// assert.Equal(t, "neq", sqliteFile)
 		x.CleanSQLPop(t, c)
 		require.NoError(t, c.Close())
 	}

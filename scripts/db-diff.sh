@@ -21,7 +21,8 @@ set -o pipefail
 #
 
 # Usage
-# ./hack/db-diff.sh sqlite master 649f56cc
+# ./scripts/db-diff.sh sqlite master 649f56cc
+# ./scripts/db-diff.sh postgres HEAD~1 HEAD
 if [ "$#" -ne 3 ]; then
 	echo "Usage: $0 <sqlite|postgres|cockroach|mysql> <commit-ish> <commit-ish>"
 	exit 1
@@ -74,8 +75,9 @@ function dump_pg {
 	hydra::util::ensure-pg_dump
 
 	make test-resetdb >/dev/null 2>&1
-	sleep 2
-	yes | go run . migrate sql "$TEST_DATABASE_POSTGRESQL" > /dev/null || true
+	sleep 4
+	yes | go run . migrate sql "$TEST_DATABASE_POSTGRESQL" >&2 || true
+	sleep 1
 	pg_dump -s "$TEST_DATABASE_POSTGRESQL" | sed '/^--/d'
 }
 
@@ -129,8 +131,8 @@ case $1 in
 esac
 
 DIALECT=$1
-COMMIT_FROM=$2
-COMMIT_TO=$3
+COMMIT_FROM=$(git rev-parse "$2")
+COMMIT_TO=$(git rev-parse "$3")
 DDL_FROM="./output/sql/$COMMIT_FROM.$DIALECT.dump.sql"
 DDL_TO="./output/sql/$COMMIT_TO.$DIALECT.dump.sql"
 

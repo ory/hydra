@@ -21,6 +21,14 @@ Something is not working.
       [@Patrik](https://github.com/zepatrik)
 - [ ] Client allowed_cors_origins not working
       ([hydra#1754](https://github.com/ory/hydra/issues/1754))
+- [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens
+      ([hydra#2042](https://github.com/ory/hydra/issues/2042))
+- [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
+      response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
+      [@hackerman](https://github.com/aeneasr)
+- [ ] SQL persister uses | to store scopes and audiences without any escaping
+      ([hydra#2859](https://github.com/ory/hydra/issues/2859)) -
+      [@Grant Zvolský](https://github.com/grantzvolsky)
 
 ### [Feat](https://github.com/ory/hydra/labels/feat)
 
@@ -39,10 +47,6 @@ New feature or request.
 - [ ] Make cookies with SameSite=None secure by default or using the
       configuration flag
       ([hydra#1844](https://github.com/ory/hydra/issues/1844))
-- [ ] Refactor SQL Migration tests to match new system
-      ([hydra#2901](https://github.com/ory/hydra/issues/2901)) -
-      [@Grant Zvolský](https://github.com/grantzvolsky),
-      [@hackerman](https://github.com/aeneasr)
 - [ ] Consider recreating Hydra V2 database model instead of migrations
       ([hydra#2902](https://github.com/ory/hydra/issues/2902)) -
       [@Grant Zvolský](https://github.com/grantzvolsky),
@@ -51,6 +55,139 @@ New feature or request.
       ([hydra#2908](https://github.com/ory/hydra/issues/2908))
 - [ ] No longer allow users to set the client ID
       ([hydra#2911](https://github.com/ory/hydra/issues/2911))
+- [ ] Move to go-jose key generation
+      ([hydra#1825](https://github.com/ory/hydra/issues/1825))
+- [ ] Auth session cannot be prolonged even if the user is active
+      ([hydra#1690](https://github.com/ory/hydra/issues/1690))
+- [ ] Token claims customization with Jsonnet
+      ([hydra#1748](https://github.com/ory/hydra/issues/1748)) -
+      [@hackerman](https://github.com/aeneasr)
+- [ ] Update clients from cli
+      ([hydra#2020](https://github.com/ory/hydra/issues/2020))
+- [x] Refactor SQL Migration tests to match new system
+      ([hydra#2901](https://github.com/ory/hydra/issues/2901)) -
+      [@Grant Zvolský](https://github.com/grantzvolsky),
+      [@hackerman](https://github.com/aeneasr)
+
+## [next](https://github.com/ory/hydra/milestone/41)
+
+_This milestone does not have a description._
+
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [x] Space character in secret.system value
+      ([hydra#2609](https://github.com/ory/hydra/issues/2609)) -
+      [@Patrik](https://github.com/zepatrik),
+      [@Jakub Błaszczyk](https://github.com/Demonsthere)
+
+### [Feat](https://github.com/ory/hydra/labels/feat)
+
+New feature or request.
+
+#### Issues
+
+- [x] Reuse Detection in Refresh Token Rotation
+      ([hydra#2022](https://github.com/ory/hydra/issues/2022))
+
+### [Rfc](https://github.com/ory/hydra/labels/rfc)
+
+A request for comments to discuss and share ideas.
+
+#### Issues
+
+- [x] Multi-region deployment support
+      ([hydra#2018](https://github.com/ory/hydra/issues/2018))
+
+## [v1.10](https://github.com/ory/hydra/milestone/40)
+
+_This milestone does not have a description._
+
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [x] Slow consent revocation request
+      ([hydra#1997](https://github.com/ory/hydra/issues/1997))
+- [x] Report expired JWT assertion token to client
+      ([hydra#2066](https://github.com/ory/hydra/issues/2066))
+- [x] Client update changes it's PK to 0
+      ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
+      [@Patrik](https://github.com/zepatrik)
+- [x] CORS error with v1.9 on localhost
+      ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] Invalid json response with get login request
+      ([hydra#2515](https://github.com/ory/hydra/issues/2515))
+- [x] Invalid TLS config after upgrading to 1.10.2
+      ([hydra#2518](https://github.com/ory/hydra/issues/2518))
+
+#### Pull Requests
+
+- [x] Deprecate client flags in introspect
+      ([hydra#2011](https://github.com/ory/hydra/pull/2011)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] fix: bump ory/fosite to v0.34.1 to address CVEs
+      ([hydra#2090](https://github.com/ory/hydra/pull/2090)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] ci: resolve ci release issues
+      ([hydra#2094](https://github.com/ory/hydra/pull/2094)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] Prepare OpenID Connect Conformity test suite with new profiles and
+      regression fixes ([hydra#2170](https://github.com/ory/hydra/pull/2170)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] test: resolve conformity test suite concurrency issues
+      ([hydra#2181](https://github.com/ory/hydra/pull/2181)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] test: completely refactor consent tests and resolve logout issue
+      ([hydra#2227](https://github.com/ory/hydra/pull/2227)) -
+      [@hackerman](https://github.com/aeneasr)
+
+### [Feat](https://github.com/ory/hydra/labels/feat)
+
+New feature or request.
+
+#### Issues
+
+- [x] Publish a generated csharp SDK
+      ([hydra#2017](https://github.com/ory/hydra/issues/2017))
+
+#### Pull Requests
+
+- [x] perf: add (client_id, subject) index to access and refresh tables to
+      improve revocation performance
+      ([hydra#2001](https://github.com/ory/hydra/pull/2001)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] Prepare OpenID Connect Conformity test suite with new profiles and
+      regression fixes ([hydra#2170](https://github.com/ory/hydra/pull/2170)) -
+      [@hackerman](https://github.com/aeneasr)
+
+### [Blocking](https://github.com/ory/hydra/labels/blocking)
+
+Blocks milestones or other issues or pulls.
+
+#### Issues
+
+- [x] Client update changes it's PK to 0
+      ([hydra#2148](https://github.com/ory/hydra/issues/2148)) -
+      [@Patrik](https://github.com/zepatrik)
+- [x] CORS error with v1.9 on localhost
+      ([hydra#2165](https://github.com/ory/hydra/issues/2165)) -
+      [@hackerman](https://github.com/aeneasr)
+
+#### Pull Requests
+
+- [x] Deprecate client flags in introspect
+      ([hydra#2011](https://github.com/ory/hydra/pull/2011)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] ci: resolve ci release issues
+      ([hydra#2094](https://github.com/ory/hydra/pull/2094)) -
+      [@hackerman](https://github.com/aeneasr)
 
 ## [v1.11](https://github.com/ory/hydra/milestone/39)
 
@@ -62,11 +199,6 @@ Something is not working.
 
 #### Issues
 
-- [ ] Consider customizing 'azp' and 'aud' claims in ID Tokens
-      ([hydra#2042](https://github.com/ory/hydra/issues/2042))
-- [ ] Do not return `email` in `id_token` but instead in `userinfo` for specific
-      response types ([hydra#2163](https://github.com/ory/hydra/issues/2163)) -
-      [@hackerman](https://github.com/aeneasr)
 - [x] Introspection Response: `access_token` and `refresh_token` are not valid
       `token_type` ([hydra#1762](https://github.com/ory/hydra/issues/1762))
 - [x] RSA key generation is slow on ARM
@@ -87,15 +219,6 @@ New feature or request.
 
 #### Issues
 
-- [ ] Auth session cannot be prolonged even if the user is active
-      ([hydra#1690](https://github.com/ory/hydra/issues/1690))
-- [ ] Move to go-jose key generation
-      ([hydra#1825](https://github.com/ory/hydra/issues/1825))
-- [ ] Token claims customization with Jsonnet
-      ([hydra#1748](https://github.com/ory/hydra/issues/1748)) -
-      [@hackerman](https://github.com/aeneasr)
-- [ ] Update clients from cli
-      ([hydra#2020](https://github.com/ory/hydra/issues/2020))
 - [x] consent: Improve remember for consent
       ([hydra#1006](https://github.com/ory/hydra/issues/1006))
 - [x] [Feature] Enhance Security Middleware
@@ -156,3 +279,70 @@ A request for comments to discuss and share ideas.
 
 - [x] Split HTTPS handling for public/admin
       ([hydra#1962](https://github.com/ory/hydra/issues/1962))
+
+## [v1.7.0](https://github.com/ory/hydra/milestone/38)
+
+_This milestone does not have a description._
+
+### [Feat](https://github.com/ory/hydra/labels/feat)
+
+New feature or request.
+
+#### Issues
+
+- [x] "debug" log level outputs multiline logs
+      ([hydra#1958](https://github.com/ory/hydra/issues/1958))
+
+## [v1.6.0](https://github.com/ory/hydra/milestone/37)
+
+_This milestone does not have a description._
+
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [x] Loopback interface redirection with arbitrary port
+      ([hydra#1732](https://github.com/ory/hydra/issues/1732))
+
+### [Feat](https://github.com/ory/hydra/labels/feat)
+
+New feature or request.
+
+#### Issues
+
+- [x] Use consistent field types for logging
+      ([hydra#1683](https://github.com/ory/hydra/issues/1683))
+
+## [v1.5.0](https://github.com/ory/hydra/milestone/36)
+
+_This milestone does not have a description._
+
+### [Bug](https://github.com/ory/hydra/labels/bug)
+
+Something is not working.
+
+#### Issues
+
+- [x] Invalid ttl.refresh_token -1 (no expiration)
+      ([hydra#1811](https://github.com/ory/hydra/issues/1811)) -
+      [@Patrik](https://github.com/zepatrik)
+- [x] /userinfo endpoint misses www-authenticate header for 401 response
+      ([hydra#1827](https://github.com/ory/hydra/issues/1827))
+- [x] Superfluous response.writeHeader
+      ([hydra#1842](https://github.com/ory/hydra/issues/1842)) -
+      [@hackerman](https://github.com/aeneasr)
+- [x] config: scopes_supported doesn't have offline_access
+      ([hydra#1866](https://github.com/ory/hydra/issues/1866))
+
+### [Feat](https://github.com/ory/hydra/labels/feat)
+
+New feature or request.
+
+#### Pull Requests
+
+- [x] refactor: move migrations to gobuffalo/fizz
+      ([hydra#1775](https://github.com/ory/hydra/pull/1775)) -
+      [@hackerman](https://github.com/aeneasr),
+      [@Patrik](https://github.com/zepatrik)

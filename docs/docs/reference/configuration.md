@@ -31,7 +31,7 @@ environmental variables head to the
 section.
 
 ```yaml
-## ORY Hydra Configuration
+## Ory Hydra Configuration
 #
 
 ## serve ##
@@ -44,7 +44,7 @@ serve:
   admin:
     ## host ##
     #
-    # The interface or unix socket ORY Hydra should listen and handle administrative API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+    # The interface or unix socket Ory Hydra should listen and handle administrative API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     #
     # Examples:
     # - localhost
@@ -421,7 +421,7 @@ serve:
   public:
     ## host ##
     #
-    # The interface or unix socket ORY Hydra should listen and handle public API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+    # The interface or unix socket Ory Hydra should listen and handle public API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     #
     # Examples:
     # - localhost
@@ -704,7 +704,7 @@ serve:
 
 ## dsn ##
 #
-# Sets the data source name. This configures the backend where ORY Hydra persists data. If dsn is "memory", data will be written to memory and is lost when you restart this instance. ORY Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql
+# Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is "memory", data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql
 #
 # Set this value using environment variables on
 # - Linux/macOS:
@@ -872,7 +872,7 @@ webfinger:
 
     ## userinfo_url ##
     #
-    # A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to ORY Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.
+    # A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.
     #
     # Examples:
     # - https://example.org/my-custom-userinfo-endpoint
@@ -1090,7 +1090,7 @@ urls:
   self:
     ## public ##
     #
-    # This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.
+    # This is the base location of the public endpoints of your Ory Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.
     #
     # Examples:
     # - https://localhost:4444/
@@ -1241,7 +1241,7 @@ oauth2:
   session:
     ## Encrypt OAuth2 Session ##
     #
-    # If set to true (default) ORY Hydra encrypt OAuth2 and OpenID Connect session data using AES-GCM and the system secret before persisting it in the database.
+    # If set to true (default) Ory Hydra encrypt OAuth2 and OpenID Connect session data using AES-GCM and the system secret before persisting it in the database.
     #
     # Default value: true
     #
@@ -1534,7 +1534,7 @@ profiling: cpu
 
 ## tracing ##
 #
-# ORY Hydra supports distributed tracing.
+# Ory Hydra supports distributed tracing.
 #
 tracing:
   ## service_name ##
@@ -1542,7 +1542,7 @@ tracing:
   # Specifies the service name to use on the tracer.
   #
   # Examples:
-  # - ORY Hydra
+  # - Ory Hydra
   #
   # Set this value using environment variables on
   # - Linux/macOS:
@@ -1550,7 +1550,7 @@ tracing:
   # - Windows Command Line (CMD):
   #    > set TRACING_SERVICE_NAME=<value>
   #
-  service_name: ORY Hydra
+  service_name: Ory Hydra
 
   ## providers ##
   #
@@ -1724,7 +1724,7 @@ version: v0.0.0
 
 ## cgroups ##
 #
-# ORY Hydra can respect Linux container CPU quota
+# Ory Hydra can respect Linux container CPU quota
 #
 cgroups:
   ## v1 ##

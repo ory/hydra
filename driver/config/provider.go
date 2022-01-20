@@ -71,7 +71,7 @@ const (
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
 	KeyAllowedTopLevelClaims                     = "oauth2.allowed_top_level_claims"
-	KeyRefreshTokenRotationGracePeriod           = "oauth2.refresh_token_rotation.grace_period"
+	KeyRefreshTokenRotationGracePeriod           = "oauth2.refresh_token_rotation.grace_period" // #nosec G101
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"

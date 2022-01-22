@@ -17,7 +17,7 @@
     "hydra-login-consent-logout": "1.4.3",
     "jsonwebtoken": "^8.5.1",
     "jwks-rsa": "^1.8.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "node-uuid": "^1.4.8",
     "openid-client": "^2.5.0",
     "simple-oauth2": "^2.5.2",

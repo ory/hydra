@@ -133,6 +133,19 @@ sdk: .bin/swagger .bin/ory node_modules
 
 		make format
 
+MIGRATIONS_SRC_DIR = ./persistence/sql/src/
+MIGRATIONS_DST_DIR = ./persistence/sql/migrations/
+MIGRATION_NAMES=$(shell find $(MIGRATIONS_SRC_DIR) -maxdepth 1 -mindepth 1 -type d -print0 | xargs -0 -I{} basename {})
+MIGRATION_TARGETS=$(addprefix $(MIGRATIONS_DST_DIR), $(MIGRATION_NAMES))
+.PHONY: $(MIGRATION_TARGETS)
+$(MIGRATION_TARGETS): $(MIGRATIONS_DST_DIR)%:
+	go run . migrate gen $(MIGRATIONS_SRC_DIR)$* $(MIGRATIONS_DST_DIR)
+
+MIGRATION_CLEAN_TARGETS=$(addsuffix -clean, $(MIGRATION_TARGETS))
+.PHONY: $(MIGRATION_CLEAN_TARGETS)
+$(MIGRATION_CLEAN_TARGETS): $(MIGRATIONS_DST_DIR)%:
+	find $(MIGRATIONS_DST_DIR) -type f -name $$(echo "$*" | cut -c1-14)* -delete
+
 .PHONY: install-stable
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)

@@ -39,7 +39,7 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool) (c *ConsentRequest, h *HandledConsentRequest) {
+func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string) (c *ConsentRequest, h *HandledConsentRequest) {
 	c = &ConsentRequest{
 		ID:                "challenge" + key,
 		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
@@ -53,10 +53,9 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		},
 		Client:                 &client.Client{OutfacingID: "fk-client-" + key},
 		RequestURL:             "https://request-url/path" + key,
-		LoginChallenge:         sqlxx.NullString("fk-login-challenge-" + key),
+		LoginChallenge:         sqlxx.NullString(loginChallengeBase + key),
 		LoginSessionID:         sqlxx.NullString("fk-login-session-" + key),
 		ForceSubjectIdentifier: "forced-subject",
-		SubjectIdentifier:      "forced-subject",
 		Verifier:               "verifier" + key,
 		CSRF:                   "csrf" + key,
 		ACR:                    "1",
@@ -127,7 +126,7 @@ func MockAuthRequest(key string, authAt bool) (c *LoginRequest, h *HandledLoginR
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
 		},
-		RequestedAt:    time.Now().UTC().Add(-time.Hour),
+		RequestedAt:    time.Now().UTC().Add(-time.Minute),
 		Client:         &client.Client{OutfacingID: "fk-client-" + key},
 		Subject:        "subject" + key,
 		RequestURL:     "https://request-url/path" + key,
@@ -219,7 +218,6 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 		LoginChallenge:         sqlxx.NullString(ar.ID),
 		LoginSessionID:         ar.SessionID,
 		ForceSubjectIdentifier: "forced-subject",
-		SubjectIdentifier:      "forced-subject",
 		ACR:                    "1",
 		AuthenticatedAt:        sqlxx.NullTime(time.Now().UTC().Add(-time.Hour)),
 		RequestedAt:            time.Now().UTC().Add(-time.Hour),
@@ -259,6 +257,8 @@ func SaneMockAuthRequest(t *testing.T, m Manager, ls *LoginSession, cl *client.C
 }
 
 func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.FositeStorer) func(t *testing.T) {
+	lr := make(map[string]*LoginRequest)
+
 	return func(t *testing.T) {
 		t.Run("case=init-fks", func(t *testing.T) {
 			for _, k := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "rv1", "rv2"} {
@@ -270,13 +270,16 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					Subject:         fmt.Sprintf("subject-%s", k),
 				}))
 
-				require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{
+				lr[k] = &LoginRequest{
 					ID:              fmt.Sprintf("fk-login-challenge-%s", k),
+					Subject:         fmt.Sprintf("subject%s", k),
 					Verifier:        fmt.Sprintf("fk-login-verifier-%s", k),
 					Client:          &client.Client{OutfacingID: fmt.Sprintf("fk-client-%s", k)},
 					AuthenticatedAt: sqlxx.NullTime(time.Now()),
 					RequestedAt:     time.Now(),
-				}))
+				}
+
+				require.NoError(t, m.CreateLoginRequest(context.Background(), lr[k]))
 			}
 		})
 
@@ -360,6 +363,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				{"4", true},
 				{"5", true},
 				{"6", false},
+				{"7", true},
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
 					c, h := MockAuthRequest(tc.key, tc.authAt)
@@ -412,7 +416,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				{"7", false, 0, false, false, false},
 			} {
 				t.Run("key="+tc.key, func(t *testing.T) {
-					c, h := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt)
+					c, h := MockConsentRequest(tc.key, tc.remember, tc.rememberFor, tc.hasError, tc.skip, tc.authAt, "challenge")
 					_ = clientManager.CreateClient(context.Background(), c.Client) // Ignore errors that are caused by duplication
 
 					_, err := m.GetConsentRequest(context.Background(), "challenge"+tc.key)
@@ -532,8 +536,8 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		})
 
 		t.Run("case=revoke-used-consent-request", func(t *testing.T) {
-			cr1, hcr1 := MockConsentRequest("rv1", false, 0, false, false, false)
-			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false)
+			cr1, hcr1 := MockConsentRequest("rv1", false, 0, false, false, false, "fk-login-challenge-")
+			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge-")
 
 			// Ignore duplication errors
 			_ = clientManager.CreateClient(context.Background(), cr1.Client)
@@ -602,8 +606,11 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 		})
 
 		t.Run("case=list-used-consent-requests", func(t *testing.T) {
-			cr1, hcr1 := MockConsentRequest("rv1", true, 0, false, false, false)
-			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false)
+			require.NoError(t, m.CreateLoginRequest(context.Background(), lr["rv1"]))
+			require.NoError(t, m.CreateLoginRequest(context.Background(), lr["rv2"]))
+
+			cr1, hcr1 := MockConsentRequest("rv1", true, 0, false, false, false, "fk-login-challenge-")
+			cr2, hcr2 := MockConsentRequest("rv2", false, 0, false, false, false, "fk-login-challenge-")
 
 			// Ignore duplicate errors
 			_ = clientManager.CreateClient(context.Background(), cr1.Client)

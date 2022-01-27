@@ -25,7 +25,9 @@ export GO111MODULE=on
 if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
-(cd ../../; go build -tags sqlite -o test/e2e/hydra . )
+
+[[ "$SKIP_HYDRA_BUILD" -ne 1 ]] &&
+    (cd ../../; go build -tags sqlite -o test/e2e/hydra . )
 
 # Install oauth2-client
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then

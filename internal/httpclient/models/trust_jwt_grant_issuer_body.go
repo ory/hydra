@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -17,12 +19,17 @@ import (
 // swagger:model trustJwtGrantIssuerBody
 type TrustJwtGrantIssuerBody struct {
 
+	// The "domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
+	// Example: example.com
+	Domain string `json:"domain,omitempty"`
+
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
 	// Required: true
 	// Format: date-time
 	ExpiresAt *strfmt.DateTime `json:"expires_at"`
 
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
+	// Example: https://jwt-idp.example.com
 	// Required: true
 	Issuer *string `json:"issuer"`
 
@@ -31,12 +38,13 @@ type TrustJwtGrantIssuerBody struct {
 	Jwk *JSONWebKey `json:"jwk"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
+	// Example: ["openid","offline"]
 	// Required: true
 	Scope []string `json:"scope"`
 
-	// The "subject" identifies the principal that is the subject of the JWT.
-	// Required: true
-	Subject *string `json:"subject"`
+	// The "subject" identifies the principal that is the subject of the JWT. Either this or "domain" must be present.
+	// Example: mike@example.com
+	Subject string `json:"subject,omitempty"`
 }
 
 // Validate validates this trust jwt grant issuer body
@@ -56,10 +64,6 @@ func (m *TrustJwtGrantIssuerBody) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateScope(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateSubject(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -118,10 +122,29 @@ func (m *TrustJwtGrantIssuerBody) validateScope(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *TrustJwtGrantIssuerBody) validateSubject(formats strfmt.Registry) error {
+// ContextValidate validate this trust jwt grant issuer body based on the context it is used
+func (m *TrustJwtGrantIssuerBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
 
-	if err := validate.Required("subject", "body", m.Subject); err != nil {
-		return err
+	if err := m.contextValidateJwk(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TrustJwtGrantIssuerBody) contextValidateJwk(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Jwk != nil {
+		if err := m.Jwk.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("jwk")
+			}
+			return err
+		}
 	}
 
 	return nil

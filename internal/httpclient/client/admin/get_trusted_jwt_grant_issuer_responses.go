@@ -41,9 +41,8 @@ func (o *GetTrustedJwtGrantIssuerReader) ReadResponse(response runtime.ClientRes
 			return nil, err
 		}
 		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -52,7 +51,7 @@ func NewGetTrustedJwtGrantIssuerOK() *GetTrustedJwtGrantIssuerOK {
 	return &GetTrustedJwtGrantIssuerOK{}
 }
 
-/*GetTrustedJwtGrantIssuerOK handles this case with default header values.
+/* GetTrustedJwtGrantIssuerOK describes a response with status code 200, with default header values.
 
 trustedJwtGrantIssuer
 */
@@ -63,7 +62,6 @@ type GetTrustedJwtGrantIssuerOK struct {
 func (o *GetTrustedJwtGrantIssuerOK) Error() string {
 	return fmt.Sprintf("[GET /trust/grants/jwt-bearer/issuers/{id}][%d] getTrustedJwtGrantIssuerOK  %+v", 200, o.Payload)
 }
-
 func (o *GetTrustedJwtGrantIssuerOK) GetPayload() *models.TrustedJwtGrantIssuer {
 	return o.Payload
 }
@@ -85,7 +83,7 @@ func NewGetTrustedJwtGrantIssuerNotFound() *GetTrustedJwtGrantIssuerNotFound {
 	return &GetTrustedJwtGrantIssuerNotFound{}
 }
 
-/*GetTrustedJwtGrantIssuerNotFound handles this case with default header values.
+/* GetTrustedJwtGrantIssuerNotFound describes a response with status code 404, with default header values.
 
 genericError
 */
@@ -96,7 +94,6 @@ type GetTrustedJwtGrantIssuerNotFound struct {
 func (o *GetTrustedJwtGrantIssuerNotFound) Error() string {
 	return fmt.Sprintf("[GET /trust/grants/jwt-bearer/issuers/{id}][%d] getTrustedJwtGrantIssuerNotFound  %+v", 404, o.Payload)
 }
-
 func (o *GetTrustedJwtGrantIssuerNotFound) GetPayload() *models.GenericError {
 	return o.Payload
 }
@@ -118,7 +115,7 @@ func NewGetTrustedJwtGrantIssuerInternalServerError() *GetTrustedJwtGrantIssuerI
 	return &GetTrustedJwtGrantIssuerInternalServerError{}
 }
 
-/*GetTrustedJwtGrantIssuerInternalServerError handles this case with default header values.
+/* GetTrustedJwtGrantIssuerInternalServerError describes a response with status code 500, with default header values.
 
 genericError
 */
@@ -129,7 +126,6 @@ type GetTrustedJwtGrantIssuerInternalServerError struct {
 func (o *GetTrustedJwtGrantIssuerInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /trust/grants/jwt-bearer/issuers/{id}][%d] getTrustedJwtGrantIssuerInternalServerError  %+v", 500, o.Payload)
 }
-
 func (o *GetTrustedJwtGrantIssuerInternalServerError) GetPayload() *models.GenericError {
 	return o.Payload
 }

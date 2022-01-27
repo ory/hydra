@@ -16,59 +16,73 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewDynamicClientRegistrationGetOAuth2ClientParams creates a new DynamicClientRegistrationGetOAuth2ClientParams object
-// with the default values initialized.
+// NewDynamicClientRegistrationGetOAuth2ClientParams creates a new DynamicClientRegistrationGetOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDynamicClientRegistrationGetOAuth2ClientParams() *DynamicClientRegistrationGetOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationGetOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDynamicClientRegistrationGetOAuth2ClientParamsWithTimeout creates a new DynamicClientRegistrationGetOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDynamicClientRegistrationGetOAuth2ClientParamsWithTimeout(timeout time.Duration) *DynamicClientRegistrationGetOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationGetOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDynamicClientRegistrationGetOAuth2ClientParamsWithContext creates a new DynamicClientRegistrationGetOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDynamicClientRegistrationGetOAuth2ClientParamsWithContext(ctx context.Context) *DynamicClientRegistrationGetOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationGetOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDynamicClientRegistrationGetOAuth2ClientParamsWithHTTPClient creates a new DynamicClientRegistrationGetOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDynamicClientRegistrationGetOAuth2ClientParamsWithHTTPClient(client *http.Client) *DynamicClientRegistrationGetOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationGetOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*DynamicClientRegistrationGetOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the dynamic client registration get o auth2 client operation typically these are written to a http.Request
+/* DynamicClientRegistrationGetOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the dynamic client registration get o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type DynamicClientRegistrationGetOAuth2ClientParams struct {
 
-	/*ID
-	  The id of the OAuth 2.0 Client.
+	/* ID.
 
+	   The id of the OAuth 2.0 Client.
 	*/
 	ID string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the dynamic client registration get o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationGetOAuth2ClientParams) WithDefaults() *DynamicClientRegistrationGetOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the dynamic client registration get o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationGetOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the dynamic client registration get o auth2 client params

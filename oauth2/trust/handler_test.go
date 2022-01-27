@@ -81,6 +81,7 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -115,6 +116,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithSameIssuerSubjectKey() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -135,6 +137,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"",
 		"hackerman@example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -144,6 +147,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 
 	createRequestParams = s.newCreateJwtBearerGrantParams(
 		"ory",
+		"",
 		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
@@ -155,6 +159,7 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 	createRequestParams = s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Time{},
 	)
@@ -163,10 +168,37 @@ func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithMissingFields() {
 	s.Error(err, "expected error, because grant missing expiration date")
 }
 
+func (s *HandlerTestSuite) TestGrantCanNotBeCreatedWithASubjectAndADomainSet() {
+	createRequestParams := s.newCreateJwtBearerGrantParams(
+		"ory",
+		"hackerman@example.com",
+		"example.com",
+		[]string{"openid", "offline", "profile"},
+		time.Now().Add(time.Hour),
+	)
+
+	_, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
+	s.Require().Error(err, "expected error, because domain and a subject cannot be defined at the same time")
+}
+
+func (s *HandlerTestSuite) TestGrantWholeDomainSet() {
+	createRequestParams := s.newCreateJwtBearerGrantParams(
+		"ory",
+		"",
+		"example.com",
+		[]string{"openid", "offline", "profile"},
+		time.Now().Add(time.Hour),
+	)
+
+	_, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
+	s.Require().NoError(err, "no error expected when domain is set with an empty subject")
+}
+
 func (s *HandlerTestSuite) TestGrantPublicCanBeFetched() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
+		"example.com",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -189,12 +221,14 @@ func (s *HandlerTestSuite) TestGrantListCanBeFetched() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
 	createRequestParams2 := s.newCreateJwtBearerGrantParams(
 		"ory2",
 		"safetyman@example.com",
+		"",
 		[]string{"profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -223,6 +257,7 @@ func (s *HandlerTestSuite) TestGrantCanBeDeleted() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -258,7 +293,7 @@ func (s *HandlerTestSuite) generateJWK(publicKey *rsa.PublicKey) *models.JSONWeb
 }
 
 func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
-	issuer, subject string, scope []string, expiresAt time.Time,
+	issuer, subject string, domain string, scope []string, expiresAt time.Time,
 ) *admin.TrustJwtGrantIssuerParams {
 	createRequestParams := admin.NewTrustJwtGrantIssuerParams()
 	exp := strfmt.DateTime(expiresAt.UTC().Round(time.Second))
@@ -268,6 +303,7 @@ func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
 		Jwk:       s.generateJWK(s.publicKey),
 		Scope:     scope,
 		Subject:   &subject,
+		//Domain: &domain,
 	}
 	createRequestParams.SetBody(model)
 

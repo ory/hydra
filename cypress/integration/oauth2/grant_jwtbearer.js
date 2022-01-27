@@ -76,9 +76,10 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
     response_types: ['token']
   })
 
-  const gr = (subject) => ({
+  const gr = (subject, domain) => ({
     issuer: prng(),
     subject: subject,
+    domain: domain,
     scope: ['foo', 'openid', 'offline_access'],
     jwk: testPublicJwk,
     expires_at: dayjs().utc().add(1, 'year').set('millisecond', 0).toISOString()
@@ -321,6 +322,170 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
 
     const assertion = jwt.sign(
       jwtAssertion(grant, { sub: 'invalid_subject' }),
+      testPrivatePem,
+      { algorithm: 'RS256' }
+    )
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      form: true,
+      body: {
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: assertion,
+        scope: client.scope,
+        client_secret: client.client_secret,
+        client_id: client.client_id
+      },
+      failOnStatusCode: false
+    })
+      .its('status')
+      .then((status) => {
+        expect(status).to.be.equal(400)
+      })
+  })
+
+  it('should return an Access Token when given client credentials and a JWT assertion with any subject under authorized domain', function () {
+    const client = nc()
+    createClient(client)
+
+    const grant = gr(null, 'example.com') // the issuer can authorise the whole domain
+    createGrant(grant)
+
+    const assertion = jwt.sign(
+      jwtAssertion(grant, { sub: 'any_subject@example.com' }),
+      testPrivatePem,
+      { algorithm: 'RS256' }
+    )
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      form: true,
+      body: {
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: assertion,
+        scope: client.scope,
+        client_secret: client.client_secret,
+        client_id: client.client_id
+      }
+    })
+      .its('body')
+      .then((body) => {
+        const { access_token, expires_in, scope, token_type } = body
+
+        expect(access_token).to.not.be.empty
+        expect(expires_in).to.not.be.undefined
+        expect(scope).to.not.be.empty
+        expect(token_type).to.not.be.empty
+      })
+  })
+
+  it('should return an Error (400) when given client credentials and a JWT assertion with invalid subject', function () {
+    const client = nc()
+    createClient(client)
+
+    const grant = gr('a_subject@example.com') // the issuer can authorise the whole domain
+    createGrant(grant)
+
+    const assertion = jwt.sign(
+      jwtAssertion(grant, { sub: 'another_subject@example.com' }),
+      testPrivatePem,
+      { algorithm: 'RS256' }
+    )
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      form: true,
+      body: {
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: assertion,
+        scope: client.scope,
+        client_secret: client.client_secret,
+        client_id: client.client_id
+      },
+      failOnStatusCode: false
+    })
+      .its('status')
+      .then((status) => {
+        expect(status).to.be.equal(400)
+      })
+  })
+
+  it('should return an Error (400) when given client credentials and a JWT assertion with a subject that is not an email', function () {
+    const client = nc()
+    createClient(client)
+
+    const grant = gr('a_subject@example.com') // the issuer can authorise the whole domain
+    createGrant(grant)
+
+    const assertion = jwt.sign(
+      jwtAssertion(grant, { sub: 'example.com' }),
+      testPrivatePem,
+      { algorithm: 'RS256' }
+    )
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      form: true,
+      body: {
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: assertion,
+        scope: client.scope,
+        client_secret: client.client_secret,
+        client_id: client.client_id
+      },
+      failOnStatusCode: false
+    })
+      .its('status')
+      .then((status) => {
+        expect(status).to.be.equal(400)
+      })
+  })
+
+  it('should return an Error (400) when given client credentials and a JWT assertion with invalid domain', function () {
+    const client = nc()
+    createClient(client)
+
+    const grant = gr(null, 'example.com') // the issuer can authorise the whole domain
+    createGrant(grant)
+
+    const assertion = jwt.sign(
+      jwtAssertion(grant, { sub: 'a_subject@not-example.com' }),
+      testPrivatePem,
+      { algorithm: 'RS256' }
+    )
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      form: true,
+      body: {
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: assertion,
+        scope: client.scope,
+        client_secret: client.client_secret,
+        client_id: client.client_id
+      },
+      failOnStatusCode: false
+    })
+      .its('status')
+      .then((status) => {
+        expect(status).to.be.equal(400)
+      })
+  })
+
+  it('should return an Error (400) when given client credentials and a JWT assertion with a subject with invalid domain', function () {
+    const client = nc()
+    createClient(client)
+
+    const grant = gr(null, 'example.com') // the issuer can authorise the whole domain
+    createGrant(grant)
+
+    const assertion = jwt.sign(
+      jwtAssertion(grant, { sub: 'any_subject@not-example.com' }),
       testPrivatePem,
       { algorithm: 'RS256' }
     )

@@ -90,8 +90,14 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	var data trust.SQLData
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject).
 		Where("key_id = ?", keyId)
+
+	if domain := getDomainFromSubject(subject); domain != "" {
+		query = query.Where("subject = ? or domain = ?", subject, domain)
+	} else {
+		query = query.Where("subject = ?", subject)
+	}
+
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -106,9 +112,14 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 
 func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (*jose.JSONWebKeySet, error) {
 	grantsData := make([]trust.SQLData, 0)
-	query := p.Connection(ctx).
-		Where("issuer = ?", issuer).
-		Where("subject = ?", subject)
+	query := p.Connection(ctx).Where("issuer = ?", issuer)
+
+	if domain := getDomainFromSubject(subject); domain != "" {
+		query = query.Where("subject = ? or domain = ?", subject, domain)
+	} else {
+		query = query.Where("subject = ?", subject)
+	}
+
 	if err := query.All(&grantsData); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -138,8 +149,14 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	var data trust.SQLData
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject).
 		Where("key_id = ?", keyId)
+
+	if domain := getDomainFromSubject(subject); domain != "" {
+		query = query.Where("subject = ? or domain = ?", subject, domain)
+	} else {
+		query = query.Where("subject = ?", subject)
+	}
+
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -165,6 +182,7 @@ func (p *Persister) sqlDataFromJWTGrant(g trust.Grant) trust.SQLData {
 		ID:        g.ID,
 		Issuer:    g.Issuer,
 		Subject:   g.Subject,
+		Domain:    g.Domain,
 		Scope:     strings.Join(g.Scope, "|"),
 		KeySet:    g.PublicKey.Set,
 		KeyID:     g.PublicKey.KeyID,
@@ -178,6 +196,7 @@ func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 		ID:      data.ID,
 		Issuer:  data.Issuer,
 		Subject: data.Subject,
+		Domain:  data.Domain,
 		Scope:   stringsx.Splitx(data.Scope, "|"),
 		PublicKey: trust.PublicKey{
 			Set:   data.KeySet,
@@ -197,4 +216,11 @@ func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time,
 		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ?", trust.SQLData{}.TableName()),
 		deleteUntil,
 	).Exec())
+}
+
+func getDomainFromSubject(subject string) string {
+	if strings.Contains(subject, "@") {
+		return strings.Split(subject, "@")[1]
+	}
+	return ""
 }

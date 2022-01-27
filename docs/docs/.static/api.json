@@ -3154,7 +3154,7 @@
     },
     "trustJwtGrantIssuerBody": {
       "type": "object",
-      "required": ["issuer", "subject", "scope", "jwk", "expires_at"],
+      "required": ["issuer", "scope", "jwk", "expires_at"],
       "properties": {
         "expires_at": {
           "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
@@ -3178,9 +3178,14 @@
           "example": ["openid", "offline"]
         },
         "subject": {
-          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT. Either this or \"domain\" must be present.",
           "type": "string",
           "example": "mike@example.com"
+        },
+        "domain": {
+          "description": "The \"domain\" is used to allow any user under that domain as the subject of the JWT. Either this or \"subject\" must be present.",
+          "type": "string",
+          "example": "example.com"
         }
       }
     },

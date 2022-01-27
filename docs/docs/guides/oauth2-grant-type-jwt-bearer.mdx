@@ -48,8 +48,8 @@ Clients using this grant must be authenticated.
 ### Establishing a Trust Relationship
 
 Before using this grant type, you must establish a trust relationship in Ory
-Hydra. This involves registering the issuer, subject, and the public key at Ory
-Hydra's Admin Endpoint:
+Hydra. This involves registering the issuer, the public key and the subject or
+domain at Ory Hydra's Admin Endpoint:
 
 ```
 POST https://<admin.ory-hydra>/trust/grants/jwt-bearer/issuers
@@ -61,6 +61,9 @@ Content-Type: application/json
 
   // The "sub" field of the access token to be created.
   "subject": "alice@example.org",
+
+  //Or "domain" to allow authorising all users under that domain.
+  // "domain": "example.org",
 
   // The allowed scope of the generated access token.
   "scope": ["read"],

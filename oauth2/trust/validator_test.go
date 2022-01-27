@@ -13,6 +13,7 @@ func TestEmptyIssuerIsInvalid(t *testing.T) {
 	r := createGrantRequest{
 		Issuer:    "",
 		Subject:   "valid-subject",
+		Domain:    "",
 		ExpiresAt: time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
@@ -30,6 +31,7 @@ func TestEmptySubjectIsInvalid(t *testing.T) {
 	r := createGrantRequest{
 		Issuer:    "valid-issuer",
 		Subject:   "",
+		Domain:    "",
 		ExpiresAt: time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
@@ -47,6 +49,7 @@ func TestEmptyExpiresAtIsInvalid(t *testing.T) {
 	r := createGrantRequest{
 		Issuer:    "valid-issuer",
 		Subject:   "valid-subject",
+		Domain:    "",
 		ExpiresAt: time.Time{},
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
@@ -64,6 +67,7 @@ func TestEmptyPublicKeyIdIsInvalid(t *testing.T) {
 	r := createGrantRequest{
 		Issuer:    "valid-issuer",
 		Subject:   "valid-subject",
+		Domain:    "",
 		ExpiresAt: time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "",
@@ -81,6 +85,7 @@ func TestIsValid(t *testing.T) {
 	r := createGrantRequest{
 		Issuer:    "valid-issuer",
 		Subject:   "valid-subject",
+		Domain:    "",
 		ExpiresAt: time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
@@ -89,5 +94,41 @@ func TestIsValid(t *testing.T) {
 
 	if err := v.Validate(r); err != nil {
 		t.Error("A request with an issuer, a subject, an expiration and a public key should be valid")
+	}
+}
+
+func TestDomainIsValid(t *testing.T) {
+	v := GrantValidator{}
+
+	r := createGrantRequest{
+		Issuer:    "valid-issuer",
+		Subject:   "",
+		Domain:    "ory.sh",
+		ExpiresAt: time.Now().Add(time.Hour * 10),
+		PublicKeyJWK: jose.JSONWebKey{
+			KeyID: "valid-key-id",
+		},
+	}
+
+	if err := v.Validate(r); err != nil {
+		t.Error("A request with a domain restriction and an empty subject should be valid")
+	}
+}
+
+func TestAnySubjectWithSubjectIsNotValid(t *testing.T) {
+	v := GrantValidator{}
+
+	r := createGrantRequest{
+		Issuer:    "valid-issuer",
+		Subject:   "valid-subject",
+		Domain:    "ory.sh",
+		ExpiresAt: time.Now().Add(time.Hour * 10),
+		PublicKeyJWK: jose.JSONWebKey{
+			KeyID: "valid-key-id",
+		},
+	}
+
+	if err := v.Validate(r); err == nil {
+		t.Error("A request with a domain restriction and a non-empty subject should not be valid")
 	}
 }

@@ -13,6 +13,9 @@ type createGrantRequest struct {
 	// Subject identifies the principal that is the subject of the JWT.
 	Subject string `json:"subject"`
 
+	// Domain contains the domain the issuer can authorise.
+	Domain string `json:"domain"`
+
 	// Scope contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	Scope []string `json:"scope"`
 

@@ -72,6 +72,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		ID:      uuid.New().String(),
 		Issuer:  grantRequest.Issuer,
 		Subject: grantRequest.Subject,
+		Domain:  grantRequest.Domain,
 		Scope:   grantRequest.Scope,
 		PublicKey: PublicKey{
 			Set:   grantRequest.Issuer, // group all keys by issuer, so set=issuer

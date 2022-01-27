@@ -12,7 +12,6 @@ jobs:
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2

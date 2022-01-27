@@ -92,7 +92,7 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	s.Require().NoError(err, "no errors expected on grant creation")
 	s.NotEmpty(createResult.Payload.ID, " grant id expected to be non-empty")
 	s.Equal(*model.Issuer, createResult.Payload.Issuer, "issuer must match")
-	s.Equal(*model.Subject, createResult.Payload.Subject, "subject must match")
+	s.Equal(model.Subject, createResult.Payload.Subject, "subject must match")
 	s.Equal(model.Scope, createResult.Payload.Scope, "scopes must match")
 	s.Equal(*model.Issuer, createResult.Payload.PublicKey.Set, "public key set must match grant issuer")
 	s.Equal(*model.Jwk.Kid, createResult.Payload.PublicKey.Kid, "public key id must match")
@@ -105,7 +105,7 @@ func (s *HandlerTestSuite) TestGrantCanBeCreatedAndFetched() {
 	s.Require().NoError(err, "no errors expected on grant fetching")
 	s.Equal(getRequestParams.ID, getResult.Payload.ID, " grant id must match")
 	s.Equal(*model.Issuer, getResult.Payload.Issuer, "issuer must match")
-	s.Equal(*model.Subject, getResult.Payload.Subject, "subject must match")
+	s.Equal(model.Subject, getResult.Payload.Subject, "subject must match")
 	s.Equal(model.Scope, getResult.Payload.Scope, "scopes must match")
 	s.Equal(*model.Issuer, getResult.Payload.PublicKey.Set, "public key set must match grant issuer")
 	s.Equal(*model.Jwk.Kid, getResult.Payload.PublicKey.Kid, "public key id must match")
@@ -198,7 +198,7 @@ func (s *HandlerTestSuite) TestGrantPublicCanBeFetched() {
 	createRequestParams := s.newCreateJwtBearerGrantParams(
 		"ory",
 		"hackerman@example.com",
-		"example.com",
+		"",
 		[]string{"openid", "offline", "profile"},
 		time.Now().Add(time.Hour),
 	)
@@ -302,8 +302,8 @@ func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
 		Issuer:    &issuer,
 		Jwk:       s.generateJWK(s.publicKey),
 		Scope:     scope,
-		Subject:   &subject,
-		//Domain: &domain,
+		Subject:   subject,
+		Domain:    domain,
 	}
 	createRequestParams.SetBody(model)
 

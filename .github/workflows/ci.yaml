@@ -126,7 +126,6 @@ jobs:
       TEST_DATABASE_MYSQL: "mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true"
       TEST_DATABASE_COCKROACHDB: "cockroach://root@localhost:26257/defaultdb?sslmode=disable"
       SKIP_HYDRA_BUILD: 1
-
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \
@@ -137,6 +136,10 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.16
+      - uses: actions/cache@v2
+        with:
+          path: ./test/e2e/hydra
+          key: ${{ runner.os }}-hydra
       - run: ./test/e2e/circle-ci.bash ${{ matrix.database }} ${{ matrix.args }}
 
   docs-build:

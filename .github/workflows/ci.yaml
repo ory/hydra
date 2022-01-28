@@ -220,6 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref_type == 'tag' }}
     needs:
+      - oidc-conformity
       - test
       - test-hsm
       - test-e2e

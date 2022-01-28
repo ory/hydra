@@ -2,12 +2,33 @@ name: CI Tasks for Ory Hydra
 on:
   push:
     branches:
-      - main
       - master
     tags:
       - '*'
+    pull_request:
+      branches:
+        - '*'
+
 
 jobs:
+  oidc-conformity:
+    name: Run OIDC conformity tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          # We must fetch at least the immediate parents so that if this is
+          # a pull request then we can checkout the head.
+          fetch-depth: 2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16.1'
+      - name: Start service
+        run: ./test/conformance/start.sh
+      - name: Run tests
+        run: ./test/conformance/test.sh -v -short -parallel 16
+
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest

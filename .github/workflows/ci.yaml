@@ -5,9 +5,7 @@ on:
       - master
     tags:
       - '*'
-    pull_request:
-      branches:
-        - '*'
+  pull_request:
 
 
 jobs:

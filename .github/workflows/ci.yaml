@@ -248,34 +248,10 @@ jobs:
     if: ${{ github.ref_type == 'tag' }}
     needs:
       - newsletter-draft
-    env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
     steps:
-      - uses: slackapi/slack-github-action@v1.16.0
+      - uses: ory/ci/newsletter/slack-notify@master
         with:
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "Pending approval for newsletter send (*${{ github.repository }}*)"
-                  },
-                  "accessory": {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "View workflow",
-                      "emoji": true
-                    },
-                    "url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-                    "action_id": "workflow_link"
-                  }
-                }
-              ]
-            }
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   newsletter-send:
     name: Send newsletter

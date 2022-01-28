@@ -65,7 +65,6 @@ jobs:
   test-hsm:
     name: Run HSM tests
     runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
     env:
       HSM_ENABLED: true
       HSM_LIBRARY: /usr/lib/softhsm/libsofthsm2.so
@@ -89,7 +88,6 @@ jobs:
   setup-e2e:
     name: Setup end-to-end tests
     runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
@@ -104,7 +102,6 @@ jobs:
   test-e2e:
     name: Run end-to-end tests
     runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' }}
     needs:
       - setup-e2e
     strategy:
@@ -186,7 +183,7 @@ jobs:
   sdk-generate:
     name: Generate SDKs
     runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' || github.ref_name != 'master' }}
+    if: ${{ github.ref_type == 'tag' || github.ref_name != 'master' || github.event_name == 'pull_request' }}
     needs:
       - test
       - test-hsm

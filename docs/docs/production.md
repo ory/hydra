@@ -98,8 +98,7 @@ Gateway or Application Proxy to restrict which clients have access to the
 endpoint.
 
 We generally advise to run ORY Hydra with `hydra serve all` which listens on
-both ports in one process. Please be aware that the `memory` backend will not
-work in this mode.
+both ports in one process.
 
 ### Binding to different interfaces or UNIX sockets
 

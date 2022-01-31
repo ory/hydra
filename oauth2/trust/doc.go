@@ -38,15 +38,15 @@ type trustJwtGrantIssuerBody struct {
 	// example: https://jwt-idp.example.com
 	Issuer string `json:"issuer"`
 
-	// The "subject" identifies the principal that is the subject of the JWT. Either this or "domain" must be present.
+	// The "subject" identifies the principal that is the subject of the JWT. Either this or "allowed_domain" must be present.
 	//
 	// example: mike@example.com
 	Subject string `json:"subject"`
 
-	// The "domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
+	// The "allowed_domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
 	//
 	// example: example.com
-	Domain string `json:"domain"`
+	AllowedDomain string `json:"allowed_domain"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	//
@@ -108,13 +108,13 @@ type trustedJwtGrantIssuer struct {
 	// example: https://jwt-idp.example.com
 	Issuer string `json:"issuer"`
 
-	// The "subject" identifies the principal that is the subject of the JWT. Either this or "domain" must be present.
+	// The "subject" identifies the principal that is the subject of the JWT. Either this or "allowed_domain" must be present.
 	// example: mike@example.com
 	Subject string `json:"subject"`
 
-	// The "domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
+	// The "allowed_domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
 	// example: example.com
-	Domain string `json:"domain"`
+	AllowedDomain string `json:"allowed_domain"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	// example: ["openid", "offline"]

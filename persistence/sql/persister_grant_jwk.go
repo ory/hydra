@@ -93,7 +93,7 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 		Where("key_id = ?", keyId)
 
 	if domain := getDomainFromSubject(subject); domain != "" {
-		query = query.Where("subject = ? or domain = ?", subject, domain)
+		query = query.Where("subject = ? or allowed_domain = ?", subject, domain)
 	} else {
 		query = query.Where("subject = ?", subject)
 	}
@@ -115,7 +115,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	query := p.Connection(ctx).Where("issuer = ?", issuer)
 
 	if domain := getDomainFromSubject(subject); domain != "" {
-		query = query.Where("subject = ? or domain = ?", subject, domain)
+		query = query.Where("subject = ? or allowed_domain = ?", subject, domain)
 	} else {
 		query = query.Where("subject = ?", subject)
 	}
@@ -152,7 +152,7 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 		Where("key_id = ?", keyId)
 
 	if domain := getDomainFromSubject(subject); domain != "" {
-		query = query.Where("subject = ? or domain = ?", subject, domain)
+		query = query.Where("subject = ? or allowed_domain = ?", subject, domain)
 	} else {
 		query = query.Where("subject = ?", subject)
 	}
@@ -179,25 +179,25 @@ func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time
 
 func (p *Persister) sqlDataFromJWTGrant(g trust.Grant) trust.SQLData {
 	return trust.SQLData{
-		ID:        g.ID,
-		Issuer:    g.Issuer,
-		Subject:   g.Subject,
-		Domain:    g.Domain,
-		Scope:     strings.Join(g.Scope, "|"),
-		KeySet:    g.PublicKey.Set,
-		KeyID:     g.PublicKey.KeyID,
-		CreatedAt: g.CreatedAt,
-		ExpiresAt: g.ExpiresAt,
+		ID:            g.ID,
+		Issuer:        g.Issuer,
+		Subject:       g.Subject,
+		AllowedDomain: g.AllowedDomain,
+		Scope:         strings.Join(g.Scope, "|"),
+		KeySet:        g.PublicKey.Set,
+		KeyID:         g.PublicKey.KeyID,
+		CreatedAt:     g.CreatedAt,
+		ExpiresAt:     g.ExpiresAt,
 	}
 }
 
 func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 	return trust.Grant{
-		ID:      data.ID,
-		Issuer:  data.Issuer,
-		Subject: data.Subject,
-		Domain:  data.Domain,
-		Scope:   stringsx.Splitx(data.Scope, "|"),
+		ID:            data.ID,
+		Issuer:        data.Issuer,
+		Subject:       data.Subject,
+		AllowedDomain: data.AllowedDomain,
+		Scope:         stringsx.Splitx(data.Scope, "|"),
 		PublicKey: trust.PublicKey{
 			Set:   data.KeySet,
 			KeyID: data.KeyID,

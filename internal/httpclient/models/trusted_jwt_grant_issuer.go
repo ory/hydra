@@ -19,13 +19,13 @@ import (
 // swagger:model trustedJwtGrantIssuer
 type TrustedJwtGrantIssuer struct {
 
+	// The "allowed_domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
+	// Example: example.com
+	AllowedDomain string `json:"allowed_domain,omitempty"`
+
 	// The "created_at" indicates, when grant was created.
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
-
-	// The "domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
-	// Example: example.com
-	Domain string `json:"domain,omitempty"`
 
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
 	// Format: date-time
@@ -46,7 +46,7 @@ type TrustedJwtGrantIssuer struct {
 	// Example: ["openid","offline"]
 	Scope []string `json:"scope"`
 
-	// The "subject" identifies the principal that is the subject of the JWT. Either this or "domain" must be present.
+	// The "subject" identifies the principal that is the subject of the JWT. Either this or "allowed_domain" must be present.
 	// Example: mike@example.com
 	Subject string `json:"subject,omitempty"`
 }

@@ -1,6 +1,6 @@
-DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_issuer_subject_domain_key_id_key CASCADE;
+DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_issuer_subject_allowed_domain_key_id_key CASCADE;
 
-ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer
-    DROP COLUMN domain;
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP COLUMN allowed_domain;
 
-CREATE UNIQUE INDEX ON hydra_oauth2_trusted_jwt_bearer_issuer(issuer, subject, key_id);
+CREATE UNIQUE INDEX hydra_oauth2_trusted_jwt_bearer_issuer_issuer_subject_key_id_key
+    ON hydra_oauth2_trusted_jwt_bearer_issuer(issuer, subject, key_id);

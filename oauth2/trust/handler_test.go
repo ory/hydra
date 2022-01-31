@@ -293,17 +293,17 @@ func (s *HandlerTestSuite) generateJWK(publicKey *rsa.PublicKey) *models.JSONWeb
 }
 
 func (s *HandlerTestSuite) newCreateJwtBearerGrantParams(
-	issuer, subject string, domain string, scope []string, expiresAt time.Time,
+	issuer, subject string, allowedDomain string, scope []string, expiresAt time.Time,
 ) *admin.TrustJwtGrantIssuerParams {
 	createRequestParams := admin.NewTrustJwtGrantIssuerParams()
 	exp := strfmt.DateTime(expiresAt.UTC().Round(time.Second))
 	model := &models.TrustJwtGrantIssuerBody{
-		ExpiresAt: &exp,
-		Issuer:    &issuer,
-		Jwk:       s.generateJWK(s.publicKey),
-		Scope:     scope,
-		Subject:   subject,
-		Domain:    domain,
+		ExpiresAt:     &exp,
+		Issuer:        &issuer,
+		Jwk:           s.generateJWK(s.publicKey),
+		Scope:         scope,
+		Subject:       subject,
+		AllowedDomain: allowedDomain,
 	}
 	createRequestParams.SetBody(model)
 

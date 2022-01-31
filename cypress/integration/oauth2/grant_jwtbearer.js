@@ -79,7 +79,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   const gr = (subject, domain) => ({
     issuer: prng(),
     subject: subject,
-    domain: domain,
+    allowed_domain: domain,
     scope: ['foo', 'openid', 'offline_access'],
     jwk: testPublicJwk,
     expires_at: dayjs().utc().add(1, 'year').set('millisecond', 0).toISOString()

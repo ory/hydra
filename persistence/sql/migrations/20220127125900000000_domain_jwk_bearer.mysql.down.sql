@@ -4,4 +4,4 @@ ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer
     ADD CONSTRAINT issuer UNIQUE (issuer, subject, key_id);
 
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer
-    DROP COLUMN domain;
+    DROP COLUMN allowed_domain;

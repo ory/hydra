@@ -19,9 +19,9 @@ import (
 // swagger:model trustJwtGrantIssuerBody
 type TrustJwtGrantIssuerBody struct {
 
-	// The "domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
+	// The "allowed_domain" is used to allow any user under that domain as the subject of the JWT. Either this or "subject" must be present.
 	// Example: example.com
-	Domain string `json:"domain,omitempty"`
+	AllowedDomain string `json:"allowed_domain,omitempty"`
 
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
 	// Required: true
@@ -42,7 +42,7 @@ type TrustJwtGrantIssuerBody struct {
 	// Required: true
 	Scope []string `json:"scope"`
 
-	// The "subject" identifies the principal that is the subject of the JWT. Either this or "domain" must be present.
+	// The "subject" identifies the principal that is the subject of the JWT. Either this or "allowed_domain" must be present.
 	// Example: mike@example.com
 	Subject string `json:"subject,omitempty"`
 }

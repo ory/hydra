@@ -16,12 +16,12 @@ func (v *GrantValidator) Validate(request createGrantRequest) error {
 		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Field 'issuer' is required."))
 	}
 
-	if request.Domain != "" && request.Subject != "" {
-		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Fields 'subject' and 'domain' are mutually exclusive, both cannot be set at the same time."))
+	if request.AllowedDomain != "" && request.Subject != "" {
+		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Fields 'subject' and 'allowed_domain' are mutually exclusive, both cannot be set at the same time."))
 	}
 
-	if request.Subject == "" && request.Domain == "" {
-		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Both 'subject' and 'domain' fields are empty, one of them is required."))
+	if request.Subject == "" && request.AllowedDomain == "" {
+		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Both 'subject' and 'allowed_domain' fields are empty, one of them is required."))
 	}
 
 	if request.ExpiresAt.IsZero() {

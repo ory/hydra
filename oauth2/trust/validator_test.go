@@ -11,10 +11,10 @@ func TestEmptyIssuerIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "",
-		Subject:   "valid-subject",
-		Domain:    "",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:        "",
+		Subject:       "valid-subject",
+		AllowedDomain: "",
+		ExpiresAt:     time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -29,10 +29,10 @@ func TestEmptySubjectIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "",
-		Domain:    "",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:        "valid-issuer",
+		Subject:       "",
+		AllowedDomain: "",
+		ExpiresAt:     time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -47,10 +47,10 @@ func TestEmptyExpiresAtIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		Domain:    "",
-		ExpiresAt: time.Time{},
+		Issuer:        "valid-issuer",
+		Subject:       "valid-subject",
+		AllowedDomain: "",
+		ExpiresAt:     time.Time{},
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -65,10 +65,10 @@ func TestEmptyPublicKeyIdIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		Domain:    "",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:        "valid-issuer",
+		Subject:       "valid-subject",
+		AllowedDomain: "",
+		ExpiresAt:     time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "",
 		},
@@ -83,10 +83,10 @@ func TestIsValid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		Domain:    "",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:        "valid-issuer",
+		Subject:       "valid-subject",
+		AllowedDomain: "",
+		ExpiresAt:     time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -101,10 +101,10 @@ func TestDomainIsValid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "",
-		Domain:    "ory.sh",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:        "valid-issuer",
+		Subject:       "",
+		AllowedDomain: "ory.sh",
+		ExpiresAt:     time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -119,10 +119,10 @@ func TestAnySubjectWithSubjectIsNotValid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		Domain:    "ory.sh",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:        "valid-issuer",
+		Subject:       "valid-subject",
+		AllowedDomain: "ory.sh",
+		ExpiresAt:     time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},

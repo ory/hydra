@@ -54,10 +54,12 @@ jobs:
           args: --timeout 10m0s --issues-exit-code=0
           skip-go-installation: true
           skip-pkg-cache: true
-      - run: |
+      - name: Run go-acc (tests)
+        run: |
           make .bin/go-acc
           .bin/go-acc -o coverage.out ./... -- -failfast -timeout=20m -tags sqlite
-      - run: |
+      - name: Submit to Codecov
+        run: |
           bash <(curl -s https://codecov.io/bash)
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -75,13 +77,16 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.17
-      - run: |
+      - name: Setup HSM libs and packages
+        run: |
           sudo apt install -y softhsm opensc
           sudo rm -rf /var/lib/softhsm/tokens
           sudo mkdir -p /var/lib/softhsm/tokens
           sudo chmod -R a+rwx /var/lib/softhsm
           sudo chmod a+rx /etc/softhsm
           sudo chmod a+r /etc/softhsm/*
+      - name: HSM tests
+        run: |
           pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
           go test -p 1 -v -failfast -short -timeout=20m -tags=sqlite,hsm ./...
 

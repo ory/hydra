@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -26,18 +28,22 @@ type TrustedJwtGrantIssuer struct {
 	ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
 
 	// id
+	// Example: 9edc811f-4e28-453c-9b46-4de65f00217f
 	ID string `json:"id,omitempty"`
 
 	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
+	// Example: https://jwt-idp.example.com
 	Issuer string `json:"issuer,omitempty"`
 
 	// public key
 	PublicKey *TrustedJSONWebKey `json:"public_key,omitempty"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
+	// Example: ["openid","offline"]
 	Scope []string `json:"scope"`
 
 	// The "subject" identifies the principal that is the subject of the JWT.
+	// Example: mike@example.com
 	Subject string `json:"subject,omitempty"`
 }
 
@@ -64,7 +70,6 @@ func (m *TrustedJwtGrantIssuer) Validate(formats strfmt.Registry) error {
 }
 
 func (m *TrustedJwtGrantIssuer) validateCreatedAt(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.CreatedAt) { // not required
 		return nil
 	}
@@ -77,7 +82,6 @@ func (m *TrustedJwtGrantIssuer) validateCreatedAt(formats strfmt.Registry) error
 }
 
 func (m *TrustedJwtGrantIssuer) validateExpiresAt(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.ExpiresAt) { // not required
 		return nil
 	}
@@ -90,7 +94,6 @@ func (m *TrustedJwtGrantIssuer) validateExpiresAt(formats strfmt.Registry) error
 }
 
 func (m *TrustedJwtGrantIssuer) validatePublicKey(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.PublicKey) { // not required
 		return nil
 	}
@@ -99,6 +102,38 @@ func (m *TrustedJwtGrantIssuer) validatePublicKey(formats strfmt.Registry) error
 		if err := m.PublicKey.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("public_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("public_key")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this trusted jwt grant issuer based on the context it is used
+func (m *TrustedJwtGrantIssuer) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidatePublicKey(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *TrustedJwtGrantIssuer) contextValidatePublicKey(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.PublicKey != nil {
+		if err := m.PublicKey.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("public_key")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("public_key")
 			}
 			return err
 		}

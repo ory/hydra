@@ -28,7 +28,7 @@ hydra keys get &lt;set&gt; [flags]
 
 ```
       --access-token string    Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN
-      --endpoint string        Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL
+      --endpoint string        Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL
       --fail-after duration    Stop retrying after the specified duration (default 1m0s)
       --fake-tls-termination   fake tls termination by adding &#34;X-Forwarded-Proto: https&#34; to http headers
       --skip-tls-verify        Foolishly accept TLS certificates signed by unknown certificate authorities

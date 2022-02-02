@@ -28,7 +28,7 @@ import (
 
 var serveControls = `## Configuration
 
-ORY Hydra can be configured using environment variables as well as a configuration file. For more information
+Ory Hydra can be configured using environment variables as well as a configuration file. For more information
 on configuration options, open the configuration documentation:
 
 >> https://www.ory.sh/hydra/docs/reference/configuration <<
@@ -39,7 +39,7 @@ func NewServeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Parent command for starting public and administrative HTTP/2 APIs",
-		Long: `ORY Hydra exposes two ports, a public and an administrative port. The public port is responsible
+		Long: `Ory Hydra exposes two ports, a public and an administrative port. The public port is responsible
 for handling requests from the public internet, such as the OAuth 2.0 Authorize and Token URLs. The administrative
 port handles administrative requests like creating OAuth 2.0 Clients, managing JSON Web Keys, and managing User Login
 and Consent sessions.

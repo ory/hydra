@@ -29,6 +29,7 @@
           "dependencies-environment",
           "production",
           "guides/tracing",
+          "guides/hsm-support",
           "guides/secrets-key-rotation",
           "guides/kubernetes-helm-chart",
           "guides/ssl-https-tls",
@@ -45,6 +46,7 @@
         "label": "OAuth2 & OpenID Connect",
         "items": [
           "advanced",
+          "guides/openid-connect-dynamic-client-registration",
           "guides/oauth2-clients",
           "guides/oauth2-grant-type-jwt-bearer",
           "guides/common-oauth2-openid-connect-flows",

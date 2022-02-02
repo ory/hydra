@@ -19,7 +19,7 @@ An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow
 ### Synopsis
 
 Starts an exemplary web server that acts as an OAuth 2.0 Client performing the
-Authorize Code Flow. This command will help you to see if ORY Hydra has been
+Authorize Code Flow. This command will help you to see if Ory Hydra has been
 configured properly.
 
 This command must not be used for anything else than manual testing or demo
@@ -37,7 +37,7 @@ hydra token user [flags]
       --auth-url endpoint      Usually it is enough to specify the endpoint flag, but if you want to force the authorization url, use this flag
       --client-id string       Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID
       --client-secret string   Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET
-      --endpoint string        Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL
+      --endpoint string        Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_URL
   -h, --help                   help for user
       --https                  Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command
       --max-age int            Set the OpenID Connect max_age parameter

@@ -58,6 +58,18 @@ func newRegistryDefault(t *testing.T, url string, c *config.Provider) driver.Reg
 	c.MustSet(config.KeyDSN, url)
 
 	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"))
+
+	kg := map[string]jwk.KeyGenerator{
+		"RS256": new(veryInsecureRS256Generator),
+		"ES256": &jwk.ECDSA256Generator{},
+		"ES512": &jwk.ECDSA512Generator{},
+		"EdDSA": &jwk.EdDSAGenerator{},
+		"HS256": &jwk.HS256Generator{},
+		"HS512": &jwk.HS512Generator{},
+	}
+
+	r = r.WithKeyGenerators(kg)
+
 	require.NoError(t, err)
 
 	require.NoError(t, r.Init(context.Background()))
@@ -144,7 +156,7 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func
 }
 
 func MustEnsureRegistryKeys(r driver.Registry, key string) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, new(veryInsecureRS256Generator), key); err != nil {
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, "RS256", key); err != nil {
 		panic(err)
 	}
 }

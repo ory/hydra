@@ -30,7 +30,7 @@ On linux, you can use `bash <(curl ...)` to fetch the latest stable binary
 using:
 
 ```shell
-$ bash <(curl https://raw.githubusercontent.com/ory/hydra/v1.10.6/install.sh) -b . v1.10.6
+$ bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -d -b . hydra v1.10.6
 $ ./hydra help
 ```
 
@@ -46,7 +46,7 @@ $ hydra help
 You can install ORY Hydra using [scoop](https://scoop.sh) on Windows:
 
 ```shell
-> scoop bucket add ory-hydra https://github.com/ory/scoop-hydra.git
+> scoop bucket add ory https://github.com/ory/scoop.git
 > scoop install hydra
 > hydra help
 ```

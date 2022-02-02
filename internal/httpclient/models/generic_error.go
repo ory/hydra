@@ -29,6 +29,11 @@ type GenericError struct {
 	// Further error details
 	Details interface{} `json:"details,omitempty"`
 
+	// The error ID
+	//
+	// Useful when trying to identify various errors in application logic.
+	ID string `json:"id,omitempty"`
+
 	// Error message
 	//
 	// The error's message.

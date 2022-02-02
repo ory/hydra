@@ -23,7 +23,7 @@ hydra token delete [flags]
 ```
       --access-token string   Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN
       --client-id string      Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID
-      --endpoint string       Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL
+      --endpoint string       Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_URL
   -h, --help                  help for delete
 ```
 

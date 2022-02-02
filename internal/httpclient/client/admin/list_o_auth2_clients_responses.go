@@ -29,15 +29,15 @@ func (o *ListOAuth2ClientsReader) ReadResponse(response runtime.ClientResponse, 
 			return nil, err
 		}
 		return result, nil
-	case 500:
-		result := NewListOAuth2ClientsInternalServerError()
+	default:
+		result := NewListOAuth2ClientsDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-
-	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
 	}
 }
 
@@ -72,28 +72,37 @@ func (o *ListOAuth2ClientsOK) readResponse(response runtime.ClientResponse, cons
 	return nil
 }
 
-// NewListOAuth2ClientsInternalServerError creates a ListOAuth2ClientsInternalServerError with default headers values
-func NewListOAuth2ClientsInternalServerError() *ListOAuth2ClientsInternalServerError {
-	return &ListOAuth2ClientsInternalServerError{}
+// NewListOAuth2ClientsDefault creates a ListOAuth2ClientsDefault with default headers values
+func NewListOAuth2ClientsDefault(code int) *ListOAuth2ClientsDefault {
+	return &ListOAuth2ClientsDefault{
+		_statusCode: code,
+	}
 }
 
-/*ListOAuth2ClientsInternalServerError handles this case with default header values.
+/*ListOAuth2ClientsDefault handles this case with default header values.
 
 jsonError
 */
-type ListOAuth2ClientsInternalServerError struct {
+type ListOAuth2ClientsDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *ListOAuth2ClientsInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /clients][%d] listOAuth2ClientsInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the list o auth2 clients default response
+func (o *ListOAuth2ClientsDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *ListOAuth2ClientsInternalServerError) GetPayload() *models.JSONError {
+func (o *ListOAuth2ClientsDefault) Error() string {
+	return fmt.Sprintf("[GET /clients][%d] listOAuth2Clients default  %+v", o._statusCode, o.Payload)
+}
+
+func (o *ListOAuth2ClientsDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *ListOAuth2ClientsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListOAuth2ClientsDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

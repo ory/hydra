@@ -26,6 +26,8 @@ import (
 	"strings"
 	"sync"
 
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
@@ -50,13 +52,13 @@ type RS256JWTStrategy struct {
 	rs               func() string
 
 	publicKey    *rsa.PublicKey
-	privateKey   *rsa.PrivateKey
+	privateKey   interface{}
 	publicKeyID  string
 	privateKeyID string
 }
 
-func NewRS256JWTStrategy(r InternalRegistry, rs func() string) (*RS256JWTStrategy, error) {
-	j := &RS256JWTStrategy{r: r, rs: rs, RS256JWTStrategy: new(jwt.RS256JWTStrategy)}
+func NewRS256JWTStrategy(c config.Provider, r InternalRegistry, rs func() string) (*RS256JWTStrategy, error) {
+	j := &RS256JWTStrategy{c: &c, r: r, rs: rs, RS256JWTStrategy: new(jwt.RS256JWTStrategy)}
 	if err := j.refresh(context.TODO()); err != nil {
 		return nil, err
 	}
@@ -114,27 +116,18 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 		return err
 	}
 
-	public, err := FindKeyByPrefix(keys, "public")
+	public, err := FindPublicKey(keys)
 	if err != nil {
 		return err
 	}
 
-	private, err := FindKeyByPrefix(keys, "private")
+	private, err := FindPrivateKey(keys)
 	if err != nil {
 		return err
 	}
 
 	if strings.Replace(public.KeyID, "public:", "", 1) != strings.Replace(private.KeyID, "private:", "", 1) {
 		return errors.New("public and private key pair kids do not match")
-	}
-
-	if k, ok := private.Key.(*rsa.PrivateKey); !ok {
-		return errors.New("unable to type assert key to *rsa.PrivateKey")
-	} else {
-		j.Lock()
-		j.privateKey = k
-		j.RS256JWTStrategy.PrivateKey = k
-		j.Unlock()
 	}
 
 	if k, ok := public.Key.(*rsa.PublicKey); !ok {
@@ -146,12 +139,25 @@ func (j *RS256JWTStrategy) refresh(ctx context.Context) error {
 		j.Unlock()
 	}
 
-	j.RLock()
-	defer j.RUnlock()
-	if j.privateKey.PublicKey.E != j.publicKey.E ||
-		j.privateKey.PublicKey.N.String() != j.publicKey.N.String() {
-		return errors.New("public and private key pair fetched from store does not match")
-	}
+	if k, ok := private.Key.(*rsa.PrivateKey); ok {
+		j.Lock()
+		j.privateKey = k
+		j.RS256JWTStrategy.PrivateKey = k
+		j.Unlock()
 
+		j.RLock()
+		defer j.RUnlock()
+		if k.PublicKey.E != j.publicKey.E ||
+			k.PublicKey.N.String() != j.publicKey.N.String() {
+			return errors.New("public and private key pair fetched from store does not match")
+		}
+	} else if k, ok := private.Key.(jose.OpaqueSigner); ok {
+		j.Lock()
+		j.privateKey = k
+		j.RS256JWTStrategy.PrivateKey = k
+		j.Unlock()
+	} else {
+		return errors.New("unknown private key type")
+	}
 	return nil
 }

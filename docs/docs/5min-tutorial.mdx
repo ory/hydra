@@ -5,12 +5,12 @@ title: 5 Minute Tutorial
 
 import CodeFromRemote from '@theme/CodeFromRemote'
 
-This tutorial walks you through a quick setup of ORY Hydra, a PostgreSQL
+This tutorial walks you through a quick setup of Ory Hydra, a PostgreSQL
 instance and an exemplary User Login & Consent App based on Docker Compose. You
 need to have the latest [Docker](https://www.docker.com) and
 [Docker Compose](https://docs.docker.com/compose) version installed.
 
-![OAuth2 Flow with Open Source OAuth2 Server ORY Hydra](images/oauth2-flow.gif)
+![OAuth2 Flow with Open Source OAuth2 Server Ory Hydra](images/oauth2-flow.gif)
 
 <p align="center">
   <iframe
@@ -22,7 +22,7 @@ need to have the latest [Docker](https://www.docker.com) and
   />
 </p>
 
-We will use the Docker Compose configuration in the ORY Hydra code base. Getting
+We will use the Docker Compose configuration in the Ory Hydra code base. Getting
 the Hydra source code is easy:
 
 - if you have Go 1.15+ installed: `go get -d github.com/ory/hydra`
@@ -53,7 +53,7 @@ $ docker-compose -f quickstart.yml \
 ```
 
 This command makes Docker Compose start up a database server and a basic base
-ORY Hydra server that uses this database. If you need more details on this,
+Ory Hydra server that uses this database. If you need more details on this,
 please examine the `scripts/5-min-tutorial.sh` and `docker-compose*.yml` files.
 
 You may also extend the command above to enable distributed tracing. The tracing
@@ -77,13 +77,22 @@ $ docker-compose -f quickstart.yml \
   up --build
 ```
 
+If you want to test Hardware Security Module add `-f quickstart-hsm.yml`. For
+more information head over to [HSM support](hsm-support).
+
+```shell script
+$ docker-compose -f quickstart.yml \
+    -f quickstart-hsm.yml \
+    up --build
+```
+
 Let's confirm that everything is working by creating an OAuth 2.0 Client.
 
-Note: The following commands run Hydra inside Docker. If you have the ORY Hydra
+Note: The following commands run Hydra inside Docker. If you have the Ory Hydra
 CLI installed locally, you can omit
 `docker-compose -f quickstart.yml exec /hydra` in front of each command.
 
-The OAuth 2.0 client uses port `4444` and `4445`. The former is ORY Hydra's
+The OAuth 2.0 client uses port `4444` and `4445`. The former is Ory Hydra's
 public endpoint, the latter its administrative endpoint. For more information
 head over to [Exposing Administrative and Public API Endpoints](production).
 
@@ -150,7 +159,7 @@ are public (such as SPA apps and native apps) because the public clients cannot
 provide client secrets.
 
 The following command starts a server that serves an example web application.
-The application will perform the OAuth 2.0 Authorization Code Flow using ORY
+The application will perform the OAuth 2.0 Authorization Code Flow using Ory
 Hydra. The web server runs on [http://127.0.0.1:5555](http://127.0.0.1:5555).
 
 ```shell script
@@ -186,9 +195,8 @@ $ docker-compose -f quickstart.yml rm -f -v
 
 ### Quickstart Configuration
 
-In this tutorial we use a simplified configuration.  
-You can find it in
-[`contrib/quickstart/5-min/hydra.yml`](https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml).  
+In this tutorial we use a simplified configuration. You can find it in
+[`contrib/quickstart/5-min/hydra.yml`](https://github.com/ory/hydra/blob/master/contrib/quickstart/5-min/hydra.yml).
 The configuration gets loaded in docker-compose as specified in the
 [`quickstart.yml`](https://github.com/ory/hydra/blob/master/quickstart.yml).
 

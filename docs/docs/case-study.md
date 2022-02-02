@@ -29,7 +29,7 @@ as your only authorization workflow, thus minimizing maintenance overhead while
 always being able to support third party applications. With OpenID Connect, you
 can delegate authentication as well!
 
-So you decide to implement OAuth2 and use ORY Hydra to do the job. You run Hydra
+So you decide to implement OAuth2 and use Ory Hydra to do the job. You run Hydra
 by adding its Docker image to your cluster. Next, you set up some exemplary
 OAuth2 clients. These clients need to access a user's todo lists. To do so, the
 client initiates an OAuth2 request. This is where Hydra's
@@ -40,12 +40,12 @@ ToDo24's login endpoint alongside with a challenge that contains important
 request information. The login endpoint (todo24.com/login) authenticates the
 user as usual, for example by username & password, session cookie or other
 means. Upon successful authentication, the login endpoint redirects the user
-back to ORY Hydra. Next, ORY Hydra needs the user's consent. It redirects the
+back to Ory Hydra. Next, Ory Hydra needs the user's consent. It redirects the
 user agent to the consent endpoint (todo24.com/consent) where the user is asked
 something like _"Do you want to grant MyAnalyticsApp read access to your todo
 lists? [Yes][no]"_. Once the user gives consent by clicking _Yes_, the consent
-endpoint redirects back to ORY Hydra. Hydra validates the request and finally
+endpoint redirects back to Ory Hydra. Hydra validates the request and finally
 issues the access, refresh, and ID tokens.
 
-You can validate the access tokens which are sent to your API directly at ORY
-Hydra, or use an Identity & Access Proxy like ORY Oathkeeper to do it for you.
+You can validate the access tokens which are sent to your API directly at Ory
+Hydra, or use an Identity & Access Proxy like Ory Oathkeeper to do it for you.

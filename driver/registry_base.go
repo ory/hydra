@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/hsm"
+
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
@@ -61,6 +63,7 @@ type RegistryBase struct {
 	fsc          fosite.ScopeStrategy
 	atjs         jwk.JWTStrategy
 	idtjs        jwk.JWTStrategy
+	hsm          hsm.Context
 	fscPrev      string
 	fos          *openid.DefaultStrategy
 	forv         *openid.OpenIDConnectRequestValidator
@@ -109,7 +112,7 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetRoutes(admin)
+	m.ClientHandler().SetRoutes(admin, public)
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.JWTGrantHandler().SetRoutes(admin)
 }
@@ -131,6 +134,11 @@ func (m *RegistryBase) WithConfig(c *config.Provider) Registry {
 	return m.r
 }
 
+func (m *RegistryBase) WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry {
+	m.kg = kg
+	return m.r
+}
+
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
 		h := herodot.NewJSONWriter(m.Logger())
@@ -147,14 +155,14 @@ func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 
 func (m *RegistryBase) Logger() *logrusx.Logger {
 	if m.l == nil {
-		m.l = logrusx.New("ORY Hydra", m.BuildVersion())
+		m.l = logrusx.New("Ory Hydra", m.BuildVersion())
 	}
 	return m.l
 }
 
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
-		m.al = logrusx.NewAudit("ORY Hydra", m.BuildVersion())
+		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
 	}
 	return m.al
 }
@@ -370,7 +378,8 @@ func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 }
 
 func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), key); err != nil {
+
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, "RS256", key); err != nil {
 		var netError net.Error
 		if errors.As(err, &netError) {
 			m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, key)
@@ -381,7 +390,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
-		s, err = jwk.NewRS256JWTStrategy(m.r, func() string {
+		s, err = jwk.NewRS256JWTStrategy(*m.C, m.r, func() string {
 			return key
 		})
 		return err
@@ -500,4 +509,19 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 		}
 	}
 	return m.arhs
+}
+
+func (m *RegistryBase) WithHsmContext(h hsm.Context) {
+	m.hsm = h
+}
+
+func (m *RegistryBase) HsmContext() hsm.Context {
+	if m.hsm == nil {
+		m.hsm = hsm.NewContext(m.C, m.l)
+	}
+	return m.hsm
+}
+
+func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
+	return m.OAuth2Provider().(*fosite.Fosite)
 }

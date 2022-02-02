@@ -37,10 +37,12 @@ services:
       ### Elastic APM ###
       ### See env vars here: https://www.elastic.co/guide/en/apm/agent/go/1.x/configuration.html) ###
       # - ELASTIC_APM_SERVER_URL="http://apm-server:8200"
-      # - ELASTIC_APM_SERVICE_NAME="ORY Hydra"
+      # - ELASTIC_APM_SERVICE_NAME="Ory Hydra"
       # - ELASTIC_APM_SERVICE_VERSION="1.9.0"
       # - ELASTIC_APM_ENVIRONMENT="devel"
-
+      ### Opentelemetry ###
+      ### See env vars here: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md ###
+      # - OTEL_SERVICE_NAME="Ory Hydra"
   jaeger:
     image: jaegertracing/all-in-one:1.19.2
     ports:

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/oauth2/trust"

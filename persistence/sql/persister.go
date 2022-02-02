@@ -4,7 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/gobuffalo/x/randx"
 	"github.com/pkg/errors"
 
@@ -40,6 +41,7 @@ type (
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
 		KeyCipher() *jwk.AEAD
+		KeyGenerators() map[string]jwk.KeyGenerator
 		x.RegistryLogger
 		x.TracingProvider
 	}

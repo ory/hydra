@@ -24,6 +24,11 @@ import (
 
 const (
 	KeyRoot                                      = ""
+	HsmEnabled                                   = "hsm.enabled"
+	HsmLibraryPath                               = "hsm.library"
+	HsmPin                                       = "hsm.pin"
+	HsmSlotNumber                                = "hsm.slot"
+	HsmTokenLabel                                = "hsm.token_label" // #nosec G101
 	KeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
 	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
@@ -56,6 +61,7 @@ const (
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
+	KeyPublicAllowDynamicRegistration            = "oidc.dynamic_client_registration.enabled"
 	KeyPKCEEnforced                              = "oauth2.pkce.enforced"
 	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
 	KeyLogLevel                                  = "log.level"
@@ -225,6 +231,10 @@ func (p *Provider) CookieSameSiteMode() http.SameSite {
 	}
 }
 
+func (p *Provider) PublicAllowDynamicRegistration() bool {
+	return p.p.Bool(KeyPublicAllowDynamicRegistration)
+}
+
 func (p *Provider) CookieSameSiteLegacyWorkaround() bool {
 	return p.p.Bool(KeyCookieSameSiteLegacyWorkaround)
 }
@@ -254,7 +264,7 @@ func (p *Provider) ScopeStrategy() string {
 }
 
 func (p *Provider) Tracing() *tracing.Config {
-	return p.p.TracingConfig("ORY Hydra")
+	return p.p.TracingConfig("Ory Hydra")
 }
 
 func (p *Provider) GetCookieSecrets() [][]byte {
@@ -435,6 +445,27 @@ func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
 
 func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
 	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
+}
+
+func (p *Provider) HsmEnabled() bool {
+	return p.p.Bool(HsmEnabled)
+}
+
+func (p *Provider) HsmLibraryPath() string {
+	return p.p.String(HsmLibraryPath)
+}
+
+func (p *Provider) HsmSlotNumber() *int {
+	n := p.p.Int(HsmSlotNumber)
+	return &n
+}
+
+func (p *Provider) HsmPin() string {
+	return p.p.String(HsmPin)
+}
+
+func (p *Provider) HsmTokenLabel() string {
+	return p.p.String(HsmTokenLabel)
 }
 
 func (p *Provider) GrantTypeJWTBearerIDOptional() bool {

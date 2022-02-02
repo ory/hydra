@@ -125,3 +125,19 @@ serve:
       group: hydra-admin-api
       mode: 770
 ```
+
+### Key generation and High Availability environments
+
+Be aware that on the very first launch of the Hydra container(s), a worker
+process will perform certain first-time installation tasks, such as generating
+[JSON web keys](/hydra/docs/jwks) if they don't already exist.
+
+If you intend on running your production Hydra environment in a highly-available
+setup (for example, multiple concurrent containers behind a load-balancer), it's
+possible that both containers will generate JWKs at the same time.
+
+Although this isn't a problem, we recommend that you launch your production
+environment with just one container to begin with, to complete the initial
+seeding of the database.
+
+Once done, you can raise your number of containers to achieve high availability.

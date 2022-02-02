@@ -31,7 +31,7 @@ environmental variables head to the
 section.
 
 ```yaml
-## ORY Hydra Configuration
+## Ory Hydra Configuration
 #
 
 ## serve ##
@@ -44,7 +44,7 @@ serve:
   admin:
     ## host ##
     #
-    # The interface or unix socket ORY Hydra should listen and handle administrative API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+    # The interface or unix socket Ory Hydra should listen and handle administrative API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     #
     # Examples:
     # - localhost
@@ -421,7 +421,7 @@ serve:
   public:
     ## host ##
     #
-    # The interface or unix socket ORY Hydra should listen and handle public API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
+    # The interface or unix socket Ory Hydra should listen and handle public API requests on. Use the prefix "unix:" to specify a path to a unix socket. Leave empty to listen on all interfaces.
     #
     # Examples:
     # - localhost
@@ -704,7 +704,7 @@ serve:
 
 ## dsn ##
 #
-# Sets the data source name. This configures the backend where ORY Hydra persists data. If dsn is "memory", data will be written to memory and is lost when you restart this instance. ORY Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql
+# Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is "memory", data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql
 #
 # Set this value using environment variables on
 # - Linux/macOS:
@@ -713,6 +713,69 @@ serve:
 #    > set DSN=<value>
 #
 dsn: ''
+
+## hsm ##
+#
+# Configures Hardware Security Module.
+#
+hsm:
+  ## library ##
+  #
+  # Full path (including file extension) of the HSM vendor PKCS#11 library
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_LIBRARY=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_LIBRARY=<value>
+  #
+  library: ''
+
+  ## pin ##
+  #
+  # PIN code for token operations
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_PIN=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_PIN=<value>
+  #
+  pin: ''
+
+  ## slot ##
+  #
+  # Slot ID of the token to use (if label is not specified)
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_SLOT=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_SLOT=<value>
+  #
+  slot: -100000000
+
+  ## token_label ##
+  #
+  # Label of the token to use (if slot is not specified). If both slot and label are set, token label takes preference over slot. In this case first slot, that contains this label is used.
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_TOKEN_LABEL=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_TOKEN_LABEL=<value>
+  #
+  token_label: ''
+
+  ## enabled ##
+  #
+  # Set this value using environment variables on
+  # - Linux/macOS:
+  #    $ export HSM_ENABLED=<value>
+  # - Windows Command Line (CMD):
+  #    > set HSM_ENABLED=<value>
+  #
+  enabled: false
 
 ## webfinger ##
 #
@@ -809,7 +872,7 @@ webfinger:
 
     ## userinfo_url ##
     #
-    # A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to ORY Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.
+    # A URL of the userinfo endpoint to be advertised at the OpenID Connect Discovery endpoint /.well-known/openid-configuration. Defaults to Ory Hydra's userinfo endpoint at /userinfo. Set this value if you want to handle this endpoint yourself.
     #
     # Examples:
     # - https://example.org/my-custom-userinfo-endpoint
@@ -888,6 +951,20 @@ oidc:
       - openid
       - offline
       - offline_access
+
+    ## enabled ##
+    #
+    # Enable dynamic client registration.
+    #
+    # Default value: false
+    #
+    # Set this value using environment variables on
+    # - Linux/macOS:
+    #    $ export OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    # - Windows Command Line (CMD):
+    #    > set OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=<value>
+    #
+    enabled: false
 
   ## subject_identifiers ##
   #
@@ -1013,7 +1090,7 @@ urls:
   self:
     ## public ##
     #
-    # This is the base location of the public endpoints of your ORY Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.
+    # This is the base location of the public endpoints of your Ory Hydra installation. This should typically be equal to the issuer value. If left unspecified, it falls back to the issuer value.
     #
     # Examples:
     # - https://localhost:4444/
@@ -1164,7 +1241,7 @@ oauth2:
   session:
     ## Encrypt OAuth2 Session ##
     #
-    # If set to true (default) ORY Hydra encrypt OAuth2 and OpenID Connect session data using AES-GCM and the system secret before persisting it in the database.
+    # If set to true (default) Ory Hydra encrypt OAuth2 and OpenID Connect session data using AES-GCM and the system secret before persisting it in the database.
     #
     # Default value: true
     #
@@ -1309,6 +1386,56 @@ oauth2:
     #
     default_grant_allowed_scope: false
 
+  ## grant ##
+  #
+  grant:
+    ## jwt ##
+    #
+    # Authorization Grants using JWT configuration
+    #
+    jwt:
+      ## iat_optional ##
+      #
+      # If false, IAT claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_IAT_OPTIONAL=<value>
+      #
+      iat_optional: false
+
+      ## max_ttl ##
+      #
+      # Configures what the maximum age of a JWT assertion can be. Uses JWT's EXP claim and JWT IAT claim to calculate assertion age. Assertion, that exceeds max age will be denied. Useful as a safety measure and recommended to not be set to 720h max.
+      #
+      # Default value: 720h
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_MAX_TTL=<value>
+      #
+      max_ttl: 1h
+
+      ## jti_optional ##
+      #
+      # If false, JTI claim must be present in JWT assertion.
+      #
+      # Default value: false
+      #
+      # Set this value using environment variables on
+      # - Linux/macOS:
+      #    $ export OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      # - Windows Command Line (CMD):
+      #    > set OAUTH2_GRANT_JWT_JTI_OPTIONAL=<value>
+      #
+      jti_optional: false
+
   ## refresh_token_hook ##
   #
   # Sets the refresh token hook endpoint. If set it will be called during token refresh to receive updated token claims.
@@ -1407,7 +1534,7 @@ profiling: cpu
 
 ## tracing ##
 #
-# ORY Hydra supports distributed tracing.
+# Ory Hydra supports distributed tracing.
 #
 tracing:
   ## service_name ##
@@ -1415,7 +1542,7 @@ tracing:
   # Specifies the service name to use on the tracer.
   #
   # Examples:
-  # - ORY Hydra
+  # - Ory Hydra
   #
   # Set this value using environment variables on
   # - Linux/macOS:
@@ -1423,7 +1550,7 @@ tracing:
   # - Windows Command Line (CMD):
   #    > set TRACING_SERVICE_NAME=<value>
   #
-  service_name: ORY Hydra
+  service_name: Ory Hydra
 
   ## providers ##
   #
@@ -1545,6 +1672,7 @@ tracing:
   # - datadog
   # - elastic-apm
   # - instana
+  # - otel
   #
   # Examples:
   # - jaeger
@@ -1596,7 +1724,7 @@ version: v0.0.0
 
 ## cgroups ##
 #
-# ORY Hydra can respect Linux container CPU quota
+# Ory Hydra can respect Linux container CPU quota
 #
 cgroups:
   ## v1 ##

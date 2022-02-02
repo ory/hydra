@@ -3,7 +3,7 @@ id: logout
 title: Logout Flow
 ---
 
-ORY Hydra implements
+Ory Hydra implements
 [OpenID Connect RP-Initiated Logout 1.0](https://openid.net/specs/openid-connect-rpinitiated-1_0.html)
 and supports
 [OpenID Connect Front-Channel Logout 1.0](https://openid.net/specs/openid-connect-frontchannel-1_0.html)
@@ -34,7 +34,7 @@ Legend:
 - `***`: Here, the "valid session cookies" implies that the browser has a valid
   authentication cookie when calling `/oauth2/sessions/logout`. If you have
   problems at this step, check if there is a cookie
-  `oauth2_authentication_session` for the domain ORY Hydra is running at. **Do
+  `oauth2_authentication_session` for the domain Ory Hydra is running at. **Do
   not mix up IP (e.g. `127.0.0.1`, `192.168.1.1`) addresses and FQDNs (e.g.
   `localhost`, `google.com`).**
 - `****`: The `post_logout_redirect` defaults to the configuration value of
@@ -48,7 +48,7 @@ Legend:
 
 1. A user-agent (browser) requests the logout endpoint
    (`/oauth2/sessions/logout`). If the URL query contains an ID Token issued by
-   ORY Hydra as the `id_token_hint`
+   Ory Hydra as the `id_token_hint`
    (`/oauth2/sessions/logout?id_token_hint=...`) then:
    - The URL query MAY contain key `post_logout_redirect_uri` indicating where
      the user agent should be redirected after the logout completed
@@ -71,7 +71,7 @@ Legend:
    required.
 5. The response contains a `redirect_to` value where the logout provider
    redirects the user back to.
-6. ORY Hydra performs OpenID Connect Front- and Back-Channel logout.
+6. Ory Hydra performs OpenID Connect Front- and Back-Channel logout.
 7. The user agent is being redirected to a specified redirect URL. This may
    either be the default redirect URL set by `urls.post_logout_redirect` or to
    the value specified by query parameter `post_logout_redirect_uri`.
@@ -157,7 +157,7 @@ fetch(
 })
 ```
 
-If the logout request was granted and the user agent redirected back to ORY
+If the logout request was granted and the user agent redirected back to Ory
 Hydra, all OpenID Connect Front-/Back-channel logout flows (if set) will be
 performed and the user will be redirect back to his/her final destination.
 
@@ -169,13 +169,13 @@ this feature allows an OAuth 2.0 Client to register fields
 `frontchannel_logout_uri` and `frontchannel_logout_session_required`.
 
 If `frontchannel_logout_uri` is set to a valid URL (the host, port, path must
-all match those of one of the Redirect URIs), ORY Hydra will redirect the
+all match those of one of the Redirect URIs), Ory Hydra will redirect the
 user-agent (typically browser) to that URL after a logout occurred. This allows
 the OAuth 2.0 Client Application to log out the end-user in its own system as
 well - for example by deleting a Cookie or otherwise invalidating the user
 session.
 
-ORY Hydra always appends query parameters values `iss` and `sid` to the
+Ory Hydra always appends query parameters values `iss` and `sid` to the
 Front-Channel Logout URI, for example:
 
 ```
@@ -187,7 +187,7 @@ https://rp.example.org/frontchannel_logout
 Each OpenID Connect ID Token is issued with a `sid` claim that will match the
 `sid` value from the Front-Channel Logout URI.
 
-ORY Hydra will automatically execute the required HTTP Redirects to make this
+Ory Hydra will automatically execute the required HTTP Redirects to make this
 work. No extra work is required.
 
 ### [OpenID Connect Back-Channel Logout 1.0](https://openid.net/specs/openid-connect-backchannel-1_0.html)
@@ -265,6 +265,6 @@ Pragma: no-cache
 ```
 
 Because the OpenID Connect Back-Channel Logout Flow is not executed using the
-user-agent (e.g. Browser) but from ORY Hydra directly, the session cookie of the
+user-agent (e.g. Browser) but from Ory Hydra directly, the session cookie of the
 end-user will not be available to the OAuth 2.0 Client and the session has to be
 invalidated by some other means (e.g. by blacklisting the session ID).

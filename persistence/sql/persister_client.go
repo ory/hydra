@@ -3,9 +3,9 @@ package sql
 import (
 	"context"
 
-	"github.com/ory/x/errorsx"
+	"github.com/gobuffalo/pop/v6"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"

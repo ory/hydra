@@ -7,15 +7,15 @@ services:
       - jaeger
     image: oryd/hydra:e2e
     ports:
-      - "5000:4444" # Public port
+      - "5004:4444" # Public port
       - "5001:4445" # Admin port
     command:
       serve all --dangerous-force-http
     environment:
-      - URLS_SELF_ISSUER=http://127.0.0.1:5000
-      - URLS_CONSENT=http://127.0.0.1:5002/consent
-      - URLS_LOGIN=http://127.0.0.1:5002/login
-      - URLS_LOGOUT=http://127.0.0.1:5002/logout
+      - URLS_SELF_ISSUER=http://127_0_0_1:5004
+      - URLS_CONSENT=http://127_0_0_1:5002/consent
+      - URLS_LOGIN=http://127_0_0_1:5002/login
+      - URLS_LOGOUT=http://127_0_0_1:5002/logout
       - DSN=memory
       - SECRETS_SYSTEM=youReallyNeedToChangeThis
       - OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public,pairwise
@@ -32,6 +32,7 @@ services:
       - TRACING_PROVIDER_JAEGER_SAMPLING_TYPE=const
       - TRACING_PROVIDER_JAEGER_SAMPLING_VALUE=1
       - WEBFINGER_OIDC_DISCOVERY_USERINFO_URL=http://hydra:4444/userinfo
+      - OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=true
     restart: unless-stopped
 
   consent:
@@ -48,12 +49,12 @@ services:
       - PUBLIC_URL=http://hydra:4444
       - PORT=5003
     build:
-      context: ./oauth2-client
+      context: _/oauth2-client
     ports:
       - "5003:5003"
     restart: unless-stopped
 
   jaeger:
-    image: jaegertracing/all-in-one:1.7.0
+    image: jaegertracing/all-in-one:1_7_0
     ports:
       - "9411:9411"

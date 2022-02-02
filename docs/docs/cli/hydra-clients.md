@@ -18,7 +18,7 @@ Manage OAuth 2.0 Clients
 
 ```
       --access-token string    Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN
-      --endpoint string        Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket
+      --endpoint string        Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket
       --fail-after duration    Stop retrying after the specified duration (default 1m0s)
       --fake-tls-termination   Fake tls termination by adding &#34;X-Forwarded-Proto: https&#34; to http headers
   -h, --help                   help for clients
@@ -27,7 +27,7 @@ Manage OAuth 2.0 Clients
 
 ### SEE ALSO
 
-- [hydra](hydra) - Run and manage ORY Hydra
+- [hydra](hydra) - Run and manage Ory Hydra
 - [hydra clients create](hydra-clients-create) - Create a new OAuth 2.0 Client
 - [hydra clients delete](hydra-clients-delete) - Delete an OAuth 2.0 Client
 - [hydra clients get](hydra-clients-get) - Get an OAuth 2.0 Client

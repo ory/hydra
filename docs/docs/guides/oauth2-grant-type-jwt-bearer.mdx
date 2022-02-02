@@ -169,7 +169,7 @@ relationship.
 
 ## Using JWTs for Client Authentication
 
-ORY Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA
+Ory Hydra supports OAuth 2.0 Client Authentication with RSA and ECDSA
 private/public keypairs with currently supported signing algorithms:
 
 - RS256 (default), RS384, RS512
@@ -192,7 +192,7 @@ When authenticating the client at the token endpoint, you generate and sign
 - `iss`: REQUIRED. Issuer. This MUST contain the client_id of the OAuth Client.
 - `sub`: REQUIRED. Subject. This MUST contain the client_id of the OAuth Client.
 - `aud`: REQUIRED. Audience. The aud (audience) Claim. Value that identifies the
-  Authorization Server (ORY Hydra) as an intended audience. The Authorization
+  Authorization Server (Ory Hydra) as an intended audience. The Authorization
   Server MUST verify that it is an intended audience for the token. The Audience
   SHOULD be the URL of the Authorization Server's Token Endpoint.
 - `jti`: REQUIRED. JWT ID. A unique identifier for the token, which can be used

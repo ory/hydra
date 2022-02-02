@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/x/configx"
 
 	"github.com/ory/hydra/persistence/sql"
@@ -16,7 +18,6 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"

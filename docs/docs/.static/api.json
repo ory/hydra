@@ -67,7 +67,7 @@
     },
     "/clients": {
       "get": {
-        "description": "This endpoint lists all clients in the database, and never returns client secrets. As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients, but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/clients?limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
+        "description": "This endpoint lists all clients in the database, and never returns client secrets.\nAs a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,\nbut it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/clients?limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -112,7 +112,7 @@
               }
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -121,7 +121,7 @@
         }
       },
       "post": {
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret\nwill be generated. The secret will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -145,19 +145,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "400": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "409": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -168,12 +156,12 @@
     },
     "/clients/{id}": {
       "get": {
-        "description": "Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
         "tags": ["admin"],
-        "summary": "Get an OAuth 2.0 Client.",
+        "summary": "Get an OAuth 2.0 Client",
         "operationId": "getOAuth2Client",
         "parameters": [
           {
@@ -191,13 +179,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "401": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -206,7 +188,7 @@
         }
       },
       "put": {
-        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -216,6 +198,7 @@
         "parameters": [
           {
             "type": "string",
+            "description": "The id of the OAuth 2.0 Client.",
             "name": "id",
             "in": "path",
             "required": true
@@ -236,7 +219,7 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -245,7 +228,7 @@
         }
       },
       "delete": {
-        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nMake sure that this endpoint is well protected and only callable by first-party components.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -265,13 +248,7 @@
           "204": {
             "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
           },
-          "404": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -280,7 +257,7 @@
         }
       },
       "patch": {
-        "description": "Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.",
+        "description": "Patch an existing OAuth 2.0 Client. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": ["application/json"],
         "produces": ["application/json"],
         "schemes": ["http", "https"],
@@ -290,6 +267,7 @@
         "parameters": [
           {
             "type": "string",
+            "description": "The id of the OAuth 2.0 Client.",
             "name": "id",
             "in": "path",
             "required": true
@@ -310,7 +288,144 @@
               "$ref": "#/definitions/oAuth2Client"
             }
           },
-          "500": {
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      }
+    },
+    "/connect/register": {
+      "post": {
+        "description": "This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nPlease note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those\nvalues will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or\n`client_secret_post`.\n\nThe `client_secret` will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somewhere safe.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["public"],
+        "summary": "Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
+        "operationId": "dynamicClientRegistrationCreateOAuth2Client",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      }
+    },
+    "/connect/register/{id}": {
+      "get": {
+        "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["public"],
+        "summary": "Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
+        "operationId": "dynamicClientRegistrationGetOAuth2Client",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the OAuth 2.0 Client.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nIf you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["public"],
+        "summary": "Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
+        "operationId": "dynamicClientRegistrationUpdateOAuth2Client",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the OAuth 2.0 Client.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "Body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oAuth2Client",
+            "schema": {
+              "$ref": "#/definitions/oAuth2Client"
+            }
+          },
+          "default": {
+            "description": "jsonError",
+            "schema": {
+              "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["public"],
+        "summary": "Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
+        "operationId": "dynamicClientRegistrationDeleteOAuth2Client",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the OAuth 2.0 Client.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+          },
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -1428,7 +1543,7 @@
     },
     "/oauth2/sessions/logout": {
       "get": {
-        "description": "This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
+        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
         "schemes": ["http", "https"],
         "tags": ["public"],
         "summary": "OpenID Connect Front-Backchannel Enabled Logout",
@@ -1543,6 +1658,172 @@
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
+            }
+          }
+        }
+      }
+    },
+    "/trust/grants/jwt-bearer/issuers": {
+      "get": {
+        "description": "Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["admin"],
+        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
+        "operationId": "listTrustedJwtGrantIssuers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned.",
+            "name": "issuer",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The maximum amount of policies returned, upper bound is 500 policies",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedJwtGrantIssuers",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuers"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["admin"],
+        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "trustJwtGrantIssuer",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/trustJwtGrantIssuerBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "trustedJwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuer"
+            }
+          },
+          "400": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "409": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
+    "/trust/grants/jwt-bearer/issuers/{id}": {
+      "get": {
+        "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["admin"],
+        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "getTrustedJwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedJwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedJwtGrantIssuer"
+            }
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.\n\nOnce deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization Grant.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "schemes": ["http", "https"],
+        "tags": ["admin"],
+        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "deleteTrustedJwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
+          },
+          "404": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          },
+          "500": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
             }
           }
         }
@@ -2338,6 +2619,52 @@
         }
       }
     },
+    "genericError": {
+      "type": "object",
+      "required": ["message"],
+      "properties": {
+        "code": {
+          "description": "The status code",
+          "type": "integer",
+          "format": "int64",
+          "example": 404
+        },
+        "debug": {
+          "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
+          "type": "string",
+          "example": "SQL field \"foo\" is not a bool."
+        },
+        "details": {
+          "description": "Further error details",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "id": {
+          "description": "The error ID\n\nUseful when trying to identify various errors in application logic.",
+          "type": "string"
+        },
+        "message": {
+          "description": "Error message\n\nThe error's message.",
+          "type": "string",
+          "example": "The resource could not be found"
+        },
+        "reason": {
+          "description": "A human-readable reason for the error",
+          "type": "string",
+          "example": "User with ID 1234 does not exist."
+        },
+        "request": {
+          "description": "The request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
+          "type": "string",
+          "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6"
+        },
+        "status": {
+          "description": "The status description",
+          "type": "string",
+          "example": "Not Found"
+        }
+      }
+    },
     "healthNotReadyStatus": {
       "type": "object",
       "properties": {
@@ -2571,6 +2898,14 @@
         },
         "redirect_uris": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
+        },
+        "registration_access_token": {
+          "description": "RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.",
+          "type": "string"
+        },
+        "registration_client_uri": {
+          "description": "RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.",
+          "type": "string"
         },
         "request_object_signing_alg": {
           "description": "JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects\nfrom this Client MUST be rejected, if not signed with this algorithm.",
@@ -2815,6 +3150,99 @@
           "description": "Original request URL to which you should redirect the user if request was already handled.",
           "type": "string"
         }
+      }
+    },
+    "trustJwtGrantIssuerBody": {
+      "type": "object",
+      "required": ["issuer", "subject", "scope", "jwk", "expires_at"],
+      "properties": {
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "jwk": {
+          "$ref": "#/definitions/JSONWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": ["openid", "offline"]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedJsonWebKey": {
+      "type": "object",
+      "properties": {
+        "kid": {
+          "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426655440000"
+        },
+        "set": {
+          "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        }
+      }
+    },
+    "trustedJwtGrantIssuer": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "description": "The \"created_at\" indicates, when grant was created.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "public_key": {
+          "$ref": "#/definitions/trustedJsonWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": ["openid", "offline"]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedJwtGrantIssuers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/trustedJwtGrantIssuer"
       }
     },
     "userinfoResponse": {

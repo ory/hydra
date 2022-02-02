@@ -116,7 +116,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 //
 // OpenID Connect Front-Backchannel Enabled Logout
 //
-// This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:
+// This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:
 //
 // - https://openid.net/specs/openid-connect-frontchannel-1_0.html
 // - https://openid.net/specs/openid-connect-backchannel-1_0.html

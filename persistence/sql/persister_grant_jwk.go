@@ -90,7 +90,8 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ?", subject).
-		Where("key_id = ?", keyId)
+		Where("key_id = ?", keyId).
+		Where("expires_at > CURRENT_TIMESTAMP")
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -107,7 +108,8 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	grantsData := make([]trust.SQLData, 0)
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject)
+		Where("subject = ?", subject).
+		Where("expires_at > CURRENT_TIMESTAMP")
 	if err := query.All(&grantsData); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}

@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -124,6 +126,8 @@ func (m *LoginRequest) validateClient(formats strfmt.Registry) error {
 		if err := m.Client.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("client")
 			}
 			return err
 		}
@@ -133,7 +137,6 @@ func (m *LoginRequest) validateClient(formats strfmt.Registry) error {
 }
 
 func (m *LoginRequest) validateOidcContext(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.OidcContext) { // not required
 		return nil
 	}
@@ -142,6 +145,8 @@ func (m *LoginRequest) validateOidcContext(formats strfmt.Registry) error {
 		if err := m.OidcContext.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("oidc_context")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidc_context")
 			}
 			return err
 		}
@@ -168,6 +173,8 @@ func (m *LoginRequest) validateRequestedAccessTokenAudience(formats strfmt.Regis
 	if err := m.RequestedAccessTokenAudience.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_access_token_audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_access_token_audience")
 		}
 		return err
 	}
@@ -184,6 +191,8 @@ func (m *LoginRequest) validateRequestedScope(formats strfmt.Registry) error {
 	if err := m.RequestedScope.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("requested_scope")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_scope")
 		}
 		return err
 	}
@@ -203,6 +212,92 @@ func (m *LoginRequest) validateSkip(formats strfmt.Registry) error {
 func (m *LoginRequest) validateSubject(formats strfmt.Registry) error {
 
 	if err := validate.Required("subject", "body", m.Subject); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this login request based on the context it is used
+func (m *LoginRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateClient(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOidcContext(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRequestedAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRequestedScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *LoginRequest) contextValidateClient(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Client != nil {
+		if err := m.Client.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("client")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("client")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) contextValidateOidcContext(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OidcContext != nil {
+		if err := m.OidcContext.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidc_context")
+			} else if ce, ok := err.(*errors.CompositeError); ok {
+				return ce.ValidateName("oidc_context")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) contextValidateRequestedAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.RequestedAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_access_token_audience")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *LoginRequest) contextValidateRequestedScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.RequestedScope.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_scope")
+		} else if ce, ok := err.(*errors.CompositeError); ok {
+			return ce.ValidateName("requested_scope")
+		}
 		return err
 	}
 

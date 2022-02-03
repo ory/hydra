@@ -18,56 +18,70 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewDynamicClientRegistrationCreateOAuth2ClientParams creates a new DynamicClientRegistrationCreateOAuth2ClientParams object
-// with the default values initialized.
+// NewDynamicClientRegistrationCreateOAuth2ClientParams creates a new DynamicClientRegistrationCreateOAuth2ClientParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewDynamicClientRegistrationCreateOAuth2ClientParams() *DynamicClientRegistrationCreateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationCreateOAuth2ClientParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewDynamicClientRegistrationCreateOAuth2ClientParamsWithTimeout creates a new DynamicClientRegistrationCreateOAuth2ClientParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewDynamicClientRegistrationCreateOAuth2ClientParamsWithTimeout(timeout time.Duration) *DynamicClientRegistrationCreateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationCreateOAuth2ClientParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewDynamicClientRegistrationCreateOAuth2ClientParamsWithContext creates a new DynamicClientRegistrationCreateOAuth2ClientParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewDynamicClientRegistrationCreateOAuth2ClientParamsWithContext(ctx context.Context) *DynamicClientRegistrationCreateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationCreateOAuth2ClientParams{
-
 		Context: ctx,
 	}
 }
 
 // NewDynamicClientRegistrationCreateOAuth2ClientParamsWithHTTPClient creates a new DynamicClientRegistrationCreateOAuth2ClientParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewDynamicClientRegistrationCreateOAuth2ClientParamsWithHTTPClient(client *http.Client) *DynamicClientRegistrationCreateOAuth2ClientParams {
-	var ()
 	return &DynamicClientRegistrationCreateOAuth2ClientParams{
 		HTTPClient: client,
 	}
 }
 
-/*DynamicClientRegistrationCreateOAuth2ClientParams contains all the parameters to send to the API endpoint
-for the dynamic client registration create o auth2 client operation typically these are written to a http.Request
+/* DynamicClientRegistrationCreateOAuth2ClientParams contains all the parameters to send to the API endpoint
+   for the dynamic client registration create o auth2 client operation.
+
+   Typically these are written to a http.Request.
 */
 type DynamicClientRegistrationCreateOAuth2ClientParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.OAuth2Client
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the dynamic client registration create o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationCreateOAuth2ClientParams) WithDefaults() *DynamicClientRegistrationCreateOAuth2ClientParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the dynamic client registration create o auth2 client params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *DynamicClientRegistrationCreateOAuth2ClientParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the dynamic client registration create o auth2 client params
@@ -121,7 +135,6 @@ func (o *DynamicClientRegistrationCreateOAuth2ClientParams) WriteToRequest(r run
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

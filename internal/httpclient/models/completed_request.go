@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
+// CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
 //
 // swagger:model completedRequest
 type CompletedRequest struct {
@@ -42,6 +44,11 @@ func (m *CompletedRequest) validateRedirectTo(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this completed request based on context it is used
+func (m *CompletedRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

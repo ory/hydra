@@ -100,7 +100,7 @@ mocks: .bin/mockgen
 # Generates the SDKs
 .PHONY: sdk
 sdk: .bin/ory
-		swagger generate spec -m -o ./spec/api.json -x internal/httpclient -x github.com/ory/dockertest/v3 -x gopkg.in/square/go-jose.v2
+		swagger generate spec -m -o ./spec/api.json -c github.com/ory/hydra -c github.com/ory/x/healthx
 		ory dev swagger sanitize ./spec/api.json
 		swagger flatten --with-flatten=remove-unused -o ./spec/api.json ./spec/api.json
 		swagger validate ./spec/api.json

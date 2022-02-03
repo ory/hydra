@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// JSONError JSONError JSONError Generic Error Response
+// JSONError Generic Error Response
 //
 // Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.
 //

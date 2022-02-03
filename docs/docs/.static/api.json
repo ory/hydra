@@ -1972,7 +1972,7 @@
       "type": "object"
     },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -2010,7 +2010,7 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "AcceptConsentRequest The request payload used to accept a consent request.",
+      "title": "The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
@@ -2037,7 +2037,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": ["subject"],
       "properties": {
         "acr": {
@@ -2082,7 +2082,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
+      "title": "Contains information on an ongoing consent request.",
       "required": ["challenge"],
       "properties": {
         "acr": {
@@ -2150,17 +2150,18 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
+      "description": "FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
       }
     },
     "genericError": {
-      "description": "GenericError GenericError GenericError generic error",
+      "description": "GenericError GenericError GenericError GenericError generic error",
       "type": "object",
       "required": ["message"],
       "properties": {
@@ -2212,7 +2213,6 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2224,7 +2224,7 @@
     "jsonError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "JSONError JSONError Generic Error Response",
+      "title": "Generic Error Response",
       "properties": {
         "error": {
           "description": "Name is the error name.",
@@ -2250,9 +2250,8 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
-      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
-      "required": ["alg", "use", "kid"],
+      "required": ["alg", "kid", "use"],
       "properties": {
         "alg": {
           "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
@@ -2270,15 +2269,15 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing login request.",
+      "title": "LoginRequest Contains information on an ongoing login request.",
       "required": [
         "challenge",
-        "client",
-        "request_url",
-        "requested_access_token_audience",
         "requested_scope",
+        "requested_access_token_audience",
         "skip",
-        "subject"
+        "subject",
+        "client",
+        "request_url"
       ],
       "properties": {
         "challenge": {
@@ -2317,7 +2316,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "LogoutRequest Contains information about an ongoing logout request.",
+      "title": "Contains information about an ongoing logout request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
@@ -2492,7 +2491,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": ["active"],
       "properties": {
         "active": {
@@ -2561,7 +2560,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
+      "description": "The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2593,7 +2592,7 @@
     },
     "openIDConnectContext": {
       "type": "object",
-      "title": "Contains optional information about the OpenID Connect request.",
+      "title": "OpenIDConnectContext Contains optional information about the OpenID Connect request.",
       "properties": {
         "acr_values": {
           "description": "ACRValues is the Authentication AuthorizationContext Class Reference requested in the OAuth 2.0 Authorization request.\nIt is a parameter defined by OpenID Connect and expresses which level of authentication (e.g. 2FA) is required.\n\nOpenID Connect defines it as follows:\n\u003e Requested Authentication AuthorizationContext Class Reference values. Space-separated string that specifies the acr values\nthat the Authorization Server is being requested to use for processing this Authentication Request, with the\nvalues appearing in order of preference. The Authentication AuthorizationContext Class satisfied by the authentication\nperformed is returned as the acr Claim Value, as specified in Section 2. The acr Claim is requested as a\nVoluntary Claim by this parameter.",
@@ -2625,7 +2624,7 @@
       }
     },
     "patchDocument": {
-      "description": "PatchDocument PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902",
+      "description": "A JSONPatch document as defined by RFC 6902",
       "type": "object",
       "required": ["op", "path"],
       "properties": {
@@ -2650,7 +2649,7 @@
       }
     },
     "patchRequest": {
-      "description": "PatchRequest A JSONPatch request",
+      "description": "PatchRequest PatchRequest A JSONPatch request",
       "type": "array",
       "items": {
         "$ref": "#/definitions/patchDocument"
@@ -2658,7 +2657,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "RejectRequest The request payload used to accept a login or consent request.",
+      "title": "The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).\n\nDefaults to `request_denied`.",
@@ -2685,7 +2684,7 @@
     },
     "requestWasHandledResponse": {
       "type": "object",
-      "title": "The response payload sent when there is an attempt to access already handled request.",
+      "title": "RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.",
       "required": ["redirect_to"],
       "properties": {
         "redirect_to": {
@@ -2695,8 +2694,9 @@
       }
     },
     "trustJwtGrantIssuerBody": {
+      "description": "TrustJwtGrantIssuerBody trust jwt grant issuer body",
       "type": "object",
-      "required": ["expires_at", "issuer", "jwk", "scope", "subject"],
+      "required": ["issuer", "subject", "scope", "jwk", "expires_at"],
       "properties": {
         "expires_at": {
           "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
@@ -2727,6 +2727,7 @@
       }
     },
     "trustedJsonWebKey": {
+      "description": "TrustedJSONWebKey trusted Json web key",
       "type": "object",
       "properties": {
         "kid": {
@@ -2742,19 +2743,21 @@
       }
     },
     "trustedJwtGrantIssuer": {
+      "description": "TrustedJwtGrantIssuer trusted jwt grant issuer",
       "type": "object",
       "properties": {
         "created_at": {
-          "description": "The \"created_at\" indicates, when grant was created.",
+          "description": "The \"created_at\" indicates, when grant was created.\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
         "expires_at": {
-          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         },
         "id": {
+          "description": "id",
           "type": "string",
           "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
         },
@@ -2788,7 +2791,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "The userinfo response",
+      "description": "UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -2882,7 +2885,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

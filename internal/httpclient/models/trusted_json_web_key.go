@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// TrustedJSONWebKey trusted Json web key
+// TrustedJSONWebKey TrustedJSONWebKey trusted Json web key
 //
 // swagger:model trustedJsonWebKey
 type TrustedJSONWebKey struct {

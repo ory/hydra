@@ -30,7 +30,32 @@ jobs:
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+        ports:
+          - 5432:5432
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test
+        ports:
+          - 3306:3306
+    env:
+      TEST_DATABASE_POSTGRESQL: "postgres://test:test@localhost:5432/postgres?sslmode=disable"
+      TEST_DATABASE_MYSQL: "mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true"
+      TEST_DATABASE_COCKROACHDB: "cockroach://root@localhost:26257/defaultdb?sslmode=disable"
+      SKIP_HYDRA_BUILD: 1
     steps:
+      - run: |
+          docker create --name cockroach -p 26257:26257 \
+            cockroachdb/cockroach:v20.2.5 start-single-node --insecure
+          docker start cockroach
+        name: Start CockroachDB
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2

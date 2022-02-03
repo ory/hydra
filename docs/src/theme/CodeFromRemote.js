@@ -53,23 +53,21 @@ const findLine = (needle, haystack) => {
   return index
 }
 
-const transform =
-  ({ startAt, endAt }) =>
-  (content) => {
-    let lines = content.split('\n')
+const transform = ({ startAt, endAt }) => (content) => {
+  let lines = content.split('\n')
 
-    const startIndex = findLine(startAt, lines)
-    if (startIndex > 0) {
-      lines = ['// ...', ...lines.slice(startIndex, -1)]
-    }
-
-    const endIndex = findLine(endAt, lines)
-    if (endIndex > 0) {
-      lines = [...lines.slice(0, endIndex + 1), '// ...']
-    }
-
-    return lines.join('\n')
+  const startIndex = findLine(startAt, lines)
+  if (startIndex > 0) {
+    lines = ['// ...', ...lines.slice(startIndex, -1)]
   }
+
+  const endIndex = findLine(endAt, lines)
+  if (endIndex > 0) {
+    lines = [...lines.slice(0, endIndex + 1), '// ...']
+  }
+
+  return lines.join('\n')
+}
 
 const CodeFromRemote = (props) => {
   const { src, title } = props

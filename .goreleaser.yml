@@ -15,7 +15,7 @@ project_name: hydra
 after:
   hooks:
     - cmd: |
-        sh -c "bash <(curl -s https://raw.githubusercontent.com/ory/xgoreleaser/master/docs.sh)"
+        sh -c "curl -s https://raw.githubusercontent.com/ory/xgoreleaser/master/docs.sh | bash"
       env:
         - "TAG_VERSION={{ .Tag }}"
         - "DOCS_VERSION={{ .Major }}.{{ .Minor }}"

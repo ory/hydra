@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// GenericError GenericError GenericError generic error
+// GenericError GenericError GenericError GenericError generic error
 //
 // swagger:model genericError
 type GenericError struct {

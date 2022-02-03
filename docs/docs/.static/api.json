@@ -1956,7 +1956,7 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+      "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
       "type": "object",
       "properties": {
         "keys": {
@@ -1971,53 +1971,8 @@
     "JoseJSONWebKeySet": {
       "type": "object"
     },
-    "PluginDevice": {
-      "description": "PluginDevice PluginDevice PluginDevice plugin device",
-      "type": "object",
-      "required": ["Description", "Name", "Path", "Settable"],
-      "properties": {
-        "Description": {
-          "description": "description",
-          "type": "string"
-        },
-        "Name": {
-          "description": "name",
-          "type": "string"
-        },
-        "Path": {
-          "description": "path",
-          "type": "string"
-        },
-        "Settable": {
-          "description": "settable",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "PluginInterfaceType": {
-      "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
-      "type": "object",
-      "required": ["Capability", "Prefix", "Version"],
-      "properties": {
-        "Capability": {
-          "description": "capability",
-          "type": "string"
-        },
-        "Prefix": {
-          "description": "prefix",
-          "type": "string"
-        },
-        "Version": {
-          "description": "version",
-          "type": "string"
-        }
-      }
-    },
     "PreviousConsentSession": {
-      "description": "PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -2055,7 +2010,7 @@
     },
     "acceptConsentRequest": {
       "type": "object",
-      "title": "The request payload used to accept a consent request.",
+      "title": "AcceptConsentRequest The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
           "$ref": "#/definitions/StringSlicePipeDelimiter"
@@ -2082,7 +2037,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "HandledLoginRequest is the request payload used to accept a login request.",
       "required": ["subject"],
       "properties": {
         "acr": {
@@ -2127,7 +2082,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "ConsentRequest Contains information on an ongoing consent request.",
+      "title": "ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
       "required": ["challenge"],
       "properties": {
         "acr": {
@@ -2180,7 +2135,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "ConsentRequestSession ConsentRequestSession Used to pass session data to a consent request.",
+      "title": "Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2195,18 +2150,17 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
-      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
           "type": "string",
           "format": "date-time"
         }
       }
     },
     "genericError": {
-      "description": "GenericError GenericError generic error",
+      "description": "GenericError GenericError GenericError generic error",
       "type": "object",
       "required": ["message"],
       "properties": {
@@ -2258,7 +2212,7 @@
       }
     },
     "healthStatus": {
-      "description": "HealthStatus health status",
+      "description": "HealthStatus HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2270,7 +2224,7 @@
     "jsonError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "JSONError Generic Error Response",
+      "title": "JSONError JSONError Generic Error Response",
       "properties": {
         "error": {
           "description": "Name is the error name.",
@@ -2296,8 +2250,9 @@
       }
     },
     "jsonWebKeySetGeneratorRequest": {
+      "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
       "type": "object",
-      "required": ["alg", "kid", "use"],
+      "required": ["alg", "use", "kid"],
       "properties": {
         "alg": {
           "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
@@ -2315,15 +2270,15 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "LoginRequest Contains information on an ongoing login request.",
+      "title": "Contains information on an ongoing login request.",
       "required": [
         "challenge",
-        "requested_scope",
-        "requested_access_token_audience",
-        "skip",
-        "subject",
         "client",
-        "request_url"
+        "request_url",
+        "requested_access_token_audience",
+        "requested_scope",
+        "skip",
+        "subject"
       ],
       "properties": {
         "challenge": {
@@ -2362,7 +2317,7 @@
     },
     "logoutRequest": {
       "type": "object",
-      "title": "Contains information about an ongoing logout request.",
+      "title": "LogoutRequest Contains information about an ongoing logout request.",
       "properties": {
         "challenge": {
           "description": "Challenge is the identifier (\"logout challenge\") of the logout authentication request. It is used to\nidentify the session.",
@@ -2537,7 +2492,7 @@
     "oAuth2TokenIntrospection": {
       "description": "https://tools.ietf.org/html/rfc7662",
       "type": "object",
-      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+      "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
       "required": ["active"],
       "properties": {
         "active": {
@@ -2606,7 +2561,7 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
+      "description": "Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2670,7 +2625,7 @@
       }
     },
     "patchDocument": {
-      "description": "PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902",
+      "description": "PatchDocument PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902",
       "type": "object",
       "required": ["op", "path"],
       "properties": {
@@ -2681,12 +2636,12 @@
         "op": {
           "description": "The operation to be performed",
           "type": "string",
-          "example": "\\\"replace\\"
+          "example": "\"replace\""
         },
         "path": {
           "description": "A JSON-pointer",
           "type": "string",
-          "example": "\\\"/name\\"
+          "example": "\"/name\""
         },
         "value": {
           "description": "The value to be used within the operations",
@@ -2695,7 +2650,7 @@
       }
     },
     "patchRequest": {
-      "description": "A JSONPatch request",
+      "description": "PatchRequest A JSONPatch request",
       "type": "array",
       "items": {
         "$ref": "#/definitions/patchDocument"
@@ -2703,7 +2658,7 @@
     },
     "rejectRequest": {
       "type": "object",
-      "title": "The request payload used to accept a login or consent request.",
+      "title": "RejectRequest The request payload used to accept a login or consent request.",
       "properties": {
         "error": {
           "description": "The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).\n\nDefaults to `request_denied`.",
@@ -2730,7 +2685,7 @@
     },
     "requestWasHandledResponse": {
       "type": "object",
-      "title": "RequestWasHandledResponse RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.",
+      "title": "The response payload sent when there is an attempt to access already handled request.",
       "required": ["redirect_to"],
       "properties": {
         "redirect_to": {
@@ -2833,7 +2788,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "UserinfoResponse UserinfoResponse The userinfo response",
+      "description": "The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -2916,7 +2871,6 @@
       }
     },
     "version": {
-      "description": "Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -2928,7 +2882,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

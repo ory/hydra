@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response
+// Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response
 //
 // swagger:model oauth2TokenResponse
 type Oauth2TokenResponse struct {

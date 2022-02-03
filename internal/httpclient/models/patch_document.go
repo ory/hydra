@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PatchDocument PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902
+// PatchDocument PatchDocument PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902
 //
 // swagger:model patchDocument
 type PatchDocument struct {

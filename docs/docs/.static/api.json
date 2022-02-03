@@ -822,20 +822,6 @@
         }
       }
     },
-    "/metrics/prometheus": {
-      "get": {
-        "description": "```\nmetadata:\nannotations:\nprometheus.io/port: \"4434\"\nprometheus.io/path: \"/metrics/prometheus\"\n```",
-        "produces": ["plain/text"],
-        "tags": ["metadata"],
-        "summary": "Get snapshot metrics from the service. If you're using k8s, you can then add annotations to\nyour deployment like so:",
-        "operationId": "prometheus",
-        "responses": {
-          "200": {
-            "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
-          }
-        }
-      }
-    },
     "/oauth2/auth": {
       "get": {
         "description": "This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.\nOAuth2 is a very popular protocol and a library for your programming language will exists.\n\nTo learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749",
@@ -1883,16 +1869,6 @@
     }
   },
   "definitions": {
-    "ContainerWaitOKBodyError": {
-      "description": "ContainerWaitOKBodyError container waiting error, if any",
-      "type": "object",
-      "properties": {
-        "Message": {
-          "description": "Details of an error",
-          "type": "string"
-        }
-      }
-    },
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -1900,7 +1876,7 @@
     "JSONWebKey": {
       "description": "It is important that this model object is named JSONWebKey for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKey.",
       "type": "object",
-      "required": ["use", "kty", "kid", "alg"],
+      "required": ["alg", "kid", "kty", "use"],
       "properties": {
         "alg": {
           "description": "The \"alg\" (algorithm) parameter identifies the algorithm intended for\nuse with the key.  The values used should either be registered in the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.",
@@ -1980,7 +1956,7 @@
       }
     },
     "JSONWebKeySet": {
-      "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+      "description": "JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
       "type": "object",
       "properties": {
         "keys": {
@@ -1995,216 +1971,8 @@
     "JoseJSONWebKeySet": {
       "type": "object"
     },
-    "PluginConfig": {
-      "type": "object",
-      "title": "PluginConfig The config of a plugin.",
-      "required": [
-        "Args",
-        "Description",
-        "Documentation",
-        "Entrypoint",
-        "Env",
-        "Interface",
-        "IpcHost",
-        "Linux",
-        "Mounts",
-        "Network",
-        "PidHost",
-        "PropagatedMount",
-        "WorkDir"
-      ],
-      "properties": {
-        "Args": {
-          "$ref": "#/definitions/PluginConfigArgs"
-        },
-        "Description": {
-          "description": "description",
-          "type": "string"
-        },
-        "DockerVersion": {
-          "description": "Docker Version used to create the plugin",
-          "type": "string"
-        },
-        "Documentation": {
-          "description": "documentation",
-          "type": "string"
-        },
-        "Entrypoint": {
-          "description": "entrypoint",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Env": {
-          "description": "env",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PluginEnv"
-          }
-        },
-        "Interface": {
-          "$ref": "#/definitions/PluginConfigInterface"
-        },
-        "IpcHost": {
-          "description": "ipc host",
-          "type": "boolean"
-        },
-        "Linux": {
-          "$ref": "#/definitions/PluginConfigLinux"
-        },
-        "Mounts": {
-          "description": "mounts",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PluginMount"
-          }
-        },
-        "Network": {
-          "$ref": "#/definitions/PluginConfigNetwork"
-        },
-        "PidHost": {
-          "description": "pid host",
-          "type": "boolean"
-        },
-        "PropagatedMount": {
-          "description": "propagated mount",
-          "type": "string"
-        },
-        "User": {
-          "$ref": "#/definitions/PluginConfigUser"
-        },
-        "WorkDir": {
-          "description": "work dir",
-          "type": "string"
-        },
-        "rootfs": {
-          "$ref": "#/definitions/PluginConfigRootfs"
-        }
-      }
-    },
-    "PluginConfigArgs": {
-      "description": "PluginConfigArgs plugin config args",
-      "type": "object",
-      "required": ["Description", "Name", "Settable", "Value"],
-      "properties": {
-        "Description": {
-          "description": "description",
-          "type": "string"
-        },
-        "Name": {
-          "description": "name",
-          "type": "string"
-        },
-        "Settable": {
-          "description": "settable",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Value": {
-          "description": "value",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "PluginConfigInterface": {
-      "description": "PluginConfigInterface The interface between Docker and the plugin",
-      "type": "object",
-      "required": ["Socket", "Types"],
-      "properties": {
-        "ProtocolScheme": {
-          "description": "Protocol to use for clients connecting to the plugin.",
-          "type": "string"
-        },
-        "Socket": {
-          "description": "socket",
-          "type": "string"
-        },
-        "Types": {
-          "description": "types",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PluginInterfaceType"
-          }
-        }
-      }
-    },
-    "PluginConfigLinux": {
-      "description": "PluginConfigLinux plugin config linux",
-      "type": "object",
-      "required": ["AllowAllDevices", "Capabilities", "Devices"],
-      "properties": {
-        "AllowAllDevices": {
-          "description": "allow all devices",
-          "type": "boolean"
-        },
-        "Capabilities": {
-          "description": "capabilities",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Devices": {
-          "description": "devices",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PluginDevice"
-          }
-        }
-      }
-    },
-    "PluginConfigNetwork": {
-      "description": "PluginConfigNetwork plugin config network",
-      "type": "object",
-      "required": ["Type"],
-      "properties": {
-        "Type": {
-          "description": "type",
-          "type": "string"
-        }
-      }
-    },
-    "PluginConfigRootfs": {
-      "description": "PluginConfigRootfs plugin config rootfs",
-      "type": "object",
-      "properties": {
-        "diff_ids": {
-          "description": "diff ids",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "type": {
-          "description": "type",
-          "type": "string"
-        }
-      }
-    },
-    "PluginConfigUser": {
-      "description": "PluginConfigUser plugin config user",
-      "type": "object",
-      "properties": {
-        "GID": {
-          "description": "g ID",
-          "type": "integer",
-          "format": "uint32"
-        },
-        "UID": {
-          "description": "UID",
-          "type": "integer",
-          "format": "uint32"
-        }
-      }
-    },
     "PluginDevice": {
-      "description": "PluginDevice plugin device",
+      "description": "PluginDevice PluginDevice PluginDevice plugin device",
       "type": "object",
       "required": ["Description", "Name", "Path", "Settable"],
       "properties": {
@@ -2229,34 +1997,8 @@
         }
       }
     },
-    "PluginEnv": {
-      "description": "PluginEnv plugin env",
-      "type": "object",
-      "required": ["Description", "Name", "Settable", "Value"],
-      "properties": {
-        "Description": {
-          "description": "description",
-          "type": "string"
-        },
-        "Name": {
-          "description": "name",
-          "type": "string"
-        },
-        "Settable": {
-          "description": "settable",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Value": {
-          "description": "value",
-          "type": "string"
-        }
-      }
-    },
     "PluginInterfaceType": {
-      "description": "PluginInterfaceType plugin interface type",
+      "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
       "type": "object",
       "required": ["Capability", "Prefix", "Version"],
       "properties": {
@@ -2274,92 +2016,8 @@
         }
       }
     },
-    "PluginMount": {
-      "description": "PluginMount plugin mount",
-      "type": "object",
-      "required": [
-        "Description",
-        "Destination",
-        "Name",
-        "Options",
-        "Settable",
-        "Source",
-        "Type"
-      ],
-      "properties": {
-        "Description": {
-          "description": "description",
-          "type": "string"
-        },
-        "Destination": {
-          "description": "destination",
-          "type": "string"
-        },
-        "Name": {
-          "description": "name",
-          "type": "string"
-        },
-        "Options": {
-          "description": "options",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Settable": {
-          "description": "settable",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Source": {
-          "description": "source",
-          "type": "string"
-        },
-        "Type": {
-          "description": "type",
-          "type": "string"
-        }
-      }
-    },
-    "PluginSettings": {
-      "type": "object",
-      "title": "PluginSettings Settings that can be modified by users.",
-      "required": ["Args", "Devices", "Env", "Mounts"],
-      "properties": {
-        "Args": {
-          "description": "args",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Devices": {
-          "description": "devices",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PluginDevice"
-          }
-        },
-        "Env": {
-          "description": "env",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "Mounts": {
-          "description": "mounts",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/PluginMount"
-          }
-        }
-      }
-    },
     "PreviousConsentSession": {
-      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "description": "PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
       "type": "object",
       "properties": {
         "consent_request": {
@@ -2395,79 +2053,6 @@
         "type": "string"
       }
     },
-    "Volume": {
-      "description": "Volume volume",
-      "type": "object",
-      "required": [
-        "Driver",
-        "Labels",
-        "Mountpoint",
-        "Name",
-        "Options",
-        "Scope"
-      ],
-      "properties": {
-        "CreatedAt": {
-          "description": "Date/Time the volume was created.",
-          "type": "string"
-        },
-        "Driver": {
-          "description": "Name of the volume driver used by the volume.",
-          "type": "string"
-        },
-        "Labels": {
-          "description": "User-defined key/value metadata.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "Mountpoint": {
-          "description": "Mount path of the volume on the host.",
-          "type": "string"
-        },
-        "Name": {
-          "description": "Name of the volume.",
-          "type": "string"
-        },
-        "Options": {
-          "description": "The driver specific options used when creating the volume.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "Scope": {
-          "description": "The level at which the volume exists. Either `global` for cluster-wide,\nor `local` for machine level.",
-          "type": "string"
-        },
-        "Status": {
-          "description": "Low-level details about the volume, provided by the volume driver.\nDetails are returned as a map with key/value pairs:\n`{\"key\":\"value\",\"key2\":\"value2\"}`.\n\nThe `Status` field is optional, and is omitted if the volume driver\ndoes not support this feature.",
-          "type": "object",
-          "additionalProperties": true
-        },
-        "UsageData": {
-          "$ref": "#/definitions/VolumeUsageData"
-        }
-      }
-    },
-    "VolumeUsageData": {
-      "description": "VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
-      "type": "object",
-      "required": ["RefCount", "Size"],
-      "properties": {
-        "RefCount": {
-          "description": "The number of containers referencing this volume. This field\nis set to `-1` if the reference-count is not available.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "Size": {
-          "description": "Amount of disk space used by the volume (in bytes). This information\nis only available for volumes created with the `\"local\"` volume\ndriver. For volumes created with other volume drivers, this field\nis set to `-1` (\"not available\")",
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
     "acceptConsentRequest": {
       "type": "object",
       "title": "The request payload used to accept a consent request.",
@@ -2497,7 +2082,7 @@
     },
     "acceptLoginRequest": {
       "type": "object",
-      "title": "HandledLoginRequest is the request payload used to accept a login request.",
+      "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
       "required": ["subject"],
       "properties": {
         "acr": {
@@ -2542,7 +2127,7 @@
     },
     "consentRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing consent request.",
+      "title": "ConsentRequest Contains information on an ongoing consent request.",
       "required": ["challenge"],
       "properties": {
         "acr": {
@@ -2595,7 +2180,7 @@
     },
     "consentRequestSession": {
       "type": "object",
-      "title": "Used to pass session data to a consent request.",
+      "title": "ConsentRequestSession ConsentRequestSession Used to pass session data to a consent request.",
       "properties": {
         "access_token": {
           "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
@@ -2610,34 +2195,33 @@
       }
     },
     "flushInactiveOAuth2TokensRequest": {
+      "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
       "type": "object",
       "properties": {
         "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
           "type": "string",
           "format": "date-time"
         }
       }
     },
     "genericError": {
+      "description": "GenericError GenericError generic error",
       "type": "object",
       "required": ["message"],
       "properties": {
         "code": {
           "description": "The status code",
           "type": "integer",
-          "format": "int64",
-          "example": 404
+          "format": "int64"
         },
         "debug": {
           "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-          "type": "string",
-          "example": "SQL field \"foo\" is not a bool."
+          "type": "string"
         },
         "details": {
           "description": "Further error details",
-          "type": "object",
-          "additionalProperties": true
+          "type": "object"
         },
         "id": {
           "description": "The error ID\n\nUseful when trying to identify various errors in application logic.",
@@ -2645,23 +2229,19 @@
         },
         "message": {
           "description": "Error message\n\nThe error's message.",
-          "type": "string",
-          "example": "The resource could not be found"
+          "type": "string"
         },
         "reason": {
           "description": "A human-readable reason for the error",
-          "type": "string",
-          "example": "User with ID 1234 does not exist."
+          "type": "string"
         },
         "request": {
           "description": "The request ID\n\nThe request ID is often exposed internally in order to trace\nerrors across service architectures. This is often a UUID.",
-          "type": "string",
-          "example": "d7ef54b1-ec15-46e6-bccb-524b82c035e6"
+          "type": "string"
         },
         "status": {
           "description": "The status description",
-          "type": "string",
-          "example": "Not Found"
+          "type": "string"
         }
       }
     },
@@ -2678,6 +2258,7 @@
       }
     },
     "healthStatus": {
+      "description": "HealthStatus health status",
       "type": "object",
       "properties": {
         "status": {
@@ -2689,7 +2270,7 @@
     "jsonError": {
       "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
       "type": "object",
-      "title": "Generic Error Response",
+      "title": "JSONError Generic Error Response",
       "properties": {
         "error": {
           "description": "Name is the error name.",
@@ -2716,7 +2297,7 @@
     },
     "jsonWebKeySetGeneratorRequest": {
       "type": "object",
-      "required": ["alg", "use", "kid"],
+      "required": ["alg", "kid", "use"],
       "properties": {
         "alg": {
           "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
@@ -2734,7 +2315,7 @@
     },
     "loginRequest": {
       "type": "object",
-      "title": "Contains information on an ongoing login request.",
+      "title": "LoginRequest Contains information on an ongoing login request.",
       "required": [
         "challenge",
         "requested_scope",
@@ -3025,26 +2606,32 @@
       }
     },
     "oauth2TokenResponse": {
-      "description": "The Access Token Response",
+      "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
       "type": "object",
       "properties": {
         "access_token": {
+          "description": "access token",
           "type": "string"
         },
         "expires_in": {
+          "description": "expires in",
           "type": "integer",
           "format": "int64"
         },
         "id_token": {
+          "description": "id token",
           "type": "string"
         },
         "refresh_token": {
+          "description": "refresh token",
           "type": "string"
         },
         "scope": {
+          "description": "scope",
           "type": "string"
         },
         "token_type": {
+          "description": "token type",
           "type": "string"
         }
       }
@@ -3083,7 +2670,7 @@
       }
     },
     "patchDocument": {
-      "description": "A JSONPatch document as defined by RFC 6902",
+      "description": "PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902",
       "type": "object",
       "required": ["op", "path"],
       "properties": {
@@ -3094,12 +2681,12 @@
         "op": {
           "description": "The operation to be performed",
           "type": "string",
-          "example": "\"replace\""
+          "example": "\\\"replace\\"
         },
         "path": {
           "description": "A JSON-pointer",
           "type": "string",
-          "example": "\"/name\""
+          "example": "\\\"/name\\"
         },
         "value": {
           "description": "The value to be used within the operations",
@@ -3143,7 +2730,7 @@
     },
     "requestWasHandledResponse": {
       "type": "object",
-      "title": "The response payload sent when there is an attempt to access already handled request.",
+      "title": "RequestWasHandledResponse RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.",
       "required": ["redirect_to"],
       "properties": {
         "redirect_to": {
@@ -3154,7 +2741,7 @@
     },
     "trustJwtGrantIssuerBody": {
       "type": "object",
-      "required": ["issuer", "subject", "scope", "jwk", "expires_at"],
+      "required": ["expires_at", "issuer", "jwk", "scope", "subject"],
       "properties": {
         "expires_at": {
           "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
@@ -3246,7 +2833,7 @@
       }
     },
     "userinfoResponse": {
-      "description": "The userinfo response",
+      "description": "UserinfoResponse UserinfoResponse The userinfo response",
       "type": "object",
       "properties": {
         "birthdate": {
@@ -3329,6 +2916,7 @@
       }
     },
     "version": {
+      "description": "Version version",
       "type": "object",
       "properties": {
         "version": {
@@ -3340,7 +2928,7 @@
     "wellKnown": {
       "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "title": "WellKnown represents important OpenID Connect discovery metadata",
+      "title": "WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata",
       "required": [
         "issuer",
         "authorization_endpoint",

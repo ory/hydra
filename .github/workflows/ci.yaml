@@ -51,7 +51,7 @@ jobs:
         env:
           GOGC: 100
         with:
-          args: --timeout 10m0s --issues-exit-code=0
+          args: --timeout 10m0s
           skip-go-installation: true
           skip-pkg-cache: true
       - name: Run go-acc (tests)

@@ -29,7 +29,7 @@
     "classnames": "2.3.1",
     "file-loader": "6.2.0",
     "mermaid": "8.13.8",
-    "node-fetch": "2.6.1",
+    "node-fetch": "2.6.7",
     "parser-front-matter": "1.6.4",
     "prism-react-renderer": "1.2.1",
     "prismjs": "1.24.1",

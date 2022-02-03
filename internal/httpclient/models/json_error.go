@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -18,20 +20,29 @@ import (
 type JSONError struct {
 
 	// Name is the error name.
+	// Example: The requested resource could not be found
 	Error string `json:"error,omitempty"`
 
 	// Debug contains debug information. This is usually not available and has to be enabled.
+	// Example: The database adapter was unable to find the element
 	ErrorDebug string `json:"error_debug,omitempty"`
 
 	// Description contains further information on the nature of the error.
+	// Example: Object with ID 12345 does not exist
 	ErrorDescription string `json:"error_description,omitempty"`
 
 	// Code represents the error status code (404, 403, 401, ...).
+	// Example: 404
 	StatusCode int64 `json:"status_code,omitempty"`
 }
 
 // Validate validates this json error
 func (m *JSONError) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this json error based on context it is used
+func (m *JSONError) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

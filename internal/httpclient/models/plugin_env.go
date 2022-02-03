@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// PluginEnv PluginEnv plugin env
+// PluginEnv PluginEnv PluginEnv plugin env
 //
 // swagger:model PluginEnv
 type PluginEnv struct {
@@ -93,6 +95,11 @@ func (m *PluginEnv) validateValue(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this plugin env based on context it is used
+func (m *PluginEnv) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

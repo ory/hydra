@@ -6,11 +6,13 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
-// OpenIDConnectContext Contains optional information about the OpenID Connect request.
+// OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.
 //
 // swagger:model openIDConnectContext
 type OpenIDConnectContext struct {
@@ -56,6 +58,11 @@ type OpenIDConnectContext struct {
 
 // Validate validates this open ID connect context
 func (m *OpenIDConnectContext) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this open ID connect context based on context it is used
+func (m *OpenIDConnectContext) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

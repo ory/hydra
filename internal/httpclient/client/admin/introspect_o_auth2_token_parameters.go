@@ -16,68 +16,83 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewIntrospectOAuth2TokenParams creates a new IntrospectOAuth2TokenParams object
-// with the default values initialized.
+// NewIntrospectOAuth2TokenParams creates a new IntrospectOAuth2TokenParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewIntrospectOAuth2TokenParams() *IntrospectOAuth2TokenParams {
-	var ()
 	return &IntrospectOAuth2TokenParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewIntrospectOAuth2TokenParamsWithTimeout creates a new IntrospectOAuth2TokenParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewIntrospectOAuth2TokenParamsWithTimeout(timeout time.Duration) *IntrospectOAuth2TokenParams {
-	var ()
 	return &IntrospectOAuth2TokenParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewIntrospectOAuth2TokenParamsWithContext creates a new IntrospectOAuth2TokenParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewIntrospectOAuth2TokenParamsWithContext(ctx context.Context) *IntrospectOAuth2TokenParams {
-	var ()
 	return &IntrospectOAuth2TokenParams{
-
 		Context: ctx,
 	}
 }
 
 // NewIntrospectOAuth2TokenParamsWithHTTPClient creates a new IntrospectOAuth2TokenParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewIntrospectOAuth2TokenParamsWithHTTPClient(client *http.Client) *IntrospectOAuth2TokenParams {
-	var ()
 	return &IntrospectOAuth2TokenParams{
 		HTTPClient: client,
 	}
 }
 
-/*IntrospectOAuth2TokenParams contains all the parameters to send to the API endpoint
-for the introspect o auth2 token operation typically these are written to a http.Request
+/* IntrospectOAuth2TokenParams contains all the parameters to send to the API endpoint
+   for the introspect o auth2 token operation.
+
+   Typically these are written to a http.Request.
 */
 type IntrospectOAuth2TokenParams struct {
 
-	/*Scope
-	  An optional, space separated list of required scopes. If the access token was not granted one of the
-	scopes, the result of active will be false.
+	/* Scope.
 
+	     An optional, space separated list of required scopes. If the access token was not granted one of the
+	scopes, the result of active will be false.
 	*/
 	Scope *string
-	/*Token
-	  The string value of the token. For access tokens, this
+
+	/* Token.
+
+	     The string value of the token. For access tokens, this
 	is the "access_token" value returned from the token endpoint
 	defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"
 	value returned.
-
 	*/
 	Token string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the introspect o auth2 token params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *IntrospectOAuth2TokenParams) WithDefaults() *IntrospectOAuth2TokenParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the introspect o auth2 token params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *IntrospectOAuth2TokenParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the introspect o auth2 token params
@@ -156,7 +171,6 @@ func (o *IntrospectOAuth2TokenParams) WriteToRequest(r runtime.ClientRequest, re
 				return err
 			}
 		}
-
 	}
 
 	// form param token

@@ -270,14 +270,6 @@ jobs:
           cosign_pwd: ${{ secrets.COSIGN_PWD }}
           docker_username: ${{ secrets.DOCKERHUB_USERNAME }}
           docker_password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - run: |
-          docs_version="$(echo "$GITHUB_REF_NAME" | awk -F'.' '{ printf("%s.%s", $1, $2) }')"
-          echo 'DOCS_VERSION='"$docs_version" >> $GITHUB_ENV
-        name: Extract docs version
-      - run: |
-          bash <(curl -s https://raw.githubusercontent.com/ory/xgoreleaser/master/docs.sh)
-        env:
-          TAG_VERSION: ${{ github.ref_name }}
 
   render-version-schema:
     name: Render version schema

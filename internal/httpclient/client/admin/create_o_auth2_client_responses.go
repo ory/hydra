@@ -46,7 +46,7 @@ func NewCreateOAuth2ClientCreated() *CreateOAuth2ClientCreated {
 	return &CreateOAuth2ClientCreated{}
 }
 
-/*CreateOAuth2ClientCreated handles this case with default header values.
+/* CreateOAuth2ClientCreated describes a response with status code 201, with default header values.
 
 oAuth2Client
 */
@@ -57,7 +57,6 @@ type CreateOAuth2ClientCreated struct {
 func (o *CreateOAuth2ClientCreated) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientCreated  %+v", 201, o.Payload)
 }
-
 func (o *CreateOAuth2ClientCreated) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -81,7 +80,7 @@ func NewCreateOAuth2ClientDefault(code int) *CreateOAuth2ClientDefault {
 	}
 }
 
-/*CreateOAuth2ClientDefault handles this case with default header values.
+/* CreateOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
@@ -99,7 +98,6 @@ func (o *CreateOAuth2ClientDefault) Code() int {
 func (o *CreateOAuth2ClientDefault) Error() string {
 	return fmt.Sprintf("[POST /clients][%d] createOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *CreateOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }

@@ -17,7 +17,7 @@ define make-go-dependency
 endef
 
 .bin/golangci-lint: Makefile
-		curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b .bin v1.31.0
+		curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b .bin v1.44.0
 
 $(foreach dep, $(GO_DEPENDENCIES), $(eval $(call make-go-dependency, $(dep))))
 
@@ -100,7 +100,7 @@ mocks: .bin/mockgen
 # Generates the SDKs
 .PHONY: sdk
 sdk: .bin/ory
-		swagger generate spec -m -o ./spec/api.json -c github.com/ory/hydra -c github.com/ory/x/healthx
+		swagger generate spec -m -o ./spec/api.json -x internal/httpclient -x github.com/ory/dockertest/v3 -x gopkg.in/square/go-jose.v2
 		ory dev swagger sanitize ./spec/api.json
 		swagger flatten --with-flatten=remove-unused -o ./spec/api.json ./spec/api.json
 		swagger validate ./spec/api.json

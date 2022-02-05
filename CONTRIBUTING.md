@@ -216,7 +216,7 @@ Please follow these guidelines when formatting source code:
 
 ```
 # First you clone the original repository
-git clone git@github.com:ory/ory/hydra.git
+git clone git@github.com:ory/hydra.git
 
 # Next you add a git remote that is your fork:
 git remote add fork git@github.com:<YOUR-GITHUB-USERNAME-HERE>/ory/hydra.git
@@ -227,7 +227,7 @@ git checkout master
 git pull --rebase
 
 # Next you create a new feature branch off of master:
-git checkout my-feature-branch
+git checkout -b my-feature-branch
 
 # Now you do your work and commit your changes:
 git add -A

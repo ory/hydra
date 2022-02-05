@@ -230,9 +230,14 @@ func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, cm consent.Ma
 			require.NoError(t, cm.CreateLoginRequest(ctx, r))
 		}
 
+		// Create consent requests
+		for _, r := range j.flushConsentRequests {
+			require.NoError(t, cm.CreateConsentRequest(ctx, r))
+		}
+
 		// Reject each request
-		for _, r := range j.flushLoginRequests {
-			_, err = cm.HandleLoginRequest(ctx, r.ID, consent.NewHandledLoginRequest(
+		for _, r := range j.flushConsentRequests {
+			_, err = cm.HandleConsentRequest(ctx, r.ID, consent.NewHandledConsentRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -242,10 +247,21 @@ func (j *JanitorConsentTestHelper) LimitSetup(ctx context.Context, cm consent.Ma
 func (j *JanitorConsentTestHelper) LimitValidate(ctx context.Context, cm consent.Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		// flush-login-2 and 3 should be cleared now
+
 		for _, r := range j.flushLoginRequests {
 			t.Logf("check login: %s", r.ID)
 			_, err := cm.GetLoginRequest(ctx, r.ID)
 			if r.ID == j.flushLoginRequests[0].ID {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		}
+
+		for _, r := range j.flushConsentRequests {
+			t.Logf("check consent: %s", r.ID)
+			_, err := cm.GetConsentRequest(ctx, r.ID)
+			if r.ID == j.flushConsentRequests[0].ID {
 				require.NoError(t, err)
 			} else {
 				require.Error(t, err)

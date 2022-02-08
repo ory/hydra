@@ -31,9 +31,22 @@ jobs:
       - name: Run tests
         run: ./test/conformance/test.sh -v -short -parallel 16
 
+  sdk-generate:
+    name: Generate SDKs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ory/ci/sdk/generate@master
+        with:
+          token: ${{ github.token }}
+          app-name: Ory_Hydra
+          swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
+          swag-spec-location: spec/api.json
+
   test:
     name: Run tests and lints
     runs-on: ubuntu-latest
+    needs:
+      - sdk-generate
     services:
       postgres:
         image: postgres:9.6
@@ -95,6 +108,8 @@ jobs:
 
   test-hsm:
     name: Run HSM tests
+    needs:
+      - sdk-generate
     runs-on: ubuntu-latest
     env:
       HSM_ENABLED: true
@@ -121,6 +136,8 @@ jobs:
 
   setup-e2e:
     name: Setup end-to-end tests
+    needs:
+      - sdk-generate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -216,22 +233,6 @@ jobs:
       - uses: ory/ci/changelog@master
         with:
           token: ${{ github.token }}
-
-  sdk-generate:
-    name: Generate SDKs
-    runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' || github.ref_name != 'master' || github.event_name == 'pull_request' }}
-    needs:
-      - test
-      - test-hsm
-      - test-e2e
-    steps:
-      - uses: ory/ci/sdk/generate@master
-        with:
-          token: ${{ github.token }}
-          app-name: Ory_Hydra
-          swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
-          swag-spec-location: spec/api.json
 
   sdk-release:
     name: Release SDKs

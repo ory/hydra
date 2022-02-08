@@ -34,6 +34,8 @@ jobs:
   sdk-generate:
     name: Generate SDKs
     runs-on: ubuntu-latest
+    outputs:
+      sdk-cache-key: ${{ steps.sdk-generate.outputs.sdk-cache-key }}
     steps:
       - uses: ory/ci/sdk/generate@master
         with:
@@ -42,11 +44,6 @@ jobs:
           swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
           swag-spec-location: spec/api.json
         id: sdk-generate
-      - uses: actions/cache@v2
-        with:
-          path: |
-            internal/httpclient
-          key: ${{ steps.sdk-generate.outputs.cache-key }}
 
   test:
     name: Run tests and lints
@@ -86,7 +83,7 @@ jobs:
         with:
           path: |
             internal/httpclient
-          key: sdk-${{ hashFiles('internal/httpclient/**') }}
+          key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.17
@@ -133,7 +130,7 @@ jobs:
         with:
           path: |
             internal/httpclient
-          key: sdk-${{ hashFiles('internal/httpclient/**') }}
+          key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.17
@@ -171,6 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - setup-e2e
+      - sdk-generate
     strategy:
       matrix:
         database: ['memory', 'postgres', 'mysql', 'cockroach']
@@ -213,7 +211,7 @@ jobs:
         with:
           path: |
             internal/httpclient
-          key: sdk-${{ hashFiles('internal/httpclient/**') }}
+          key: ${{ needs.sdk-generate.outputs.sdk-cache-key }}
       - run: ./test/e2e/circle-ci.bash ${{ matrix.database }} ${{ matrix.args }}
 
   docs-build:

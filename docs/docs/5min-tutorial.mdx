@@ -5,9 +5,9 @@ title: 5 Minute Tutorial
 
 import CodeFromRemote from '@theme/CodeFromRemote'
 
-This tutorial walks you through a quick setup of Ory Hydra, a PostgreSQL
-instance and an exemplary User Login & Consent App based on Docker Compose. You
-need to have the latest [Docker](https://www.docker.com) and
+This tutorial walks you through a quick setup of Ory Hydra and an exemplary User
+Login & Consent App based on Docker Compose. You need to have the latest
+[Docker](https://www.docker.com) and
 [Docker Compose](https://docs.docker.com/compose) version installed.
 
 ![OAuth2 Flow with Open Source OAuth2 Server Ory Hydra](images/oauth2-flow.gif)
@@ -44,11 +44,27 @@ Starting hydra_hydra_1
 [...]
 ```
 
-If you prefer to use MySQL as the database backend, run this command instead:
+This command adds support for PostgreSQL. If you wish to use another database
+backend, you can run this command to use MySQL:
 
 ```shell script
 $ docker-compose -f quickstart.yml \
     -f quickstart-mysql.yml \
+    up --build
+```
+
+This one to use CockroachDB:
+
+```shell script
+$ docker-compose -f quickstart.yml \
+    -f quickstart-cockroach.yml \
+    up --build
+```
+
+Or simply omit the second file to default to SQLite:
+
+```shell script
+$ docker-compose -f quickstart.yml \
     up --build
 ```
 

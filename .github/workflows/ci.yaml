@@ -41,11 +41,12 @@ jobs:
           app-name: Ory_Hydra
           swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
           swag-spec-location: spec/api.json
+        id: sdk-generate
       - uses: actions/cache@v2
         with:
           path: |
             internal/httpclient
-          key: sdk-${{ hashFiles('internal/httpclient/**') }}
+          key: ${{ steps.sdk-generate.outputs.cache-key }}
 
   test:
     name: Run tests and lints

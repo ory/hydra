@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: ory/ci/sdk/generate@master
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.ORY_BOT_PAT }}
           app-name: Ory_Hydra
           swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
           swag-spec-location: spec/api.json
@@ -234,7 +234,7 @@ jobs:
     steps:
       - uses: ory/ci/docs/cli@master
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.ORY_BOT_PAT }}
 
   changelog:
     name: Generate changelog
@@ -251,7 +251,7 @@ jobs:
           fetch-depth: 0
       - uses: ory/ci/changelog@master
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.ORY_BOT_PAT }}
 
   sdk-release:
     name: Release SDKs
@@ -285,7 +285,7 @@ jobs:
     steps:
       - uses: ory/ci/releaser@master
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.ORY_BOT_PAT }}
           goreleaser_key: ${{ secrets.GORELEASER_KEY }}
           cosign_pwd: ${{ secrets.COSIGN_PWD }}
           docker_username: ${{ secrets.DOCKERHUB_USERNAME }}

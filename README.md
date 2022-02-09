@@ -263,6 +263,12 @@ that your company deserves a spot here, reach out to
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/hanko.svg" alt="Hanko"></td>
             <td><a href="https://hanko.io/">hanko.io</a></td>
         </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Rabbit</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/rabbit.svg" alt="rabbit"></td>
+            <td><a href="https://rabbit.co.th/">rabbit.th.co</a></td>
+        </tr>
     </tbody>
 </table>
 

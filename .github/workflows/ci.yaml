@@ -246,9 +246,6 @@ jobs:
       - test-e2e
       - docs-build
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: ory/ci/changelog@master
         with:
           token: ${{ secrets.ORY_BOT_PAT }}

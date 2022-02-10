@@ -217,10 +217,10 @@ jobs:
     needs:
       - test
     steps:
-      - uses: ory/ci/docs/build@master
+      - uses: ory/ci/docs/cli-next@master
         with:
           token: ${{ secrets.ORY_BOT_PAT }}
-          swag-spec-location: spec/api.json
+          output-dir: docs/hydra/cli
 
   docs-cli:
     runs-on: ubuntu-latest

@@ -14,12 +14,12 @@ version: '3.7'
 
 services:
   hydra-migrate:
-    image: oryd/hydra:v1.10.6
+    image: oryd/hydra:v1.11.0
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
 
   hydra:
-    image: oryd/hydra:v1.10.6
+    image: oryd/hydra:v1.11.0
     environment:
       - DSN=cockroach://root@cockroachd:26257/defaultdb?sslmode=disable&max_conns=20&max_idle_conns=4
 

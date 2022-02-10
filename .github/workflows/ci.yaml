@@ -92,10 +92,6 @@ jobs:
         uses: sonatype-nexus-community/nancy-github-action@v1.0.2
       - name: Run prettier
         uses: ory/ci/prettier@master
-      - name: Run prettier (docs)
-        uses: ory/ci/prettier@master
-        with:
-          dir: docs
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
         env:

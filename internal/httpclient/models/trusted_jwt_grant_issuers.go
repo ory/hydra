@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// TrustedJwtGrantIssuers trusted jwt grant issuers
+// TrustedJwtGrantIssuers TrustedJwtGrantIssuers TrustedJwtGrantIssuers TrustedJwtGrantIssuers trusted jwt grant issuers
 //
 // swagger:model trustedJwtGrantIssuers
 type TrustedJwtGrantIssuers []*TrustedJwtGrantIssuer
@@ -32,8 +32,6 @@ func (m TrustedJwtGrantIssuers) Validate(formats strfmt.Registry) error {
 			if err := m[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName(strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName(strconv.Itoa(i))
 				}
 				return err
 			}
@@ -57,8 +55,6 @@ func (m TrustedJwtGrantIssuers) ContextValidate(ctx context.Context, formats str
 			if err := m[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName(strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName(strconv.Itoa(i))
 				}
 				return err
 			}

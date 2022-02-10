@@ -14,16 +14,18 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// TrustedJwtGrantIssuer trusted jwt grant issuer
+// TrustedJwtGrantIssuer TrustedJwtGrantIssuer trusted jwt grant issuer
 //
 // swagger:model trustedJwtGrantIssuer
 type TrustedJwtGrantIssuer struct {
 
 	// The "created_at" indicates, when grant was created.
 	// Format: date-time
+	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
+	// Format: date-time
 	// Format: date-time
 	ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
 
@@ -102,8 +104,6 @@ func (m *TrustedJwtGrantIssuer) validatePublicKey(formats strfmt.Registry) error
 		if err := m.PublicKey.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("public_key")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("public_key")
 			}
 			return err
 		}
@@ -132,8 +132,6 @@ func (m *TrustedJwtGrantIssuer) contextValidatePublicKey(ctx context.Context, fo
 		if err := m.PublicKey.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("public_key")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("public_key")
 			}
 			return err
 		}

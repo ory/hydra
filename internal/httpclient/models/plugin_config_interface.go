@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin
+// PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin
 //
 // swagger:model PluginConfigInterface
 type PluginConfigInterface struct {
@@ -74,8 +74,6 @@ func (m *PluginConfigInterface) validateTypes(formats strfmt.Registry) error {
 			if err := m.Types[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Types" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("Types" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
@@ -108,8 +106,6 @@ func (m *PluginConfigInterface) contextValidateTypes(ctx context.Context, format
 			if err := m.Types[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("Types" + "." + strconv.Itoa(i))
-				} else if ce, ok := err.(*errors.CompositeError); ok {
-					return ce.ValidateName("Types" + "." + strconv.Itoa(i))
 				}
 				return err
 			}

@@ -106,8 +106,6 @@ func (m *TrustJwtGrantIssuerBody) validateJwk(formats strfmt.Registry) error {
 		if err := m.Jwk.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("jwk")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("jwk")
 			}
 			return err
 		}
@@ -154,8 +152,6 @@ func (m *TrustJwtGrantIssuerBody) contextValidateJwk(ctx context.Context, format
 		if err := m.Jwk.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("jwk")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("jwk")
 			}
 			return err
 		}

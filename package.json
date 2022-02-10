@@ -12,7 +12,11 @@
     "test": "cypress run",
     "test:watch": "cypress open",
     "wait-on": "wait-on",
-    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\""
+    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\"",
+    "openapi-generator-cli": "openapi-generator-cli"
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.1.18"
   },
   "devDependencies": {
     "cypress": "^7.7.0",

@@ -40,9 +40,6 @@ jobs:
       - uses: ory/ci/sdk/generate@master
         with:
           token: ${{ secrets.ORY_BOT_PAT }}
-          app-name: Ory_Hydra
-          swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
-          swag-spec-location: spec/api.json
         id: sdk-generate
 
   test:
@@ -264,9 +261,6 @@ jobs:
       - uses: ory/ci/sdk/release@master
         with:
           token: ${{ secrets.ORY_BOT_PAT }}
-          app-name: Ory_Hydra
-          swag-spec-ignore: internal/httpclient gopkg.in/square/go-jose.v2
-          swag-spec-location: spec/api.json
 
   release:
     name: Generate release

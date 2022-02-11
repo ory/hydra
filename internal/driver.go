@@ -28,14 +28,14 @@ func resetConfig(p *config.Provider) {
 }
 
 func NewConfigurationWithDefaults() *config.Provider {
-	p := config.MustNew(logrusx.New("", ""), configx.SkipValidation())
+	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
 	p.MustSet("dangerous-force-http", true)
 	return p
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
-	p := config.MustNew(logrusx.New("", ""), configx.SkipValidation())
+	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
 	p.MustSet("dangerous-force-http", false)
 	return p

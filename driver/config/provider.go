@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -85,15 +86,15 @@ type Provider struct {
 	p               *configx.Provider
 }
 
-func MustNew(l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
-	p, err := New(l, opts...)
+func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
+	p, err := New(ctx, l, opts...)
 	if err != nil {
 		l.WithError(err).Fatalf("Unable to load config.")
 	}
 	return p
 }
 
-func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
+func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 	opts = append([]configx.OptionModifier{
 		configx.WithStderrValidationReporter(),
 		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
@@ -101,7 +102,7 @@ func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 		configx.WithLogrusWatcher(l),
 	}, opts...)
 
-	p, err := configx.New(spec.ConfigValidationSchema, opts...)
+	p, err := configx.New(ctx, spec.ConfigValidationSchema, opts...)
 	if err != nil {
 		return nil, err
 	}

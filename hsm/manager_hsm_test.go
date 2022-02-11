@@ -40,7 +40,7 @@ func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
 	mockHsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
 	l := logrusx.New("", "")
-	c := config.MustNew(l, configx.SkipValidation())
+	c := config.MustNew(context.Background(), l, configx.SkipValidation())
 	c.MustSet(config.KeyDSN, "memory")
 	c.MustSet(config.HsmEnabled, "true")
 	reg := driver.NewRegistrySQL()

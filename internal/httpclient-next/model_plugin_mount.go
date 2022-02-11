@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount
+// PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount
 type PluginMount struct {
 	// description
 	Description string `json:"Description"`

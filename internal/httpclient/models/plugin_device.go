@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device
+// PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device
 //
 // swagger:model PluginDevice
 type PluginDevice struct {

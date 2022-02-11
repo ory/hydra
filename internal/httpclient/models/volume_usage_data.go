@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
+// VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
 // `GET /system/df` endpoint, and omitted in other endpoints.
 //
 // swagger:model VolumeUsageData

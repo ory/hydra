@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-// PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
+// PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests same as HandledLoginRequest, just with consent_request exposed as json
 type PreviousConsentSession struct {
 	ConsentRequest           *ConsentRequest `json:"consent_request,omitempty"`
 	GrantAccessTokenAudience []string        `json:"grant_access_token_audience,omitempty"`

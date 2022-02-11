@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PatchDocument PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902
+// PatchDocument A JSONPatch document as defined by RFC 6902
 //
 // swagger:model patchDocument
 type PatchDocument struct {
@@ -23,12 +23,12 @@ type PatchDocument struct {
 	From string `json:"from,omitempty"`
 
 	// The operation to be performed
-	// Example: \\\\\\\"replace\\\\
+	// Example: \"replace\
 	// Required: true
 	Op *string `json:"op"`
 
 	// A JSON-pointer
-	// Example: \\\\\\\"/name\\\\
+	// Example: \"/name\
 	// Required: true
 	Path *string `json:"path"`
 

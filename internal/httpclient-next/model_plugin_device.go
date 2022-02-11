@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device
+// PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device
 type PluginDevice struct {
 	// description
 	Description string `json:"Description"`

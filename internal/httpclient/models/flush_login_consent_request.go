@@ -14,21 +14,19 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request
+// FlushLoginConsentRequest flush login consent request
 //
-// swagger:model flushInactiveOAuth2TokensRequest
-type FlushInactiveOAuth2TokensRequest struct {
+// swagger:model flushLoginConsentRequest
+type FlushLoginConsentRequest struct {
 
 	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
-	// of recently issued tokens for auditing.
-	// Format: date-time
-	// Format: date-time
+	// of recent login and consent database entries for auditing.
 	// Format: date-time
 	NotAfter strfmt.DateTime `json:"notAfter,omitempty"`
 }
 
-// Validate validates this flush inactive o auth2 tokens request
-func (m *FlushInactiveOAuth2TokensRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this flush login consent request
+func (m *FlushLoginConsentRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateNotAfter(formats); err != nil {
@@ -41,7 +39,7 @@ func (m *FlushInactiveOAuth2TokensRequest) Validate(formats strfmt.Registry) err
 	return nil
 }
 
-func (m *FlushInactiveOAuth2TokensRequest) validateNotAfter(formats strfmt.Registry) error {
+func (m *FlushLoginConsentRequest) validateNotAfter(formats strfmt.Registry) error {
 	if swag.IsZero(m.NotAfter) { // not required
 		return nil
 	}
@@ -53,13 +51,13 @@ func (m *FlushInactiveOAuth2TokensRequest) validateNotAfter(formats strfmt.Regis
 	return nil
 }
 
-// ContextValidate validates this flush inactive o auth2 tokens request based on context it is used
-func (m *FlushInactiveOAuth2TokensRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this flush login consent request based on context it is used
+func (m *FlushLoginConsentRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *FlushInactiveOAuth2TokensRequest) MarshalBinary() ([]byte, error) {
+func (m *FlushLoginConsentRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -67,8 +65,8 @@ func (m *FlushInactiveOAuth2TokensRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *FlushInactiveOAuth2TokensRequest) UnmarshalBinary(b []byte) error {
-	var res FlushInactiveOAuth2TokensRequest
+func (m *FlushLoginConsentRequest) UnmarshalBinary(b []byte) error {
+	var res FlushLoginConsentRequest
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// LogoutRequest Contains information about an ongoing logout request.
+// LogoutRequest LogoutRequest Contains information about an ongoing logout request.
 //
 // swagger:model logoutRequest
 type LogoutRequest struct {
@@ -61,8 +61,6 @@ func (m *LogoutRequest) validateClient(formats strfmt.Registry) error {
 		if err := m.Client.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("client")
 			}
 			return err
 		}
@@ -91,8 +89,6 @@ func (m *LogoutRequest) contextValidateClient(ctx context.Context, formats strfm
 		if err := m.Client.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("client")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("client")
 			}
 			return err
 		}

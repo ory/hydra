@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Volume Volume volume
+// Volume Volume Volume Volume Volume volume
 //
 // swagger:model Volume
 type Volume struct {
@@ -160,8 +160,6 @@ func (m *Volume) validateUsageData(formats strfmt.Registry) error {
 		if err := m.UsageData.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("UsageData")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("UsageData")
 			}
 			return err
 		}
@@ -190,8 +188,6 @@ func (m *Volume) contextValidateUsageData(ctx context.Context, formats strfmt.Re
 		if err := m.UsageData.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("UsageData")
-			} else if ce, ok := err.(*errors.CompositeError); ok {
-				return ce.ValidateName("UsageData")
 			}
 			return err
 		}

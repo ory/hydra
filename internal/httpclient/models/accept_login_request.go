@@ -88,8 +88,6 @@ func (m *AcceptLoginRequest) validateAmr(formats strfmt.Registry) error {
 	if err := m.Amr.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("amr")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("amr")
 		}
 		return err
 	}
@@ -125,8 +123,6 @@ func (m *AcceptLoginRequest) contextValidateAmr(ctx context.Context, formats str
 	if err := m.Amr.ContextValidate(ctx, formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("amr")
-		} else if ce, ok := err.(*errors.CompositeError); ok {
-			return ce.ValidateName("amr")
 		}
 		return err
 	}

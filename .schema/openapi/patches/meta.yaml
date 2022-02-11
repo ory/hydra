@@ -1,0 +1,12 @@
+- op: replace
+  path: /info
+  value:
+    title: Ory Oathkeeper API
+    description: |
+      Documentation for all of Ory Oathkeeper's APIs.
+    version: >-
+      {{ getenv "CIRCLE_TAG" }}
+    license:
+      name: Apache 2.0
+    contact:
+      email: "hi@ory.sh"

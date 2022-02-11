@@ -9,27 +9,21 @@
 # endpoint can only be used if you follow the steps in the tutorial.      #
 #                                                                         #
 ###########################################################################
-
 version: '3.7'
-
 services:
-
   hydra:
     image: oryd/hydra:v1.11.0
     ports:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
       - "5555:5555" # Port for hydra token user
-    command:
-      serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http
+    command: serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http
     volumes:
-      -
-        type: volume
+      - type: volume
         source: hydra-sqlite
         target: /var/lib/sqlite
         read_only: false
-      -
-        type: bind
+      - type: bind
         source: ./contrib/quickstart/5-min
         target: /etc/config/hydra
     environment:
@@ -39,27 +33,22 @@ services:
       - hydra-migrate
     networks:
       - intranet
-
   hydra-migrate:
     image: oryd/hydra:v1.11.0
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
-    command:
-      migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+    command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
     volumes:
-      -
-        type: volume
+      - type: volume
         source: hydra-sqlite
         target: /var/lib/sqlite
         read_only: false
-      -
-        type: bind
+      - type: bind
         source: ./contrib/quickstart/5-min
         target: /etc/config/hydra
     restart: on-failure
     networks:
       - intranet
-
   consent:
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
@@ -69,9 +58,7 @@ services:
     restart: unless-stopped
     networks:
       - intranet
-
 networks:
   intranet:
-
 volumes:
   hydra-sqlite:

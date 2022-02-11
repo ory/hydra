@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// Volume Volume Volume Volume Volume Volume Volume volume
+// Volume Volume Volume Volume Volume Volume Volume Volume volume
 type Volume struct {
 	// Date/Time the volume was created.
 	CreatedAt *string `json:"CreatedAt,omitempty"`

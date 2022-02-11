@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the `GET /system/df` endpoint, and omitted in other endpoints.
+// VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the `GET /system/df` endpoint, and omitted in other endpoints.
 type VolumeUsageData struct {
 	// The number of containers referencing this volume. This field is set to `-1` if the reference-count is not available.
 	RefCount int64 `json:"RefCount"`

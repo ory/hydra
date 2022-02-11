@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs
+// PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs
 type PluginConfigRootfs struct {
 	// diff ids
 	DiffIds []string `json:"diff_ids,omitempty"`

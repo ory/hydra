@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// Oauth2TokenResponse Oauth2TokenResponse Oauth2TokenResponse The Access Token Response
+// Oauth2TokenResponse The Access Token Response
 type Oauth2TokenResponse struct {
 	// access token
 	AccessToken *string `json:"access_token,omitempty"`

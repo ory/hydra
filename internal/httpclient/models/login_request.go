@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// LoginRequest Contains information on an ongoing login request.
+// LoginRequest LoginRequest Contains information on an ongoing login request.
 //
 // swagger:model loginRequest
 type LoginRequest struct {

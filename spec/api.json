@@ -33,7 +33,7 @@
     },
     "schemas": {
       "ContainerWaitOKBodyError": {
-        "description": "ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any",
+        "description": "ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any",
         "properties": {
           "Message": {
             "description": "Details of an error",
@@ -52,7 +52,7 @@
         "type": "object"
       },
       "JSONWebKey": {
-        "description": "JSONWebKey JSONWebKey JSONWebKey JSONWebKey It is important that this model object is named JSONWebKey for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKey.",
+        "description": "JSONWebKey JSONWebKey JSONWebKey JSONWebKey JSONWebKey It is important that this model object is named JSONWebKey for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKey.",
         "properties": {
           "alg": {
             "description": "The \"alg\" (algorithm) parameter identifies the algorithm intended for\nuse with the key.  The values used should either be registered in the\nIANA \"JSON Web Signature and Encryption Algorithms\" registry\nestablished by [JWA] or be a value that contains a Collision-\nResistant Name.",
@@ -151,7 +151,7 @@
         "type": "object"
       },
       "JSONWebKeySet": {
-        "description": "JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+        "description": "It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
         "properties": {
           "keys": {
             "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -251,11 +251,11 @@
           "PropagatedMount",
           "WorkDir"
         ],
-        "title": "PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig The config of a plugin.",
+        "title": "PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig The config of a plugin.",
         "type": "object"
       },
       "PluginConfigArgs": {
-        "description": "PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args",
+        "description": "PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args",
         "properties": {
           "Description": {
             "description": "description",
@@ -289,7 +289,7 @@
         "type": "object"
       },
       "PluginConfigInterface": {
-        "description": "PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
+        "description": "PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
         "properties": {
           "ProtocolScheme": {
             "description": "Protocol to use for clients connecting to the plugin.",
@@ -314,7 +314,7 @@
         "type": "object"
       },
       "PluginConfigLinux": {
-        "description": "PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux",
+        "description": "PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux",
         "properties": {
           "AllowAllDevices": {
             "description": "allow all devices",
@@ -343,7 +343,7 @@
         "type": "object"
       },
       "PluginConfigNetwork": {
-        "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
+        "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
         "properties": {
           "Type": {
             "description": "type",
@@ -356,7 +356,7 @@
         "type": "object"
       },
       "PluginConfigRootfs": {
-        "description": "PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs",
+        "description": "PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs",
         "properties": {
           "diff_ids": {
             "description": "diff ids",
@@ -373,7 +373,7 @@
         "type": "object"
       },
       "PluginConfigUser": {
-        "description": "PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin config user",
+        "description": "PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin config user",
         "properties": {
           "GID": {
             "description": "g ID",
@@ -389,7 +389,7 @@
         "type": "object"
       },
       "PluginDevice": {
-        "description": "PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device",
+        "description": "PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device",
         "properties": {
           "Description": {
             "description": "description",
@@ -420,7 +420,7 @@
         "type": "object"
       },
       "PluginEnv": {
-        "description": "PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env",
+        "description": "PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env",
         "properties": {
           "Description": {
             "description": "description",
@@ -451,7 +451,7 @@
         "type": "object"
       },
       "PluginInterfaceType": {
-        "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
+        "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
         "properties": {
           "Capability": {
             "description": "capability",
@@ -474,7 +474,7 @@
         "type": "object"
       },
       "PluginMount": {
-        "description": "PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount",
+        "description": "PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount",
         "properties": {
           "Description": {
             "description": "description",
@@ -559,11 +559,11 @@
           "Env",
           "Mounts"
         ],
-        "title": "PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings Settings that can be modified by users.",
+        "title": "PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings Settings that can be modified by users.",
         "type": "object"
       },
       "PreviousConsentSession": {
-        "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+        "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
         "properties": {
           "consent_request": {
             "$ref": "#/components/schemas/consentRequest"
@@ -604,7 +604,7 @@
         "type": "string"
       },
       "Volume": {
-        "description": "Volume Volume Volume Volume Volume volume",
+        "description": "Volume Volume Volume Volume Volume Volume volume",
         "properties": {
           "CreatedAt": {
             "description": "Date/Time the volume was created.",
@@ -659,7 +659,7 @@
         "type": "object"
       },
       "VolumeUsageData": {
-        "description": "VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
+        "description": "VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
         "properties": {
           "RefCount": {
             "description": "The number of containers referencing this volume. This field\nis set to `-1` if the reference-count is not available.",
@@ -702,7 +702,7 @@
             "$ref": "#/components/schemas/consentRequestSession"
           }
         },
-        "title": "The request payload used to accept a consent request.",
+        "title": "AcceptConsentRequest The request payload used to accept a consent request.",
         "type": "object"
       },
       "acceptLoginRequest": {
@@ -738,7 +738,7 @@
         "required": [
           "subject"
         ],
-        "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
+        "title": "AcceptLoginRequest AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
         "type": "object"
       },
       "completedRequest": {
@@ -751,7 +751,7 @@
         "required": [
           "redirect_to"
         ],
-        "title": "CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
+        "title": "CompletedRequest CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
         "type": "object"
       },
       "consentRequest": {
@@ -806,7 +806,7 @@
         "required": [
           "challenge"
         ],
-        "title": "ConsentRequest Contains information on an ongoing consent request.",
+        "title": "ConsentRequest ConsentRequest Contains information on an ongoing consent request.",
         "type": "object"
       },
       "consentRequestSession": {
@@ -826,10 +826,9 @@
         "type": "object"
       },
       "flushInactiveOAuth2TokensRequest": {
-        "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
         "properties": {
           "notAfter": {
-            "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time",
+            "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
             "format": "date-time",
             "type": "string"
           }
@@ -847,7 +846,7 @@
         "type": "object"
       },
       "genericError": {
-        "description": "GenericError GenericError GenericError GenericError generic error",
+        "description": "GenericError GenericError GenericError GenericError GenericError generic error",
         "properties": {
           "code": {
             "description": "The status code",
@@ -857,7 +856,7 @@
           },
           "debug": {
             "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-            "example": "SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" is not a bool.",
+            "example": "SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" is not a bool.",
             "type": "string"
           },
           "details": {
@@ -907,6 +906,7 @@
         "type": "object"
       },
       "healthStatus": {
+        "description": "HealthStatus health status",
         "properties": {
           "status": {
             "description": "Status always contains \"ok\".",
@@ -940,7 +940,7 @@
             "type": "integer"
           }
         },
-        "title": "Generic Error Response",
+        "title": "JSONError Generic Error Response",
         "type": "object"
       },
       "jsonWebKeySetGeneratorRequest": {
@@ -1002,14 +1002,14 @@
         },
         "required": [
           "challenge",
-          "client",
-          "request_url",
-          "requested_access_token_audience",
           "requested_scope",
+          "requested_access_token_audience",
           "skip",
-          "subject"
+          "subject",
+          "client",
+          "request_url"
         ],
-        "title": "Contains information on an ongoing login request.",
+        "title": "LoginRequest Contains information on an ongoing login request.",
         "type": "object"
       },
       "logoutRequest": {
@@ -1038,7 +1038,7 @@
             "type": "string"
           }
         },
-        "title": "LogoutRequest LogoutRequest Contains information about an ongoing logout request.",
+        "title": "Contains information about an ongoing logout request.",
         "type": "object"
       },
       "nullTime": {
@@ -1260,7 +1260,7 @@
         "type": "object"
       },
       "oauth2TokenResponse": {
-        "description": "Oauth2TokenResponse The Access Token Response",
+        "description": "Oauth2TokenResponse Oauth2TokenResponse The Access Token Response",
         "properties": {
           "access_token": {
             "description": "access token",
@@ -1385,7 +1385,7 @@
         "type": "object"
       },
       "patchRequest": {
-        "description": "PatchRequest A JSONPatch request",
+        "description": "PatchRequest PatchRequest A JSONPatch request",
         "items": {
           "$ref": "#/components/schemas/patchDocument"
         },
@@ -1452,7 +1452,7 @@
             "type": "integer"
           }
         },
-        "title": "RejectRequest RejectRequest The request payload used to accept a login or consent request.",
+        "title": "RejectRequest RejectRequest RejectRequest The request payload used to accept a login or consent request.",
         "type": "object"
       },
       "requestWasHandledResponse": {
@@ -1465,7 +1465,7 @@
         "required": [
           "redirect_to"
         ],
-        "title": "RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.",
+        "title": "RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.",
         "type": "object"
       },
       "trustJwtGrantIssuerBody": {
@@ -1510,7 +1510,7 @@
         "type": "object"
       },
       "trustedJsonWebKey": {
-        "description": "TrustedJSONWebKey TrustedJSONWebKey trusted Json web key",
+        "description": "TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey trusted Json web key",
         "properties": {
           "kid": {
             "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
@@ -1526,18 +1526,20 @@
         "type": "object"
       },
       "trustedJwtGrantIssuer": {
+        "description": "TrustedJwtGrantIssuer trusted jwt grant issuer",
         "properties": {
           "created_at": {
-            "description": "The \"created_at\" indicates, when grant was created.",
+            "description": "The \"created_at\" indicates, when grant was created.\nFormat: date-time",
             "format": "date-time",
             "type": "string"
           },
           "expires_at": {
-            "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+            "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".\nFormat: date-time",
             "format": "date-time",
             "type": "string"
           },
           "id": {
+            "description": "id",
             "example": "9edc811f-4e28-453c-9b46-4de65f00217f",
             "type": "string"
           },
@@ -1569,7 +1571,6 @@
         "type": "object"
       },
       "trustedJwtGrantIssuers": {
-        "description": "TrustedJwtGrantIssuers TrustedJwtGrantIssuers TrustedJwtGrantIssuers TrustedJwtGrantIssuers trusted jwt grant issuers",
         "items": {
           "$ref": "#/components/schemas/trustedJwtGrantIssuer"
         },
@@ -1659,6 +1660,7 @@
         "type": "object"
       },
       "version": {
+        "description": "Version version",
         "properties": {
           "version": {
             "description": "Version is the service's version.",
@@ -1818,15 +1820,15 @@
           }
         },
         "required": [
-          "authorization_endpoint",
-          "id_token_signing_alg_values_supported",
           "issuer",
+          "authorization_endpoint",
+          "token_endpoint",
           "jwks_uri",
-          "response_types_supported",
           "subject_types_supported",
-          "token_endpoint"
+          "response_types_supported",
+          "id_token_signing_alg_values_supported"
         ],
-        "title": "WellKnown represents important OpenID Connect discovery metadata",
+        "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
         "type": "object"
       }
     },

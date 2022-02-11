@@ -11,7 +11,6 @@ replace (
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.9
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
-	github.com/seatgeek/logrus-gelf-formatter => github.com/zepatrik/logrus-gelf-formatter v0.0.0-20210305135027-b8b3731dba10
 )
 
 require (

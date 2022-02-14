@@ -358,6 +358,10 @@ func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) error {
 	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
 }
 
+func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, signature string) error {
+	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
+}
+
 func (p *Persister) RevokeAccessToken(ctx context.Context, id string) error {
 	return p.deleteSessionByRequestID(ctx, id, sqlTableAccess)
 }

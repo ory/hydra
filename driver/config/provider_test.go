@@ -278,6 +278,13 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "random_salt", c.SubjectIdentifierAlgorithmSalt())
 	assert.Equal(t, []string{"whatever"}, c.DefaultClientScope())
 
+	// refresh
+	assert.Equal(t, time.Duration(0), c.RefreshTokenRotationGracePeriod())
+	require.NoError(t, c.Set(KeyRefreshTokenRotationGracePeriod, "1s"))
+	assert.Equal(t, time.Second, c.RefreshTokenRotationGracePeriod())
+	require.NoError(t, c.Set(KeyRefreshTokenRotationGracePeriod, "2h"))
+	assert.Equal(t, time.Hour, c.RefreshTokenRotationGracePeriod())
+
 	// urls
 	assert.Equal(t, urlx.ParseOrPanic("https://issuer/"), c.IssuerURL())
 	assert.Equal(t, urlx.ParseOrPanic("https://public/"), c.PublicURL())

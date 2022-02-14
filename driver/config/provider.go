@@ -483,5 +483,10 @@ func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
 }
 
 func (p *Provider) RefreshTokenRotationGracePeriod() time.Duration {
+	var duration = p.p.DurationF(KeyRefreshTokenRotationGracePeriod, 0)
+	if duration > time.Hour {
+		return time.Hour
+	}
+
 	return p.p.DurationF(KeyRefreshTokenRotationGracePeriod, 0)
 }

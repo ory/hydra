@@ -54,13 +54,6 @@ func NewRegistrySQL() *RegistrySQL {
 	return r
 }
 
-// SetConfig used for testing only.
-func (m *RegistrySQL) SetConfig(key string, value interface{}) {
-	if err := m.C.Set(key, value); err != nil {
-		m.l.WithError(err).Fatalf("Unable to set \"%s\" to \"%s\".", key, value)
-	}
-}
-
 func (m *RegistrySQL) Init(ctx context.Context) error {
 	if m.persister == nil {
 		var opts []instrumentedsql.Opt

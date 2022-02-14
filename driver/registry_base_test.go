@@ -27,7 +27,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
 
 	// Create a config and set a valid but unresolvable DSN
-	c := config.MustNew(l, configx.WithConfigFiles("../internal/.hydra.yaml"))
+	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
 	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 	c.MustSet(config.HsmEnabled, "false")
 
@@ -51,7 +51,7 @@ func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
 	// Test ensures that CookieStore MaxAge option is equal to zero after initialization
 
 	r := new(RegistryBase)
-	r.WithConfig(config.MustNew(logrusx.New("", "")))
+	r.WithConfig(config.MustNew(context.Background(), logrusx.New("", "")))
 
 	cs := r.CookieStore().(*sessions.CookieStore)
 

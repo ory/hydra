@@ -46,7 +46,7 @@ func NewGetOAuth2ClientOK() *GetOAuth2ClientOK {
 	return &GetOAuth2ClientOK{}
 }
 
-/*GetOAuth2ClientOK handles this case with default header values.
+/* GetOAuth2ClientOK describes a response with status code 200, with default header values.
 
 oAuth2Client
 */
@@ -57,7 +57,6 @@ type GetOAuth2ClientOK struct {
 func (o *GetOAuth2ClientOK) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientOK  %+v", 200, o.Payload)
 }
-
 func (o *GetOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -81,7 +80,7 @@ func NewGetOAuth2ClientDefault(code int) *GetOAuth2ClientDefault {
 	}
 }
 
-/*GetOAuth2ClientDefault handles this case with default header values.
+/* GetOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
@@ -99,7 +98,6 @@ func (o *GetOAuth2ClientDefault) Code() int {
 func (o *GetOAuth2ClientDefault) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *GetOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }

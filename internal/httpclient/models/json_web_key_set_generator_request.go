@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// JSONWebKeySetGeneratorRequest json web key set generator request
+// JSONWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request
 //
 // swagger:model jsonWebKeySetGeneratorRequest
 type JSONWebKeySetGeneratorRequest struct {
@@ -79,6 +81,11 @@ func (m *JSONWebKeySetGeneratorRequest) validateUse(formats strfmt.Registry) err
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this json web key set generator request based on context it is used
+func (m *JSONWebKeySetGeneratorRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

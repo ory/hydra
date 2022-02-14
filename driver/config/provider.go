@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -66,7 +67,7 @@ const (
 	KeyPKCEEnforcedForPublicClients              = "oauth2.pkce.enforced_for_public_clients"
 	KeyLogLevel                                  = "log.level"
 	KeyCGroupsV1AutoMaxProcsEnabled              = "cgroups.v1.auto_max_procs_enabled"
-	KeyGrantAllClientCredentialsScopesPerDefault = "oauth2.client_credentials.default_grant_allowed_scope"
+	KeyGrantAllClientCredentialsScopesPerDefault = "oauth2.client_credentials.default_grant_allowed_scope" // #nosec G101
 	KeyExposeOAuth2Debug                         = "oauth2.expose_internal_errors"
 	KeyOAuth2LegacyErrors                        = "oauth2.include_legacy_error_fields"
 	KeyExcludeNotBeforeClaim                     = "oauth2.exclude_not_before_claim"
@@ -86,15 +87,15 @@ type Provider struct {
 	p               *configx.Provider
 }
 
-func MustNew(l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
-	p, err := New(l, opts...)
+func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
+	p, err := New(ctx, l, opts...)
 	if err != nil {
 		l.WithError(err).Fatalf("Unable to load config.")
 	}
 	return p
 }
 
-func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
+func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 	opts = append([]configx.OptionModifier{
 		configx.WithStderrValidationReporter(),
 		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
@@ -102,7 +103,7 @@ func New(l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
 		configx.WithLogrusWatcher(l),
 	}, opts...)
 
-	p, err := configx.New(spec.ConfigValidationSchema, opts...)
+	p, err := configx.New(ctx, spec.ConfigValidationSchema, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +266,7 @@ func (p *Provider) ScopeStrategy() string {
 }
 
 func (p *Provider) Tracing() *tracing.Config {
-	return p.p.TracingConfig("ORY Hydra")
+	return p.p.TracingConfig("Ory Hydra")
 }
 
 func (p *Provider) GetCookieSecrets() [][]byte {

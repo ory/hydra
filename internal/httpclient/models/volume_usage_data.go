@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
+// VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
 // `GET /system/df` endpoint, and omitted in other endpoints.
 //
 // swagger:model VolumeUsageData
@@ -64,6 +66,11 @@ func (m *VolumeUsageData) validateSize(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this volume usage data based on context it is used
+func (m *VolumeUsageData) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

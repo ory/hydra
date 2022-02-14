@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// WellKnown WellKnown represents important OpenID Connect discovery metadata
+// WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect discovery metadata
 //
 // It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms
 // among others.
@@ -21,6 +23,7 @@ import (
 type WellKnown struct {
 
 	// URL of the OP's OAuth 2.0 Authorization Endpoint.
+	// Example: https://playground.ory.sh/ory-hydra/public/oauth2/auth
 	// Required: true
 	AuthorizationEndpoint *string `json:"authorization_endpoint"`
 
@@ -64,6 +67,7 @@ type WellKnown struct {
 	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
 	// If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned
 	// by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
+	// Example: https://playground.ory.sh/ory-hydra/public/
 	// Required: true
 	Issuer *string `json:"issuer"`
 
@@ -74,10 +78,12 @@ type WellKnown struct {
 	// Although some algorithms allow the same key to be used for both signatures and encryption, doing so is
 	// NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of
 	// keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate.
+	// Example: https://playground.ory.sh/ory-hydra/public/.well-known/jwks.json
 	// Required: true
 	JwksURI *string `json:"jwks_uri"`
 
 	// URL of the OP's Dynamic Client Registration Endpoint.
+	// Example: https://playground.ory.sh/ory-hydra/admin/client
 	RegistrationEndpoint string `json:"registration_endpoint,omitempty"`
 
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for Request Objects,
@@ -117,6 +123,7 @@ type WellKnown struct {
 	SubjectTypesSupported []string `json:"subject_types_supported"`
 
 	// URL of the OP's OAuth 2.0 Token Endpoint
+	// Example: https://playground.ory.sh/ory-hydra/public/oauth2/token
 	// Required: true
 	TokenEndpoint *string `json:"token_endpoint"`
 
@@ -229,6 +236,11 @@ func (m *WellKnown) validateTokenEndpoint(formats strfmt.Registry) error {
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this well known based on context it is used
+func (m *WellKnown) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

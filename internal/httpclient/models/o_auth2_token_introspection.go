@@ -6,13 +6,15 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
+// OAuth2TokenIntrospection OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:
 //
 // https://tools.ietf.org/html/rfc7662
 //
@@ -102,6 +104,11 @@ func (m *OAuth2TokenIntrospection) validateActive(formats strfmt.Registry) error
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this o auth2 token introspection based on context it is used
+func (m *OAuth2TokenIntrospection) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

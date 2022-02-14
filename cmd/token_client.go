@@ -57,7 +57,7 @@ func NewTokenClientCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "client",
 		Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Client Credentials Flow",
-		Long: `Performs the OAuth 2.0 Client Credentials Flow. This command will help you to see if ORY Hydra has
+		Long: `Performs the OAuth 2.0 Client Credentials Flow. This command will help you to see if Ory Hydra has
 been configured properly.
 
 This command should not be used for anything else than manual testing or demo purposes. The server will terminate on error
@@ -108,6 +108,6 @@ and success.`,
 	cmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
 	cmd.Flags().String("client-secret", os.Getenv("OAUTH2_CLIENT_SECRET"), "Use the provided OAuth 2.0 Client Secret, defaults to environment variable OAUTH2_CLIENT_SECRET")
 	cmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
-	cmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_URL")
+	cmd.PersistentFlags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_URL")
 	return cmd
 }

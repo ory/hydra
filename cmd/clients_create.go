@@ -34,7 +34,7 @@ func NewClientsCreateCmd() *cobra.Command {
 		Long: `This command creates an OAuth 2.0 Client which can be used to perform various OAuth 2.0 Flows like
 the Authorize Code, Implicit, Refresh flow.
 
-ORY Hydra implements the OpenID Connect Dynamic Client registration specification. Most flags are supported by this command
+Ory Hydra implements the OpenID Connect Dynamic Client registration specification. Most flags are supported by this command
 as well.
 
 Example:

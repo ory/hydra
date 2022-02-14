@@ -39,6 +39,6 @@ func NewTokenFlushCmd() *cobra.Command {
 
 	cmd.Flags().Duration("min-age", time.Duration(0), "Skip removing tokens which do not satisfy the minimum age (1s, 1m, 1h)")
 	cmd.Flags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
-	cmd.Flags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
+	cmd.Flags().String("endpoint", os.Getenv("HYDRA_ADMIN_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL")
 	return cmd
 }

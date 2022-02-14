@@ -29,6 +29,18 @@ but connects to your existing identity provider through a [login and consent app
 Implementing the login and consent app in a different language is easy, and exemplary consent apps
 ([Node](https://github.com/ory/hydra-login-consent-node)) and [SDKs](https://www.ory.sh/docs/next/hydra/sdk/) for all common languages are provided.
 
+## Ory Cloud
+
+The easiest way to get started with Ory Software is in Ory Cloud! It is [**free for developers**](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme), forever, no credit card required!
+
+Ory Cloud has easy examples, administrative user interfaces, hosted pages (e.g. for login or registration), support for custom domains, collaborative features for your colleagues, and much more!
+
+### :mega: Community gets Ory Cloud for Free! :mega:
+
+Ory community members get the Ory Cloud Start Up plan **free for a year**, with all quality-of-life features available, such as custom domains and giving your team members access. [Sign up with your GitHub account](https://console.ory.sh/registration?preferred_plan=start-up&utm_source=github&utm_medium=banner&utm_campaign=hydra-readme-first900) and use the coupon code **`FIRST900`** on the *"Start-Up Plan"* checkout page to calim your free project now! Make sure to be signed up to the [Ory Community Slack](https://slack.ory.sh) when using the code!
+
+## Get Started
+
 If you're looking to jump straight into it, go ahead:
 
 - **[Run your own OAuth 2.0 Server - step by step guide](https://www.ory.sh/run-oauth2-server-open-source-api-security/)**: A in-depth look at setting up ORY Hydra and performing a variety of OAuth 2.0 Flows.
@@ -172,7 +184,7 @@ that your company deserves a spot here, reach out to
             <td>DataDetect</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/datadetect.svg" alt="Datadetect"></td>
             <td><a href="https://unifiedglobalarchiving.com/data-detect/">unifiedglobalarchiving.com/data-detect/</a></td>
-        </tr>
+        </tr>        
         <tr>
             <td>Adopter *</td>
             <td>Sainsbury's</td>
@@ -190,13 +202,13 @@ that your company deserves a spot here, reach out to
             <td>Reyah</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/reyah.svg" alt="Reyah"></td>
             <td><a href="https://reyah.eu/">reyah.eu</a></td>
-        </tr>
+        </tr>        
         <tr>
             <td>Adopter *</td>
             <td>Zero</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/commitzero.svg" alt="Project Zero by Commit"></td>
             <td><a href="https://getzero.dev/">getzero.dev</a></td>
-        </tr>
+        </tr>        
         <tr>
             <td>Adopter *</td>
             <td>Padis</td>
@@ -214,7 +226,7 @@ that your company deserves a spot here, reach out to
             <td>Security Onion Solutions</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/securityonion.svg" alt="Security Onion Solutions"></td>
             <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
-        </tr>
+        </tr>        
         <tr>
             <td>Adopter *</td>
             <td>Factly</td>
@@ -238,12 +250,24 @@ that your company deserves a spot here, reach out to
             <td>Spiri.bo</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/spiribo.svg" alt="Spiri.bo"></td>
             <td><a href="https://spiri.bo/">spiri.bo</a></td>
-        </tr>
+        </tr>        
         <tr>
             <td>Sponsor</td>
             <td>Strivacity</td>
             <td align="center"><img height="16px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/strivacity.svg" alt="Strivacity"></td>
-            <td><a href="https://strivacity.com/">strivacity</a></td>
+            <td><a href="https://strivacity.com/">strivacity.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Hanko</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/hanko.svg" alt="Hanko"></td>
+            <td><a href="https://hanko.io/">hanko.io</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Rabbit</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/rabbit.svg" alt="rabbit"></td>
+            <td><a href="https://rabbit.co.th/">rabbit.co.th</a></td>
         </tr>
     </tbody>
 </table>

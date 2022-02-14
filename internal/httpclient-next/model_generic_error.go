@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// GenericError GenericError GenericError GenericError GenericError GenericError GenericError generic error
+// GenericError GenericError GenericError GenericError GenericError GenericError GenericError GenericError generic error
 type GenericError struct {
 	// The status code
 	Code *int64 `json:"code,omitempty"`

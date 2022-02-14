@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// TrustJwtGrantIssuerBody TrustJwtGrantIssuerBody trust jwt grant issuer body
+// TrustJwtGrantIssuerBody TrustJwtGrantIssuerBody TrustJwtGrantIssuerBody trust jwt grant issuer body
 //
 // swagger:model trustJwtGrantIssuerBody
 type TrustJwtGrantIssuerBody struct {

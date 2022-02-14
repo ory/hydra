@@ -2006,7 +2006,8 @@ components:
     ContainerWaitOKBodyError:
       description: ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError
         ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError
-        ContainerWaitOKBodyError container waiting error, if any
+        ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error,
+        if any
       properties:
         Message:
           description: Details of an error
@@ -2026,7 +2027,7 @@ components:
       type: object
     JSONWebKey:
       description: |-
-        JSONWebKey JSONWebKey JSONWebKey JSONWebKey JSONWebKey JSONWebKey It is important that this model object is named JSONWebKey for
+        It is important that this model object is named JSONWebKey for
         "swagger generate spec" to generate only on definition of a
         JSONWebKey.
       example:
@@ -2060,27 +2061,21 @@ components:
           example: RS256
           type: string
         crv:
-          description: crv
           example: P-256
           type: string
         d:
-          description: d
           example: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
           type: string
         dp:
-          description: dp
           example: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
           type: string
         dq:
-          description: dq
           example: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
           type: string
         e:
-          description: e
           example: AQAB
           type: string
         k:
-          description: k
           example: GawgguFyGrWKav7AX4VKUg
           type: string
         kid:
@@ -2106,19 +2101,15 @@ components:
           example: RSA
           type: string
         n:
-          description: "n"
           example: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
           type: string
         p:
-          description: p
           example: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
           type: string
         q:
-          description: q
           example: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
           type: string
         qi:
-          description: qi
           example: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
           type: string
         use:
@@ -2130,7 +2121,6 @@ components:
           example: sig
           type: string
         x:
-          description: x
           example: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
           type: string
         x5c:
@@ -2146,7 +2136,6 @@ components:
             type: string
           type: array
         y:
-          description: "y"
           example: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
           type: string
       required:
@@ -2157,7 +2146,7 @@ components:
       type: object
     JSONWebKeySet:
       description: |-
-        JSONWebKeySet It is important that this model object is named JSONWebKeySet for
+        JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for
         "swagger generate spec" to generate only on definition of a
         JSONWebKeySet. Since one with the same name is previously defined as
         client.Client.JSONWebKeys and this one is last, this one will be
@@ -2281,11 +2270,12 @@ components:
       - PropagatedMount
       - WorkDir
       title: PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig
-        PluginConfig The config of a plugin.
+        PluginConfig PluginConfig The config of a plugin.
       type: object
     PluginConfigArgs:
       description: PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs
-        PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args
+        PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin
+        config args
       properties:
         Description:
           description: description
@@ -2312,7 +2302,7 @@ components:
     PluginConfigInterface:
       description: PluginConfigInterface PluginConfigInterface PluginConfigInterface
         PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface
-        The interface between Docker and the plugin
+        PluginConfigInterface The interface between Docker and the plugin
       properties:
         ProtocolScheme:
           description: Protocol to use for clients connecting to the plugin.
@@ -2331,7 +2321,8 @@ components:
       type: object
     PluginConfigLinux:
       description: PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux
-        PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux
+        PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin
+        config linux
       properties:
         AllowAllDevices:
           description: allow all devices
@@ -2353,8 +2344,8 @@ components:
       type: object
     PluginConfigNetwork:
       description: PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork
-        PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config
-        network
+        PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork
+        plugin config network
       properties:
         Type:
           description: type
@@ -2364,7 +2355,8 @@ components:
       type: object
     PluginConfigRootfs:
       description: PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs
-        PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs
+        PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs
+        plugin config rootfs
       properties:
         diff_ids:
           description: diff ids
@@ -2377,7 +2369,8 @@ components:
       type: object
     PluginConfigUser:
       description: PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser
-        PluginConfigUser PluginConfigUser PluginConfigUser plugin config user
+        PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin
+        config user
       properties:
         GID:
           description: g ID
@@ -2390,7 +2383,7 @@ components:
       type: object
     PluginDevice:
       description: PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice
-        PluginDevice PluginDevice plugin device
+        PluginDevice PluginDevice PluginDevice plugin device
       properties:
         Description:
           description: description
@@ -2414,7 +2407,7 @@ components:
       type: object
     PluginEnv:
       description: PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv
-        plugin env
+        PluginEnv plugin env
       properties:
         Description:
           description: description
@@ -2438,8 +2431,8 @@ components:
       type: object
     PluginInterfaceType:
       description: PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType
-        PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface
-        type
+        PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType
+        plugin interface type
       properties:
         Capability:
           description: capability
@@ -2457,7 +2450,7 @@ components:
       type: object
     PluginMount:
       description: PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount
-        PluginMount plugin mount
+        PluginMount PluginMount plugin mount
       properties:
         Description:
           description: description
@@ -2521,11 +2514,12 @@ components:
       - Env
       - Mounts
       title: PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings
-        PluginSettings PluginSettings Settings that can be modified by users.
+        PluginSettings PluginSettings PluginSettings Settings that can be modified
+        by users.
       type: object
     PreviousConsentSession:
       description: |-
-        PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
+        PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
         same as HandledLoginRequest, just with consent_request exposed as json
       example:
         remember: true
@@ -2665,7 +2659,7 @@ components:
       format: uuid4
       type: string
     Volume:
-      description: Volume Volume Volume Volume Volume Volume Volume volume
+      description: Volume Volume Volume Volume Volume Volume Volume Volume volume
       properties:
         CreatedAt:
           description: Date/Time the volume was created.
@@ -2715,7 +2709,7 @@ components:
       type: object
     VolumeUsageData:
       description: |-
-        VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
+        VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
         `GET /system/df` endpoint, and omitted in other endpoints.
       properties:
         RefCount:
@@ -2767,8 +2761,7 @@ components:
           type: integer
         session:
           $ref: '#/components/schemas/consentRequestSession'
-      title: AcceptConsentRequest AcceptConsentRequest The request payload used to
-        accept a consent request.
+      title: The request payload used to accept a consent request.
       type: object
     acceptLoginRequest:
       properties:
@@ -2836,8 +2829,8 @@ components:
           type: string
       required:
       - redirect_to
-      title: CompletedRequest CompletedRequest CompletedRequest CompletedRequest The
-        response payload sent when accepting or rejecting a login or consent request.
+      title: The response payload sent when accepting or rejecting a login or consent
+        request.
       type: object
     consentRequest:
       example:
@@ -3015,29 +3008,32 @@ components:
       title: Used to pass session data to a consent request.
       type: object
     flushInactiveOAuth2TokensRequest:
-      description: FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens
-        request
+      description: FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest
+        flush inactive o auth2 tokens request
       properties:
         notAfter:
           description: |-
             NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
             of recently issued tokens for auditing.
             Format: date-time
+            Format: date-time
           format: date-time
           type: string
       type: object
     flushLoginConsentRequest:
+      description: FlushLoginConsentRequest flush login consent request
       properties:
         notAfter:
           description: |-
             NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
             of recent login and consent database entries for auditing.
+            Format: date-time
           format: date-time
           type: string
       type: object
     genericError:
       description: GenericError GenericError GenericError GenericError GenericError
-        GenericError generic error
+        GenericError GenericError generic error
       properties:
         code:
           description: The status code
@@ -3050,7 +3046,7 @@ components:
 
             This field is often not exposed to protect against leaking
             sensitive information.
-          example: SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+          example: SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
             is not a bool.
           type: string
         details:
@@ -3126,10 +3122,9 @@ components:
           example: 404
           format: int64
           type: integer
-      title: Generic Error Response
+      title: JSONError Generic Error Response
       type: object
     jsonWebKeySetGeneratorRequest:
-      description: JSONWebKeySetGeneratorRequest json web key set generator request
       properties:
         alg:
           description: The algorithm to be used for creating the key. Supports "RS256",
@@ -3282,7 +3277,7 @@ components:
       - requested_scope
       - skip
       - subject
-      title: LoginRequest LoginRequest Contains information on an ongoing login request.
+      title: Contains information on an ongoing login request.
       type: object
     logoutRequest:
       example:
@@ -3365,7 +3360,7 @@ components:
         subject:
           description: Subject is the user for whom the logout was request.
           type: string
-      title: Contains information about an ongoing logout request.
+      title: LogoutRequest Contains information about an ongoing logout request.
       type: object
     nullTime:
       format: date-time
@@ -3487,6 +3482,7 @@ components:
         created_at:
           description: |-
             CreatedAt returns the timestamp of the client's creation.
+            Format: date-time
             Format: date-time
           format: date-time
           type: string
@@ -3612,6 +3608,7 @@ components:
           description: |-
             UpdatedAt returns the timestamp of the last update.
             Format: date-time
+            Format: date-time
           format: date-time
           type: string
         userinfo_signed_response_alg:
@@ -3620,7 +3617,7 @@ components:
             [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims
             as a UTF-8 encoded JSON object using the application/json content-type.
           type: string
-      title: OAuth2Client Client represents an OAuth 2.0 Client.
+      title: OAuth2Client OAuth2Client Client represents an OAuth 2.0 Client.
       type: object
     oAuth2TokenIntrospection:
       description: https://tools.ietf.org/html/rfc7662
@@ -3722,11 +3719,11 @@ components:
           type: string
       required:
       - active
-      title: 'OAuth2TokenIntrospection Introspection contains an access token''s session
-        data as specified by IETF RFC 7662, see:'
+      title: 'Introspection contains an access token''s session data as specified
+        by IETF RFC 7662, see:'
       type: object
     oauth2TokenResponse:
-      description: The Access Token Response
+      description: Oauth2TokenResponse The Access Token Response
       example:
         access_token: access_token
         refresh_token: refresh_token
@@ -3756,7 +3753,7 @@ components:
           type: string
       type: object
     oauthTokenResponse:
-      description: The token response
+      description: OauthTokenResponse The token response
       properties:
         access_token:
           description: The access token issued by the authorization server.
@@ -3846,21 +3843,22 @@ components:
           items:
             type: string
           type: array
-      title: Contains optional information about the OpenID Connect request.
+      title: OpenIDConnectContext Contains optional information about the OpenID Connect
+        request.
       type: object
     patchDocument:
-      description: A JSONPatch document as defined by RFC 6902
+      description: PatchDocument A JSONPatch document as defined by RFC 6902
       properties:
         from:
           description: A JSON-pointer
           type: string
         op:
           description: The operation to be performed
-          example: '"replace"'
+          example: \"replace\
           type: string
         path:
           description: A JSON-pointer
-          example: '"/name"'
+          example: \"/name\
           type: string
         value:
           description: The value to be used within the operations
@@ -3894,15 +3892,15 @@ components:
         subject:
           description: Subject is the identifier of the authenticated end-user.
           type: string
-      title: RefreshTokenHookRequest is the request body sent to the refresh token
-        hook.
+      title: RefreshTokenHookRequest RefreshTokenHookRequest is the request body sent
+        to the refresh token hook.
       type: object
     refreshTokenHookResponse:
       properties:
         session:
           $ref: '#/components/schemas/consentRequestSession'
-      title: RefreshTokenHookResponse RefreshTokenHookResponse is the response body
-        received from the refresh token hook.
+      title: RefreshTokenHookResponse RefreshTokenHookResponse RefreshTokenHookResponse
+        is the response body received from the refresh token hook.
       type: object
     rejectRequest:
       properties:
@@ -3930,7 +3928,7 @@ components:
             Defaults to 400
           format: int64
           type: integer
-      title: The request payload used to accept a login or consent request.
+      title: RejectRequest The request payload used to accept a login or consent request.
       type: object
     requestWasHandledResponse:
       properties:
@@ -3941,11 +3939,13 @@ components:
       required:
       - redirect_to
       title: RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse
-        RequestWasHandledResponse RequestWasHandledResponse The response payload sent
-        when there is an attempt to access already handled request.
+        RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse
+        The response payload sent when there is an attempt to access already handled
+        request.
       type: object
     trustJwtGrantIssuerBody:
-      description: TrustJwtGrantIssuerBody trust jwt grant issuer body
+      description: TrustJwtGrantIssuerBody TrustJwtGrantIssuerBody trust jwt grant
+        issuer body
       properties:
         expires_at:
           description: The "expires_at" indicates, when grant will expire, so we will
@@ -3981,8 +3981,6 @@ components:
       - subject
       type: object
     trustedJsonWebKey:
-      description: TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey
-        trusted Json web key
       example:
         set: https://jwt-idp.example.com
         kid: 123e4567-e89b-12d3-a456-426655440000
@@ -3999,7 +3997,6 @@ components:
           type: string
       type: object
     trustedJwtGrantIssuer:
-      description: TrustedJwtGrantIssuer TrustedJwtGrantIssuer trusted jwt grant issuer
       example:
         public_key:
           set: https://jwt-idp.example.com
@@ -4014,21 +4011,15 @@ components:
         issuer: https://jwt-idp.example.com
       properties:
         created_at:
-          description: |-
-            The "created_at" indicates, when grant was created.
-            Format: date-time
-            Format: date-time
+          description: The "created_at" indicates, when grant was created.
           format: date-time
           type: string
         expires_at:
-          description: |-
-            The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
-            Format: date-time
-            Format: date-time
+          description: The "expires_at" indicates, when grant will expire, so we will
+            reject assertion from "issuer" targeting "subject".
           format: date-time
           type: string
         id:
-          description: id
           example: 9edc811f-4e28-453c-9b46-4de65f00217f
           type: string
         issuer:
@@ -4058,7 +4049,7 @@ components:
         $ref: '#/components/schemas/trustedJwtGrantIssuer'
       type: array
     userinfoResponse:
-      description: UserinfoResponse The userinfo response
+      description: The userinfo response
       example:
         sub: sub
         website: website
@@ -4415,8 +4406,8 @@ components:
       - response_types_supported
       - subject_types_supported
       - token_endpoint
-      title: WellKnown WellKnown WellKnown represents important OpenID Connect discovery
-        metadata
+      title: WellKnown WellKnown WellKnown WellKnown represents important OpenID Connect
+        discovery metadata
       type: object
     inline_response_200:
       example:

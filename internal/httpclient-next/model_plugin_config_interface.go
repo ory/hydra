@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin
+// PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin
 type PluginConfigInterface struct {
 	// Protocol to use for clients connecting to the plugin.
 	ProtocolScheme *string `json:"ProtocolScheme,omitempty"`

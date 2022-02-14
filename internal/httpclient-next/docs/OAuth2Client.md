@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **ClientSecretExpiresAt** | Pointer to **int64** | SecretExpiresAt is an integer holding the time at which the client secret will expire or 0 if it will not expire. The time is represented as the number of seconds from 1970-01-01T00:00:00Z as measured in UTC until the date/time of expiration.  This feature is currently not supported and it&#39;s value will always be set to 0. | [optional] 
 **ClientUri** | Pointer to **string** | ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion. | [optional] 
 **Contacts** | Pointer to **[]string** |  | [optional] 
-**CreatedAt** | Pointer to **time.Time** | CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time | [optional] 
+**CreatedAt** | Pointer to **time.Time** | CreatedAt returns the timestamp of the client&#39;s creation. Format: date-time Format: date-time | [optional] 
 **FrontchannelLogoutSessionRequired** | Pointer to **bool** | Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false. | [optional] 
 **FrontchannelLogoutUri** | Pointer to **string** | RP URL that will cause the RP to log itself out when rendered in an iframe by the OP. An iss (issuer) query parameter and a sid (session ID) query parameter MAY be included by the OP to enable the RP to validate the request and to determine which of the potentially multiple sessions is to be logged out; if either is included, both MUST be. | [optional] 
 **GrantTypes** | Pointer to **[]string** |  | [optional] 
@@ -37,7 +37,7 @@ Name | Type | Description | Notes
 **TokenEndpointAuthMethod** | Pointer to **string** | Requested Client Authentication method for the Token Endpoint. The options are client_secret_post, client_secret_basic, private_key_jwt, and none. | [optional] 
 **TokenEndpointAuthSigningAlg** | Pointer to **string** | Requested Client Authentication signing algorithm for the Token Endpoint. | [optional] 
 **TosUri** | Pointer to **string** | TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client. | [optional] 
-**UpdatedAt** | Pointer to **time.Time** | UpdatedAt returns the timestamp of the last update. Format: date-time | [optional] 
+**UpdatedAt** | Pointer to **time.Time** | UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time | [optional] 
 **UserinfoSignedResponseAlg** | Pointer to **string** | JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type. | [optional] 
 
 ## Methods

@@ -14,13 +14,14 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// FlushLoginConsentRequest flush login consent request
+// FlushLoginConsentRequest FlushLoginConsentRequest flush login consent request
 //
 // swagger:model flushLoginConsentRequest
 type FlushLoginConsentRequest struct {
 
 	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
 	// of recent login and consent database entries for auditing.
+	// Format: date-time
 	// Format: date-time
 	NotAfter strfmt.DateTime `json:"notAfter,omitempty"`
 }

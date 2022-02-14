@@ -16,9 +16,9 @@ import (
 	"time"
 )
 
-// FlushLoginConsentRequest struct for FlushLoginConsentRequest
+// FlushLoginConsentRequest FlushLoginConsentRequest flush login consent request
 type FlushLoginConsentRequest struct {
-	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history of recent login and consent database entries for auditing.
+	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history of recent login and consent database entries for auditing. Format: date-time
 	NotAfter *time.Time `json:"notAfter,omitempty"`
 }
 

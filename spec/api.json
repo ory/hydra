@@ -33,7 +33,7 @@
     },
     "schemas": {
       "ContainerWaitOKBodyError": {
-        "description": "ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any",
+        "description": "ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any",
         "properties": {
           "Message": {
             "description": "Details of an error",
@@ -139,7 +139,7 @@
         "type": "object"
       },
       "JSONWebKeySet": {
-        "description": "JSONWebKeySet JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
+        "description": "JSONWebKeySet JSONWebKeySet JSONWebKeySet JSONWebKeySet It is important that this model object is named JSONWebKeySet for\n\"swagger generate spec\" to generate only on definition of a\nJSONWebKeySet. Since one with the same name is previously defined as\nclient.Client.JSONWebKeys and this one is last, this one will be\neffectively written in the swagger spec.",
         "properties": {
           "keys": {
             "description": "The value of the \"keys\" parameter is an array of JWK values.  By\ndefault, the order of the JWK values within the array does not imply\nan order of preference among them, although applications of JWK Sets\ncan choose to assign a meaning to the order for their purposes, if\ndesired.",
@@ -239,11 +239,11 @@
           "PropagatedMount",
           "WorkDir"
         ],
-        "title": "PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig The config of a plugin.",
+        "title": "PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig The config of a plugin.",
         "type": "object"
       },
       "PluginConfigArgs": {
-        "description": "PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args",
+        "description": "PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args",
         "properties": {
           "Description": {
             "description": "description",
@@ -277,7 +277,7 @@
         "type": "object"
       },
       "PluginConfigInterface": {
-        "description": "PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
+        "description": "PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin",
         "properties": {
           "ProtocolScheme": {
             "description": "Protocol to use for clients connecting to the plugin.",
@@ -302,7 +302,7 @@
         "type": "object"
       },
       "PluginConfigLinux": {
-        "description": "PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux",
+        "description": "PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux",
         "properties": {
           "AllowAllDevices": {
             "description": "allow all devices",
@@ -331,7 +331,7 @@
         "type": "object"
       },
       "PluginConfigNetwork": {
-        "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
+        "description": "PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network",
         "properties": {
           "Type": {
             "description": "type",
@@ -344,7 +344,7 @@
         "type": "object"
       },
       "PluginConfigRootfs": {
-        "description": "PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs",
+        "description": "PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs",
         "properties": {
           "diff_ids": {
             "description": "diff ids",
@@ -361,7 +361,7 @@
         "type": "object"
       },
       "PluginConfigUser": {
-        "description": "PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin config user",
+        "description": "PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin config user",
         "properties": {
           "GID": {
             "description": "g ID",
@@ -377,7 +377,7 @@
         "type": "object"
       },
       "PluginDevice": {
-        "description": "PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device",
+        "description": "PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice plugin device",
         "properties": {
           "Description": {
             "description": "description",
@@ -408,7 +408,7 @@
         "type": "object"
       },
       "PluginEnv": {
-        "description": "PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env",
+        "description": "PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env",
         "properties": {
           "Description": {
             "description": "description",
@@ -439,7 +439,7 @@
         "type": "object"
       },
       "PluginInterfaceType": {
-        "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
+        "description": "PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type",
         "properties": {
           "Capability": {
             "description": "capability",
@@ -462,7 +462,7 @@
         "type": "object"
       },
       "PluginMount": {
-        "description": "PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount",
+        "description": "PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount",
         "properties": {
           "Description": {
             "description": "description",
@@ -547,11 +547,11 @@
           "Env",
           "Mounts"
         ],
-        "title": "PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings Settings that can be modified by users.",
+        "title": "PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings Settings that can be modified by users.",
         "type": "object"
       },
       "PreviousConsentSession": {
-        "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+        "description": "PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
         "properties": {
           "consent_request": {
             "$ref": "#/components/schemas/consentRequest"
@@ -592,7 +592,7 @@
         "type": "string"
       },
       "Volume": {
-        "description": "Volume Volume Volume Volume Volume Volume Volume Volume Volume volume",
+        "description": "Volume Volume Volume Volume Volume Volume Volume Volume Volume Volume volume",
         "properties": {
           "CreatedAt": {
             "description": "Date/Time the volume was created.",
@@ -647,7 +647,7 @@
         "type": "object"
       },
       "VolumeUsageData": {
-        "description": "VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
+        "description": "VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the\n`GET /system/df` endpoint, and omitted in other endpoints.",
         "properties": {
           "RefCount": {
             "description": "The number of containers referencing this volume. This field\nis set to `-1` if the reference-count is not available.",
@@ -690,7 +690,7 @@
             "$ref": "#/components/schemas/consentRequestSession"
           }
         },
-        "title": "AcceptConsentRequest The request payload used to accept a consent request.",
+        "title": "The request payload used to accept a consent request.",
         "type": "object"
       },
       "acceptLoginRequest": {
@@ -726,7 +726,7 @@
         "required": [
           "subject"
         ],
-        "title": "HandledLoginRequest is the request payload used to accept a login request.",
+        "title": "AcceptLoginRequest HandledLoginRequest is the request payload used to accept a login request.",
         "type": "object"
       },
       "completedRequest": {
@@ -739,7 +739,7 @@
         "required": [
           "redirect_to"
         ],
-        "title": "CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
+        "title": "CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.",
         "type": "object"
       },
       "consentRequest": {
@@ -794,7 +794,7 @@
         "required": [
           "challenge"
         ],
-        "title": "ConsentRequest Contains information on an ongoing consent request.",
+        "title": "Contains information on an ongoing consent request.",
         "type": "object"
       },
       "consentRequestSession": {
@@ -810,14 +810,14 @@
             "type": "object"
           }
         },
-        "title": "ConsentRequestSession Used to pass session data to a consent request.",
+        "title": "Used to pass session data to a consent request.",
         "type": "object"
       },
       "flushInactiveOAuth2TokensRequest": {
-        "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
+        "description": "FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request",
         "properties": {
           "notAfter": {
-            "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
+            "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.\nFormat: date-time\nFormat: date-time\nFormat: date-time\nFormat: date-time",
             "format": "date-time",
             "type": "string"
           }
@@ -825,10 +825,10 @@
         "type": "object"
       },
       "flushLoginConsentRequest": {
-        "description": "FlushLoginConsentRequest FlushLoginConsentRequest flush login consent request",
+        "description": "FlushLoginConsentRequest FlushLoginConsentRequest FlushLoginConsentRequest flush login consent request",
         "properties": {
           "notAfter": {
-            "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recent login and consent database entries for auditing.\nFormat: date-time\nFormat: date-time",
+            "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recent login and consent database entries for auditing.\nFormat: date-time\nFormat: date-time\nFormat: date-time",
             "format": "date-time",
             "type": "string"
           }
@@ -836,7 +836,7 @@
         "type": "object"
       },
       "genericError": {
-        "description": "GenericError GenericError GenericError GenericError GenericError GenericError GenericError GenericError generic error",
+        "description": "GenericError GenericError GenericError GenericError GenericError GenericError GenericError GenericError GenericError generic error",
         "properties": {
           "code": {
             "description": "The status code",
@@ -846,7 +846,7 @@
           },
           "debug": {
             "description": "Debug information\n\nThis field is often not exposed to protect against leaking\nsensitive information.",
-            "example": "SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" is not a bool.",
+            "example": "SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" is not a bool.",
             "type": "string"
           },
           "details": {
@@ -896,6 +896,7 @@
         "type": "object"
       },
       "healthStatus": {
+        "description": "HealthStatus health status",
         "properties": {
           "status": {
             "description": "Status always contains \"ok\".",
@@ -929,11 +930,10 @@
             "type": "integer"
           }
         },
-        "title": "Generic Error Response",
+        "title": "JSONError Generic Error Response",
         "type": "object"
       },
       "jsonWebKeySetGeneratorRequest": {
-        "description": "JSONWebKeySetGeneratorRequest json web key set generator request",
         "properties": {
           "alg": {
             "description": "The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"",
@@ -950,8 +950,8 @@
         },
         "required": [
           "alg",
-          "use",
-          "kid"
+          "kid",
+          "use"
         ],
         "type": "object"
       },
@@ -1028,7 +1028,7 @@
             "type": "string"
           }
         },
-        "title": "Contains information about an ongoing logout request.",
+        "title": "LogoutRequest Contains information about an ongoing logout request.",
         "type": "object"
       },
       "nullTime": {
@@ -1077,7 +1077,7 @@
             "$ref": "#/components/schemas/StringSlicePipeDelimiter"
           },
           "created_at": {
-            "description": "CreatedAt returns the timestamp of the client's creation.",
+            "description": "CreatedAt returns the timestamp of the client's creation.\nFormat: date-time",
             "format": "date-time",
             "type": "string"
           },
@@ -1164,7 +1164,7 @@
             "type": "string"
           },
           "updated_at": {
-            "description": "UpdatedAt returns the timestamp of the last update.",
+            "description": "UpdatedAt returns the timestamp of the last update.\nFormat: date-time",
             "format": "date-time",
             "type": "string"
           },
@@ -1173,7 +1173,7 @@
             "type": "string"
           }
         },
-        "title": "Client represents an OAuth 2.0 Client.",
+        "title": "OAuth2Client Client represents an OAuth 2.0 Client.",
         "type": "object"
       },
       "oAuth2TokenIntrospection": {
@@ -1246,11 +1246,11 @@
         "required": [
           "active"
         ],
-        "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
+        "title": "OAuth2TokenIntrospection Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
         "type": "object"
       },
       "oauth2TokenResponse": {
-        "description": "The Access Token Response",
+        "description": "Oauth2TokenResponse The Access Token Response",
         "properties": {
           "access_token": {
             "description": "access token",
@@ -1281,7 +1281,7 @@
         "type": "object"
       },
       "oauthTokenResponse": {
-        "description": "OauthTokenResponse OauthTokenResponse The token response",
+        "description": "The token response",
         "properties": {
           "access_token": {
             "description": "The access token issued by the authorization server.",
@@ -1343,7 +1343,7 @@
             "type": "array"
           }
         },
-        "title": "OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
+        "title": "OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext Contains optional information about the OpenID Connect request.",
         "type": "object"
       },
       "patchDocument": {
@@ -1375,7 +1375,7 @@
         "type": "object"
       },
       "patchRequest": {
-        "description": "PatchRequest A JSONPatch request",
+        "description": "PatchRequest PatchRequest A JSONPatch request",
         "items": {
           "$ref": "#/components/schemas/patchDocument"
         },
@@ -1406,7 +1406,7 @@
             "type": "string"
           }
         },
-        "title": "RefreshTokenHookRequest is the request body sent to the refresh token hook.",
+        "title": "RefreshTokenHookRequest RefreshTokenHookRequest is the request body sent to the refresh token hook.",
         "type": "object"
       },
       "refreshTokenHookResponse": {
@@ -1442,7 +1442,7 @@
             "type": "integer"
           }
         },
-        "title": "RejectRequest RejectRequest The request payload used to accept a login or consent request.",
+        "title": "RejectRequest RejectRequest RejectRequest The request payload used to accept a login or consent request.",
         "type": "object"
       },
       "requestWasHandledResponse": {
@@ -1455,10 +1455,11 @@
         "required": [
           "redirect_to"
         ],
-        "title": "The response payload sent when there is an attempt to access already handled request.",
+        "title": "RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.",
         "type": "object"
       },
       "trustJwtGrantIssuerBody": {
+        "description": "TrustJwtGrantIssuerBody trust jwt grant issuer body",
         "properties": {
           "expires_at": {
             "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
@@ -1491,16 +1492,16 @@
           }
         },
         "required": [
-          "expires_at",
           "issuer",
-          "jwk",
+          "subject",
           "scope",
-          "subject"
+          "jwk",
+          "expires_at"
         ],
         "type": "object"
       },
       "trustedJsonWebKey": {
-        "description": "TrustedJSONWebKey trusted Json web key",
+        "description": "TrustedJSONWebKey TrustedJSONWebKey trusted Json web key",
         "properties": {
           "kid": {
             "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
@@ -1559,7 +1560,7 @@
         "type": "object"
       },
       "trustedJwtGrantIssuers": {
-        "description": "TrustedJwtGrantIssuers trusted jwt grant issuers",
+        "description": "TrustedJwtGrantIssuers TrustedJwtGrantIssuers trusted jwt grant issuers",
         "items": {
           "$ref": "#/components/schemas/trustedJwtGrantIssuer"
         },
@@ -1649,6 +1650,7 @@
         "type": "object"
       },
       "version": {
+        "description": "Version version",
         "properties": {
           "version": {
             "description": "Version is the service's version.",
@@ -1808,15 +1810,15 @@
           }
         },
         "required": [
-          "authorization_endpoint",
-          "id_token_signing_alg_values_supported",
           "issuer",
+          "authorization_endpoint",
+          "token_endpoint",
           "jwks_uri",
-          "response_types_supported",
           "subject_types_supported",
-          "token_endpoint"
+          "response_types_supported",
+          "id_token_signing_alg_values_supported"
         ],
-        "title": "WellKnown represents important OpenID Connect discovery metadata",
+        "title": "WellKnown WellKnown represents important OpenID Connect discovery metadata",
         "type": "object"
       }
     },

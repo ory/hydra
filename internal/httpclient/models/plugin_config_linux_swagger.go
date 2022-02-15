@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux
+// PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux
 //
 // swagger:model PluginConfigLinux
 type PluginConfigLinux struct {

@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// JsonWebKeySetGeneratorRequest JSONWebKeySetGeneratorRequest json web key set generator request
+// JsonWebKeySetGeneratorRequest struct for JsonWebKeySetGeneratorRequest
 type JsonWebKeySetGeneratorRequest struct {
 	// The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"
 	Alg string `json:"alg"`

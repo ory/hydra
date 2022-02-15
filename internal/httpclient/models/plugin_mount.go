@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount
+// PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin mount
 //
 // swagger:model PluginMount
 type PluginMount struct {

@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network
+// PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork plugin config network
 type PluginConfigNetwork struct {
 	// type
 	Type string `json:"Type"`

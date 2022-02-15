@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any
+// ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError container waiting error, if any
 //
 // swagger:model ContainerWaitOKBodyError
 type ContainerWaitOKBodyError struct {

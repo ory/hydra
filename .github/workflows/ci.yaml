@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: ory/ci/checkout@master
         with:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
@@ -73,7 +73,7 @@ jobs:
             cockroachdb/cockroach:v20.2.5 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
         with:
           fetch-depth: 2
       - uses: actions/cache@v2
@@ -118,7 +118,7 @@ jobs:
       HSM_TOKEN_LABEL: hydra
       HSM_PIN: 1234
     steps:
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
       - uses: actions/cache@v2
         with:
           path: |
@@ -146,7 +146,7 @@ jobs:
       - sdk-generate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.16
@@ -192,7 +192,7 @@ jobs:
             cockroachdb/cockroach:v20.2.5 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.16

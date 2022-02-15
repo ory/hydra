@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin config user
+// PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin config user
 type PluginConfigUser struct {
 	// g ID
 	GID *int32 `json:"GID,omitempty"`

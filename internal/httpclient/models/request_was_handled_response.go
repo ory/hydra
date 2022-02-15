@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.
+// RequestWasHandledResponse The response payload sent when there is an attempt to access already handled request.
 //
 // swagger:model requestWasHandledResponse
 type RequestWasHandledResponse struct {

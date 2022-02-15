@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-// TrustJwtGrantIssuerBody TrustJwtGrantIssuerBody TrustJwtGrantIssuerBody trust jwt grant issuer body
+// TrustJwtGrantIssuerBody struct for TrustJwtGrantIssuerBody
 type TrustJwtGrantIssuerBody struct {
 	// The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".
 	ExpiresAt time.Time `json:"expires_at"`

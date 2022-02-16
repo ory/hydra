@@ -15,20 +15,14 @@ import (
 	"encoding/json"
 )
 
-// Oauth2TokenResponse Oauth2TokenResponse The Access Token Response
+// Oauth2TokenResponse The Access Token Response
 type Oauth2TokenResponse struct {
-	// access token
-	AccessToken *string `json:"access_token,omitempty"`
-	// expires in
-	ExpiresIn *int64 `json:"expires_in,omitempty"`
-	// id token
-	IdToken *string `json:"id_token,omitempty"`
-	// refresh token
+	AccessToken  *string `json:"access_token,omitempty"`
+	ExpiresIn    *int64  `json:"expires_in,omitempty"`
+	IdToken      *string `json:"id_token,omitempty"`
 	RefreshToken *string `json:"refresh_token,omitempty"`
-	// scope
-	Scope *string `json:"scope,omitempty"`
-	// token type
-	TokenType *string `json:"token_type,omitempty"`
+	Scope        *string `json:"scope,omitempty"`
+	TokenType    *string `json:"token_type,omitempty"`
 }
 
 // NewOauth2TokenResponse instantiates a new Oauth2TokenResponse object

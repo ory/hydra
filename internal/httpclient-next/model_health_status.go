@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// HealthStatus HealthStatus HealthStatus health status
+// HealthStatus struct for HealthStatus
 type HealthStatus struct {
 	// Status always contains \"ok\".
 	Status *string `json:"status,omitempty"`

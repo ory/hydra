@@ -5,83 +5,79 @@
 **Table of Contents**
 
 - [0.0.0 (2022-02-16)](#000-2022-02-16)
-- [1.11.4-pre.2 (2022-02-16)](#1114-pre2-2022-02-16)
-    - [Code Generation](#code-generation)
-- [1.11.4-pre.1 (2022-02-16)](#1114-pre1-2022-02-16)
+- [1.11.4 (2022-02-16)](#1114-2022-02-16)
     - [Bug Fixes](#bug-fixes)
-    - [Code Generation](#code-generation-1)
-- [1.11.4-pre.0 (2022-02-16)](#1114-pre0-2022-02-16)
-    - [Code Generation](#code-generation-2)
+    - [Code Generation](#code-generation)
 - [1.11.3 (2022-02-15)](#1113-2022-02-15)
     - [Bug Fixes](#bug-fixes-1)
-    - [Code Generation](#code-generation-3)
+    - [Code Generation](#code-generation-1)
 - [1.11.2 (2022-02-11)](#1112-2022-02-11)
-    - [Code Generation](#code-generation-4)
+    - [Code Generation](#code-generation-2)
 - [1.11.1 (2022-02-11)](#1111-2022-02-11)
     - [Bug Fixes](#bug-fixes-2)
-    - [Code Generation](#code-generation-5)
+    - [Code Generation](#code-generation-3)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
 - [1.11.0 (2022-01-21)](#1110-2022-01-21)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes-3)
-    - [Code Generation](#code-generation-6)
+    - [Code Generation](#code-generation-4)
     - [Documentation](#documentation-1)
     - [Features](#features)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
   - [Breaking Changes](#breaking-changes-1)
     - [Bug Fixes](#bug-fixes-4)
-    - [Code Generation](#code-generation-7)
+    - [Code Generation](#code-generation-5)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-2)
     - [Features](#features-1)
 - [1.10.6 (2021-08-28)](#1106-2021-08-28)
     - [Bug Fixes](#bug-fixes-5)
-    - [Code Generation](#code-generation-8)
+    - [Code Generation](#code-generation-6)
     - [Documentation](#documentation-3)
 - [1.10.5 (2021-08-13)](#1105-2021-08-13)
     - [Bug Fixes](#bug-fixes-6)
-    - [Code Generation](#code-generation-9)
+    - [Code Generation](#code-generation-7)
     - [Documentation](#documentation-4)
     - [Features](#features-2)
 - [1.10.3 (2021-07-14)](#1103-2021-07-14)
     - [Bug Fixes](#bug-fixes-7)
-    - [Code Generation](#code-generation-10)
+    - [Code Generation](#code-generation-8)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-5)
     - [Features](#features-3)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
   - [Breaking Changes](#breaking-changes-2)
     - [Bug Fixes](#bug-fixes-8)
-    - [Code Generation](#code-generation-11)
+    - [Code Generation](#code-generation-9)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-6)
     - [Features](#features-4)
 - [1.10.1 (2021-03-25)](#1101-2021-03-25)
     - [Bug Fixes](#bug-fixes-9)
-    - [Code Generation](#code-generation-12)
+    - [Code Generation](#code-generation-10)
     - [Documentation](#documentation-7)
     - [Features](#features-5)
     - [Tests](#tests)
     - [Unclassified](#unclassified)
 - [1.9.2 (2021-01-29)](#192-2021-01-29)
-    - [Code Generation](#code-generation-13)
+    - [Code Generation](#code-generation-11)
     - [Features](#features-6)
 - [1.9.1 (2021-01-27)](#191-2021-01-27)
-    - [Code Generation](#code-generation-14)
+    - [Code Generation](#code-generation-12)
     - [Documentation](#documentation-8)
 - [1.9.0 (2021-01-12)](#190-2021-01-12)
-    - [Code Generation](#code-generation-15)
+    - [Code Generation](#code-generation-13)
 - [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
-    - [Code Generation](#code-generation-16)
+    - [Code Generation](#code-generation-14)
 - [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
     - [Bug Fixes](#bug-fixes-10)
-    - [Code Generation](#code-generation-17)
+    - [Code Generation](#code-generation-15)
     - [Documentation](#documentation-9)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
   - [Breaking Changes](#breaking-changes-3)
     - [Bug Fixes](#bug-fixes-11)
-    - [Code Generation](#code-generation-18)
+    - [Code Generation](#code-generation-16)
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-10)
     - [Features](#features-7)
@@ -89,38 +85,38 @@
     - [Unclassified](#unclassified-1)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
     - [Bug Fixes](#bug-fixes-12)
-    - [Code Generation](#code-generation-19)
+    - [Code Generation](#code-generation-17)
     - [Documentation](#documentation-11)
     - [Features](#features-8)
     - [Tests](#tests-2)
 - [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
     - [Bug Fixes](#bug-fixes-13)
-    - [Code Generation](#code-generation-20)
+    - [Code Generation](#code-generation-18)
     - [Code Refactoring](#code-refactoring-5)
     - [Documentation](#documentation-12)
     - [Features](#features-9)
     - [Tests](#tests-3)
 - [1.8.5 (2020-10-03)](#185-2020-10-03)
-    - [Code Generation](#code-generation-21)
+    - [Code Generation](#code-generation-19)
 - [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
     - [Bug Fixes](#bug-fixes-14)
-    - [Code Generation](#code-generation-22)
+    - [Code Generation](#code-generation-20)
     - [Features](#features-10)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
   - [Breaking Changes](#breaking-changes-4)
     - [Bug Fixes](#bug-fixes-15)
-    - [Code Generation](#code-generation-23)
+    - [Code Generation](#code-generation-21)
     - [Documentation](#documentation-13)
     - [Features](#features-11)
 - [1.7.4 (2020-08-31)](#174-2020-08-31)
     - [Bug Fixes](#bug-fixes-16)
-    - [Code Generation](#code-generation-24)
+    - [Code Generation](#code-generation-22)
 - [1.7.3 (2020-08-31)](#173-2020-08-31)
-    - [Code Generation](#code-generation-25)
+    - [Code Generation](#code-generation-23)
 - [1.7.1 (2020-08-31)](#171-2020-08-31)
   - [Breaking Changes](#breaking-changes-5)
     - [Bug Fixes](#bug-fixes-17)
-    - [Code Generation](#code-generation-26)
+    - [Code Generation](#code-generation-24)
     - [Code Refactoring](#code-refactoring-6)
     - [Documentation](#documentation-14)
     - [Features](#features-12)
@@ -128,22 +124,22 @@
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
   - [Breaking Changes](#breaking-changes-6)
     - [Bug Fixes](#bug-fixes-18)
-    - [Code Generation](#code-generation-27)
+    - [Code Generation](#code-generation-25)
     - [Code Refactoring](#code-refactoring-7)
     - [Documentation](#documentation-15)
     - [Features](#features-13)
     - [Unclassified](#unclassified-3)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
     - [Bug Fixes](#bug-fixes-19)
-    - [Code Generation](#code-generation-28)
+    - [Code Generation](#code-generation-26)
     - [Documentation](#documentation-16)
     - [Unclassified](#unclassified-4)
 - [1.5.2 (2020-06-23)](#152-2020-06-23)
     - [Bug Fixes](#bug-fixes-20)
-    - [Code Generation](#code-generation-29)
+    - [Code Generation](#code-generation-27)
     - [Features](#features-14)
 - [1.5.1 (2020-06-16)](#151-2020-06-16)
-    - [Code Generation](#code-generation-30)
+    - [Code Generation](#code-generation-28)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
     - [Bug Fixes](#bug-fixes-21)
     - [Chores](#chores)
@@ -622,26 +618,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.4-pre.2...v0.0.0) (2022-02-16)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.4...v0.0.0) (2022-02-16)
 
 
 
-# [1.11.4-pre.2](https://github.com/ory/hydra/compare/v1.11.4-pre.1...v1.11.4-pre.2) (2022-02-16)
+# [1.11.4](https://github.com/ory/hydra/compare/v1.11.3...v1.11.4) (2022-02-16)
 
-autogen: pin v1.11.4-pre.2 release commit
-
-
-
-
-
-### Code Generation
-
-* Pin v1.11.4-pre.2 release commit ([8b1c967](https://github.com/ory/hydra/commit/8b1c967c133f2cd2f3abc5679248c81c62986454))
-
-
-# [1.11.4-pre.1](https://github.com/ory/hydra/compare/v1.11.4-pre.0...v1.11.4-pre.1) (2022-02-16)
-
-autogen: pin v1.11.4-pre.1 release commit
+autogen: pin v1.11.4 release commit
 
 
 
@@ -653,20 +636,7 @@ autogen: pin v1.11.4-pre.1 release commit
 
 ### Code Generation
 
-* Pin v1.11.4-pre.1 release commit ([96798db](https://github.com/ory/hydra/commit/96798db82ea5f3761ed7eed10c6b96a78595627d))
-
-
-# [1.11.4-pre.0](https://github.com/ory/hydra/compare/v1.11.3...v1.11.4-pre.0) (2022-02-16)
-
-autogen: pin v1.11.4-pre.0 release commit
-
-
-
-
-
-### Code Generation
-
-* Pin v1.11.4-pre.0 release commit ([b00f5ec](https://github.com/ory/hydra/commit/b00f5ec38173ccfbebee096820f7b817d9e102ca))
+* Pin v1.11.4 release commit ([9e731b6](https://github.com/ory/hydra/commit/9e731b6e30b5aadd30fe3d7d8541db2331b11df2))
 
 
 # [1.11.3](https://github.com/ory/hydra/compare/v1.11.2...v1.11.3) (2022-02-15)

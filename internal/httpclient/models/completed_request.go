@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// CompletedRequest CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
+// CompletedRequest CompletedRequest CompletedRequest CompletedRequest The response payload sent when accepting or rejecting a login or consent request.
 //
 // swagger:model completedRequest
 type CompletedRequest struct {

@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Volume Volume Volume Volume Volume Volume Volume Volume Volume Volume Volume volume
+// Volume Volume Volume Volume Volume Volume Volume Volume Volume Volume Volume Volume volume
 //
 // swagger:model Volume
 type Volume struct {

@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// HealthNotReadyStatus struct for HealthNotReadyStatus
+// HealthNotReadyStatus HealthNotReadyStatus health not ready status
 type HealthNotReadyStatus struct {
 	// Errors contains a list of errors that caused the not ready status.
 	Errors *map[string]string `json:"errors,omitempty"`

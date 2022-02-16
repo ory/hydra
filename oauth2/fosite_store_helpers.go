@@ -25,7 +25,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/url"
-	"reflect"
 	"testing"
 	"time"
 
@@ -418,15 +417,6 @@ func testHelperRevokeAccessToken(x InternalRegistry) func(t *testing.T) {
 
 func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *testing.T) {
 
-	setConfig := func(registry InternalRegistry, key string, value interface{}) {
-		r := reflect.ValueOf(registry)
-		updateConfig := r.MethodByName("SetConfig")
-		updateConfig.Call([]reflect.Value{
-			reflect.ValueOf(key),
-			reflect.ValueOf(value),
-		})
-	}
-
 	return func(t *testing.T) {
 		t.Run("Revokes refresh token when grace period not configured", func(t *testing.T) {
 			// SETUP
@@ -453,10 +443,10 @@ func testHelperRevokeRefreshTokenMaybeGracePeriod(x InternalRegistry) func(t *te
 		t.Run("refresh token enters grace period when configured,", func(t *testing.T) {
 
 			// SETUP
-			setConfig(x, "oauth2.refresh_token_rotation.grace_period", "1m")
+			x.Config().Set("oauth2.refresh_token_rotation.grace_period", "1m")
 
 			// always reset back to the default
-			defer setConfig(x, "oauth2.refresh_token_rotation.grace_period", "0m")
+			defer x.Config().Set("oauth2.refresh_token_rotation.grace_period", "0m")
 
 			ctx := context.Background()
 			m := x.OAuth2Storage()

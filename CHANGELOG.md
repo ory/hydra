@@ -626,6 +626,7 @@
 
 * Only include needed openapi models ([3d4c16f](https://github.com/ory/hydra/commit/3d4c16ffb14b0ae94858a778b0e75a8ac0535229))
 * Remove unused npm format in docs ([2519628](https://github.com/ory/hydra/commit/2519628dd9a512d452ef7fb49cfc12b4624cffd4))
+* Update mailchimp list ids ([#2995](https://github.com/ory/hydra/issues/2995)) ([172ca9a](https://github.com/ory/hydra/commit/172ca9aabbf154f863233b8590a200617098a252))
 
 
 # [1.11.4](https://github.com/ory/hydra/compare/v1.11.3...v1.11.4) (2022-02-16)

@@ -1561,7 +1561,7 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    patchDocument := []openapiclient.PatchDocument{*openapiclient.NewPatchDocument("\"replace\", "\"/name\")} // []PatchDocument | 
+    patchDocument := []openapiclient.PatchDocument{*openapiclient.NewPatchDocument(""replace"", ""/name"")} // []PatchDocument | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

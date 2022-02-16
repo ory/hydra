@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type
+// PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType plugin interface type
 type PluginInterfaceType struct {
 	// capability
 	Capability string `json:"Capability"`

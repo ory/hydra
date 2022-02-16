@@ -35,7 +35,7 @@ type OAuth2Client struct {
 	// ClientURI is an URL string of a web page providing information about the client. If present, the server SHOULD display this URL to the end-user in a clickable fashion.
 	ClientUri *string  `json:"client_uri,omitempty"`
 	Contacts  []string `json:"contacts,omitempty"`
-	// CreatedAt returns the timestamp of the client's creation. Format: date-time Format: date-time
+	// CreatedAt returns the timestamp of the client's creation.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// Boolean value specifying whether the RP requires that iss (issuer) and sid (session ID) query parameters be included to identify the RP session with the OP when the frontchannel_logout_uri is used. If omitted, the default value is false.
 	FrontchannelLogoutSessionRequired *bool `json:"frontchannel_logout_session_required,omitempty"`
@@ -74,7 +74,7 @@ type OAuth2Client struct {
 	TokenEndpointAuthSigningAlg *string `json:"token_endpoint_auth_signing_alg,omitempty"`
 	// TermsOfServiceURI is a URL string that points to a human-readable terms of service document for the client that describes a contractual relationship between the end-user and the client that the end-user accepts when authorizing the client.
 	TosUri *string `json:"tos_uri,omitempty"`
-	// UpdatedAt returns the timestamp of the last update. Format: date-time Format: date-time
+	// UpdatedAt returns the timestamp of the last update.
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	// JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims as a UTF-8 encoded JSON object using the application/json content-type.
 	UserinfoSignedResponseAlg *string `json:"userinfo_signed_response_alg,omitempty"`

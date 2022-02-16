@@ -14,16 +14,18 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// TrustedJwtGrantIssuer trusted jwt grant issuer
+// TrustedJwtGrantIssuer TrustedJwtGrantIssuer trusted jwt grant issuer
 //
 // swagger:model trustedJwtGrantIssuer
 type TrustedJwtGrantIssuer struct {
 
 	// The "created_at" indicates, when grant was created.
 	// Format: date-time
+	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`
 
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
+	// Format: date-time
 	// Format: date-time
 	ExpiresAt strfmt.DateTime `json:"expires_at,omitempty"`
 

@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PatchDocument PatchDocument A JSONPatch document as defined by RFC 6902
+// PatchDocument A JSONPatch document as defined by RFC 6902
 type PatchDocument struct {
 	// A JSON-pointer
 	From *string `json:"from,omitempty"`

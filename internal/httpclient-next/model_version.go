@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// Version Version Version version
+// Version Version Version Version version
 type Version struct {
 	// Version is the service's version.
 	Version *string `json:"version,omitempty"`

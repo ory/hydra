@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs
+// PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs plugin config rootfs
 //
 // swagger:model PluginConfigRootfs
 type PluginConfigRootfs struct {

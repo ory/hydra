@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// TrustedJsonWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey trusted Json web key
+// TrustedJsonWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey trusted Json web key
 type TrustedJsonWebKey struct {
 	// The \"key_id\" is key unique identifier (same as kid header in jws/jwt).
 	Kid *string `json:"kid,omitempty"`

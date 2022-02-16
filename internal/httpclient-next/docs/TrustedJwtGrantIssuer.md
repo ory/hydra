@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CreatedAt** | Pointer to **time.Time** | The \&quot;created_at\&quot; indicates, when grant was created. Format: date-time | [optional] 
-**ExpiresAt** | Pointer to **time.Time** | The \&quot;expires_at\&quot; indicates, when grant will expire, so we will reject assertion from \&quot;issuer\&quot; targeting \&quot;subject\&quot;. Format: date-time | [optional] 
-**Id** | Pointer to **string** | id | [optional] 
+**CreatedAt** | Pointer to **time.Time** | The \&quot;created_at\&quot; indicates, when grant was created. | [optional] 
+**ExpiresAt** | Pointer to **time.Time** | The \&quot;expires_at\&quot; indicates, when grant will expire, so we will reject assertion from \&quot;issuer\&quot; targeting \&quot;subject\&quot;. | [optional] 
+**Id** | Pointer to **string** |  | [optional] 
 **Issuer** | Pointer to **string** | The \&quot;issuer\&quot; identifies the principal that issued the JWT assertion (same as \&quot;iss\&quot; claim in JWT). | [optional] 
 **PublicKey** | Pointer to [**TrustedJsonWebKey**](TrustedJsonWebKey.md) |  | [optional] 
 **Scope** | Pointer to **[]string** | The \&quot;scope\&quot; contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) | [optional] 

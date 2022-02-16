@@ -16,14 +16,13 @@ import (
 	"time"
 )
 
-// TrustedJwtGrantIssuer TrustedJwtGrantIssuer trusted jwt grant issuer
+// TrustedJwtGrantIssuer struct for TrustedJwtGrantIssuer
 type TrustedJwtGrantIssuer struct {
-	// The \"created_at\" indicates, when grant was created. Format: date-time
+	// The \"created_at\" indicates, when grant was created.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
-	// The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\". Format: date-time
+	// The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
-	// id
-	Id *string `json:"id,omitempty"`
+	Id        *string    `json:"id,omitempty"`
 	// The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).
 	Issuer    *string            `json:"issuer,omitempty"`
 	PublicKey *TrustedJsonWebKey `json:"public_key,omitempty"`

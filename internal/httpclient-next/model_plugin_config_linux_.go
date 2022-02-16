@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux
+// PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux
 type PluginConfigLinux struct {
 	// allow all devices
 	AllowAllDevices bool `json:"AllowAllDevices"`

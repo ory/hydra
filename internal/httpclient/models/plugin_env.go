@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env
+// PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env
 //
 // swagger:model PluginEnv
 type PluginEnv struct {

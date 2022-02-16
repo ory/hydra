@@ -2008,7 +2008,7 @@ components:
         ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError
         ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError
         ContainerWaitOKBodyError ContainerWaitOKBodyError ContainerWaitOKBodyError
-        container waiting error, if any
+        ContainerWaitOKBodyError container waiting error, if any
       properties:
         Message:
           description: Details of an error
@@ -2028,7 +2028,7 @@ components:
       type: object
     JSONWebKey:
       description: |-
-        It is important that this model object is named JSONWebKey for
+        JSONWebKey It is important that this model object is named JSONWebKey for
         "swagger generate spec" to generate only on definition of a
         JSONWebKey.
       example:
@@ -2062,21 +2062,27 @@ components:
           example: RS256
           type: string
         crv:
+          description: crv
           example: P-256
           type: string
         d:
+          description: d
           example: T_N8I-6He3M8a7X1vWt6TGIx4xB_GP3Mb4SsZSA4v-orvJzzRiQhLlRR81naWYxfQAYt5isDI6_C2L9bdWo4FFPjGQFvNoRX-_sBJyBI_rl-TBgsZYoUlAj3J92WmY2inbA-PwyJfsaIIDceYBC-eX-xiCu6qMqkZi3MwQAFL6bMdPEM0z4JBcwFT3VdiWAIRUuACWQwrXMq672x7fMuaIaHi7XDGgt1ith23CLfaREmJku9PQcchbt_uEY-hqrFY6ntTtS4paWWQj86xLL94S-Tf6v6xkL918PfLSOTq6XCzxvlFwzBJqApnAhbwqLjpPhgUG04EDRrqrSBc5Y1BLevn6Ip5h1AhessBp3wLkQgz_roeckt-ybvzKTjESMuagnpqLvOT7Y9veIug2MwPJZI2VjczRc1vzMs25XrFQ8DpUy-bNdp89TmvAXwctUMiJdgHloJw23Cv03gIUAkDnsTqZmkpbIf-crpgNKFmQP_EDKoe8p_PXZZgfbRri3NoEVGP7Mk6yEu8LjJhClhZaBNjuWw2-KlBfOA3g79mhfBnkInee5KO9mGR50qPk1V-MorUYNTFMZIm0kFE6eYVWFBwJHLKYhHU34DoiK1VP-svZpC2uAMFNA_UJEwM9CQ2b8qe4-5e9aywMvwcuArRkAB5mBIfOaOJao3mfukKAE
           type: string
         dp:
+          description: dp
           example: G4sPXkc6Ya9y8oJW9_ILj4xuppu0lzi_H7VTkS8xj5SdX3coE0oimYwxIi2emTAue0UOa5dpgFGyBJ4c8tQ2VF402XRugKDTP8akYhFo5tAA77Qe_NmtuYZc3C3m3I24G2GvR5sSDxUyAN2zq8Lfn9EUms6rY3Ob8YeiKkTiBj0
           type: string
         dq:
+          description: dq
           example: s9lAH9fggBsoFR8Oac2R_E2gw282rT2kGOAhvIllETE1efrA6huUUvMfBcMpn8lqeW6vzznYY5SSQF7pMdC_agI3nG8Ibp1BUb0JUiraRNqUfLhcQb_d9GF4Dh7e74WbRsobRonujTYN1xCaP6TO61jvWrX-L18txXw494Q_cgk
           type: string
         e:
+          description: e
           example: AQAB
           type: string
         k:
+          description: k
           example: GawgguFyGrWKav7AX4VKUg
           type: string
         kid:
@@ -2102,15 +2108,19 @@ components:
           example: RSA
           type: string
         n:
+          description: "n"
           example: vTqrxUyQPl_20aqf5kXHwDZrel-KovIp8s7ewJod2EXHl8tWlRB3_Rem34KwBfqlKQGp1nqah-51H4Jzruqe0cFP58hPEIt6WqrvnmJCXxnNuIB53iX_uUUXXHDHBeaPCSRoNJzNysjoJ30TIUsKBiirhBa7f235PXbKiHducLevV6PcKxJ5cY8zO286qJLBWSPm-OIevwqsIsSIH44Qtm9sioFikhkbLwoqwWORGAY0nl6XvVOlhADdLjBSqSAeT1FPuCDCnXwzCDR8N9IFB_IjdStFkC-rVt2K5BYfPd0c3yFp_vHR15eRd0zJ8XQ7woBC8Vnsac6Et1pKS59pX6256DPWu8UDdEOolKAPgcd_g2NpA76cAaF_jcT80j9KrEzw8Tv0nJBGesuCjPNjGs_KzdkWTUXt23Hn9QJsdc1MZuaW0iqXBepHYfYoqNelzVte117t4BwVp0kUM6we0IqyXClaZgOI8S-WDBw2_Ovdm8e5NmhYAblEVoygcX8Y46oH6bKiaCQfKCFDMcRgChme7AoE1yZZYsPbaG_3IjPrC4LBMHQw8rM9dWjJ8ImjicvZ1pAm0dx-KHCP3y5PVKrxBDf1zSOsBRkOSjB8TPODnJMz6-jd5hTtZxpZPwPoIdCanTZ3ZD6uRBpTmDwtpRGm63UQs1m5FWPwb0T2IF0
           type: string
         p:
+          description: p
           example: 6NbkXwDWUhi-eR55Cgbf27FkQDDWIamOaDr0rj1q0f1fFEz1W5A_09YvG09Fiv1AO2-D8Rl8gS1Vkz2i0zCSqnyy8A025XOcRviOMK7nIxE4OH_PEsko8dtIrb3TmE2hUXvCkmzw9EsTF1LQBOGC6iusLTXepIC1x9ukCKFZQvdgtEObQ5kzd9Nhq-cdqmSeMVLoxPLd1blviVT9Vm8-y12CtYpeJHOaIDtVPLlBhJiBoPKWg3vxSm4XxIliNOefqegIlsmTIa3MpS6WWlCK3yHhat0Q-rRxDxdyiVdG_wzJvp0Iw_2wms7pe-PgNPYvUWH9JphWP5K38YqEBiJFXQ
           type: string
         q:
+          description: q
           example: 0A1FmpOWR91_RAWpqreWSavNaZb9nXeKiBo0DQGBz32DbqKqQ8S4aBJmbRhJcctjCLjain-ivut477tAUMmzJwVJDDq2MZFwC9Q-4VYZmFU4HJityQuSzHYe64RjN-E_NQ02TWhG3QGW6roq6c57c99rrUsETwJJiwS8M5p15Miuz53DaOjv-uqqFAFfywN5WkxHbraBcjHtMiQuyQbQqkCFh-oanHkwYNeytsNhTu2mQmwR5DR2roZ2nPiFjC6nsdk-A7E3S3wMzYYFw7jvbWWoYWo9vB40_MY2Y0FYQSqcDzcBIcq_0tnnasf3VW4Fdx6m80RzOb2Fsnln7vKXAQ
           type: string
         qi:
+          description: qi
           example: GyM_p6JrXySiz1toFgKbWV-JdI3jQ4ypu9rbMWx3rQJBfmt0FoYzgUIZEVFEcOqwemRN81zoDAaa-Bk0KWNGDjJHZDdDmFhW3AN7lI-puxk_mHZGJ11rxyR8O55XLSe3SPmRfKwZI6yU24ZxvQKFYItdldUKGzO6Ia6zTKhAVRU
           type: string
         use:
@@ -2122,6 +2132,7 @@ components:
           example: sig
           type: string
         x:
+          description: x
           example: f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU
           type: string
         x5c:
@@ -2137,6 +2148,7 @@ components:
             type: string
           type: array
         y:
+          description: "y"
           example: x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0
           type: string
       required:
@@ -2147,7 +2159,7 @@ components:
       type: object
     JSONWebKeySet:
       description: |-
-        It is important that this model object is named JSONWebKeySet for
+        JSONWebKeySet It is important that this model object is named JSONWebKeySet for
         "swagger generate spec" to generate only on definition of a
         JSONWebKeySet. Since one with the same name is previously defined as
         client.Client.JSONWebKeys and this one is last, this one will be
@@ -2272,12 +2284,13 @@ components:
       - WorkDir
       title: PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig
         PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig PluginConfig
-        The config of a plugin.
+        PluginConfig The config of a plugin.
       type: object
     PluginConfigArgs:
       description: PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs
         PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs
-        PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin config args
+        PluginConfigArgs PluginConfigArgs PluginConfigArgs PluginConfigArgs plugin
+        config args
       properties:
         Description:
           description: description
@@ -2305,7 +2318,8 @@ components:
       description: PluginConfigInterface PluginConfigInterface PluginConfigInterface
         PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface
         PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface
-        PluginConfigInterface The interface between Docker and the plugin
+        PluginConfigInterface PluginConfigInterface The interface between Docker and
+        the plugin
       properties:
         ProtocolScheme:
           description: Protocol to use for clients connecting to the plugin.
@@ -2325,7 +2339,8 @@ components:
     PluginConfigLinux:
       description: PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux
         PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux
-        PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin config linux
+        PluginConfigLinux PluginConfigLinux PluginConfigLinux PluginConfigLinux plugin
+        config linux
       properties:
         AllowAllDevices:
           description: allow all devices
@@ -2349,7 +2364,7 @@ components:
       description: PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork
         PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork
         PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork PluginConfigNetwork
-        plugin config network
+        PluginConfigNetwork plugin config network
       properties:
         Type:
           description: type
@@ -2361,7 +2376,7 @@ components:
       description: PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs
         PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs
         PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs PluginConfigRootfs
-        plugin config rootfs
+        PluginConfigRootfs plugin config rootfs
       properties:
         diff_ids:
           description: diff ids
@@ -2375,7 +2390,8 @@ components:
     PluginConfigUser:
       description: PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser
         PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser
-        PluginConfigUser PluginConfigUser PluginConfigUser plugin config user
+        PluginConfigUser PluginConfigUser PluginConfigUser PluginConfigUser plugin
+        config user
       properties:
         GID:
           description: g ID
@@ -2389,7 +2405,7 @@ components:
     PluginDevice:
       description: PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice
         PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice PluginDevice
-        PluginDevice plugin device
+        PluginDevice PluginDevice plugin device
       properties:
         Description:
           description: description
@@ -2413,7 +2429,7 @@ components:
       type: object
     PluginEnv:
       description: PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv
-        PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env
+        PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv PluginEnv plugin env
       properties:
         Description:
           description: description
@@ -2439,7 +2455,7 @@ components:
       description: PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType
         PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType
         PluginInterfaceType PluginInterfaceType PluginInterfaceType PluginInterfaceType
-        plugin interface type
+        PluginInterfaceType plugin interface type
       properties:
         Capability:
           description: capability
@@ -2457,8 +2473,8 @@ components:
       type: object
     PluginMount:
       description: PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount
-        PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount plugin
-        mount
+        PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount PluginMount
+        plugin mount
       properties:
         Description:
           description: description
@@ -2523,11 +2539,12 @@ components:
       - Mounts
       title: PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings
         PluginSettings PluginSettings PluginSettings PluginSettings PluginSettings
-        PluginSettings PluginSettings Settings that can be modified by users.
+        PluginSettings PluginSettings PluginSettings Settings that can be modified
+        by users.
       type: object
     PreviousConsentSession:
       description: |-
-        PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
+        PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
         same as HandledLoginRequest, just with consent_request exposed as json
       example:
         remember: true
@@ -2668,7 +2685,7 @@ components:
       type: string
     Volume:
       description: Volume Volume Volume Volume Volume Volume Volume Volume Volume
-        Volume Volume Volume volume
+        Volume Volume Volume Volume volume
       properties:
         CreatedAt:
           description: Date/Time the volume was created.
@@ -2718,7 +2735,7 @@ components:
       type: object
     VolumeUsageData:
       description: |-
-        VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
+        VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData VolumeUsageData Usage details about the volume. This information is used by the
         `GET /system/df` endpoint, and omitted in other endpoints.
       properties:
         RefCount:
@@ -2770,7 +2787,7 @@ components:
           type: integer
         session:
           $ref: '#/components/schemas/consentRequestSession'
-      title: The request payload used to accept a consent request.
+      title: AcceptConsentRequest The request payload used to accept a consent request.
       type: object
     acceptLoginRequest:
       properties:
@@ -2826,7 +2843,8 @@ components:
           type: string
       required:
       - subject
-      title: HandledLoginRequest is the request payload used to accept a login request.
+      title: AcceptLoginRequest HandledLoginRequest is the request payload used to
+        accept a login request.
       type: object
     completedRequest:
       example:
@@ -2838,8 +2856,8 @@ components:
           type: string
       required:
       - redirect_to
-      title: CompletedRequest CompletedRequest CompletedRequest CompletedRequest The
-        response payload sent when accepting or rejecting a login or consent request.
+      title: The response payload sent when accepting or rejecting a login or consent
+        request.
       type: object
     consentRequest:
       example:
@@ -2991,7 +3009,7 @@ components:
           type: string
       required:
       - challenge
-      title: Contains information on an ongoing consent request.
+      title: ConsentRequest Contains information on an ongoing consent request.
       type: object
     consentRequestSession:
       example:
@@ -3014,13 +3032,14 @@ components:
             IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
             by anyone that has access to the ID Challenge. Use with care!
           type: object
-      title: ConsentRequestSession ConsentRequestSession Used to pass session data
-        to a consent request.
+      title: ConsentRequestSession ConsentRequestSession ConsentRequestSession Used
+        to pass session data to a consent request.
       type: object
     flushInactiveOAuth2TokensRequest:
       description: FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest
         FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest
-        FlushInactiveOAuth2TokensRequest flush inactive o auth2 tokens request
+        FlushInactiveOAuth2TokensRequest FlushInactiveOAuth2TokensRequest flush inactive
+        o auth2 tokens request
       properties:
         notAfter:
           description: |-
@@ -3032,17 +3051,20 @@ components:
             Format: date-time
             Format: date-time
             Format: date-time
+            Format: date-time
           format: date-time
           type: string
       type: object
     flushLoginConsentRequest:
       description: FlushLoginConsentRequest FlushLoginConsentRequest FlushLoginConsentRequest
-        FlushLoginConsentRequest FlushLoginConsentRequest flush login consent request
+        FlushLoginConsentRequest FlushLoginConsentRequest FlushLoginConsentRequest
+        flush login consent request
       properties:
         notAfter:
           description: |-
             NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history
             of recent login and consent database entries for auditing.
+            Format: date-time
             Format: date-time
             Format: date-time
             Format: date-time
@@ -3054,7 +3076,7 @@ components:
     genericError:
       description: GenericError GenericError GenericError GenericError GenericError
         GenericError GenericError GenericError GenericError GenericError GenericError
-        generic error
+        GenericError generic error
       properties:
         code:
           description: The status code
@@ -3067,7 +3089,7 @@ components:
 
             This field is often not exposed to protect against leaking
             sensitive information.
-          example: SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+          example: SQL field \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"foo\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
             is not a bool.
           type: string
         details:
@@ -3106,7 +3128,8 @@ components:
       - message
       type: object
     healthNotReadyStatus:
-      description: HealthNotReadyStatus HealthNotReadyStatus health not ready status
+      description: HealthNotReadyStatus HealthNotReadyStatus HealthNotReadyStatus
+        health not ready status
       properties:
         errors:
           additionalProperties:
@@ -3116,6 +3139,7 @@ components:
           type: object
       type: object
     healthStatus:
+      description: HealthStatus health status
       properties:
         status:
           description: Status always contains "ok".
@@ -3144,10 +3168,9 @@ components:
           example: 404
           format: int64
           type: integer
-      title: JSONError JSONError JSONError Generic Error Response
+      title: JSONError JSONError JSONError JSONError Generic Error Response
       type: object
     jsonWebKeySetGeneratorRequest:
-      description: JSONWebKeySetGeneratorRequest json web key set generator request
       properties:
         alg:
           description: The algorithm to be used for creating the key. Supports "RS256",
@@ -3300,7 +3323,7 @@ components:
       - requested_scope
       - skip
       - subject
-      title: LoginRequest LoginRequest Contains information on an ongoing login request.
+      title: Contains information on an ongoing login request.
       type: object
     logoutRequest:
       example:
@@ -3383,8 +3406,7 @@ components:
         subject:
           description: Subject is the user for whom the logout was request.
           type: string
-      title: LogoutRequest LogoutRequest LogoutRequest Contains information about
-        an ongoing logout request.
+      title: Contains information about an ongoing logout request.
       type: object
     nullTime:
       format: date-time
@@ -3737,8 +3759,8 @@ components:
           type: string
       required:
       - active
-      title: 'OAuth2TokenIntrospection Introspection contains an access token''s session
-        data as specified by IETF RFC 7662, see:'
+      title: 'OAuth2TokenIntrospection OAuth2TokenIntrospection Introspection contains
+        an access token''s session data as specified by IETF RFC 7662, see:'
       type: object
     oauth2TokenResponse:
       description: The Access Token Response
@@ -3771,7 +3793,7 @@ components:
           type: string
       type: object
     oauthTokenResponse:
-      description: OauthTokenResponse OauthTokenResponse The token response
+      description: The token response
       properties:
         access_token:
           description: The access token issued by the authorization server.
@@ -3862,8 +3884,8 @@ components:
             type: string
           type: array
       title: OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext OpenIDConnectContext
-        OpenIDConnectContext Contains optional information about the OpenID Connect
-        request.
+        OpenIDConnectContext OpenIDConnectContext Contains optional information about
+        the OpenID Connect request.
       type: object
     patchDocument:
       description: A JSONPatch document as defined by RFC 6902
@@ -3887,8 +3909,7 @@ components:
       - path
       type: object
     patchRequest:
-      description: PatchRequest PatchRequest PatchRequest PatchRequest A JSONPatch
-        request
+      description: A JSONPatch request
       items:
         $ref: '#/components/schemas/patchDocument'
       type: array
@@ -3919,8 +3940,8 @@ components:
       properties:
         session:
           $ref: '#/components/schemas/consentRequestSession'
-      title: RefreshTokenHookResponse RefreshTokenHookResponse is the response body
-        received from the refresh token hook.
+      title: RefreshTokenHookResponse RefreshTokenHookResponse RefreshTokenHookResponse
+        is the response body received from the refresh token hook.
       type: object
     rejectRequest:
       properties:
@@ -3948,7 +3969,7 @@ components:
             Defaults to 400
           format: int64
           type: integer
-      title: RejectRequest The request payload used to accept a login or consent request.
+      title: The request payload used to accept a login or consent request.
       type: object
     requestWasHandledResponse:
       properties:
@@ -3962,7 +3983,6 @@ components:
         handled request.
       type: object
     trustJwtGrantIssuerBody:
-      description: TrustJwtGrantIssuerBody trust jwt grant issuer body
       properties:
         expires_at:
           description: The "expires_at" indicates, when grant will expire, so we will
@@ -3999,7 +4019,7 @@ components:
       type: object
     trustedJsonWebKey:
       description: TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey TrustedJSONWebKey
-        trusted Json web key
+        TrustedJSONWebKey trusted Json web key
       example:
         set: https://jwt-idp.example.com
         kid: 123e4567-e89b-12d3-a456-426655440000
@@ -4016,7 +4036,6 @@ components:
           type: string
       type: object
     trustedJwtGrantIssuer:
-      description: TrustedJwtGrantIssuer trusted jwt grant issuer
       example:
         public_key:
           set: https://jwt-idp.example.com
@@ -4031,19 +4050,15 @@ components:
         issuer: https://jwt-idp.example.com
       properties:
         created_at:
-          description: |-
-            The "created_at" indicates, when grant was created.
-            Format: date-time
+          description: The "created_at" indicates, when grant was created.
           format: date-time
           type: string
         expires_at:
-          description: |-
-            The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
-            Format: date-time
+          description: The "expires_at" indicates, when grant will expire, so we will
+            reject assertion from "issuer" targeting "subject".
           format: date-time
           type: string
         id:
-          description: id
           example: 9edc811f-4e28-453c-9b46-4de65f00217f
           type: string
         issuer:
@@ -4069,11 +4084,12 @@ components:
           type: string
       type: object
     trustedJwtGrantIssuers:
+      description: TrustedJwtGrantIssuers trusted jwt grant issuers
       items:
         $ref: '#/components/schemas/trustedJwtGrantIssuer'
       type: array
     userinfoResponse:
-      description: UserinfoResponse The userinfo response
+      description: UserinfoResponse UserinfoResponse The userinfo response
       example:
         sub: sub
         website: website
@@ -4209,7 +4225,6 @@ components:
           type: string
       type: object
     version:
-      description: Version Version Version version
       properties:
         version:
           description: Version is the service's version.
@@ -4431,7 +4446,7 @@ components:
       - response_types_supported
       - subject_types_supported
       - token_endpoint
-      title: WellKnown WellKnown represents important OpenID Connect discovery metadata
+      title: WellKnown represents important OpenID Connect discovery metadata
       type: object
     inline_response_200:
       example:

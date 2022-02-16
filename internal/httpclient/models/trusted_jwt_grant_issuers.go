@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// TrustedJwtGrantIssuers trusted jwt grant issuers
+// TrustedJwtGrantIssuers TrustedJwtGrantIssuers trusted jwt grant issuers
 //
 // swagger:model trustedJwtGrantIssuers
 type TrustedJwtGrantIssuers []*TrustedJwtGrantIssuer

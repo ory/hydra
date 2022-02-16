@@ -243,6 +243,7 @@ jobs:
     steps:
       - uses: ory/ci/sdk/release@master
         with:
+          swag-spec-location: spec/api.json
           token: ${{ secrets.ORY_BOT_PAT }}
 
   release:

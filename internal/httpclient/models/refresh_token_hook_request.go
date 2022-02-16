@@ -12,7 +12,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// RefreshTokenHookRequest RefreshTokenHookRequest is the request body sent to the refresh token hook.
+// RefreshTokenHookRequest RefreshTokenHookRequest RefreshTokenHookRequest is the request body sent to the refresh token hook.
 //
 // swagger:model refreshTokenHookRequest
 type RefreshTokenHookRequest struct {

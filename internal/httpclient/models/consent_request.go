@@ -14,7 +14,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// ConsentRequest ConsentRequest Contains information on an ongoing consent request.
+// ConsentRequest Contains information on an ongoing consent request.
 //
 // swagger:model consentRequest
 type ConsentRequest struct {

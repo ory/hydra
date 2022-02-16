@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin
+// PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface PluginConfigInterface The interface between Docker and the plugin
 //
 // swagger:model PluginConfigInterface
 type PluginConfigInterface struct {

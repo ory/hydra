@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 )
 
-// JSONWebKey JSONWebKey It is important that this model object is named JSONWebKey for \"swagger generate spec\" to generate only on definition of a JSONWebKey.
+// JSONWebKey JSONWebKey JSONWebKey It is important that this model object is named JSONWebKey for \"swagger generate spec\" to generate only on definition of a JSONWebKey.
 type JSONWebKey struct {
 	// The \"alg\" (algorithm) parameter identifies the algorithm intended for use with the key.  The values used should either be registered in the IANA \"JSON Web Signature and Encryption Algorithms\" registry established by [JWA] or be a value that contains a Collision- Resistant Name.
 	Alg string `json:"alg"`

@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: ory/ci/checkout@master
         with:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
@@ -73,7 +73,7 @@ jobs:
             cockroachdb/cockroach:v20.2.5 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
         with:
           fetch-depth: 2
       - uses: actions/cache@v2
@@ -118,7 +118,7 @@ jobs:
       HSM_TOKEN_LABEL: hydra
       HSM_PIN: 1234
     steps:
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
       - uses: actions/cache@v2
         with:
           path: |
@@ -146,7 +146,7 @@ jobs:
       - sdk-generate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.16
@@ -192,7 +192,7 @@ jobs:
             cockroachdb/cockroach:v20.2.5 start-single-node --insecure
           docker start cockroach
         name: Start CockroachDB
-      - uses: actions/checkout@v2
+      - uses: ory/ci/checkout@master
       - uses: actions/setup-go@v2
         with:
           go-version: ^1.16
@@ -243,6 +243,7 @@ jobs:
     steps:
       - uses: ory/ci/sdk/release@master
         with:
+          swag-spec-location: spec/api.json
           token: ${{ secrets.ORY_BOT_PAT }}
 
   release:
@@ -274,6 +275,7 @@ jobs:
       - uses: ory/ci/releaser/render-version-schema@master
         with:
           schema-path: spec/config.json
+          token: ${{ secrets.ORY_BOT_PAT }}
 
   newsletter-draft:
     name: Draft newsletter
@@ -284,8 +286,8 @@ jobs:
     steps:
       - uses: ory/ci/newsletter@master
         with:
-          mailchimp_list_id: 058a056618
-          mailchmip_segment_id: 11398953
+          mailchimp_list_id: f605a41b53
+          mailchmip_segment_id: 6479481
           mailchimp_api_key: ${{ secrets.MAILCHIMP_API_KEY }}
           draft: 'true'
           ssh_key: ${{ secrets.ORY_BOT_SSH_KEY }}
@@ -311,8 +313,8 @@ jobs:
     steps:
       - uses: ory/ci/newsletter@master
         with:
-          mailchimp_list_id: 058a056618
-          mailchmip_segment_id: 11398953
+          mailchimp_list_id: f605a41b53
+          mailchmip_segment_id: 6479481
           mailchimp_api_key: ${{ secrets.MAILCHIMP_API_KEY }}
           draft: 'false'
           ssh_key: ${{ secrets.ORY_BOT_SSH_KEY }}

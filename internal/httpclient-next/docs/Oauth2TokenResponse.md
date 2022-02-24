@@ -4,12 +4,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AccessToken** | Pointer to **string** | access token | [optional] 
-**ExpiresIn** | Pointer to **int64** | expires in | [optional] 
-**IdToken** | Pointer to **string** | id token | [optional] 
-**RefreshToken** | Pointer to **string** | refresh token | [optional] 
-**Scope** | Pointer to **string** | scope | [optional] 
-**TokenType** | Pointer to **string** | token type | [optional] 
+**AccessToken** | Pointer to **string** |  | [optional] 
+**ExpiresIn** | Pointer to **int64** |  | [optional] 
+**IdToken** | Pointer to **string** |  | [optional] 
+**RefreshToken** | Pointer to **string** |  | [optional] 
+**Scope** | Pointer to **string** |  | [optional] 
+**TokenType** | Pointer to **string** |  | [optional] 
 
 ## Methods
 

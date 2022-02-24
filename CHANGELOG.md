@@ -4,151 +4,165 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-02-11)](#000-2022-02-11)
-- [1.11.2 (2022-02-11)](#1112-2022-02-11)
+- [0.0.0 (2022-02-23)](#000-2022-02-23)
+- [1.11.7 (2022-02-23)](#1117-2022-02-23)
     - [Code Generation](#code-generation)
-- [1.11.1 (2022-02-11)](#1111-2022-02-11)
+- [1.11.6 (2022-02-23)](#1116-2022-02-23)
     - [Bug Fixes](#bug-fixes)
     - [Code Generation](#code-generation-1)
+- [1.11.5 (2022-02-21)](#1115-2022-02-21)
+    - [Bug Fixes](#bug-fixes-1)
+    - [Code Generation](#code-generation-2)
+- [1.11.4 (2022-02-16)](#1114-2022-02-16)
+    - [Bug Fixes](#bug-fixes-2)
+    - [Code Generation](#code-generation-3)
+- [1.11.3 (2022-02-15)](#1113-2022-02-15)
+    - [Bug Fixes](#bug-fixes-3)
+    - [Code Generation](#code-generation-4)
+- [1.11.2 (2022-02-11)](#1112-2022-02-11)
+    - [Code Generation](#code-generation-5)
+- [1.11.1 (2022-02-11)](#1111-2022-02-11)
+    - [Bug Fixes](#bug-fixes-4)
+    - [Code Generation](#code-generation-6)
     - [Code Refactoring](#code-refactoring)
     - [Documentation](#documentation)
 - [1.11.0 (2022-01-21)](#1110-2022-01-21)
   - [Breaking Changes](#breaking-changes)
-    - [Bug Fixes](#bug-fixes-1)
-    - [Code Generation](#code-generation-2)
+    - [Bug Fixes](#bug-fixes-5)
+    - [Code Generation](#code-generation-7)
     - [Documentation](#documentation-1)
     - [Features](#features)
 - [1.10.7 (2021-10-27)](#1107-2021-10-27)
   - [Breaking Changes](#breaking-changes-1)
-    - [Bug Fixes](#bug-fixes-2)
-    - [Code Generation](#code-generation-3)
+    - [Bug Fixes](#bug-fixes-6)
+    - [Code Generation](#code-generation-8)
     - [Code Refactoring](#code-refactoring-1)
     - [Documentation](#documentation-2)
     - [Features](#features-1)
 - [1.10.6 (2021-08-28)](#1106-2021-08-28)
-    - [Bug Fixes](#bug-fixes-3)
-    - [Code Generation](#code-generation-4)
+    - [Bug Fixes](#bug-fixes-7)
+    - [Code Generation](#code-generation-9)
     - [Documentation](#documentation-3)
 - [1.10.5 (2021-08-13)](#1105-2021-08-13)
-    - [Bug Fixes](#bug-fixes-4)
-    - [Code Generation](#code-generation-5)
+    - [Bug Fixes](#bug-fixes-8)
+    - [Code Generation](#code-generation-10)
     - [Documentation](#documentation-4)
     - [Features](#features-2)
 - [1.10.3 (2021-07-14)](#1103-2021-07-14)
-    - [Bug Fixes](#bug-fixes-5)
-    - [Code Generation](#code-generation-6)
+    - [Bug Fixes](#bug-fixes-9)
+    - [Code Generation](#code-generation-11)
     - [Code Refactoring](#code-refactoring-2)
     - [Documentation](#documentation-5)
     - [Features](#features-3)
 - [1.10.2 (2021-05-04)](#1102-2021-05-04)
   - [Breaking Changes](#breaking-changes-2)
-    - [Bug Fixes](#bug-fixes-6)
-    - [Code Generation](#code-generation-7)
+    - [Bug Fixes](#bug-fixes-10)
+    - [Code Generation](#code-generation-12)
     - [Code Refactoring](#code-refactoring-3)
     - [Documentation](#documentation-6)
     - [Features](#features-4)
 - [1.10.1 (2021-03-25)](#1101-2021-03-25)
-    - [Bug Fixes](#bug-fixes-7)
-    - [Code Generation](#code-generation-8)
+    - [Bug Fixes](#bug-fixes-11)
+    - [Code Generation](#code-generation-13)
     - [Documentation](#documentation-7)
     - [Features](#features-5)
     - [Tests](#tests)
     - [Unclassified](#unclassified)
 - [1.9.2 (2021-01-29)](#192-2021-01-29)
-    - [Code Generation](#code-generation-9)
+    - [Code Generation](#code-generation-14)
     - [Features](#features-6)
 - [1.9.1 (2021-01-27)](#191-2021-01-27)
-    - [Code Generation](#code-generation-10)
+    - [Code Generation](#code-generation-15)
     - [Documentation](#documentation-8)
 - [1.9.0 (2021-01-12)](#190-2021-01-12)
-    - [Code Generation](#code-generation-11)
+    - [Code Generation](#code-generation-16)
 - [1.9.0-rc.0 (2021-01-12)](#190-rc0-2021-01-12)
-    - [Code Generation](#code-generation-12)
+    - [Code Generation](#code-generation-17)
 - [1.9.0-alpha.4.pre.0 (2021-01-12)](#190-alpha4pre0-2021-01-12)
-    - [Bug Fixes](#bug-fixes-8)
-    - [Code Generation](#code-generation-13)
+    - [Bug Fixes](#bug-fixes-12)
+    - [Code Generation](#code-generation-18)
     - [Documentation](#documentation-9)
 - [1.9.0-alpha.3 (2020-12-08)](#190-alpha3-2020-12-08)
   - [Breaking Changes](#breaking-changes-3)
-    - [Bug Fixes](#bug-fixes-9)
-    - [Code Generation](#code-generation-14)
+    - [Bug Fixes](#bug-fixes-13)
+    - [Code Generation](#code-generation-19)
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-10)
     - [Features](#features-7)
     - [Tests](#tests-1)
     - [Unclassified](#unclassified-1)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
-    - [Bug Fixes](#bug-fixes-10)
-    - [Code Generation](#code-generation-15)
+    - [Bug Fixes](#bug-fixes-14)
+    - [Code Generation](#code-generation-20)
     - [Documentation](#documentation-11)
     - [Features](#features-8)
     - [Tests](#tests-2)
 - [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
-    - [Bug Fixes](#bug-fixes-11)
-    - [Code Generation](#code-generation-16)
+    - [Bug Fixes](#bug-fixes-15)
+    - [Code Generation](#code-generation-21)
     - [Code Refactoring](#code-refactoring-5)
     - [Documentation](#documentation-12)
     - [Features](#features-9)
     - [Tests](#tests-3)
 - [1.8.5 (2020-10-03)](#185-2020-10-03)
-    - [Code Generation](#code-generation-17)
+    - [Code Generation](#code-generation-22)
 - [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
-    - [Bug Fixes](#bug-fixes-12)
-    - [Code Generation](#code-generation-18)
+    - [Bug Fixes](#bug-fixes-16)
+    - [Code Generation](#code-generation-23)
     - [Features](#features-10)
 - [1.8.0-pre.0 (2020-10-02)](#180-pre0-2020-10-02)
   - [Breaking Changes](#breaking-changes-4)
-    - [Bug Fixes](#bug-fixes-13)
-    - [Code Generation](#code-generation-19)
+    - [Bug Fixes](#bug-fixes-17)
+    - [Code Generation](#code-generation-24)
     - [Documentation](#documentation-13)
     - [Features](#features-11)
 - [1.7.4 (2020-08-31)](#174-2020-08-31)
-    - [Bug Fixes](#bug-fixes-14)
-    - [Code Generation](#code-generation-20)
+    - [Bug Fixes](#bug-fixes-18)
+    - [Code Generation](#code-generation-25)
 - [1.7.3 (2020-08-31)](#173-2020-08-31)
-    - [Code Generation](#code-generation-21)
+    - [Code Generation](#code-generation-26)
 - [1.7.1 (2020-08-31)](#171-2020-08-31)
   - [Breaking Changes](#breaking-changes-5)
-    - [Bug Fixes](#bug-fixes-15)
-    - [Code Generation](#code-generation-22)
+    - [Bug Fixes](#bug-fixes-19)
+    - [Code Generation](#code-generation-27)
     - [Code Refactoring](#code-refactoring-6)
     - [Documentation](#documentation-14)
     - [Features](#features-12)
     - [Unclassified](#unclassified-2)
 - [1.7.0 (2020-08-14)](#170-2020-08-14)
   - [Breaking Changes](#breaking-changes-6)
-    - [Bug Fixes](#bug-fixes-16)
-    - [Code Generation](#code-generation-23)
+    - [Bug Fixes](#bug-fixes-20)
+    - [Code Generation](#code-generation-28)
     - [Code Refactoring](#code-refactoring-7)
     - [Documentation](#documentation-15)
     - [Features](#features-13)
     - [Unclassified](#unclassified-3)
 - [1.6.0 (2020-07-20)](#160-2020-07-20)
-    - [Bug Fixes](#bug-fixes-17)
-    - [Code Generation](#code-generation-24)
+    - [Bug Fixes](#bug-fixes-21)
+    - [Code Generation](#code-generation-29)
     - [Documentation](#documentation-16)
     - [Unclassified](#unclassified-4)
 - [1.5.2 (2020-06-23)](#152-2020-06-23)
-    - [Bug Fixes](#bug-fixes-18)
-    - [Code Generation](#code-generation-25)
+    - [Bug Fixes](#bug-fixes-22)
+    - [Code Generation](#code-generation-30)
     - [Features](#features-14)
 - [1.5.1 (2020-06-16)](#151-2020-06-16)
-    - [Code Generation](#code-generation-26)
+    - [Code Generation](#code-generation-31)
 - [1.5.0 (2020-06-16)](#150-2020-06-16)
-    - [Bug Fixes](#bug-fixes-19)
+    - [Bug Fixes](#bug-fixes-23)
     - [Chores](#chores)
     - [Documentation](#documentation-17)
     - [Features](#features-15)
     - [Unclassified](#unclassified-5)
 - [1.5.0-beta.5 (2020-05-28)](#150-beta5-2020-05-28)
-    - [Bug Fixes](#bug-fixes-20)
+    - [Bug Fixes](#bug-fixes-24)
     - [Chores](#chores-1)
     - [Documentation](#documentation-18)
     - [Features](#features-16)
 - [1.5.0-beta.3 (2020-05-23)](#150-beta3-2020-05-23)
     - [Chores](#chores-2)
 - [1.5.0-beta.2 (2020-05-23)](#150-beta2-2020-05-23)
-    - [Bug Fixes](#bug-fixes-21)
+    - [Bug Fixes](#bug-fixes-25)
     - [Chores](#chores-3)
     - [Code Refactoring](#code-refactoring-8)
     - [Documentation](#documentation-19)
@@ -157,30 +171,30 @@
     - [Chores](#chores-4)
     - [Code Refactoring](#code-refactoring-9)
 - [1.4.10 (2020-04-30)](#1410-2020-04-30)
-    - [Bug Fixes](#bug-fixes-22)
+    - [Bug Fixes](#bug-fixes-26)
     - [Chores](#chores-5)
     - [Documentation](#documentation-20)
     - [Unclassified](#unclassified-6)
 - [1.4.9 (2020-04-25)](#149-2020-04-25)
-    - [Bug Fixes](#bug-fixes-23)
+    - [Bug Fixes](#bug-fixes-27)
     - [Chores](#chores-6)
 - [1.4.8 (2020-04-24)](#148-2020-04-24)
-    - [Bug Fixes](#bug-fixes-24)
+    - [Bug Fixes](#bug-fixes-28)
     - [Chores](#chores-7)
     - [Documentation](#documentation-21)
     - [Features](#features-17)
 - [1.4.7 (2020-04-24)](#147-2020-04-24)
-    - [Bug Fixes](#bug-fixes-25)
+    - [Bug Fixes](#bug-fixes-29)
     - [Chores](#chores-8)
     - [Documentation](#documentation-22)
 - [1.4.6 (2020-04-17)](#146-2020-04-17)
-    - [Bug Fixes](#bug-fixes-26)
+    - [Bug Fixes](#bug-fixes-30)
     - [Documentation](#documentation-23)
 - [1.4.5 (2020-04-16)](#145-2020-04-16)
-    - [Bug Fixes](#bug-fixes-27)
+    - [Bug Fixes](#bug-fixes-31)
     - [Documentation](#documentation-24)
 - [1.4.3 (2020-04-16)](#143-2020-04-16)
-    - [Bug Fixes](#bug-fixes-28)
+    - [Bug Fixes](#bug-fixes-32)
     - [Code Refactoring](#code-refactoring-10)
     - [Documentation](#documentation-25)
     - [Features](#features-18)
@@ -188,7 +202,7 @@
     - [Chores](#chores-9)
     - [Documentation](#documentation-26)
 - [1.4.1 (2020-04-02)](#141-2020-04-02)
-    - [Bug Fixes](#bug-fixes-29)
+    - [Bug Fixes](#bug-fixes-33)
 - [1.4.0 (2020-04-02)](#140-2020-04-02)
   - [GHSA-3p3g-vpw6-4w66](#ghsa-3p3g-vpw6-4w66)
     - [Impact](#impact)
@@ -205,19 +219,19 @@
     - [Workarounds](#workarounds-1)
     - [References](#references-1)
     - [Upstream](#upstream-1)
-    - [Bug Fixes](#bug-fixes-30)
+    - [Bug Fixes](#bug-fixes-34)
     - [Code Refactoring](#code-refactoring-11)
     - [Documentation](#documentation-27)
     - [Features](#features-19)
     - [Unclassified](#unclassified-7)
 - [1.3.2 (2020-02-17)](#132-2020-02-17)
-    - [Bug Fixes](#bug-fixes-31)
+    - [Bug Fixes](#bug-fixes-35)
     - [Chores](#chores-10)
     - [Documentation](#documentation-28)
 - [1.3.1 (2020-02-16)](#131-2020-02-16)
     - [Continuous Integration](#continuous-integration)
 - [1.3.0 (2020-02-14)](#130-2020-02-14)
-    - [Bug Fixes](#bug-fixes-32)
+    - [Bug Fixes](#bug-fixes-36)
     - [Documentation](#documentation-29)
     - [Features](#features-20)
     - [Unclassified](#unclassified-8)
@@ -612,13 +626,96 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.2...v0.0.0) (2022-02-11)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-02-23)
 
+
+
+# [1.11.7](https://github.com/ory/hydra/compare/v1.11.6...v1.11.7) (2022-02-23)
+
+Ory Hydra has a new place for documentation at [github.com/ory/docs](https://github.com/ory/docs) and [www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra)! Additionally, the CI/CD infrastructure was moved to GitHub actions.
+
+
+
+
+
+### Code Generation
+
+* Pin v1.11.7 release commit ([510615b](https://github.com/ory/hydra/commit/510615bcc66231f90c29c1186c28f61366da7e52))
+
+
+# [1.11.6](https://github.com/ory/hydra/compare/v1.11.5...v1.11.6) (2022-02-23)
+
+Ory Hydra has a new place for documentation at [github.com/ory/docs](https://github.com/ory/docs) and [www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra)! Additionally, the CI/CD infrastructure was moved to GitHub actions.
+
+
+
+
+
+### Bug Fixes
+
+* Pass token to render-version-schema ([#3003](https://github.com/ory/hydra/issues/3003)) ([a574689](https://github.com/ory/hydra/commit/a5746898abda877a9072739e519fedd44a2e81a9))
+
+### Code Generation
+
+* Pin v1.11.6 release commit ([49d0d75](https://github.com/ory/hydra/commit/49d0d754c9432b27c7282d39d9b3533f359bc08f))
+
+
+# [1.11.5](https://github.com/ory/hydra/compare/v1.11.4...v1.11.5) (2022-02-21)
+
+Ory Hydra has a new place for documentation at [github.com/ory/docs](https://github.com/ory/docs) and [www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra)! Additionally, the CI/CD infrastructure was moved to GitHub actions.
+
+
+
+
+
+### Bug Fixes
+
+* Only include needed openapi models ([3d4c16f](https://github.com/ory/hydra/commit/3d4c16ffb14b0ae94858a778b0e75a8ac0535229))
+* Remove unused npm format in docs ([2519628](https://github.com/ory/hydra/commit/2519628dd9a512d452ef7fb49cfc12b4624cffd4))
+* Update mailchimp list ids ([#2995](https://github.com/ory/hydra/issues/2995)) ([172ca9a](https://github.com/ory/hydra/commit/172ca9aabbf154f863233b8590a200617098a252))
+
+### Code Generation
+
+* Pin v1.11.5 release commit ([743468e](https://github.com/ory/hydra/commit/743468eced1c8329d9b11b7a4cd5410e101bb05b))
+
+
+# [1.11.4](https://github.com/ory/hydra/compare/v1.11.3...v1.11.4) (2022-02-16)
+
+Ory Hydra has a new place for documentation at [github.com/ory/docs](https://github.com/ory/docs) and [www.ory.sh/docs/hydra](https://www.ory.sh/docs/hydra)! Additionally, the CI/CD infrastructure was moved to GitHub actions.
+
+
+
+
+
+### Bug Fixes
+
+* Pass swag-spec-location to sdk-release ([#2994](https://github.com/ory/hydra/issues/2994)) ([b768bb5](https://github.com/ory/hydra/commit/b768bb5afd452d3eb59faf7b0066e146163cb88b))
+
+### Code Generation
+
+* Pin v1.11.4 release commit ([9e731b6](https://github.com/ory/hydra/commit/9e731b6e30b5aadd30fe3d7d8541db2331b11df2))
+
+
+# [1.11.3](https://github.com/ory/hydra/compare/v1.11.2...v1.11.3) (2022-02-15)
+
+No significant changes.
+
+
+
+
+
+### Bug Fixes
+
+* Comply with new fosite persister interface ([#2990](https://github.com/ory/hydra/issues/2990)) ([4c91a39](https://github.com/ory/hydra/commit/4c91a393c9c8bee50557a21b12b01923c874ff14))
+
+### Code Generation
+
+* Pin v1.11.3 release commit ([a3dd4ee](https://github.com/ory/hydra/commit/a3dd4ee051314730f14aa6b7731397fb6e9b90db))
 
 
 # [1.11.2](https://github.com/ory/hydra/compare/v1.11.1...v1.11.2) (2022-02-11)
 
-autogen: pin v1.11.2 release commit
+Ory Hydra moved from CircleCI to GitHub Actions!
 
 
 

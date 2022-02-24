@@ -91,7 +91,6 @@ quicktest-hsm:
 format: .bin/goimports node_modules
 		goimports -w --local github.com/ory .
 		npm run format
-		cd docs; npm run format
 
 # Generates mocks
 .PHONY: mocks
@@ -102,9 +101,14 @@ mocks: .bin/mockgen
 .PHONY: sdk
 sdk: .bin/swagger .bin/ory node_modules
 		swagger generate spec -m -o spec/swagger.json \
-			-c github.com/ory/hydra \
+			-c github.com/ory/hydra/client \
+			-c github.com/ory/hydra/consent \
+			-c github.com/ory/hydra/health \
+			-c github.com/ory/hydra/jwk \
+			-c github.com/ory/hydra/oauth2 \
+			-c github.com/ory/hydra/x \
 			-c github.com/ory/x/healthx \
-			-x internal/httpclient
+			-c github.com/ory/herodot
 		ory dev swagger sanitize ./spec/swagger.json
 		swagger validate ./spec/swagger.json
 		CIRCLE_PROJECT_USERNAME=ory CIRCLE_PROJECT_REPONAME=hydra \

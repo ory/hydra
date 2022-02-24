@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession PreviousConsentSession The response used to return used consent requests
+// PreviousConsentSession The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
 //
 // swagger:model PreviousConsentSession

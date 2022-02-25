@@ -79,6 +79,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   const gr = (subject) => ({
     issuer: prng(),
     subject: subject,
+    allow_any_subject: subject === '',
     scope: ['foo', 'openid', 'offline_access'],
     jwk: testPublicJwk,
     expires_at: dayjs().utc().add(1, 'year').set('millisecond', 0).toISOString()
@@ -341,6 +342,44 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
       .its('status')
       .then((status) => {
         expect(status).to.be.equal(400)
+      })
+  })
+
+  it('should return an Access Token when given client credentials and a JWT assertion with any subject', function () {
+    const client = nc()
+    createClient(client)
+
+    const grant = gr('') // allow any subject
+    createGrant(grant)
+
+    const assertion = jwt.sign(
+      jwtAssertion(grant, { sub: 'any-subject-is-valid' }),
+      testPrivatePem,
+      {
+        algorithm: 'RS256'
+      }
+    )
+
+    cy.request({
+      method: 'POST',
+      url: tokenUrl,
+      form: true,
+      body: {
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: assertion,
+        scope: client.scope,
+        client_secret: client.client_secret,
+        client_id: client.client_id
+      }
+    })
+      .its('body')
+      .then((body) => {
+        const { access_token, expires_in, scope, token_type } = body
+
+        expect(access_token).to.not.be.empty
+        expect(expires_in).to.not.be.undefined
+        expect(scope).to.not.be.empty
+        expect(token_type).to.not.be.empty
       })
   })
 

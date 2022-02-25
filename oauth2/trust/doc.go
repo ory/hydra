@@ -40,9 +40,11 @@ type trustJwtGrantIssuerBody struct {
 
 	// The "subject" identifies the principal that is the subject of the JWT.
 	//
-	// required:true
 	// example: mike@example.com
 	Subject string `json:"subject"`
+
+	// The "allow_any_subject" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject bool `json:"allow_any_subject"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	//
@@ -107,6 +109,9 @@ type trustedJwtGrantIssuer struct {
 	// The "subject" identifies the principal that is the subject of the JWT.
 	// example: mike@example.com
 	Subject string `json:"subject"`
+
+	// The "allow_any_subject" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject bool `json:"allow_any_subject"`
 
 	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	// example: ["openid", "offline"]

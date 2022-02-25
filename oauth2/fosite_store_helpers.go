@@ -747,13 +747,14 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			issuer := "token-service"
 			subject := "bob@example.com"
 			grant := trust.Grant{
-				ID:        uuid.New(),
-				Issuer:    issuer,
-				Subject:   subject,
-				Scope:     []string{"openid", "offline"},
-				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
-				CreatedAt: time.Now().UTC().Round(time.Second),
-				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: false,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
 			storedKeySet, err := grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
@@ -798,13 +799,14 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			issuer := "maria"
 			subject := "maria@example.com"
 			grant := trust.Grant{
-				ID:        uuid.New(),
-				Issuer:    issuer,
-				Subject:   subject,
-				Scope:     []string{"openid"},
-				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
-				CreatedAt: time.Now().UTC().Round(time.Second),
-				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: false,
+				Scope:           []string{"openid"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
 			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
@@ -833,13 +835,14 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			issuer := "aeneas"
 			subject := "aeneas@example.com"
 			grant := trust.Grant{
-				ID:        uuid.New(),
-				Issuer:    issuer,
-				Subject:   subject,
-				Scope:     []string{"openid", "offline"},
-				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
-				CreatedAt: time.Now().UTC().Round(time.Second),
-				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: false,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
 			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
@@ -869,13 +872,14 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			issuer := "vladimir"
 			subject := "vladimir@example.com"
 			grant := trust.Grant{
-				ID:        uuid.New(),
-				Issuer:    issuer,
-				Subject:   subject,
-				Scope:     []string{"openid", "offline"},
-				PublicKey: trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
-				CreatedAt: time.Now().UTC().Round(time.Second),
-				ExpiresAt: time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: false,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
 			}
 
 			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
@@ -895,6 +899,81 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 
 			_, err = grantManager.GetConcreteGrant(context.TODO(), grant.ID)
 			assert.Error(t, err)
+		})
+
+		t.Run("case=only returns the key when subject matches", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("issuer-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "limited-issuer"
+			subject := "jagoba"
+			grant := trust.Grant{
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         subject,
+				AllowAnySubject: false,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			// All three get methods should only return the public key when using the valid subject
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, "any-subject-1", publicKey.KeyID)
+			require.Error(t, err)
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "any-subject-2", publicKey.KeyID)
+			require.Error(t, err)
+			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, subject, publicKey.KeyID)
+			require.NoError(t, err)
+
+			jwks, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			require.NoError(t, err)
+			require.NotNil(t, jwks)
+			require.Empty(t, jwks.Keys)
+			jwks, err = grantStorage.GetPublicKeys(context.TODO(), issuer, subject)
+			require.NoError(t, err)
+			require.NotNil(t, jwks)
+			require.NotEmpty(t, jwks.Keys)
+		})
+
+		t.Run("case=returns the key when any subject is allowed", func(t *testing.T) {
+			keySet, err := keyGenerator.Generate("issuer-key", "sig")
+			require.NoError(t, err)
+
+			publicKey := keySet.Keys[1]
+			issuer := "unlimited-issuer"
+			grant := trust.Grant{
+				ID:              uuid.New(),
+				Issuer:          issuer,
+				Subject:         "",
+				AllowAnySubject: true,
+				Scope:           []string{"openid", "offline"},
+				PublicKey:       trust.PublicKey{Set: issuer, KeyID: publicKey.KeyID},
+				CreatedAt:       time.Now().UTC().Round(time.Second),
+				ExpiresAt:       time.Now().UTC().Round(time.Second).AddDate(1, 0, 0),
+			}
+
+			err = grantManager.CreateGrant(context.TODO(), grant, publicKey)
+			require.NoError(t, err)
+
+			// All three get methods should always return the public key
+			_, err = grantStorage.GetPublicKey(context.TODO(), issuer, "any-subject-1", publicKey.KeyID)
+			require.NoError(t, err)
+
+			_, err = grantStorage.GetPublicKeyScopes(context.TODO(), issuer, "any-subject-2", publicKey.KeyID)
+			require.NoError(t, err)
+
+			jwks, err := grantStorage.GetPublicKeys(context.TODO(), issuer, "any-subject-3")
+			require.NoError(t, err)
+			require.NotNil(t, jwks)
+			require.NotEmpty(t, jwks.Keys)
 		})
 	}
 }

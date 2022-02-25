@@ -18,6 +18,8 @@ import (
 
 // TrustedJwtGrantIssuer struct for TrustedJwtGrantIssuer
 type TrustedJwtGrantIssuer struct {
+	// The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject *bool `json:"allow_any_subject,omitempty"`
 	// The \"created_at\" indicates, when grant was created.
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	// The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".
@@ -47,6 +49,38 @@ func NewTrustedJwtGrantIssuer() *TrustedJwtGrantIssuer {
 func NewTrustedJwtGrantIssuerWithDefaults() *TrustedJwtGrantIssuer {
 	this := TrustedJwtGrantIssuer{}
 	return &this
+}
+
+// GetAllowAnySubject returns the AllowAnySubject field value if set, zero value otherwise.
+func (o *TrustedJwtGrantIssuer) GetAllowAnySubject() bool {
+	if o == nil || o.AllowAnySubject == nil {
+		var ret bool
+		return ret
+	}
+	return *o.AllowAnySubject
+}
+
+// GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TrustedJwtGrantIssuer) GetAllowAnySubjectOk() (*bool, bool) {
+	if o == nil || o.AllowAnySubject == nil {
+		return nil, false
+	}
+	return o.AllowAnySubject, true
+}
+
+// HasAllowAnySubject returns a boolean if a field has been set.
+func (o *TrustedJwtGrantIssuer) HasAllowAnySubject() bool {
+	if o != nil && o.AllowAnySubject != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAllowAnySubject gets a reference to the given bool and assigns it to the AllowAnySubject field.
+func (o *TrustedJwtGrantIssuer) SetAllowAnySubject(v bool) {
+	o.AllowAnySubject = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -275,6 +309,9 @@ func (o *TrustedJwtGrantIssuer) SetSubject(v string) {
 
 func (o TrustedJwtGrantIssuer) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
+	if o.AllowAnySubject != nil {
+		toSerialize["allow_any_subject"] = o.AllowAnySubject
+	}
 	if o.CreatedAt != nil {
 		toSerialize["created_at"] = o.CreatedAt
 	}

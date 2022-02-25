@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**AllowAnySubject** | Pointer to **bool** | The \&quot;allow_any_subject\&quot; indicates that the issuer is allowed to have any principal as the subject of the JWT. | [optional] 
 **CreatedAt** | Pointer to **time.Time** | The \&quot;created_at\&quot; indicates, when grant was created. | [optional] 
 **ExpiresAt** | Pointer to **time.Time** | The \&quot;expires_at\&quot; indicates, when grant will expire, so we will reject assertion from \&quot;issuer\&quot; targeting \&quot;subject\&quot;. | [optional] 
 **Id** | Pointer to **string** |  | [optional] 
@@ -30,6 +31,31 @@ will change when the set of required properties is changed
 NewTrustedJwtGrantIssuerWithDefaults instantiates a new TrustedJwtGrantIssuer object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetAllowAnySubject
+
+`func (o *TrustedJwtGrantIssuer) GetAllowAnySubject() bool`
+
+GetAllowAnySubject returns the AllowAnySubject field if non-nil, zero value otherwise.
+
+### GetAllowAnySubjectOk
+
+`func (o *TrustedJwtGrantIssuer) GetAllowAnySubjectOk() (*bool, bool)`
+
+GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAllowAnySubject
+
+`func (o *TrustedJwtGrantIssuer) SetAllowAnySubject(v bool)`
+
+SetAllowAnySubject sets AllowAnySubject field to given value.
+
+### HasAllowAnySubject
+
+`func (o *TrustedJwtGrantIssuer) HasAllowAnySubject() bool`
+
+HasAllowAnySubject returns a boolean if a field has been set.
 
 ### GetCreatedAt
 

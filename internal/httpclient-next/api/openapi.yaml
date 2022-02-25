@@ -3520,6 +3520,10 @@ components:
       type: object
     trustJwtGrantIssuerBody:
       properties:
+        allow_any_subject:
+          description: The "allow_any_subject" indicates that the issuer is allowed
+            to have any principal as the subject of the JWT.
+          type: boolean
         expires_at:
           description: The "expires_at" indicates, when grant will expire, so we will
             reject assertion from "issuer" targeting "subject".
@@ -3551,7 +3555,6 @@ components:
       - issuer
       - jwk
       - scope
-      - subject
       type: object
     trustedJsonWebKey:
       example:
@@ -3581,8 +3584,13 @@ components:
         - offline
         created_at: 2000-01-23T04:56:07.000+00:00
         id: 9edc811f-4e28-453c-9b46-4de65f00217f
+        allow_any_subject: true
         issuer: https://jwt-idp.example.com
       properties:
+        allow_any_subject:
+          description: The "allow_any_subject" indicates that the issuer is allowed
+            to have any principal as the subject of the JWT.
+          type: boolean
         created_at:
           description: The "created_at" indicates, when grant was created.
           format: date-time

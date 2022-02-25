@@ -19,6 +19,9 @@ import (
 // swagger:model trustedJwtGrantIssuer
 type TrustedJwtGrantIssuer struct {
 
+	// The "allow_any_subject" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject bool `json:"allow_any_subject,omitempty"`
+
 	// The "created_at" indicates, when grant was created.
 	// Format: date-time
 	CreatedAt strfmt.DateTime `json:"created_at,omitempty"`

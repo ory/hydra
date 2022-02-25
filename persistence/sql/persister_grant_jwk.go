@@ -90,7 +90,7 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 	var data trust.SQLData
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject).
+		Where("subject = ? OR allow_any_subject IS TRUE", subject).
 		Where("key_id = ?", keyId)
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -108,7 +108,7 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 	grantsData := make([]trust.SQLData, 0)
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject)
+		Where("subject = ? OR allow_any_subject IS TRUE", subject)
 	if err := query.All(&grantsData); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -138,7 +138,7 @@ func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subje
 	var data trust.SQLData
 	query := p.Connection(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject).
+		Where("subject = ? OR allow_any_subject IS TRUE", subject).
 		Where("key_id = ?", keyId)
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
@@ -162,23 +162,25 @@ func (p *Persister) MarkJWTUsedForTime(ctx context.Context, jti string, exp time
 
 func (p *Persister) sqlDataFromJWTGrant(g trust.Grant) trust.SQLData {
 	return trust.SQLData{
-		ID:        g.ID,
-		Issuer:    g.Issuer,
-		Subject:   g.Subject,
-		Scope:     strings.Join(g.Scope, "|"),
-		KeySet:    g.PublicKey.Set,
-		KeyID:     g.PublicKey.KeyID,
-		CreatedAt: g.CreatedAt,
-		ExpiresAt: g.ExpiresAt,
+		ID:              g.ID,
+		Issuer:          g.Issuer,
+		Subject:         g.Subject,
+		AllowAnySubject: g.AllowAnySubject,
+		Scope:           strings.Join(g.Scope, "|"),
+		KeySet:          g.PublicKey.Set,
+		KeyID:           g.PublicKey.KeyID,
+		CreatedAt:       g.CreatedAt,
+		ExpiresAt:       g.ExpiresAt,
 	}
 }
 
 func (p *Persister) jwtGrantFromSQlData(data trust.SQLData) trust.Grant {
 	return trust.Grant{
-		ID:      data.ID,
-		Issuer:  data.Issuer,
-		Subject: data.Subject,
-		Scope:   stringsx.Splitx(data.Scope, "|"),
+		ID:              data.ID,
+		Issuer:          data.Issuer,
+		Subject:         data.Subject,
+		AllowAnySubject: data.AllowAnySubject,
+		Scope:           stringsx.Splitx(data.Scope, "|"),
 		PublicKey: trust.PublicKey{
 			Set:   data.KeySet,
 			KeyID: data.KeyID,

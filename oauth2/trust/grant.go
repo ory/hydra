@@ -13,6 +13,9 @@ type Grant struct {
 	// Subject identifies the principal that is the subject of the JWT.
 	Subject string `json:"subject"`
 
+	// AllowAnySubject indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject bool `json:"allow_any_subject"`
+
 	// Scope contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	Scope []string `json:"scope"`
 

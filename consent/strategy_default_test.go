@@ -77,6 +77,7 @@ func checkAndAcceptConsentHandler(t *testing.T, apiClient admin.ClientService, c
 	}
 }
 func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
+	ctx := context.TODO()
 	if hc == nil {
 		hc = testhelpers.NewEmptyJarClient(t)
 	}
@@ -84,7 +85,7 @@ func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *c
 	values.Add("response_type", "code")
 	values.Add("state", uuid.New().String())
 	values.Add("client_id", oc.OutfacingID)
-	res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(), values).String())
+	res, err := hc.Get(urlx.CopyWithQuery(reg.Config(ctx).OAuth2AuthURL(), values).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
 
@@ -102,16 +103,17 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 }
 
 func newAuthCookieJar(t *testing.T, reg driver.Registry, u, sessionID string) http.CookieJar {
+	ctx := context.TODO()
 	cj, err := cookiejar.New(&cookiejar.Options{})
 	require.NoError(t, err)
-	secrets := reg.Config().Source().Strings(config.KeyGetCookieSecrets)
+	secrets := reg.Config(ctx).Source().Strings(config.KeyGetCookieSecrets)
 	bs := make([][]byte, len(secrets))
 	for k, s := range secrets {
 		bs[k] = []byte(s)
 	}
 
 	hr := &http.Request{Header: map[string][]string{}, URL: urlx.ParseOrPanic(u), RequestURI: u}
-	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.Config().TLS(config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie, _ := reg.CookieStore().Get(hr, CookieName(reg.Config(ctx).TLS(config.PublicInterface).Enabled(), CookieAuthenticationName))
 
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	cookie.Options.HttpOnly = true

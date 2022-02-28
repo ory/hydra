@@ -83,7 +83,7 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 
 func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
 	j.conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", dbname))
-	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"))
+	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), nil, false, true)
 }
 
 func (j *JanitorConsentTestHelper) AccessTokenNotAfterSetup(ctx context.Context, cl client.Manager, store x.FositeStorer) func(t *testing.T) {
@@ -466,11 +466,14 @@ func (j *JanitorConsentTestHelper) notAfterCheck(notAfter time.Time, lifespan ti
 	return lesser.Unix() > requestedAt.Unix()
 }
 
-func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer) func(t *testing.T) {
+func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, tenant string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
+		if parallel {
+			t.Parallel()
+		}
 		ctx := context.Background()
 
-		jt := NewConsentJanitorTestHelper(t.Name())
+		jt := NewConsentJanitorTestHelper(tenant + t.Name())
 
 		conf.MustSet(config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan())
 
@@ -479,7 +482,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 			notAfterTests := jt.GetNotAfterTestCycles()
 
 			for k, v := range notAfterTests {
-				jt := NewConsentJanitorTestHelper(k)
+				jt := NewConsentJanitorTestHelper(tenant + k)
 				t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 					notAfter := time.Now().Round(time.Second).Add(-v)
 					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
@@ -500,7 +503,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		})
 
 		t.Run("case=flush-consent-request-limit", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper("limit")
+			jt := NewConsentJanitorTestHelper(tenant + "limit")
 
 			t.Run("case=limit", func(t *testing.T) {
 				// setup
@@ -517,7 +520,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		})
 
 		t.Run("case=flush-consent-request-rejection", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper("loginRejection")
+			jt := NewConsentJanitorTestHelper(tenant + "loginRejection")
 
 			t.Run(fmt.Sprintf("case=%s", "loginRejection"), func(t *testing.T) {
 				// setup
@@ -532,7 +535,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 				t.Run("step=validate", jt.LoginRejectionValidate(ctx, consentManager))
 			})
 
-			jt = NewConsentJanitorTestHelper("consentRejection")
+			jt = NewConsentJanitorTestHelper(tenant + "consentRejection")
 
 			t.Run(fmt.Sprintf("case=%s", "consentRejection"), func(t *testing.T) {
 				// setup
@@ -550,7 +553,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		})
 
 		t.Run("case=flush-consent-request-timeout", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper("loginTimeout")
+			jt := NewConsentJanitorTestHelper(tenant + "loginTimeout")
 
 			t.Run(fmt.Sprintf("case=%s", "login-timeout"), func(t *testing.T) {
 
@@ -567,7 +570,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 			})
 
-			jt = NewConsentJanitorTestHelper("consentTimeout")
+			jt = NewConsentJanitorTestHelper(tenant + "consentTimeout")
 
 			t.Run(fmt.Sprintf("case=%s", "consent-timeout"), func(t *testing.T) {
 

@@ -60,7 +60,7 @@ func NewHandler(r InternalRegistry) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+func (h *Handler) SetRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.GET(ClientsHandlerPath, h.List)
 	admin.POST(ClientsHandlerPath, h.Create)
 	admin.GET(ClientsHandlerPath+"/:id", h.Get)
@@ -68,7 +68,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.PATCH(ClientsHandlerPath+"/:id", h.Patch)
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 
-	if h.r.Config().PublicAllowDynamicRegistration() {
+	if h.r.Config(ctx).PublicAllowDynamicRegistration() {
 		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
 		public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
 		public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
@@ -99,7 +99,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 //       201: oAuth2Client
 //       default: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
+	c, err := h.CreateClient(r, h.r.ClientValidator(r.Context()).Validate, false)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -137,7 +137,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //       201: oAuth2Client
 //       default: jsonError
 func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	c, err := h.CreateClient(r, h.r.ClientValidator().ValidateDynamicRegistration, true)
+	c, err := h.CreateClient(r, h.r.ClientValidator(r.Context()).ValidateDynamicRegistration, true)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -146,7 +146,7 @@ func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, isDynamic bool) (*Client, error) {
+func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
 
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
@@ -168,7 +168,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, i
 		c.Secret = string(secretb)
 	}
 
-	if err := validator(&c); err != nil {
+	if err := validator(r.Context(), &c); err != nil {
 		return nil, err
 	}
 
@@ -183,7 +183,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(*Client) error, i
 
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
-	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(), DynClientsHandlerPath+"/"+c.OutfacingID).String()
+	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config(r.Context()).PublicURL(), DynClientsHandlerPath+"/"+c.OutfacingID).String()
 
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
@@ -225,7 +225,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	c.OutfacingID = ps.ByName("id")
-	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
+	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator(r.Context()).Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -233,13 +233,13 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.r.Writer().Write(w, r, &c)
 }
 
-func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(*Client) error) error {
+func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(context.Context, *Client) error) error {
 	var secret string
 	if len(c.Secret) > 0 {
 		secret = c.Secret
 	}
 
-	if err := validator(c); err != nil {
+	if err := validator(ctx, c); err != nil {
 		return err
 	}
 
@@ -310,7 +310,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	c.RegistrationAccessTokenSignature = signature
 
 	c.OutfacingID = client.GetID()
-	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
+	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator(r.Context()).ValidateDynamicRegistration); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -369,7 +369,7 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		c.Secret = ""
 	}
 
-	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator(r.Context()).Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

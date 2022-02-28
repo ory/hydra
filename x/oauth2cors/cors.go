@@ -38,13 +38,15 @@ import (
 	"github.com/ory/fosite"
 )
 
-func Middleware(reg interface {
-	Config() *config.Provider
-	x.RegistryLogger
-	oauth2.Registry
-	client.Registry
-}) func(h http.Handler) http.Handler {
-	opts, enabled := reg.Config().CORS(config.PublicInterface)
+func Middleware(
+	ctx context.Context,
+	reg interface {
+		Config(ctx context.Context) *config.Provider
+		x.RegistryLogger
+		oauth2.Registry
+		client.Registry
+	}) func(h http.Handler) http.Handler {
+	opts, enabled := reg.Config(ctx).CORS(config.PublicInterface)
 	if !enabled {
 		return func(h http.Handler) http.Handler {
 			return h
@@ -98,7 +100,7 @@ func Middleware(reg interface {
 					return false
 				}
 
-				session := oauth2.NewSessionWithCustomClaims("", reg.Config().AllowedTopLevelClaims())
+				session := oauth2.NewSessionWithCustomClaims("", reg.Config(ctx).AllowedTopLevelClaims())
 				_, ar, err := reg.OAuth2Provider().IntrospectToken(context.Background(), token, fosite.AccessToken, session)
 				if err != nil {
 					return false

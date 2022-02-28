@@ -75,6 +75,7 @@ func (_ *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func purge(cmd *cobra.Command, args []string) error {
+	ctx := context.TODO()
 	var d driver.Registry
 
 	co := []configx.OptionModifier{
@@ -112,13 +113,13 @@ func purge(cmd *cobra.Command, args []string) error {
 
 	d = driver.New(cmd.Context(), do...)
 
-	if len(d.Config().DSN()) == 0 {
+	if len(d.Config(ctx).DSN()) == 0 {
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
 			"When using flag -e, environment variable DSN must be set.",
 			"When using flag -c, the dsn property should be set.")
 	}
 
-	if err := d.Init(cmd.Context()); err != nil {
+	if err := d.Init(cmd.Context(), nil, false, false); err != nil {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
 	}

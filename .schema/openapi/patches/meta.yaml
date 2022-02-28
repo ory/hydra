@@ -1,9 +1,9 @@
 - op: replace
   path: /info
   value:
-    title: Ory Oathkeeper API
+    title: Ory Hydra API
     description: |
-      Documentation for all of Ory Oathkeeper's APIs.
+      Documentation for all of Ory Hydra's APIs.
     version: >-
       {{ getenv "CIRCLE_TAG" }}
     license:

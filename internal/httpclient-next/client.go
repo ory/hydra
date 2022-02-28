@@ -1,7 +1,7 @@
 /*
- * Ory Oathkeeper API
+ * Ory Hydra API
  *
- * Documentation for all of Ory Oathkeeper's APIs.
+ * Documentation for all of Ory Hydra's APIs.
  *
  * API version: 1.0.0
  * Contact: hi@ory.sh
@@ -41,7 +41,7 @@ var (
 	xmlCheck  = regexp.MustCompile(`(?i:(?:application|text)/xml)`)
 )
 
-// APIClient manages communication with the Ory Oathkeeper API API v1.0.0
+// APIClient manages communication with the Ory Hydra API API v1.0.0
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
 	cfg    *Configuration

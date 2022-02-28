@@ -3,10 +3,10 @@ info:
   contact:
     email: hi@ory.sh
   description: |
-    Documentation for all of Ory Oathkeeper's APIs.
+    Documentation for all of Ory Hydra's APIs.
   license:
     name: Apache 2.0
-  title: Ory Oathkeeper API
+  title: Ory Hydra API
 servers:
 - url: /
 paths:

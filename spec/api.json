@@ -1348,11 +1348,11 @@
     "contact": {
       "email": "hi@ory.sh"
     },
-    "description": "Documentation for all of Ory Oathkeeper's APIs.\n",
+    "description": "Documentation for all of Ory Hydra's APIs.\n",
     "license": {
       "name": "Apache 2.0"
     },
-    "title": "Ory Oathkeeper API",
+    "title": "Ory Hydra API",
     "version": ""
   },
   "openapi": "3.0.3",

@@ -22,6 +22,7 @@ package consent
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -281,7 +282,11 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 		return errorsx.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieAuthenticationCSRFName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
+	authCookieName := cookieAuthenticationCSRFName + ar.GetClient().GetID()
+
+	fmt.Printf("Setting Auth Cookie + client_ID: %s ", authCookieName)
+
+	if err := createCsrfSession(w, r, s.r.CookieStore(), authCookieName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -356,8 +361,10 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	if session.RequestedAt.Add(s.c.ConsentRequestMaxAge()).Before(time.Now()) {
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
 	}
+	authCookieName := cookieAuthenticationCSRFName + session.LoginRequest.ClientID
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
+	fmt.Printf("Validating Auth Cookie + client_ID: %s ", authCookieName)
+	if err := validateCsrfSession(r, s.r.CookieStore(), authCookieName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
 		return nil, err
 	}
 
@@ -569,8 +576,10 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 	); err != nil {
 		return errorsx.WithStack(err)
 	}
+	consentCookieName := cookieConsentCSRFName + ar.GetClient().GetID()
+	fmt.Printf("Setting Consent Cookie + client_ID: %s ", consentCookieName)
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(), cookieConsentCSRFName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(), consentCookieName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -604,8 +613,10 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	if time.Time(session.ConsentRequest.AuthenticatedAt).IsZero() {
 		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
+	consentCookieName := cookieConsentCSRFName + session.ConsentRequest.ClientID
 
-	if err := validateCsrfSession(r, s.r.CookieStore(), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
+	fmt.Printf("Validating Consent Cookie + client_ID: %s ", consentCookieName)
+	if err := validateCsrfSession(r, s.r.CookieStore(), consentCookieName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
 		return nil, err
 	}
 

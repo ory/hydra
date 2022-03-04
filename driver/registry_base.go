@@ -151,6 +151,7 @@ func (m *RegistryBase) Logger() *logrusx.Logger {
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
 		m.al = logrusx.NewAudit("ORY Hydra", m.BuildVersion())
+		m.al.UseConfig(m.C.Source())
 	}
 	return m.al
 }

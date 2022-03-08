@@ -26,8 +26,9 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/ory/fosite"
 	jose "gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/fosite"
 )
 
 var ErrUnsupportedKeyAlgorithm = &fosite.RFC6749Error{

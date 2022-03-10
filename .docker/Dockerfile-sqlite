@@ -25,8 +25,8 @@ VOLUME /var/lib/sqlite
 # Exposing the ory home directory
 VOLUME /home/ory
 
-# Declare the standard ports used by Hydra (4433 for public service endpoint, 4434 for admin service endpoint)
-EXPOSE 4433 4434
+# Declare the standard ports used by Hydra (4444 for public service endpoint, 4445 for admin service endpoint)
+EXPOSE 4444 4445
 
 USER ory
 

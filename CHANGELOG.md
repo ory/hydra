@@ -638,6 +638,7 @@
 
     Closes https://github.com/ory/sdk/issues/153
 
+* Sync ports between Dockerfiles and comments ([#3027](https://github.com/ory/hydra/issues/3027)) ([ebd1694](https://github.com/ory/hydra/commit/ebd16940e270561c13aab60a969a4969391d5d80))
 
 ### Documentation
 

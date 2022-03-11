@@ -175,26 +175,26 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 }
 
 func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
-	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		// delete expired
-		now := "now()"
-		if c.Dialect.Name() == "sqlite3" {
-			now = "CURRENT_TIMESTAMP"
-		}
-		/* #nosec G201 table is static */
-		if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < %s", oauth2.BlacklistedJTI{}.TableName(), now)).Exec(); err != nil {
-			return sqlcon.HandleError(err)
-		}
+	// delete expired
+	c := p.Connection(ctx)
+	now := "now()"
+	if c.Dialect.Name() == "sqlite3" {
+		now = "CURRENT_TIMESTAMP"
+	}
+	/* #nosec G201 table is static */
+	if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < %s", oauth2.BlacklistedJTI{}.TableName(), now)).Exec(); err != nil {
+		return sqlcon.HandleError(err)
+	}
 
-		if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
-			// found a jti
-			return errorsx.WithStack(fosite.ErrJTIKnown)
-		} else if err != nil {
-			return err
-		}
-		// setting worked without a problem
-		return nil
-	})
+	if err := p.SetClientAssertionJWTRaw(ctx, oauth2.NewBlacklistedJTI(jti, exp)); errors.Is(err, sqlcon.ErrUniqueViolation) {
+		// found a jti
+		return errorsx.WithStack(fosite.ErrJTIKnown)
+	} else if err != nil {
+		return err
+	}
+
+	// setting worked without a problem
+	return nil
 }
 
 func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {

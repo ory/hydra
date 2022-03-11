@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-03-10)](#000-2022-03-10)
+- [0.0.0 (2022-03-11)](#000-2022-03-11)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
 - [1.11.7 (2022-02-23)](#1117-2022-02-23)
@@ -628,12 +628,13 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-03-10)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-03-11)
 
 
 ### Bug Fixes
 
 * Configure audit logger ([#3022](https://github.com/ory/hydra/issues/3022)) ([3115dde](https://github.com/ory/hydra/commit/3115dde229a6be936ad4d844d778d6ee82279643))
+* Remove unnecessary transaction ([#3029](https://github.com/ory/hydra/issues/3029)) ([d4b2696](https://github.com/ory/hydra/commit/d4b2696bd72b9fc98f3959b13be2fc28aa2263bc))
 * **sdk:** Incorrect title ([#3014](https://github.com/ory/hydra/issues/3014)) ([d654911](https://github.com/ory/hydra/commit/d654911c0da2e2f9513e62916daf2284186d19de)):
 
     Closes https://github.com/ory/sdk/issues/153

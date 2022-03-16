@@ -7,6 +7,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/ory/fosite"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/hydra/v2/client"
@@ -27,6 +29,7 @@ type Manager interface {
 	CreateConsentRequest(ctx context.Context, req *OAuth2ConsentRequest) error
 	GetConsentRequest(ctx context.Context, challenge string) (*OAuth2ConsentRequest, error)
 	HandleConsentRequest(ctx context.Context, r *AcceptOAuth2ConsentRequest) (*OAuth2ConsentRequest, error)
+	ExtendConsentRequest(ctx context.Context, scopeStrategy fosite.ScopeStrategy, req *OAuth2ConsentRequest, extendBy int) error
 	RevokeSubjectConsentSession(ctx context.Context, user string) error
 	RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
 

@@ -51,9 +51,9 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 	if k == "memory" || k == "mysql" || k == "cockroach" { // TODO enable parallel tests for cockroach once we configure the cockroach integration test server to support retry
 		parallel = false
 	}
-
-	t.Run("package=consent/manager="+k, consent.ManagerTests(t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
-	t.Run("package=consent/manager="+k, consent.ManagerTests(t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
+	scopeStrategy := t1.Config().GetScopeStrategy(ctx)
+	t.Run("package=consent/manager="+k, consent.ManagerTests(t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), scopeStrategy, "t1", parallel))
+	t.Run("package=consent/manager="+k, consent.ManagerTests(t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), scopeStrategy, "t2", parallel))
 
 	t.Run("parallel-boundary", func(t *testing.T) {
 		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1.Config(), t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))

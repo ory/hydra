@@ -12,6 +12,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus/hooks/test"
+
+	"github.com/ory/x/logrusx"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
@@ -31,6 +35,13 @@ import (
 
 func TestLogoutFlows(t *testing.T) {
 	reg := internal.NewMockedRegistry(t)
+
+	hook := test.Hook{} // Test hook for asserting log messages
+
+	l := logrusx.New("", "", logrusx.WithHook(&hook))
+	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
+
+	reg.WithLogger(l)
 	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
 	reg.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)
 
@@ -58,7 +69,7 @@ func TestLogoutFlows(t *testing.T) {
 			PostLogoutRedirectURIs: []string{customPostLogoutURL}})
 	}
 
-	createClientWithBackchannelLogout := func(t *testing.T, wg *sync.WaitGroup, cb func(t *testing.T, logoutToken gjson.Result)) *client.Client {
+	createClientWithBackchannelLogout := func(t *testing.T, wg *sync.WaitGroup, responseRedirect bool, cb func(t *testing.T, logoutToken gjson.Result)) *client.Client {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer wg.Done()
 
@@ -71,6 +82,10 @@ func TestLogoutFlows(t *testing.T) {
 			var b bytes.Buffer
 			require.NoError(t, json.NewEncoder(&b).Encode(token.Claims))
 			cb(t, gjson.Parse(b.String()))
+
+			if responseRedirect {
+				http.Redirect(w, r, "https://localhost", 302)
+			}
 		}))
 		t.Cleanup(server.Close)
 
@@ -238,7 +253,7 @@ func TestLogoutFlows(t *testing.T) {
 		checkAndAcceptLogout(t, logoutWg, nil)
 
 		backChannelWG := newWg(2)
-		c := createClientWithBackchannelLogout(t, backChannelWG, func(t *testing.T, logoutToken gjson.Result) {
+		c := createClientWithBackchannelLogout(t, backChannelWG, false, func(t *testing.T, logoutToken gjson.Result) {
 			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
 			assert.Empty(t, logoutToken.Get("sub").String(), logoutToken.Raw) // The sub claim should be empty because it doesn't work with forced obfuscation and thus we can't easily recover it.
 			assert.Empty(t, logoutToken.Get("nonce").String(), logoutToken.Raw)
@@ -250,6 +265,40 @@ func TestLogoutFlows(t *testing.T) {
 
 		logoutWg.Wait()      // we want to ensure that logout ui was called!
 		backChannelWG.Wait() // we want to ensure that all back channels have been called!
+	})
+
+	t.Run("case=should not retry backchannel logout if backchannel logout responds with redirect", func(t *testing.T) {
+		sid := make(chan string)
+		acceptLoginAsAndWatchSid(t, subject, sid)
+
+		logoutWg := newWg(2)
+		checkAndAcceptLogout(t, logoutWg, nil)
+
+		backChannelWG := newWg(2)
+		c := createClientWithBackchannelLogout(t, backChannelWG, true, func(t *testing.T, logoutToken gjson.Result) {
+			assert.EqualValues(t, <-sid, logoutToken.Get("sid").String(), logoutToken.Raw)
+			assert.Empty(t, logoutToken.Get("sub").String(), logoutToken.Raw) // The sub claim should be empty because it doesn't work with forced obfuscation and thus we can't easily recover it.
+			assert.Empty(t, logoutToken.Get("nonce").String(), logoutToken.Raw)
+		})
+
+		t.Run("method=get", testExpectPostLogoutPage(createBrowserWithSession(t, c), http.MethodGet, url.Values{}, defaultRedirectedMessage))
+
+		t.Run("method=post", testExpectPostLogoutPage(createBrowserWithSession(t, c), http.MethodPost, url.Values{}, defaultRedirectedMessage))
+
+		logoutWg.Wait()      // we want to ensure that logout ui was called!
+		backChannelWG.Wait() // we want to ensure that all back channels have been called!
+
+		backChannelErrMessage := false
+		for _, entry := range hook.AllEntries() {
+			message, _ := entry.String()
+			if strings.Contains(message, "Unable to execute OpenID Connect Back-Channel Logout") {
+				cause := entry.Data["error"].(map[string]interface{})
+				assert.Equal(t, cause["message"], "expected HTTP status code 200 but got 302")
+				backChannelErrMessage = true
+				break
+			}
+		}
+		assert.True(t, backChannelErrMessage)
 	})
 
 	// Only do GET requests from here on out, POST should be tested enough to ensure that it is working fine already.

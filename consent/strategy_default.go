@@ -697,7 +697,14 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 	}
 
 	var wg sync.WaitGroup
-	hc := httpx.NewResilientClient()
+	hc := httpx.NewResilientClient(
+		httpx.ResilientClientWithClient(
+			&http.Client{
+				Timeout: time.Minute,
+				CheckRedirect: func(req *http.Request, via []*http.Request) error {
+					return http.ErrUseLastResponse // This results in no retry. If retry is favorable, then custom error should be thrown. If redirects should be allowed, then CheckRedirect should be made configurable (other configuration related PRs #2875, #2849).
+				},
+			}))
 	wg.Add(len(tasks))
 
 	var execute = func(t task) {

@@ -1,4 +1,4 @@
-FROM alpine:3.13.4
+FROM alpine:3.15.1
 
 # Because this image is built for SQLite, we create /home/ory and /home/ory/sqlite which is owned by the ory user
 # and declare /home/ory/sqlite a volume.
@@ -10,7 +10,7 @@ FROM alpine:3.13.4
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
     chown -R ory:ory /home/ory
-RUN apk add -U --no-cache ca-certificates
+RUN apk --no-cache --update-cache --upgrade --latest add ca-certificates
 
 WORKDIR /home/ory
 

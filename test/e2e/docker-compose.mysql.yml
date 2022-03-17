@@ -18,6 +18,7 @@ services:
 
   mysqld:
     image: mysql:5.7
+    platform: linux/amd64
     ports:
       - "3306:3306"
     environment:

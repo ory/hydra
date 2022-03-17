@@ -4,7 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/gobuffalo/x/randx"
 	"github.com/pkg/errors"
 
@@ -40,6 +41,7 @@ type (
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
 		KeyCipher() *jwk.AEAD
+		KeyGenerators() map[string]jwk.KeyGenerator
 		x.RegistryLogger
 		x.TracingProvider
 	}
@@ -71,7 +73,7 @@ func (p *Persister) Commit(ctx context.Context) error {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
-	return c.TX.Commit()
+	return errorsx.WithStack(c.TX.Commit())
 }
 
 func (p *Persister) Rollback(ctx context.Context) error {
@@ -80,7 +82,7 @@ func (p *Persister) Rollback(ctx context.Context) error {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
-	return c.TX.Rollback()
+	return errorsx.WithStack(c.TX.Rollback())
 }
 
 func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.Provider, l *logrusx.Logger) (*Persister, error) {

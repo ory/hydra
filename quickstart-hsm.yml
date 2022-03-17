@@ -1,0 +1,25 @@
+###########################################################################
+#######             FOR DEMONSTRATION PURPOSES ONLY                 #######
+###########################################################################
+#                                                                         #
+# If you have not yet read the tutorial, do so now:                       #
+#  https://www.ory.sh/docs/hydra/5min-tutorial                            #
+#                                                                         #
+# This set up is only for demonstration purposes. The login               #
+# endpoint can only be used if you follow the steps in the tutorial.      #
+#                                                                         #
+###########################################################################
+
+version: '3.7'
+
+services:
+
+  hydra:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile-hsm
+    environment:
+      - HSM_ENABLED=true
+      - HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
+      - HSM_TOKEN_LABEL=hydra
+      - HSM_PIN=1234

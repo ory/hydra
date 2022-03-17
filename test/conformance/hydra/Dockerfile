@@ -1,4 +1,4 @@
-FROM golang:1.16-buster AS builder
+FROM golang:1.17-buster AS builder
 
 RUN apt-get update && \
   apt-get install -y git gcc bash ssl-cert ca-certificates
@@ -22,7 +22,7 @@ VOLUME /var/lib/sqlite
 # Exposing the ory home directory
 VOLUME /home/ory
 
-# Declare the standard ports used by hydra (4433 for public service endpoint, 4434 for admin service endpoint)
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 
 RUN mv test/conformance/ssl/ory-ca.* /etc/ssl/certs/

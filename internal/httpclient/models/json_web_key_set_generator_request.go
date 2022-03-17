@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -17,7 +19,7 @@ import (
 // swagger:model jsonWebKeySetGeneratorRequest
 type JSONWebKeySetGeneratorRequest struct {
 
-	// The algorithm to be used for creating the key. Supports "RS256", "ES512", "HS512", and "HS256"
+	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES512", "HS512", and "HS256"
 	// Required: true
 	Alg *string `json:"alg"`
 
@@ -79,6 +81,11 @@ func (m *JSONWebKeySetGeneratorRequest) validateUse(formats strfmt.Registry) err
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this json web key set generator request based on context it is used
+func (m *JSONWebKeySetGeneratorRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

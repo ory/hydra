@@ -28,6 +28,7 @@ import (
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/handler/pkce"
+	"github.com/ory/fosite/handler/rfc7523"
 )
 
 type FositeStorer interface {
@@ -35,6 +36,7 @@ type FositeStorer interface {
 	oauth2.CoreStorage
 	openid.OpenIDConnectRequestStorage
 	pkce.PKCERequestStorage
+	rfc7523.RFC7523KeyStorage
 
 	RevokeRefreshToken(ctx context.Context, requestID string) error
 
@@ -52,4 +54,8 @@ type FositeStorer interface {
 	DeleteAccessTokens(ctx context.Context, clientID string) error
 
 	FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error
+
+	// DeleteOpenIDConnectSession deletes an OpenID Connect session.
+	// This is duplicated from Ory Fosite to help against deprecation linting errors.
+	DeleteOpenIDConnectSession(ctx context.Context, authorizeCode string) error
 }

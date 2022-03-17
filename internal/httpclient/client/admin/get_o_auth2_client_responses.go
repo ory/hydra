@@ -29,21 +29,15 @@ func (o *GetOAuth2ClientReader) ReadResponse(response runtime.ClientResponse, co
 			return nil, err
 		}
 		return result, nil
-	case 401:
-		result := NewGetOAuth2ClientUnauthorized()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 500:
-		result := NewGetOAuth2ClientInternalServerError()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-
 	default:
-		return nil, runtime.NewAPIError("unknown error", response, response.Code())
+		result := NewGetOAuth2ClientDefault(response.Code())
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
+		return nil, result
 	}
 }
 
@@ -52,7 +46,7 @@ func NewGetOAuth2ClientOK() *GetOAuth2ClientOK {
 	return &GetOAuth2ClientOK{}
 }
 
-/*GetOAuth2ClientOK handles this case with default header values.
+/* GetOAuth2ClientOK describes a response with status code 200, with default header values.
 
 oAuth2Client
 */
@@ -63,7 +57,6 @@ type GetOAuth2ClientOK struct {
 func (o *GetOAuth2ClientOK) Error() string {
 	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientOK  %+v", 200, o.Payload)
 }
-
 func (o *GetOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -80,61 +73,36 @@ func (o *GetOAuth2ClientOK) readResponse(response runtime.ClientResponse, consum
 	return nil
 }
 
-// NewGetOAuth2ClientUnauthorized creates a GetOAuth2ClientUnauthorized with default headers values
-func NewGetOAuth2ClientUnauthorized() *GetOAuth2ClientUnauthorized {
-	return &GetOAuth2ClientUnauthorized{}
-}
-
-/*GetOAuth2ClientUnauthorized handles this case with default header values.
-
-jsonError
-*/
-type GetOAuth2ClientUnauthorized struct {
-	Payload *models.JSONError
-}
-
-func (o *GetOAuth2ClientUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientUnauthorized  %+v", 401, o.Payload)
-}
-
-func (o *GetOAuth2ClientUnauthorized) GetPayload() *models.JSONError {
-	return o.Payload
-}
-
-func (o *GetOAuth2ClientUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.JSONError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
+// NewGetOAuth2ClientDefault creates a GetOAuth2ClientDefault with default headers values
+func NewGetOAuth2ClientDefault(code int) *GetOAuth2ClientDefault {
+	return &GetOAuth2ClientDefault{
+		_statusCode: code,
 	}
-
-	return nil
 }
 
-// NewGetOAuth2ClientInternalServerError creates a GetOAuth2ClientInternalServerError with default headers values
-func NewGetOAuth2ClientInternalServerError() *GetOAuth2ClientInternalServerError {
-	return &GetOAuth2ClientInternalServerError{}
-}
-
-/*GetOAuth2ClientInternalServerError handles this case with default header values.
+/* GetOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type GetOAuth2ClientInternalServerError struct {
+type GetOAuth2ClientDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *GetOAuth2ClientInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the get o auth2 client default response
+func (o *GetOAuth2ClientDefault) Code() int {
+	return o._statusCode
 }
 
-func (o *GetOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
+func (o *GetOAuth2ClientDefault) Error() string {
+	return fmt.Sprintf("[GET /clients/{id}][%d] getOAuth2Client default  %+v", o._statusCode, o.Payload)
+}
+func (o *GetOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *GetOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *GetOAuth2ClientDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

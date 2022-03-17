@@ -368,7 +368,6 @@ EOF
 PROJECT_NAME="hydra"
 OWNER=ory
 REPO="hydra"
-BINARY=hydra
 FORMAT=tar.gz
 OS=$(uname_os)
 ARCH=$(uname_arch)

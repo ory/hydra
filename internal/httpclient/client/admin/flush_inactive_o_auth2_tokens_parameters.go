@@ -18,56 +18,70 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewFlushInactiveOAuth2TokensParams creates a new FlushInactiveOAuth2TokensParams object
-// with the default values initialized.
+// NewFlushInactiveOAuth2TokensParams creates a new FlushInactiveOAuth2TokensParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewFlushInactiveOAuth2TokensParams() *FlushInactiveOAuth2TokensParams {
-	var ()
 	return &FlushInactiveOAuth2TokensParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewFlushInactiveOAuth2TokensParamsWithTimeout creates a new FlushInactiveOAuth2TokensParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewFlushInactiveOAuth2TokensParamsWithTimeout(timeout time.Duration) *FlushInactiveOAuth2TokensParams {
-	var ()
 	return &FlushInactiveOAuth2TokensParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewFlushInactiveOAuth2TokensParamsWithContext creates a new FlushInactiveOAuth2TokensParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewFlushInactiveOAuth2TokensParamsWithContext(ctx context.Context) *FlushInactiveOAuth2TokensParams {
-	var ()
 	return &FlushInactiveOAuth2TokensParams{
-
 		Context: ctx,
 	}
 }
 
 // NewFlushInactiveOAuth2TokensParamsWithHTTPClient creates a new FlushInactiveOAuth2TokensParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewFlushInactiveOAuth2TokensParamsWithHTTPClient(client *http.Client) *FlushInactiveOAuth2TokensParams {
-	var ()
 	return &FlushInactiveOAuth2TokensParams{
 		HTTPClient: client,
 	}
 }
 
-/*FlushInactiveOAuth2TokensParams contains all the parameters to send to the API endpoint
-for the flush inactive o auth2 tokens operation typically these are written to a http.Request
+/* FlushInactiveOAuth2TokensParams contains all the parameters to send to the API endpoint
+   for the flush inactive o auth2 tokens operation.
+
+   Typically these are written to a http.Request.
 */
 type FlushInactiveOAuth2TokensParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.FlushInactiveOAuth2TokensRequest
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the flush inactive o auth2 tokens params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *FlushInactiveOAuth2TokensParams) WithDefaults() *FlushInactiveOAuth2TokensParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the flush inactive o auth2 tokens params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *FlushInactiveOAuth2TokensParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the flush inactive o auth2 tokens params
@@ -121,7 +135,6 @@ func (o *FlushInactiveOAuth2TokensParams) WriteToRequest(r runtime.ClientRequest
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err

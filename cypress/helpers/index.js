@@ -1,7 +1,9 @@
-export const prng = () =>
-  `${Math.random().toString(36).substring(2)}${Math.random()
-    .toString(36)
-    .substring(2)}`
+export const prng = () => {
+  var array = new Uint32Array(2)
+  crypto.getRandomValues(array)
+
+  return `${array[0].toString()}${array[1].toString()}`
+}
 
 const isStatusOk = (res) =>
   res.ok
@@ -56,3 +58,43 @@ const getClient = (id) =>
   cy
     .request(Cypress.env('admin_url') + '/clients/' + id)
     .then(({ body }) => body)
+
+export const createGrant = (grant) =>
+  cy
+    .request(
+      'POST',
+      Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers',
+      JSON.stringify(grant)
+    )
+    .then((response) => {
+      const grantID = response.body.id
+      getGrant(grantID).then((actual) => {
+        if (actual.id !== grantID) {
+          return Promise.reject(
+            new Error(`Expected id's to match: ${actual.id} !== ${grantID}`)
+          )
+        }
+        return Promise.resolve(response)
+      })
+    })
+
+export const getGrant = (grantID) =>
+  cy
+    .request(
+      'GET',
+      Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers/' + grantID
+    )
+    .then(({ body }) => body)
+
+export const deleteGrants = () =>
+  cy
+    .request(Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers')
+    .then(({ body = [] }) => {
+      ;(body || []).forEach(({ id }) => deleteGrant(id))
+    })
+
+const deleteGrant = (id) =>
+  cy.request(
+    'DELETE',
+    Cypress.env('admin_url') + '/trust/grants/jwt-bearer/issuers/' + id
+  )

@@ -33,7 +33,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 	c.MustSet(config.HsmEnabled, "false")
 
-	registry, err := NewRegistryFromDSN(context.Background(), c, l, nil, true, false)
+	registry, err := NewRegistryFromDSN(context.Background(), c, l, true, false)
 	registry.WithContextualizer(&contextx.StaticContextualizer{NID: uuid.Must(uuid.NewV4())})
 	if err != nil {
 		t.Error("failed to create registry: ", err)

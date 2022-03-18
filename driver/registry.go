@@ -3,7 +3,6 @@ package driver
 import (
 	"context"
 
-	"github.com/gofrs/uuid"
 	"github.com/ory/hydra/hsm"
 	"github.com/ory/hydra/x/contextx"
 
@@ -36,7 +35,7 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context, defaultDefaultNID *uuid.UUID, skipNetworkInit bool, migrate bool) error
+	Init(ctx context.Context, skipNetworkInit bool, migrate bool) error
 
 	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.Provider) Registry
@@ -70,7 +69,7 @@ type Registry interface {
 	WithHsmContext(h hsm.Context)
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, defaultDefaultNID *uuid.UUID, skipNetworkInit bool, migrate bool) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, skipNetworkInit bool, migrate bool) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)
@@ -83,7 +82,7 @@ func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logg
 
 	registry = registry.WithLogger(l).WithConfig(c).WithBuildInfo(config.Version, config.Commit, config.Date)
 
-	if err := registry.Init(ctx, defaultDefaultNID, skipNetworkInit, migrate); err != nil {
+	if err := registry.Init(ctx, skipNetworkInit, migrate); err != nil {
 		return nil, err
 	}
 

@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
 	"github.com/ory/hydra/hsm"
 	"github.com/pkg/errors"
 
@@ -74,7 +73,7 @@ func (m *RegistrySQL) determineNetwork(c *pop.Connection, ctx context.Context) (
 	return networkx.NewManager(c, m.Logger(), m.Tracer(ctx)).Determine(ctx)
 }
 
-func (m *RegistrySQL) Init(ctx context.Context, defaultDefaultNID *uuid.UUID, skipNetworkInit bool, migrate bool) error {
+func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bool) error {
 	if m.persister == nil {
 		var opts []instrumentedsql.Opt
 		if m.Tracer(ctx).IsLoaded() {
@@ -124,9 +123,9 @@ func (m *RegistrySQL) Init(ctx context.Context, defaultDefaultNID *uuid.UUID, sk
 			}
 		}
 
-		if !skipNetworkInit && defaultDefaultNID != nil {
-			m.persister = p.WithNetworkID(*defaultDefaultNID)
-		} else if !skipNetworkInit {
+		if skipNetworkInit {
+			m.persister = p
+		} else {
 			net, err := p.DetermineNetwork(ctx)
 			if err != nil {
 				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
@@ -134,8 +133,6 @@ func (m *RegistrySQL) Init(ctx context.Context, defaultDefaultNID *uuid.UUID, sk
 			}
 
 			m.persister = p.WithNetworkID(net.ID)
-		} else {
-			m.persister = p
 		}
 
 		if m.C.HsmEnabled() {

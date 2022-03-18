@@ -119,7 +119,7 @@ func purge(cmd *cobra.Command, args []string) error {
 			"When using flag -c, the dsn property should be set.")
 	}
 
-	if err := d.Init(cmd.Context(), nil, false, false); err != nil {
+	if err := d.Init(cmd.Context(), false, false); err != nil {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
 	}

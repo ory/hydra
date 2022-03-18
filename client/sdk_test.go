@@ -82,7 +82,7 @@ func TestClientSDK(t *testing.T) {
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
 	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
-	r := internal.NewRegistryMemory(t, conf, nil)
+	r := internal.NewRegistryMemory(t, conf)
 
 	routerAdmin := x.NewRouterAdmin()
 	routerPublic := x.NewRouterPublic()

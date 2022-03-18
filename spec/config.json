@@ -298,6 +298,11 @@
           "description": "Logs sensitive values such as cookie and URL parameter.",
           "default": false
         },
+        "redaction_text": {
+          "type": "string",
+          "title": "Sensitive log value redaction text",
+          "description": "Text to use, when redacting sensitive log value."
+        },
         "format": {
           "type": "string",
           "description": "Sets the log format.",

@@ -266,8 +266,20 @@ that your company deserves a spot here, reach out to
         <tr>
             <td>Adopter *</td>
             <td>Rabbit</td>
-            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/rabbit.svg" alt="rabbit"></td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/rabbit.svg" alt="Rabbit"></td>
             <td><a href="https://rabbit.co.th/">rabbit.co.th</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>inMusic</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/inmusic.svg" alt="InMusic"></td>
+            <td><a href="https://inmusicbrands.com/">inmusicbrands.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Buhta</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/buhta.svg" alt="Buhta"></td>
+            <td><a href="https://buhta.com/">buhta.com</a></td>
         </tr>
     </tbody>
 </table>

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-03-20)](#000-2022-03-20)
+- [0.0.0 (2022-03-21)](#000-2022-03-21)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -629,7 +629,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-03-20)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-03-21)
 
 
 ### Bug Fixes
@@ -644,6 +644,7 @@
 
 ### Documentation
 
+* Update pricing ([c46f780](https://github.com/ory/hydra/commit/c46f780f4d736a325e63d4542ed3dfbe83431ae6))
 * Update README ([#3032](https://github.com/ory/hydra/issues/3032)) ([980c2d8](https://github.com/ory/hydra/commit/980c2d843acc70a23a71dc9b4347d13d70dbc399))
 
 ### Features

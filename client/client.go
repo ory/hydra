@@ -202,7 +202,7 @@ type Client struct {
 	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty" db:"backchannel_logout_session_required"`
 
 	// Metadata is arbitrary data.
-	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
+	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata" faker:"-"`
 
 	// RegistrationAccessTokenSignature is contains the signature of the registration token for managing the OAuth2 Client.
 	RegistrationAccessTokenSignature string `json:"-" db:"registration_access_token_signature"`

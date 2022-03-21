@@ -19,6 +19,7 @@ require (
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.0.0
 	github.com/evanphx/json-patch v4.9.0+incompatible
+	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-openapi/errors v0.20.1
 	github.com/go-openapi/runtime v0.20.0

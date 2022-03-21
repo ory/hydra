@@ -107,6 +107,38 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 	})
 }
 
+func TestManagersNextGen(t *testing.T) {
+	regs := map[string]driver.Registry{
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true),
+	}
+
+	if !testing.Short() {
+		regs["postgres"], regs["mysql"], regs["cockroach"], _ = internal.ConnectDatabases(t, true)
+	}
+
+	ctx := context.Background()
+	networks := make([]uuid.UUID, 5)
+	for k := range networks {
+		nid := uuid.Must(uuid.NewV4())
+		for k := range regs {
+			require.NoError(t, regs[k].Persister().Connection(ctx).Create(&networkx.Network{ID: nid}))
+		}
+		networks[k] = nid
+	}
+
+	for k := range regs {
+		regs[k].WithContextualizer(new(contextx.TestContextualizer))
+	}
+
+	for k := range regs {
+		k := k
+		t.Run("database="+k, func(t *testing.T) {
+			t.Parallel()
+			client.TestHelperCreateGetUpdateDeleteClientNext(t, regs[k].Persister(), networks)
+		})
+	}
+}
+
 func TestManagers(t *testing.T) {
 	ctx := context.TODO()
 	t1registries := map[string]driver.Registry{

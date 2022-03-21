@@ -23,15 +23,19 @@ package client
 import (
 	"context"
 	"crypto/x509"
+	"fmt"
+	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/assertx"
+	"github.com/ory/x/sqlcon"
+	"gopkg.in/square/go-jose.v2"
 	"testing"
 	"time"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/gofrs/uuid"
+	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	jose "gopkg.in/square/go-jose.v2"
-
-	"github.com/ory/fosite"
 
 	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/x"
@@ -112,6 +116,84 @@ func testHelperUpdateClient(t *testing.T, ctx context.Context, tenant Storage, k
 	assert.Equal(t, "name-new", nc.Name)
 	assert.EqualValues(t, []string{"http://redirect/new"}, nc.GetRedirectURIs())
 	assert.Zero(t, len(nc.Contacts))
+}
+
+func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks []uuid.UUID) {
+	ctx := context.Background()
+
+	resources := map[uuid.UUID][]Client{}
+	for k := range networks {
+		nid := networks[k]
+		resources[nid] = []Client{}
+
+		ctx := contextx.SetNIDContext(ctx, nid)
+		t.Run(fmt.Sprintf("nid=%s", nid), func(t *testing.T) {
+			var client Client
+			require.NoError(t, faker.FakeData(&client))
+
+			t.Run("lifecycle=does not exist", func(t *testing.T) {
+				_, err := m.GetClient(ctx, "1234")
+				require.Error(t, err)
+			})
+
+			t.Run("lifecycle=exists", func(t *testing.T) {
+				require.NoError(t, m.CreateClient(ctx, &client))
+				resources[nid] = append(resources[nid], client)
+
+				c, err := m.GetClient(ctx, client.GetID())
+				require.NoError(t, err)
+				assertx.EqualAsJSONExcept(t, &client, c, []string{
+					"registration_access_token",
+					"registration_client_uri",
+				})
+
+				n, err := m.CountClients(ctx)
+				assert.NoError(t, err)
+				assert.Equal(t, 1, n)
+			})
+		})
+	}
+
+	for k := range resources {
+		original := k
+		clients := resources[k]
+		for i := range networks {
+			check := networks[i]
+			if check == original {
+				continue
+			}
+
+			t.Run("network="+k.String(), func(t *testing.T) {
+				ctx := contextx.SetNIDContext(ctx, check)
+				for _, expected := range clients {
+					t.Run(fmt.Sprintf("case=can not find client %s", expected.ID), func(t *testing.T) {
+						_, err := m.GetClient(ctx, expected.GetID())
+						require.ErrorIs(t, err, sqlcon.ErrNoRows)
+					})
+				}
+			})
+		}
+	}
+
+	for k := range resources {
+		clients := resources[k]
+		ctx := contextx.SetNIDContext(ctx, k)
+		t.Run("network="+k.String(), func(t *testing.T) {
+			for _, client := range clients {
+				t.Run("lifecycle=cleanup", func(t *testing.T) {
+					err := m.DeleteClient(ctx, client.GetID())
+					assert.NoError(t, err)
+
+					_, err = m.GetClient(ctx, client.GetID())
+					assert.ErrorIs(t, err, sqlcon.ErrNoRows)
+
+					n, err := m.CountClients(ctx)
+					assert.NoError(t, err)
+					assert.Equal(t, 0, n)
+				})
+			}
+		})
+	}
 }
 
 func TestHelperCreateGetUpdateDeleteClient(k string, t1 Storage, t2 Storage) func(t *testing.T) {

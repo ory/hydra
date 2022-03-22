@@ -24,12 +24,13 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/sqlcon"
 	"gopkg.in/square/go-jose.v2"
-	"testing"
-	"time"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gofrs/uuid"
@@ -138,8 +139,6 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 
 			t.Run("lifecycle=exists", func(t *testing.T) {
 				require.NoError(t, m.CreateClient(ctx, &client))
-				resources[nid] = append(resources[nid], client)
-
 				c, err := m.GetClient(ctx, client.GetID())
 				require.NoError(t, err)
 				assertx.EqualAsJSONExcept(t, &client, c, []string{
@@ -150,6 +149,20 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 				n, err := m.CountClients(ctx)
 				assert.NoError(t, err)
 				assert.Equal(t, 1, n)
+				copy := client
+				require.Error(t, m.CreateClient(ctx, &copy))
+			})
+
+			t.Run("lifecycle=update", func(t *testing.T) {
+				client.Name = "updated" + nid.String()
+				require.NoError(t, m.UpdateClient(ctx, &client))
+				c, err := m.GetClient(ctx, client.GetID())
+				require.NoError(t, err)
+				assertx.EqualAsJSONExcept(t, &client, c, []string{
+					"registration_access_token",
+					"registration_client_uri",
+				})
+				resources[nid] = append(resources[nid], client)
 			})
 		})
 	}
@@ -159,17 +172,21 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 		clients := resources[k]
 		for i := range networks {
 			check := networks[i]
-			if check == original {
-				continue
-			}
 
-			t.Run("network="+k.String(), func(t *testing.T) {
+			t.Run("network="+original.String(), func(t *testing.T) {
 				ctx := contextx.SetNIDContext(ctx, check)
 				for _, expected := range clients {
-					t.Run(fmt.Sprintf("case=can not find client %s", expected.ID), func(t *testing.T) {
-						_, err := m.GetClient(ctx, expected.GetID())
-						require.ErrorIs(t, err, sqlcon.ErrNoRows)
-					})
+					c, err := m.GetClient(ctx, expected.GetID())
+					if check != original {
+						t.Run(fmt.Sprintf("case=must not find client %s", expected.ID), func(t *testing.T) {
+							require.ErrorIs(t, err, sqlcon.ErrNoRows)
+						})
+					} else {
+						t.Run("case=updates must not override each other", func(t *testing.T) {
+							require.NoError(t, err)
+							assert.Equal(t, "updated"+original.String(), c.(*Client).Name)
+						})
+					}
 				}
 			})
 		}
@@ -181,15 +198,15 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 		t.Run("network="+k.String(), func(t *testing.T) {
 			for _, client := range clients {
 				t.Run("lifecycle=cleanup", func(t *testing.T) {
-					err := m.DeleteClient(ctx, client.GetID())
-					assert.NoError(t, err)
+					assert.NoError(t, m.DeleteClient(ctx, client.GetID()))
 
-					_, err = m.GetClient(ctx, client.GetID())
+					_, err := m.GetClient(ctx, client.GetID())
 					assert.ErrorIs(t, err, sqlcon.ErrNoRows)
 
 					n, err := m.CountClients(ctx)
 					assert.NoError(t, err)
 					assert.Equal(t, 0, n)
+					assert.Error(t, m.DeleteClient(ctx, client.GetID()))
 				})
 			}
 		})

@@ -71,6 +71,7 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 
 	c.Secret = string(h)
 	c.NID = p.NetworkID(ctx)
+	c.ID = uuid.Must(uuid.NewV4())
 	return sqlcon.HandleError(p.Connection(ctx).Create(c, "pk"))
 }
 

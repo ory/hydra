@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/sqlcon"
@@ -138,9 +139,11 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 			})
 
 			t.Run("lifecycle=exists", func(t *testing.T) {
+				fakeID := client.ID
 				require.NoError(t, m.CreateClient(ctx, &client))
 				c, err := m.GetClient(ctx, client.GetID())
 				require.NoError(t, err)
+				require.NotEqual(t, fakeID.String(), c.(*Client).ID.String(), "create must generate a new ID instead of using the original")
 				assertx.EqualAsJSONExcept(t, &client, c, []string{
 					"registration_access_token",
 					"registration_client_uri",
@@ -213,7 +216,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 	}
 }
 
-func TestHelperCreateGetUpdateDeleteClient(k string, t1 Storage, t2 Storage) func(t *testing.T) {
+func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection, t1 Storage, t2 Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
 		_, err := t1.GetClient(ctx, "1234")
@@ -255,8 +258,7 @@ func TestHelperCreateGetUpdateDeleteClient(k string, t1 Storage, t2 Storage) fun
 		require.NoError(t, t1.CreateClient(ctx, t1c1))
 		{
 			t2c1 := *t1c1
-			require.Error(t, t2.CreateClient(ctx, &t2c1), "should not be able to create the same client in other manager/tenant; are they backed by the same database?")
-			t2c1.ID = uuid.Nil
+			require.Error(t, connection.Create(&t2c1), "should not be able to create the same client in other manager/tenant; are they backed by the same database?")
 			require.NoError(t, t2.CreateClient(ctx, &t2c1), "we should be able to create a client with the same OutfacingID but different ID in other tenant")
 		}
 

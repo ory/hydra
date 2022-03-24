@@ -66,7 +66,6 @@ jobs:
       TEST_DATABASE_POSTGRESQL: "postgres://test:test@localhost:5432/postgres?sslmode=disable"
       TEST_DATABASE_MYSQL: "mysql://root:test@(localhost:3306)/mysql?multiStatements=true&parseTime=true"
       TEST_DATABASE_COCKROACHDB: "cockroach://root@localhost:26257/defaultdb?sslmode=disable"
-      SKIP_HYDRA_BUILD: 1
     steps:
       - run: |
           docker create --name cockroach -p 26257:26257 \

@@ -171,9 +171,22 @@ func TestHandler(t *testing.T) {
 	t.Run("selfservice disabled", func(t *testing.T) {
 		ts, hc := newServer(t, false)
 
-		for _, method := range []string{"GET", "POST", "PUT", "DELETE"} {
-			t.Run("method="+method, func(t *testing.T) {
-				req, err := http.NewRequest(method, ts.URL+client.DynClientsHandlerPath, nil)
+		trap := &client.Client{
+			OutfacingID: "dynamic-client-test-trap",
+		}
+		createClient(t, trap, ts, client.ClientsHandlerPath)
+
+		for _, tc := range []struct {
+			method string
+			path   string
+		}{
+			{method: "GET", path: ts.URL + client.DynClientsHandlerPath + "/" + trap.OutfacingID},
+			{method: "POST", path: ts.URL + client.DynClientsHandlerPath},
+			{method: "PUT", path: ts.URL + client.DynClientsHandlerPath + "/" + trap.OutfacingID},
+			{method: "DELETE", path: ts.URL + client.DynClientsHandlerPath + "/" + trap.OutfacingID},
+		} {
+			t.Run("method="+tc.method, func(t *testing.T) {
+				req, err := http.NewRequest(tc.method, tc.path, nil)
 				require.NoError(t, err)
 
 				res, err := hc.Do(req)

@@ -46,7 +46,7 @@ func NewDynamicClientRegistrationCreateOAuth2ClientCreated() *DynamicClientRegis
 	return &DynamicClientRegistrationCreateOAuth2ClientCreated{}
 }
 
-/*DynamicClientRegistrationCreateOAuth2ClientCreated handles this case with default header values.
+/* DynamicClientRegistrationCreateOAuth2ClientCreated describes a response with status code 201, with default header values.
 
 oAuth2Client
 */
@@ -57,7 +57,6 @@ type DynamicClientRegistrationCreateOAuth2ClientCreated struct {
 func (o *DynamicClientRegistrationCreateOAuth2ClientCreated) Error() string {
 	return fmt.Sprintf("[POST /connect/register][%d] dynamicClientRegistrationCreateOAuth2ClientCreated  %+v", 201, o.Payload)
 }
-
 func (o *DynamicClientRegistrationCreateOAuth2ClientCreated) GetPayload() *models.OAuth2Client {
 	return o.Payload
 }
@@ -81,7 +80,7 @@ func NewDynamicClientRegistrationCreateOAuth2ClientDefault(code int) *DynamicCli
 	}
 }
 
-/*DynamicClientRegistrationCreateOAuth2ClientDefault handles this case with default header values.
+/* DynamicClientRegistrationCreateOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
@@ -99,7 +98,6 @@ func (o *DynamicClientRegistrationCreateOAuth2ClientDefault) Code() int {
 func (o *DynamicClientRegistrationCreateOAuth2ClientDefault) Error() string {
 	return fmt.Sprintf("[POST /connect/register][%d] dynamicClientRegistrationCreateOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
-
 func (o *DynamicClientRegistrationCreateOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }

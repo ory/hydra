@@ -1,6 +1,6 @@
 FROM golang:1.16-alpine AS builder
 
-RUN apk -U --no-cache add build-base git gcc bash
+RUN apk --no-cache --update-cache --upgrade --latest add build-base git gcc bash
 
 WORKDIR /go/src/github.com/ory/hydra
 
@@ -23,13 +23,13 @@ ENV HSM_LIBRARY=/usr/lib/softhsm/libsofthsm2.so
 ENV HSM_TOKEN_LABEL=hydra
 ENV HSM_PIN=1234
 
-RUN apk -U --no-cache add softhsm opensc; \
+RUN apk --no-cache --update-cache --upgrade --latest add softhsm opensc; \
     pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra; \
     go test -p 1 -v -failfast -short -tags=sqlite,hsm ./...
 
-FROM alpine:3.14.2
+FROM alpine:3.15.1
 
-RUN apk -U --no-cache add softhsm opensc; \
+RUN apk --no-cache --update-cache --upgrade --latest add softhsm opensc; \
     pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
 
 RUN addgroup -S ory; \
@@ -48,7 +48,7 @@ VOLUME /var/lib/sqlite
 # Exposing the ory home directory
 VOLUME /home/ory
 
-# Declare the standard ports used by hydra (4433 for public service endpoint, 4434 for admin service endpoint)
+# Declare the standard ports used by hydra (4444 for public service endpoint, 4445 for admin service endpoint)
 EXPOSE 4444 4445
 
 USER ory

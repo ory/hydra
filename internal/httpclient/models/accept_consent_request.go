@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -65,7 +67,6 @@ func (m *AcceptConsentRequest) Validate(formats strfmt.Registry) error {
 }
 
 func (m *AcceptConsentRequest) validateGrantAccessTokenAudience(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.GrantAccessTokenAudience) { // not required
 		return nil
 	}
@@ -81,7 +82,6 @@ func (m *AcceptConsentRequest) validateGrantAccessTokenAudience(formats strfmt.R
 }
 
 func (m *AcceptConsentRequest) validateGrantScope(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.GrantScope) { // not required
 		return nil
 	}
@@ -97,7 +97,6 @@ func (m *AcceptConsentRequest) validateGrantScope(formats strfmt.Registry) error
 }
 
 func (m *AcceptConsentRequest) validateHandledAt(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.HandledAt) { // not required
 		return nil
 	}
@@ -113,13 +112,88 @@ func (m *AcceptConsentRequest) validateHandledAt(formats strfmt.Registry) error 
 }
 
 func (m *AcceptConsentRequest) validateSession(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Session) { // not required
 		return nil
 	}
 
 	if m.Session != nil {
 		if err := m.Session.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("session")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this accept consent request based on the context it is used
+func (m *AcceptConsentRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateGrantAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGrantScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateHandledAt(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSession(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateGrantAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateGrantScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantScope.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateHandledAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.HandledAt.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("handled_at")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateSession(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Session != nil {
+		if err := m.Session.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("session")
 			}

@@ -25,31 +25,34 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
+
 // ClientService is the interface for Client methods
 type ClientService interface {
-	DisconnectUser(params *DisconnectUserParams) error
+	DisconnectUser(params *DisconnectUserParams, opts ...ClientOption) error
 
-	DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams) (*DiscoverOpenIDConfigurationOK, error)
+	DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams, opts ...ClientOption) (*DiscoverOpenIDConfigurationOK, error)
 
-	DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error)
+	DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error)
 
-	DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error)
+	DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error)
 
-	DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams) (*DynamicClientRegistrationGetOAuth2ClientOK, error)
+	DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error)
 
-	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
+	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
 
-	IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceReadyOK, error)
+	IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOption) (*IsInstanceReadyOK, error)
 
-	Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*Oauth2TokenOK, error)
+	Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Oauth2TokenOK, error)
 
-	OauthAuth(params *OauthAuthParams) error
+	OauthAuth(params *OauthAuthParams, opts ...ClientOption) error
 
-	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*RevokeOAuth2TokenOK, error)
+	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error)
 
-	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error)
+	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UserinfoOK, error)
 
-	WellKnown(params *WellKnownParams) (*WellKnownOK, error)
+	WellKnown(params *WellKnownParams, opts ...ClientOption) (*WellKnownOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -62,13 +65,12 @@ type ClientService interface {
 https://openid.net/specs/openid-connect-frontchannel-1_0.html
 https://openid.net/specs/openid-connect-backchannel-1_0.html
 */
-func (a *Client) DisconnectUser(params *DisconnectUserParams) error {
+func (a *Client) DisconnectUser(params *DisconnectUserParams, opts ...ClientOption) error {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDisconnectUserParams()
 	}
-
-	_, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "disconnectUser",
 		Method:             "GET",
 		PathPattern:        "/oauth2/sessions/logout",
@@ -79,7 +81,12 @@ func (a *Client) DisconnectUser(params *DisconnectUserParams) error {
 		Reader:             &DisconnectUserReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	_, err := a.transport.Submit(op)
 	if err != nil {
 		return err
 	}
@@ -96,13 +103,12 @@ flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
 Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
 For a full list of clients go here: https://openid.net/developers/certified/
 */
-func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams) (*DiscoverOpenIDConfigurationOK, error) {
+func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfigurationParams, opts ...ClientOption) (*DiscoverOpenIDConfigurationOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDiscoverOpenIDConfigurationParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "discoverOpenIDConfiguration",
 		Method:             "GET",
 		PathPattern:        "/.well-known/openid-configuration",
@@ -113,7 +119,12 @@ func (a *Client) DiscoverOpenIDConfiguration(params *DiscoverOpenIDConfiguration
 		Reader:             &DiscoverOpenIDConfigurationReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -142,13 +153,12 @@ values will be server generated when specifying `token_endpoint_auth_method` as 
 The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
 Write the secret down and keep it somewhere safe.
 */
-func (a *Client) DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error) {
+func (a *Client) DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationCreateOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationCreateOAuth2Client",
 		Method:             "POST",
 		PathPattern:        "/connect/register",
@@ -159,7 +169,12 @@ func (a *Client) DynamicClientRegistrationCreateOAuth2Client(params *DynamicClie
 		Reader:             &DynamicClientRegistrationCreateOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -187,13 +202,12 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error) {
+func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationDeleteOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationDeleteOAuth2Client",
 		Method:             "DELETE",
 		PathPattern:        "/connect/register/{id}",
@@ -204,7 +218,12 @@ func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClie
 		Reader:             &DynamicClientRegistrationDeleteOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -232,13 +251,12 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams) (*DynamicClientRegistrationGetOAuth2ClientOK, error) {
+func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationGetOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationGetOAuth2Client",
 		Method:             "GET",
 		PathPattern:        "/connect/register/{id}",
@@ -249,7 +267,12 @@ func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientR
 		Reader:             &DynamicClientRegistrationGetOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -280,13 +303,12 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error) {
+func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationUpdateOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationUpdateOAuth2Client",
 		Method:             "PUT",
 		PathPattern:        "/connect/register/{id}",
@@ -297,7 +319,12 @@ func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClie
 		Reader:             &DynamicClientRegistrationUpdateOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -322,13 +349,12 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 Be aware that if you are running multiple nodes of this service, the health status will never
 refer to the cluster state, only to a single instance.
 */
-func (a *Client) IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceReadyOK, error) {
+func (a *Client) IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOption) (*IsInstanceReadyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewIsInstanceReadyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "isInstanceReady",
 		Method:             "GET",
 		PathPattern:        "/health/ready",
@@ -339,7 +365,12 @@ func (a *Client) IsInstanceReady(params *IsInstanceReadyParams) (*IsInstanceRead
 		Reader:             &IsInstanceReadyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -365,13 +396,12 @@ request entity-body.
 >
 > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
 */
-func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*Oauth2TokenOK, error) {
+func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*Oauth2TokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewOauth2TokenParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "oauth2Token",
 		Method:             "POST",
 		PathPattern:        "/oauth2/token",
@@ -383,7 +413,12 @@ func (a *Client) Oauth2Token(params *Oauth2TokenParams, authInfo runtime.ClientA
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -405,13 +440,12 @@ OAuth2 is a very popular protocol and a library for your programming language wi
 
 To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
 */
-func (a *Client) OauthAuth(params *OauthAuthParams) error {
+func (a *Client) OauthAuth(params *OauthAuthParams, opts ...ClientOption) error {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewOauthAuthParams()
 	}
-
-	_, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "oauthAuth",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth",
@@ -422,7 +456,12 @@ func (a *Client) OauthAuth(params *OauthAuthParams) error {
 		Reader:             &OauthAuthReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	_, err := a.transport.Submit(op)
 	if err != nil {
 		return err
 	}
@@ -437,13 +476,12 @@ longer be used to make access requests, and a revoked refresh token can no longe
 Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
 the client the token was generated for.
 */
-func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter) (*RevokeOAuth2TokenOK, error) {
+func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRevokeOAuth2TokenParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "revokeOAuth2Token",
 		Method:             "POST",
 		PathPattern:        "/oauth2/revoke",
@@ -455,7 +493,12 @@ func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo run
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -481,13 +524,12 @@ In the case of authentication error, a WWW-Authenticate header might be set in t
 with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
 for more details about header format.
 */
-func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter) (*UserinfoOK, error) {
+func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UserinfoOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUserinfoParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "userinfo",
 		Method:             "GET",
 		PathPattern:        "/userinfo",
@@ -499,7 +541,12 @@ func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInf
 		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -520,13 +567,12 @@ func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInf
 if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
 [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 */
-func (a *Client) WellKnown(params *WellKnownParams) (*WellKnownOK, error) {
+func (a *Client) WellKnown(params *WellKnownParams, opts ...ClientOption) (*WellKnownOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewWellKnownParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "wellKnown",
 		Method:             "GET",
 		PathPattern:        "/.well-known/jwks.json",
@@ -537,7 +583,12 @@ func (a *Client) WellKnown(params *WellKnownParams) (*WellKnownOK, error) {
 		Reader:             &WellKnownReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}

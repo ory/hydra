@@ -70,12 +70,10 @@ func (h *Handler) SetRoutes(ctx context.Context, admin *x.RouterAdmin, public *x
 	admin.DELETE(ClientsHandlerPath+"/:id", h.Delete)
 	admin.PUT(ClientsHandlerPath+"/:id/lifespans", h.UpdateLifespans)
 
-	if h.r.Config(ctx).PublicAllowDynamicRegistration() {
-		public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
-		public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
-		public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
-		public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
-	}
+	public.POST(DynClientsHandlerPath, h.CreateDynamicRegistration)
+	public.GET(DynClientsHandlerPath+"/:id", h.GetDynamicRegistration)
+	public.PUT(DynClientsHandlerPath+"/:id", h.UpdateDynamicRegistration)
+	public.DELETE(DynClientsHandlerPath+"/:id", h.DeleteDynamicRegistration)
 }
 
 // swagger:route POST /clients admin createOAuth2Client
@@ -139,6 +137,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 //       201: oAuth2Client
 //       default: jsonError
 func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if err := h.requireDynamicAuth(r); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	c, err := h.CreateClient(r, h.r.ClientValidator(r.Context()).ValidateDynamicRegistration, true)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
@@ -285,6 +287,10 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 //       default: jsonError
 //
 func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if err := h.requireDynamicAuth(r); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -518,6 +524,10 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //       200: oAuth2Client
 //       default: jsonError
 func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if err := h.requireDynamicAuth(r); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -643,6 +653,10 @@ func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps htt
 //       204: emptyResponse
 //       default: jsonError
 func (h *Handler) DeleteDynamicRegistration(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	if err := h.requireDynamicAuth(r); err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -684,4 +698,11 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 	}
 
 	return c, nil
+}
+
+func (h *Handler) requireDynamicAuth(r *http.Request) *herodot.DefaultError {
+	if !h.r.Config(r.Context()).PublicAllowDynamicRegistration() {
+		return herodot.ErrNotFound.WithReason("Dynamic registration is not enabled.")
+	}
+	return nil
 }

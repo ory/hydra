@@ -26,7 +26,7 @@ if [[ ! -d "../../node_modules/" ]]; then
     (cd ../..; npm ci)
 fi
 
-[[ "$SKIP_HYDRA_BUILD" -ne 1 ]] &&
+[[ "${SKIP_HYDRA_BUILD:-0}" -ne 1 ]] &&
     (cd ../../; go build -tags sqlite -o test/e2e/hydra . )
 
 # Install oauth2-client

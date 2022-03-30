@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 
@@ -298,12 +299,14 @@ func TestCreateCsrfSession(t *testing.T) {
 		secure   bool
 		domain   string
 		sameSite http.SameSite
+		maxAge   int
 	}
 	for _, tc := range []struct {
 		name                     string
 		secure                   bool
 		domain                   string
 		sameSite                 http.SameSite
+		maxAge                   time.Duration
 		sameSiteLegacyWorkaround bool
 		expectedCookies          map[string]cookie
 	}{
@@ -311,12 +314,14 @@ func TestCreateCsrfSession(t *testing.T) {
 			name:                     "csrf_default",
 			secure:                   true,
 			sameSite:                 http.SameSiteDefaultMode,
+			maxAge:                   10 * time.Second,
 			sameSiteLegacyWorkaround: false,
 			expectedCookies: map[string]cookie{
 				"csrf_default": {
 					httpOnly: true,
 					secure:   true,
 					sameSite: 0, // see https://golang.org/doc/go1.16#net/http
+					maxAge:   10,
 				},
 			},
 		},
@@ -324,12 +329,14 @@ func TestCreateCsrfSession(t *testing.T) {
 			name:                     "csrf_lax_insecure",
 			secure:                   false,
 			sameSite:                 http.SameSiteLaxMode,
+			maxAge:                   20 * time.Second,
 			sameSiteLegacyWorkaround: false,
 			expectedCookies: map[string]cookie{
 				"csrf_lax_insecure": {
 					httpOnly: true,
 					secure:   false,
 					sameSite: http.SameSiteLaxMode,
+					maxAge:   20,
 				},
 			},
 		},
@@ -337,12 +344,14 @@ func TestCreateCsrfSession(t *testing.T) {
 			name:                     "csrf_none",
 			secure:                   true,
 			sameSite:                 http.SameSiteNoneMode,
+			maxAge:                   30 * time.Second,
 			sameSiteLegacyWorkaround: false,
 			expectedCookies: map[string]cookie{
 				"csrf_none": {
 					httpOnly: true,
 					secure:   true,
 					sameSite: http.SameSiteNoneMode,
+					maxAge:   30,
 				},
 			},
 		},
@@ -350,17 +359,20 @@ func TestCreateCsrfSession(t *testing.T) {
 			name:                     "csrf_none_fallback",
 			secure:                   true,
 			sameSite:                 http.SameSiteNoneMode,
+			maxAge:                   40 * time.Second,
 			sameSiteLegacyWorkaround: true,
 			expectedCookies: map[string]cookie{
 				"csrf_none_fallback": {
 					httpOnly: true,
 					secure:   true,
 					sameSite: http.SameSiteNoneMode,
+					maxAge:   40,
 				},
 				"csrf_none_fallback_legacy": {
 					httpOnly: true,
 					secure:   true,
 					sameSite: 0,
+					maxAge:   40,
 				},
 			},
 		},
@@ -368,12 +380,14 @@ func TestCreateCsrfSession(t *testing.T) {
 			name:                     "csrf_strict_fallback_ignored",
 			secure:                   true,
 			sameSite:                 http.SameSiteStrictMode,
+			maxAge:                   50 * time.Second,
 			sameSiteLegacyWorkaround: true,
 			expectedCookies: map[string]cookie{
 				"csrf_strict_fallback_ignored": {
 					httpOnly: true,
 					secure:   true,
 					sameSite: http.SameSiteStrictMode,
+					maxAge:   50,
 				},
 			},
 		},
@@ -406,7 +420,7 @@ func TestCreateCsrfSession(t *testing.T) {
 			config.EXPECT().CookieSecure(gomock.Any()).Return(tc.secure).AnyTimes()
 			config.EXPECT().CookieDomain(gomock.Any()).Return(tc.domain).AnyTimes()
 
-			err := createCsrfSession(rr, req, config, store, tc.name, "value")
+			err := createCsrfSession(rr, req, config, store, tc.name, "value", tc.maxAge)
 			assert.NoError(t, err)
 
 			cookies := make(map[string]cookie)
@@ -415,6 +429,7 @@ func TestCreateCsrfSession(t *testing.T) {
 					httpOnly: c.HttpOnly,
 					secure:   c.Secure,
 					sameSite: c.SameSite,
+					maxAge:   c.MaxAge,
 					domain:   c.Domain,
 				}
 			}

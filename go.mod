@@ -61,6 +61,7 @@ require (
 	github.com/tidwall/sjson v1.2.4
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/toqueteos/webbrowser v1.2.0
+	github.com/twmb/murmur3 v1.1.6
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/otel v1.9.0
 	go.step.sm/crypto v0.16.2

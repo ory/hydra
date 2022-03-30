@@ -18,6 +18,7 @@ type (
 	DefaultContextualizer struct{}
 	StaticContextualizer  struct {
 		NID uuid.UUID
+		C   *config.Provider
 	}
 )
 
@@ -39,5 +40,5 @@ func (d *StaticContextualizer) Network(ctx context.Context, network uuid.UUID) u
 }
 
 func (d *StaticContextualizer) Config(ctx context.Context, config *config.Provider) *config.Provider {
-	return config
+	return d.C
 }

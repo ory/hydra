@@ -2,7 +2,6 @@ package sql
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -32,15 +31,14 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 		}
 
 		data := p.sqlDataFromJWTGrant(g)
-		data.NID = p.NetworkID(ctx)
 
-		return sqlcon.HandleError(p.Connection(ctx).Create(&data))
+		return sqlcon.HandleError(p.CreateWithNetwork(ctx, &data))
 	})
 }
 
 func (p *Persister) GetConcreteGrant(ctx context.Context, id string) (trust.Grant, error) {
 	var data trust.SQLData
-	if err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).First(&data); err != nil {
+	if err := p.QueryWithNetwork(ctx).Where("id = ?", id).First(&data); err != nil {
 		return trust.Grant{}, sqlcon.HandleError(err)
 	}
 
@@ -54,7 +52,7 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 			return sqlcon.HandleError(err)
 		}
 
-		if err := p.Connection(ctx).Destroy(&trust.SQLData{ID: grant.ID}); err != nil {
+		if err := p.QueryWithNetwork(ctx).Where("id = ?", grant.ID).Delete(&trust.SQLData{}); err != nil {
 			return sqlcon.HandleError(err)
 		}
 
@@ -65,8 +63,7 @@ func (p *Persister) DeleteGrant(ctx context.Context, id string) error {
 func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIssuer string) ([]trust.Grant, error) {
 	grantsData := make([]trust.SQLData, 0)
 
-	query := p.Connection(ctx).
-		Where("nid = ?", p.NetworkID(ctx)).
+	query := p.QueryWithNetwork(ctx).
 		Paginate(offset/limit+1, limit).
 		Order("id")
 	if optionalIssuer != "" {
@@ -86,19 +83,17 @@ func (p *Persister) GetGrants(ctx context.Context, limit, offset int, optionalIs
 }
 
 func (p *Persister) CountGrants(ctx context.Context) (int, error) {
-	n, err := p.Connection(ctx).
-		Where("nid = ?", p.NetworkID(ctx)).
+	n, err := p.QueryWithNetwork(ctx).
 		Count(&trust.SQLData{})
 	return n, sqlcon.HandleError(err)
 }
 
 func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject string, keyId string) (*jose.JSONWebKey, error) {
 	var data trust.SQLData
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ?", subject).
-		Where("key_id = ?", keyId).
-		Where("nid = ?", p.NetworkID(ctx))
+		Where("key_id = ?", keyId)
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -113,10 +108,9 @@ func (p *Persister) GetPublicKey(ctx context.Context, issuer string, subject str
 
 func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject string) (*jose.JSONWebKeySet, error) {
 	grantsData := make([]trust.SQLData, 0)
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
-		Where("subject = ?", subject).
-		Where("nid = ?", p.NetworkID(ctx))
+		Where("subject = ?", subject)
 	if err := query.All(&grantsData); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -144,11 +138,10 @@ func (p *Persister) GetPublicKeys(ctx context.Context, issuer string, subject st
 
 func (p *Persister) GetPublicKeyScopes(ctx context.Context, issuer string, subject string, keyId string) ([]string, error) {
 	var data trust.SQLData
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Where("issuer = ?", issuer).
 		Where("subject = ?", subject).
-		Where("key_id = ?", keyId).
-		Where("nid = ?", p.NetworkID(ctx))
+		Where("key_id = ?", keyId)
 	if err := query.First(&data); err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
@@ -202,9 +195,5 @@ func (p *Persister) FlushInactiveGrants(ctx context.Context, notAfter time.Time,
 	if deleteUntil.After(notAfter) {
 		deleteUntil = notAfter
 	}
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE expires_at < ? AND nid = ?", trust.SQLData{}.TableName()),
-		deleteUntil,
-		p.NetworkID(ctx),
-	).Exec())
+	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("expires_at < ?", deleteUntil).Delete(&trust.SQLData{}))
 }

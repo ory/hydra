@@ -21,6 +21,7 @@
 package oauth2_test
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -65,7 +66,7 @@ func (c *consentMock) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.R
 	panic("not implemented")
 }
 
-func (c *consentMock) ObfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error) {
+func (c *consentMock) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {
 	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
 		panic("not implemented")
 	} else if !ok {

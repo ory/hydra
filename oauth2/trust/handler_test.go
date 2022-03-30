@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/google/uuid"
@@ -43,12 +44,12 @@ func (s *HandlerTestSuite) SetupSuite() {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
-	s.registry = internal.NewRegistryMemory(s.T(), conf)
+	s.registry = internal.NewRegistryMemory(s.T(), conf, &contextx.DefaultContextualizer{})
 
 	router := x.NewRouterAdmin()
 	handler := trust.NewHandler(s.registry)
 	handler.SetRoutes(router)
-	jwkHandler := jwk.NewHandler(s.registry, conf)
+	jwkHandler := jwk.NewHandler(s.registry)
 	jwkHandler.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})

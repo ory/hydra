@@ -8,6 +8,7 @@ import (
 
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 )
@@ -17,7 +18,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
 	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 	c.MustSet(config.HsmEnabled, "false")
-	reg, err := NewRegistryFromDSN(context.Background(), c, l, true, false)
+	reg, err := NewRegistryFromDSN(context.Background(), c, l, true, false, &contextx.DefaultContextualizer{})
 	assert.NoError(t, err)
 	assert.IsType(t, &sql.Persister{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())

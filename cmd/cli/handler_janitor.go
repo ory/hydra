@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/persistence"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/pkg/errors"
 
@@ -75,7 +76,7 @@ func (_ *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func purge(cmd *cobra.Command, args []string) error {
-	ctx := context.TODO()
+	ctx := cmd.Context()
 	var d driver.Registry
 
 	co := []configx.OptionModifier{
@@ -119,7 +120,7 @@ func purge(cmd *cobra.Command, args []string) error {
 			"When using flag -c, the dsn property should be set.")
 	}
 
-	if err := d.Init(cmd.Context(), false, false); err != nil {
+	if err := d.Init(cmd.Context(), false, false, &contextx.DefaultContextualizer{}); err != nil {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
 	}

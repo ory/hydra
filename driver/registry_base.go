@@ -96,7 +96,7 @@ func (m *RegistryBase) WithContextualizer(ctxer contextx.Contextualizer) Registr
 
 func (m *RegistryBase) Contextualizer() contextx.Contextualizer {
 	if m.ctxer == nil {
-		m.ctxer = &contextx.DefaultContextualizer{}
+		panic("registry Contextualizer not set")
 	}
 	return m.ctxer
 }
@@ -113,14 +113,14 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 	return m.r
 }
 
-func (m *RegistryBase) OAuth2AwareMiddleware(ctx context.Context) func(h http.Handler) http.Handler {
+func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = oauth2cors.Middleware(ctx, m.r)
+		m.oa2mw = oauth2cors.Middleware(m.r)
 	}
 	return m.oa2mw
 }
 
-func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
+func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 
@@ -129,9 +129,9 @@ func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *x.RouterAdmin,
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
-	m.ClientHandler().SetRoutes(ctx, admin, public)
-	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
+	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.ClientHandler().SetRoutes(admin, public)
+	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 
@@ -181,7 +181,7 @@ func (m *RegistryBase) Logger() *logrusx.Logger {
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
 		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
-		m.al.UseConfig(m.C.Source())
+		m.al.UseConfig(m.Config(contextx.RootContext).Source())
 	}
 	return m.al
 }
@@ -189,9 +189,9 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
 		if m.Tracer(context.TODO()).IsLoaded() {
-			m.fh = &tracing.TracedBCrypt{WorkFactor: m.C.BCryptCost()}
+			m.fh = &tracing.TracedBCrypt{WorkFactor: m.Config(contextx.RootContext).BCryptCost()}
 		} else {
-			m.fh = x.NewBCrypt(m.C)
+			m.fh = x.NewBCrypt(m.Config(contextx.RootContext))
 		}
 	}
 	return m.fh
@@ -206,14 +206,14 @@ func (m *RegistryBase) ClientHandler() *client.Handler {
 
 func (m *RegistryBase) ClientValidator(ctx context.Context) *client.Validator {
 	if m.cv == nil {
-		m.cv = client.NewValidator(m.Contextualizer(), m.C)
+		m.cv = client.NewValidator(m.r)
 	}
 	return m.cv
 }
 
 func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	if m.kh == nil {
-		m.kh = jwk.NewHandler(m.r, m.C)
+		m.kh = jwk.NewHandler(m.r)
 	}
 	return m.kh
 }
@@ -468,15 +468,15 @@ func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 	return m.oah
 }
 
-func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectIdentifierAlgorithm {
+func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
 	if m.sia == nil {
 		m.sia = map[string]consent.SubjectIdentifierAlgorithm{}
-		for _, t := range m.C.SubjectTypesSupported() {
+		for _, t := range m.Config(ctx).SubjectTypesSupported() {
 			switch t {
 			case "public":
 				m.sia["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
 			case "pairwise":
-				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.C.SubjectIdentifierAlgorithmSalt()))
+				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.Config(ctx).SubjectIdentifierAlgorithmSalt()))
 			}
 		}
 	}
@@ -507,6 +507,7 @@ func (m *RegistryBase) Persister() persistence.Persister {
 	return m.persister
 }
 
+// Config returns the configuration for the given context. It may or may not be the same as the global configuration.
 func (m *RegistryBase) Config(ctx context.Context) *config.Provider {
 	return m.Contextualizer().Config(ctx, m.C)
 }

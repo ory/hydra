@@ -37,6 +37,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 )
@@ -50,7 +51,7 @@ func TestSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyIssuerURL, "https://www.ory.sh")
 	conf.MustSet(config.KeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)

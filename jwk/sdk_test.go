@@ -28,6 +28,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
@@ -43,10 +44,10 @@ import (
 
 func TestJWKSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	router := x.NewRouterAdmin()
-	h := NewHandler(reg, conf)
+	h := NewHandler(reg)
 	h.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {
 		return h
 	})

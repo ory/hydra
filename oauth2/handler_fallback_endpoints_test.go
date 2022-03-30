@@ -27,6 +27,7 @@ import (
 	"testing"
 
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
@@ -38,7 +39,7 @@ import (
 func TestHandlerConsent(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	h := reg.OAuth2Handler()
 	r := x.NewRouterAdmin()

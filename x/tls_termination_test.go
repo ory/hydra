@@ -11,6 +11,7 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 )
 
 func panicHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +24,7 @@ func noopHandler(w http.ResponseWriter, r *http.Request) {
 
 func TestDoesRequestSatisfyTermination(t *testing.T) {
 	c := internal.NewConfigurationWithDefaultsAndHTTPS()
-	r := internal.NewRegistryMemory(t, c)
+	r := internal.NewRegistryMemory(t, c, &contextx.DefaultContextualizer{})
 
 	t.Run("case=tls-termination-disabled", func(t *testing.T) {
 		c.MustSet(config.KeyTLSAllowTerminationFrom, "")

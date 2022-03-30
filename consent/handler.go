@@ -312,12 +312,7 @@ func (h *Handler) revokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Reque
 func (h *Handler) revokeOAuth2LoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var loginSessionId = ps.ByName("id")
 
-	if loginSessionId == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Path parameter 'id' is not defined but should have been.`)))
-		return
-	}
-
-	if err := h.r.ConsentManager().DeleteLoginSession(r.Context(), loginSessionId); err != nil && !errors.Is(err, x.ErrNotFound) {
+	if err := h.r.ConsentManager().DeleteLoginSession(r.Context(), loginSessionId); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

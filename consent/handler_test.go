@@ -13,9 +13,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pborman/uuid"
+	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 
-	"github.com/ory/x/sqlxx"
+	"github.com/pborman/uuid"
 
 	"github.com/ory/x/pointerx"
 
@@ -283,81 +284,144 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 
 func TestDeleteLoginSessionBySessionId(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
-	loginSession1 := uuid.NewUUID().String()
-	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
-		ID:              loginSession1,
-		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
-		Subject:         "subject1",
-		Remember:        true,
-	}))
-	loginSession2 := uuid.NewUUID().String()
-	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
-		ID:              loginSession2,
-		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
-		Subject:         "subject1",
-		Remember:        true,
-	}))
-	h := NewHandler(reg, conf)
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-	_, err := reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
-	require.NoError(t, err)
-	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
-	require.NoError(t, err)
-	c := &http.Client{}
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	req, err := http.NewRequest("DELETE", ts.URL+SessionsPath+"/login/"+loginSession1, nil)
+	t.Run("case=should pass when deleted by session id", func(t *testing.T) {
+		loginSession1 := uuid.NewUUID().String()
+		require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+			ID:              loginSession1,
+			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+			Subject:         "subject1",
+			Remember:        true,
+		}))
+		loginSession2 := uuid.NewUUID().String()
+		require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+			ID:              loginSession2,
+			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+			Subject:         "subject1",
+			Remember:        true,
+		}))
+		h := NewHandler(reg, conf)
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		_, err := reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+		require.NoError(t, err)
+		_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+		require.NoError(t, err)
+		c := &http.Client{}
 
-	require.NoError(t, err)
-	resp, err := c.Do(req)
-	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNoContent, resp.StatusCode)
-	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
-	require.EqualError(t, err, x.ErrNotFound.Error())
-	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
-	require.NoError(t, err)
+		req, err := http.NewRequest(http.MethodDelete, ts.URL+"/admin"+SessionsPath+"/login/"+loginSession1, nil)
+
+		require.NoError(t, err)
+		resp, err := c.Do(req)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+		_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+		require.EqualError(t, err, x.ErrNotFound.Error())
+		_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+		require.NoError(t, err)
+	})
+
+	t.Run("case=should fail with internal server error when delete fails", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		mockPersister := NewMockManager(ctrl)
+		reg.WithPersister(mockPersister)
+		defer ctrl.Finish()
+		mockPersister.EXPECT().DeleteLoginSession(gomock.Any(), gomock.Any()).Return(errors.New("SqlError"))
+		h := NewHandler(reg, conf)
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		c := &http.Client{}
+
+		req, err := http.NewRequest(http.MethodDelete, ts.URL+"/admin"+SessionsPath+"/login/session-1", nil)
+
+		require.NoError(t, err)
+		resp, err := c.Do(req)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusInternalServerError, resp.StatusCode)
+	})
 }
 
 func TestDeleteLoginSessionBySubject(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
-	subject := "subject1"
-	loginSession1 := uuid.NewUUID().String()
-	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
-		ID:              loginSession1,
-		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
-		Subject:         subject,
-		Remember:        true,
-	}))
-	loginSession2 := uuid.NewUUID().String()
-	require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
-		ID:              loginSession2,
-		AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
-		Subject:         subject,
-		Remember:        true,
-	}))
-	h := NewHandler(reg, conf)
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r)
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-	_, err := reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
-	require.NoError(t, err)
-	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
-	require.NoError(t, err)
-	c := &http.Client{}
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	req, err := http.NewRequest("DELETE", ts.URL+SessionsPath+"/login?subject="+subject, nil)
+	t.Run("case=should pass when deleted by subject", func(t *testing.T) {
+		subject := "subject1"
+		loginSession1 := uuid.NewUUID().String()
+		require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+			ID:              loginSession1,
+			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+			Subject:         subject,
+			Remember:        true,
+		}))
+		loginSession2 := uuid.NewUUID().String()
+		require.NoError(t, reg.ConsentManager().CreateLoginSession(context.Background(), &LoginSession{
+			ID:              loginSession2,
+			AuthenticatedAt: sqlxx.NullTime(time.Now().Round(time.Second).UTC()),
+			Subject:         subject,
+			Remember:        true,
+		}))
+		h := NewHandler(reg, conf)
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		_, err := reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+		require.NoError(t, err)
+		_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+		require.NoError(t, err)
+		c := &http.Client{}
 
-	require.NoError(t, err)
-	resp, err := c.Do(req)
-	require.NoError(t, err)
-	require.EqualValues(t, http.StatusNoContent, resp.StatusCode)
-	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
-	require.EqualError(t, err, x.ErrNotFound.Error())
-	_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
-	require.EqualError(t, err, x.ErrNotFound.Error())
+		req, err := http.NewRequest(http.MethodDelete, ts.URL+"/admin"+SessionsPath+"/login?subject="+subject, nil)
+
+		require.NoError(t, err)
+		resp, err := c.Do(req)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusNoContent, resp.StatusCode)
+		_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession1)
+		require.EqualError(t, err, x.ErrNotFound.Error())
+		_, err = reg.ConsentManager().GetRememberedLoginSession(context.Background(), loginSession2)
+		require.EqualError(t, err, x.ErrNotFound.Error())
+	})
+
+	t.Run("case=should fail when missing subject parameter", func(t *testing.T) {
+		h := NewHandler(reg, conf)
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		c := &http.Client{}
+
+		req, err := http.NewRequest(http.MethodDelete, ts.URL+"/admin"+SessionsPath+"/login?subject=", nil)
+
+		require.NoError(t, err)
+		resp, err := c.Do(req)
+		require.EqualValues(t, 400, resp.StatusCode)
+	})
+
+	t.Run("case=should fail with internal server error when delete fails", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		mockPersister := NewMockManager(ctrl)
+		reg.WithPersister(mockPersister)
+		defer ctrl.Finish()
+		mockPersister.EXPECT().RevokeSubjectLoginSession(gomock.Any(), gomock.Any()).Return(errors.New("SqlError"))
+		h := NewHandler(reg, conf)
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+		c := &http.Client{}
+
+		req, err := http.NewRequest(http.MethodDelete, ts.URL+"/admin"+SessionsPath+"/login?subject=subject-1", nil)
+
+		require.NoError(t, err)
+		resp, err := c.Do(req)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusInternalServerError, resp.StatusCode)
+	})
 }

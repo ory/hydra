@@ -72,6 +72,7 @@ type Registry interface {
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
 	WithOAuth2Provider(f fosite.OAuth2Provider)
 	WithConsentStrategy(c consent.Strategy)
+	WithPersister(p persistence.Persister)
 	WithHsmContext(h hsm.Context)
 }
 

@@ -502,6 +502,11 @@ func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
 	m.cos = c
 }
 
+// WithPersister forces a persister which is only used for testing.
+func (m *RegistryBase) WithPersister(p persistence.Persister) {
+	m.persister = p
+}
+
 func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	if m.arhs == nil {
 		m.arhs = []oauth2.AccessRequestHook{
@@ -512,6 +517,7 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	return m.arhs
 }
 
+// WithHsmContext forces a hsm context which is only used for testing.
 func (m *RegistryBase) WithHsmContext(h hsm.Context) {
 	m.hsm = h
 }

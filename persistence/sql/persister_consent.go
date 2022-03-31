@@ -247,7 +247,7 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 	var r consent.HandledConsentRequest
 	return &r, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		var f flow.Flow
-		if err := p.QueryWithNetwork(ctx).Where("consent_verifier = ?", verifier).Select("*").First(&f); err != nil {
+		if err := p.QueryWithNetwork(ctx).Where("consent_verifier = ?", verifier).First(&f); err != nil {
 			return sqlcon.HandleError(err)
 		}
 

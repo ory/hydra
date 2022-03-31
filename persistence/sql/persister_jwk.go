@@ -48,8 +48,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 		return errorsx.WithStack(err)
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Create(&jwk.SQLData{
-		NID:     p.NetworkID(ctx),
+	return sqlcon.HandleError(p.CreateWithNetwork(ctx, &jwk.SQLData{
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,

@@ -1,6 +1,6 @@
 FROM alpine:3.15.1
 
-RUN apk --no-cache --update-cache --upgrade --latest add ca-certificates
+RUN apk --no-cache add ca-certificates
 
 # set up nsswitch.conf for Go's "netgo" implementation
 # - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275

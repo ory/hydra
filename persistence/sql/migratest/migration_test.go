@@ -277,13 +277,10 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 1, len(ns))
 					for _, n := range ns {
 						testhelpersuuid.AssertUUID(t, &n.ID)
-						n.ID = uuid.Nil
 						require.NotZero(t, n.CreatedAt)
 						require.NotZero(t, n.UpdatedAt)
-						CompareWithFixture(t, n, "networks", n.ID.String())
 					}
 				})
-
 			})
 		}
 	}

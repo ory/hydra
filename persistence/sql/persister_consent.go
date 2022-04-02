@@ -466,8 +466,7 @@ WHERE
 }
 
 func (p *Persister) CreateLogoutRequest(ctx context.Context, request *consent.LogoutRequest) error {
-	request.NID = p.NetworkID(ctx)
-	return errorsx.WithStack(p.Connection(ctx).Create(request))
+	return errorsx.WithStack(p.CreateWithNetwork(ctx, request))
 }
 
 func (p *Persister) AcceptLogoutRequest(ctx context.Context, challenge string) (*consent.LogoutRequest, error) {

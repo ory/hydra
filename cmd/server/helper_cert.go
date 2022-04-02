@@ -75,11 +75,11 @@ func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver
 		}
 
 		AttachCertificate(priv, cert)
-		if err := d.SoftwareKeyManager().DeleteKey(context.TODO(), TlsKeyName, priv.KeyID); err != nil {
+		if err := d.SoftwareKeyManager().DeleteKey(ctx, TlsKeyName, priv.KeyID); err != nil {
 			d.Logger().WithError(err).Fatal(`Could not update (delete) the self signed TLS certificate`)
 		}
 
-		if err := d.SoftwareKeyManager().AddKey(context.TODO(), TlsKeyName, priv); err != nil {
+		if err := d.SoftwareKeyManager().AddKey(ctx, TlsKeyName, priv); err != nil {
 			d.Logger().WithError(err).Fatalf(`Could not update (add) the self signed TLS certificate: %s %x %d`, cert.SignatureAlgorithm, cert.Signature, len(cert.Signature))
 		}
 	}

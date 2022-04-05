@@ -8,8 +8,9 @@ RUN wget https://gitlab.com/openid/conformance-suite/-/archive/release-v4.1.4/co
   find conformance-suite-release-v4.1.4 -maxdepth 1 -mindepth 1 -exec mv {} . \; && \
   rmdir conformance-suite-release-v4.1.4
 
-RUN mvn -B clean package -DskipTests
-RUN apt-get update && apt-get install -y redir ca-certificates
+RUN mvn -B clean package -DskipTests && \
+    apt-get update && apt-get install -y \
+    redir ca-certificates && \
 
 COPY ssl/ory-conformity.crt /etc/ssl/certs/
 COPY ssl/ory-conformity.key /etc/ssl/private/

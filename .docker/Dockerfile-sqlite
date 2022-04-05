@@ -1,4 +1,4 @@
-FROM alpine:3.15.1
+FROM alpine:3.15
 
 # Because this image is built for SQLite, we create /home/ory and /home/ory/sqlite which is owned by the ory user
 # and declare /home/ory/sqlite a volume.
@@ -9,8 +9,8 @@ FROM alpine:3.15.1
 
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
-    chown -R ory:ory /home/ory
-RUN apk --no-cache --update-cache --upgrade --latest add ca-certificates
+    chown -R ory:ory /home/ory && \
+    apk --no-cache --upgrade --latest add ca-certificates
 
 WORKDIR /home/ory
 
@@ -18,8 +18,9 @@ COPY hydra /usr/bin/hydra
 
 # By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
 # is required for read/write of SQLite.
-RUN mkdir -p /var/lib/sqlite
-RUN chown ory:ory /var/lib/sqlite
+RUN mkdir -p /var/lib/sqlite && \
+    chown ory:ory /var/lib/sqlite
+
 VOLUME /var/lib/sqlite
 
 # Exposing the ory home directory

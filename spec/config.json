@@ -1206,6 +1206,21 @@
           }
         }
       }
+    },
+    "dangerous-force-http": {
+      "type": "boolean",
+      "title": "Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead",
+      "description": "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead. This is only available as CLI flag `--dangerous-force-http`."
+    },
+    "dangerous-allow-insecure-redirect-urls": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "title": "Disable HTTPS enforcement for the provided redirect URLs.",
+      "description": "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs. This is only available as CLI flag `--dangerous-allow-insecure-redirect-urls`."
     }
   }
 }

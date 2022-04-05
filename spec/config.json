@@ -269,6 +269,11 @@
               "$ref": "#/definitions/duration"
             }
           ]
+        },
+        "client_auth_optional": {
+          "type": "boolean",
+          "description": "Configures if Client Authentication is optional for the jwt bearer grant",
+          "default": true
         }
       }
     }

@@ -299,7 +299,7 @@ func (m *RegistryBase) oAuth2Config() *compose.Config {
 		EnablePKCEPlainChallengeMethod:       false,
 		TokenURL:                             urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
 		RedirectSecureChecker:                x.IsRedirectURISecure(m.C),
-		GrantTypeJWTBearerCanSkipClientAuth:  false,
+		GrantTypeJWTBearerCanSkipClientAuth:  m.C.GrantTypeJWTBearerClientAuthOptional(),
 		GrantTypeJWTBearerIDOptional:         m.C.GrantTypeJWTBearerIDOptional(),
 		GrantTypeJWTBearerIssuedDateOptional: m.C.GrantTypeJWTBearerIssuedDateOptional(),
 		GrantTypeJWTBearerMaxDuration:        m.C.GrantTypeJWTBearerMaxDuration(),

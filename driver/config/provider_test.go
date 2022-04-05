@@ -382,3 +382,32 @@ func TestInfinitRefreshTokenTTL(t *testing.T) {
 
 	assert.Equal(t, -1*time.Nanosecond, c.RefreshTokenLifespan())
 }
+
+func TestJWTBearer(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+	p := MustNew(context.Background(), l)
+
+	p.MustSet(KeyOAuth2GrantJWTClientAuthOptional, false)
+	p.MustSet(KeyOAuth2GrantJWTMaxDuration, "1h")
+	p.MustSet(KeyOAuth2GrantJWTIssuedDateOptional, false)
+	p.MustSet(KeyOAuth2GrantJWTIDOptional, false)
+
+	assert.Equal(t, false, p.GrantTypeJWTBearerClientAuthOptional())
+	assert.Equal(t, 1.0, p.GrantTypeJWTBearerMaxDuration().Hours())
+	assert.Equal(t, false, p.GrantTypeJWTBearerIssuedDateOptional())
+	assert.Equal(t, false, p.GrantTypeJWTBearerIDOptional())
+
+	p2 := MustNew(context.Background(), l)
+
+	p2.MustSet(KeyOAuth2GrantJWTClientAuthOptional, true)
+	p2.MustSet(KeyOAuth2GrantJWTMaxDuration, "24h")
+	p2.MustSet(KeyOAuth2GrantJWTIssuedDateOptional, true)
+	p2.MustSet(KeyOAuth2GrantJWTIDOptional, true)
+
+	assert.Equal(t, true, p2.GrantTypeJWTBearerClientAuthOptional())
+	assert.Equal(t, 24.0, p2.GrantTypeJWTBearerMaxDuration().Hours())
+	assert.Equal(t, true, p2.GrantTypeJWTBearerIssuedDateOptional())
+	assert.Equal(t, true, p2.GrantTypeJWTBearerIDOptional())
+
+}

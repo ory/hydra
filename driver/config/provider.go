@@ -75,6 +75,7 @@ const (
 	KeyOAuth2GrantJWTIDOptional                  = "oauth2.grant.jwt.jti_optional"
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
+	KeyOAuth2GrantJWTClientAuthOptional          = "oauth2.grant.jwt.client_auth_optional"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
 )
 
@@ -479,4 +480,8 @@ func (p *Provider) GrantTypeJWTBearerIssuedDateOptional() bool {
 
 func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
 	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
+}
+
+func (p *Provider) GrantTypeJWTBearerClientAuthOptional() bool {
+	return p.p.Bool(KeyOAuth2GrantJWTClientAuthOptional)
 }

@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-03-24)](#000-2022-03-24)
+- [0.0.0 (2022-04-05)](#000-2022-04-05)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -629,18 +629,21 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-03-24)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-05)
 
 
 ### Bug Fixes
 
+* Add missing flags to config schema ([00100a1](https://github.com/ory/hydra/commit/00100a1bcb60d1836a2c3d6c6a4212e3161b1bda)), closes [#653](https://github.com/ory/hydra/issues/653)
 * Configure audit logger ([#3022](https://github.com/ory/hydra/issues/3022)) ([3115dde](https://github.com/ory/hydra/commit/3115dde229a6be936ad4d844d778d6ee82279643))
+* Do not use cached version ([422d422](https://github.com/ory/hydra/commit/422d4227e8b599a6eb32b60d432fd0cad95a717a))
 * Remove unnecessary transaction ([#3029](https://github.com/ory/hydra/issues/3029)) ([d4b2696](https://github.com/ory/hydra/commit/d4b2696bd72b9fc98f3959b13be2fc28aa2263bc))
 * **sdk:** Incorrect title ([#3014](https://github.com/ory/hydra/issues/3014)) ([d654911](https://github.com/ory/hydra/commit/d654911c0da2e2f9513e62916daf2284186d19de)):
 
     Closes https://github.com/ory/sdk/issues/153
 
 * Sync ports between Dockerfiles and comments ([#3027](https://github.com/ory/hydra/issues/3027)) ([ebd1694](https://github.com/ory/hydra/commit/ebd16940e270561c13aab60a969a4969391d5d80))
+* Use default for env var ([2b024b4](https://github.com/ory/hydra/commit/2b024b4f8e98f3efe73018bd57e1d16738d50eeb))
 
 ### Documentation
 

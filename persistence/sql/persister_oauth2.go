@@ -397,7 +397,14 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 		}
 
 		if i != j {
-			err = p.QueryWithNetwork(ctx).Where("signature in (?)", signatures[i:j]).Delete(&OAuth2RequestSQL{Table: table})
+			ss := signatures[i:j]
+			iss := make([]interface{}, len(ss))
+			for i, v := range ss { // Workaround for https://github.com/gobuffalo/pop/issues/699
+				iss[i] = v
+			}
+
+			err = p.QueryWithNetwork(ctx).Where("signature in (?)", iss...).Delete(&OAuth2RequestSQL{Table: table})
+
 			if err != nil {
 				return sqlcon.HandleError(err)
 			}

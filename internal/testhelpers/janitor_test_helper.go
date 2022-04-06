@@ -274,12 +274,12 @@ func (j *JanitorConsentTestHelper) ConsentRejectionSetup(ctx context.Context, cm
 		for _, r := range j.flushConsentRequests {
 			if r.ID == j.flushConsentRequests[0].ID {
 				// accept this one
-				_, err = cm.HandleConsentRequest(ctx, r.ID, consent.NewHandledConsentRequest(
+				_, err = cm.HandleConsentRequest(ctx, consent.NewHandledConsentRequest(
 					r.ID, false, r.RequestedAt, r.AuthenticatedAt))
 				require.NoError(t, err)
 				continue
 			}
-			_, err = cm.HandleConsentRequest(ctx, r.ID, consent.NewHandledConsentRequest(
+			_, err = cm.HandleConsentRequest(ctx, consent.NewHandledConsentRequest(
 				r.ID, true, r.RequestedAt, r.AuthenticatedAt))
 			require.NoError(t, err)
 		}
@@ -362,7 +362,7 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 		}
 
 		// Create at least 1 consent request that has been accepted
-		_, err = cm.HandleConsentRequest(ctx, j.flushConsentRequests[0].ID, &consent.HandledConsentRequest{
+		_, err = cm.HandleConsentRequest(ctx, &consent.HandledConsentRequest{
 			ID:              j.flushConsentRequests[0].ID,
 			WasHandled:      true,
 			HandledAt:       sqlxx.NullTime(time.Now()),

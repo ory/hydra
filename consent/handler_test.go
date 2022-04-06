@@ -191,7 +191,7 @@ func TestGetConsentRequest(t *testing.T) {
 				}))
 
 				if tc.handled {
-					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), challenge, &HandledConsentRequest{
+					_, err := reg.ConsentManager().HandleConsentRequest(context.Background(), &HandledConsentRequest{
 						ID:         challenge,
 						WasHandled: true,
 						HandledAt:  sqlxx.NullTime(time.Now()),

@@ -125,7 +125,7 @@ type Client struct {
 
 	// SubjectType requested for responses to this Client. The subject_types_supported Discovery parameter contains a
 	// list of the supported subject_type values for this server. Valid types include `pairwise` and `public`.
-	SubjectType string `json:"subject_type" db:"subject_type"`
+	SubjectType string `json:"subject_type" db:"subject_type" faker:"len=15"`
 
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
 	// file with a single JSON array of redirect_uri values.
@@ -152,10 +152,10 @@ type Client struct {
 
 	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,
 	// client_secret_basic, private_key_jwt, and none.
-	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty" db:"token_endpoint_auth_method"`
+	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty" db:"token_endpoint_auth_method" faker:"len=25"`
 
 	// Requested Client Authentication signing algorithm for the Token Endpoint.
-	TokenEndpointAuthSigningAlgorithm string `json:"token_endpoint_auth_signing_alg,omitempty" db:"token_endpoint_auth_signing_alg"`
+	TokenEndpointAuthSigningAlgorithm string `json:"token_endpoint_auth_signing_alg,omitempty" db:"token_endpoint_auth_signing_alg" faker:"len=10"`
 
 	// Array of request_uri values that are pre-registered by the RP for use at the OP. Servers MAY cache the
 	// contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
@@ -165,12 +165,12 @@ type Client struct {
 
 	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
 	// from this Client MUST be rejected, if not signed with this algorithm.
-	RequestObjectSigningAlgorithm string `json:"request_object_signing_alg,omitempty" db:"request_object_signing_alg"`
+	RequestObjectSigningAlgorithm string `json:"request_object_signing_alg,omitempty" db:"request_object_signing_alg" faker:"len=10"`
 
 	// JWS alg algorithm [JWA] REQUIRED for signing UserInfo Responses. If this is specified, the response will be JWT
 	// [JWT] serialized, and signed using JWS. The default, if omitted, is for the UserInfo Response to return the Claims
 	// as a UTF-8 encoded JSON object using the application/json content-type.
-	UserinfoSignedResponseAlg string `json:"userinfo_signed_response_alg,omitempty" db:"userinfo_signed_response_alg"`
+	UserinfoSignedResponseAlg string `json:"userinfo_signed_response_alg,omitempty" db:"userinfo_signed_response_alg" faker:"len=10"`
 
 	// CreatedAt returns the timestamp of the client's creation.
 	CreatedAt time.Time `json:"created_at,omitempty" db:"created_at"`

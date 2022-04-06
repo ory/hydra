@@ -132,7 +132,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 		t.Run(fmt.Sprintf("nid=%s", nid), func(t *testing.T) {
 			var client Client
 			require.NoError(t, faker.FakeData(&client))
-			client.CreatedAt = time.Now()
+			client.CreatedAt = time.Now().Truncate(time.Second).UTC()
 
 			t.Run("lifecycle=does not exist", func(t *testing.T) {
 				_, err := m.GetClient(ctx, "1234")
@@ -148,6 +148,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 				assertx.EqualAsJSONExcept(t, &client, c, []string{
 					"registration_access_token",
 					"registration_client_uri",
+					"updated_at",
 				})
 
 				n, err := m.CountClients(ctx)
@@ -165,6 +166,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 				assertx.EqualAsJSONExcept(t, &client, c, []string{
 					"registration_access_token",
 					"registration_client_uri",
+					"updated_at",
 				})
 				resources[nid] = append(resources[nid], client)
 			})

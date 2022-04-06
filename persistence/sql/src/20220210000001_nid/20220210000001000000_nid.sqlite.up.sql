@@ -4,7 +4,8 @@ UPDATE hydra_oauth2_jti_blacklist SET nid = (SELECT id FROM networks LIMIT 1);
 CREATE TABLE "_hydra_oauth2_jti_blacklist_tmp" (
     signature  VARCHAR(64) NOT NULL PRIMARY KEY,
     expires_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    nid        CHAR(36)    NOT NULL
+    nid        CHAR(36)    NOT NULL,
+    CHECK (nid != '00000000-0000-0000-0000-000000000000')
 );
 INSERT INTO "_hydra_oauth2_jti_blacklist_tmp" (signature, expires_at, nid) SELECT signature, expires_at, nid FROM "hydra_oauth2_jti_blacklist";
 DROP TABLE "hydra_oauth2_jti_blacklist";

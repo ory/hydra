@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/ory/x/configx"
-	"github.com/ory/x/networkx"
 
 	"github.com/stretchr/testify/require"
 
@@ -78,14 +77,8 @@ func newRegistryDefault(t *testing.T, url string, c *config.Provider, migrate bo
 
 func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 	return func(t *testing.T) {
-		net := &networkx.Network{}
-		recreateNetwork := reg.Persister().Connection(context.Background()).First(net) == nil
 		x.CleanSQLPop(t, reg.Persister().Connection(context.Background()))
 		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
-		if recreateNetwork {
-			require.NoError(t, reg.Persister().Connection(context.Background()).RawQuery("DELETE FROM networks").Exec())
-			require.NoError(t, reg.Persister().Connection(context.Background()).Create(net))
-		}
 		t.Log("clean and migrate done")
 	}
 }

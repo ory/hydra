@@ -153,7 +153,7 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 
 	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
 	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
-	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), id, &consent.HandledConsentRequest{
+	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), &consent.HandledConsentRequest{
 		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: sqlxx.NullTime(time.Now()),
 		ID:          id,
 		RequestedAt: time.Now(),

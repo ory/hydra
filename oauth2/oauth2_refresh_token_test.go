@@ -18,6 +18,7 @@ import (
 	"github.com/ory/fosite"
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/dbal"
@@ -84,7 +85,7 @@ func TestCreateRefreshTokenSessionStress(t *testing.T) {
 		}
 		net := &networkx.Network{}
 		require.NoError(t, dbRegistry.Persister().Connection(context.Background()).First(net))
-		dbRegistry.WithContextualizer(&contextx.StaticContextualizer{NID: net.ID})
+		dbRegistry.WithContextualizer(&contextx.StaticContextualizer{NID: net.ID, C: internal.NewConfigurationWithDefaults()})
 
 		ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 		require.NoError(t, dbRegistry.OAuth2Storage().(clientCreator).CreateClient(ctx, &testClient))

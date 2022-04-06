@@ -188,7 +188,7 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		if m.Tracer(context.TODO()).IsLoaded() {
+		if m.Tracer(contextx.RootContext).IsLoaded() {
 			m.fh = &tracing.TracedBCrypt{WorkFactor: m.Config(contextx.RootContext).BCryptCost()}
 		} else {
 			m.fh = x.NewBCrypt(m.Config(contextx.RootContext))

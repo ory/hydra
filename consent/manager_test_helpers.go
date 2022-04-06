@@ -197,7 +197,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		HandledAt:       sqlxx.NullTime(time.Now().UTC().Add(-time.Minute)),
 	}
 
-	_, err := m.HandleConsentRequest(context.Background(), c.ID, h)
+	_, err := m.HandleConsentRequest(context.Background(), h)
 	require.NoError(t, err)
 	return h
 }
@@ -487,13 +487,13 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					compareConsentRequest(t, c, got1)
 					assert.False(t, got1.WasHandled)
 
-					got1, err = m.HandleConsentRequest(context.Background(), consentChallenge, h)
+					got1, err = m.HandleConsentRequest(context.Background(), h)
 					require.NoError(t, err)
 					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
 					compareConsentRequest(t, c, got1)
 
 					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience"}
-					_, err = m.HandleConsentRequest(context.Background(), consentChallenge, h)
+					_, err = m.HandleConsentRequest(context.Background(), h)
 					require.NoError(t, err)
 
 					got2, err := m.VerifyAndInvalidateConsentRequest(context.Background(), makeID("verifier", tenant, tc.key))
@@ -504,7 +504,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 					// Trying to update this again should return an error because the consent request was used.
 					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience", "new-audience-2"}
-					_, err = m.HandleConsentRequest(context.Background(), consentChallenge, h)
+					_, err = m.HandleConsentRequest(context.Background(), h)
 					require.Error(t, err)
 
 					if tc.hasError {
@@ -605,9 +605,9 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
-			_, err := m.HandleConsentRequest(context.Background(), challengerv1, hcr1)
+			_, err := m.HandleConsentRequest(context.Background(), hcr1)
 			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(context.Background(), challengerv2, hcr2)
+			_, err = m.HandleConsentRequest(context.Background(), hcr2)
 			require.NoError(t, err)
 
 			require.NoError(t, fositeManager.CreateAccessTokenSession(context.Background(), makeID("", tenant, "trva1"), &fosite.Request{Client: cr1.Client, ID: challengerv1, RequestedAt: time.Now()}))
@@ -678,9 +678,9 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr1))
 			require.NoError(t, m.CreateConsentRequest(context.Background(), cr2))
-			_, err := m.HandleConsentRequest(context.Background(), challengerv1, hcr1)
+			_, err := m.HandleConsentRequest(context.Background(), hcr1)
 			require.NoError(t, err)
-			_, err = m.HandleConsentRequest(context.Background(), challengerv2, hcr2)
+			_, err = m.HandleConsentRequest(context.Background(), hcr2)
 			require.NoError(t, err)
 
 			for i, tc := range []struct {

@@ -42,7 +42,7 @@ func (_ ForcedObfuscatedLoginSession) TableName() string {
 type Manager interface {
 	CreateConsentRequest(ctx context.Context, req *ConsentRequest) error
 	GetConsentRequest(ctx context.Context, challenge string) (*ConsentRequest, error)
-	HandleConsentRequest(ctx context.Context, challenge string, r *HandledConsentRequest) (*ConsentRequest, error)
+	HandleConsentRequest(ctx context.Context, r *HandledConsentRequest) (*ConsentRequest, error)
 	RevokeSubjectConsentSession(ctx context.Context, user string) error
 	RevokeSubjectClientConsentSession(ctx context.Context, user, client string) error
 

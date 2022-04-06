@@ -574,7 +574,7 @@ func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, p
 	p.RequestedAt = cr.RequestedAt
 	p.HandledAt = sqlxx.NullTime(time.Now().UTC())
 
-	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &p)
+	hr, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), &p)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -651,7 +651,7 @@ func (h *Handler) RejectConsentRequest(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), challenge, &HandledConsentRequest{
+	request, err := h.r.ConsentManager().HandleConsentRequest(r.Context(), &HandledConsentRequest{
 		Error:       &p,
 		ID:          challenge,
 		RequestedAt: hr.RequestedAt,

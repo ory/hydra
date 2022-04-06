@@ -225,7 +225,7 @@ func (p *Persister) GetLoginRequest(ctx context.Context, login_challenge string)
 	})
 }
 
-func (p *Persister) HandleConsentRequest(ctx context.Context, challenge string, r *consent.HandledConsentRequest) (*consent.ConsentRequest, error) {
+func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.HandledConsentRequest) (*consent.ConsentRequest, error) {
 	f := &flow.Flow{}
 
 	if err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("consent_challenge_id = ?", r.ID).First(f)); errors.Is(err, sqlcon.ErrNoRows) {
@@ -496,24 +496,21 @@ func (p *Persister) GetLogoutRequest(ctx context.Context, challenge string) (*co
 func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifier string) (*consent.LogoutRequest, error) {
 	var lr consent.LogoutRequest
 	return &lr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.QueryWithNetwork(ctx).Where("verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE", verifier).Select("challenge").First(&lr); err != nil {
-			if err == sql.ErrNoRows {
-				return errorsx.WithStack(x.ErrNotFound)
-			}
-
+		if count, err := c.RawQuery(
+			"UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE nid = ? AND verifier=? AND was_used=FALSE AND accepted=TRUE AND rejected=FALSE",
+			p.NetworkID(ctx),
+			verifier,
+		).ExecWithCount(); count == 0 && err == nil {
+			return errorsx.WithStack(x.ErrNotFound)
+		} else if err != nil {
 			return sqlcon.HandleError(err)
 		}
 
-		if err := c.RawQuery("UPDATE hydra_oauth2_logout_request SET was_used=TRUE WHERE verifier=? AND nid = ?", verifier, p.NetworkID(ctx)).Exec(); err != nil {
-			return sqlcon.HandleError(err)
-		}
-
-		updated, err := p.GetLogoutRequest(ctx, lr.ID)
+		err := sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("verifier=?", verifier).First(&lr))
 		if err != nil {
 			return err
 		}
 
-		lr = *updated
 		return nil
 	})
 }

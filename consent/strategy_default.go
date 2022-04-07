@@ -22,7 +22,6 @@ package consent
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -284,7 +283,6 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(w http.ResponseWriter, r 
 
 	authCookieName := cookieAuthenticationCSRFName + ar.GetClient().GetID()
 
-	fmt.Printf("Setting Auth Cookie + client_ID: %s ", authCookieName)
 
 	if err := createCsrfSession(w, r, s.r.CookieStore(), authCookieName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
 		return errorsx.WithStack(err)
@@ -363,7 +361,6 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 	authCookieName := cookieAuthenticationCSRFName + session.LoginRequest.ClientID
 
-	fmt.Printf("Validating Auth Cookie + client_ID: %s ", authCookieName)
 	if err := validateCsrfSession(r, s.r.CookieStore(), authCookieName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
 		return nil, err
 	}
@@ -577,7 +574,6 @@ func (s *DefaultStrategy) forwardConsentRequest(w http.ResponseWriter, r *http.R
 		return errorsx.WithStack(err)
 	}
 	consentCookieName := cookieConsentCSRFName + ar.GetClient().GetID()
-	fmt.Printf("Setting Consent Cookie + client_ID: %s ", consentCookieName)
 
 	if err := createCsrfSession(w, r, s.r.CookieStore(), consentCookieName, csrf, s.c.TLS(config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(), s.c.CookieSameSiteLegacyWorkaround()); err != nil {
 		return errorsx.WithStack(err)
@@ -615,7 +611,6 @@ func (s *DefaultStrategy) verifyConsent(w http.ResponseWriter, r *http.Request, 
 	}
 	consentCookieName := cookieConsentCSRFName + session.ConsentRequest.ClientID
 
-	fmt.Printf("Validating Consent Cookie + client_ID: %s ", consentCookieName)
 	if err := validateCsrfSession(r, s.r.CookieStore(), consentCookieName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(), s.c.TLS(config.PublicInterface).Enabled()); err != nil {
 		return nil, err
 	}

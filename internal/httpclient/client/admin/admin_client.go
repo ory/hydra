@@ -25,67 +25,78 @@ type Client struct {
 	formats   strfmt.Registry
 }
 
+// ClientOption is the option for Client methods
+type ClientOption func(*runtime.ClientOperation)
+
 // ClientService is the interface for Client methods
 type ClientService interface {
-	AcceptConsentRequest(params *AcceptConsentRequestParams) (*AcceptConsentRequestOK, error)
+	AcceptConsentRequest(params *AcceptConsentRequestParams, opts ...ClientOption) (*AcceptConsentRequestOK, error)
 
-	AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLoginRequestOK, error)
+	AcceptLoginRequest(params *AcceptLoginRequestParams, opts ...ClientOption) (*AcceptLoginRequestOK, error)
 
-	AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*AcceptLogoutRequestOK, error)
+	AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...ClientOption) (*AcceptLogoutRequestOK, error)
 
-	CreateJSONWebKeySet(params *CreateJSONWebKeySetParams) (*CreateJSONWebKeySetCreated, error)
+	CreateJSONWebKeySet(params *CreateJSONWebKeySetParams, opts ...ClientOption) (*CreateJSONWebKeySetCreated, error)
 
-	CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOAuth2ClientCreated, error)
+	CreateOAuth2Client(params *CreateOAuth2ClientParams, opts ...ClientOption) (*CreateOAuth2ClientCreated, error)
 
-	DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWebKeyNoContent, error)
+	DeleteJSONWebKey(params *DeleteJSONWebKeyParams, opts ...ClientOption) (*DeleteJSONWebKeyNoContent, error)
 
-	DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams) (*DeleteJSONWebKeySetNoContent, error)
+	DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams, opts ...ClientOption) (*DeleteJSONWebKeySetNoContent, error)
 
-	DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOAuth2ClientNoContent, error)
+	DeleteOAuth2Client(params *DeleteOAuth2ClientParams, opts ...ClientOption) (*DeleteOAuth2ClientNoContent, error)
 
-	DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAuth2TokenNoContent, error)
+	DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...ClientOption) (*DeleteOAuth2TokenNoContent, error)
 
-	FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams) (*FlushInactiveOAuth2TokensNoContent, error)
+	DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error)
 
-	GetConsentRequest(params *GetConsentRequestParams) (*GetConsentRequestOK, error)
+	FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams, opts ...ClientOption) (*FlushInactiveOAuth2TokensNoContent, error)
 
-	GetJSONWebKey(params *GetJSONWebKeyParams) (*GetJSONWebKeyOK, error)
+	GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error)
 
-	GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKeySetOK, error)
+	GetJSONWebKey(params *GetJSONWebKeyParams, opts ...ClientOption) (*GetJSONWebKeyOK, error)
 
-	GetLoginRequest(params *GetLoginRequestParams) (*GetLoginRequestOK, error)
+	GetJSONWebKeySet(params *GetJSONWebKeySetParams, opts ...ClientOption) (*GetJSONWebKeySetOK, error)
 
-	GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutRequestOK, error)
+	GetLoginRequest(params *GetLoginRequestParams, opts ...ClientOption) (*GetLoginRequestOK, error)
 
-	GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2ClientOK, error)
+	GetLogoutRequest(params *GetLogoutRequestParams, opts ...ClientOption) (*GetLogoutRequestOK, error)
 
-	GetVersion(params *GetVersionParams) (*GetVersionOK, error)
+	GetOAuth2Client(params *GetOAuth2ClientParams, opts ...ClientOption) (*GetOAuth2ClientOK, error)
 
-	IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams) (*IntrospectOAuth2TokenOK, error)
+	GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams, opts ...ClientOption) (*GetTrustedJwtGrantIssuerOK, error)
 
-	IsInstanceAlive(params *IsInstanceAliveParams) (*IsInstanceAliveOK, error)
+	GetVersion(params *GetVersionParams, opts ...ClientOption) (*GetVersionOK, error)
 
-	ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2ClientsOK, error)
+	IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, opts ...ClientOption) (*IntrospectOAuth2TokenOK, error)
 
-	ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams) (*ListSubjectConsentSessionsOK, error)
+	IsInstanceAlive(params *IsInstanceAliveParams, opts ...ClientOption) (*IsInstanceAliveOK, error)
 
-	PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth2ClientOK, error)
+	ListOAuth2Clients(params *ListOAuth2ClientsParams, opts ...ClientOption) (*ListOAuth2ClientsOK, error)
 
-	RejectConsentRequest(params *RejectConsentRequestParams) (*RejectConsentRequestOK, error)
+	ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams, opts ...ClientOption) (*ListSubjectConsentSessionsOK, error)
 
-	RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLoginRequestOK, error)
+	ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams, opts ...ClientOption) (*ListTrustedJwtGrantIssuersOK, error)
 
-	RejectLogoutRequest(params *RejectLogoutRequestParams) (*RejectLogoutRequestNoContent, error)
+	PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...ClientOption) (*PatchOAuth2ClientOK, error)
 
-	RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams) (*RevokeAuthenticationSessionNoContent, error)
+	RejectConsentRequest(params *RejectConsentRequestParams, opts ...ClientOption) (*RejectConsentRequestOK, error)
 
-	RevokeConsentSessions(params *RevokeConsentSessionsParams) (*RevokeConsentSessionsNoContent, error)
+	RejectLoginRequest(params *RejectLoginRequestParams, opts ...ClientOption) (*RejectLoginRequestOK, error)
 
-	UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWebKeyOK, error)
+	RejectLogoutRequest(params *RejectLogoutRequestParams, opts ...ClientOption) (*RejectLogoutRequestNoContent, error)
 
-	UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams) (*UpdateJSONWebKeySetOK, error)
+	RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams, opts ...ClientOption) (*RevokeAuthenticationSessionNoContent, error)
 
-	UpdateOAuth2Client(params *UpdateOAuth2ClientParams) (*UpdateOAuth2ClientOK, error)
+	RevokeConsentSessions(params *RevokeConsentSessionsParams, opts ...ClientOption) (*RevokeConsentSessionsNoContent, error)
+
+	TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...ClientOption) (*TrustJwtGrantIssuerCreated, error)
+
+	UpdateJSONWebKey(params *UpdateJSONWebKeyParams, opts ...ClientOption) (*UpdateJSONWebKeyOK, error)
+
+	UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams, opts ...ClientOption) (*UpdateJSONWebKeySetOK, error)
+
+	UpdateOAuth2Client(params *UpdateOAuth2ClientParams, opts ...ClientOption) (*UpdateOAuth2ClientOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -110,13 +121,12 @@ consent request should be used as basis for future requests.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
 */
-func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*AcceptConsentRequestOK, error) {
+func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams, opts ...ClientOption) (*AcceptConsentRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewAcceptConsentRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "acceptConsentRequest",
 		Method:             "PUT",
 		PathPattern:        "/oauth2/auth/requests/consent/accept",
@@ -127,7 +137,12 @@ func (a *Client) AcceptConsentRequest(params *AcceptConsentRequestParams) (*Acce
 		Reader:             &AcceptConsentRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -158,13 +173,12 @@ a cookie.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
 */
-func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLoginRequestOK, error) {
+func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams, opts ...ClientOption) (*AcceptLoginRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewAcceptLoginRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "acceptLoginRequest",
 		Method:             "PUT",
 		PathPattern:        "/oauth2/auth/requests/login/accept",
@@ -175,7 +189,12 @@ func (a *Client) AcceptLoginRequest(params *AcceptLoginRequestParams) (*AcceptLo
 		Reader:             &AcceptLoginRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -197,13 +216,12 @@ No body is required.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
 */
-func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*AcceptLogoutRequestOK, error) {
+func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...ClientOption) (*AcceptLogoutRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewAcceptLogoutRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "acceptLogoutRequest",
 		Method:             "PUT",
 		PathPattern:        "/oauth2/auth/requests/logout/accept",
@@ -214,7 +232,12 @@ func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*Accept
 		Reader:             &AcceptLogoutRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -235,13 +258,12 @@ func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams) (*Accept
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
-func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams) (*CreateJSONWebKeySetCreated, error) {
+func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams, opts ...ClientOption) (*CreateJSONWebKeySetCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewCreateJSONWebKeySetParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "createJsonWebKeySet",
 		Method:             "POST",
 		PathPattern:        "/keys/{set}",
@@ -252,7 +274,12 @@ func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams) (*Create
 		Reader:             &CreateJSONWebKeySetReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -269,17 +296,19 @@ func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams) (*Create
 /*
   CreateOAuth2Client creates an o auth 2 0 client
 
-  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
+  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret
+will be generated. The secret will be returned in the response and you will not be able to retrieve it later on.
+Write the secret down and keep it somwhere safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOAuth2ClientCreated, error) {
+func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams, opts ...ClientOption) (*CreateOAuth2ClientCreated, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewCreateOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "createOAuth2Client",
 		Method:             "POST",
 		PathPattern:        "/clients",
@@ -290,7 +319,12 @@ func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOA
 		Reader:             &CreateOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -299,9 +333,8 @@ func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOA
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for createOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*CreateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -311,13 +344,12 @@ func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams) (*CreateOA
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
-func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWebKeyNoContent, error) {
+func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams, opts ...ClientOption) (*DeleteJSONWebKeyNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDeleteJSONWebKeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "deleteJsonWebKey",
 		Method:             "DELETE",
 		PathPattern:        "/keys/{set}/{kid}",
@@ -328,7 +360,12 @@ func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWe
 		Reader:             &DeleteJSONWebKeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -349,13 +386,12 @@ func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams) (*DeleteJSONWe
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
-func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams) (*DeleteJSONWebKeySetNoContent, error) {
+func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams, opts ...ClientOption) (*DeleteJSONWebKeySetNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDeleteJSONWebKeySetParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "deleteJsonWebKeySet",
 		Method:             "DELETE",
 		PathPattern:        "/keys/{set}",
@@ -366,7 +402,12 @@ func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams) (*Delete
 		Reader:             &DeleteJSONWebKeySetReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -385,15 +426,17 @@ func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams) (*Delete
 
   Delete an existing OAuth 2.0 Client by its ID.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+
+Make sure that this endpoint is well protected and only callable by first-party components.
 */
-func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOAuth2ClientNoContent, error) {
+func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams, opts ...ClientOption) (*DeleteOAuth2ClientNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDeleteOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "deleteOAuth2Client",
 		Method:             "DELETE",
 		PathPattern:        "/clients/{id}",
@@ -404,7 +447,12 @@ func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOA
 		Reader:             &DeleteOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -413,9 +461,8 @@ func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOA
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*DeleteOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -423,13 +470,12 @@ func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams) (*DeleteOA
 
   This endpoint deletes OAuth2 access tokens issued for a client from the database
 */
-func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAuth2TokenNoContent, error) {
+func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...ClientOption) (*DeleteOAuth2TokenNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDeleteOAuth2TokenParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "deleteOAuth2Token",
 		Method:             "DELETE",
 		PathPattern:        "/oauth2/tokens",
@@ -440,7 +486,12 @@ func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAut
 		Reader:             &DeleteOAuth2TokenReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -455,19 +506,62 @@ func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams) (*DeleteOAut
 }
 
 /*
+  DeleteTrustedJwtGrantIssuer deletes a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+
+Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+for OAuth 2.0 Client Authentication and Authorization Grant.
+*/
+func (a *Client) DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteTrustedJwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteTrustedJwtGrantIssuer",
+		Method:             "DELETE",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DeleteTrustedJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteTrustedJwtGrantIssuerNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   FlushInactiveOAuth2Tokens flushes expired o auth2 access tokens
 
   This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
 not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
 automatically when performing the refresh flow.
 */
-func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams) (*FlushInactiveOAuth2TokensNoContent, error) {
+func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams, opts ...ClientOption) (*FlushInactiveOAuth2TokensNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewFlushInactiveOAuth2TokensParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "flushInactiveOAuth2Tokens",
 		Method:             "POST",
 		PathPattern:        "/oauth2/flush",
@@ -478,7 +572,12 @@ func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensPara
 		Reader:             &FlushInactiveOAuth2TokensReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -506,13 +605,12 @@ The consent challenge is appended to the consent provider's URL to which the sub
 provider uses that challenge to fetch information on the OAuth2 request and then tells ORY Hydra if the subject accepted
 or rejected the request.
 */
-func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsentRequestOK, error) {
+func (a *Client) GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetConsentRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getConsentRequest",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth/requests/consent",
@@ -523,7 +621,12 @@ func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsent
 		Reader:             &GetConsentRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -542,13 +645,12 @@ func (a *Client) GetConsentRequest(params *GetConsentRequestParams) (*GetConsent
 
   This endpoint returns a singular JSON Web Key, identified by the set and the specific key ID (kid).
 */
-func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams) (*GetJSONWebKeyOK, error) {
+func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams, opts ...ClientOption) (*GetJSONWebKeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetJSONWebKeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getJsonWebKey",
 		Method:             "GET",
 		PathPattern:        "/keys/{set}/{kid}",
@@ -559,7 +661,12 @@ func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams) (*GetJSONWebKeyOK, e
 		Reader:             &GetJSONWebKeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -580,13 +687,12 @@ func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams) (*GetJSONWebKeyOK, e
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
-func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKeySetOK, error) {
+func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams, opts ...ClientOption) (*GetJSONWebKeySetOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetJSONWebKeySetParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getJsonWebKeySet",
 		Method:             "GET",
 		PathPattern:        "/keys/{set}",
@@ -597,7 +703,12 @@ func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams) (*GetJSONWebKe
 		Reader:             &GetJSONWebKeySetReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -622,13 +733,12 @@ a subject (in OAuth2 the proper name for subject is "resource owner").
 The authentication challenge is appended to the login provider URL to which the subject's user-agent (browser) is redirected to. The login
 provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 */
-func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginRequestOK, error) {
+func (a *Client) GetLoginRequest(params *GetLoginRequestParams, opts ...ClientOption) (*GetLoginRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetLoginRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getLoginRequest",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth/requests/login",
@@ -639,7 +749,12 @@ func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginReques
 		Reader:             &GetLoginRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -658,13 +773,12 @@ func (a *Client) GetLoginRequest(params *GetLoginRequestParams) (*GetLoginReques
 
   Use this endpoint to fetch a logout request.
 */
-func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutRequestOK, error) {
+func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams, opts ...ClientOption) (*GetLogoutRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetLogoutRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getLogoutRequest",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth/requests/logout",
@@ -675,7 +789,12 @@ func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutReq
 		Reader:             &GetLogoutRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -692,17 +811,17 @@ func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams) (*GetLogoutReq
 /*
   GetOAuth2Client gets an o auth 2 0 client
 
-  Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
+  Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2ClientOK, error) {
+func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams, opts ...ClientOption) (*GetOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getOAuth2Client",
 		Method:             "GET",
 		PathPattern:        "/clients/{id}",
@@ -713,7 +832,12 @@ func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2Clien
 		Reader:             &GetOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -722,8 +846,48 @@ func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2Clien
 		return success, nil
 	}
 	// unexpected success response
+	unexpectedSuccess := result.(*GetOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  GetTrustedJwtGrantIssuer gets a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+*/
+func (a *Client) GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams, opts ...ClientOption) (*GetTrustedJwtGrantIssuerOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetTrustedJwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getTrustedJwtGrantIssuer",
+		Method:             "GET",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetTrustedJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetTrustedJwtGrantIssuerOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for getTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -735,13 +899,12 @@ func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams) (*GetOAuth2Clien
 If the service supports TLS Edge Termination, this endpoint does not require the
 `X-Forwarded-Proto` header to be set.
 */
-func (a *Client) GetVersion(params *GetVersionParams) (*GetVersionOK, error) {
+func (a *Client) GetVersion(params *GetVersionParams, opts ...ClientOption) (*GetVersionOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetVersionParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "getVersion",
 		Method:             "GET",
 		PathPattern:        "/version",
@@ -752,7 +915,12 @@ func (a *Client) GetVersion(params *GetVersionParams) (*GetVersionOK, error) {
 		Reader:             &GetVersionReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -775,13 +943,12 @@ set additional data for a token by setting `accessTokenExtra` during the consent
 
 For more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).
 */
-func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams) (*IntrospectOAuth2TokenOK, error) {
+func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, opts ...ClientOption) (*IntrospectOAuth2TokenOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewIntrospectOAuth2TokenParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "introspectOAuth2Token",
 		Method:             "POST",
 		PathPattern:        "/oauth2/introspect",
@@ -792,7 +959,12 @@ func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams) (*In
 		Reader:             &IntrospectOAuth2TokenReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -818,13 +990,12 @@ If the service supports TLS Edge Termination, this endpoint does not require the
 Be aware that if you are running multiple nodes of this service, the health status will never
 refer to the cluster state, only to a single instance.
 */
-func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams) (*IsInstanceAliveOK, error) {
+func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams, opts ...ClientOption) (*IsInstanceAliveOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewIsInstanceAliveParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "isInstanceAlive",
 		Method:             "GET",
 		PathPattern:        "/health/alive",
@@ -835,7 +1006,12 @@ func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams) (*IsInstanceAliv
 		Reader:             &IsInstanceAliveReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -852,19 +1028,22 @@ func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams) (*IsInstanceAliv
 /*
   ListOAuth2Clients lists o auth 2 0 clients
 
-  This endpoint lists all clients in the database, and never returns client secrets. As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients, but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
+  This endpoint lists all clients in the database, and never returns client secrets.
+As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,
+but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 */
-func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2ClientsOK, error) {
+func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams, opts ...ClientOption) (*ListOAuth2ClientsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewListOAuth2ClientsParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "listOAuth2Clients",
 		Method:             "GET",
 		PathPattern:        "/clients",
@@ -875,7 +1054,12 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2
 		Reader:             &ListOAuth2ClientsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -884,9 +1068,8 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams) (*ListOAuth2
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for listOAuth2Clients: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*ListOAuth2ClientsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -900,13 +1083,12 @@ empty JSON array with status code 200 OK.
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 */
-func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams) (*ListSubjectConsentSessionsOK, error) {
+func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams, opts ...ClientOption) (*ListSubjectConsentSessionsOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewListSubjectConsentSessionsParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "listSubjectConsentSessions",
 		Method:             "GET",
 		PathPattern:        "/oauth2/auth/sessions/consent",
@@ -917,7 +1099,12 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 		Reader:             &ListSubjectConsentSessionsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -932,19 +1119,61 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 }
 
 /*
+  ListTrustedJwtGrantIssuers lists trusted o auth2 j w t bearer grant type issuers
+
+  Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
+*/
+func (a *Client) ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams, opts ...ClientOption) (*ListTrustedJwtGrantIssuersOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListTrustedJwtGrantIssuersParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listTrustedJwtGrantIssuers",
+		Method:             "GET",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &ListTrustedJwtGrantIssuersReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListTrustedJwtGrantIssuersOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listTrustedJwtGrantIssuers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   PatchOAuth2Client patches an o auth 2 0 client
 
-  Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+  Patch an existing OAuth 2.0 Client. If you pass `client_secret`
+the secret will be updated and returned via the API. This is the
+only time you will be able to retrieve the client secret, so write it down and keep it safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth2ClientOK, error) {
+func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...ClientOption) (*PatchOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewPatchOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "patchOAuth2Client",
 		Method:             "PATCH",
 		PathPattern:        "/clients/{id}",
@@ -955,7 +1184,12 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth
 		Reader:             &PatchOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -964,9 +1198,8 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams) (*PatchOAuth
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for patchOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*PatchOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -988,13 +1221,12 @@ The consent provider must include a reason why the consent was not granted.
 
 The response contains a redirect URL which the consent provider should redirect the user-agent to.
 */
-func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams) (*RejectConsentRequestOK, error) {
+func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams, opts ...ClientOption) (*RejectConsentRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRejectConsentRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "rejectConsentRequest",
 		Method:             "PUT",
 		PathPattern:        "/oauth2/auth/requests/consent/reject",
@@ -1005,7 +1237,12 @@ func (a *Client) RejectConsentRequest(params *RejectConsentRequestParams) (*Reje
 		Reader:             &RejectConsentRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1035,13 +1272,12 @@ was be denied.
 
 The response contains a redirect URL which the login provider should redirect the user-agent to.
 */
-func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLoginRequestOK, error) {
+func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams, opts ...ClientOption) (*RejectLoginRequestOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRejectLoginRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "rejectLoginRequest",
 		Method:             "PUT",
 		PathPattern:        "/oauth2/auth/requests/login/reject",
@@ -1052,7 +1288,12 @@ func (a *Client) RejectLoginRequest(params *RejectLoginRequestParams) (*RejectLo
 		Reader:             &RejectLoginRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1074,13 +1315,12 @@ No body is required.
 
 The response is empty as the logout provider has to chose what action to perform next.
 */
-func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*RejectLogoutRequestNoContent, error) {
+func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams, opts ...ClientOption) (*RejectLogoutRequestNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRejectLogoutRequestParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "rejectLogoutRequest",
 		Method:             "PUT",
 		PathPattern:        "/oauth2/auth/requests/logout/reject",
@@ -1091,7 +1331,12 @@ func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*Reject
 		Reader:             &RejectLogoutRequestReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1112,13 +1357,12 @@ func (a *Client) RejectLogoutRequest(params *RejectLogoutRequestParams) (*Reject
 has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
 Front- or Back-channel logout.
 */
-func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams) (*RevokeAuthenticationSessionNoContent, error) {
+func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams, opts ...ClientOption) (*RevokeAuthenticationSessionNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRevokeAuthenticationSessionParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "revokeAuthenticationSession",
 		Method:             "DELETE",
 		PathPattern:        "/oauth2/auth/sessions/login",
@@ -1129,7 +1373,12 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
 		Reader:             &RevokeAuthenticationSessionReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1149,13 +1398,12 @@ func (a *Client) RevokeAuthenticationSession(params *RevokeAuthenticationSession
   This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 associated OAuth 2.0 Access Tokens.
 */
-func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*RevokeConsentSessionsNoContent, error) {
+func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams, opts ...ClientOption) (*RevokeConsentSessionsNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewRevokeConsentSessionsParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "revokeConsentSessions",
 		Method:             "DELETE",
 		PathPattern:        "/oauth2/auth/sessions/consent",
@@ -1166,7 +1414,12 @@ func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*Re
 		Reader:             &RevokeConsentSessionsReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1181,19 +1434,60 @@ func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams) (*Re
 }
 
 /*
+  TrustJwtGrantIssuer trusts an o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to establish a trust relationship for a JWT issuer
+to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
+*/
+func (a *Client) TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...ClientOption) (*TrustJwtGrantIssuerCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewTrustJwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "trustJwtGrantIssuer",
+		Method:             "POST",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &TrustJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*TrustJwtGrantIssuerCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for trustJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   UpdateJSONWebKey updates a JSON web key
 
   Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
-func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWebKeyOK, error) {
+func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams, opts ...ClientOption) (*UpdateJSONWebKeyOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUpdateJSONWebKeyParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "updateJsonWebKey",
 		Method:             "PUT",
 		PathPattern:        "/keys/{set}/{kid}",
@@ -1204,7 +1498,12 @@ func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWe
 		Reader:             &UpdateJSONWebKeyReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1225,13 +1524,12 @@ func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams) (*UpdateJSONWe
 
 A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
 */
-func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams) (*UpdateJSONWebKeySetOK, error) {
+func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams, opts ...ClientOption) (*UpdateJSONWebKeySetOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUpdateJSONWebKeySetParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "updateJsonWebKeySet",
 		Method:             "PUT",
 		PathPattern:        "/keys/{set}",
@@ -1242,7 +1540,12 @@ func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams) (*Update
 		Reader:             &UpdateJSONWebKeySetReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1259,17 +1562,18 @@ func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams) (*Update
 /*
   UpdateOAuth2Client updates an o auth 2 0 client
 
-  Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+  Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.
+This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams) (*UpdateOAuth2ClientOK, error) {
+func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams, opts ...ClientOption) (*UpdateOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewUpdateOAuth2ClientParams()
 	}
-
-	result, err := a.transport.Submit(&runtime.ClientOperation{
+	op := &runtime.ClientOperation{
 		ID:                 "updateOAuth2Client",
 		Method:             "PUT",
 		PathPattern:        "/clients/{id}",
@@ -1280,7 +1584,12 @@ func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams) (*UpdateOA
 		Reader:             &UpdateOAuth2ClientReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
-	})
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
 	if err != nil {
 		return nil, err
 	}
@@ -1289,9 +1598,8 @@ func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams) (*UpdateOA
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for updateOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*UpdateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 // SetTransport changes the transport on the client

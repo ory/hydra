@@ -18,58 +18,73 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 )
 
-// NewAcceptLoginRequestParams creates a new AcceptLoginRequestParams object
-// with the default values initialized.
+// NewAcceptLoginRequestParams creates a new AcceptLoginRequestParams object,
+// with the default timeout for this client.
+//
+// Default values are not hydrated, since defaults are normally applied by the API server side.
+//
+// To enforce default values in parameter, use SetDefaults or WithDefaults.
 func NewAcceptLoginRequestParams() *AcceptLoginRequestParams {
-	var ()
 	return &AcceptLoginRequestParams{
-
 		timeout: cr.DefaultTimeout,
 	}
 }
 
 // NewAcceptLoginRequestParamsWithTimeout creates a new AcceptLoginRequestParams object
-// with the default values initialized, and the ability to set a timeout on a request
+// with the ability to set a timeout on a request.
 func NewAcceptLoginRequestParamsWithTimeout(timeout time.Duration) *AcceptLoginRequestParams {
-	var ()
 	return &AcceptLoginRequestParams{
-
 		timeout: timeout,
 	}
 }
 
 // NewAcceptLoginRequestParamsWithContext creates a new AcceptLoginRequestParams object
-// with the default values initialized, and the ability to set a context for a request
+// with the ability to set a context for a request.
 func NewAcceptLoginRequestParamsWithContext(ctx context.Context) *AcceptLoginRequestParams {
-	var ()
 	return &AcceptLoginRequestParams{
-
 		Context: ctx,
 	}
 }
 
 // NewAcceptLoginRequestParamsWithHTTPClient creates a new AcceptLoginRequestParams object
-// with the default values initialized, and the ability to set a custom HTTPClient for a request
+// with the ability to set a custom HTTPClient for a request.
 func NewAcceptLoginRequestParamsWithHTTPClient(client *http.Client) *AcceptLoginRequestParams {
-	var ()
 	return &AcceptLoginRequestParams{
 		HTTPClient: client,
 	}
 }
 
-/*AcceptLoginRequestParams contains all the parameters to send to the API endpoint
-for the accept login request operation typically these are written to a http.Request
+/* AcceptLoginRequestParams contains all the parameters to send to the API endpoint
+   for the accept login request operation.
+
+   Typically these are written to a http.Request.
 */
 type AcceptLoginRequestParams struct {
 
-	/*Body*/
+	// Body.
 	Body *models.AcceptLoginRequest
-	/*LoginChallenge*/
+
+	// LoginChallenge.
 	LoginChallenge string
 
 	timeout    time.Duration
 	Context    context.Context
 	HTTPClient *http.Client
+}
+
+// WithDefaults hydrates default values in the accept login request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *AcceptLoginRequestParams) WithDefaults() *AcceptLoginRequestParams {
+	o.SetDefaults()
+	return o
+}
+
+// SetDefaults hydrates default values in the accept login request params (not the query body).
+//
+// All values with no default are reset to their zero value.
+func (o *AcceptLoginRequestParams) SetDefaults() {
+	// no default values defined for this parameter
 }
 
 // WithTimeout adds the timeout to the accept login request params
@@ -134,7 +149,6 @@ func (o *AcceptLoginRequestParams) WriteToRequest(r runtime.ClientRequest, reg s
 		return err
 	}
 	var res []error
-
 	if o.Body != nil {
 		if err := r.SetBodyParam(o.Body); err != nil {
 			return err
@@ -145,6 +159,7 @@ func (o *AcceptLoginRequestParams) WriteToRequest(r runtime.ClientRequest, reg s
 	qrLoginChallenge := o.LoginChallenge
 	qLoginChallenge := qrLoginChallenge
 	if qLoginChallenge != "" {
+
 		if err := r.SetQueryParam("login_challenge", qLoginChallenge); err != nil {
 			return err
 		}

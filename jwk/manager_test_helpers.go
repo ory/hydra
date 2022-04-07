@@ -44,40 +44,44 @@ func RandomBytes(n int) ([]byte, error) {
 
 func canonicalizeThumbprints(js []jose.JSONWebKey) []jose.JSONWebKey {
 	for k, v := range js {
-		if len(v.CertificateThumbprintSHA1) == 0 {
-			v.CertificateThumbprintSHA1 = nil
-		}
-		if len(v.CertificateThumbprintSHA256) == 0 {
-			v.CertificateThumbprintSHA256 = nil
-		}
-		js[k] = v
+		js[k] = canonicalizeKeyThumbprints(&v)
 	}
 	return js
 }
 
-func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+func canonicalizeKeyThumbprints(v *jose.JSONWebKey) jose.JSONWebKey {
+	if len(v.CertificateThumbprintSHA1) == 0 {
+		v.CertificateThumbprintSHA1 = nil
+	}
+	if len(v.CertificateThumbprintSHA256) == 0 {
+		v.CertificateThumbprintSHA256 = nil
+	}
+	return *v
+}
+
+func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
 	pub := canonicalizeThumbprints(keys.Key("public:" + suffix))
 	priv := canonicalizeThumbprints(keys.Key("private:" + suffix))
 
 	return func(t *testing.T) {
-		_, err := m.GetKey(context.TODO(), "faz", "baz")
+		_, err := m.GetKey(context.TODO(), algo+"faz", "baz")
 		assert.NotNil(t, err)
 
-		err = m.AddKey(context.TODO(), "faz", First(priv))
+		err = m.AddKey(context.TODO(), algo+"faz", First(priv))
 		require.NoError(t, err)
 
-		got, err := m.GetKey(context.TODO(), "faz", "private:"+suffix)
-		require.NoError(t, err)
-		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
-
-		err = m.AddKey(context.TODO(), "faz", First(pub))
-		require.NoError(t, err)
-
-		got, err = m.GetKey(context.TODO(), "faz", "private:"+suffix)
+		got, err := m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
 		require.NoError(t, err)
 		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
 
-		got, err = m.GetKey(context.TODO(), "faz", "public:"+suffix)
+		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
+		require.NoError(t, err)
+
+		got, err = m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
+		require.NoError(t, err)
+		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
+
+		got, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.NoError(t, err)
 		assert.Equal(t, pub, canonicalizeThumbprints(got.Keys))
 
@@ -85,46 +89,97 @@ func TestHelperManagerKey(m Manager, keys *jose.JSONWebKeySet, suffix string) fu
 		time.Sleep(time.Second * 2)
 
 		First(pub).KeyID = "new-key-id:" + suffix
-		err = m.AddKey(context.TODO(), "faz", First(pub))
+		First(pub).Use = "sig"
+		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), "faz", "new-key-id:"+suffix)
+		got, err = m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
 		require.NoError(t, err)
+		newKey := First(got.Keys)
+		assert.EqualValues(t, "sig", newKey.Use)
 
-		keys, err = m.GetKeySet(context.TODO(), "faz")
+		newKey.Use = "enc"
+		err = m.UpdateKey(context.TODO(), algo+"faz", newKey)
+		require.NoError(t, err)
+		updated, err := m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
+		require.NoError(t, err)
+		updatedKey := First(updated.Keys)
+		assert.EqualValues(t, "enc", updatedKey.Use)
+
+		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
 		require.NoError(t, err)
 		assert.EqualValues(t, "new-key-id:"+suffix, First(keys.Keys).KeyID)
 
 		beforeDeleteKeysCount := len(keys.Keys)
-		err = m.DeleteKey(context.TODO(), "faz", "public:"+suffix)
+		err = m.DeleteKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), "faz", "public:"+suffix)
+		_, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.Error(t, err)
 
-		keys, err = m.GetKeySet(context.TODO(), "faz")
+		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
 		require.NoError(t, err)
 		assert.EqualValues(t, beforeDeleteKeysCount-1, len(keys.Keys))
 	}
 }
 
-func TestHelperManagerKeySet(m Manager, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
 	return func(t *testing.T) {
-		_, err := m.GetKeySet(context.TODO(), "foo")
+		_, err := m.GetKeySet(context.TODO(), algo+"foo")
 		require.Error(t, err)
 
-		err = m.AddKeySet(context.TODO(), "bar", keys)
+		err = m.AddKeySet(context.TODO(), algo+"bar", keys)
 		require.NoError(t, err)
 
-		got, err := m.GetKeySet(context.TODO(), "bar")
+		got, err := m.GetKeySet(context.TODO(), algo+"bar")
 		require.NoError(t, err)
 		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
 		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
 
-		err = m.DeleteKeySet(context.TODO(), "bar")
+		for i, _ := range got.Keys {
+			got.Keys[i].Use = "enc"
+		}
+		err = m.UpdateKeySet(context.TODO(), algo+"bar", got)
+		require.NoError(t, err)
+		updated, err := m.GetKeySet(context.TODO(), algo+"bar")
+		require.NoError(t, err)
+		assert.EqualValues(t, "enc", First(updated.Key("public:"+suffix)).Use)
+		assert.EqualValues(t, "enc", First(updated.Key("private:"+suffix)).Use)
+
+		err = m.DeleteKeySet(context.TODO(), algo+"bar")
 		require.NoError(t, err)
 
-		_, err = m.GetKeySet(context.TODO(), "bar")
+		_, err = m.GetKeySet(context.TODO(), algo+"bar")
+		require.Error(t, err)
+	}
+}
+
+func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string) func(t *testing.T) {
+	return func(t *testing.T) {
+		_, err := m.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		keys, err := m.GenerateAndPersistKeySet(context.TODO(), "foo", "bar", alg, "sig")
+		require.NoError(t, err)
+		genPub, err := FindPublicKey(keys)
+		require.NoError(t, err)
+		genPriv, err := FindPrivateKey(keys)
+		require.NoError(t, err)
+
+		got, err := m.GetKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+		gotPub, err := FindPublicKey(got)
+		require.NoError(t, err)
+		gotPriv, err := FindPrivateKey(got)
+		require.NoError(t, err)
+
+		assert.Equal(t, canonicalizeKeyThumbprints(genPub), canonicalizeKeyThumbprints(gotPub))
+		assert.Equal(t, canonicalizeKeyThumbprints(genPriv), canonicalizeKeyThumbprints(gotPriv))
+
+		err = m.DeleteKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+
+		_, err = m.GetKeySet(context.TODO(), "foo")
 		require.Error(t, err)
 	}
 }

@@ -80,12 +80,14 @@ func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
+	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
 	r := internal.NewRegistryMemory(t, conf)
 
-	router := x.NewRouterAdmin()
+	routerAdmin := x.NewRouterAdmin()
+	routerPublic := x.NewRouterPublic()
 	handler := client.NewHandler(r)
-	handler.SetRoutes(router)
-	server := httptest.NewServer(router)
+	handler.SetRoutes(routerAdmin, routerPublic)
+	server := httptest.NewServer(routerAdmin)
 
 	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
@@ -113,6 +115,11 @@ func TestClientSDK(t *testing.T) {
 		result.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, result.Payload.CreatedAt)
 		result.Payload.CreatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, result.Payload.RegistrationAccessToken)
+		assert.NotEmpty(t, result.Payload.RegistrationClientURI)
+		result.Payload.RegistrationAccessToken = ""
+		result.Payload.RegistrationClientURI = ""
+
 		assert.EqualValues(t, compareClient, result.Payload)
 		assert.EqualValues(t, "bar", result.Payload.Metadata.(map[string]interface{})["foo"])
 
@@ -130,7 +137,7 @@ func TestClientSDK(t *testing.T) {
 		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID("unknown"))
 		require.Error(t, err)
 		assert.Empty(t, gresult)
-		assert.True(t, strings.Contains(err.Error(), "401"))
+		assert.True(t, strings.Contains(err.Error(), "404"), err.Error())
 
 		// listing clients returns the only added one
 		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(100)))
@@ -265,5 +272,24 @@ func TestClientSDK(t *testing.T) {
 
 		_, err = c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
 		require.Error(t, err)
+	})
+
+	t.Run("case=patch should not alter secret if not requested", func(t *testing.T) {
+		op := "replace"
+		path := "/client_uri"
+		value := "http://foo.bar"
+
+		client := createTestClient("")
+		client.ClientID = "patch3_client"
+		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
+		require.NoError(t, err)
+
+		result1, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		require.NoError(t, err)
+		result2, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		require.NoError(t, err)
+
+		// secret hashes shouldn't change between these PUT calls
+		require.Equal(t, result1.Payload.ClientSecret, result2.Payload.ClientSecret)
 	})
 }

@@ -1,4 +1,4 @@
-This directory contains SSL certificates required for deploying ORY Hydra, the OpenID Connect Conformity Test Suite,
+This directory contains SSL certificates required for deploying Ory Hydra, the OpenID Connect Conformity Test Suite,
 and other components with SSL certificates. These certificates are loaded into the Docker Images and are seen
 as valid CAs.
 

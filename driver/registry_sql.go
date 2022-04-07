@@ -5,6 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/hsm"
+
+	"github.com/gobuffalo/pop/v6"
+
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
 
 	"github.com/luna-duclos/instrumentedsql"
@@ -12,7 +17,6 @@ import (
 
 	"github.com/ory/x/resilience"
 
-	"github.com/gobuffalo/pop/v5"
 	_ "github.com/jackc/pgx/v4/stdlib"
 
 	"github.com/ory/hydra/persistence/sql"
@@ -30,7 +34,8 @@ import (
 
 type RegistrySQL struct {
 	*RegistryBase
-	db *sqlx.DB
+	db                *sqlx.DB
+	defaultKeyManager jwk.Manager
 }
 
 var _ Registry = new(RegistrySQL)
@@ -80,6 +85,13 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 			return err
 		}
 
+		if m.C.HsmEnabled() {
+			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext())
+			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
+		} else {
+			m.defaultKeyManager = m.persister
+		}
+
 		// if dsn is memory we have to run the migrations on every start
 		// use case - such as
 		// - just in memory
@@ -121,5 +133,13 @@ func (m *RegistrySQL) OAuth2Storage() x.FositeStorer {
 }
 
 func (m *RegistrySQL) KeyManager() jwk.Manager {
+	return m.defaultKeyManager
+}
+
+func (m *RegistrySQL) SoftwareKeyManager() jwk.Manager {
+	return m.Persister()
+}
+
+func (m *RegistrySQL) GrantManager() trust.GrantManager {
 	return m.Persister()
 }

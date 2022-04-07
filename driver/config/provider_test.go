@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -25,7 +26,7 @@ import (
 )
 
 func newProvider() *Provider {
-	return MustNew(logrusx.New("", ""))
+	return MustNew(context.Background(), logrusx.New("", ""))
 }
 
 func setupEnv(env map[string]string) func(t *testing.T) (func(), func()) {
@@ -108,7 +109,7 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := MustNew(l)
+	p := MustNew(context.Background(), l)
 
 	value := p.DisableHealthAccessLog(AdminInterface)
 	assert.Equal(t, false, value)
@@ -123,7 +124,7 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := MustNew(l)
+	p := MustNew(context.Background(), l)
 
 	value := p.DisableHealthAccessLog(PublicInterface)
 	assert.Equal(t, false, value)
@@ -134,14 +135,29 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 	assert.Equal(t, true, value)
 }
 
+func TestPublicAllowDynamicRegistration(t *testing.T) {
+	l := logrusx.New("", "")
+	l.Logrus().SetOutput(ioutil.Discard)
+
+	p := MustNew(context.Background(), l)
+
+	value := p.PublicAllowDynamicRegistration()
+	assert.Equal(t, false, value)
+
+	p.MustSet(KeyPublicAllowDynamicRegistration, "true")
+
+	value = p.PublicAllowDynamicRegistration()
+	assert.Equal(t, true, value)
+}
+
 func TestProviderIssuerURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
-	p := MustNew(l)
+	p := MustNew(context.Background(), l)
 	p.MustSet(KeyIssuerURL, "http://hydra.localhost")
 	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
 
-	p2 := MustNew(l)
+	p2 := MustNew(context.Background(), l)
 	p2.MustSet(KeyIssuerURL, "http://hydra.localhost/")
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 }
@@ -149,7 +165,7 @@ func TestProviderIssuerURL(t *testing.T) {
 func TestProviderIssuerPublicURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
-	p := MustNew(l)
+	p := MustNew(context.Background(), l)
 	p.MustSet(KeyIssuerURL, "http://hydra.localhost")
 	p.MustSet(KeyPublicURL, "http://hydra.example")
 
@@ -163,7 +179,7 @@ func TestProviderIssuerPublicURL(t *testing.T) {
 	assert.Equal(t, "http://hydra.example/oauth2/auth", p.OAuth2AuthURL().String())
 	assert.Equal(t, "http://hydra.example/userinfo", p.OIDCDiscoveryUserinfoEndpoint().String())
 
-	p2 := MustNew(l)
+	p2 := MustNew(context.Background(), l)
 	p2.MustSet(KeyIssuerURL, "http://hydra.localhost")
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL().String())
 	assert.Equal(t, "http://hydra.localhost/", p2.PublicURL().String())
@@ -180,14 +196,14 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
 
-	p := MustNew(l, configx.SkipValidation())
+	p := MustNew(context.Background(), l, configx.SkipValidation())
 	p.MustSet(KeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode())
 
 	p.MustSet(KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode())
 
-	p = MustNew(l, configx.SkipValidation())
+	p = MustNew(context.Background(), l, configx.SkipValidation())
 	p.MustSet("dangerous-force-http", true)
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode())
 	p.MustSet(KeyCookieSameSiteMode, "none")
@@ -196,7 +212,7 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 
 func TestViperProviderValidates(t *testing.T) {
 	l := logrusx.New("", "")
-	c := MustNew(l, configx.WithConfigFiles("../../internal/.hydra.yaml"))
+	c := MustNew(context.Background(), l, configx.WithConfigFiles("../../internal/.hydra.yaml"))
 
 	// log
 	assert.Equal(t, "debug", c.Source().String(KeyLogLevel))
@@ -344,14 +360,14 @@ func TestSetPerm(t *testing.T) {
 func TestLoginConsentURL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
-	p := MustNew(l)
+	p := MustNew(context.Background(), l)
 	p.MustSet(KeyLoginURL, "http://localhost:8080/oauth/login")
 	p.MustSet(KeyConsentURL, "http://localhost:8080/oauth/consent")
 
 	assert.Equal(t, "http://localhost:8080/oauth/login", p.LoginURL().String())
 	assert.Equal(t, "http://localhost:8080/oauth/consent", p.ConsentURL().String())
 
-	p2 := MustNew(l)
+	p2 := MustNew(context.Background(), l)
 	p2.MustSet(KeyLoginURL, "http://localhost:3000/#/oauth/login")
 	p2.MustSet(KeyConsentURL, "http://localhost:3000/#/oauth/consent")
 
@@ -362,7 +378,7 @@ func TestLoginConsentURL(t *testing.T) {
 func TestInfinitRefreshTokenTTL(t *testing.T) {
 	l := logrusx.New("", "")
 	l.Logrus().SetOutput(ioutil.Discard)
-	c := MustNew(l, configx.WithValue("ttl.refresh_token", -1))
+	c := MustNew(context.Background(), l, configx.WithValue("ttl.refresh_token", -1))
 
 	assert.Equal(t, -1*time.Nanosecond, c.RefreshTokenLifespan())
 }

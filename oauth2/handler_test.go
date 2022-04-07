@@ -370,7 +370,7 @@ func TestUserinfo(t *testing.T) {
 					keys, err := reg.KeyManager().GetKeySet(context.Background(), x.OpenIDConnectKeyName)
 					require.NoError(t, err)
 					t.Logf("%+v", keys)
-					key, err := jwk.FindKeyByPrefix(keys, "public")
+					key, err := jwk.FindPublicKey(keys)
 					return jwk.MustRSAPublic(key), nil
 				})
 				require.NoError(t, err)

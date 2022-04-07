@@ -43,7 +43,7 @@ func TestGenerator(t *testing.T) {
 			g:   &RS256Generator{},
 			use: "sig",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 2)
+				assert.Len(t, ks.Keys, 2)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.NotEmpty(t, ks.Keys[1].Key)
 				assert.Equal(t, "sig", ks.Keys[0].Use)
@@ -54,7 +54,7 @@ func TestGenerator(t *testing.T) {
 			g:   &ECDSA512Generator{},
 			use: "enc",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 2)
+				assert.Len(t, ks.Keys, 2)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.NotEmpty(t, ks.Keys[1].Key)
 				assert.Equal(t, "enc", ks.Keys[0].Use)
@@ -65,7 +65,7 @@ func TestGenerator(t *testing.T) {
 			g:   &ECDSA256Generator{},
 			use: "sig",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 2)
+				assert.Len(t, ks.Keys, 2)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.NotEmpty(t, ks.Keys[1].Key)
 				assert.Equal(t, "sig", ks.Keys[0].Use)
@@ -76,27 +76,25 @@ func TestGenerator(t *testing.T) {
 			g:   &HS256Generator{},
 			use: "sig",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 1)
+				assert.Len(t, ks.Keys, 1)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.Equal(t, "sig", ks.Keys[0].Use)
-				assert.Equal(t, "sig", ks.Keys[1].Use)
 			},
 		},
 		{
 			g:   &HS512Generator{},
 			use: "enc",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 1)
+				assert.Len(t, ks.Keys, 1)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.Equal(t, "enc", ks.Keys[0].Use)
-				assert.Equal(t, "enc", ks.Keys[1].Use)
 			},
 		},
 		{
 			g:   &EdDSAGenerator{},
 			use: "sig",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 2)
+				assert.Len(t, ks.Keys, 2)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.NotEmpty(t, ks.Keys[1].Key)
 				assert.Equal(t, "sig", ks.Keys[0].Use)
@@ -107,18 +105,18 @@ func TestGenerator(t *testing.T) {
 			g:   &EdDSAGenerator{},
 			use: "enc",
 			check: func(ks *jose.JSONWebKeySet) {
-				assert.Len(t, ks, 2)
+				assert.Len(t, ks.Keys, 2)
 				assert.NotEmpty(t, ks.Keys[0].Key)
 				assert.NotEmpty(t, ks.Keys[1].Key)
-				assert.Equal(t, "sig", ks.Keys[0].Use)
-				assert.Equal(t, "sig", ks.Keys[1].Use)
+				assert.Equal(t, "enc", ks.Keys[0].Use)
+				assert.Equal(t, "enc", ks.Keys[1].Use)
 			},
 		},
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			keys, err := c.g.Generate("foo", c.use)
 			require.NoError(t, err)
-			if err != nil {
+			if err == nil {
 				c.check(keys)
 			}
 		})

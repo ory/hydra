@@ -4,10 +4,11 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-04-05)](#000-2022-04-05)
+- [0.0.0 (2022-04-08)](#000-2022-04-08)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
+    - [Tests](#tests)
 - [1.11.7 (2022-02-23)](#1117-2022-02-23)
     - [Code Generation](#code-generation)
 - [1.11.6 (2022-02-23)](#1116-2022-02-23)
@@ -69,7 +70,7 @@
     - [Code Generation](#code-generation-13)
     - [Documentation](#documentation-8)
     - [Features](#features-6)
-    - [Tests](#tests)
+    - [Tests](#tests-1)
     - [Unclassified](#unclassified)
 - [1.9.2 (2021-01-29)](#192-2021-01-29)
     - [Code Generation](#code-generation-14)
@@ -92,21 +93,21 @@
     - [Code Refactoring](#code-refactoring-4)
     - [Documentation](#documentation-11)
     - [Features](#features-8)
-    - [Tests](#tests-1)
+    - [Tests](#tests-2)
     - [Unclassified](#unclassified-1)
 - [1.9.0-alpha.2 (2020-10-29)](#190-alpha2-2020-10-29)
     - [Bug Fixes](#bug-fixes-15)
     - [Code Generation](#code-generation-20)
     - [Documentation](#documentation-12)
     - [Features](#features-9)
-    - [Tests](#tests-2)
+    - [Tests](#tests-3)
 - [1.9.0-alpha.1 (2020-10-20)](#190-alpha1-2020-10-20)
     - [Bug Fixes](#bug-fixes-16)
     - [Code Generation](#code-generation-21)
     - [Code Refactoring](#code-refactoring-5)
     - [Documentation](#documentation-13)
     - [Features](#features-10)
-    - [Tests](#tests-3)
+    - [Tests](#tests-4)
 - [1.8.5 (2020-10-03)](#185-2020-10-03)
     - [Code Generation](#code-generation-22)
 - [1.8.0-pre.1 (2020-10-03)](#180-pre1-2020-10-03)
@@ -629,7 +630,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-05)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-08)
 
 
 ### Bug Fixes
@@ -653,6 +654,10 @@
 ### Features
 
 * Make sensitive log value redaction text configurable ([#3040](https://github.com/ory/hydra/issues/3040)) ([536352c](https://github.com/ory/hydra/commit/536352c15bb054f123e9d62944690a06cff86ba0))
+
+### Tests
+
+* Ensure generator checks are executed ([#3061](https://github.com/ory/hydra/issues/3061)) ([d38f6e6](https://github.com/ory/hydra/commit/d38f6e626baef00cb4cf57cbe59c7b15bea76e06))
 
 
 # [1.11.7](https://github.com/ory/hydra/compare/v1.11.6...v1.11.7) (2022-02-23)

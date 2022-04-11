@@ -14,6 +14,7 @@ import (
 	"github.com/go-openapi/runtime"
 	cr "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewListSubjectConsentSessionsParams creates a new ListSubjectConsentSessionsParams object,
@@ -58,6 +59,22 @@ func NewListSubjectConsentSessionsParamsWithHTTPClient(client *http.Client) *Lis
    Typically these are written to a http.Request.
 */
 type ListSubjectConsentSessionsParams struct {
+
+	/* Limit.
+
+	   The maximum amount of consent sessions to be returned, upper bound is 500 sessions.
+
+	   Format: int64
+	*/
+	Limit *int64
+
+	/* Offset.
+
+	   The offset from where to start looking.
+
+	   Format: int64
+	*/
+	Offset *int64
 
 	// Subject.
 	Subject string
@@ -115,6 +132,28 @@ func (o *ListSubjectConsentSessionsParams) SetHTTPClient(client *http.Client) {
 	o.HTTPClient = client
 }
 
+// WithLimit adds the limit to the list subject consent sessions params
+func (o *ListSubjectConsentSessionsParams) WithLimit(limit *int64) *ListSubjectConsentSessionsParams {
+	o.SetLimit(limit)
+	return o
+}
+
+// SetLimit adds the limit to the list subject consent sessions params
+func (o *ListSubjectConsentSessionsParams) SetLimit(limit *int64) {
+	o.Limit = limit
+}
+
+// WithOffset adds the offset to the list subject consent sessions params
+func (o *ListSubjectConsentSessionsParams) WithOffset(offset *int64) *ListSubjectConsentSessionsParams {
+	o.SetOffset(offset)
+	return o
+}
+
+// SetOffset adds the offset to the list subject consent sessions params
+func (o *ListSubjectConsentSessionsParams) SetOffset(offset *int64) {
+	o.Offset = offset
+}
+
 // WithSubject adds the subject to the list subject consent sessions params
 func (o *ListSubjectConsentSessionsParams) WithSubject(subject string) *ListSubjectConsentSessionsParams {
 	o.SetSubject(subject)
@@ -133,6 +172,40 @@ func (o *ListSubjectConsentSessionsParams) WriteToRequest(r runtime.ClientReques
 		return err
 	}
 	var res []error
+
+	if o.Limit != nil {
+
+		// query param limit
+		var qrLimit int64
+
+		if o.Limit != nil {
+			qrLimit = *o.Limit
+		}
+		qLimit := swag.FormatInt64(qrLimit)
+		if qLimit != "" {
+
+			if err := r.SetQueryParam("limit", qLimit); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.Offset != nil {
+
+		// query param offset
+		var qrOffset int64
+
+		if o.Offset != nil {
+			qrOffset = *o.Offset
+		}
+		qOffset := swag.FormatInt64(qrOffset)
+		if qOffset != "" {
+
+			if err := r.SetQueryParam("offset", qOffset); err != nil {
+				return err
+			}
+		}
+	}
 
 	// query param subject
 	qrSubject := o.Subject

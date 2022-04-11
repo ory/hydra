@@ -1560,6 +1560,20 @@
             "name": "subject",
             "in": "query",
             "required": true
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The maximum amount of consent sessions to be returned, upper bound is 500 sessions.",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "format": "int64",
+            "description": "The offset from where to start looking.",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {

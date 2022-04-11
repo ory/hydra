@@ -1432,6 +1432,25 @@ paths:
         schema:
           type: string
         style: form
+      - description: The maximum amount of consent sessions to be returned, upper
+          bound is 500 sessions.
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The offset from where to start looking.
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
       responses:
         "200":
           content:

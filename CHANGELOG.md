@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-04-08)](#000-2022-04-08)
+- [0.0.0 (2022-04-11)](#000-2022-04-11)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -630,11 +630,12 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-08)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-11)
 
 
 ### Bug Fixes
 
+* Add limit and offset to pagination ([#3062](https://github.com/ory/hydra/issues/3062)) ([51f6c5d](https://github.com/ory/hydra/commit/51f6c5d12e38ac82f80d6db34d9d0d788af2d985)), closes [#3033](https://github.com/ory/hydra/issues/3033)
 * Add missing flags to config schema ([00100a1](https://github.com/ory/hydra/commit/00100a1bcb60d1836a2c3d6c6a4212e3161b1bda)), closes [#653](https://github.com/ory/hydra/issues/653)
 * Configure audit logger ([#3022](https://github.com/ory/hydra/issues/3022)) ([3115dde](https://github.com/ory/hydra/commit/3115dde229a6be936ad4d844d778d6ee82279643))
 * Do not use cached version ([422d422](https://github.com/ory/hydra/commit/422d4227e8b599a6eb32b60d432fd0cad95a717a))

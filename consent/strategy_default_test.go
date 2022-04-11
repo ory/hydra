@@ -64,6 +64,27 @@ func checkAndAcceptLoginHandler(t *testing.T, apiClient admin.ClientService, sub
 	}
 }
 
+func checkAndDuplicateAcceptLoginHandler(t *testing.T, apiClient admin.ClientService, subject string, cb func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := apiClient.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge(r.URL.Query().Get("login_challenge")))
+		payload := cb(t, res, err)
+		payload.Subject = &subject
+
+		v, err := apiClient.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+			WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+			WithBody(payload))
+		require.NoError(t, err)
+		require.NotEmpty(t, *v.Payload.RedirectTo)
+
+		v2, err := apiClient.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
+			WithLoginChallenge(r.URL.Query().Get("login_challenge")).
+			WithBody(payload))
+		require.NoError(t, err)
+		require.NotEmpty(t, *v2.Payload.RedirectTo)
+		http.Redirect(w, r, *v2.Payload.RedirectTo, http.StatusFound)
+	}
+}
+
 func checkAndAcceptConsentHandler(t *testing.T, apiClient admin.ClientService, cb func(*testing.T, *admin.GetConsentRequestOK, error) *models.AcceptConsentRequest) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res, err := apiClient.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
@@ -76,6 +97,27 @@ func checkAndAcceptConsentHandler(t *testing.T, apiClient admin.ClientService, c
 		http.Redirect(w, r, *v.Payload.RedirectTo, http.StatusFound)
 	}
 }
+
+func checkAndDuplicateAcceptConsentHandler(t *testing.T, apiClient admin.ClientService, cb func(*testing.T, *admin.GetConsentRequestOK, error) *models.AcceptConsentRequest) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res, err := apiClient.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+
+		v, err := apiClient.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
+			WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
+			WithBody(cb(t, res, err)))
+		require.NoError(t, err)
+		require.NotEmpty(t, *v.Payload.RedirectTo)
+		res2, err := apiClient.GetConsentRequest(admin.NewGetConsentRequestParams().WithConsentChallenge(r.URL.Query().Get("consent_challenge")))
+
+		v2, err := apiClient.AcceptConsentRequest(admin.NewAcceptConsentRequestParams().
+			WithConsentChallenge(r.URL.Query().Get("consent_challenge")).
+			WithBody(cb(t, res2, err)))
+		require.NoError(t, err)
+		require.NotEmpty(t, *v2.Payload.RedirectTo)
+		http.Redirect(w, r, *v2.Payload.RedirectTo, http.StatusFound)
+	}
+}
+
 func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *client.Client, values url.Values) (gjson.Result, *http.Response) {
 	ctx := context.TODO()
 	if hc == nil {

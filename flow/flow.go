@@ -253,7 +253,7 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
 
 	if f.State == FlowStateLoginUnused {
-		return x.ErrConflict
+		return nil
 	} else if f.State != FlowStateLoginInitialized {
 		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
 	}

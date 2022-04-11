@@ -283,7 +283,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 
 		resp2, err := c.Do(req2)
 		require.NoError(t, err)
-		require.EqualValues(t, http.StatusConflict, resp2.StatusCode)
+		require.EqualValues(t, http.StatusOK, resp2.StatusCode)
 
 		var result2 RequestHandlerResponse
 		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result2))

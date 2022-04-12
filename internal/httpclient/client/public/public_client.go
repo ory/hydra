@@ -64,6 +64,8 @@ type ClientService interface {
 
 https://openid.net/specs/openid-connect-frontchannel-1_0.html
 https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+Back-channel logout is performed asynchronously and does not affect logout flow.
 */
 func (a *Client) DisconnectUser(params *DisconnectUserParams, opts ...ClientOption) error {
 	// TODO: Validate the params before sending

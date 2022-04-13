@@ -10,6 +10,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -51,6 +52,89 @@ func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
 	assert.NoError(t, err)
 	assert.IsType(t, &jwk.ManagerStrategy{}, reg.KeyManager())
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
+}
+
+func TestKeyManager_HsmKeyPrefix(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	hsmContext := NewMockContext(ctrl)
+	defer ctrl.Finish()
+
+	rsaKey, err := rsa.GenerateKey(rand.Reader, 512)
+	require.NoError(t, err)
+
+	ecdsaKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
+	require.NoError(t, err)
+
+	rsaKeyPair := NewMockSignerDecrypter(ctrl)
+	rsaKeyPair.EXPECT().Public().Return(&rsaKey.PublicKey).AnyTimes()
+
+	ecdsaKeyPair := NewMockSignerDecrypter(ctrl)
+	ecdsaKeyPair.EXPECT().Public().Return(&ecdsaKey.PublicKey).AnyTimes()
+
+	var kid = uuid.New()
+
+	keyPrefix := "application_specific_prefix."
+	expectedPrefixedOpenIDConnectKeyName := fmt.Sprintf("%s%s", keyPrefix, x.OpenIDConnectKeyName)
+
+	m := &hsm.KeyManager{
+		Context:   hsmContext,
+		KeyPrefix: keyPrefix,
+	}
+
+	t.Run("case=GenerateAndPersistKeySet", func(t *testing.T) {
+		privateAttrSet, publicAttrSet := expectedKeyAttributes(t, expectedPrefixedOpenIDConnectKeyName, kid)
+		hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(expectedPrefixedOpenIDConnectKeyName))).Return(nil, nil)
+		hsmContext.EXPECT().GenerateRSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(4096)).Return(rsaKeyPair, nil)
+
+		got, err := m.GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, kid, "RS256", "sig")
+
+		assert.NoError(t, err)
+		expectedKeySet := expectedKeySet(rsaKeyPair, kid, "RS256", "sig")
+		if !reflect.DeepEqual(got, expectedKeySet) {
+			t.Errorf("GenerateAndPersistKeySet() got = %v, want %v", got, expectedKeySet)
+		}
+	})
+	t.Run("case=GetKey", func(t *testing.T) {
+		hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(expectedPrefixedOpenIDConnectKeyName))).Return(rsaKeyPair, nil)
+		hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
+
+		got, err := m.GetKey(context.TODO(), x.OpenIDConnectKeyName, kid)
+
+		assert.NoError(t, err)
+		expectedKeySet := expectedKeySet(rsaKeyPair, kid, "RS256", "sig")
+		if !reflect.DeepEqual(got, expectedKeySet) {
+			t.Errorf("GetKey() got = %v, want %v", got, expectedKeySet)
+		}
+	})
+	t.Run("case=GetKeySet", func(t *testing.T) {
+		hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(expectedPrefixedOpenIDConnectKeyName))).Return([]crypto11.Signer{rsaKeyPair}, nil)
+		hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaId)).Return(pkcs11.NewAttribute(pkcs11.CKA_ID, []byte(kid)), nil)
+		hsmContext.EXPECT().GetAttribute(gomock.Eq(rsaKeyPair), gomock.Eq(crypto11.CkaDecrypt)).Return(nil, nil)
+
+		got, err := m.GetKeySet(context.TODO(), x.OpenIDConnectKeyName)
+
+		assert.NoError(t, err)
+		expectedKeySet := expectedKeySet(rsaKeyPair, kid, "RS256", "sig")
+		if !reflect.DeepEqual(got, expectedKeySet) {
+			t.Errorf("GetKey() got = %v, want %v", got, expectedKeySet)
+		}
+	})
+	t.Run("case=DeleteKey", func(t *testing.T) {
+		hsmContext.EXPECT().FindKeyPair(gomock.Eq([]byte(kid)), gomock.Eq([]byte(expectedPrefixedOpenIDConnectKeyName))).Return(rsaKeyPair, nil)
+		rsaKeyPair.EXPECT().Delete().Return(nil)
+
+		err := m.DeleteKey(context.TODO(), x.OpenIDConnectKeyName, kid)
+
+		assert.NoError(t, err)
+	})
+	t.Run("case=DeleteKeySet", func(t *testing.T) {
+		hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(expectedPrefixedOpenIDConnectKeyName))).Return([]crypto11.Signer{rsaKeyPair}, nil)
+		rsaKeyPair.EXPECT().Delete().Return(nil)
+
+		err := m.DeleteKeySet(context.TODO(), x.OpenIDConnectKeyName)
+
+		assert.NoError(t, err)
+	})
 }
 
 func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
@@ -97,7 +181,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 				use: "sig",
 			},
 			setup: func(t *testing.T) {
-				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, x.OpenIDConnectKeyName, kid)
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateRSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(4096)).Return(rsaKeyPair, nil)
 			},
@@ -113,7 +197,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 				use: "sig",
 			},
 			setup: func(t *testing.T) {
-				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, x.OpenIDConnectKeyName, kid)
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateRSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(4096)).Return(nil, errors.New("GenerateRSAKeyPairWithAttributesError"))
 			},
@@ -129,7 +213,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 				use: "sig",
 			},
 			setup: func(t *testing.T) {
-				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, x.OpenIDConnectKeyName, kid)
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P256())).Return(ecdsaKeyPair, nil)
 			},
@@ -145,7 +229,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 				use: "sig",
 			},
 			setup: func(t *testing.T) {
-				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, x.OpenIDConnectKeyName, kid)
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P256())).Return(nil, errors.New("GenerateECDSAKeyPairWithAttributesError"))
 			},
@@ -161,7 +245,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 				use: "sig",
 			},
 			setup: func(t *testing.T) {
-				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, x.OpenIDConnectKeyName, kid)
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P521())).Return(ecdsaKeyPair, nil)
 			},
@@ -177,7 +261,7 @@ func TestKeyManager_GenerateAndPersistKeySet(t *testing.T) {
 				use: "sig",
 			},
 			setup: func(t *testing.T) {
-				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, kid)
+				privateAttrSet, publicAttrSet := expectedKeyAttributes(t, x.OpenIDConnectKeyName, kid)
 				hsmContext.EXPECT().FindKeyPairs(gomock.Nil(), gomock.Eq([]byte(x.OpenIDConnectKeyName))).Return(nil, nil)
 				hsmContext.EXPECT().GenerateECDSAKeyPairWithAttributes(gomock.Eq(publicAttrSet), gomock.Eq(privateAttrSet), gomock.Eq(elliptic.P521())).Return(nil, errors.New("GenerateECDSAKeyPairWithAttributesError"))
 			},
@@ -766,10 +850,10 @@ func TestKeyManager_UpdateKeySet(t *testing.T) {
 	assert.ErrorIs(t, err, hsm.ErrPreGeneratedKeys)
 }
 
-func expectedKeyAttributes(t *testing.T, kid string) (crypto11.AttributeSet, crypto11.AttributeSet) {
-	privateAttrSet, err := crypto11.NewAttributeSetWithIDAndLabel([]byte(kid), []byte(x.OpenIDConnectKeyName))
+func expectedKeyAttributes(t *testing.T, set, kid string) (crypto11.AttributeSet, crypto11.AttributeSet) {
+	privateAttrSet, err := crypto11.NewAttributeSetWithIDAndLabel([]byte(kid), []byte(set))
 	require.NoError(t, err)
-	publicAttrSet, err := crypto11.NewAttributeSetWithIDAndLabel([]byte(kid), []byte(x.OpenIDConnectKeyName))
+	publicAttrSet, err := crypto11.NewAttributeSetWithIDAndLabel([]byte(kid), []byte(set))
 	require.NoError(t, err)
 	publicAttrSet.AddIfNotPresent([]*pkcs11.Attribute{
 		pkcs11.NewAttribute(pkcs11.CKA_VERIFY, true),

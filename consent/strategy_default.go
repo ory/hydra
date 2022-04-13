@@ -702,24 +702,24 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 
 	var execute = func(t task) {
 		defer wg.Done()
+		l := s.r.Logger().WithRequest(r).
+			WithField("client_id", t.clientID).
+			WithField("token", t.token).
+			WithField("backchannel_logout_url", t.url)
 
 		res, err := hc.PostForm(t.url, url.Values{"logout_token": {t.token}})
 		if err != nil {
-			s.r.Logger().WithRequest(r).WithError(err).
-				WithField("client_id", t.clientID).
-				WithField("backchannel_logout_url", t.url).
-				Error("Unable to execute OpenID Connect Back-Channel Logout Request")
+			l.WithError(err).Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return
 		}
 		defer res.Body.Close()
 
 		if res.StatusCode != http.StatusOK {
-			s.r.Logger().WithError(errors.Errorf("expected HTTP status code %d but got %d", http.StatusOK, res.StatusCode)).
-				WithRequest(r).
-				WithField("client_id", t.clientID).
-				WithField("backchannel_logout_url", t.url).
+			l.WithError(errors.Errorf("expected HTTP status code %d but got %d", http.StatusOK, res.StatusCode)).
 				Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return
+		} else {
+			l.Info("Back-Channel Logout Request")
 		}
 	}
 

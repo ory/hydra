@@ -495,7 +495,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/healthStatus'
           description: Ory Hydra is ready to accept connections.
         "500":
           content:
@@ -2703,6 +2703,8 @@ components:
           type: object
       type: object
     healthStatus:
+      example:
+        status: status
       properties:
         status:
           description: Status always contains "ok".
@@ -4007,8 +4009,6 @@ components:
         status:
           description: Always "ok".
           type: string
-      required:
-      - status
       type: object
     inline_response_503:
       properties:
@@ -4018,8 +4018,6 @@ components:
           description: Errors contains a list of errors that caused the not ready
             status.
           type: object
-      required:
-      - errors
       type: object
     inline_object:
       properties:
@@ -4081,8 +4079,6 @@ components:
         version:
           description: The version of Ory Hydra.
           type: string
-      required:
-      - version
       type: object
   securitySchemes:
     basic:

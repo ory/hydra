@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Status** | **string** | Always \&quot;ok\&quot;. | 
+**Status** | Pointer to **string** | Always \&quot;ok\&quot;. | [optional] 
 
 ## Methods
 
 ### NewInlineResponse200
 
-`func NewInlineResponse200(status string, ) *InlineResponse200`
+`func NewInlineResponse200() *InlineResponse200`
 
 NewInlineResponse200 instantiates a new InlineResponse200 object
 This constructor will assign default values to properties that have it defined,
@@ -44,6 +44,11 @@ and a boolean to check if the value has been set.
 
 SetStatus sets Status field to given value.
 
+### HasStatus
+
+`func (o *InlineResponse200) HasStatus() bool`
+
+HasStatus returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

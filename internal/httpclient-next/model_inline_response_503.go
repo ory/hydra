@@ -18,16 +18,15 @@ import (
 // InlineResponse503 struct for InlineResponse503
 type InlineResponse503 struct {
 	// Errors contains a list of errors that caused the not ready status.
-	Errors map[string]string `json:"errors"`
+	Errors *map[string]string `json:"errors,omitempty"`
 }
 
 // NewInlineResponse503 instantiates a new InlineResponse503 object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInlineResponse503(errors map[string]string) *InlineResponse503 {
+func NewInlineResponse503() *InlineResponse503 {
 	this := InlineResponse503{}
-	this.Errors = errors
 	return &this
 }
 
@@ -39,33 +38,41 @@ func NewInlineResponse503WithDefaults() *InlineResponse503 {
 	return &this
 }
 
-// GetErrors returns the Errors field value
+// GetErrors returns the Errors field value if set, zero value otherwise.
 func (o *InlineResponse503) GetErrors() map[string]string {
-	if o == nil {
+	if o == nil || o.Errors == nil {
 		var ret map[string]string
 		return ret
 	}
-
-	return o.Errors
+	return *o.Errors
 }
 
-// GetErrorsOk returns a tuple with the Errors field value
+// GetErrorsOk returns a tuple with the Errors field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InlineResponse503) GetErrorsOk() (*map[string]string, bool) {
-	if o == nil {
+	if o == nil || o.Errors == nil {
 		return nil, false
 	}
-	return &o.Errors, true
+	return o.Errors, true
 }
 
-// SetErrors sets field value
+// HasErrors returns a boolean if a field has been set.
+func (o *InlineResponse503) HasErrors() bool {
+	if o != nil && o.Errors != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetErrors gets a reference to the given map[string]string and assigns it to the Errors field.
 func (o *InlineResponse503) SetErrors(v map[string]string) {
-	o.Errors = v
+	o.Errors = &v
 }
 
 func (o InlineResponse503) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if true {
+	if o.Errors != nil {
 		toSerialize["errors"] = o.Errors
 	}
 	return json.Marshal(toSerialize)

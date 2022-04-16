@@ -315,13 +315,11 @@
         "properties": {
           "access_token": {
             "additionalProperties": true,
-            "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
-            "type": "object"
+            "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!"
           },
           "id_token": {
             "additionalProperties": true,
-            "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!",
-            "type": "object"
+            "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!"
           }
         },
         "title": "Used to pass session data to a consent request.",
@@ -1895,16 +1893,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "status": {
-                      "description": "Always \"ok\".",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "status"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/healthStatus"
                 }
               }
             },
@@ -1942,9 +1931,6 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "status"
-                  ],
                   "type": "object"
                 }
               }
@@ -1964,9 +1950,6 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "errors"
-                  ],
                   "type": "object"
                 }
               }
@@ -3857,9 +3840,6 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "version"
-                  ],
                   "type": "object"
                 }
               }

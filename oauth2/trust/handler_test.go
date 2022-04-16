@@ -3,6 +3,7 @@ package trust_test
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -202,6 +203,22 @@ func (s *HandlerTestSuite) TestGrantPublicCanBeFetched() {
 
 	s.Require().NoError(err, "no error expected on fetching public key")
 	s.Equal(*model.Jwk.Kid, *getResult.Payload.Keys[0].Kid)
+}
+
+func (s *HandlerTestSuite) TestGrantWithAnySubjectCanBeCreated() {
+	createRequestParams := s.newCreateJwtBearerGrantParams(
+		"ory",
+		"",
+		true,
+		[]string{"openid", "offline", "profile"},
+		time.Now().Add(time.Hour),
+	)
+
+	grant, err := s.hydraClient.Admin.TrustJwtGrantIssuer(createRequestParams)
+	s.Require().NoError(err, "no error expected on grant creation")
+
+	assert.Empty(s.T(), grant.Payload.Subject)
+	assert.Truef(s.T(), grant.Payload.AllowAnySubject, "grant with any subject must be true")
 }
 
 func (s *HandlerTestSuite) TestGrantListCanBeFetched() {

@@ -2294,10 +2294,8 @@ components:
           - requested_scope
           - requested_scope
         session:
-          access_token:
-            key: '{}'
-          id_token:
-            key: '{}'
+          access_token: '{}'
+          id_token: '{}'
         grant_access_token_audience:
         - grant_access_token_audience
         - grant_access_token_audience
@@ -2603,13 +2601,10 @@ components:
       type: object
     consentRequestSession:
       example:
-        access_token:
-          key: '{}'
-        id_token:
-          key: '{}'
+        access_token: '{}'
+        id_token: '{}'
       properties:
         access_token:
-          additionalProperties: true
           description: |-
             AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the
             refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.
@@ -2617,7 +2612,6 @@ components:
             can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!
           type: object
         id_token:
-          additionalProperties: true
           description: |-
             IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
             by anyone that has access to the ID Challenge. Use with care!

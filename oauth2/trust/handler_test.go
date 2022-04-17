@@ -3,11 +3,12 @@ package trust_test
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/oauth2/trust"
 

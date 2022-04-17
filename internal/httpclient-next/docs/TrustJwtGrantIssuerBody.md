@@ -4,17 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**AllowAnySubject** | Pointer to **bool** | The \&quot;allow_any_subject\&quot; indicates that the issuer is allowed to have any principal as the subject of the JWT. | [optional] 
 **ExpiresAt** | **time.Time** | The \&quot;expires_at\&quot; indicates, when grant will expire, so we will reject assertion from \&quot;issuer\&quot; targeting \&quot;subject\&quot;. | 
 **Issuer** | **string** | The \&quot;issuer\&quot; identifies the principal that issued the JWT assertion (same as \&quot;iss\&quot; claim in JWT). | 
 **Jwk** | [**JSONWebKey**](JSONWebKey.md) |  | 
 **Scope** | **[]string** | The \&quot;scope\&quot; contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749]) | 
-**Subject** | **string** | The \&quot;subject\&quot; identifies the principal that is the subject of the JWT. | 
+**Subject** | Pointer to **string** | The \&quot;subject\&quot; identifies the principal that is the subject of the JWT. | [optional] 
 
 ## Methods
 
 ### NewTrustJwtGrantIssuerBody
 
-`func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JSONWebKey, scope []string, subject string, ) *TrustJwtGrantIssuerBody`
+`func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JSONWebKey, scope []string, ) *TrustJwtGrantIssuerBody`
 
 NewTrustJwtGrantIssuerBody instantiates a new TrustJwtGrantIssuerBody object
 This constructor will assign default values to properties that have it defined,
@@ -28,6 +29,31 @@ will change when the set of required properties is changed
 NewTrustJwtGrantIssuerBodyWithDefaults instantiates a new TrustJwtGrantIssuerBody object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
+
+### GetAllowAnySubject
+
+`func (o *TrustJwtGrantIssuerBody) GetAllowAnySubject() bool`
+
+GetAllowAnySubject returns the AllowAnySubject field if non-nil, zero value otherwise.
+
+### GetAllowAnySubjectOk
+
+`func (o *TrustJwtGrantIssuerBody) GetAllowAnySubjectOk() (*bool, bool)`
+
+GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetAllowAnySubject
+
+`func (o *TrustJwtGrantIssuerBody) SetAllowAnySubject(v bool)`
+
+SetAllowAnySubject sets AllowAnySubject field to given value.
+
+### HasAllowAnySubject
+
+`func (o *TrustJwtGrantIssuerBody) HasAllowAnySubject() bool`
+
+HasAllowAnySubject returns a boolean if a field has been set.
 
 ### GetExpiresAt
 
@@ -128,6 +154,11 @@ and a boolean to check if the value has been set.
 
 SetSubject sets Subject field to given value.
 
+### HasSubject
+
+`func (o *TrustJwtGrantIssuerBody) HasSubject() bool`
+
+HasSubject returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

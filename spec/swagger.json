@@ -3185,12 +3185,15 @@
       "type": "object",
       "required": [
         "issuer",
-        "subject",
         "scope",
         "jwk",
         "expires_at"
       ],
       "properties": {
+        "allow_any_subject": {
+          "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
+          "type": "boolean"
+        },
         "expires_at": {
           "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
           "type": "string",
@@ -3240,6 +3243,10 @@
     "trustedJwtGrantIssuer": {
       "type": "object",
       "properties": {
+        "allow_any_subject": {
+          "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
+          "type": "boolean"
+        },
         "created_at": {
           "description": "The \"created_at\" indicates, when grant was created.",
           "type": "string",

@@ -1971,7 +1971,7 @@ import (
 )
 
 func main() {
-    trustJwtGrantIssuerBody := *openapiclient.NewTrustJwtGrantIssuerBody(time.Now(), "https://jwt-idp.example.com", *openapiclient.NewJSONWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig"), []string{"Scope_example"}, "mike@example.com") // TrustJwtGrantIssuerBody |  (optional)
+    trustJwtGrantIssuerBody := *openapiclient.NewTrustJwtGrantIssuerBody(time.Now(), "https://jwt-idp.example.com", *openapiclient.NewJSONWebKey("RS256", "1603dfe0af8f4596", "RSA", "sig"), []string{"Scope_example"}) // TrustJwtGrantIssuerBody |  (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)

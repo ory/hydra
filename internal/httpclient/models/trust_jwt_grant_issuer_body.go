@@ -19,6 +19,9 @@ import (
 // swagger:model trustJwtGrantIssuerBody
 type TrustJwtGrantIssuerBody struct {
 
+	// The "allow_any_subject" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject bool `json:"allow_any_subject,omitempty"`
+
 	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
 	// Required: true
 	// Format: date-time
@@ -40,8 +43,7 @@ type TrustJwtGrantIssuerBody struct {
 
 	// The "subject" identifies the principal that is the subject of the JWT.
 	// Example: mike@example.com
-	// Required: true
-	Subject *string `json:"subject"`
+	Subject string `json:"subject,omitempty"`
 }
 
 // Validate validates this trust jwt grant issuer body
@@ -61,10 +63,6 @@ func (m *TrustJwtGrantIssuerBody) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateScope(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateSubject(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -117,15 +115,6 @@ func (m *TrustJwtGrantIssuerBody) validateJwk(formats strfmt.Registry) error {
 func (m *TrustJwtGrantIssuerBody) validateScope(formats strfmt.Registry) error {
 
 	if err := validate.Required("scope", "body", m.Scope); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *TrustJwtGrantIssuerBody) validateSubject(formats strfmt.Registry) error {
-
-	if err := validate.Required("subject", "body", m.Subject); err != nil {
 		return err
 	}
 

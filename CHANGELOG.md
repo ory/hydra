@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-04-16)](#000-2022-04-16)
+- [0.0.0 (2022-04-17)](#000-2022-04-17)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -630,7 +630,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-16)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-17)
 
 
 ### Bug Fixes
@@ -655,6 +655,13 @@
 * Update README ([#3032](https://github.com/ory/hydra/issues/3032)) ([980c2d8](https://github.com/ory/hydra/commit/980c2d843acc70a23a71dc9b4347d13d70dbc399))
 
 ### Features
+
+* Add support for trust grants that can issue tokens for any subject ([#3012](https://github.com/ory/hydra/issues/3012)) ([a3c4304](https://github.com/ory/hydra/commit/a3c4304be2d3988843084d871aa5066d36803219)), closes [#2930](https://github.com/ory/hydra/issues/2930):
+
+    Previously, a trust relationship had to be setup for every subject
+    before the issuer could sign a JWT token for it. This change will allow
+    setting up token services that can issue tokens with any value in the
+    subject field.
 
 * Make sensitive log value redaction text configurable ([#3040](https://github.com/ory/hydra/issues/3040)) ([536352c](https://github.com/ory/hydra/commit/536352c15bb054f123e9d62944690a06cff86ba0))
 

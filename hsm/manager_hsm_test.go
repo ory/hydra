@@ -54,7 +54,7 @@ func TestDefaultKeyManager_HsmEnabled(t *testing.T) {
 	assert.IsType(t, &sql.Persister{}, reg.SoftwareKeyManager())
 }
 
-func TestKeyManager_HsmKeyPrefix(t *testing.T) {
+func TestKeyManager_HsmKeySetPrefix(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	hsmContext := NewMockContext(ctrl)
 	defer ctrl.Finish()
@@ -73,12 +73,12 @@ func TestKeyManager_HsmKeyPrefix(t *testing.T) {
 
 	var kid = uuid.New()
 
-	keyPrefix := "application_specific_prefix."
-	expectedPrefixedOpenIDConnectKeyName := fmt.Sprintf("%s%s", keyPrefix, x.OpenIDConnectKeyName)
+	keySetPrefix := "application_specific_prefix."
+	expectedPrefixedOpenIDConnectKeyName := fmt.Sprintf("%s%s", keySetPrefix, x.OpenIDConnectKeyName)
 
 	m := &hsm.KeyManager{
-		Context:   hsmContext,
-		KeyPrefix: keyPrefix,
+		Context:      hsmContext,
+		KeySetPrefix: keySetPrefix,
 	}
 
 	t.Run("case=GenerateAndPersistKeySet", func(t *testing.T) {

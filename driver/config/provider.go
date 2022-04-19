@@ -470,7 +470,7 @@ func (p *Provider) HsmTokenLabel() string {
 	return p.p.String(HsmTokenLabel)
 }
 
-func (p *Provider) HsmKeyPrefix() string {
+func (p *Provider) HsmKeySetPrefix() string {
 	return p.p.String(HsmKeySetPrefix)
 }
 

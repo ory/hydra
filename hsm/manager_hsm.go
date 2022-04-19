@@ -10,6 +10,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
+	"github.com/ory/hydra/driver/config"
 	"net/http"
 	"sync"
 
@@ -33,7 +34,7 @@ type KeyManager struct {
 	jwk.Manager
 	sync.RWMutex
 	Context
-	KeyPrefix string
+	KeySetPrefix string
 }
 
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
@@ -42,10 +43,10 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context, keyPrefix string) *KeyManager {
+func NewKeyManager(hsm Context, config *config.Provider) *KeyManager {
 	return &KeyManager{
-		Context:   hsm,
-		KeyPrefix: keyPrefix,
+		Context:      hsm,
+		KeySetPrefix: config.HsmKeySetPrefix(),
 	}
 }
 
@@ -324,5 +325,5 @@ func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
 }
 
 func (m *KeyManager) prefixKeySet(set string) string {
-	return fmt.Sprintf("%s%s", m.KeyPrefix, set)
+	return fmt.Sprintf("%s%s", m.KeySetPrefix, set)
 }

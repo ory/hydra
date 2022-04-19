@@ -24,7 +24,7 @@ type KeyManager struct {
 	jwk.Manager
 	sync.RWMutex
 	Context
-	KeyPrefix string
+	KeySetPrefix string
 }
 
 var ErrOpSysNotSupported = errors.New("Hardware Security Module is not supported on this platform.")
@@ -34,7 +34,7 @@ func NewContext(c *config.Provider, l *logrusx.Logger) Context {
 	return nil
 }
 
-func NewKeyManager(hsm Context, keyPrefix string) *KeyManager {
+func NewKeyManager(hsm Context, config *config.Provider) *KeyManager {
 	return nil
 }
 

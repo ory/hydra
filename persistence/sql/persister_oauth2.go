@@ -374,43 +374,31 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 		notAfter = requestMaxExpire
 	}
 
-	signatures := []string{}
-
-	// Select tokens' signatures with limit
-	q := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ? AND nid = ? ORDER BY signature LIMIT %d",
-			OAuth2RequestSQL{Table: table}.TableName(), limit),
-		notAfter,
-		p.NetworkID(ctx),
-	)
-	if err := q.All(&signatures); err == sql.ErrNoRows {
-		return errorsx.WithStack(fosite.ErrNotFound)
-	} else if err != nil {
-		return errorsx.WithStack(err)
-	}
-
-	// Delete tokens in batch
 	var err error
-	for i := 0; i < len(signatures); i += batchSize {
-		j := i + batchSize
-		if j > len(signatures) {
-			j = len(signatures)
+
+	totalDeletedCount := 0
+	for deletedRecords := batchSize; totalDeletedCount < limit && deletedRecords == batchSize; {
+		d := batchSize
+		if limit-totalDeletedCount < batchSize {
+			d = limit - totalDeletedCount
 		}
+		// Delete in batches
+		// The outer SELECT is necessary because our version of MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery
+		deletedRecords, err = p.Connection(ctx).RawQuery(
+			fmt.Sprintf(`DELETE FROM %s WHERE signature in (
+				SELECT signature FROM (SELECT signature FROM %s hoa WHERE requested_at < ? and nid = ? ORDER BY signature LIMIT %d )  as s
+			)`, OAuth2RequestSQL{Table: table}.TableName(), OAuth2RequestSQL{Table: table}.TableName(), d),
+			notAfter,
+			p.NetworkID(ctx),
+		).ExecWithCount()
+		totalDeletedCount += deletedRecords
 
-		if i != j {
-			ss := signatures[i:j]
-			iss := make([]interface{}, len(ss))
-			for i, v := range ss { // Workaround for https://github.com/gobuffalo/pop/issues/699
-				iss[i] = v
-			}
-
-			err = p.QueryWithNetwork(ctx).Where("signature in (?)", iss...).Delete(&OAuth2RequestSQL{Table: table})
-
-			if err != nil {
-				return sqlcon.HandleError(err)
-			}
+		if err != nil {
+			break
 		}
+		p.l.Debugf("Flushing tokens...: %d/%d", totalDeletedCount, limit)
 	}
+	p.l.Debugf("Flush Refresh Tokens flushed_records: %d", totalDeletedCount)
 	return sqlcon.HandleError(err)
 }
 

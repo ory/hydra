@@ -28,16 +28,18 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/sqlcon"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/gofrs/uuid"
-	"github.com/ory/fosite"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/ory/fosite"
 
 	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/x"

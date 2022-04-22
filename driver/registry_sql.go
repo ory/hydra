@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/hydra/hsm"
 	"github.com/ory/hydra/x/contextx"
-	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/pop/v6"
 

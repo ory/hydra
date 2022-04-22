@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+
 	"github.com/ory/hydra/client"
 )
 

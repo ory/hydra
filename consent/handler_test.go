@@ -21,9 +21,11 @@
 package consent_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/hydra/internal/httpclient/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -225,4 +227,68 @@ func TestGetConsentRequest(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
+	t.Run("Test get login request with duplicate accept", func(t *testing.T) {
+		challenge := "challenge"
+		requestURL := "http://192.0.2.1"
+
+		conf := internal.NewConfigurationWithDefaults()
+		reg := internal.NewRegistryMemory(t, conf)
+
+		cl := &client.Client{OutfacingID: "client"}
+		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
+		require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
+			Client:     cl,
+			ID:         challenge,
+			RequestURL: requestURL,
+		}))
+
+		h := NewHandler(reg, conf)
+		r := x.NewRouterAdmin()
+		h.SetRoutes(r)
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+
+		c := &http.Client{}
+
+		sub := "sub123"
+		acceptLogin := &models.AcceptLoginRequest{Remember: true, Subject: &sub}
+
+		// marshal User to json
+		acceptLoginJson, err := json.Marshal(acceptLogin)
+		if err != nil {
+			panic(err)
+		}
+
+		// set the HTTP method, url, and request body
+		req, err := http.NewRequest(http.MethodPut, ts.URL+LoginPath+"/accept?challenge="+challenge, bytes.NewBuffer(acceptLoginJson))
+		if err != nil {
+			panic(err)
+		}
+
+		resp, err := c.Do(req)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusOK, resp.StatusCode)
+
+		var result RequestHandlerResponse
+		require.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
+		require.NotNil(t, result.RedirectTo)
+		require.Contains(t, result.RedirectTo, "login_verifier")
+
+		req2, err := http.NewRequest(http.MethodPut, ts.URL+LoginPath+"/accept?challenge="+challenge, bytes.NewBuffer(acceptLoginJson))
+		if err != nil {
+			panic(err)
+		}
+
+		resp2, err := c.Do(req2)
+		require.NoError(t, err)
+		require.EqualValues(t, http.StatusOK, resp2.StatusCode)
+
+		var result2 RequestHandlerResponse
+		require.NoError(t, json.NewDecoder(resp2.Body).Decode(&result2))
+		require.NotNil(t, result2.RedirectTo)
+		require.Contains(t, result2.RedirectTo, "login_verifier")
+	})
 }

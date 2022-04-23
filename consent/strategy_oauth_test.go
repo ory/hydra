@@ -671,4 +671,91 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		hc := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist")}
 		makeRequestAndExpectError(t, hc, c, url.Values{"prompt": {"none"}}, "The Authorization Server requires End-User authentication.")
 	})
+
+	t.Run("case=should be able to retry accept consent request", func(t *testing.T) {
+
+		subject := "aeneas-rekkas"
+		c := createDefaultClient(t)
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{
+				Subject: &subject,
+				Context: map[string]interface{}{"fooz": "barz"},
+			}),
+			checkAndDuplicateAcceptConsentHandler(t, adminClient.Admin, func(t *testing.T, res *admin.GetConsentRequestOK, err error) *models.AcceptConsentRequest {
+				require.NoError(t, err)
+				assert.Equal(t, map[string]interface{}{"fooz": "barz"}, res.Payload.Context)
+				assert.Equal(t, subject, res.Payload.Subject)
+				return &models.AcceptConsentRequest{
+					Remember:   true,
+					GrantScope: []string{"openid"},
+					Session: &models.ConsentRequestSession{
+						AccessToken: map[string]interface{}{"foo": "bar"},
+						IDToken:     map[string]interface{}{"bar": "baz"},
+					},
+				}
+			}))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
+
+	})
+
+	t.Run("case=should be able to retry accept login request", func(t *testing.T) {
+		subject := "aeneas-rekkas"
+		c := createDefaultClient(t)
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			checkAndDuplicateAcceptLoginHandler(t, adminClient.Admin, subject, func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest {
+				return &models.AcceptLoginRequest{
+					Subject: &subject,
+					Context: map[string]interface{}{"fooz": "barz"},
+				}
+			}),
+			checkAndAcceptConsentHandler(t, adminClient.Admin, func(t *testing.T, res *admin.GetConsentRequestOK, err error) *models.AcceptConsentRequest {
+				require.NoError(t, err)
+				assert.Equal(t, map[string]interface{}{"fooz": "barz"}, res.Payload.Context)
+				assert.Equal(t, subject, res.Payload.Subject)
+				return &models.AcceptConsentRequest{
+					Remember:   true,
+					GrantScope: []string{"openid"},
+					Session: &models.ConsentRequestSession{
+						AccessToken: map[string]interface{}{"foo": "bar"},
+						IDToken:     map[string]interface{}{"bar": "baz"},
+					},
+				}
+			}))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
+	})
+
+	t.Run("case=should be able to retry both accept login and consent requests", func(t *testing.T) {
+
+		subject := "aeneas-rekkas"
+		c := createDefaultClient(t)
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
+			checkAndDuplicateAcceptLoginHandler(t, adminClient.Admin, subject, func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest {
+				return &models.AcceptLoginRequest{
+					Subject: &subject,
+					Context: map[string]interface{}{"fooz": "barz"},
+				}
+			}),
+			checkAndDuplicateAcceptConsentHandler(t, adminClient.Admin, func(t *testing.T, res *admin.GetConsentRequestOK, err error) *models.AcceptConsentRequest {
+				require.NoError(t, err)
+				assert.Equal(t, map[string]interface{}{"fooz": "barz"}, res.Payload.Context)
+				assert.Equal(t, subject, res.Payload.Subject)
+				return &models.AcceptConsentRequest{
+					Remember:   true,
+					GrantScope: []string{"openid"},
+					Session: &models.ConsentRequestSession{
+						AccessToken: map[string]interface{}{"foo": "bar"},
+						IDToken:     map[string]interface{}{"bar": "baz"},
+					},
+				}
+			}))
+
+		hc := testhelpers.NewEmptyJarClient(t)
+		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
+
+	})
+
 }

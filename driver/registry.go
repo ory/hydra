@@ -3,6 +3,11 @@ package driver
 import (
 	"context"
 
+	"github.com/ory/hydra/hsm"
+	"github.com/ory/hydra/x/contextx"
+
+	"github.com/ory/hydra/oauth2/trust"
+
 	"github.com/pkg/errors"
 
 	"github.com/ory/x/errorsx"
@@ -30,12 +35,15 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context) error
+	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error
 
+	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.Provider) Registry
+	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
+	WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry
 
-	Config() *config.Provider
+	Config(ctx context.Context) *config.Provider
 	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
@@ -43,6 +51,7 @@ type Registry interface {
 	client.Registry
 	consent.Registry
 	jwk.Registry
+	trust.Registry
 	oauth2.Registry
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
@@ -57,9 +66,10 @@ type Registry interface {
 	OAuth2HMACStrategy() *foauth2.HMACSHAStrategy
 	WithOAuth2Provider(f fosite.OAuth2Provider)
 	WithConsentStrategy(c consent.Strategy)
+	WithHsmContext(h hsm.Context)
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)
@@ -70,9 +80,9 @@ func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logg
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
 
-	registry = registry.WithLogger(l).WithConfig(c)
+	registry = registry.WithLogger(l).WithConfig(c).WithBuildInfo(config.Version, config.Commit, config.Date)
 
-	if err := registry.Init(ctx); err != nil {
+	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer); err != nil {
 		return nil, err
 	}
 
@@ -80,12 +90,12 @@ func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logg
 }
 
 func CallRegistry(ctx context.Context, r Registry) {
-	r.ClientValidator()
+	r.ClientValidator(ctx)
 	r.ClientManager()
 	r.ClientHasher()
 	r.ConsentManager()
 	r.ConsentStrategy()
-	r.SubjectIdentifierAlgorithm()
+	r.SubjectIdentifierAlgorithm(ctx)
 	r.KeyManager()
 	r.KeyGenerators()
 	r.KeyCipher()

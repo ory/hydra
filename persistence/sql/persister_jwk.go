@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/gobuffalo/pop/v6"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/x/errorsx"
 
-	"github.com/gobuffalo/pop/v5"
 	"github.com/pkg/errors"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
@@ -16,6 +17,25 @@ import (
 )
 
 var _ jwk.Manager = &Persister{}
+
+func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+	generator, found := p.r.KeyGenerators()[alg]
+	if !found {
+		return nil, errorsx.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
+	}
+
+	keys, err := generator.Generate(kid, use)
+	if err != nil {
+		return nil, err
+	}
+
+	err = p.AddKeySet(ctx, set, keys)
+	if err != nil {
+		return nil, err
+	}
+
+	return keys, nil
+}
 
 func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	out, err := json.Marshal(key)
@@ -28,7 +48,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 		return errorsx.WithStack(err)
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Create(&jwk.SQLData{
+	return sqlcon.HandleError(p.CreateWithNetwork(ctx, &jwk.SQLData{
 		Set:     set,
 		KID:     key.KeyID,
 		Version: 0,
@@ -49,7 +69,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 				return err
 			}
 
-			if err := c.Create(&jwk.SQLData{
+			if err := p.CreateWithNetwork(ctx, &jwk.SQLData{
 				Set:     set,
 				KID:     key.KeyID,
 				Version: 0,
@@ -62,9 +82,35 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 	})
 }
 
+// UpdateKey updates or creates the key.
+func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
+			return err
+		}
+		if err := p.AddKey(ctx, set, key); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// UpdateKeySet updates or creates the key set.
+func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
+	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
+		if err := p.DeleteKeySet(ctx, set); err != nil {
+			return err
+		}
+		if err := p.AddKeySet(ctx, set, keySet); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
 	var j jwk.SQLData
-	if err := p.Connection(ctx).
+	if err := p.QueryWithNetwork(ctx).
 		Where("sid = ? AND kid = ?", set, kid).
 		Order("created_at DESC").
 		First(&j); err != nil {
@@ -88,7 +134,7 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 
 func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
 	var js []jwk.SQLData
-	if err := p.Connection(ctx).
+	if err := p.QueryWithNetwork(ctx).
 		Where("sid = ?", set).
 		Order("created_at DESC").
 		All(&js); err != nil {
@@ -121,9 +167,11 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND kid=?", set, kid).Exec())
+	err := p.QueryWithNetwork(ctx).Where("sid=? AND kid=?", set, kid).Delete(&jwk.SQLData{})
+	return sqlcon.HandleError(err)
 }
 
 func (p *Persister) DeleteKeySet(ctx context.Context, set string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=?", set).Exec())
+	err := p.QueryWithNetwork(ctx).Where("sid=?", set).Delete(&jwk.SQLData{})
+	return sqlcon.HandleError(err)
 }

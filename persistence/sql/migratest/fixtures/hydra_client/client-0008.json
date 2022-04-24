@@ -1,41 +1,55 @@
 {
-  "client_id": "client-0008",
-  "client_name": "Client 0008",
-  "client_secret": "secret-0008",
-  "redirect_uris": [
-    "http://redirect/0008_1"
-  ],
-  "grant_types": [
-    "grant-0008_1"
-  ],
-  "response_types": [
-    "response-0008_1"
-  ],
-  "scope": "scope-0008",
-  "audience": [],
-  "owner": "owner-0008",
-  "policy_uri": "http://policy/0008",
-  "allowed_cors_origins": [
+  "AllowedCORSOrigins": [
     "http://cors/0008_1"
   ],
-  "tos_uri": "http://tos/0008",
-  "client_uri": "http://client/0008",
-  "logo_uri": "http://logo/0008",
-  "contacts": [
+  "Audience": [],
+  "BackChannelLogoutSessionRequired": false,
+  "BackChannelLogoutURI": "",
+  "ClientURI": "http://client/0008",
+  "Contacts": [
     "contact-0008_1"
   ],
-  "client_secret_expires_at": 0,
-  "subject_type": "subject-0008",
-  "sector_identifier_uri": "http://sector_id/0008",
-  "jwks_uri": "http://jwks/0008",
-  "jwks": {},
-  "token_endpoint_auth_method": "token_auth-0008",
-  "request_uris": [
+  "CreatedAt": "0001-01-01T00:00:00Z",
+  "FrontChannelLogoutSessionRequired": false,
+  "FrontChannelLogoutURI": "",
+  "GrantTypes": [
+    "grant-0008_1"
+  ],
+  "ID": "00000000-0000-0000-0000-000000000000",
+  "JSONWebKeys": {
+    "JSONWebKeySet": null
+  },
+  "JSONWebKeysURI": "http://jwks/0008",
+  "LogoURI": "http://logo/0008",
+  "Metadata": {},
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Name": "Client 0008",
+  "OutfacingID": "client-0008",
+  "Owner": "owner-0008",
+  "PKDeprecated": 8,
+  "PolicyURI": "http://policy/0008",
+  "PostLogoutRedirectURIs": [],
+  "RedirectURIs": [
+    "http://redirect/0008_1"
+  ],
+  "RegistrationAccessToken": "",
+  "RegistrationAccessTokenSignature": "",
+  "RegistrationClientURI": "",
+  "RequestObjectSigningAlgorithm": "r_alg-0008",
+  "RequestURIs": [
     "http://request/0008_1"
   ],
-  "request_object_signing_alg": "r_alg-0008",
-  "userinfo_signed_response_alg": "u_alg-0008",
-  "created_at": "0001-01-01T00:00:00Z",
-  "updated_at": "0001-01-01T00:00:00Z",
-  "metadata": {}
+  "ResponseTypes": [
+    "response-0008_1"
+  ],
+  "Scope": "scope-0008",
+  "Secret": "secret-0008",
+  "SecretExpiresAt": 0,
+  "SectorIdentifierURI": "http://sector_id/0008",
+  "SubjectType": "subject-0008",
+  "TermsOfServiceURI": "http://tos/0008",
+  "TokenEndpointAuthMethod": "token_auth-0008",
+  "TokenEndpointAuthSigningAlgorithm": "",
+  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UserinfoSignedResponseAlg": "u_alg-0008"
 }

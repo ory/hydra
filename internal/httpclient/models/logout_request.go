@@ -101,6 +101,34 @@ func (m *LogoutRequest) contextValidateClient(ctx context.Context, formats strfm
 	return nil
 }
 
+// ContextValidate validate this logout request based on the context it is used
+func (m *LogoutRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateClient(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *LogoutRequest) contextValidateClient(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Client != nil {
+		if err := m.Client.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("client")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *LogoutRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {

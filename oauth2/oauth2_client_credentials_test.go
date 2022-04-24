@@ -36,6 +36,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
@@ -44,9 +45,10 @@ import (
 )
 
 func TestClientCredentials(t *testing.T) {
-	reg := internal.NewMockedRegistry(t)
-	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
-	public, admin := testhelpers.NewOAuth2Server(t, reg)
+	ctx := context.TODO()
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
+	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
+	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	var newClient = func(t *testing.T) (*hc.Client, clientcredentials.Config) {
 		secret := uuid.New().String()
@@ -63,7 +65,7 @@ func TestClientCredentials(t *testing.T) {
 		return c, clientcredentials.Config{
 			ClientID:       c.OutfacingID,
 			ClientSecret:   secret,
-			TokenURL:       reg.Config().OAuth2TokenURL().String(),
+			TokenURL:       reg.Config(ctx).OAuth2TokenURL().String(),
 			Scopes:         strings.Split(c.Scope, " "),
 			EndpointParams: url.Values{"audience": c.Audience},
 		}
@@ -90,10 +92,10 @@ func TestClientCredentials(t *testing.T) {
 		check := func(res gjson.Result) {
 			assert.EqualValues(t, cl.OutfacingID, res.Get("client_id").String(), "%s", res.Raw)
 			assert.EqualValues(t, cl.OutfacingID, res.Get("sub").String(), "%s", res.Raw)
-			assert.EqualValues(t, reg.Config().IssuerURL().String(), res.Get("iss").String(), "%s", res.Raw)
+			assert.EqualValues(t, reg.Config(ctx).IssuerURL().String(), res.Get("iss").String(), "%s", res.Raw)
 
 			assert.EqualValues(t, res.Get("nbf").Int(), res.Get("iat").Int(), "%s", res.Raw)
-			assert.True(t, res.Get("exp").Int() >= res.Get("iat").Int()+int64(reg.Config().AccessTokenLifespan().Seconds()), "%s", res.Raw)
+			assert.True(t, res.Get("exp").Int() >= res.Get("iat").Int()+int64(reg.Config(ctx).AccessTokenLifespan().Seconds()), "%s", res.Raw)
 
 			assert.EqualValues(t, encodeOr(t, conf.EndpointParams["audience"], "[]"), res.Get("aud").Raw, "%s", res.Raw)
 		}
@@ -140,7 +142,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass with audience", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
+				reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				getAndInspectToken(t, cl, conf, strategy)
@@ -154,7 +156,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass without audience", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
+				reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				conf.EndpointParams = url.Values{}
@@ -169,7 +171,7 @@ func TestClientCredentials(t *testing.T) {
 	t.Run("case=should pass without scope", func(t *testing.T) {
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
+				reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				conf.Scopes = []string{}
@@ -182,11 +184,11 @@ func TestClientCredentials(t *testing.T) {
 	})
 
 	t.Run("case=should grant default scopes if configured to do ", func(t *testing.T) {
-		reg.Config().MustSet(config.KeyGrantAllClientCredentialsScopesPerDefault, true)
+		reg.Config(ctx).MustSet(config.KeyGrantAllClientCredentialsScopesPerDefault, true)
 
 		run := func(strategy string) func(t *testing.T) {
 			return func(t *testing.T) {
-				reg.Config().MustSet(config.KeyAccessTokenStrategy, strategy)
+				reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, strategy)
 
 				cl, conf := newClient(t)
 				defaultScope := conf.Scopes

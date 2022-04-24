@@ -24,13 +24,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/ory/hydra/client"
 )
 
 type ForcedObfuscatedLoginSession struct {
-	ClientID          string `db:"client_id"`
-	Subject           string `db:"subject"`
-	SubjectObfuscated string `db:"subject_obfuscated"`
+	ClientID          string    `db:"client_id"`
+	Subject           string    `db:"subject"`
+	SubjectObfuscated string    `db:"subject_obfuscated"`
+	NID               uuid.UUID `db:"nid"`
 }
 
 func (_ ForcedObfuscatedLoginSession) TableName() string {

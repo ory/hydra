@@ -2,6 +2,7 @@ package consent_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -25,14 +26,16 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/urlx"
 )
 
 func TestLogoutFlows(t *testing.T) {
-	reg := internal.NewMockedRegistry(t)
-	reg.Config().MustSet(config.KeyAccessTokenStrategy, "opaque")
-	reg.Config().MustSet(config.KeyConsentRequestMaxAge, time.Hour)
+	ctx := context.TODO()
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
+	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
+	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)
 
 	defaultRedirectedMessage := "redirected to default server"
 	postLogoutCallback := func(w http.ResponseWriter, r *http.Request) {
@@ -41,9 +44,9 @@ func TestLogoutFlows(t *testing.T) {
 	}
 	defaultLogoutURL := testhelpers.NewCallbackURL(t, "logged-out", postLogoutCallback)
 	customPostLogoutURL := testhelpers.NewCallbackURL(t, "logged-out/custom", postLogoutCallback)
-	reg.Config().MustSet(config.KeyLogoutRedirectURL, defaultLogoutURL)
+	reg.Config(ctx).MustSet(config.KeyLogoutRedirectURL, defaultLogoutURL)
 
-	publicTS, adminTS := testhelpers.NewOAuth2Server(t, reg)
+	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 	adminApi := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
 
 	createBrowserWithSession := func(t *testing.T, c *client.Client) *http.Client {
@@ -144,11 +147,11 @@ func TestLogoutFlows(t *testing.T) {
 
 		t.Cleanup(server.Close)
 
-		reg.Config().MustSet(config.KeyLogoutURL, server.URL)
+		reg.Config(ctx).MustSet(config.KeyLogoutURL, server.URL)
 	}
 
 	acceptLoginAsAndWatchSid := func(t *testing.T, subject string, sid chan string) {
-		testhelpers.NewLoginConsentUI(t, reg.Config(),
+		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
 			checkAndAcceptLoginHandler(t, adminApi.Admin, subject, func(t *testing.T, res *admin.GetLoginRequestOK, err error) *models.AcceptLoginRequest {
 				require.NoError(t, err)
 				//res.Payload.SessionID
@@ -289,7 +292,7 @@ func TestLogoutFlows(t *testing.T) {
 			{
 				d: "should fail rp-inititated flow because iat is in the future",
 				claims: jwtgo.MapClaims{
-					"iss": reg.Config().IssuerURL().String(),
+					"iss": reg.Config(ctx).IssuerURL().String(),
 					"iat": time.Now().Add(time.Hour * 2).Unix(),
 				},
 				expectedErrMessage: "Token used before issued",
@@ -330,7 +333,7 @@ func TestLogoutFlows(t *testing.T) {
 			"post_logout_redirect_uri": {"https://this-is-not-a-valid-redirect-url/custom"},
 			"id_token_hint": {testhelpers.NewIDTokenWithClaims(t, reg, jwtgo.MapClaims{
 				"aud": c.OutfacingID,
-				"iss": reg.Config().IssuerURL().String(),
+				"iss": reg.Config(ctx).IssuerURL().String(),
 				"sub": subject,
 				"sid": "logout-session-temp4",
 				"exp": time.Now().Add(-time.Hour).Unix(),
@@ -352,7 +355,7 @@ func TestLogoutFlows(t *testing.T) {
 				browser := createBrowserWithSession(t, c)
 
 				sendClaims := jwtgo.MapClaims{
-					"iss": reg.Config().IssuerURL().String(),
+					"iss": reg.Config(ctx).IssuerURL().String(),
 					"aud": c.OutfacingID,
 					"sid": <-sid,
 					"sub": subject,
@@ -405,7 +408,7 @@ func TestLogoutFlows(t *testing.T) {
 			"post_logout_redirect_uri": {customPostLogoutURL},
 			"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
 				"aud": []string{c.OutfacingID}, // make sure this works with string slices too
-				"iss": reg.Config().IssuerURL().String(),
+				"iss": reg.Config(ctx).IssuerURL().String(),
 				"sub": subject,
 				"sid": "i-do-not-exist",
 				"exp": time.Now().Add(time.Hour).Unix(),
@@ -425,7 +428,7 @@ func TestLogoutFlows(t *testing.T) {
 		body, res := makeLogoutRequest(t, browser, "GET", url.Values{
 			"post_logout_redirect_uri": {customPostLogoutURL},
 			"id_token_hint": {testhelpers.NewIDTokenWithClaims(t, reg, jwtgo.MapClaims{
-				"iss": reg.Config().IssuerURL().String(),
+				"iss": reg.Config(ctx).IssuerURL().String(),
 				"aud": c.OutfacingID,
 				"sid": <-sid,
 				"sub": subject,
@@ -454,7 +457,7 @@ func TestLogoutFlows(t *testing.T) {
 		logoutAndExpectPostLogoutPage(t, otherBrowser, "GET", url.Values{
 			"post_logout_redirect_uri": {customPostLogoutURL},
 			"id_token_hint": {testhelpers.NewIDTokenWithClaims(t, reg, jwtgo.MapClaims{
-				"iss": reg.Config().IssuerURL().String(),
+				"iss": reg.Config(ctx).IssuerURL().String(),
 				"aud": c.OutfacingID,
 				"sid": <-sid,
 				"sub": subject,
@@ -465,7 +468,7 @@ func TestLogoutFlows(t *testing.T) {
 
 		// Set up login / consent and check if skip is set to false (because logout happened), but use
 		// the original login browser which still has the session.
-		testhelpers.NewLoginConsentUI(t, reg.Config(),
+		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
 			checkAndAcceptLoginHandler(t, adminApi.Admin, subject, func(t *testing.T, res *admin.GetLoginRequestOK, err error) *models.AcceptLoginRequest {
 				defer wg.Done()
 				require.NoError(t, err)

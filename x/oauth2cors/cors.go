@@ -29,6 +29,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/oauth2"
 
@@ -38,13 +39,13 @@ import (
 	"github.com/ory/fosite"
 )
 
-func Middleware(reg interface {
-	Config() *config.Provider
-	x.RegistryLogger
-	oauth2.Registry
-	client.Registry
-}) func(h http.Handler) http.Handler {
-	opts, enabled := reg.Config().CORS(config.PublicInterface)
+func Middleware(
+	reg interface {
+		x.RegistryLogger
+		oauth2.Registry
+		client.Registry
+	}) func(h http.Handler) http.Handler {
+	opts, enabled := reg.Config(contextx.RootContext).CORS(config.PublicInterface)
 	if !enabled {
 		return func(h http.Handler) http.Handler {
 			return h
@@ -98,7 +99,7 @@ func Middleware(reg interface {
 					return false
 				}
 
-				session := oauth2.NewSessionWithCustomClaims("", reg.Config().AllowedTopLevelClaims())
+				session := oauth2.NewSessionWithCustomClaims("", reg.Config(contextx.RootContext).AllowedTopLevelClaims())
 				_, ar, err := reg.OAuth2Provider().IntrospectToken(context.Background(), token, fosite.AccessToken, session)
 				if err != nil {
 					return false

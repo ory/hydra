@@ -29,26 +29,15 @@ func (o *CreateOAuth2ClientReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return result, nil
-	case 400:
-		result := NewCreateOAuth2ClientBadRequest()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 409:
-		result := NewCreateOAuth2ClientConflict()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
-	case 500:
-		result := NewCreateOAuth2ClientInternalServerError()
-		if err := result.readResponse(response, consumer, o.formats); err != nil {
-			return nil, err
-		}
-		return nil, result
 	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
+		result := NewCreateOAuth2ClientDefault(response.Code())
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
+		return nil, result
 	}
 }
 
@@ -84,91 +73,36 @@ func (o *CreateOAuth2ClientCreated) readResponse(response runtime.ClientResponse
 	return nil
 }
 
-// NewCreateOAuth2ClientBadRequest creates a CreateOAuth2ClientBadRequest with default headers values
-func NewCreateOAuth2ClientBadRequest() *CreateOAuth2ClientBadRequest {
-	return &CreateOAuth2ClientBadRequest{}
-}
-
-/* CreateOAuth2ClientBadRequest describes a response with status code 400, with default header values.
-
-jsonError
-*/
-type CreateOAuth2ClientBadRequest struct {
-	Payload *models.JSONError
-}
-
-func (o *CreateOAuth2ClientBadRequest) Error() string {
-	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientBadRequest  %+v", 400, o.Payload)
-}
-func (o *CreateOAuth2ClientBadRequest) GetPayload() *models.JSONError {
-	return o.Payload
-}
-
-func (o *CreateOAuth2ClientBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.JSONError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
+// NewCreateOAuth2ClientDefault creates a CreateOAuth2ClientDefault with default headers values
+func NewCreateOAuth2ClientDefault(code int) *CreateOAuth2ClientDefault {
+	return &CreateOAuth2ClientDefault{
+		_statusCode: code,
 	}
-
-	return nil
 }
 
-// NewCreateOAuth2ClientConflict creates a CreateOAuth2ClientConflict with default headers values
-func NewCreateOAuth2ClientConflict() *CreateOAuth2ClientConflict {
-	return &CreateOAuth2ClientConflict{}
-}
-
-/* CreateOAuth2ClientConflict describes a response with status code 409, with default header values.
+/* CreateOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type CreateOAuth2ClientConflict struct {
+type CreateOAuth2ClientDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *CreateOAuth2ClientConflict) Error() string {
-	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientConflict  %+v", 409, o.Payload)
+// Code gets the status code for the create o auth2 client default response
+func (o *CreateOAuth2ClientDefault) Code() int {
+	return o._statusCode
 }
-func (o *CreateOAuth2ClientConflict) GetPayload() *models.JSONError {
+
+func (o *CreateOAuth2ClientDefault) Error() string {
+	return fmt.Sprintf("[POST /clients][%d] createOAuth2Client default  %+v", o._statusCode, o.Payload)
+}
+func (o *CreateOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *CreateOAuth2ClientConflict) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.JSONError)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
-
-	return nil
-}
-
-// NewCreateOAuth2ClientInternalServerError creates a CreateOAuth2ClientInternalServerError with default headers values
-func NewCreateOAuth2ClientInternalServerError() *CreateOAuth2ClientInternalServerError {
-	return &CreateOAuth2ClientInternalServerError{}
-}
-
-/* CreateOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
-
-jsonError
-*/
-type CreateOAuth2ClientInternalServerError struct {
-	Payload *models.JSONError
-}
-
-func (o *CreateOAuth2ClientInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /clients][%d] createOAuth2ClientInternalServerError  %+v", 500, o.Payload)
-}
-func (o *CreateOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
-	return o.Payload
-}
-
-func (o *CreateOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *CreateOAuth2ClientDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

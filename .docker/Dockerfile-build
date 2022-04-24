@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine AS builder
+FROM golang:1.17-alpine3.15 AS builder
 
 RUN apk -U --no-cache add build-base git gcc bash
 
@@ -16,7 +16,7 @@ ADD . .
 
 RUN go build -tags sqlite -o /usr/bin/hydra
 
-FROM alpine:3.14.3
+FROM alpine:3.15
 
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \

@@ -7,7 +7,8 @@
     <a href="https://www.ory.sh/hydra/docs/index">Guide</a> |
     <a href="https://www.ory.sh/hydra/docs/reference/api">API Docs</a> |
     <a href="https://godoc.org/github.com/ory/hydra">Code Docs</a><br/><br/>
-    <a href="https://opencollective.com/ory">Support this project!</a>
+    <a href="https://opencollective.com/ory">Support this project!</a><br/><br/>
+    <a href="https://www.ory.sh/jobs/">Work in Open Source, Ory is hiring!</a>
 </h4>
 
 ---
@@ -27,6 +28,18 @@ and low resource consumption. ORY Hydra *is not* an identity provider (user sign
 but connects to your existing identity provider through a [login and consent app](https://www.ory.sh/docs/next/hydra/oauth2#authenticating-users-and-requesting-consent).
 Implementing the login and consent app in a different language is easy, and exemplary consent apps
 ([Node](https://github.com/ory/hydra-login-consent-node)) and [SDKs](https://www.ory.sh/docs/next/hydra/sdk/) for all common languages are provided.
+
+## Ory Cloud
+
+The easiest way to get started with Ory Software is in Ory Cloud! It is [**free for developers**](https://console.ory.sh/registration?utm_source=github&utm_medium=banner&utm_campaign=hydra-readme), forever, no credit card required!
+
+Ory Cloud has easy examples, administrative user interfaces, hosted pages (e.g. for login or registration), support for custom domains, collaborative features for your colleagues, and much more!
+
+### :mega: Community gets Ory Cloud for Free! :mega:
+
+Ory community members get the Ory Cloud Start Up plan **free for a year**, with all quality-of-life features available, such as custom domains and giving your team members access. [Sign up with your GitHub account](https://console.ory.sh/registration?preferred_plan=start-up&utm_source=github&utm_medium=banner&utm_campaign=hydra-readme-first900) and use the coupon code **`FIRST900`** on the *"Start-Up Plan"* checkout page to calim your free project now! Make sure to be signed up to the [Ory Community Slack](https://slack.ory.sh) when using the code!
+
+## Get Started
 
 If you're looking to jump straight into it, go ahead:
 
@@ -213,6 +226,18 @@ that your company deserves a spot here, reach out to
             <td>Security Onion Solutions</td>
             <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/securityonion.svg" alt="Security Onion Solutions"></td>
             <td><a href="https://securityonionsolutions.com/">securityonionsolutions.com</a></td>
+        </tr>        
+        <tr>
+            <td>Adopter *</td>
+            <td>Factly</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/factly.svg" alt="Factly"></td>
+            <td><a href="https://factlylabs.com/">factlylabs.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Nortal</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/nortal.svg" alt="Nortal"></td>
+            <td><a href="https://nortal.com/">nortal.com</a></td>
         </tr>
         <tr>
             <td>Sponsor</td>
@@ -230,7 +255,19 @@ that your company deserves a spot here, reach out to
             <td>Sponsor</td>
             <td>Strivacity</td>
             <td align="center"><img height="16px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/strivacity.svg" alt="Strivacity"></td>
-            <td><a href="https://strivacity.com/">strivacity</a></td>
+            <td><a href="https://strivacity.com/">strivacity.com</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Hanko</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/hanko.svg" alt="Hanko"></td>
+            <td><a href="https://hanko.io/">hanko.io</a></td>
+        </tr>
+        <tr>
+            <td>Adopter *</td>
+            <td>Rabbit</td>
+            <td align="center"><img height="32px" src="https://raw.githubusercontent.com/ory/meta/master/static/adopters/rabbit.svg" alt="rabbit"></td>
+            <td><a href="https://rabbit.co.th/">rabbit.co.th</a></td>
         </tr>
     </tbody>
 </table>
@@ -252,26 +289,6 @@ TheCrealm.
 
 <!--END ADOPTERS-->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### OAuth2 and OpenID Connect: Open Standards!
 
 ORY Hydra implements Open Standards set by the IETF:
@@ -281,7 +298,10 @@ ORY Hydra implements Open Standards set by the IETF:
 * [OAuth 2.0 Token Revocation](https://tools.ietf.org/html/rfc7009)
 * [OAuth 2.0 Token Introspection](https://tools.ietf.org/html/rfc7662)
 * [OAuth 2.0 for Native Apps](https://tools.ietf.org/html/draft-ietf-oauth-native-apps-10)
+* [OAuth 2.0 Dynamic Client Registration Protocol](https://datatracker.ietf.org/doc/html/rfc7591)
+* [OAuth 2.0 Dynamic Client Registration Management Protocol](https://datatracker.ietf.org/doc/html/rfc7592)
 * [Proof Key for Code Exchange by OAuth Public Clients](https://tools.ietf.org/html/rfc7636)
+* [JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and Authorization Grants](https://tools.ietf.org/html/rfc7523)
 
 and the OpenID Foundation:
 
@@ -530,7 +550,7 @@ you are trying to fix something very specific and need the database tests all th
 suggest that you initialize the databases with:
 
 ```shell script
-make resetdb
+make test-resetdb
 export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true'
 export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable'
 export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
@@ -566,7 +586,7 @@ type of tests very difficult, but thankfully you can run the e2e test in the bro
 or if you would like to test one of the databases:
 
 ```shell script
-make resetdb
+make test-resetdb
 export TEST_DATABASE_MYSQL='mysql://root:secret@(127.0.0.1:3444)/mysql?parseTime=true&multiStatements=true'
 export TEST_DATABASE_POSTGRESQL='postgres://postgres:secret@127.0.0.1:3445/postgres?sslmode=disable'
 export TEST_DATABASE_COCKROACHDB='cockroach://root@127.0.0.1:3446/defaultdb?sslmode=disable'
@@ -622,7 +642,7 @@ docker compose -f quickstart.yml up # ....
 #### Add a new migration
 
 1. `mkdir persistence/sql/src/YYYYMMDD000001_migration_name/`
-2. Put the migration files into this directory, following the standard naming conventions. If you wish to execute different parts of a migration in separate transactions, add split marks (lines with the text `-- split`) where desired. Why this might be necessary is explained in https://github.com/gobuffalo/fizz/issues/104.
+2. Put the migration files into this directory, following the standard naming conventions. If you wish to execute different parts of a migration in separate transactions, add split marks (lines with the text `--split`) where desired. Why this might be necessary is explained in https://github.com/gobuffalo/fizz/issues/104.
 3. Run `make persistence/sql/migrations/<migration_id>` to generate migration fragments.
 4. If an update causes the migration to have fewer fragments than the number already generated, run `make persistence/sql/migrations/<migration_id>-clean`. This is equivalent to a `rm` command with the right parameters, but comes with better tab completion.
 5. Before committing generated migration fragments, run the above clean command and generate a fresh copy of migration fragments to make sure the `sql/src` and `sql/migrations` directories are consistent.

@@ -105,6 +105,38 @@ func (m *JSONWebKeySet) contextValidateKeys(ctx context.Context, formats strfmt.
 	return nil
 }
 
+// ContextValidate validate this JSON web key set based on the context it is used
+func (m *JSONWebKeySet) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateKeys(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *JSONWebKeySet) contextValidateKeys(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Keys); i++ {
+
+		if m.Keys[i] != nil {
+			if err := m.Keys[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("keys" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *JSONWebKeySet) MarshalBinary() ([]byte, error) {
 	if m == nil {

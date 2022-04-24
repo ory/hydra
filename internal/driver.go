@@ -7,10 +7,12 @@ import (
 	"testing"
 
 	"github.com/ory/x/configx"
+	"github.com/ory/x/networkx"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/hydra/driver"
@@ -28,46 +30,62 @@ func resetConfig(p *config.Provider) {
 }
 
 func NewConfigurationWithDefaults() *config.Provider {
-	p := config.MustNew(logrusx.New("", ""), configx.SkipValidation())
+	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
 	p.MustSet("dangerous-force-http", true)
 	return p
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
-	p := config.MustNew(logrusx.New("", ""), configx.SkipValidation())
+	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
 	p.MustSet("dangerous-force-http", false)
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.Provider) driver.Registry {
-	return newRegistryDefault(t, "memory", c)
+func NewRegistryMemory(t *testing.T, c *config.Provider, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, "memory", c, true, ctxer)
 }
 
-func NewMockedRegistry(t *testing.T) driver.Registry {
-	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults())
+func NewMockedRegistry(t *testing.T, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), true, ctxer)
 }
 
-func NewRegistrySQLFromURL(t *testing.T, url string) driver.Registry {
-	return newRegistryDefault(t, url, NewConfigurationWithDefaults())
+func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate, ctxer)
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.Provider) driver.Registry {
+func newRegistryDefault(t *testing.T, url string, c *config.Provider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
 	c.MustSet(config.KeyLogLevel, "trace")
 	c.MustSet(config.KeyDSN, url)
 
-	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"))
+	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"), false, migrate, ctxer)
 	require.NoError(t, err)
 
-	require.NoError(t, r.Init(context.Background()))
+	kg := map[string]jwk.KeyGenerator{
+		"RS256": new(veryInsecureRS256Generator),
+		"ES256": &jwk.ECDSA256Generator{},
+		"ES512": &jwk.ECDSA512Generator{},
+		"EdDSA": &jwk.EdDSAGenerator{},
+		"HS256": &jwk.HS256Generator{},
+		"HS512": &jwk.HS512Generator{},
+	}
+
+	r = r.WithKeyGenerators(kg)
+
 	return r
 }
 
 func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 	return func(t *testing.T) {
+		net := &networkx.Network{}
+		recreateNetwork := reg.Persister().Connection(context.Background()).First(net) == nil
 		x.CleanSQLPop(t, reg.Persister().Connection(context.Background()))
 		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
+		if recreateNetwork {
+			require.NoError(t, reg.Persister().Connection(context.Background()).RawQuery("DELETE FROM networks").Exec())
+			require.NoError(t, reg.Persister().Connection(context.Background()).Create(net))
+		}
 		t.Log("clean and migrate done")
 	}
 }
@@ -98,7 +116,7 @@ func ConnectToCRDB(t *testing.T) string {
 	return url
 }
 
-func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
+func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
 	var pgURL, mysqlURL, crdbURL string
 	wg := sync.WaitGroup{}
 
@@ -122,9 +140,9 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func
 	wg.Wait()
 	t.Log("done waiting")
 
-	pg = NewRegistrySQLFromURL(t, pgURL)
-	mysql = NewRegistrySQLFromURL(t, mysqlURL)
-	crdb = NewRegistrySQLFromURL(t, crdbURL)
+	pg = NewRegistrySQLFromURL(t, pgURL, migrate, ctxer)
+	mysql = NewRegistrySQLFromURL(t, mysqlURL, migrate, ctxer)
+	crdb = NewRegistrySQLFromURL(t, crdbURL, migrate, ctxer)
 	dbs := []driver.Registry{pg, mysql, crdb}
 
 	clean = func(t *testing.T) {
@@ -144,7 +162,7 @@ func ConnectDatabases(t *testing.T) (pg, mysql, crdb driver.Registry, clean func
 }
 
 func MustEnsureRegistryKeys(r driver.Registry, key string) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, new(veryInsecureRS256Generator), key); err != nil {
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), r, "RS256", key); err != nil {
 		panic(err)
 	}
 }

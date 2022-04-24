@@ -8,10 +8,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/hsm"
+
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
 
+	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/hydra/x/oauth2cors"
 
 	"github.com/ory/hydra/persistence"
@@ -40,14 +44,21 @@ import (
 	"github.com/ory/hydra/x"
 )
 
+var (
+	_ contextx.ContextualizerProvider = (*RegistryBase)(nil)
+)
+
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
 	C            *config.Provider
 	ch           *client.Handler
 	fh           fosite.Hasher
+	jwtGrantH    *trust.Handler
+	jwtGrantV    *trust.GrantValidator
 	kh           *jwk.Handler
 	cv           *client.Validator
+	ctxer        contextx.Contextualizer
 	hh           *healthx.Handler
 	kg           map[string]jwk.KeyGenerator
 	kc           *jwk.AEAD
@@ -58,6 +69,7 @@ type RegistryBase struct {
 	fsc          fosite.ScopeStrategy
 	atjs         jwk.JWTStrategy
 	idtjs        jwk.JWTStrategy
+	hsm          hsm.Context
 	fscPrev      string
 	fos          *openid.DefaultStrategy
 	forv         *openid.OpenIDConnectRequestValidator
@@ -75,6 +87,18 @@ type RegistryBase struct {
 	buildDate    string
 	r            Registry
 	persister    persistence.Persister
+}
+
+func (m *RegistryBase) WithContextualizer(ctxer contextx.Contextualizer) Registry {
+	m.ctxer = ctxer
+	return m.r
+}
+
+func (m *RegistryBase) Contextualizer() contextx.Contextualizer {
+	if m.ctxer == nil {
+		panic("registry Contextualizer not set")
+	}
+	return m.ctxer
 }
 
 func (m *RegistryBase) with(r Registry) *RegistryBase {
@@ -106,8 +130,9 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 
 	m.ConsentHandler().SetRoutes(admin)
 	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetRoutes(admin)
+	m.ClientHandler().SetRoutes(admin, public)
 	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.JWTGrantHandler().SetRoutes(admin)
 }
 
 func (m *RegistryBase) BuildVersion() string {
@@ -127,6 +152,11 @@ func (m *RegistryBase) WithConfig(c *config.Provider) Registry {
 	return m.r
 }
 
+func (m *RegistryBase) WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry {
+	m.kg = kg
+	return m.r
+}
+
 func (m *RegistryBase) Writer() herodot.Writer {
 	if m.writer == nil {
 		h := herodot.NewJSONWriter(m.Logger())
@@ -143,15 +173,15 @@ func (m *RegistryBase) WithLogger(l *logrusx.Logger) Registry {
 
 func (m *RegistryBase) Logger() *logrusx.Logger {
 	if m.l == nil {
-		m.l = logrusx.New("ORY Hydra", m.BuildVersion())
+		m.l = logrusx.New("Ory Hydra", m.BuildVersion())
 	}
 	return m.l
 }
 
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
-		m.al = logrusx.NewAudit("ORY Hydra", m.BuildVersion())
-		m.al.UseConfig(m.C.Source())
+		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
+		m.al.UseConfig(m.Config(contextx.RootContext).Source())
 	}
 	return m.al
 }
@@ -159,9 +189,9 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
 		if m.Tracer(context.TODO()).IsLoaded() {
-			m.fh = &tracing.TracedBCrypt{WorkFactor: m.C.BCryptCost()}
+			m.fh = &tracing.TracedBCrypt{WorkFactor: m.Config(contextx.RootContext).BCryptCost()}
 		} else {
-			m.fh = x.NewBCrypt(m.C)
+			m.fh = x.NewBCrypt(m.Config(contextx.RootContext))
 		}
 	}
 	return m.fh
@@ -174,18 +204,32 @@ func (m *RegistryBase) ClientHandler() *client.Handler {
 	return m.ch
 }
 
-func (m *RegistryBase) ClientValidator() *client.Validator {
+func (m *RegistryBase) ClientValidator(ctx context.Context) *client.Validator {
 	if m.cv == nil {
-		m.cv = client.NewValidator(m.C)
+		m.cv = client.NewValidator(m.r)
 	}
 	return m.cv
 }
 
 func (m *RegistryBase) KeyHandler() *jwk.Handler {
 	if m.kh == nil {
-		m.kh = jwk.NewHandler(m.r, m.C)
+		m.kh = jwk.NewHandler(m.r)
 	}
 	return m.kh
+}
+
+func (m *RegistryBase) JWTGrantHandler() *trust.Handler {
+	if m.jwtGrantH == nil {
+		m.jwtGrantH = trust.NewHandler(m.r)
+	}
+	return m.jwtGrantH
+}
+
+func (m *RegistryBase) GrantValidator() *trust.GrantValidator {
+	if m.jwtGrantV == nil {
+		m.jwtGrantV = trust.NewGrantValidator()
+	}
+	return m.jwtGrantV
 }
 
 func (m *RegistryBase) HealthHandler() *healthx.Handler {
@@ -259,20 +303,24 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 
 func (m *RegistryBase) oAuth2Config() *compose.Config {
 	return &compose.Config{
-		AccessTokenLifespan:            m.C.AccessTokenLifespan(),
-		RefreshTokenLifespan:           m.C.RefreshTokenLifespan(),
-		AuthorizeCodeLifespan:          m.C.AuthCodeLifespan(),
-		IDTokenLifespan:                m.C.IDTokenLifespan(),
-		IDTokenIssuer:                  m.C.IssuerURL().String(),
-		HashCost:                       m.C.BCryptCost(),
-		ScopeStrategy:                  m.ScopeStrategy(),
-		SendDebugMessagesToClients:     m.C.ShareOAuth2Debug(),
-		UseLegacyErrorFormat:           m.C.OAuth2LegacyErrors(),
-		EnforcePKCE:                    m.C.PKCEEnforced(),
-		EnforcePKCEForPublicClients:    m.C.EnforcePKCEForPublicClients(),
-		EnablePKCEPlainChallengeMethod: false,
-		TokenURL:                       urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
-		RedirectSecureChecker:          x.IsRedirectURISecure(m.C),
+		AccessTokenLifespan:                  m.C.AccessTokenLifespan(),
+		RefreshTokenLifespan:                 m.C.RefreshTokenLifespan(),
+		AuthorizeCodeLifespan:                m.C.AuthCodeLifespan(),
+		IDTokenLifespan:                      m.C.IDTokenLifespan(),
+		IDTokenIssuer:                        m.C.IssuerURL().String(),
+		HashCost:                             m.C.BCryptCost(),
+		ScopeStrategy:                        m.ScopeStrategy(),
+		SendDebugMessagesToClients:           m.C.ShareOAuth2Debug(),
+		UseLegacyErrorFormat:                 m.C.OAuth2LegacyErrors(),
+		EnforcePKCE:                          m.C.PKCEEnforced(),
+		EnforcePKCEForPublicClients:          m.C.EnforcePKCEForPublicClients(),
+		EnablePKCEPlainChallengeMethod:       false,
+		TokenURL:                             urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
+		RedirectSecureChecker:                x.IsRedirectURISecure(m.C),
+		GrantTypeJWTBearerCanSkipClientAuth:  false,
+		GrantTypeJWTBearerIDOptional:         m.C.GrantTypeJWTBearerIDOptional(),
+		GrantTypeJWTBearerIssuedDateOptional: m.C.GrantTypeJWTBearerIssuedDateOptional(),
+		GrantTypeJWTBearerMaxDuration:        m.C.GrantTypeJWTBearerMaxDuration(),
 	}
 }
 
@@ -327,6 +375,7 @@ func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
 			compose.OAuth2TokenRevocationFactory,
 			compose.OAuth2TokenIntrospectionFactory,
 			compose.OAuth2PKCEFactory,
+			compose.RFC7523AssertionGrantFactory,
 		)
 	}
 	return m.fop
@@ -348,7 +397,8 @@ func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
 }
 
 func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, new(jwk.RS256Generator), key); err != nil {
+
+	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, "RS256", key); err != nil {
 		var netError net.Error
 		if errors.As(err, &netError) {
 			m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, key)
@@ -359,7 +409,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
-		s, err = jwk.NewRS256JWTStrategy(m.r, func() string {
+		s, err = jwk.NewRS256JWTStrategy(*m.C, m.r, func() string {
 			return key
 		})
 		return err
@@ -418,15 +468,15 @@ func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 	return m.oah
 }
 
-func (m *RegistryBase) SubjectIdentifierAlgorithm() map[string]consent.SubjectIdentifierAlgorithm {
+func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
 	if m.sia == nil {
 		m.sia = map[string]consent.SubjectIdentifierAlgorithm{}
-		for _, t := range m.C.SubjectTypesSupported() {
+		for _, t := range m.Config(ctx).SubjectTypesSupported() {
 			switch t {
 			case "public":
 				m.sia["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
 			case "pairwise":
-				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.C.SubjectIdentifierAlgorithmSalt()))
+				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.Config(ctx).SubjectIdentifierAlgorithmSalt()))
 			}
 		}
 	}
@@ -457,8 +507,9 @@ func (m *RegistryBase) Persister() persistence.Persister {
 	return m.persister
 }
 
-func (m *RegistryBase) Config() *config.Provider {
-	return m.C
+// Config returns the configuration for the given context. It may or may not be the same as the global configuration.
+func (m *RegistryBase) Config(ctx context.Context) *config.Provider {
+	return m.Contextualizer().Config(ctx, m.C)
 }
 
 // WithOAuth2Provider forces an oauth2 provider which is only used for testing.
@@ -478,4 +529,19 @@ func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 		}
 	}
 	return m.arhs
+}
+
+func (m *RegistryBase) WithHsmContext(h hsm.Context) {
+	m.hsm = h
+}
+
+func (m *RegistryBase) HsmContext() hsm.Context {
+	if m.hsm == nil {
+		m.hsm = hsm.NewContext(m.C, m.l)
+	}
+	return m.hsm
+}
+
+func (m *RegistrySQL) ClientAuthenticator() x.ClientAuthenticator {
+	return m.OAuth2Provider().(*fosite.Fosite)
 }

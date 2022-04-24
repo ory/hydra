@@ -267,6 +267,100 @@ func (m *PreviousConsentSession) contextValidateSession(ctx context.Context, for
 	return nil
 }
 
+// ContextValidate validate this previous consent session based on the context it is used
+func (m *PreviousConsentSession) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateConsentRequest(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGrantAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGrantScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateHandledAt(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSession(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateConsentRequest(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.ConsentRequest != nil {
+		if err := m.ConsentRequest.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("consent_request")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateGrantAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateGrantScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantScope.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateHandledAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.HandledAt.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("handled_at")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *PreviousConsentSession) contextValidateSession(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Session != nil {
+		if err := m.Session.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("session")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *PreviousConsentSession) MarshalBinary() ([]byte, error) {
 	if m == nil {

@@ -220,6 +220,82 @@ func (m *AcceptConsentRequest) contextValidateSession(ctx context.Context, forma
 	return nil
 }
 
+// ContextValidate validate this accept consent request based on the context it is used
+func (m *AcceptConsentRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateGrantAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateGrantScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateHandledAt(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateSession(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateGrantAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateGrantScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.GrantScope.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("grant_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateHandledAt(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.HandledAt.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("handled_at")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *AcceptConsentRequest) contextValidateSession(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Session != nil {
+		if err := m.Session.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("session")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *AcceptConsentRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {

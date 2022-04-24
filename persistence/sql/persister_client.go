@@ -3,9 +3,10 @@ package sql
 import (
 	"context"
 
-	"github.com/ory/x/errorsx"
+	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -14,7 +15,7 @@ import (
 
 func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.Client, error) {
 	var cl client.Client
-	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("id = ?", id).First(&cl))
+	return &cl, sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).First(&cl))
 }
 
 func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -40,7 +41,7 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 		// set the internal primary key
 		cl.ID = o.ID
 
-		return sqlcon.HandleError(c.Update(cl))
+		return sqlcon.HandleError(p.UpdateWithNetwork(ctx, cl))
 	})
 }
 
@@ -64,7 +65,8 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 	}
 
 	c.Secret = string(h)
-	return sqlcon.HandleError(p.Connection(ctx).Create(c, "pk"))
+	c.ID = uuid.Must(uuid.NewV4())
+	return sqlcon.HandleError(p.CreateWithNetwork(ctx, c))
 }
 
 func (p *Persister) DeleteClient(ctx context.Context, id string) error {
@@ -73,13 +75,13 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) error {
 		return err
 	}
 
-	return sqlcon.HandleError(p.Connection(ctx).Destroy(&client.Client{ID: cl.ID}))
+	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("pk = ?", cl.ID).Delete(&client.Client{}))
 }
 
 func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]client.Client, error) {
 	cs := make([]client.Client, 0)
 
-	query := p.Connection(ctx).
+	query := p.QueryWithNetwork(ctx).
 		Paginate(filters.Offset/filters.Limit+1, filters.Limit).
 		Order("id")
 
@@ -94,6 +96,6 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]cl
 }
 
 func (p *Persister) CountClients(ctx context.Context) (int, error) {
-	n, err := p.Connection(ctx).Count(&client.Client{})
+	n, err := p.QueryWithNetwork(ctx).Count(&client.Client{})
 	return n, sqlcon.HandleError(err)
 }

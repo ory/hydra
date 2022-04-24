@@ -5,11 +5,13 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/configx"
 	"github.com/ory/x/logrusx"
 
@@ -27,16 +29,18 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	l.Logrus().ExitFunc = func(int) {} // Override the exit func to avoid call to os.Exit
 
 	// Create a config and set a valid but unresolvable DSN
-	c := config.MustNew(l, configx.WithConfigFiles("../internal/.hydra.yaml"))
+	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
 	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
+	c.MustSet(config.HsmEnabled, "false")
 
-	registry, err := NewRegistryFromDSN(context.Background(), c, l)
+	registry, err := NewRegistryFromDSN(context.Background(), c, l, true, false, &contextx.StaticContextualizer{NID: uuid.Must(uuid.NewV4()), C: c})
 	if err != nil {
 		t.Error("failed to create registry: ", err)
 		return
 	}
 
 	registryBase := RegistryBase{r: registry, l: l}
+	registryBase.WithConfig(c)
 
 	strategy := registryBase.newKeyStrategy("key")
 
@@ -49,7 +53,7 @@ func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
 	// Test ensures that CookieStore MaxAge option is equal to zero after initialization
 
 	r := new(RegistryBase)
-	r.WithConfig(config.MustNew(logrusx.New("", "")))
+	r.WithConfig(config.MustNew(context.Background(), logrusx.New("", "")))
 
 	cs := r.CookieStore().(*sessions.CookieStore)
 

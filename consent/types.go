@@ -28,9 +28,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ory/x/errorsx"
+	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/ory/x/errorsx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
@@ -56,6 +57,7 @@ type RequestHandlerResponse struct {
 // swagger:ignore
 type LoginSession struct {
 	ID              string         `db:"id"`
+	NID             uuid.UUID      `db:"nid"`
 	AuthenticatedAt sqlxx.NullTime `db:"authenticated_at"`
 	Subject         string         `db:"subject"`
 	Remember        bool           `db:"remember"`
@@ -381,7 +383,8 @@ func (n *OpenIDConnectContext) Value() (driver.Value, error) {
 type LogoutRequest struct {
 	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
 	// identify the session.
-	ID string `json:"challenge" db:"challenge"`
+	ID  string    `json:"challenge" db:"challenge"`
+	NID uuid.UUID `json:"-" db:"nid"`
 
 	// Subject is the user for whom the logout was request.
 	Subject string `json:"subject" db:"subject"`

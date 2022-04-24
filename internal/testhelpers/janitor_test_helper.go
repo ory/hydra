@@ -7,7 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
@@ -17,7 +19,9 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/x/sqlxx"
@@ -29,12 +33,19 @@ type JanitorConsentTestHelper struct {
 	flushConsentRequests []*consent.ConsentRequest
 	flushAccessRequests  []*fosite.Request
 	flushRefreshRequests []*fosite.AccessRequest
+	flushGrants          []*createGrantRequest
 	conf                 *config.Provider
 	Lifespan             time.Duration
 }
 
+type createGrantRequest struct {
+	grant trust.Grant
+	pk    jose.JSONWebKey
+}
+
+const lifespan = time.Hour
+
 func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
-	var lifespan = time.Hour
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
@@ -50,6 +61,7 @@ func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 		flushConsentRequests: genConsentRequests(uniqueName, lifespan),
 		flushAccessRequests:  getAccessRequests(uniqueName, lifespan),
 		flushRefreshRequests: getRefreshRequests(uniqueName, lifespan),
+		flushGrants:          getGrantRequests(uniqueName, lifespan),
 		Lifespan:             lifespan,
 	}
 }
@@ -72,7 +84,7 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 
 func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
 	j.conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", dbname))
-	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"))
+	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), false, true, &contextx.DefaultContextualizer{})
 }
 
 func (j *JanitorConsentTestHelper) AccessTokenNotAfterSetup(ctx context.Context, cl client.Manager, store x.FositeStorer) func(t *testing.T) {
@@ -126,6 +138,37 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterValidate(ctx context.Cont
 			t.Logf("refresh flush check: %s", r.ID)
 			_, err = store.GetRefreshTokenSession(ctx, r.ID, ds)
 			if j.notAfterCheck(notAfter, refreshTokenLifespan, r.RequestedAt) {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		}
+	}
+}
+
+func (j *JanitorConsentTestHelper) GrantNotAfterSetup(ctx context.Context, cl client.Manager, gr trust.GrantManager) func(t *testing.T) {
+	return func(t *testing.T) {
+		for _, fg := range j.flushGrants {
+			require.NoError(t, gr.CreateGrant(ctx, fg.grant, fg.pk))
+		}
+	}
+}
+
+func (j *JanitorConsentTestHelper) GrantNotAfterValidate(ctx context.Context, notAfter time.Time, gr trust.GrantManager) func(t *testing.T) {
+	return func(t *testing.T) {
+		var err error
+
+		// flush won't delete grants that have not yet expired, so use now to check that
+		deleteUntil := time.Now().Round(time.Second)
+		if deleteUntil.After(notAfter) {
+			deleteUntil = notAfter
+		}
+
+		for _, r := range j.flushGrants {
+			t.Logf("grant flush check: %s", r.grant.Issuer)
+			_, err = gr.GetConcreteGrant(ctx, r.grant.ID)
+
+			if deleteUntil.After(r.grant.ExpiresAt) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
@@ -424,11 +467,14 @@ func (j *JanitorConsentTestHelper) notAfterCheck(notAfter time.Time, lifespan ti
 	return lesser.Unix() > requestedAt.Unix()
 }
 
-func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer) func(t *testing.T) {
+func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, tenant string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
+		if parallel {
+			t.Parallel()
+		}
 		ctx := context.Background()
 
-		jt := NewConsentJanitorTestHelper(t.Name())
+		jt := NewConsentJanitorTestHelper(tenant + t.Name())
 
 		conf.MustSet(config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan())
 
@@ -437,7 +483,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 			notAfterTests := jt.GetNotAfterTestCycles()
 
 			for k, v := range notAfterTests {
-				jt := NewConsentJanitorTestHelper(k)
+				jt := NewConsentJanitorTestHelper(tenant + k)
 				t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 					notAfter := time.Now().Round(time.Second).Add(-v)
 					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
@@ -458,7 +504,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		})
 
 		t.Run("case=flush-consent-request-limit", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper("limit")
+			jt := NewConsentJanitorTestHelper(tenant + "limit")
 
 			t.Run("case=limit", func(t *testing.T) {
 				// setup
@@ -475,7 +521,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		})
 
 		t.Run("case=flush-consent-request-rejection", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper("loginRejection")
+			jt := NewConsentJanitorTestHelper(tenant + "loginRejection")
 
 			t.Run(fmt.Sprintf("case=%s", "loginRejection"), func(t *testing.T) {
 				// setup
@@ -490,7 +536,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 				t.Run("step=validate", jt.LoginRejectionValidate(ctx, consentManager))
 			})
 
-			jt = NewConsentJanitorTestHelper("consentRejection")
+			jt = NewConsentJanitorTestHelper(tenant + "consentRejection")
 
 			t.Run(fmt.Sprintf("case=%s", "consentRejection"), func(t *testing.T) {
 				// setup
@@ -508,7 +554,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 		})
 
 		t.Run("case=flush-consent-request-timeout", func(t *testing.T) {
-			jt := NewConsentJanitorTestHelper("loginTimeout")
+			jt := NewConsentJanitorTestHelper(tenant + "loginTimeout")
 
 			t.Run(fmt.Sprintf("case=%s", "login-timeout"), func(t *testing.T) {
 
@@ -525,7 +571,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 			})
 
-			jt = NewConsentJanitorTestHelper("consentTimeout")
+			jt = NewConsentJanitorTestHelper(tenant + "consentTimeout")
 
 			t.Run(fmt.Sprintf("case=%s", "consent-timeout"), func(t *testing.T) {
 
@@ -712,6 +758,65 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
 			Verifier:             fmt.Sprintf("%s_flush-consent-3", uniqueName),
 			CSRF:                 fmt.Sprintf("%s_flush-consent-3", uniqueName),
+		},
+	}
+}
+
+func getGrantRequests(uniqueName string, lifespan time.Duration) []*createGrantRequest {
+	return []*createGrantRequest{
+		{
+			grant: trust.Grant{
+				ID:      uuid.New().String(),
+				Issuer:  fmt.Sprintf("%s_flush-grant-iss-1", uniqueName),
+				Subject: fmt.Sprintf("%s_flush-grant-sub-1", uniqueName),
+				Scope:   []string{"foo", "bar"},
+				PublicKey: trust.PublicKey{
+					Set:   fmt.Sprintf("%s_flush-grant-iss-1", uniqueName),
+					KeyID: fmt.Sprintf("%s_flush-grant-kid-1", uniqueName),
+				},
+				CreatedAt: time.Now().Round(time.Second),
+				ExpiresAt: time.Now().Round(time.Second).Add(lifespan),
+			},
+			pk: jose.JSONWebKey{
+				Key:   []byte("asdf"),
+				KeyID: fmt.Sprintf("%s_flush-grant-kid-1", uniqueName),
+			},
+		},
+		{
+			grant: trust.Grant{
+				ID:      uuid.New().String(),
+				Issuer:  fmt.Sprintf("%s_flush-grant-iss-2", uniqueName),
+				Subject: fmt.Sprintf("%s_flush-grant-sub-2", uniqueName),
+				Scope:   []string{"foo", "bar"},
+				PublicKey: trust.PublicKey{
+					Set:   fmt.Sprintf("%s_flush-grant-iss-2", uniqueName),
+					KeyID: fmt.Sprintf("%s_flush-grant-kid-2", uniqueName),
+				},
+				CreatedAt: time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
+				ExpiresAt: time.Now().Round(time.Second).Add(-(lifespan + time.Minute)).Add(lifespan),
+			},
+			pk: jose.JSONWebKey{
+				Key:   []byte("asdf"),
+				KeyID: fmt.Sprintf("%s_flush-grant-kid-2", uniqueName),
+			},
+		},
+		{
+			grant: trust.Grant{
+				ID:      uuid.New().String(),
+				Issuer:  fmt.Sprintf("%s_flush-grant-iss-3", uniqueName),
+				Subject: fmt.Sprintf("%s_flush-grant-sub-3", uniqueName),
+				Scope:   []string{"foo", "bar"},
+				PublicKey: trust.PublicKey{
+					Set:   fmt.Sprintf("%s_flush-grant-iss-3", uniqueName),
+					KeyID: fmt.Sprintf("%s_flush-grant-kid-3", uniqueName),
+				},
+				CreatedAt: time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
+				ExpiresAt: time.Now().Round(time.Second).Add(-(lifespan + time.Hour)).Add(lifespan),
+			},
+			pk: jose.JSONWebKey{
+				Key:   []byte("asdf"),
+				KeyID: fmt.Sprintf("%s_flush-grant-kid-3", uniqueName),
+			},
 		},
 	}
 }

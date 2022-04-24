@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/persistence"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/pkg/errors"
 
@@ -28,6 +29,7 @@ const (
 	ConsentRequestLifespan = "consent-request-lifespan"
 	OnlyTokens             = "tokens"
 	OnlyRequests           = "requests"
+	OnlyGrants             = "grants"
 	ReadFromEnv            = "read-from-env"
 	Config                 = "config"
 )
@@ -50,9 +52,9 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 			"- Using the config file with flag -c, --config")
 	}
 
-	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) {
+	if !flagx.MustGetBool(cmd, OnlyTokens) && !flagx.MustGetBool(cmd, OnlyRequests) && !flagx.MustGetBool(cmd, OnlyGrants) {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
-			"Janitor requires either --tokens or --requests or both to be set")
+			"Janitor requires at least one of --tokens, --requests or --grants to be set")
 	}
 
 	limit := flagx.MustGetInt(cmd, Limit)
@@ -74,6 +76,7 @@ func (_ *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func purge(cmd *cobra.Command, args []string) error {
+	ctx := cmd.Context()
 	var d driver.Registry
 
 	co := []configx.OptionModifier{
@@ -111,13 +114,13 @@ func purge(cmd *cobra.Command, args []string) error {
 
 	d = driver.New(cmd.Context(), do...)
 
-	if len(d.Config().DSN()) == 0 {
+	if len(d.Config(ctx).DSN()) == 0 {
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
 			"When using flag -e, environment variable DSN must be set.",
 			"When using flag -c, the dsn property should be set.")
 	}
 
-	if err := d.Init(cmd.Context()); err != nil {
+	if err := d.Init(cmd.Context(), false, false, &contextx.DefaultContextualizer{}); err != nil {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
 	}
@@ -137,6 +140,10 @@ func purge(cmd *cobra.Command, args []string) error {
 		routineFlags = append(routineFlags, OnlyRequests)
 	}
 
+	if flagx.MustGetBool(cmd, OnlyGrants) {
+		routineFlags = append(routineFlags, OnlyGrants)
+	}
+
 	return cleanupRun(cmd.Context(), notAfter, limit, batchSize, addRoutine(p, routineFlags...)...)
 }
 
@@ -149,6 +156,8 @@ func addRoutine(p persistence.Persister, names ...string) []cleanupRoutine {
 			routines = append(routines, cleanup(p.FlushInactiveRefreshTokens, "refresh tokens"))
 		case OnlyRequests:
 			routines = append(routines, cleanup(p.FlushInactiveLoginConsentRequests, "login-consent requests"))
+		case OnlyGrants:
+			routines = append(routines, cleanup(p.FlushInactiveGrants, "grants"))
 		}
 	}
 	return routines

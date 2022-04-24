@@ -25,8 +25,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ory/hydra/driver/config"
-
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/stringslice"
@@ -34,7 +32,6 @@ import (
 	"github.com/ory/hydra/x"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"
 )
 
@@ -45,11 +42,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.Provider
 }
 
-func NewHandler(r InternalRegistry, c *config.Provider) *Handler {
-	return &Handler{r: r, c: c}
+func NewHandler(r InternalRegistry) *Handler {
+	return &Handler{r: r}
 }
 
 func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
@@ -90,7 +86,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
-	for _, set := range stringslice.Unique(h.c.WellKnownKeys()) {
+	for _, set := range stringslice.Unique(h.r.Config(r.Context()).WellKnownKeys()) {
 		keys, err := h.r.KeyManager().GetKeySet(r.Context(), set)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
@@ -130,6 +126,7 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	keys = ExcludeOpaquePrivateKeys(keys)
 
 	h.r.Writer().Write(w, r, keys)
 }
@@ -163,6 +160,7 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+	keys = ExcludeOpaquePrivateKeys(keys)
 
 	h.r.Writer().Write(w, r, keys)
 }
@@ -196,24 +194,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 	}
 
-	generator, found := h.r.KeyGenerators()[keyRequest.Algorithm]
-	if !found {
-		h.r.Writer().WriteErrorCode(w, r, http.StatusBadRequest, errors.Errorf("Generator %s unknown", keyRequest.Algorithm))
-		return
-	}
-
-	keys, err := generator.Generate(keyRequest.KeyID, keyRequest.Use)
-	if err != nil {
+	if keys, err := h.r.KeyManager().GenerateAndPersistKeySet(r.Context(), set, keyRequest.KeyID, keyRequest.Algorithm, keyRequest.Use); err == nil {
+		keys = ExcludeOpaquePrivateKeys(keys)
+		h.r.Writer().WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
+	} else {
 		h.r.Writer().WriteError(w, r, err)
-		return
 	}
-
-	if err := h.r.KeyManager().AddKeySet(r.Context(), set, keys); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	h.r.Writer().WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
 }
 
 // swagger:route PUT /keys/{set} admin updateJsonWebKeySet
@@ -246,12 +232,7 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if err := h.r.KeyManager().DeleteKeySet(r.Context(), set); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if err := h.r.KeyManager().AddKeySet(r.Context(), set, &keySet); err != nil {
+	if err := h.r.KeyManager().UpdateKeySet(r.Context(), set, &keySet); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -289,12 +270,7 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	if err := h.r.KeyManager().DeleteKey(r.Context(), set, key.KeyID); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if err := h.r.KeyManager().AddKey(r.Context(), set, &key); err != nil {
+	if err := h.r.KeyManager().UpdateKey(r.Context(), set, &key); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

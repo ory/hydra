@@ -21,7 +21,8 @@ set -o pipefail
 #
 
 # Usage
-# ./hack/db-diff.sh sqlite master 649f56cc
+# ./scripts/db-diff.sh sqlite master 649f56cc
+# ./scripts/db-diff.sh postgres HEAD~1 HEAD
 if [ "$#" -ne 3 ]; then
 	echo "Usage: $0 <sqlite|postgres|cockroach|mysql> <commit-ish> <commit-ish>"
 	exit 1
@@ -71,15 +72,26 @@ function hydra::util::ensure-mysqldump {
 }
 
 function dump_pg {
+	if [[ ! -v TEST_DATABASE_POSTGRESQL ]]; then
+		echo 'Error: TEST_DATABASE_POSTGRESQL is not set; try running "source scripts/test-env.sh"' >&2
+		exit 1
+	fi
+
 	hydra::util::ensure-pg_dump
 
 	make test-resetdb >/dev/null 2>&1
-	sleep 2
-	yes | go run . migrate sql "$TEST_DATABASE_POSTGRESQL" > /dev/null || true
+	sleep 4
+	yes | go run . migrate sql "$TEST_DATABASE_POSTGRESQL" >&2 || true
+	sleep 1
 	pg_dump -s "$TEST_DATABASE_POSTGRESQL" | sed '/^--/d'
 }
 
 function dump_cockroach {
+	if [[ ! -v TEST_DATABASE_COCKROACHDB ]]; then
+		echo 'Error: TEST_DATABASE_COCKROACHDB is not set; try running "source scripts/test-env.sh"' >&2
+		exit 1
+	fi
+
 	make test-resetdb >/dev/null 2>&1
 	sleep 4
 	yes | go run . migrate sql "$TEST_DATABASE_COCKROACHDB" > /dev/null || true
@@ -88,6 +100,10 @@ function dump_cockroach {
 }
 
 function dump_sqlite {
+	if [[ ! -v SQLITE_PATH ]]; then
+		SQLITE_PATH="$(mktemp -d)/temp.sqlite"
+	fi
+
 	hydra::util::ensure-sqlite
 
 	rm "$SQLITE_PATH" > /dev/null 2>&1 || true
@@ -96,6 +112,11 @@ function dump_sqlite {
 }
 
 function dump_mysql {
+	if [[ ! -v TEST_DATABASE_MYSQL ]]; then
+		echo 'Error: TEST_DATABASE_MYSQL is not set; try running "source scripts/test-env.sh"' >&2
+		exit 1
+	fi
+
 	hydra::util::ensure-mysqldump
 	make test-resetdb >/dev/null 2>&1
 	sleep 10
@@ -129,8 +150,8 @@ case $1 in
 esac
 
 DIALECT=$1
-COMMIT_FROM=$2
-COMMIT_TO=$3
+COMMIT_FROM=$(git rev-parse "$2")
+COMMIT_TO=$(git rev-parse "$3")
 DDL_FROM="./output/sql/$COMMIT_FROM.$DIALECT.dump.sql"
 DDL_TO="./output/sql/$COMMIT_TO.$DIALECT.dump.sql"
 
@@ -138,7 +159,12 @@ mkdir -p ./output/sql/
 
 set -x
 # shellcheck disable=SC2064
-trap "git checkout -q $(git symbolic-ref HEAD); git symbolic-ref HEAD $(git symbolic-ref HEAD)" EXIT
+
+if git symbolic-ref --quiet HEAD; then
+	trap "git checkout -q $(git symbolic-ref HEAD); git symbolic-ref HEAD $(git symbolic-ref HEAD)" EXIT
+else
+	trap "git checkout $(git rev-parse HEAD)" EXIT
+fi
 
 git checkout "$COMMIT_FROM" >/dev/null 2>&1
 $DUMP_CMD > "$DDL_FROM"

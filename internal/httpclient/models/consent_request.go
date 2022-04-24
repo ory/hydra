@@ -307,6 +307,100 @@ func (m *ConsentRequest) contextValidateRequestedScope(ctx context.Context, form
 	return nil
 }
 
+// ContextValidate validate this consent request based on the context it is used
+func (m *ConsentRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAmr(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateClient(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateOidcContext(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRequestedAccessTokenAudience(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRequestedScope(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateAmr(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.Amr.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("amr")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateClient(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Client != nil {
+		if err := m.Client.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("client")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateOidcContext(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.OidcContext != nil {
+		if err := m.OidcContext.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("oidc_context")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateRequestedAccessTokenAudience(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.RequestedAccessTokenAudience.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_access_token_audience")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *ConsentRequest) contextValidateRequestedScope(ctx context.Context, formats strfmt.Registry) error {
+
+	if err := m.RequestedScope.ContextValidate(ctx, formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("requested_scope")
+		}
+		return err
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *ConsentRequest) MarshalBinary() ([]byte, error) {
 	if m == nil {

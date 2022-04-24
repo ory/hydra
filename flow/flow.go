@@ -3,9 +3,10 @@ package flow
 import (
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -63,8 +64,8 @@ const (
 	FlowStateConsentError = int16(129)
 )
 
-// Flow is an abstraction used in the persistence layer to unify LoginRequest
-// and HandledLoginRequest.
+// Flow is an abstraction used in the persistence layer to unify LoginRequest,
+// HandledLoginRequest, ConsentRequest, and HandledConsentRequest.
 //
 // TODO: Deprecate the structs that are made obsolete by the Flow concept.
 // Context: Before Flow was introduced, the API and the database used the same
@@ -79,7 +80,8 @@ type Flow struct {
 	// identify the session.
 	//
 	// required: true
-	ID string `db:"login_challenge"`
+	ID  string    `db:"login_challenge"`
+	NID uuid.UUID `db:"nid"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
@@ -127,7 +129,7 @@ type Flow struct {
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)
 	// this will be a new random value. This value is used as the "sid" parameter in the ID Token and in OIDC Front-/Back-
-	// channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
+	// channel logout. Its value can generally be used to associate consecutive login requests by a certain user.
 	SessionID sqlxx.NullString `db:"login_session_id"`
 
 	LoginVerifier string `db:"login_verifier"`
@@ -251,22 +253,15 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 }
 
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
-	if f.LoginWasUsed {
-		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
+	if f.State != FlowStateLoginInitialized {
+		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
 	}
-
-	if f.State != FlowStateLoginInitialized && f.State != FlowStateLoginUnused && f.State != FlowStateLoginError {
-		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateLoginInitialized, FlowStateLoginUnused, FlowStateLoginError, f.State)
-	}
-
 	if f.ID != h.ID {
 		return errors.Errorf("flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
 	}
-
 	if f.Subject != "" && h.Subject != "" && f.Subject != h.Subject {
 		return errors.Errorf("flow Subject %s does not match the HandledLoginRequest Subject %s", f.Subject, h.Subject)
 	}
-
 	if f.ForceSubjectIdentifier != "" && h.ForceSubjectIdentifier != "" && f.ForceSubjectIdentifier != h.ForceSubjectIdentifier {
 		return errors.Errorf("flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier)
 	}
@@ -352,11 +347,9 @@ func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
 	if f.ConsentWasHandled {
 		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
 	}
-
 	if f.State != FlowStateConsentInitialized && f.State != FlowStateConsentUnused && f.State != FlowStateConsentError {
 		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
-
 	if f.ConsentChallengeID.String() != r.ID {
 		return errors.Errorf("flow.ConsentChallengeID %s doesn't match HandledConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
 	}
@@ -449,11 +442,6 @@ func (_ Flow) TableName() string {
 	return "hydra_oauth2_flow"
 }
 
-// FindByConsentChallengeID retrieves a flow given its consent challenge ID.
-func (f *Flow) FindByConsentChallengeID(c *pop.Connection, id string) error {
-	return c.Where("consent_challenge_id = ?", id).First(f)
-}
-
 func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	if f.Client != nil {
 		f.ClientID = f.Client.OutfacingID
@@ -469,7 +457,7 @@ func (f *Flow) BeforeSave(_ *pop.Connection) error {
 func (f *Flow) AfterFind(c *pop.Connection) error {
 	f.AfterSave(c)
 	f.Client = &client.Client{}
-	return sqlcon.HandleError(c.Where("id = ?", f.ClientID).First(f.Client))
+	return sqlcon.HandleError(c.Where("id = ? AND nid = ?", f.ClientID, f.NID).First(f.Client))
 }
 
 func (f *Flow) AfterSave(c *pop.Connection) {

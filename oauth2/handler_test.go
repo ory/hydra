@@ -33,6 +33,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/go-openapi/strfmt"
 
@@ -66,7 +67,7 @@ var lifespan = time.Hour
 func TestHandlerDeleteHandler(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -155,7 +156,7 @@ func TestUserinfo(t *testing.T) {
 	conf.MustSet(config.KeyScopeStrategy, "")
 	conf.MustSet(config.KeyAuthCodeLifespan, lifespan)
 	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
@@ -370,7 +371,7 @@ func TestUserinfo(t *testing.T) {
 					keys, err := reg.KeyManager().GetKeySet(context.Background(), x.OpenIDConnectKeyName)
 					require.NoError(t, err)
 					t.Logf("%+v", keys)
-					key, err := jwk.FindKeyByPrefix(keys, "public")
+					key, err := jwk.FindPublicKey(keys)
 					return jwk.MustRSAPublic(key), nil
 				})
 				require.NoError(t, err)
@@ -409,7 +410,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	conf.MustSet(config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
 	conf.MustSet(config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
 	conf.MustSet(config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	h := oauth2.NewHandler(reg, conf)
 

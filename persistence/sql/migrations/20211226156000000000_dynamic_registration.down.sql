@@ -1,0 +1,1 @@
+ALTER TABLE hydra_client DROP COLUMN registration_access_token_signature;

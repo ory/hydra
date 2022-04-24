@@ -3,13 +3,14 @@ package persistence
 import (
 	"context"
 
+	"github.com/gobuffalo/pop/v6"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/popx"
-
-	"github.com/gobuffalo/pop/v5"
 )
 
 type (
@@ -18,6 +19,7 @@ type (
 		client.Manager
 		x.FositeStorer
 		jwk.Manager
+		trust.GrantManager
 
 		MigrationStatus(ctx context.Context) (popx.MigrationStatuses, error)
 		MigrateDown(context.Context, int) error

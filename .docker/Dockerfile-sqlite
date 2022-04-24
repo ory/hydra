@@ -1,4 +1,4 @@
-FROM alpine:3.14.3
+FROM alpine:3.15
 
 # Because this image is built for SQLite, we create /home/ory and /home/ory/sqlite which is owned by the ory user
 # and declare /home/ory/sqlite a volume.

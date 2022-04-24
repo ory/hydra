@@ -21,13 +21,12 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/ory/hydra/driver/config"
 
 	"github.com/ory/x/errorsx"
 
@@ -52,25 +51,25 @@ var (
 )
 
 type Validator struct {
-	c    *http.Client
-	conf *config.Provider
+	c *http.Client
+	r Registry
 }
 
-func NewValidator(conf *config.Provider) *Validator {
+func NewValidator(registry Registry) *Validator {
 	return &Validator{
-		c:    http.DefaultClient,
-		conf: conf,
+		c: http.DefaultClient,
+		r: registry,
 	}
 }
 
-func NewValidatorWithClient(conf *config.Provider, client *http.Client) *Validator {
+func NewValidatorWithClient(registry Registry, client *http.Client) *Validator {
 	return &Validator{
-		c:    client,
-		conf: conf,
+		c: client,
+		r: registry,
 	}
 }
 
-func (v *Validator) Validate(c *Client) error {
+func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	id := uuid.New()
 	c.OutfacingID = stringsx.Coalesce(c.OutfacingID, id)
 
@@ -94,7 +93,7 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if len(c.Scope) == 0 {
-		c.Scope = strings.Join(v.conf.DefaultClientScope(), " ")
+		c.Scope = strings.Join(v.r.Config(ctx).DefaultClientScope(), " ")
 	}
 
 	for k, origin := range c.AllowedCORSOrigins {
@@ -150,14 +149,14 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.conf.SubjectTypesSupported(), c.SubjectType) {
-			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.conf.SubjectTypesSupported()))
+		if !stringslice.Has(v.r.Config(ctx).SubjectTypesSupported(), c.SubjectType) {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config(ctx).SubjectTypesSupported()))
 		}
 	} else {
-		if stringslice.Has(v.conf.SubjectTypesSupported(), "public") {
+		if stringslice.Has(v.r.Config(ctx).SubjectTypesSupported(), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.conf.SubjectTypesSupported()[0]
+			c.SubjectType = v.r.Config(ctx).SubjectTypesSupported()[0]
 		}
 	}
 
@@ -184,6 +183,16 @@ func (v *Validator) Validate(c *Client) error {
 	}
 
 	return nil
+}
+
+func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) error {
+	if c.Metadata != nil {
+		return errorsx.WithStack(ErrInvalidClientMetadata.
+			WithHint(`metadata cannot be set for dynamic client registration'`),
+		)
+	}
+
+	return v.Validate(ctx, c)
 }
 
 func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {

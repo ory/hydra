@@ -21,6 +21,7 @@
 package client_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -34,14 +35,18 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 )
 
 func TestValidate(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
 	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
+	reg := internal.NewRegistryMemory(t, c, &contextx.StaticContextualizer{C: c})
+	v := NewValidator(reg)
 
-	v := NewValidator(c)
+	testCtx := context.TODO()
+
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)
@@ -111,7 +116,7 @@ func TestValidate(t *testing.T) {
 		{
 			v: func(t *testing.T) *Validator {
 				c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise"})
-				return NewValidator(c)
+				return NewValidator(reg)
 			},
 			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
@@ -135,7 +140,7 @@ func TestValidate(t *testing.T) {
 					return v
 				}
 			}
-			err := tc.v(t).Validate(tc.in)
+			err := tc.v(t).Validate(testCtx, tc.in)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {
@@ -195,6 +200,75 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestValidateDynamicRegistration(t *testing.T) {
+	c := internal.NewConfigurationWithDefaults()
+	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
+	reg := internal.NewRegistryMemory(t, c, &contextx.StaticContextualizer{C: c})
+
+	testCtx := context.TODO()
+	v := NewValidator(reg)
+	for k, tc := range []struct {
+		in        *Client
+		check     func(t *testing.T, c *Client)
+		expectErr bool
+		v         func(t *testing.T) *Validator
+	}{
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+				Metadata:               []byte("{\"access_token_ttl\":10}"),
+			},
+			expectErr: true,
+		},
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+				Metadata:               []byte("{\"id_token_ttl\":10}"),
+			},
+			expectErr: true,
+		},
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+				Metadata:               []byte("{\"anything\":10}"),
+			},
+			expectErr: true,
+		},
+		{
+			in: &Client{
+				OutfacingID:            "foo",
+				PostLogoutRedirectURIs: []string{"https://foo/"},
+				RedirectURIs:           []string{"https://foo/"},
+			},
+			check: func(t *testing.T, c *Client) {
+				assert.Equal(t, "foo", c.OutfacingID)
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
+			if tc.v == nil {
+				tc.v = func(t *testing.T) *Validator {
+					return v
+				}
+			}
+			err := tc.v(t).ValidateDynamicRegistration(testCtx, tc.in)
+			if tc.expectErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				tc.check(t, tc.in)
 			}
 		})
 	}

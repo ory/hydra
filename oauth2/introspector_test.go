@@ -34,6 +34,7 @@ import (
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/x"
 
@@ -52,7 +53,7 @@ func TestIntrospectorSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyScopeStrategy, "wildcard")
 	conf.MustSet(config.KeyIssuerURL, "https://foobariss")
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

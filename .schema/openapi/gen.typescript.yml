@@ -1,0 +1,7 @@
+npmName: "@ory/kratos-client"
+npmVersion: 0.0.0
+# typescriptThreePlus: true
+#npmRepository: https://github.com/ory/sdk.git
+supportsES6: true
+ensureUniqueParams: true
+modelPropertyNaming: original

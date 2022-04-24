@@ -8,6 +8,7 @@ import (
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x/contextx"
 )
 
 type options struct {
@@ -15,6 +16,8 @@ type options struct {
 	preload      bool
 	validate     bool
 	opts         []configx.OptionModifier
+	// The first default refers to determining the NID at startup; the second default referes to the fact that the Contextualizer may dynamically change the NID.
+	skipNetworkInit bool
 }
 
 func newOptions() *options {
@@ -51,14 +54,20 @@ func DisablePreloading() OptionsModifier {
 	}
 }
 
+func SkipNetworkInit() OptionsModifier {
+	return func(o *options) {
+		o.skipNetworkInit = true
+	}
+}
+
 func New(ctx context.Context, opts ...OptionsModifier) Registry {
 	o := newOptions()
 	for _, f := range opts {
 		f(o)
 	}
 
-	l := logrusx.New("ORY Hydra", config.Version)
-	c, err := config.New(l, o.opts...)
+	l := logrusx.New("Ory Hydra", config.Version)
+	c, err := config.New(ctx, l, o.opts...)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to instantiate configuration.")
 	}
@@ -67,12 +76,12 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		config.MustValidate(l, c)
 	}
 
-	r, err := NewRegistryFromDSN(ctx, c, l)
+	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, &contextx.DefaultContextualizer{})
 	if err != nil {
 		l.WithError(err).Fatal("Unable to create service registry.")
 	}
 
-	if err = r.Init(ctx); err != nil {
+	if err = r.Init(ctx, o.skipNetworkInit, false, &contextx.DefaultContextualizer{}); err != nil {
 		l.WithError(err).Fatal("Unable to initialize service registry.")
 	}
 

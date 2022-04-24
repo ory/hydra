@@ -36,6 +36,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/driver/config"
 
@@ -80,12 +81,14 @@ func TestClientSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
-	r := internal.NewRegistryMemory(t, conf)
+	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
+	r := internal.NewRegistryMemory(t, conf, &contextx.StaticContextualizer{C: conf})
 
-	router := x.NewRouterAdmin()
+	routerAdmin := x.NewRouterAdmin()
+	routerPublic := x.NewRouterPublic()
 	handler := client.NewHandler(r)
-	handler.SetRoutes(router)
-	server := httptest.NewServer(router)
+	handler.SetRoutes(routerAdmin, routerPublic)
+	server := httptest.NewServer(routerAdmin)
 
 	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
@@ -113,6 +116,11 @@ func TestClientSDK(t *testing.T) {
 		result.Payload.UpdatedAt = strfmt.DateTime{}
 		assert.NotEmpty(t, result.Payload.CreatedAt)
 		result.Payload.CreatedAt = strfmt.DateTime{}
+		assert.NotEmpty(t, result.Payload.RegistrationAccessToken)
+		assert.NotEmpty(t, result.Payload.RegistrationClientURI)
+		result.Payload.RegistrationAccessToken = ""
+		result.Payload.RegistrationClientURI = ""
+
 		assert.EqualValues(t, compareClient, result.Payload)
 		assert.EqualValues(t, "bar", result.Payload.Metadata.(map[string]interface{})["foo"])
 
@@ -130,7 +138,7 @@ func TestClientSDK(t *testing.T) {
 		gresult, err = c.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID("unknown"))
 		require.Error(t, err)
 		assert.Empty(t, gresult)
-		assert.True(t, strings.Contains(err.Error(), "401"))
+		assert.True(t, strings.Contains(err.Error(), "404"), err.Error())
 
 		// listing clients returns the only added one
 		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(100)))

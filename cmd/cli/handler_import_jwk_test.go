@@ -16,12 +16,17 @@ import (
 
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 )
 
 func TestImportJSONWebKey(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 	router := x.NewRouterPublic()
+
+	if conf.HsmEnabled() {
+		t.Skip("Skipping test. Keys cannot be imported when Hardware Security Module is enabled")
+	}
 
 	h := reg.KeyHandler()
 	m := reg.KeyManager()
@@ -37,7 +42,7 @@ func TestImportJSONWebKey(t *testing.T) {
 	cmd.Flags().String("use", "sig", "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
 	cmd.Flags().Bool("fake-tls-termination", false, "Sets the \"use\" value of the JSON Web Key if not \"use\" value was defined by the key itself")
 	cmd.Flags().String("access-token", "", "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
-	cmd.Flags().String("endpoint", "", "Set the URL where ORY Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
+	cmd.Flags().String("endpoint", "", "Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_ADMIN_URL. A unix socket can be set in the form unix:///path/to/socket")
 	cmd.Flags().Bool("skip-tls-verify", true, "Foolishly accept TLS certificates signed by unknown certificate authorities")
 	cmd.Flags().String("default-key-id", "cae6b214-fb1e-4ebc-9019-95286a62eabc", "A fallback value for keys without \"kid\" attribute to be stored with a common \"kid\", e.g. private/public keypairs")
 	os.Setenv("HYDRA_URL", testServer.URL)

@@ -1,32 +1,51 @@
 {
-  "client_id": "client-0001",
-  "client_name": "Client 0001",
-  "client_secret": "secret-0001",
-  "redirect_uris": [
-    "http://redirect/0001_1"
-  ],
-  "grant_types": [
-    "grant-0001_1"
-  ],
-  "response_types": [
-    "response-0001_1"
-  ],
-  "scope": "scope-0001",
-  "audience": [],
-  "owner": "owner-0001",
-  "policy_uri": "http://policy/0001",
-  "allowed_cors_origins": [],
-  "tos_uri": "http://tos/0001",
-  "client_uri": "http://client/0001",
-  "logo_uri": "http://logo/0001",
-  "contacts": [
+  "AllowedCORSOrigins": [],
+  "Audience": [],
+  "BackChannelLogoutSessionRequired": false,
+  "BackChannelLogoutURI": "",
+  "ClientURI": "http://client/0001",
+  "Contacts": [
     "contact-0001_1"
   ],
-  "client_secret_expires_at": 0,
-  "subject_type": "",
-  "jwks": {},
-  "token_endpoint_auth_method": "none",
-  "created_at": "0001-01-01T00:00:00Z",
-  "updated_at": "0001-01-01T00:00:00Z",
-  "metadata": {}
+  "CreatedAt": "0001-01-01T00:00:00Z",
+  "FrontChannelLogoutSessionRequired": false,
+  "FrontChannelLogoutURI": "",
+  "GrantTypes": [
+    "grant-0001_1"
+  ],
+  "ID": "00000000-0000-0000-0000-000000000000",
+  "JSONWebKeys": {
+    "JSONWebKeySet": null
+  },
+  "JSONWebKeysURI": "",
+  "LogoURI": "http://logo/0001",
+  "Metadata": {},
+  "NID": "00000000-0000-0000-0000-000000000000",
+  "Name": "Client 0001",
+  "OutfacingID": "client-0001",
+  "Owner": "owner-0001",
+  "PKDeprecated": 1,
+  "PolicyURI": "http://policy/0001",
+  "PostLogoutRedirectURIs": [],
+  "RedirectURIs": [
+    "http://redirect/0001_1"
+  ],
+  "RegistrationAccessToken": "",
+  "RegistrationAccessTokenSignature": "",
+  "RegistrationClientURI": "",
+  "RequestObjectSigningAlgorithm": "",
+  "RequestURIs": [],
+  "ResponseTypes": [
+    "response-0001_1"
+  ],
+  "Scope": "scope-0001",
+  "Secret": "secret-0001",
+  "SecretExpiresAt": 0,
+  "SectorIdentifierURI": "",
+  "SubjectType": "",
+  "TermsOfServiceURI": "http://tos/0001",
+  "TokenEndpointAuthMethod": "none",
+  "TokenEndpointAuthSigningAlgorithm": "",
+  "UpdatedAt": "0001-01-01T00:00:00Z",
+  "UserinfoSignedResponseAlg": ""
 }

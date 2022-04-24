@@ -12,12 +12,18 @@
     "test": "cypress run",
     "test:watch": "cypress open",
     "wait-on": "wait-on",
-    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\""
+    "lint": "standard --fix \"test/**/*.js\" \"cypress/**/*.js\"",
+    "openapi-generator-cli": "openapi-generator-cli"
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.1.18"
   },
   "devDependencies": {
-    "cypress": "^6.6.0",
-    "ory-prettier-styles": "1.1.1",
-    "prettier": "2.1.2",
+    "cypress": "^7.7.0",
+    "dayjs": "^1.10.6",
+    "jsonwebtoken": "^8.5.1",
+    "ory-prettier-styles": "1.1.2",
+    "prettier": "2.5.1",
     "standard": "^12.0.1",
     "wait-on": "^3.2.0"
   }

@@ -29,14 +29,15 @@ func (o *UpdateOAuth2ClientReader) ReadResponse(response runtime.ClientResponse,
 			return nil, err
 		}
 		return result, nil
-	case 500:
-		result := NewUpdateOAuth2ClientInternalServerError()
+	default:
+		result := NewUpdateOAuth2ClientDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -72,27 +73,36 @@ func (o *UpdateOAuth2ClientOK) readResponse(response runtime.ClientResponse, con
 	return nil
 }
 
-// NewUpdateOAuth2ClientInternalServerError creates a UpdateOAuth2ClientInternalServerError with default headers values
-func NewUpdateOAuth2ClientInternalServerError() *UpdateOAuth2ClientInternalServerError {
-	return &UpdateOAuth2ClientInternalServerError{}
+// NewUpdateOAuth2ClientDefault creates a UpdateOAuth2ClientDefault with default headers values
+func NewUpdateOAuth2ClientDefault(code int) *UpdateOAuth2ClientDefault {
+	return &UpdateOAuth2ClientDefault{
+		_statusCode: code,
+	}
 }
 
-/* UpdateOAuth2ClientInternalServerError describes a response with status code 500, with default header values.
+/* UpdateOAuth2ClientDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type UpdateOAuth2ClientInternalServerError struct {
+type UpdateOAuth2ClientDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *UpdateOAuth2ClientInternalServerError) Error() string {
-	return fmt.Sprintf("[PUT /clients/{id}][%d] updateOAuth2ClientInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the update o auth2 client default response
+func (o *UpdateOAuth2ClientDefault) Code() int {
+	return o._statusCode
 }
-func (o *UpdateOAuth2ClientInternalServerError) GetPayload() *models.JSONError {
+
+func (o *UpdateOAuth2ClientDefault) Error() string {
+	return fmt.Sprintf("[PUT /clients/{id}][%d] updateOAuth2Client default  %+v", o._statusCode, o.Payload)
+}
+func (o *UpdateOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *UpdateOAuth2ClientInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateOAuth2ClientDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

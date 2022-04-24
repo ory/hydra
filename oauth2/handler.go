@@ -116,7 +116,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 //
 // OpenID Connect Front-Backchannel Enabled Logout
 //
-// This endpoint initiates and completes user logout at ORY Hydra and initiates OpenID Connect Front-/Back-channel logout:
+// This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:
 //
 // - https://openid.net/specs/openid-connect-frontchannel-1_0.html
 // - https://openid.net/specs/openid-connect-backchannel-1_0.html
@@ -721,7 +721,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		}
 	}
 
-	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
+	obfuscatedSubject, err := h.r.ConsentStrategy().ObfuscateSubjectIdentifier(ctx, authorizeRequest.GetClient(), session.ConsentRequest.Subject, session.ConsentRequest.ForceSubjectIdentifier)
 	if e := &(fosite.RFC6749Error{}); errors.As(err, &e) {
 		x.LogAudit(r, err, h.r.AuditLogger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)

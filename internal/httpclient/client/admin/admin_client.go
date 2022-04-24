@@ -48,6 +48,8 @@ type ClientService interface {
 
 	DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...ClientOption) (*DeleteOAuth2TokenNoContent, error)
 
+	DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error)
+
 	FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams, opts ...ClientOption) (*FlushInactiveOAuth2TokensNoContent, error)
 
 	GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error)
@@ -62,6 +64,8 @@ type ClientService interface {
 
 	GetOAuth2Client(params *GetOAuth2ClientParams, opts ...ClientOption) (*GetOAuth2ClientOK, error)
 
+	GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams, opts ...ClientOption) (*GetTrustedJwtGrantIssuerOK, error)
+
 	GetVersion(params *GetVersionParams, opts ...ClientOption) (*GetVersionOK, error)
 
 	IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, opts ...ClientOption) (*IntrospectOAuth2TokenOK, error)
@@ -71,6 +75,8 @@ type ClientService interface {
 	ListOAuth2Clients(params *ListOAuth2ClientsParams, opts ...ClientOption) (*ListOAuth2ClientsOK, error)
 
 	ListSubjectConsentSessions(params *ListSubjectConsentSessionsParams, opts ...ClientOption) (*ListSubjectConsentSessionsOK, error)
+
+	ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams, opts ...ClientOption) (*ListTrustedJwtGrantIssuersOK, error)
 
 	PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...ClientOption) (*PatchOAuth2ClientOK, error)
 
@@ -83,6 +89,8 @@ type ClientService interface {
 	RevokeAuthenticationSession(params *RevokeAuthenticationSessionParams, opts ...ClientOption) (*RevokeAuthenticationSessionNoContent, error)
 
 	RevokeConsentSessions(params *RevokeConsentSessionsParams, opts ...ClientOption) (*RevokeConsentSessionsNoContent, error)
+
+	TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...ClientOption) (*TrustJwtGrantIssuerCreated, error)
 
 	UpdateJSONWebKey(params *UpdateJSONWebKeyParams, opts ...ClientOption) (*UpdateJSONWebKeyOK, error)
 
@@ -288,9 +296,12 @@ func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams, opts ...
 /*
   CreateOAuth2Client creates an o auth 2 0 client
 
-  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret will be generated. The secret will be returned in the response and you will not be able to retrieve it later on. Write the secret down and keep it somwhere safe.
+  Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret
+will be generated. The secret will be returned in the response and you will not be able to retrieve it later on.
+Write the secret down and keep it somwhere safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
 func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams, opts ...ClientOption) (*CreateOAuth2ClientCreated, error) {
 	// TODO: Validate the params before sending
@@ -322,9 +333,8 @@ func (a *Client) CreateOAuth2Client(params *CreateOAuth2ClientParams, opts ...Cl
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for createOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*CreateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -416,7 +426,10 @@ func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams, opts ...
 
   Delete an existing OAuth 2.0 Client by its ID.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+
+Make sure that this endpoint is well protected and only callable by first-party components.
 */
 func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams, opts ...ClientOption) (*DeleteOAuth2ClientNoContent, error) {
 	// TODO: Validate the params before sending
@@ -448,9 +461,8 @@ func (a *Client) DeleteOAuth2Client(params *DeleteOAuth2ClientParams, opts ...Cl
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*DeleteOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -490,6 +502,50 @@ func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...Clie
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+  DeleteTrustedJwtGrantIssuer deletes a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+
+Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+for OAuth 2.0 Client Authentication and Authorization Grant.
+*/
+func (a *Client) DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDeleteTrustedJwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "deleteTrustedJwtGrantIssuer",
+		Method:             "DELETE",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DeleteTrustedJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DeleteTrustedJwtGrantIssuerNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for deleteTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -755,9 +811,10 @@ func (a *Client) GetLogoutRequest(params *GetLogoutRequestParams, opts ...Client
 /*
   GetOAuth2Client gets an o auth 2 0 client
 
-  Get an OAUth 2.0 client by its ID. This endpoint never returns passwords.
+  Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
 func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams, opts ...ClientOption) (*GetOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
@@ -789,8 +846,48 @@ func (a *Client) GetOAuth2Client(params *GetOAuth2ClientParams, opts ...ClientOp
 		return success, nil
 	}
 	// unexpected success response
+	unexpectedSuccess := result.(*GetOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  GetTrustedJwtGrantIssuer gets a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+*/
+func (a *Client) GetTrustedJwtGrantIssuer(params *GetTrustedJwtGrantIssuerParams, opts ...ClientOption) (*GetTrustedJwtGrantIssuerOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetTrustedJwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getTrustedJwtGrantIssuer",
+		Method:             "GET",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetTrustedJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetTrustedJwtGrantIssuerOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for getTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -931,9 +1028,13 @@ func (a *Client) IsInstanceAlive(params *IsInstanceAliveParams, opts ...ClientOp
 /*
   ListOAuth2Clients lists o auth 2 0 clients
 
-  This endpoint lists all clients in the database, and never returns client secrets. As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients, but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
+  This endpoint lists all clients in the database, and never returns client secrets.
+As a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,
+but it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+
 The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 Multiple links can be included in this header, and will be separated by a comma.
 */
@@ -967,9 +1068,8 @@ func (a *Client) ListOAuth2Clients(params *ListOAuth2ClientsParams, opts ...Clie
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for listOAuth2Clients: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*ListOAuth2ClientsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -1019,11 +1119,54 @@ func (a *Client) ListSubjectConsentSessions(params *ListSubjectConsentSessionsPa
 }
 
 /*
+  ListTrustedJwtGrantIssuers lists trusted o auth2 j w t bearer grant type issuers
+
+  Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
+*/
+func (a *Client) ListTrustedJwtGrantIssuers(params *ListTrustedJwtGrantIssuersParams, opts ...ClientOption) (*ListTrustedJwtGrantIssuersOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewListTrustedJwtGrantIssuersParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "listTrustedJwtGrantIssuers",
+		Method:             "GET",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &ListTrustedJwtGrantIssuersReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*ListTrustedJwtGrantIssuersOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for listTrustedJwtGrantIssuers: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   PatchOAuth2Client patches an o auth 2 0 client
 
-  Patch an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+  Patch an existing OAuth 2.0 Client. If you pass `client_secret`
+the secret will be updated and returned via the API. This is the
+only time you will be able to retrieve the client secret, so write it down and keep it safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
 func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...ClientOption) (*PatchOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
@@ -1055,9 +1198,8 @@ func (a *Client) PatchOAuth2Client(params *PatchOAuth2ClientParams, opts ...Clie
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for patchOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*PatchOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -1292,6 +1434,48 @@ func (a *Client) RevokeConsentSessions(params *RevokeConsentSessionsParams, opts
 }
 
 /*
+  TrustJwtGrantIssuer trusts an o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to establish a trust relationship for a JWT issuer
+to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
+*/
+func (a *Client) TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...ClientOption) (*TrustJwtGrantIssuerCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewTrustJwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "trustJwtGrantIssuer",
+		Method:             "POST",
+		PathPattern:        "/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &TrustJwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*TrustJwtGrantIssuerCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for trustJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
   UpdateJSONWebKey updates a JSON web key
 
   Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
@@ -1378,9 +1562,11 @@ func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams, opts ...
 /*
   UpdateOAuth2Client updates an o auth 2 0 client
 
-  Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API. This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+  Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.
+This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
 
-OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities. To manage ORY Hydra, you will need an OAuth 2.0 Client as well. Make sure that this endpoint is well protected and only callable by first-party components.
+OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
 func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams, opts ...ClientOption) (*UpdateOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
@@ -1412,9 +1598,8 @@ func (a *Client) UpdateOAuth2Client(params *UpdateOAuth2ClientParams, opts ...Cl
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for updateOAuth2Client: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*UpdateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 // SetTransport changes the transport on the client

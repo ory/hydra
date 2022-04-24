@@ -24,7 +24,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gobuffalo/pop/v5"
+	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 
 	jose "gopkg.in/square/go-jose.v2" // Naming the dependency jose is important for go-swagger to work, see https://github.com/go-swagger/go-swagger/issues/1587
@@ -38,7 +38,8 @@ import (
 //
 // swagger:model oAuth2Client
 type Client struct {
-	ID uuid.UUID `json:"-" db:"pk"`
+	ID  uuid.UUID `json:"-" db:"pk"`
+	NID uuid.UUID `db:"nid" faker:"-" json:"-"`
 
 	// This field is deprecated and will be removed
 	PKDeprecated int64 `json:"-" db:"pk_deprecated"`
@@ -201,7 +202,16 @@ type Client struct {
 	BackChannelLogoutSessionRequired bool `json:"backchannel_logout_session_required,omitempty" db:"backchannel_logout_session_required"`
 
 	// Metadata is arbitrary data.
-	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata"`
+	Metadata sqlxx.JSONRawMessage `json:"metadata,omitempty" db:"metadata" faker:"-"`
+
+	// RegistrationAccessTokenSignature is contains the signature of the registration token for managing the OAuth2 Client.
+	RegistrationAccessTokenSignature string `json:"-" db:"registration_access_token_signature"`
+
+	// RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.
+	RegistrationAccessToken string `json:"registration_access_token,omitempty" db:"-"`
+
+	// RegistrationClientURI is the URL used to update, get, or delete the OAuth2 Client.
+	RegistrationClientURI string `json:"registration_client_uri,omitempty" db:"-"`
 }
 
 func (Client) TableName() string {

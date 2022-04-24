@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-04-17)](#000-2022-04-17)
+- [0.0.0 (2022-04-24)](#000-2022-04-24)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -630,7 +630,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-17)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-24)
 
 
 ### Bug Fixes
@@ -639,6 +639,7 @@
 * Add missing flags to config schema ([00100a1](https://github.com/ory/hydra/commit/00100a1bcb60d1836a2c3d6c6a4212e3161b1bda)), closes [#653](https://github.com/ory/hydra/issues/653)
 * Configure audit logger ([#3022](https://github.com/ory/hydra/issues/3022)) ([3115dde](https://github.com/ory/hydra/commit/3115dde229a6be936ad4d844d778d6ee82279643))
 * Do not use cached version ([422d422](https://github.com/ory/hydra/commit/422d4227e8b599a6eb32b60d432fd0cad95a717a))
+* Generated consent model ([#3076](https://github.com/ory/hydra/issues/3076)) ([270dbe0](https://github.com/ory/hydra/commit/270dbe0842827b3ec362a7ec35a56acd33275603))
 * Proper response types for 404 errors ([#3072](https://github.com/ory/hydra/issues/3072)) ([e711273](https://github.com/ory/hydra/commit/e711273e935d693d726dde2d97c296bd523f3a1e)), closes [#3064](https://github.com/ory/hydra/issues/3064)
 * Remove unnecessary transaction ([#3029](https://github.com/ory/hydra/issues/3029)) ([d4b2696](https://github.com/ory/hydra/commit/d4b2696bd72b9fc98f3959b13be2fc28aa2263bc))
 * **sdk:** Correct polymorph type for consent session ([#3074](https://github.com/ory/hydra/issues/3074)) ([646459a](https://github.com/ory/hydra/commit/646459a55528e7f0805934d34493d78b92476904)), closes [#3058](https://github.com/ory/hydra/issues/3058)
@@ -647,6 +648,7 @@
     Closes https://github.com/ory/sdk/issues/153
 
 * Sync ports between Dockerfiles and comments ([#3027](https://github.com/ory/hydra/issues/3027)) ([ebd1694](https://github.com/ory/hydra/commit/ebd16940e270561c13aab60a969a4969391d5d80))
+* Typo README ([#3078](https://github.com/ory/hydra/issues/3078)) ([7d378f1](https://github.com/ory/hydra/commit/7d378f186cfc140cbb0649557bfd0e2fadd96fff))
 * Use default for env var ([2b024b4](https://github.com/ory/hydra/commit/2b024b4f8e98f3efe73018bd57e1d16738d50eeb))
 
 ### Documentation
@@ -656,6 +658,12 @@
 
 ### Features
 
+* Add hsm key set prefix to support multiple hydra instances on the same hsm partition ([#3066](https://github.com/ory/hydra/issues/3066)) ([90523fd](https://github.com/ory/hydra/commit/90523fd0d31930666bd091efeb9346498d92978e)):
+
+    This pull request adds configuration option `hsm.key_set_prefix` to support multiple Ory Hydra instances to store keys on the same HSM partition. For example if `hsm.key_set_prefix=app1.` then key set `hydra.openid.id-token` would be generated/requested/deleted on HSM with `CKA_LABEL=app1.hydra.openid.id-token`
+    
+    This will not affect Hydra API in any way. `GET /keys/hydra.openid.id-token` will return key set from HSM with label `app1.hydra.openid.id-token`.
+
 * Add support for trust grants that can issue tokens for any subject ([#3012](https://github.com/ory/hydra/issues/3012)) ([a3c4304](https://github.com/ory/hydra/commit/a3c4304be2d3988843084d871aa5066d36803219)), closes [#2930](https://github.com/ory/hydra/issues/2930):
 
     Previously, a trust relationship had to be setup for every subject
@@ -663,6 +671,7 @@
     setting up token services that can issue tokens with any value in the
     subject field.
 
+* Backchannel request logging ([#3067](https://github.com/ory/hydra/issues/3067)) ([6dda48d](https://github.com/ory/hydra/commit/6dda48dc3e2eb6d4f57e41abcc8b49e71c38e80d))
 * Make sensitive log value redaction text configurable ([#3040](https://github.com/ory/hydra/issues/3040)) ([536352c](https://github.com/ory/hydra/commit/536352c15bb054f123e9d62944690a06cff86ba0))
 
 ### Tests

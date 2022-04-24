@@ -251,18 +251,22 @@ func NewFlow(r *consent.LoginRequest) *Flow {
 }
 
 func (f *Flow) HandleLoginRequest(h *consent.HandledLoginRequest) error {
-
-	if f.State == FlowStateLoginUnused {
-		return nil
-	} else if f.State != FlowStateLoginInitialized {
-		return errors.Errorf("invalid flow state: expected %d, got %d", FlowStateLoginInitialized, f.State)
+	if f.LoginWasUsed {
+		return errors.WithStack(x.ErrConflict.WithHint("The login request was already used and can no longer be changed."))
 	}
+
+	if f.State != FlowStateLoginInitialized && f.State != FlowStateLoginUnused && f.State != FlowStateLoginError {
+		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateLoginInitialized, FlowStateLoginUnused, FlowStateLoginError, f.State)
+	}
+
 	if f.ID != h.ID {
 		return errors.Errorf("flow ID %s does not match HandledLoginRequest ID %s", f.ID, h.ID)
 	}
+
 	if f.Subject != "" && h.Subject != "" && f.Subject != h.Subject {
 		return errors.Errorf("flow Subject %s does not match the HandledLoginRequest Subject %s", f.Subject, h.Subject)
 	}
+
 	if f.ForceSubjectIdentifier != "" && h.ForceSubjectIdentifier != "" && f.ForceSubjectIdentifier != h.ForceSubjectIdentifier {
 		return errors.Errorf("flow ForceSubjectIdentifier %s does not match the HandledLoginRequest ForceSubjectIdentifier %s", f.ForceSubjectIdentifier, h.ForceSubjectIdentifier)
 	}
@@ -348,9 +352,11 @@ func (f *Flow) HandleConsentRequest(r *consent.HandledConsentRequest) error {
 	if f.ConsentWasHandled {
 		return x.ErrConflict.WithHint("The consent request was already used and can no longer be changed.")
 	}
+
 	if f.State != FlowStateConsentInitialized && f.State != FlowStateConsentUnused && f.State != FlowStateConsentError {
 		return errors.Errorf("invalid flow state: expected %d/%d/%d, got %d", FlowStateConsentInitialized, FlowStateConsentUnused, FlowStateConsentError, f.State)
 	}
+
 	if f.ConsentChallengeID.String() != r.ID {
 		return errors.Errorf("flow.ConsentChallengeID %s doesn't match HandledConsentRequest.ID %s", f.ConsentChallengeID.String(), r.ID)
 	}

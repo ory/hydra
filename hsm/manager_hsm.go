@@ -10,9 +10,10 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
-	"github.com/ory/hydra/driver/config"
 	"net/http"
 	"sync"
+
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
 

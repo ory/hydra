@@ -16,7 +16,7 @@ const fakeNIDContext = "fake nid context"
 
 // SetNIDContext sets the nid context for the given context.
 func SetNIDContext(ctx context.Context, nid uuid.UUID) context.Context {
-	return context.WithValue(ctx, fakeNIDContext, nid)
+	return context.WithValue(ctx, fakeNIDContext, nid) //nolint:staticcheck
 }
 
 func (d *TestContextualizer) Network(ctx context.Context, network uuid.UUID) uuid.UUID {

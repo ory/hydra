@@ -678,7 +678,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(),
+		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{
 				Subject: &subject,
 				Context: map[string]interface{}{"fooz": "barz"},
@@ -705,7 +705,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should be able to retry accept login request", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(),
+		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
 			checkAndDuplicateAcceptLoginHandler(t, adminClient.Admin, subject, func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest {
 				return &models.AcceptLoginRequest{
 					Subject: &subject,
@@ -731,10 +731,9 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should be able to retry both accept login and consent requests", func(t *testing.T) {
-
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(),
+		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
 			checkAndDuplicateAcceptLoginHandler(t, adminClient.Admin, subject, func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest {
 				return &models.AcceptLoginRequest{
 					Subject: &subject,
@@ -757,7 +756,5 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		hc := testhelpers.NewEmptyJarClient(t)
 		makeRequestAndExpectCode(t, hc, c, url.Values{"redirect_uri": {c.RedirectURIs[0]}})
-
 	})
-
 }

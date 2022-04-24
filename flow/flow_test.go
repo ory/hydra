@@ -133,6 +133,7 @@ func TestFlow_HandleLoginRequest(t *testing.T) {
 			r.ID = f.ID
 			r.Subject = f.Subject
 			r.ForceSubjectIdentifier = f.ForceSubjectIdentifier
+			f.LoginWasUsed = false
 
 			assert.NoError(t, f.HandleLoginRequest(&r))
 

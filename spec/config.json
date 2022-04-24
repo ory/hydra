@@ -479,6 +479,11 @@
         "token_label": {
           "type": "string",
           "description": "Label of the token to use (if slot is not specified). If both slot and label are set, token label takes preference over slot. In this case first slot, that contains this label is used."
+        },
+        "key_set_prefix": {
+          "type": "string",
+          "description": "Key set prefix can be used in case of multiple Ory Hydra instances need to store keys on the same HSM partition. For example if `hsm.key_set_prefix=app1.` then key set `hydra.openid.id-token` would be generated/requested/deleted on HSM with `CKA_LABEL=app1.hydra.openid.id-token`.",
+          "default": ""
         }
       }
     },

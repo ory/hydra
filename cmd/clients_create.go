@@ -62,6 +62,7 @@ To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--
 	cmd.Flags().String("secret", "", "Provide the client's secret")
 	cmd.Flags().StringP("name", "n", "", "The client's name")
 	cmd.Flags().StringSlice("post-logout-callbacks", []string{}, "List of allowed URLs to be redirected to after a logout")
+	cmd.Flags().String("metadata", "", "A valid JSON string containing metadata")
 
 	// back-channel logout options
 	cmd.Flags().Bool("backchannel-logout-session-required", false, "Boolean flag specifying whether the client requires that a sid (session ID) Claim be included in the Logout Token to identify the client session with the OP when the backchannel-logout-callback is used. If omitted, the default value is false.")

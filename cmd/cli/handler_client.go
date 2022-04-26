@@ -101,6 +101,13 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
+	var metadata models.JSONRawMessage
+	metadataStr := flagx.MustGetString(cmd, "metadata")
+	if metadataStr != "" {
+		err = json.Unmarshal([]byte(flagx.MustGetString(cmd, "metadata")), &metadata)
+		cmdx.Must(err, "Failed to parse metadata: %s", err)
+	}
+
 	cc := models.OAuth2Client{
 		ClientID:                          flagx.MustGetString(cmd, "id"),
 		ClientSecret:                      secret,
@@ -119,6 +126,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		SubjectType:                       flagx.MustGetString(cmd, "subject-type"),
 		Audience:                          flagx.MustGetStringSlice(cmd, "audience"),
 		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
+		Metadata:                          metadata,
 		BackchannelLogoutSessionRequired:  flagx.MustGetBool(cmd, "backchannel-logout-session-required"),
 		BackchannelLogoutURI:              flagx.MustGetString(cmd, "backchannel-logout-callback"),
 		FrontchannelLogoutSessionRequired: flagx.MustGetBool(cmd, "frontchannel-logout-session-required"),
@@ -165,6 +173,13 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
+	var metadata models.JSONRawMessage
+	metadataStr := flagx.MustGetString(cmd, "metadata")
+	if metadataStr != "" {
+		err = json.Unmarshal([]byte(flagx.MustGetString(cmd, "metadata")), &metadata)
+		cmdx.Must(err, "Failed to parse metadata: %s", err)
+	}
+
 	id := args[0]
 	cc := models.OAuth2Client{
 		ClientID:                          id,
@@ -184,6 +199,7 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 		SubjectType:                       flagx.MustGetString(cmd, "subject-type"),
 		Audience:                          flagx.MustGetStringSlice(cmd, "audience"),
 		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
+		Metadata:                          metadata,
 		BackchannelLogoutSessionRequired:  flagx.MustGetBool(cmd, "backchannel-logout-session-required"),
 		BackchannelLogoutURI:              flagx.MustGetString(cmd, "backchannel-logout-callback"),
 		FrontchannelLogoutSessionRequired: flagx.MustGetBool(cmd, "frontchannel-logout-session-required"),

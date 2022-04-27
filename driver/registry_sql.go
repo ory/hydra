@@ -117,7 +117,7 @@ func (m *RegistrySQL) alwaysCanHandle(dsn string) bool {
 }
 
 func (m *RegistrySQL) Ping() error {
-	return m.Persister().Connection(context.Background()).Open()
+	return m.Persister().Ping()
 }
 
 func (m *RegistrySQL) ClientManager() client.Manager {

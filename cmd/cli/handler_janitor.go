@@ -118,6 +118,12 @@ func purge(cmd *cobra.Command, args []string) error {
 			"When using flag -c, the dsn property should be set.")
 	}
 
+	if err := d.Ping(); err != nil {
+		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
+			err.Error(),
+			"There was an error connecting to the database. Please check your DSN.")
+	}
+
 	p := d.Persister()
 
 	limit := flagx.MustGetInt(cmd, Limit)

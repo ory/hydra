@@ -158,6 +158,28 @@
         }
       }
     },
+    "basic_auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Configures basic auth for admin endpoints.",
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Sets whether basic auth is required.",
+          "default": false
+        },
+        "username": {
+          "type": "string",
+          "description": "Basic auth username",
+          "default": ""
+        },
+        "password": {
+          "type": "string",
+          "description": "Basic auth password",
+          "default": ""
+        }
+      }
+    },
     "cidr": {
       "description": "CIDR address range.",
       "type": "string",
@@ -388,6 +410,9 @@
             },
             "cors": {
               "$ref": "#/definitions/cors"
+            },
+            "basic_auth": {
+              "$ref": "#/definitions/basic_auth"
             },
             "socket": {
               "$ref": "#/definitions/socket"

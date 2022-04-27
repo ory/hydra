@@ -17,6 +17,9 @@ const (
 	KeySuffixSocketGroup            = "socket.group"
 	KeySuffixSocketMode             = "socket.mode"
 	KeySuffixDisableHealthAccessLog = "access_log.disable_for_health"
+	KeyBasicAuthRequired            = "basic_auth.required"
+	KeyBasicAuthUsername            = "basic_auth.username"
+	KeyBasicAuthPassword            = "basic_auth.password" // #nosec G101
 )
 
 var (
@@ -78,4 +81,28 @@ func (p *Provider) host(iface ServeInterface) string {
 
 func (p *Provider) port(iface ServeInterface) int {
 	return p.p.Int(iface.Key(KeySuffixListenOnPort))
+}
+
+func (p *Provider) AdminBasicAuthRequired() bool {
+	return p.basicAuthRequired(AdminInterface)
+}
+
+func (p *Provider) AdminBasicAuthUsername() string {
+	return p.basicAuthUsername(AdminInterface)
+}
+
+func (p *Provider) AdminBasicAuthPassword() string {
+	return p.basicAuthPassword(AdminInterface)
+}
+
+func (p *Provider) basicAuthRequired(iface ServeInterface) bool {
+	return p.p.BoolF(iface.Key(KeyBasicAuthRequired), false)
+}
+
+func (p *Provider) basicAuthUsername(iface ServeInterface) string {
+	return p.p.String(iface.Key(KeyBasicAuthUsername))
+}
+
+func (p *Provider) basicAuthPassword(iface ServeInterface) string {
+	return p.p.String(iface.Key(KeyBasicAuthPassword))
 }

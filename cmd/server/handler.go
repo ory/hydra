@@ -207,6 +207,14 @@ func setup(d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public 
 	adminmw.Use(adminLogger)
 	adminmw.Use(d.PrometheusManager())
 
+	if d.Config().AdminBasicAuthRequired() {
+		basicAuthMiddleware := x.NewBasicAuthMiddleware(
+			d.Config().AdminBasicAuthUsername(),
+			d.Config().AdminBasicAuthPassword(),
+		)
+		adminmw.Use(basicAuthMiddleware)
+	}
+
 	publicLogger := reqlog.NewMiddlewareFromLogger(
 		d.Logger(),
 		fmt.Sprintf("hydra/public: %s", d.Config().IssuerURL().String()),

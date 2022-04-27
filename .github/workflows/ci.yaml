@@ -147,7 +147,7 @@ jobs:
     strategy:
       matrix:
         database: ['memory', 'postgres', 'mysql', 'cockroach']
-        args: ['', '--jwt']
+        args: ['', '--jwt', '--admin-basic-auth']
     services:
       postgres:
         image: postgres:9.6

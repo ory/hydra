@@ -75,6 +75,7 @@ e2e: node_modules test-resetdb
 		for db in memory postgres mysql cockroach; do \
 			./test/e2e/circle-ci.bash "$${db}"; \
 			./test/e2e/circle-ci.bash "$${db}" --jwt; \
+			./test/e2e/circle-ci.bash "$${db}" --admin-basic-auth; \
 		done
 
 # Runs tests in short mode, without database adapters

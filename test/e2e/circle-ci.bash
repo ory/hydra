@@ -32,10 +32,6 @@ fi
 if [[ ! -d "./oauth2-client/node_modules/" ]]; then
     (cd oauth2-client; npm ci)
 fi
-(cd oauth2-client; ADMIN_URL=http://127.0.0.1:5001 PUBLIC_URL=http://127.0.0.1:5004 PORT=5003 npm run start > ../oauth2-client.e2e.log 2>&1 &)
-
-# Install consent app
-(cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL=http://127.0.0.1:5001 npm run consent > ../login-consent-logout.e2e.log 2>&1 &)
 
 export URLS_SELF_ISSUER=http://127.0.0.1:5004
 export URLS_CONSENT=http://127.0.0.1:5002/consent
@@ -59,6 +55,7 @@ export TEST_DATABASE_SQLITE="sqlite://$(mktemp -d -t ci-XXXXXXXXXX)/e2e.sqlite?_
 export OIDC_DYNAMIC_CLIENT_REGISTRATION_ENABLED=true
 export TEST_DATABASE="$TEST_DATABASE_SQLITE"
 
+ADMIN_API_CREDS=
 WATCH=no
 for i in "$@"
 do
@@ -84,13 +81,24 @@ case $i in
         export OIDC_SUBJECT_IDENTIFIERS_SUPPORTED_TYPES=public
         export CYPRESS_jwt_enabled=true
     ;;
+    --admin-basic-auth)
+        export SERVE_ADMIN_BASIC_AUTH_REQUIRED=true
+        export SERVE_ADMIN_BASIC_AUTH_USERNAME=foo
+        export SERVE_ADMIN_BASIC_AUTH_PASSWORD=bar
+        ADMIN_API_CREDS="${SERVE_ADMIN_BASIC_AUTH_USERNAME}:${SERVE_ADMIN_BASIC_AUTH_PASSWORD}@"
+    ;;
     *)
         echo $"Invalid param $i"
-        echo $"Usage: $0 [memory|postgres|mysql|cockroach] [--watch][--jwt]"
+        echo $"Usage: $0 [memory|postgres|mysql|cockroach] [--watch][--jwt][--admin-basic-auth]"
         exit 1
     ;;
 esac
 done
+
+(cd oauth2-client; ADMIN_URL="http://${ADMIN_API_CREDS}127.0.0.1:5001" PUBLIC_URL=http://127.0.0.1:5004 PORT=5003 npm run start > ../oauth2-client.e2e.log 2>&1 &)
+
+# Install consent app
+(cd oauth2-client; PORT=5002 HYDRA_ADMIN_URL="http://${ADMIN_API_CREDS}127.0.0.1:5001" npm run consent > ../login-consent-logout.e2e.log 2>&1 &)
 
 ./hydra migrate sql --yes $TEST_DATABASE > ./hydra-migrate.e2e.log 2>&1
     DSN=$TEST_DATABASE \
@@ -98,7 +106,10 @@ done
 
 npm run wait-on -- -l -t 300000 \
   --interval 1000 -s 1 -d 1000 \
-  http-get://localhost:5004/health/ready http-get://localhost:5001/health/ready http-get://localhost:5002/ http-get://localhost:5003/oauth2/callback
+  "http-get://localhost:5004/health/ready" \
+  "http-get://${ADMIN_API_CREDS}localhost:5001/health/ready" \
+  "http-get://localhost:5002/" \
+  "http-get://localhost:5003/oauth2/callback"
 
 if [[ $WATCH = "yes" ]]; then
     (cd ../..; npm run test:watch)

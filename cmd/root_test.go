@@ -120,6 +120,8 @@ func TestExecute(t *testing.T) {
 		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "public-foo"}},
 		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "confidential-foo", "--pgp-key", base64EncodedPGPPublicKey(t), "--grant-types", "client_credentials", "--response-types", "token"}},
 		{args: []string{"clients", "delete", "--skip-tls-verify", "--endpoint", backend, "public-foo"}},
+		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "metadata", "--metadata", `{"foo":"bar"}`}},
+		{args: []string{"clients", "get", "--skip-tls-verify", "--endpoint", backend, "metadata"}},
 		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "RS256"}},
 		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "HS256"}, skipTest: conf.HsmEnabled()},
 		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},

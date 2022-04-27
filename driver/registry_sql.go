@@ -85,6 +85,10 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 			return err
 		}
 
+		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, m.persister.Ping); err != nil {
+			return errorsx.WithStack(err)
+		}
+
 		if m.C.HsmEnabled() {
 			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext(), m.C)
 			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)

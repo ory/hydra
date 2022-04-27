@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-04-24)](#000-2022-04-24)
+- [0.0.0 (2022-04-27)](#000-2022-04-27)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -630,7 +630,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-24)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-27)
 
 
 ### Bug Fixes
@@ -641,6 +641,7 @@
 * Do not use cached version ([422d422](https://github.com/ory/hydra/commit/422d4227e8b599a6eb32b60d432fd0cad95a717a))
 * Generated consent model ([#3076](https://github.com/ory/hydra/issues/3076)) ([270dbe0](https://github.com/ory/hydra/commit/270dbe0842827b3ec362a7ec35a56acd33275603))
 * Proper response types for 404 errors ([#3072](https://github.com/ory/hydra/issues/3072)) ([e711273](https://github.com/ory/hydra/commit/e711273e935d693d726dde2d97c296bd523f3a1e)), closes [#3064](https://github.com/ory/hydra/issues/3064)
+* Remove extraneous call to driver.init() ([#3093](https://github.com/ory/hydra/issues/3093)) ([1590542](https://github.com/ory/hydra/commit/1590542c70f98955aed591e3d929309e2b3b7396))
 * Remove unnecessary transaction ([#3029](https://github.com/ory/hydra/issues/3029)) ([d4b2696](https://github.com/ory/hydra/commit/d4b2696bd72b9fc98f3959b13be2fc28aa2263bc))
 * **sdk:** Correct polymorph type for consent session ([#3074](https://github.com/ory/hydra/issues/3074)) ([646459a](https://github.com/ory/hydra/commit/646459a55528e7f0805934d34493d78b92476904)), closes [#3058](https://github.com/ory/hydra/issues/3058)
 * **sdk:** Incorrect title ([#3014](https://github.com/ory/hydra/issues/3014)) ([d654911](https://github.com/ory/hydra/commit/d654911c0da2e2f9513e62916daf2284186d19de)):

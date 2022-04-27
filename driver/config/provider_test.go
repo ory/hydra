@@ -171,7 +171,7 @@ func TestProviderIssuerPublicURL(t *testing.T) {
 
 	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL().String())
 	assert.Equal(t, "http://hydra.example/", p.PublicURL().String())
-	assert.Equal(t, "http://hydra.localhost/.well-known/jwks.json", p.JWKSURL().String())
+	assert.Equal(t, "http://hydra.example/.well-known/jwks.json", p.JWKSURL().String())
 	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/consent", p.ConsentURL().String())
 	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/login", p.LoginURL().String())
 	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/logout", p.LogoutURL().String())

@@ -231,7 +231,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		AuthURL:                                h.c.OAuth2AuthURL().String(),
 		TokenURL:                               h.c.OAuth2TokenURL().String(),
 		JWKsURI:                                h.c.JWKSURL().String(),
-		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(), RevocationPath).String(),
+		RevocationEndpoint:                     urlx.AppendPaths(h.c.PublicURL(), RevocationPath).String(),
 		RegistrationEndpoint:                   h.c.OAuth2ClientRegistrationURL().String(),
 		SubjectTypes:                           h.c.SubjectTypesSupported(),
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
@@ -250,7 +250,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		BackChannelLogoutSessionSupported:      true,
 		FrontChannelLogoutSupported:            true,
 		FrontChannelLogoutSessionSupported:     true,
-		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(), LogoutPath).String(),
+		EndSessionEndpoint:                     urlx.AppendPaths(h.c.PublicURL(), LogoutPath).String(),
 		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
 		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	})

@@ -388,7 +388,7 @@ func (p *Provider) OAuth2AuthURL() *url.URL {
 }
 
 func (p *Provider) JWKSURL() *url.URL {
-	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
+	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.PublicURL(), "/.well-known/jwks.json"))
 }
 
 func (p *Provider) TokenRefreshHookURL() *url.URL {

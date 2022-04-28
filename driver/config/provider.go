@@ -29,6 +29,7 @@ const (
 	HsmLibraryPath                               = "hsm.library"
 	HsmPin                                       = "hsm.pin"
 	HsmSlotNumber                                = "hsm.slot"
+	HsmKeySetPrefix                              = "hsm.key_set_prefix"
 	HsmTokenLabel                                = "hsm.token_label" // #nosec G101
 	KeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
@@ -467,6 +468,10 @@ func (p *Provider) HsmPin() string {
 
 func (p *Provider) HsmTokenLabel() string {
 	return p.p.String(HsmTokenLabel)
+}
+
+func (p *Provider) HsmKeySetPrefix() string {
+	return p.p.String(HsmKeySetPrefix)
 }
 
 func (p *Provider) GrantTypeJWTBearerIDOptional() bool {

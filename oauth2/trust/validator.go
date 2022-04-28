@@ -16,8 +16,12 @@ func (v *GrantValidator) Validate(request createGrantRequest) error {
 		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Field 'issuer' is required."))
 	}
 
-	if request.Subject == "" {
-		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Field 'subject' is required."))
+	if request.Subject == "" && !request.AllowAnySubject {
+		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("One of 'subject' or 'allow_any_subject' field must be set."))
+	}
+
+	if request.Subject != "" && request.AllowAnySubject {
+		return errorsx.WithStack(ErrMissingRequiredParameter.WithHint("Both 'subject' and 'allow_any_subject' fields cannot be set at the same time."))
 	}
 
 	if request.ExpiresAt.IsZero() {

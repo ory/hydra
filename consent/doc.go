@@ -67,6 +67,14 @@ type swaggerListSubjectConsentSessionsPayload struct {
 	// in: query
 	// required: true
 	Subject string `json:"subject"`
+
+	// The maximum amount of consent sessions to be returned, upper bound is 500 sessions.
+	// in: query
+	Limit int `json:"limit"`
+
+	// The offset from where to start looking.
+	// in: query
+	Offset int `json:"offset"`
 }
 
 // swagger:parameters revokeAuthenticationSession

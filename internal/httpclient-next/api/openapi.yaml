@@ -3,10 +3,10 @@ info:
   contact:
     email: hi@ory.sh
   description: |
-    Documentation for all of Ory Oathkeeper's APIs.
+    Documentation for all of Ory Hydra's APIs.
   license:
     name: Apache 2.0
-  title: Ory Oathkeeper API
+  title: Ory Hydra API
 servers:
 - url: /
 paths:
@@ -495,7 +495,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/inline_response_200'
+                $ref: '#/components/schemas/healthStatus'
           description: Ory Hydra is ready to accept connections.
         "500":
           content:
@@ -1432,6 +1432,25 @@ paths:
         schema:
           type: string
         style: form
+      - description: The maximum amount of consent sessions to be returned, upper
+          bound is 500 sessions.
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      - description: The offset from where to start looking.
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
       responses:
         "200":
           content:
@@ -2275,10 +2294,8 @@ components:
           - requested_scope
           - requested_scope
         session:
-          access_token:
-            key: '{}'
-          id_token:
-            key: '{}'
+          access_token: ""
+          id_token: ""
         grant_access_token_audience:
         - grant_access_token_audience
         - grant_access_token_audience
@@ -2584,25 +2601,19 @@ components:
       type: object
     consentRequestSession:
       example:
-        access_token:
-          key: '{}'
-        id_token:
-          key: '{}'
+        access_token: ""
+        id_token: ""
       properties:
         access_token:
-          additionalProperties: true
           description: |-
             AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the
             refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.
             If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties
             can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!
-          type: object
         id_token:
-          additionalProperties: true
           description: |-
             IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable
             by anyone that has access to the ID Challenge. Use with care!
-          type: object
       title: Used to pass session data to a consent request.
       type: object
     flushInactiveOAuth2TokensRequest:
@@ -2684,6 +2695,8 @@ components:
           type: object
       type: object
     healthStatus:
+      example:
+        status: status
       properties:
         status:
           description: Status always contains "ok".
@@ -3520,6 +3533,10 @@ components:
       type: object
     trustJwtGrantIssuerBody:
       properties:
+        allow_any_subject:
+          description: The "allow_any_subject" indicates that the issuer is allowed
+            to have any principal as the subject of the JWT.
+          type: boolean
         expires_at:
           description: The "expires_at" indicates, when grant will expire, so we will
             reject assertion from "issuer" targeting "subject".
@@ -3551,7 +3568,6 @@ components:
       - issuer
       - jwk
       - scope
-      - subject
       type: object
     trustedJsonWebKey:
       example:
@@ -3581,8 +3597,13 @@ components:
         - offline
         created_at: 2000-01-23T04:56:07.000+00:00
         id: 9edc811f-4e28-453c-9b46-4de65f00217f
+        allow_any_subject: true
         issuer: https://jwt-idp.example.com
       properties:
+        allow_any_subject:
+          description: The "allow_any_subject" indicates that the issuer is allowed
+            to have any principal as the subject of the JWT.
+          type: boolean
         created_at:
           description: The "created_at" indicates, when grant was created.
           format: date-time
@@ -3988,8 +4009,6 @@ components:
         status:
           description: Always "ok".
           type: string
-      required:
-      - status
       type: object
     inline_response_503:
       properties:
@@ -3999,8 +4018,6 @@ components:
           description: Errors contains a list of errors that caused the not ready
             status.
           type: object
-      required:
-      - errors
       type: object
     inline_object:
       properties:
@@ -4062,8 +4079,6 @@ components:
         version:
           description: The version of Ory Hydra.
           type: string
-      required:
-      - version
       type: object
   securitySchemes:
     basic:

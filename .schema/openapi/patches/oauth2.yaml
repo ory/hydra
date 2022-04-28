@@ -1,0 +1,8 @@
+- op: remove
+  path: /components/schemas/consentRequestSession/properties/access_token/additionalProperties
+- op: remove
+  path: /components/schemas/consentRequestSession/properties/access_token/type
+- op: remove
+  path: /components/schemas/consentRequestSession/properties/id_token/additionalProperties
+- op: remove
+  path: /components/schemas/consentRequestSession/properties/id_token/type

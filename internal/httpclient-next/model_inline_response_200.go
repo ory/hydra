@@ -1,7 +1,7 @@
 /*
- * Ory Oathkeeper API
+ * Ory Hydra API
  *
- * Documentation for all of Ory Oathkeeper's APIs.
+ * Documentation for all of Ory Hydra's APIs.
  *
  * API version: 1.0.0
  * Contact: hi@ory.sh
@@ -18,16 +18,15 @@ import (
 // InlineResponse200 struct for InlineResponse200
 type InlineResponse200 struct {
 	// Always \"ok\".
-	Status string `json:"status"`
+	Status *string `json:"status,omitempty"`
 }
 
 // NewInlineResponse200 instantiates a new InlineResponse200 object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewInlineResponse200(status string) *InlineResponse200 {
+func NewInlineResponse200() *InlineResponse200 {
 	this := InlineResponse200{}
-	this.Status = status
 	return &this
 }
 
@@ -39,33 +38,41 @@ func NewInlineResponse200WithDefaults() *InlineResponse200 {
 	return &this
 }
 
-// GetStatus returns the Status field value
+// GetStatus returns the Status field value if set, zero value otherwise.
 func (o *InlineResponse200) GetStatus() string {
-	if o == nil {
+	if o == nil || o.Status == nil {
 		var ret string
 		return ret
 	}
-
-	return o.Status
+	return *o.Status
 }
 
-// GetStatusOk returns a tuple with the Status field value
+// GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *InlineResponse200) GetStatusOk() (*string, bool) {
-	if o == nil {
+	if o == nil || o.Status == nil {
 		return nil, false
 	}
-	return &o.Status, true
+	return o.Status, true
 }
 
-// SetStatus sets field value
+// HasStatus returns a boolean if a field has been set.
+func (o *InlineResponse200) HasStatus() bool {
+	if o != nil && o.Status != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetStatus gets a reference to the given string and assigns it to the Status field.
 func (o *InlineResponse200) SetStatus(v string) {
-	o.Status = v
+	o.Status = &v
 }
 
 func (o InlineResponse200) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
-	if true {
+	if o.Status != nil {
 		toSerialize["status"] = o.Status
 	}
 	return json.Marshal(toSerialize)

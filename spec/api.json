@@ -314,14 +314,10 @@
       "consentRequestSession": {
         "properties": {
           "access_token": {
-            "additionalProperties": true,
-            "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!",
-            "type": "object"
+            "description": "AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the\nrefresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection.\nIf only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties\ncan access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!"
           },
           "id_token": {
-            "additionalProperties": true,
-            "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!",
-            "type": "object"
+            "description": "IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable\nby anyone that has access to the ID Challenge. Use with care!"
           }
         },
         "title": "Used to pass session data to a consent request.",
@@ -965,6 +961,10 @@
       },
       "trustJwtGrantIssuerBody": {
         "properties": {
+          "allow_any_subject": {
+            "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
+            "type": "boolean"
+          },
           "expires_at": {
             "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
             "format": "date-time",
@@ -997,7 +997,6 @@
         },
         "required": [
           "issuer",
-          "subject",
           "scope",
           "jwk",
           "expires_at"
@@ -1021,6 +1020,10 @@
       },
       "trustedJwtGrantIssuer": {
         "properties": {
+          "allow_any_subject": {
+            "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
+            "type": "boolean"
+          },
           "created_at": {
             "description": "The \"created_at\" indicates, when grant was created.",
             "format": "date-time",
@@ -1348,11 +1351,11 @@
     "contact": {
       "email": "hi@ory.sh"
     },
-    "description": "Documentation for all of Ory Oathkeeper's APIs.\n",
+    "description": "Documentation for all of Ory Hydra's APIs.\n",
     "license": {
       "name": "Apache 2.0"
     },
-    "title": "Ory Oathkeeper API",
+    "title": "Ory Hydra API",
     "version": ""
   },
   "openapi": "3.0.3",
@@ -1895,16 +1898,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "properties": {
-                    "status": {
-                      "description": "Always \"ok\".",
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "status"
-                  ],
-                  "type": "object"
+                  "$ref": "#/components/schemas/healthStatus"
                 }
               }
             },
@@ -1942,9 +1936,6 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "status"
-                  ],
                   "type": "object"
                 }
               }
@@ -1964,9 +1955,6 @@
                       "type": "object"
                     }
                   },
-                  "required": [
-                    "errors"
-                  ],
                   "type": "object"
                 }
               }
@@ -3147,6 +3135,24 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "The maximum amount of consent sessions to be returned, upper bound is 500 sessions.",
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The offset from where to start looking.",
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "format": "int64",
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -3839,9 +3845,6 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "version"
-                  ],
                   "type": "object"
                 }
               }

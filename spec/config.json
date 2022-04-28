@@ -298,6 +298,11 @@
           "description": "Logs sensitive values such as cookie and URL parameter.",
           "default": false
         },
+        "redaction_text": {
+          "type": "string",
+          "title": "Sensitive log value redaction text",
+          "description": "Text to use, when redacting sensitive log value."
+        },
         "format": {
           "type": "string",
           "description": "Sets the log format.",
@@ -474,6 +479,11 @@
         "token_label": {
           "type": "string",
           "description": "Label of the token to use (if slot is not specified). If both slot and label are set, token label takes preference over slot. In this case first slot, that contains this label is used."
+        },
+        "key_set_prefix": {
+          "type": "string",
+          "description": "Key set prefix can be used in case of multiple Ory Hydra instances need to store keys on the same HSM partition. For example if `hsm.key_set_prefix=app1.` then key set `hydra.openid.id-token` would be generated/requested/deleted on HSM with `CKA_LABEL=app1.hydra.openid.id-token`.",
+          "default": ""
         }
       }
     },
@@ -1201,6 +1211,21 @@
           }
         }
       }
+    },
+    "dangerous-force-http": {
+      "type": "boolean",
+      "title": "Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead",
+      "description": "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead. This is only available as CLI flag `--dangerous-force-http`."
+    },
+    "dangerous-allow-insecure-redirect-urls": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "title": "Disable HTTPS enforcement for the provided redirect URLs.",
+      "description": "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs. This is only available as CLI flag `--dangerous-allow-insecure-redirect-urls`."
     }
   }
 }

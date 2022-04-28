@@ -1,6 +1,6 @@
 # Go API client for client
 
-Documentation for all of Ory Oathkeeper's APIs.
+Documentation for all of Ory Hydra's APIs.
 
 
 ## Overview

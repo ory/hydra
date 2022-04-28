@@ -9,8 +9,11 @@ import (
 	"crypto/elliptic"
 	"crypto/rsa"
 	"crypto/x509"
+	"fmt"
 	"net/http"
 	"sync"
+
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
 
@@ -32,6 +35,7 @@ type KeyManager struct {
 	jwk.Manager
 	sync.RWMutex
 	Context
+	KeySetPrefix string
 }
 
 var ErrPreGeneratedKeys = &fosite.RFC6749Error{
@@ -40,15 +44,18 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context) *KeyManager {
+func NewKeyManager(hsm Context, config *config.Provider) *KeyManager {
 	return &KeyManager{
-		Context: hsm,
+		Context:      hsm,
+		KeySetPrefix: config.HsmKeySetPrefix(),
 	}
 }
 
 func (m *KeyManager) GenerateAndPersistKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
 	m.Lock()
 	defer m.Unlock()
+
+	set = m.prefixKeySet(set)
 
 	err := m.deleteExistingKeySet(set)
 	if err != nil {
@@ -99,6 +106,8 @@ func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKe
 	m.RLock()
 	defer m.RUnlock()
 
+	set = m.prefixKeySet(set)
+
 	keyPair, err := m.FindKeyPair([]byte(kid), []byte(set))
 	if err != nil {
 		return nil, err
@@ -119,6 +128,8 @@ func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKe
 func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeySet, error) {
 	m.RLock()
 	defer m.RUnlock()
+
+	set = m.prefixKeySet(set)
 
 	keyPairs, err := m.FindKeyPairs(nil, []byte(set))
 	if err != nil {
@@ -147,6 +158,8 @@ func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
 	m.Lock()
 	defer m.Unlock()
 
+	set = m.prefixKeySet(set)
+
 	keyPair, err := m.FindKeyPair([]byte(kid), []byte(set))
 	if err != nil {
 		return err
@@ -166,6 +179,8 @@ func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
 func (m *KeyManager) DeleteKeySet(_ context.Context, set string) error {
 	m.Lock()
 	defer m.Unlock()
+
+	set = m.prefixKeySet(set)
 
 	keyPairs, err := m.FindKeyPairs(nil, []byte(set))
 	if err != nil {
@@ -308,4 +323,8 @@ func createKeys(key crypto11.Signer, kid, alg, use string) []jose.JSONWebKey {
 		CertificateThumbprintSHA1:   []uint8{},
 		CertificateThumbprintSHA256: []uint8{},
 	}}
+}
+
+func (m *KeyManager) prefixKeySet(set string) string {
+	return fmt.Sprintf("%s%s", m.KeySetPrefix, set)
 }

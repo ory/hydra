@@ -1,7 +1,7 @@
 /*
- * Ory Oathkeeper API
+ * Ory Hydra API
  *
- * Documentation for all of Ory Oathkeeper's APIs.
+ * Documentation for all of Ory Hydra's APIs.
  *
  * API version: 1.0.0
  * Contact: hi@ory.sh
@@ -18,6 +18,8 @@ import (
 
 // TrustJwtGrantIssuerBody struct for TrustJwtGrantIssuerBody
 type TrustJwtGrantIssuerBody struct {
+	// The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject *bool `json:"allow_any_subject,omitempty"`
 	// The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".
 	ExpiresAt time.Time `json:"expires_at"`
 	// The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).
@@ -26,20 +28,19 @@ type TrustJwtGrantIssuerBody struct {
 	// The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	Scope []string `json:"scope"`
 	// The \"subject\" identifies the principal that is the subject of the JWT.
-	Subject string `json:"subject"`
+	Subject *string `json:"subject,omitempty"`
 }
 
 // NewTrustJwtGrantIssuerBody instantiates a new TrustJwtGrantIssuerBody object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JSONWebKey, scope []string, subject string) *TrustJwtGrantIssuerBody {
+func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JSONWebKey, scope []string) *TrustJwtGrantIssuerBody {
 	this := TrustJwtGrantIssuerBody{}
 	this.ExpiresAt = expiresAt
 	this.Issuer = issuer
 	this.Jwk = jwk
 	this.Scope = scope
-	this.Subject = subject
 	return &this
 }
 
@@ -49,6 +50,38 @@ func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JSONWebK
 func NewTrustJwtGrantIssuerBodyWithDefaults() *TrustJwtGrantIssuerBody {
 	this := TrustJwtGrantIssuerBody{}
 	return &this
+}
+
+// GetAllowAnySubject returns the AllowAnySubject field value if set, zero value otherwise.
+func (o *TrustJwtGrantIssuerBody) GetAllowAnySubject() bool {
+	if o == nil || o.AllowAnySubject == nil {
+		var ret bool
+		return ret
+	}
+	return *o.AllowAnySubject
+}
+
+// GetAllowAnySubjectOk returns a tuple with the AllowAnySubject field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TrustJwtGrantIssuerBody) GetAllowAnySubjectOk() (*bool, bool) {
+	if o == nil || o.AllowAnySubject == nil {
+		return nil, false
+	}
+	return o.AllowAnySubject, true
+}
+
+// HasAllowAnySubject returns a boolean if a field has been set.
+func (o *TrustJwtGrantIssuerBody) HasAllowAnySubject() bool {
+	if o != nil && o.AllowAnySubject != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetAllowAnySubject gets a reference to the given bool and assigns it to the AllowAnySubject field.
+func (o *TrustJwtGrantIssuerBody) SetAllowAnySubject(v bool) {
+	o.AllowAnySubject = &v
 }
 
 // GetExpiresAt returns the ExpiresAt field value
@@ -147,32 +180,43 @@ func (o *TrustJwtGrantIssuerBody) SetScope(v []string) {
 	o.Scope = v
 }
 
-// GetSubject returns the Subject field value
+// GetSubject returns the Subject field value if set, zero value otherwise.
 func (o *TrustJwtGrantIssuerBody) GetSubject() string {
-	if o == nil {
+	if o == nil || o.Subject == nil {
 		var ret string
 		return ret
 	}
-
-	return o.Subject
+	return *o.Subject
 }
 
-// GetSubjectOk returns a tuple with the Subject field value
+// GetSubjectOk returns a tuple with the Subject field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TrustJwtGrantIssuerBody) GetSubjectOk() (*string, bool) {
-	if o == nil {
+	if o == nil || o.Subject == nil {
 		return nil, false
 	}
-	return &o.Subject, true
+	return o.Subject, true
 }
 
-// SetSubject sets field value
+// HasSubject returns a boolean if a field has been set.
+func (o *TrustJwtGrantIssuerBody) HasSubject() bool {
+	if o != nil && o.Subject != nil {
+		return true
+	}
+
+	return false
+}
+
+// SetSubject gets a reference to the given string and assigns it to the Subject field.
 func (o *TrustJwtGrantIssuerBody) SetSubject(v string) {
-	o.Subject = v
+	o.Subject = &v
 }
 
 func (o TrustJwtGrantIssuerBody) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
+	if o.AllowAnySubject != nil {
+		toSerialize["allow_any_subject"] = o.AllowAnySubject
+	}
 	if true {
 		toSerialize["expires_at"] = o.ExpiresAt
 	}
@@ -185,7 +229,7 @@ func (o TrustJwtGrantIssuerBody) MarshalJSON() ([]byte, error) {
 	if true {
 		toSerialize["scope"] = o.Scope
 	}
-	if true {
+	if o.Subject != nil {
 		toSerialize["subject"] = o.Subject
 	}
 	return json.Marshal(toSerialize)

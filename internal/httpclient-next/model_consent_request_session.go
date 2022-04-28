@@ -1,7 +1,7 @@
 /*
- * Ory Oathkeeper API
+ * Ory Hydra API
  *
- * Documentation for all of Ory Oathkeeper's APIs.
+ * Documentation for all of Ory Hydra's APIs.
  *
  * API version: 1.0.0
  * Contact: hi@ory.sh
@@ -18,9 +18,9 @@ import (
 // ConsentRequestSession struct for ConsentRequestSession
 type ConsentRequestSession struct {
 	// AccessToken sets session data for the access and refresh token, as well as any future tokens issued by the refresh grant. Keep in mind that this data will be available to anyone performing OAuth 2.0 Challenge Introspection. If only your services can perform OAuth 2.0 Challenge Introspection, this is usually fine. But if third parties can access that endpoint as well, sensitive data from the session might be exposed to them. Use with care!
-	AccessToken map[string]map[string]interface{} `json:"access_token,omitempty"`
+	AccessToken interface{} `json:"access_token,omitempty"`
 	// IDToken sets session data for the OpenID Connect ID token. Keep in mind that the session'id payloads are readable by anyone that has access to the ID Challenge. Use with care!
-	IdToken map[string]map[string]interface{} `json:"id_token,omitempty"`
+	IdToken interface{} `json:"id_token,omitempty"`
 }
 
 // NewConsentRequestSession instantiates a new ConsentRequestSession object
@@ -40,10 +40,10 @@ func NewConsentRequestSessionWithDefaults() *ConsentRequestSession {
 	return &this
 }
 
-// GetAccessToken returns the AccessToken field value if set, zero value otherwise.
-func (o *ConsentRequestSession) GetAccessToken() map[string]map[string]interface{} {
-	if o == nil || o.AccessToken == nil {
-		var ret map[string]map[string]interface{}
+// GetAccessToken returns the AccessToken field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *ConsentRequestSession) GetAccessToken() interface{} {
+	if o == nil {
+		var ret interface{}
 		return ret
 	}
 	return o.AccessToken
@@ -51,11 +51,12 @@ func (o *ConsentRequestSession) GetAccessToken() map[string]map[string]interface
 
 // GetAccessTokenOk returns a tuple with the AccessToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ConsentRequestSession) GetAccessTokenOk() (map[string]map[string]interface{}, bool) {
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *ConsentRequestSession) GetAccessTokenOk() (*interface{}, bool) {
 	if o == nil || o.AccessToken == nil {
 		return nil, false
 	}
-	return o.AccessToken, true
+	return &o.AccessToken, true
 }
 
 // HasAccessToken returns a boolean if a field has been set.
@@ -67,15 +68,15 @@ func (o *ConsentRequestSession) HasAccessToken() bool {
 	return false
 }
 
-// SetAccessToken gets a reference to the given map[string]map[string]interface{} and assigns it to the AccessToken field.
-func (o *ConsentRequestSession) SetAccessToken(v map[string]map[string]interface{}) {
+// SetAccessToken gets a reference to the given interface{} and assigns it to the AccessToken field.
+func (o *ConsentRequestSession) SetAccessToken(v interface{}) {
 	o.AccessToken = v
 }
 
-// GetIdToken returns the IdToken field value if set, zero value otherwise.
-func (o *ConsentRequestSession) GetIdToken() map[string]map[string]interface{} {
-	if o == nil || o.IdToken == nil {
-		var ret map[string]map[string]interface{}
+// GetIdToken returns the IdToken field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *ConsentRequestSession) GetIdToken() interface{} {
+	if o == nil {
+		var ret interface{}
 		return ret
 	}
 	return o.IdToken
@@ -83,11 +84,12 @@ func (o *ConsentRequestSession) GetIdToken() map[string]map[string]interface{} {
 
 // GetIdTokenOk returns a tuple with the IdToken field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ConsentRequestSession) GetIdTokenOk() (map[string]map[string]interface{}, bool) {
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *ConsentRequestSession) GetIdTokenOk() (*interface{}, bool) {
 	if o == nil || o.IdToken == nil {
 		return nil, false
 	}
-	return o.IdToken, true
+	return &o.IdToken, true
 }
 
 // HasIdToken returns a boolean if a field has been set.
@@ -99,8 +101,8 @@ func (o *ConsentRequestSession) HasIdToken() bool {
 	return false
 }
 
-// SetIdToken gets a reference to the given map[string]map[string]interface{} and assigns it to the IdToken field.
-func (o *ConsentRequestSession) SetIdToken(v map[string]map[string]interface{}) {
+// SetIdToken gets a reference to the given interface{} and assigns it to the IdToken field.
+func (o *ConsentRequestSession) SetIdToken(v interface{}) {
 	o.IdToken = v
 }
 

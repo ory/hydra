@@ -1653,6 +1653,8 @@ paths:
 
         https://openid.net/specs/openid-connect-frontchannel-1_0.html
         https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+        Back-channel logout is performed asynchronously and does not affect logout flow.
       operationId: disconnectUser
       responses:
         "302":

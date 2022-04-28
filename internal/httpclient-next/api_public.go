@@ -33,6 +33,8 @@ type PublicApi interface {
 
 		https://openid.net/specs/openid-connect-frontchannel-1_0.html
 		https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+		Back-channel logout is performed asynchronously and does not affect logout flow.
 			 * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 			 * @return PublicApiApiDisconnectUserRequest
 	*/
@@ -272,6 +274,8 @@ func (r PublicApiApiDisconnectUserRequest) Execute() (*http.Response, error) {
 
 https://openid.net/specs/openid-connect-frontchannel-1_0.html
 https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+Back-channel logout is performed asynchronously and does not affect logout flow.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @return PublicApiApiDisconnectUserRequest
 */

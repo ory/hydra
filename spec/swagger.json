@@ -1846,7 +1846,7 @@
     },
     "/oauth2/sessions/logout": {
       "get": {
-        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html",
+        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html\n\nBack-channel logout is performed asynchronously and does not affect logout flow.",
         "schemes": [
           "http",
           "https"

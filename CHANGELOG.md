@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-04-27)](#000-2022-04-27)
+- [0.0.0 (2022-04-28)](#000-2022-04-28)
     - [Bug Fixes](#bug-fixes)
     - [Documentation](#documentation)
     - [Features](#features)
@@ -630,7 +630,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-27)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.7...v0.0.0) (2022-04-28)
 
 
 ### Bug Fixes
@@ -672,6 +672,7 @@
     setting up token services that can issue tokens with any value in the
     subject field.
 
+* Async backchannel logout ([#2849](https://github.com/ory/hydra/issues/2849)) ([22e1ebb](https://github.com/ory/hydra/commit/22e1ebb5742477e924ebac83c711bec08bffd7ba))
 * Backchannel request logging ([#3067](https://github.com/ory/hydra/issues/3067)) ([6dda48d](https://github.com/ory/hydra/commit/6dda48dc3e2eb6d4f57e41abcc8b49e71c38e80d))
 * Make sensitive log value redaction text configurable ([#3040](https://github.com/ory/hydra/issues/3040)) ([536352c](https://github.com/ory/hydra/commit/536352c15bb054f123e9d62944690a06cff86ba0))
 

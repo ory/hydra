@@ -4,10 +4,11 @@
 ALTER TABLE hydra_oauth2_jti_blacklist ADD COLUMN nid CHAR(36) NULL REFERENCES networks(id) ON DELETE CASCADE ON UPDATE RESTRICT;
 UPDATE hydra_oauth2_jti_blacklist SET nid = (SELECT id FROM networks LIMIT 1);
 CREATE TABLE "_hydra_oauth2_jti_blacklist_tmp" (
-    signature  VARCHAR(64) NOT NULL PRIMARY KEY,
+    signature  VARCHAR(64) NOT NULL,
     expires_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     nid        CHAR(36)    NOT NULL,
-    CHECK (nid != '00000000-0000-0000-0000-000000000000')
+    CHECK (nid != '00000000-0000-0000-0000-000000000000'),
+    PRIMARY KEY (signature, nid)
 );
 INSERT INTO "_hydra_oauth2_jti_blacklist_tmp" (signature, expires_at, nid) SELECT signature, expires_at, nid FROM "hydra_oauth2_jti_blacklist";
 DROP TABLE "hydra_oauth2_jti_blacklist";

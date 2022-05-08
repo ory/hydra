@@ -1219,11 +1219,9 @@
     },
     "dangerous-allow-insecure-redirect-urls": {
       "type": "array",
-      "items": [
-        {
+      "items": {
           "type": "string"
-        }
-      ],
+      },
       "title": "Disable HTTPS enforcement for the provided redirect URLs.",
       "description": "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs. This is only available as CLI flag `--dangerous-allow-insecure-redirect-urls`."
     }

@@ -19,7 +19,7 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.0.0
-	github.com/evanphx/json-patch v4.9.0+incompatible
+	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
 	github.com/go-openapi/errors v0.20.1
@@ -35,7 +35,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/gorilla/securecookie v1.1.1
-	github.com/gorilla/sessions v1.2.0
+	github.com/gorilla/sessions v1.2.1
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/instana/testify v1.6.2-0.20200721153833-94b1851f4d65
@@ -49,12 +49,12 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
-	github.com/ory/analytics-go/v4 v4.0.2
+	github.com/ory/analytics-go/v4 v4.0.3
 	github.com/ory/fosite v0.42.1
 	github.com/ory/go-acc v0.2.6
 	github.com/ory/graceful v0.1.1
-	github.com/ory/herodot v0.9.12
-	github.com/ory/x v0.0.344
+	github.com/ory/herodot v0.9.13
+	github.com/ory/x v0.0.382
 	github.com/pborman/uuid v1.2.1
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
@@ -64,13 +64,13 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
-	github.com/tidwall/gjson v1.9.4
+	github.com/tidwall/gjson v1.14.0
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/tools v0.1.7
-	gopkg.in/DataDog/dd-trace-go.v1 v1.33.0
+	gopkg.in/DataDog/dd-trace-go.v1 v1.38.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 )

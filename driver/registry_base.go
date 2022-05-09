@@ -10,6 +10,7 @@ import (
 
 	"github.com/ory/hydra/hsm"
 
+	"github.com/ory/x/otelx"
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
@@ -77,7 +78,7 @@ type RegistryBase struct {
 	coh          *consent.Handler
 	oah          *oauth2.Handler
 	sia          map[string]consent.SubjectIdentifierAlgorithm
-	trc          *tracing.Tracer
+	trc          *otelx.Tracer
 	pmm          *prometheus.MetricsManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
@@ -483,9 +484,9 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[strin
 	return m.sia
 }
 
-func (m *RegistryBase) Tracer(ctx context.Context) *tracing.Tracer {
+func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
 	if m.trc == nil {
-		t, err := tracing.New(m.l, m.C.Tracing())
+		t, err := otelx.New("Ory Hydra", m.l, m.C.Tracing())
 		if err != nil {
 			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
 		} else {

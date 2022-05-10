@@ -16,6 +16,7 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/persistence"
+	"github.com/ory/hydra/persistence/sql/transaction"
 	"github.com/ory/hydra/x"
 	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/errorsx"
@@ -26,8 +27,6 @@ import (
 
 var _ persistence.Persister = new(Persister)
 var _ storage.Transactional = new(Persister)
-
-const transactionContextKey transactionContextType = "transactionConnection"
 
 var (
 	ErrTransactionOpen   = errors.New("There is already a transaction in this context.")
@@ -52,11 +51,10 @@ type (
 		x.RegistryLogger
 		x.TracingProvider
 	}
-	transactionContextType string
 )
 
 func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
-	_, ok := ctx.Value(transactionContextKey).(*pop.Connection)
+	_, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection)
 	if ok {
 		return ctx, errorsx.WithStack(ErrTransactionOpen)
 	}
@@ -71,11 +69,11 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 		ID:      randx.String(30),
 		Dialect: p.conn.Dialect,
 	}
-	return context.WithValue(ctx, transactionContextKey, c), err
+	return context.WithValue(ctx, transaction.TransactionContextKey, c), err
 }
 
 func (p *Persister) Commit(ctx context.Context) error {
-	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
+	c, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection)
 	if !ok || c.TX == nil {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
@@ -84,7 +82,7 @@ func (p *Persister) Commit(ctx context.Context) error {
 }
 
 func (p *Persister) Rollback(ctx context.Context) error {
-	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
+	c, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection)
 	if !ok || c.TX == nil {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
@@ -144,7 +142,7 @@ func (p *Persister) QueryWithNetwork(ctx context.Context) *pop.Query {
 }
 
 func (p *Persister) Connection(ctx context.Context) *pop.Connection {
-	if c, ok := ctx.Value(transactionContextKey).(*pop.Connection); ok {
+	if c, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection); ok {
 		return c.WithContext(ctx)
 	}
 	return p.conn.WithContext(ctx)
@@ -170,32 +168,5 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 }
 
 func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
-	isNested := true
-	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)
-	if !ok {
-		isNested = false
-
-		var err error
-		c, err = p.conn.WithContext(ctx).NewTransaction()
-
-		if err != nil {
-			return errorsx.WithStack(err)
-		}
-	}
-
-	if err := f(context.WithValue(ctx, transactionContextKey, c), c); err != nil {
-		if !isNested {
-			if err := c.TX.Rollback(); err != nil {
-				return errorsx.WithStack(err)
-			}
-		}
-		return err
-	}
-
-	// commit if there is no wrapping transaction
-	if !isNested {
-		return errorsx.WithStack(c.TX.Commit())
-	}
-
-	return nil
+	return transaction.Transaction(ctx, p.conn, f)
 }

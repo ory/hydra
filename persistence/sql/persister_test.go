@@ -35,7 +35,7 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 	})
 
 	parallel := true
-	if k == "memory" || k == "mysql" || k == "cockroach" { // TODO enable parallel tests for cockroach once we swap the transaction wrapper for one that supports retry
+	if k == "memory" || k == "mysql" || k == "cockroach" { // TODO enable parallel tests for cockroach once we configure the cockroach integration test server to support retry
 		parallel = false
 	}
 
@@ -69,7 +69,8 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 				}
 				if t1.Config(ctx).HsmEnabled() {
 					t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerGenerateAndPersistKeySet(t1.KeyManager(), tc.alg, false))
-					t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerNIDIsolationKeySet(t1.KeyManager(), t2.KeyManager(), tc.alg))
+					// We don't support NID isolation with HSM at the moment
+					// t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerNIDIsolationKeySet(t1.KeyManager(), t2.KeyManager(), tc.alg))
 				} else {
 					kid, err := uuid.NewV4()
 					require.NoError(t, err)
@@ -170,9 +171,11 @@ func TestManagers(t *testing.T) {
 		t2 := t2registries[k]
 		t2.WithContextualizer(&contextx.StaticContextualizer{NID: uuid.Nil, C: t2.Config(ctx)})
 
-		t.Run("package=jwk/manager="+k+"/case=nid",
-			jwk.TestHelperNID(t1.KeyManager(), t2.KeyManager()),
-		)
+		if !t1.Config(ctx).HsmEnabled() { // We don't support NID isolation with HSM at the moment
+			t.Run("package=jwk/manager="+k+"/case=nid",
+				jwk.TestHelperNID(t1.KeyManager(), t2.KeyManager()),
+			)
+		}
 		t.Run("package=consent/manager="+k+"/case=nid",
 			consent.TestHelperNID(t1.ClientManager(), t1.ConsentManager(), t2.ConsentManager()),
 		)

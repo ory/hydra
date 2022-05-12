@@ -6,9 +6,9 @@ import (
 	"reflect"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gobuffalo/x/randx"
 	"github.com/gofrs/uuid"
 
-	"github.com/gobuffalo/x/randx"
 	"github.com/pkg/errors"
 
 	"github.com/ory/fosite"
@@ -16,7 +16,6 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/persistence"
-	"github.com/ory/hydra/persistence/sql/transaction"
 	"github.com/ory/hydra/x"
 	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/errorsx"
@@ -54,8 +53,8 @@ type (
 )
 
 func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
-	_, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection)
-	if ok {
+	fallback := &pop.Connection{TX: &pop.Tx{}}
+	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
 		return ctx, errorsx.WithStack(ErrTransactionOpen)
 	}
 
@@ -69,25 +68,27 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 		ID:      randx.String(30),
 		Dialect: p.conn.Dialect,
 	}
-	return context.WithValue(ctx, transaction.TransactionContextKey, c), err
+	return popx.WithTransaction(ctx, c), err
 }
 
 func (p *Persister) Commit(ctx context.Context) error {
-	c, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection)
-	if !ok || c.TX == nil {
+	fallback := &pop.Connection{TX: &pop.Tx{}}
+	tx := popx.GetConnection(ctx, fallback)
+	if tx.TX == fallback.TX || tx.TX == nil {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
-	return errorsx.WithStack(c.TX.Commit())
+	return errorsx.WithStack(tx.TX.Commit())
 }
 
 func (p *Persister) Rollback(ctx context.Context) error {
-	c, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection)
-	if !ok || c.TX == nil {
+	fallback := &pop.Connection{TX: &pop.Tx{}}
+	tx := popx.GetConnection(ctx, fallback)
+	if tx.TX == fallback.TX || tx.TX == nil {
 		return errorsx.WithStack(ErrNoTransactionOpen)
 	}
 
-	return errorsx.WithStack(c.TX.Rollback())
+	return errorsx.WithStack(tx.TX.Rollback())
 }
 
 func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config *config.Provider, l *logrusx.Logger) (*Persister, error) {
@@ -142,10 +143,7 @@ func (p *Persister) QueryWithNetwork(ctx context.Context) *pop.Query {
 }
 
 func (p *Persister) Connection(ctx context.Context) *pop.Connection {
-	if c, ok := ctx.Value(transaction.TransactionContextKey).(*pop.Connection); ok {
-		return c.WithContext(ctx)
-	}
-	return p.conn.WithContext(ctx)
+	return popx.GetConnection(ctx, p.conn)
 }
 
 func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
@@ -163,5 +161,5 @@ func (p *Persister) mustSetNetwork(nid uuid.UUID, v interface{}) interface{} {
 }
 
 func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
-	return transaction.Transaction(ctx, p.conn, f)
+	return popx.Transaction(ctx, p.conn, f)
 }

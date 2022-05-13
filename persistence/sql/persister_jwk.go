@@ -2,7 +2,9 @@ package sql
 
 import (
 	"context"
+	"crypto/x509"
 	"encoding/json"
+	"github.com/ory/x/josex"
 
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
@@ -19,17 +21,29 @@ import (
 var _ jwk.Manager = &Persister{}
 
 func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
-	generator, found := p.r.KeyGenerators()[alg]
-	if !found {
-		return nil, errorsx.WithStack(jwk.ErrUnsupportedKeyAlgorithm)
-	}
-
-	keys, err := generator.Generate(kid, use)
+	pub, priv, err := josex.NewSigningKey(jose.SignatureAlgorithm(alg), 4096)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(jwk.ErrUnsupportedKeyAlgorithm, "%s", err)
 	}
 
-	err = p.AddKeySet(ctx, set, keys)
+	err = p.AddKeySet(ctx, set, &jose.JSONWebKeySet{
+		Keys: []jose.JSONWebKey{
+			{
+				Algorithm:    alg,
+				Key:          priv,
+				Use:          use,
+				KeyID:        jwk.Ider("private", kid),
+				Certificates: []*x509.Certificate{},
+			},
+			{
+				Algorithm:    alg,
+				Key:          &pub,
+				Use:          use,
+				KeyID:        jwk.Ider("public", kid),
+				Certificates: []*x509.Certificate{},
+			},
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +57,7 @@ func (p *Persister) AddKey(ctx context.Context, set string, key *jose.JSONWebKey
 		return errorsx.WithStack(err)
 	}
 
-	encrypted, err := p.r.KeyCipher().Encrypt(out)
+	encrypted, err := p.r.KeyCipher().Encrypt(ctx, out)
 	if err != nil {
 		return errorsx.WithStack(err)
 	}
@@ -64,7 +78,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 				return errorsx.WithStack(err)
 			}
 
-			encrypted, err := p.r.KeyCipher().Encrypt(out)
+			encrypted, err := p.r.KeyCipher().Encrypt(ctx, out)
 			if err != nil {
 				return err
 			}
@@ -117,7 +131,7 @@ func (p *Persister) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebK
 		return nil, sqlcon.HandleError(err)
 	}
 
-	key, err := p.r.KeyCipher().Decrypt(j.Key)
+	key, err := p.r.KeyCipher().Decrypt(ctx, j.Key)
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -147,7 +161,7 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 
 	keys := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, d := range js {
-		key, err := p.r.KeyCipher().Decrypt(d.Key)
+		key, err := p.r.KeyCipher().Decrypt(ctx, d.Key)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}

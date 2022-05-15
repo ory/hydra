@@ -60,15 +60,3 @@ func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
 
 	assert.Equal(t, cs.Options.MaxAge, 0)
 }
-
-type MockRegistry struct {
-	*RegistrySQL
-	onInit func(ctx context.Context) error
-}
-
-func (m MockRegistry) Init(ctx context.Context) error {
-	if m.onInit != nil {
-		return m.onInit(ctx)
-	}
-	return m.RegistrySQL.Init(ctx)
-}

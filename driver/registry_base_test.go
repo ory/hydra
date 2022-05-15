@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"testing"
 
@@ -31,20 +32,22 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	c.MustSet(config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
 	c.MustSet(config.HsmEnabled, "false")
 
-	registry, err := NewRegistryFromDSN(context.Background(), c, l)
+	registry, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
-		t.Error("failed to create registry: ", err)
+		t.Errorf("Failed to create registry: %s", err)
 		return
 	}
 
-	registryBase := RegistryBase{r: registry, l: l}
+	r := registry.(*RegistrySQL)
+	r.initialPing = failedPing(errors.New("snizzles"))
+
+	_ = r.Init(context.Background())
+
+	registryBase := RegistryBase{r: r, l: l}
 	registryBase.WithConfig(c)
 
-	strategy := registryBase.newKeyStrategy("key")
-
-	assert.Equal(t, nil, strategy)
 	assert.Equal(t, logrus.FatalLevel, hook.LastEntry().Level)
-	assert.Contains(t, hook.LastEntry().Message, "A network error occurred, see error for specific details.")
+	assert.Contains(t, hook.LastEntry().Message, "snizzles")
 }
 
 func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
@@ -56,4 +59,16 @@ func TestRegistryBase_CookieStore_MaxAgeZero(t *testing.T) {
 	cs := r.CookieStore().(*sessions.CookieStore)
 
 	assert.Equal(t, cs.Options.MaxAge, 0)
+}
+
+type MockRegistry struct {
+	*RegistrySQL
+	onInit func(ctx context.Context) error
+}
+
+func (m MockRegistry) Init(ctx context.Context) error {
+	if m.onInit != nil {
+		return m.onInit(ctx)
+	}
+	return m.RegistrySQL.Init(ctx)
 }

@@ -36,9 +36,21 @@ type RegistrySQL struct {
 	*RegistryBase
 	db                *sqlx.DB
 	defaultKeyManager jwk.Manager
+	initialPing       func(r *RegistrySQL) error
 }
 
 var _ Registry = new(RegistrySQL)
+
+// defaultInitialPing is the default function that will be called within RegistrySQL.Init to make sure
+// the database is reachable. It can be injected for test purposes by changing the value
+// of RegistrySQL.initialPing.
+var defaultInitialPing = func(m *RegistrySQL) error {
+	if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, m.Ping); err != nil {
+		m.Logger().Print("Could not ping database: ", err)
+		return errorsx.WithStack(err)
+	}
+	return nil
+}
 
 func init() {
 	dbal.RegisterDriver(func() dbal.Driver {
@@ -49,6 +61,7 @@ func init() {
 func NewRegistrySQL() *RegistrySQL {
 	r := &RegistrySQL{
 		RegistryBase: new(RegistryBase),
+		initialPing:  defaultInitialPing,
 	}
 	r.RegistryBase.with(r)
 	return r
@@ -84,9 +97,8 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-
-		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, m.persister.Ping); err != nil {
-			return errorsx.WithStack(err)
+		if err := m.initialPing(m); err != nil {
+			return err
 		}
 
 		if m.C.HsmEnabled() {

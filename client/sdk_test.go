@@ -70,8 +70,8 @@ func createTestClient(prefix string) *models.OAuth2Client {
 		SubjectType:               "public",
 		Metadata:                  map[string]interface{}{"foo": "bar"},
 		// because these values are not nullable in the SQL schema, we have to set them not nil
-		AllowedCorsOrigins: models.StringSlicePipeDelimiter{},
-		Audience:           models.StringSlicePipeDelimiter{},
+		AllowedCorsOrigins: models.StringSliceJSONFormat{},
+		Audience:           models.StringSliceJSONFormat{},
 		Jwks:               models.JoseJSONWebKeySet(map[string]interface{}{}),
 		// SectorIdentifierUri:   "https://sector.com/foo",
 	}

@@ -171,10 +171,10 @@ type HandledConsentRequest struct {
 	ID string `json:"-"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope"`
+	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
 	Session *ConsentRequestSessionData `json:"session" faker:"-"`
@@ -216,10 +216,10 @@ type PreviousConsentSession struct {
 	ID string `json:"-" db:"challenge"`
 
 	// GrantScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSlicePipeDelimiter `json:"grant_scope" db:"granted_scope"`
+	GrantedScope sqlxx.StringSliceJSONFormat `json:"grant_scope" db:"granted_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSlicePipeDelimiter `json:"grant_access_token_audience" db:"granted_at_audience"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `json:"grant_access_token_audience" db:"granted_at_audience"`
 
 	// Session allows you to set (optional) session data for access and ID tokens.
 	Session *ConsentRequestSessionData `json:"session" db:"-"`
@@ -274,7 +274,7 @@ type HandledLoginRequest struct {
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSlicePipeDelimiter `json:"amr"`
+	AMR sqlxx.StringSliceJSONFormat `json:"amr"`
 
 	// Subject is the user ID of the end-user that authenticated.
 	//
@@ -455,12 +455,12 @@ type LoginRequest struct {
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope"`
+	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
 
 	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience"`
+	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
@@ -526,10 +526,10 @@ type ConsentRequest struct {
 	ID string `json:"challenge"`
 
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
-	RequestedScope sqlxx.StringSlicePipeDelimiter `json:"requested_scope"`
+	RequestedScope sqlxx.StringSliceJSONFormat `json:"requested_scope"`
 
 	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `json:"requested_access_token_audience"`
+	RequestedAudience sqlxx.StringSliceJSONFormat `json:"requested_access_token_audience"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the
@@ -571,7 +571,7 @@ type ConsentRequest struct {
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSlicePipeDelimiter `json:"amr"`
+	AMR sqlxx.StringSliceJSONFormat `json:"amr"`
 
 	// Context contains arbitrary information set by the login endpoint or is empty if not set.
 	Context sqlxx.JSONRawMessage `json:"context,omitempty"`

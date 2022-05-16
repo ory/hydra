@@ -39,11 +39,11 @@ type LoginRequest struct {
 
 	// requested access token audience
 	// Required: true
-	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience"`
+	RequestedAccessTokenAudience StringSliceJSONFormat `json:"requested_access_token_audience"`
 
 	// requested scope
 	// Required: true
-	RequestedScope StringSlicePipeDelimiter `json:"requested_scope"`
+	RequestedScope StringSliceJSONFormat `json:"requested_scope"`
 
 	// SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)
 	// this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)

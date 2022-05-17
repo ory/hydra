@@ -41,7 +41,7 @@ import (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.Provider
+	c *config.DefaultProvider
 }
 
 const (
@@ -53,7 +53,7 @@ const (
 
 func NewHandler(
 	r InternalRegistry,
-	c *config.Provider,
+	c *config.DefaultProvider,
 ) *Handler {
 	return &Handler{
 		c: c,
@@ -704,7 +704,7 @@ func (h *Handler) AcceptLogoutRequest(w http.ResponseWriter, r *http.Request, ps
 	}
 
 	h.r.Writer().Write(w, r, &RequestHandlerResponse{
-		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
+		RedirectTo: urlx.SetQuery(urlx.AppendPaths(h.c.PublicURL(r.Context()), "/oauth2/sessions/logout"), url.Values{"logout_verifier": {c.Verifier}}).String(),
 	})
 }
 

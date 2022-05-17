@@ -2,10 +2,7 @@ package sql
 
 import (
 	"context"
-	"crypto/x509"
 	"encoding/json"
-	"github.com/ory/x/josex"
-
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
@@ -21,29 +18,12 @@ import (
 var _ jwk.Manager = &Persister{}
 
 func (p *Persister) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
-	pub, priv, err := josex.NewSigningKey(jose.SignatureAlgorithm(alg), 4096)
+	keys, err := jwk.GenerateJWK(ctx, jose.SignatureAlgorithm(alg), kid, use)
 	if err != nil {
 		return nil, errors.Wrapf(jwk.ErrUnsupportedKeyAlgorithm, "%s", err)
 	}
 
-	err = p.AddKeySet(ctx, set, &jose.JSONWebKeySet{
-		Keys: []jose.JSONWebKey{
-			{
-				Algorithm:    alg,
-				Key:          priv,
-				Use:          use,
-				KeyID:        jwk.Ider("private", kid),
-				Certificates: []*x509.Certificate{},
-			},
-			{
-				Algorithm:    alg,
-				Key:          &pub,
-				Use:          use,
-				KeyID:        jwk.Ider("public", kid),
-				Certificates: []*x509.Certificate{},
-			},
-		},
-	})
+	err = p.AddKeySet(ctx, set, keys)
 	if err != nil {
 		return nil, err
 	}

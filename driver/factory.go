@@ -8,7 +8,7 @@ import (
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 )
 
 type options struct {
@@ -45,9 +45,7 @@ func DisableValidation() OptionsModifier {
 	}
 }
 
-// DisableValidation validating the config.
-//
-// This does not affect schema validation!
+// DisablePreloading will not preload the config.
 func DisablePreloading() OptionsModifier {
 	return func(o *options) {
 		o.preload = false
@@ -73,15 +71,15 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 	}
 
 	if o.validate {
-		config.MustValidate(l, c)
+		config.MustValidate(ctx, l, c)
 	}
 
-	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, &contextx.DefaultContextualizer{})
+	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, &contextx.Default{})
 	if err != nil {
 		l.WithError(err).Fatal("Unable to create service registry.")
 	}
 
-	if err = r.Init(ctx, o.skipNetworkInit, false, &contextx.DefaultContextualizer{}); err != nil {
+	if err = r.Init(ctx, o.skipNetworkInit, false, &contextx.Default{}); err != nil {
 		l.WithError(err).Fatal("Unable to initialize service registry.")
 	}
 
@@ -90,7 +88,7 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		CallRegistry(ctx, r)
 	}
 
-	c.Source().SetTracer(context.Background(), r.Tracer(ctx))
+	c.Source(ctx).SetTracer(ctx, r.Tracer(ctx))
 
 	return r
 }

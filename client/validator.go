@@ -93,7 +93,7 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if len(c.Scope) == 0 {
-		c.Scope = strings.Join(v.r.Config(ctx).DefaultClientScope(), " ")
+		c.Scope = strings.Join(v.r.Config().DefaultClientScope(ctx), " ")
 	}
 
 	for k, origin := range c.AllowedCORSOrigins {
@@ -149,14 +149,14 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.r.Config(ctx).SubjectTypesSupported(), c.SubjectType) {
-			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config(ctx).SubjectTypesSupported()))
+		if !stringslice.Has(v.r.Config().SubjectTypesSupported(ctx), c.SubjectType) {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config().SubjectTypesSupported(ctx)))
 		}
 	} else {
-		if stringslice.Has(v.r.Config(ctx).SubjectTypesSupported(), "public") {
+		if stringslice.Has(v.r.Config().SubjectTypesSupported(ctx), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.r.Config(ctx).SubjectTypesSupported()[0]
+			c.SubjectType = v.r.Config().SubjectTypesSupported(ctx)[0]
 		}
 	}
 

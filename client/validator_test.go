@@ -35,14 +35,15 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 )
 
 func TestValidate(t *testing.T) {
+	ctx := context.Background()
 	c := internal.NewConfigurationWithDefaults()
-	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
-	reg := internal.NewRegistryMemory(t, c, &contextx.StaticContextualizer{C: c})
+	c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.MustSet(ctx, config.KeyDefaultClientScope, []string{"openid"})
+	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 	v := NewValidator(reg)
 
 	testCtx := context.TODO()
@@ -115,7 +116,7 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			v: func(t *testing.T) *Validator {
-				c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise"})
+				c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(reg)
 			},
 			in: &Client{OutfacingID: "foo"},
@@ -206,10 +207,11 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 }
 
 func TestValidateDynamicRegistration(t *testing.T) {
+	ctx := context.Background()
 	c := internal.NewConfigurationWithDefaults()
-	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
-	reg := internal.NewRegistryMemory(t, c, &contextx.StaticContextualizer{C: c})
+	c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	c.MustSet(ctx, config.KeyDefaultClientScope, []string{"openid"})
+	reg := internal.NewRegistryMemory(t, c, &contextx.Static{C: c.Source(ctx)})
 
 	testCtx := context.TODO()
 	v := NewValidator(reg)

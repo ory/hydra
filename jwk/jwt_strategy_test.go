@@ -40,7 +40,7 @@ import (
 )
 
 func TestJWTStrategy(t *testing.T) {
-	for _, alg := range []string{"RS256", "ES256"} {
+	for _, alg := range []string{"RS256", "ES256", "ES512"} {
 		t.Run("case="+alg, func(t *testing.T) {
 			conf := internal.NewConfigurationWithDefaults()
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})

@@ -32,7 +32,7 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/oauth2"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlcon/dockertest"
 )
@@ -46,7 +46,7 @@ func TestMain(m *testing.M) {
 
 var registries = make(map[string]driver.Registry)
 var cleanRegistries = func(t *testing.T) {
-	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.DefaultContextualizer{})
+	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.Default{})
 }
 
 // returns clean registries that can safely be used for one test
@@ -55,7 +55,7 @@ func setupRegistries(t *testing.T) {
 	if len(registries) == 0 && !testing.Short() {
 		// first time called and sql tests
 		var cleanSQL func(*testing.T)
-		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t, true, &contextx.DefaultContextualizer{})
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t, true, &contextx.Default{})
 		cleanMem := cleanRegistries
 		cleanMem(t)
 		cleanRegistries = func(t *testing.T) {
@@ -92,8 +92,8 @@ func TestManagers(t *testing.T) {
 			for k, store := range registries {
 				net := &networkx.Network{}
 				require.NoError(t, store.Persister().Connection(context.Background()).First(net))
-				store.Config(ctx).MustSet(config.KeyEncryptSessionData, tc.enableSessionEncrypted)
-				store.WithContextualizer(&contextx.StaticContextualizer{NID: net.ID, C: store.Config(ctx)})
+				store.Config().MustSet(ctx, config.KeyEncryptSessionData, tc.enableSessionEncrypted)
+				store.WithContextualizer(&contextx.Static{NID: net.ID, C: store.Config().Source(ctx)})
 				TestHelperRunner(t, store, k)
 			}
 		})

@@ -99,7 +99,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 //       201: oAuth2Client
 //       default: jsonError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c, err := h.CreateClient(r, h.r.ClientValidator(r.Context()).Validate, false)
+	c, err := h.CreateClient(r, h.r.ClientValidator().Validate, false)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -141,7 +141,7 @@ func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
-	c, err := h.CreateClient(r, h.r.ClientValidator(r.Context()).ValidateDynamicRegistration, true)
+	c, err := h.CreateClient(r, h.r.ClientValidator().ValidateDynamicRegistration, true)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(err))
 		return
@@ -187,7 +187,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
-	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config(r.Context()).PublicURL(), DynClientsHandlerPath+"/"+c.OutfacingID).String()
+	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath+"/"+c.OutfacingID).String()
 
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
@@ -229,7 +229,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 
 	c.OutfacingID = ps.ByName("id")
-	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator(r.Context()).Validate); err != nil {
+	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -318,7 +318,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	c.RegistrationAccessTokenSignature = signature
 
 	c.OutfacingID = client.GetID()
-	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator(r.Context()).ValidateDynamicRegistration); err != nil {
+	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -377,7 +377,7 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 		c.Secret = ""
 	}
 
-	if err := h.updateClient(r.Context(), c, h.r.ClientValidator(r.Context()).Validate); err != nil {
+	if err := h.updateClient(r.Context(), c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
@@ -685,7 +685,7 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 	}
 
 	token := fosite.AccessTokenFromRequest(r)
-	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(token); err != nil {
+	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(r.Context(), token); err != nil {
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())
@@ -701,7 +701,7 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 }
 
 func (h *Handler) requireDynamicAuth(r *http.Request) *herodot.DefaultError {
-	if !h.r.Config(r.Context()).PublicAllowDynamicRegistration() {
+	if !h.r.Config().PublicAllowDynamicRegistration(r.Context()) {
 		return herodot.ErrNotFound.WithReason("Dynamic registration is not enabled.")
 	}
 	return nil

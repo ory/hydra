@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal/testhelpers"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/urlx"
@@ -36,14 +36,14 @@ import (
 )
 
 func TestStrategyLoginConsentNext(t *testing.T) {
-	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
-	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
-	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)
-	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)
-	reg.Config(ctx).MustSet(config.KeyScopeStrategy, "exact")
-	reg.Config(ctx).MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	reg.Config(ctx).MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	ctx := context.Background()
+	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
+	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
+	reg.Config().MustSet(ctx, config.KeyConsentRequestMaxAge, time.Hour)
+	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
+	reg.Config().MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 	adminClient := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(adminTS.URL).Host})
@@ -104,7 +104,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	}
 
 	t.Run("case=should fail because a login verifier was given that doesn't exist in the store", func(t *testing.T) {
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
 
 		makeRequestAndExpectError(t, nil, c, url.Values{"login_verifier": {"does-not-exist"}}, "The login verifier has already been used, has not been granted, or is invalid.")
@@ -114,13 +114,13 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// Covers:
 		// - This should fail because consent verifier was set but does not exist
 		// - This should fail because a consent verifier was given but no login verifier
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createDefaultClient(t)
 		makeRequestAndExpectError(t, nil, c, url.Values{"consent_verifier": {"does-not-exist"}}, "The consent verifier has already been used, has not been granted, or is invalid.")
 	})
 
 	t.Run("case=should fail because the request was redirected but the login endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), testhelpers.HTTPServerNotImplementedHandler, testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNotImplementedHandler, testhelpers.HTTPServerNoExpectedCallHandler(t))
 		c := createClientWithRedir(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNoExpectedCallHandler(t)))
 
 		_, res := makeOAuth2Request(t, reg, nil, c, url.Values{})
@@ -130,7 +130,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because the request was redirected but consent endpoint doesn't do anything (like redirecting back)", func(t *testing.T) {
 		// "This should fail because consent endpoints idles after login was granted - but consent endpoint should be called because cookie jar exists"
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), acceptLoginHandler(t, "aeneas-rekkas", nil), testhelpers.HTTPServerNotImplementedHandler)
+		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", nil), testhelpers.HTTPServerNotImplementedHandler)
 		c := createClientWithRedir(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNoExpectedCallHandler(t)))
 
 		_, res := makeOAuth2Request(t, reg, nil, c, url.Values{})
@@ -139,7 +139,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	})
 
 	t.Run("case=should fail because the request was redirected but the login endpoint rejected the request", func(t *testing.T) {
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), func(w http.ResponseWriter, r *http.Request) {
+		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 			vr, err := adminClient.Admin.RejectLoginRequest(admin.NewRejectLoginRequestParams().
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 				WithBody(&models.RejectRequest{
@@ -158,7 +158,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because no cookie jar invalid csrf", func(t *testing.T) {
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), acceptLoginHandler(t, "aeneas-rekkas", nil),
+		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", nil),
 			testhelpers.HTTPServerNoExpectedCallHandler(t))
 
 		hc := new(http.Client)
@@ -167,7 +167,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because consent endpoints denies the request after login was granted", func(t *testing.T) {
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			func(w http.ResponseWriter, r *http.Request) {
 				vr, err := adminClient.Admin.RejectConsentRequest(
@@ -186,7 +186,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should pass and set acr values properly", func(t *testing.T) {
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", nil),
 			acceptConsentHandler(t, nil))
 
@@ -203,7 +203,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{
 				Remember: true,
 			}),
@@ -239,7 +239,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		t.Run("perform first flow", run)
 
 		t.Run("perform follow up flows and check if session values are set", func(t *testing.T) {
-			testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				checkAndAcceptLoginHandler(t, adminClient.Admin, subject, func(t *testing.T, res *admin.GetLoginRequestOK, err error) *models.AcceptLoginRequest {
 					require.NoError(t, err)
 					assert.True(t, *res.Payload.Skip)
@@ -277,7 +277,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// This should pass because login was remembered and session id should be set and session context should also work
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{
 				Subject: &subject,
 				Context: map[string]interface{}{"fooz": "barz"},
@@ -315,7 +315,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 
 		subject := "aeneas-rekkas"
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true, RememberFor: 0}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true, RememberFor: 0}))
 
@@ -337,7 +337,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		t.Run("followup=should pass when prompt=none, redirection scheme is HTTP and host is a custom scheme", func(t *testing.T) {
 			for _, redir := range c.RedirectURIs[1:] {
 				t.Run("redir=should pass because prompt=none, client is public, and redirection is "+redir, func(t *testing.T) {
-					_, err := hc.Get(urlx.CopyWithQuery(reg.Config(ctx).OAuth2AuthURL(), url.Values{
+					_, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(ctx), url.Values{
 						"response_type": {"code"},
 						"state":         {uuid.New()},
 						"redirect_uri":  {redir},
@@ -370,7 +370,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should fail at login screen because subject in login challenge does not match subject from previous session", func(t *testing.T) {
 		// Previously: This should fail at login screen because subject from accept does not match subject from session
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, "aeneas-rekkas", &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, nil))
 
@@ -378,7 +378,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		hc := testhelpers.NewEmptyJarClient(t)
 		makeRequestAndExpectCode(t, hc, c, url.Values{})
 
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			func(w http.ResponseWriter, r *http.Request) {
 				_, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 					WithLoginChallenge(r.URL.Query().Get("login_challenge")).
@@ -403,7 +403,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
 		resetUI := func(t *testing.T) {
-			testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				checkAndAcceptLoginHandler(t, adminClient.Admin, subject, func(t *testing.T, res *admin.GetLoginRequestOK, err error) *models.AcceptLoginRequest {
 					require.NoError(t, err)
 					assert.False(t, *res.Payload.Skip) // Skip should always be false here
@@ -441,7 +441,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
 
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true}),
+		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true}))
 
 		hc := testhelpers.NewEmptyJarClient(t)
@@ -455,7 +455,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because prompt is none but no auth session exists", func(t *testing.T) {
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), acceptLoginHandler(t, "aeneas-rekkas", &models.AcceptLoginRequest{Remember: true}),
+		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true}))
 
 		makeRequestAndExpectError(t, nil, c, url.Values{"prompt": {"none"}},
@@ -464,7 +464,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	t.Run("case=should fail because prompt is none and consent is missing a permission which requires re-authorization of the app", func(t *testing.T) {
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), acceptLoginHandler(t, "aeneas-rekkas", &models.AcceptLoginRequest{Remember: true}),
+		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, "aeneas-rekkas", &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true}))
 
 		// Init cookie
@@ -479,7 +479,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=pass and properly require authentication as well as authorization because prompt is set to login and consent although previous session exists", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndAcceptLoginHandler(t, adminClient.Admin, subject, func(t *testing.T, res *admin.GetLoginRequestOK, err error) *models.AcceptLoginRequest {
 				require.NoError(t, err)
 				assert.False(t, *res.Payload.Skip) // Skip should always be false here because prompt has login
@@ -510,7 +510,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		subject := "aeneas-rekkas"
 		notSubject := "not-aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true}))
 
@@ -523,7 +523,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 			{"id_token_hint": {testhelpers.NewIDToken(t, reg, notSubject)}},
 		} {
 			t.Run(fmt.Sprintf("values=%v", values), func(t *testing.T) {
-				testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					checkAndAcceptLoginHandler(t, adminClient.Admin, subject, func(t *testing.T, res *admin.GetLoginRequestOK, err error) *models.AcceptLoginRequest {
 						var b bytes.Buffer
 						require.NoError(t, json.NewEncoder(&b).Encode(res.Payload))
@@ -541,7 +541,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should pass and require authentication because id_token_hint does match subject from session", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true}))
 
@@ -567,9 +567,9 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		subject := "auth-user"
 		hash := fmt.Sprintf("%x",
-			sha256.Sum256([]byte(c.SectorIdentifierURI+subject+reg.Config(ctx).SubjectIdentifierAlgorithmSalt())))
+			sha256.Sum256([]byte(c.SectorIdentifierURI+subject+reg.Config().SubjectIdentifierAlgorithmSalt(ctx))))
 
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true, GrantScope: []string{"openid"}}))
 
@@ -617,7 +617,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		})
 		subject := "aeneas-rekkas"
 		obfuscated := "obfuscated-friedrich-kaiser"
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{
 				ForceSubjectIdentifier: obfuscated,
 			}),
@@ -645,7 +645,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: true}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: true}))
 
@@ -656,7 +656,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		// Re-run flow but do not remember login
 		// Formerly: This should pass and also revoke the session cookie
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{Remember: false}),
 			acceptConsentHandler(t, &models.AcceptConsentRequest{Remember: false}))
 		makeRequestAndExpectCode(t, hc, c, url.Values{})
@@ -668,7 +668,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should require re-authentication because the session does not exist in the store", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), acceptLoginHandler(t, subject, nil), acceptConsentHandler(t, nil))
+		testhelpers.NewLoginConsentUI(t, reg.Config(), acceptLoginHandler(t, subject, nil), acceptConsentHandler(t, nil))
 
 		hc := &http.Client{Jar: newAuthCookieJar(t, reg, publicTS.URL, "i-do-not-exist")}
 		makeRequestAndExpectError(t, hc, c, url.Values{"prompt": {"none"}}, "The Authorization Server requires End-User authentication.")
@@ -678,7 +678,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, subject, &models.AcceptLoginRequest{
 				Subject: &subject,
 				Context: map[string]interface{}{"fooz": "barz"},
@@ -705,7 +705,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should be able to retry accept login request", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndDuplicateAcceptLoginHandler(t, adminClient.Admin, subject, func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest {
 				return &models.AcceptLoginRequest{
 					Subject: &subject,
@@ -733,7 +733,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 	t.Run("case=should be able to retry both accept login and consent requests", func(t *testing.T) {
 		subject := "aeneas-rekkas"
 		c := createDefaultClient(t)
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			checkAndDuplicateAcceptLoginHandler(t, adminClient.Admin, subject, func(*testing.T, *admin.GetLoginRequestOK, error) *models.AcceptLoginRequest {
 				return &models.AcceptLoginRequest{
 					Subject: &subject,

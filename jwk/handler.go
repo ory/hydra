@@ -86,8 +86,9 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
-	for _, set := range stringslice.Unique(h.r.Config(r.Context()).WellKnownKeys()) {
-		keys, err := h.r.KeyManager().GetKeySet(r.Context(), set)
+	ctx := r.Context()
+	for _, set := range stringslice.Unique(h.r.Config().WellKnownKeys(ctx)) {
+		keys, err := h.r.KeyManager().GetKeySet(ctx, set)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return

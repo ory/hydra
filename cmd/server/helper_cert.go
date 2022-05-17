@@ -55,7 +55,7 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 }
 
 func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
-	cert, err := d.Config(ctx).TLS(iface).Certificate()
+	cert, err := d.Config().TLS(ctx, iface).Certificate()
 
 	if err == nil {
 		return cert

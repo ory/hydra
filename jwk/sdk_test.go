@@ -21,6 +21,7 @@
 package jwk_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,7 +29,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client"
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 
@@ -43,8 +44,9 @@ import (
 )
 
 func TestJWKSDK(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	router := x.NewRouterAdmin()
 	h := NewHandler(reg)
@@ -55,7 +57,7 @@ func TestJWKSDK(t *testing.T) {
 	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
 	expectedPublicKid := "public:key-bar"
-	if conf.HsmEnabled() {
+	if conf.HsmEnabled(ctx) {
 		expectedPublicKid = "key-bar"
 	}
 
@@ -68,7 +70,7 @@ func TestJWKSDK(t *testing.T) {
 				Use: pointerx.String("sig"),
 			}))
 			require.NoError(t, err)
-			if conf.HsmEnabled() {
+			if conf.HsmEnabled(ctx) {
 				require.Len(t, resultKeys.Payload.Keys, 1)
 				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
 				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
@@ -96,7 +98,7 @@ func TestJWKSDK(t *testing.T) {
 		})
 
 		t.Run("UpdateJwkSetKey", func(t *testing.T) {
-			if conf.HsmEnabled() {
+			if conf.HsmEnabled(ctx) {
 				t.Skip("Skipping test. Keys cannot be updated when Hardware Security Module is enabled")
 			}
 			require.Len(t, resultKeys.Keys, 1)
@@ -127,7 +129,7 @@ func TestJWKSDK(t *testing.T) {
 				Kid: pointerx.String("key-bar"),
 			}))
 			require.NoError(t, err)
-			if conf.HsmEnabled() {
+			if conf.HsmEnabled(ctx) {
 				require.Len(t, resultKeys.Payload.Keys, 1)
 				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
 				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
@@ -143,7 +145,7 @@ func TestJWKSDK(t *testing.T) {
 		resultKeys, err := sdk.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet("set-foo2"))
 		t.Run("GetJwkSet after create", func(t *testing.T) {
 			require.NoError(t, err)
-			if conf.HsmEnabled() {
+			if conf.HsmEnabled(ctx) {
 				require.Len(t, resultKeys.Payload.Keys, 1)
 				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
 				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
@@ -157,7 +159,7 @@ func TestJWKSDK(t *testing.T) {
 		})
 
 		t.Run("UpdateJwkSet", func(t *testing.T) {
-			if conf.HsmEnabled() {
+			if conf.HsmEnabled(ctx) {
 				t.Skip("Skipping test. Keys cannot be updated when Hardware Security Module is enabled")
 			}
 			require.Len(t, resultKeys.Payload.Keys, 2)

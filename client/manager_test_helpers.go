@@ -30,8 +30,8 @@ import (
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/assertx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlcon"
 
 	"github.com/bxcodec/faker/v3"

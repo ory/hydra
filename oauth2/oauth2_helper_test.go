@@ -42,7 +42,7 @@ type consentMock struct {
 	requestTime time.Time
 }
 
-func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.HandledConsentRequest, error) {
+func (c *consentMock) HandleOAuth2AuthorizationRequest(ctx context.Context, w http.ResponseWriter, r *http.Request, req fosite.AuthorizeRequester) (*consent.HandledConsentRequest, error) {
 	if c.deny {
 		return nil, fosite.ErrRequestForbidden
 	}
@@ -62,7 +62,7 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 	}, nil
 }
 
-func (c *consentMock) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
+func (c *consentMock) HandleOpenIDConnectLogout(ctx context.Context, w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
 	panic("not implemented")
 }
 

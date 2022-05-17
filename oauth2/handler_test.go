@@ -33,7 +33,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/internal/testhelpers"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/go-openapi/strfmt"
 
@@ -65,9 +65,10 @@ import (
 var lifespan = time.Hour
 
 func TestHandlerDeleteHandler(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	cm := reg.ClientManager()
 	store := reg.OAuth2Storage()
@@ -98,7 +99,6 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, err)
 
 	ds := new(oauth2.Session)
-	ctx := context.Background()
 	_, err = store.GetAccessTokenSession(ctx, "del-1", ds)
 	require.Error(t, err, "not_found")
 }
@@ -152,11 +152,12 @@ func TestHandlerFlushHandler(t *testing.T) {
 }
 
 func TestUserinfo(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "")
-	conf.MustSet(config.KeyAuthCodeLifespan, lifespan)
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+	conf.MustSet(ctx, config.KeyScopeStrategy, "")
+	conf.MustSet(ctx, config.KeyAuthCodeLifespan, lifespan)
+	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 
 	ctrl := gomock.NewController(t)
@@ -403,14 +404,15 @@ func TestUserinfo(t *testing.T) {
 }
 
 func TestHandlerWellKnown(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	conf.MustSet(config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
-	conf.MustSet(config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
-	conf.MustSet(config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+	conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+	conf.MustSet(ctx, config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
+	conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+	conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	h := oauth2.NewHandler(reg, conf)
 
@@ -426,17 +428,17 @@ func TestHandlerWellKnown(t *testing.T) {
 	defer res.Body.Close()
 
 	trueConfig := oauth2.WellKnown{
-		Issuer:                                 strings.TrimRight(conf.IssuerURL().String(), "/") + "/",
-		AuthURL:                                conf.OAuth2AuthURL().String(),
-		TokenURL:                               conf.OAuth2TokenURL().String(),
-		JWKsURI:                                conf.JWKSURL().String(),
-		RevocationEndpoint:                     urlx.AppendPaths(conf.IssuerURL(), oauth2.RevocationPath).String(),
-		RegistrationEndpoint:                   conf.OAuth2ClientRegistrationURL().String(),
+		Issuer:                                 strings.TrimRight(conf.IssuerURL(ctx).String(), "/") + "/",
+		AuthURL:                                conf.OAuth2AuthURL(ctx).String(),
+		TokenURL:                               conf.OAuth2TokenURL(ctx).String(),
+		JWKsURI:                                conf.JWKSURL(ctx).String(),
+		RevocationEndpoint:                     urlx.AppendPaths(conf.IssuerURL(ctx), oauth2.RevocationPath).String(),
+		RegistrationEndpoint:                   conf.OAuth2ClientRegistrationURL(ctx).String(),
 		SubjectTypes:                           []string{"pairwise", "public"},
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                        conf.OIDCDiscoverySupportedClaims(),
-		ScopesSupported:                        conf.OIDCDiscoverySupportedScope(),
-		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint().String(),
+		ClaimsSupported:                        conf.OIDCDiscoverySupportedClaims(ctx),
+		ScopesSupported:                        conf.OIDCDiscoverySupportedScope(ctx),
+		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint(ctx).String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:                 []string{"query", "fragment"},
@@ -449,7 +451,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		BackChannelLogoutSessionSupported:      true,
 		FrontChannelLogoutSupported:            true,
 		FrontChannelLogoutSessionSupported:     true,
-		EndSessionEndpoint:                     urlx.AppendPaths(conf.IssuerURL(), oauth2.LogoutPath).String(),
+		EndSessionEndpoint:                     urlx.AppendPaths(conf.IssuerURL(ctx), oauth2.LogoutPath).String(),
 		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
 		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	}

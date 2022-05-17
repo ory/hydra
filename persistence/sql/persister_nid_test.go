@@ -3,6 +3,7 @@ package sql_test
 import (
 	"context"
 	"database/sql"
+	"github.com/ory/x/assertx"
 	"testing"
 	"time"
 
@@ -22,7 +23,7 @@ import (
 	"github.com/ory/hydra/oauth2/trust"
 	persistencesql "github.com/ory/hydra/persistence/sql"
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
@@ -42,11 +43,11 @@ var _ PersisterTestSuite = PersisterTestSuite{}
 
 func (s *PersisterTestSuite) SetupSuite() {
 	s.registries = map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(s.T(), dbal.SQLiteSharedInMemory, true, &contextx.DefaultContextualizer{}),
+		"memory": internal.NewRegistrySQLFromURL(s.T(), dbal.NewSQLiteTestDatabase(s.T()), true, &contextx.Default{}),
 	}
 
 	if !testing.Short() {
-		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], s.clean = internal.ConnectDatabases(s.T(), true, &contextx.DefaultContextualizer{})
+		s.registries["postgres"], s.registries["mysql"], s.registries["cockroach"], s.clean = internal.ConnectDatabases(s.T(), true, &contextx.Default{})
 	}
 
 	s.t1NID, s.t2NID = uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())
@@ -102,7 +103,7 @@ func (s *PersisterTestSuite) TestAddKeyGetKeyDeleteKey() {
 			require.Equal(t, (*jose.JSONWebKeySet)(nil), actual)
 			actual, err = r.Persister().GetKey(s.t1, ks, key.KeyID)
 			require.NoError(t, err)
-			require.Equal(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{key}}, actual)
+			assertx.EqualAsJSON(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{key}}, actual)
 
 			r.Persister().DeleteKey(s.t2, ks, key.KeyID)
 			_, err = r.Persister().GetKey(s.t1, ks, key.KeyID)
@@ -1810,13 +1811,13 @@ func (s *PersisterTestSuite) TestUpdateKey() {
 			require.NoError(t, r.Persister().AddKey(s.t1, ks, &k1))
 			actual, err := r.Persister().GetKey(s.t1, ks, k1.KeyID)
 			require.NoError(t, err)
-			require.Equal(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
+			assertx.EqualAsJSON(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
 
 			k2 := newKey("test-ks", "test")
 			r.Persister().UpdateKey(s.t2, ks, &k2)
 			actual, err = r.Persister().GetKey(s.t1, ks, k1.KeyID)
 			require.NoError(t, err)
-			require.Equal(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
+			assertx.EqualAsJSON(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
 
 			r.Persister().UpdateKey(s.t1, ks, &k2)
 			actual, err = r.Persister().GetKey(s.t1, ks, k2.KeyID)
@@ -1978,7 +1979,7 @@ func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	t := s.T()
 	for k, r := range s.registries {
 		t.Run(k, func(*testing.T) {
-			r.WithContextualizer(&contextx.DefaultContextualizer{})
+			r.WithContextualizer(&contextx.Default{})
 			store, ok := r.Persister().(*persistencesql.Persister)
 			if !ok {
 				t.Fatal("type assertion failed")
@@ -2043,8 +2044,7 @@ func newLogoutRequest() *consent.LogoutRequest {
 }
 
 func newKey(ksID string, use string) jose.JSONWebKey {
-	kg := &jwk.RS256Generator{}
-	ks, err := kg.Generate(ksID, use)
+	ks, err := jwk.GenerateJWK(context.Background(), jose.RS256, ksID, use)
 	if err != nil {
 		panic(err)
 	}
@@ -2052,8 +2052,7 @@ func newKey(ksID string, use string) jose.JSONWebKey {
 }
 
 func newKeySet(id string, use string) *jose.JSONWebKeySet {
-	kg := &jwk.RS256Generator{}
-	ks, err := kg.Generate(id, use)
+	ks, err := jwk.GenerateJWK(context.Background(), jose.RS256, id, use)
 	if err != nil {
 		panic(err)
 	}
@@ -2073,5 +2072,5 @@ func requireKeySetEqual(t *testing.T, expected *jose.JSONWebKeySet, actual *jose
 	if expected.Keys[0].KeyID == actual.Keys[1].KeyID {
 		actual.Keys[0], actual.Keys[1] = actual.Keys[1], actual.Keys[0]
 	}
-	require.Equal(t, expected, actual)
+	assertx.EqualAsJSON(t, expected, actual)
 }

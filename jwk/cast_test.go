@@ -21,18 +21,17 @@
 package jwk
 
 import (
+	"context"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMustRSAPrivate(t *testing.T) {
-	//if testing.Short() {
-	//	t.SkipNow()
-	//}
-
-	keys, err := new(RS256Generator).Generate("foo", "sig")
-	assert.Nil(t, err)
+	keys, err := GenerateJWK(context.Background(), jose.RS256, "foo", "sig")
+	require.NoError(t, err)
 
 	_, err = ToRSAPrivate(&keys.Key("private:foo")[0])
 	assert.Nil(t, err)

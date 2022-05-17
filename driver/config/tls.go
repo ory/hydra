@@ -1,8 +1,8 @@
 package config
 
 import (
+	"context"
 	"crypto/tls"
-
 	"github.com/ory/x/tlsx"
 )
 
@@ -27,26 +27,6 @@ type TLSConfig interface {
 	Certificate() ([]tls.Certificate, error)
 }
 
-func (p *Provider) TLS(iface ServeInterface) TLSConfig {
-	enabled := true
-	if p.forcedHTTP() {
-		enabled = false
-	} else if iface == AdminInterface {
-		// Support `tls.enabled` for admin interface only
-		enabled = p.p.Bool(iface.Key(KeySuffixTLSEnabled))
-	}
-
-	return &tlsConfig{
-		enabled:              enabled,
-		allowTerminationFrom: p.p.StringsF(iface.Key(KeySuffixTLSAllowTerminationFrom), p.p.Strings(KeyTLSAllowTerminationFrom)),
-
-		certString: p.p.StringF(iface.Key(KeySuffixTLSCertString), p.p.String(KeyTLSCertString)),
-		keyString:  p.p.StringF(iface.Key(KeySuffixTLSKeyString), p.p.String(KeyTLSKeyString)),
-		certPath:   p.p.StringF(iface.Key(KeySuffixTLSCertPath), p.p.String(KeyTLSCertPath)),
-		keyPath:    p.p.StringF(iface.Key(KeySuffixTLSKeyPath), p.p.String(KeyTLSKeyPath)),
-	}
-}
-
 type tlsConfig struct {
 	enabled              bool
 	allowTerminationFrom []string
@@ -65,10 +45,30 @@ func (c *tlsConfig) AllowTerminationFrom() []string {
 	return c.allowTerminationFrom
 }
 
+func (p *DefaultProvider) TLS(ctx context.Context, iface ServeInterface) TLSConfig {
+	enabled := true
+	if p.forcedHTTP(ctx) {
+		enabled = false
+	} else if iface == AdminInterface {
+		// Support `tls.enabled` for admin interface only
+		enabled = p.getProvider(ctx).Bool(iface.Key(KeySuffixTLSEnabled))
+	}
+
+	return &tlsConfig{
+		enabled:              enabled,
+		allowTerminationFrom: p.getProvider(ctx).StringsF(iface.Key(KeySuffixTLSAllowTerminationFrom), p.getProvider(ctx).Strings(KeyTLSAllowTerminationFrom)),
+
+		certString: p.getProvider(ctx).StringF(iface.Key(KeySuffixTLSCertString), p.getProvider(ctx).String(KeyTLSCertString)),
+		keyString:  p.getProvider(ctx).StringF(iface.Key(KeySuffixTLSKeyString), p.getProvider(ctx).String(KeyTLSKeyString)),
+		certPath:   p.getProvider(ctx).StringF(iface.Key(KeySuffixTLSCertPath), p.getProvider(ctx).String(KeyTLSCertPath)),
+		keyPath:    p.getProvider(ctx).StringF(iface.Key(KeySuffixTLSKeyPath), p.getProvider(ctx).String(KeyTLSKeyPath)),
+	}
+}
+
 func (c *tlsConfig) Certificate() ([]tls.Certificate, error) {
 	return tlsx.Certificate(c.certString, c.keyString, c.certPath, c.keyPath)
 }
 
-func (p *Provider) forcedHTTP() bool {
-	return p.p.Bool("dangerous-force-http")
+func (p *DefaultProvider) forcedHTTP(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool("dangerous-force-http")
 }

@@ -42,10 +42,10 @@ func TestJanitorHandler_PurgeTokenNotAfter(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan().String()),
-					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan().String()),
+					fmt.Sprintf("--%s=%s", cli.AccessLifespan, jt.GetAccessTokenLifespan(ctx).String()),
+					fmt.Sprintf("--%s=%s", cli.RefreshLifespan, jt.GetRefreshTokenLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyTokens),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -75,14 +75,14 @@ func TestJanitorHandler_PurgeLoginConsentNotAfter(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
-					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan().String()),
+					fmt.Sprintf("--%s=%s", cli.ConsentRequestLifespan, jt.GetConsentRequestLifespan(ctx).String()),
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
 			notAfter := time.Now().Round(time.Second).Add(-v)
-			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
+			consentLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
 			t.Run("step=validate", jt.LoginConsentNotAfterValidate(ctx, notAfter, consentLifespan, reg.ConsentManager()))
 		})
 	}
@@ -111,7 +111,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -133,7 +133,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -159,7 +159,7 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
@@ -180,16 +180,14 @@ func TestJanitorHandler_PurgeLoginConsent(t *testing.T) {
 				cmdx.ExecNoErr(t, newJanitorCmd(),
 					"janitor",
 					fmt.Sprintf("--%s", cli.OnlyRequests),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 
 			// validate
 			t.Run("step=validate", jt.ConsentRejectionValidate(ctx, reg.ConsentManager()))
 		})
-
 	})
-
 }
 
 func TestJanitorHandler_Arguments(t *testing.T) {
@@ -286,7 +284,7 @@ func TestJanitorHandler_PurgeGrantNotAfter(t *testing.T) {
 					"janitor",
 					fmt.Sprintf("--%s=%s", cli.KeepIfYounger, v.String()),
 					fmt.Sprintf("--%s", cli.OnlyGrants),
-					jt.GetDSN(),
+					jt.GetDSN(ctx),
 				)
 			})
 

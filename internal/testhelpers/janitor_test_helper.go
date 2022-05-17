@@ -507,7 +507,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 				// cleanup
 				t.Run("step=cleanup", func(t *testing.T) {
-					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 2, 1))
+					require.NoError(t, fositeManager.FlushInactiveLoginConsentRequests(ctx, time.Now().Round(time.Second), 4, 1))
 				})
 
 				// validate

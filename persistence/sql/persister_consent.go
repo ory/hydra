@@ -454,7 +454,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		notAfter = requestMaxExpire
 	}
 
-	challenges := []string{}
+	consent_challenges := []string{}
 	queryFormat := `
 	SELECT %[1]s.challenge
 	FROM %[1]s
@@ -464,7 +464,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		OR (%[2]s.error IS NOT NULL AND %[2]s.error <> '{}' AND %[2]s.error <> '')
 	)
 	AND %[1]s.requested_at < ?
-	ORDER BY %[1]s.challenge
+	ORDER BY %[1]s.requested_at
 	LIMIT %[3]d
 	`
 
@@ -476,21 +476,21 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_consent_request.requested_at < minimum between ttl.login_consent_request and notAfter
 	q := p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&cr).TableName(), (&crh).TableName(), limit), notAfter)
 
-	if err := q.All(&challenges); err == sql.ErrNoRows {
+	if err := q.All(&consent_challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
 
 	// Delete in batch consent requests and their references in cascade
-	for i := 0; i < len(challenges); i += batchSize {
+	for i := 0; i < len(consent_challenges); i += batchSize {
 		j := i + batchSize
-		if j > len(challenges) {
-			j = len(challenges)
+		if j > len(consent_challenges) {
+			j = len(consent_challenges)
 		}
 
 		if i != j {
 			q := p.Connection(ctx).RawQuery(
 				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&cr).TableName()),
-				challenges[i:j],
+				consent_challenges[i:j],
 			)
 
 			if err := q.Exec(); err != nil {
@@ -499,6 +499,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 		}
 	}
 
+	login_challenges := []string{}
 	// Select challenges from all authentication requests that can be safely deleted with limit
 	// where hydra_oauth2_authentication_request were unhandled or rejected, so either of these is true
 	// - hydra_oauth2_authentication_request_handled does not exist (unhandled)
@@ -507,21 +508,20 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	// - hydra_oauth2_authentication_request.requested_at < minimum between ttl.login_consent_request and notAfter
 	q = p.Connection(ctx).RawQuery(fmt.Sprintf(queryFormat, (&lr).TableName(), (&lrh).TableName(), limit), notAfter)
 
-	if err := q.All(&challenges); err == sql.ErrNoRows {
+	if err := q.All(&login_challenges); err == sql.ErrNoRows {
 		return errors.Wrap(fosite.ErrNotFound, "")
 	}
-
 	// Delete in batch authentication requests
-	for i := 0; i < len(challenges); i += batchSize {
+	for i := 0; i < len(login_challenges); i += batchSize {
 		j := i + batchSize
-		if j > len(challenges) {
-			j = len(challenges)
+		if j > len(login_challenges) {
+			j = len(login_challenges)
 		}
 
 		if i != j {
 			q := p.Connection(ctx).RawQuery(
 				fmt.Sprintf("DELETE FROM %s WHERE challenge in (?)", (&lr).TableName()),
-				challenges[i:j],
+				login_challenges[i:j],
 			)
 
 			if err := q.Exec(); err != nil {

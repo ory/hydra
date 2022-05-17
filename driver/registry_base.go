@@ -106,6 +106,14 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 
+	// TODO: add cors to this handler
+	// Current thoughts
+	// 1. Add a sub router group, add that as something that can also be passed to EnhanceMiddleware and just routes inside the
+	// cors will have the headers (needs quite a bit of refactoring, less preferred)
+	// 2. enable cors for the entire public router by just sending `true` to EnhanceMiddleware which will work but adds unnecessary
+	// cors to redirections (the simplest solution , might have unknown side-effects)
+	// 3. wrap the handlers with cors in `github.com/ory/x/healthx` instead but that won't work cause it's needs a router / http.Handler
+	// which the functions there are not.
 	m.HealthHandler().SetHealthRoutes(public.Router, false)
 
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())

@@ -242,7 +242,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			driver.DisableValidation(),
 			driver.DisablePreloading(),
 			driver.SkipNetworkInit())
-		if len(d.Config(ctx).DSN()) == 0 {
+		if len(d.Config().DSN(ctx)) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
 			fmt.Println("When using flag -e, environment variable DSN must be set")

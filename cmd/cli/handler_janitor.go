@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/persistence"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/pkg/errors"
 
@@ -112,15 +112,15 @@ func purge(cmd *cobra.Command, args []string) error {
 		driver.WithOptions(co...),
 	}
 
-	d = driver.New(cmd.Context(), do...)
+	d = driver.New(ctx, do...)
 
-	if len(d.Config(ctx).DSN()) == 0 {
+	if len(d.Config().DSN(ctx)) == 0 {
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
 			"When using flag -e, environment variable DSN must be set.",
 			"When using flag -c, the dsn property should be set.")
 	}
 
-	if err := d.Init(cmd.Context(), false, false, &contextx.DefaultContextualizer{}); err != nil {
+	if err := d.Init(cmd.Context(), false, false, &contextx.Default{}); err != nil {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
 			"Janitor can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
 	}

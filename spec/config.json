@@ -451,6 +451,26 @@
       "type": "string",
       "description": "Sets the data source name. This configures the backend where Ory Hydra persists data. If dsn is \"memory\", data will be written to memory and is lost when you restart this instance. Ory Hydra supports popular SQL databases. For more detailed configuration information go to: https://www.ory.sh/docs/hydra/dependencies-environment#sql"
     },
+    "clients": {
+      "title": "Global outgoing network settings",
+      "description": "Configure how outgoing network calls behave.",
+      "type": "object",
+      "properties": {
+        "http": {
+          "title": "Global HTTP client configuration",
+          "description": "Configure how outgoing HTTP calls behave.",
+          "type": "object",
+          "properties": {
+            "disallow_private_ip_ranges": {
+              "title": "Disallow private IP ranges",
+              "description": "Disallow all outgoing HTTP calls to private IP ranges. This feature can help protect against SSRF attacks.",
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    },
     "hsm": {
       "type": "object",
       "additionalProperties": false,

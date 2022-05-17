@@ -24,6 +24,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"github.com/ory/hydra/jwk"
 	"net/url"
 	"testing"
 	"time"
@@ -747,13 +748,10 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		grantManager := x.GrantManager()
 		keyManager := x.KeyManager()
-		keyGenerators := x.KeyGenerators()
-		keyGenerator, ok := keyGenerators[string(jose.RS256)]
-		require.True(t, ok)
 		grantStorage := x.OAuth2Storage().(rfc7523.RFC7523KeyStorage)
 
 		t.Run("case=associated key added with grant", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("token-service-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "token-service-key", "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[1]
@@ -798,13 +796,13 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=only associated key returns", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("some-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "some-key", "sig")
 			require.NoError(t, err)
 
 			err = keyManager.AddKeySet(context.TODO(), "some-set", keySet)
 			require.NoError(t, err)
 
-			keySet, err = keyGenerator.Generate("maria-key", "sig")
+			keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "maria-key", "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[1]
@@ -839,7 +837,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=associated key is deleted, when granted is deleted", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("hackerman-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "hackerman-key", "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[1]
@@ -875,7 +873,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=associated grant is deleted, when key is deleted", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("vladimir-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "vladimir-key", "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[1]

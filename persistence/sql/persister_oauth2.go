@@ -62,7 +62,7 @@ func (r OAuth2RequestSQL) TableName() string {
 	return "hydra_oauth2_" + string(r.Table)
 }
 
-func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
+func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature string, r fosite.Requester, table tableName) (*OAuth2RequestSQL, error) {
 	subject := ""
 	if r.GetSession() == nil {
 		p.l.Debugf("Got an empty session in sqlSchemaFromRequest")
@@ -75,8 +75,8 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 		return nil, errorsx.WithStack(err)
 	}
 
-	if p.config.EncryptSessionData() {
-		ciphertext, err := p.r.KeyCipher().Encrypt(session)
+	if p.config.EncryptSessionData(ctx) {
+		ciphertext, err := p.r.KeyCipher().Encrypt(ctx, session)
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -96,7 +96,7 @@ func (p *Persister) sqlSchemaFromRequest(rawSignature string, r fosite.Requester
 	return &OAuth2RequestSQL{
 		Request:           r.GetID(),
 		ConsentChallenge:  challenge,
-		ID:                p.hashSignature(rawSignature, table),
+		ID:                p.hashSignature(ctx, rawSignature, table),
 		RequestedAt:       r.GetRequestedAt(),
 		Client:            r.GetClient().GetID(),
 		Scopes:            strings.Join(r.GetRequestedScopes(), "|"),
@@ -115,7 +115,7 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
-		sess, err = p.r.KeyCipher().Decrypt(string(sess))
+		sess, err = p.r.KeyCipher().Decrypt(ctx, string(sess))
 		if err != nil {
 			return nil, errorsx.WithStack(err)
 		}
@@ -153,8 +153,8 @@ func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session
 }
 
 // hashSignature prevents errors where the signature is longer than 128 characters (and thus doesn't fit into the pk).
-func (p *Persister) hashSignature(signature string, table tableName) string {
-	if table == sqlTableAccess && p.config.IsUsingJWTAsAccessTokens() {
+func (p *Persister) hashSignature(ctx context.Context, signature string, table tableName) string {
+	if table == sqlTableAccess && p.config.IsUsingJWTAsAccessTokens(ctx) {
 		return fmt.Sprintf("%x", sha512.Sum384([]byte(signature)))
 	}
 	return signature
@@ -204,7 +204,7 @@ func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.Bl
 }
 
 func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
-	req, err := p.sqlSchemaFromRequest(signature, requester, table)
+	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
 	}
@@ -218,7 +218,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 }
 
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
-	rawSignature = p.hashSignature(rawSignature, table)
+	rawSignature = p.hashSignature(ctx, rawSignature, table)
 
 	r := OAuth2RequestSQL{Table: table}
 	var fr fosite.Requester
@@ -246,7 +246,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 }
 
 func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) error {
-	signature = p.hashSignature(signature, table)
+	signature = p.hashSignature(ctx, signature, table)
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
@@ -358,7 +358,7 @@ func (p *Persister) RevokeRefreshToken(ctx context.Context, id string) error {
 	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
 }
 
-func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, signature string) error {
+func (p *Persister) RevokeRefreshTokenMaybeGracePeriod(ctx context.Context, id string, _ string) error {
 	return p.deactivateSessionByRequestID(ctx, id, sqlTableRefresh)
 }
 
@@ -403,11 +403,11 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 }
 
 func (p *Persister) FlushInactiveAccessTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
-	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableAccess, p.config.AccessTokenLifespan())
+	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableAccess, p.config.GetAccessTokenLifespan(ctx))
 }
 
 func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter time.Time, limit int, batchSize int) error {
-	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableRefresh, p.config.RefreshTokenLifespan())
+	return p.flushInactiveTokens(ctx, notAfter, limit, batchSize, sqlTableRefresh, p.config.GetRefreshTokenLifespan(ctx))
 }
 
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) error {

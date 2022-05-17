@@ -21,6 +21,7 @@
 package jwk
 
 import (
+	"context"
 	"encoding/base64"
 
 	"github.com/ory/x/errorsx"
@@ -32,10 +33,10 @@ import (
 )
 
 type AEAD struct {
-	c *config.Provider
+	c *config.DefaultProvider
 }
 
-func NewAEAD(c *config.Provider) *AEAD {
+func NewAEAD(c *config.DefaultProvider) *AEAD {
 	return &AEAD{c: c}
 }
 
@@ -45,8 +46,8 @@ func aeadKey(key []byte) *[32]byte {
 	return &result
 }
 
-func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
-	keys := append([][]byte{c.c.GetSystemSecret()}, c.c.GetRotatedSystemSecrets()...)
+func (c *AEAD) Encrypt(ctx context.Context, plaintext []byte) (string, error) {
+	keys := append([][]byte{c.c.GetGlobalSecret(ctx)}, c.c.GetRotatedGlobalSecrets(ctx)...)
 	if len(keys) == 0 {
 		return "", errors.Errorf("at least one encryption key must be defined but none were")
 	}
@@ -63,8 +64,8 @@ func (c *AEAD) Encrypt(plaintext []byte) (string, error) {
 	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
 
-func (c *AEAD) Decrypt(ciphertext string) (p []byte, err error) {
-	keys := append([][]byte{c.c.GetSystemSecret()}, c.c.GetRotatedSystemSecrets()...)
+func (c *AEAD) Decrypt(ctx context.Context, ciphertext string) (p []byte, err error) {
+	keys := append([][]byte{c.c.GetGlobalSecret(ctx)}, c.c.GetRotatedGlobalSecrets(ctx)...)
 	if len(keys) == 0 {
 		return nil, errors.Errorf("at least one decryption key must be defined but none were")
 	}

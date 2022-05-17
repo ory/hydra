@@ -40,7 +40,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal/testhelpers"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
@@ -84,8 +84,8 @@ type clientCreator interface {
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
-	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
+	reg := internal.NewMockedRegistry(t, &contextx.Default{})
+	reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {
@@ -104,8 +104,8 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			ClientID:     c.OutfacingID,
 			ClientSecret: secret,
 			Endpoint: oauth2.Endpoint{
-				AuthURL:   reg.Config(ctx).OAuth2AuthURL().String(),
-				TokenURL:  reg.Config(ctx).OAuth2TokenURL().String(),
+				AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
+				TokenURL:  reg.Config().OAuth2TokenURL(ctx).String(),
 				AuthStyle: oauth2.AuthStyleInHeader,
 			},
 			Scopes: strings.Split(c.Scope, " "),
@@ -141,7 +141,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			assert.EqualValues(t, c.RedirectURIs, rr.Payload.Client.RedirectUris)
 			assert.EqualValues(t, r.URL.Query().Get("login_challenge"), *rr.Payload.Challenge)
 			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.Payload.RequestedScope)
-			assert.Contains(t, *rr.Payload.RequestURL, reg.Config(ctx).OAuth2AuthURL().String())
+			assert.Contains(t, *rr.Payload.RequestURL, reg.Config().OAuth2AuthURL(ctx).String())
 
 			acceptBody := &models.AcceptLoginRequest{
 				Subject:  &subject,
@@ -178,7 +178,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			assert.EqualValues(t, subject, rr.Payload.Subject)
 			assert.EqualValues(t, []string{"hydra", "offline", "openid"}, rr.Payload.RequestedScope)
 			assert.EqualValues(t, r.URL.Query().Get("consent_challenge"), *rr.Payload.Challenge)
-			assert.Contains(t, rr.Payload.RequestURL, reg.Config(ctx).OAuth2AuthURL().String())
+			assert.Contains(t, rr.Payload.RequestURL, reg.Config().OAuth2AuthURL(ctx).String())
 			if checkRequestPayload != nil {
 				checkRequestPayload(rr)
 			}
@@ -213,7 +213,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.True(t, time.Now().After(time.Unix(claims.Get("nbf").Int(), 0)), "%s", claims)
 		assert.True(t, time.Now().Before(time.Unix(claims.Get("exp").Int(), 0)), "%s", claims)
 		assert.NotEmpty(t, claims.Get("jti").String(), "%s", claims)
-		assert.EqualValues(t, reg.Config(ctx).IssuerURL().String(), claims.Get("iss").String(), "%s", claims)
+		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), claims.Get("iss").String(), "%s", claims)
 		assert.NotEmpty(t, claims.Get("sid").String(), "%s", claims)
 		assert.Equal(t, "1", claims.Get("acr").String(), "%s", claims)
 		require.Len(t, claims.Get("amr").Array(), 1, "%s", claims)
@@ -254,7 +254,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		assert.NotEmpty(t, i.Get("jti").String())
 		assert.EqualValues(t, conf.ClientID, i.Get("client_id").String(), "%s", i)
 		assert.EqualValues(t, expectedSubject, i.Get("sub").String(), "%s", i)
-		assert.EqualValues(t, reg.Config(ctx).IssuerURL().String(), i.Get("iss").String(), "%s", i)
+		assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), i.Get("iss").String(), "%s", i)
 		assert.True(t, time.Now().After(time.Unix(i.Get("iat").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().After(time.Unix(i.Get("nbf").Int(), 0)), "%s", i)
 		assert.True(t, time.Now().Before(time.Unix(i.Get("exp").Int(), 0)), "%s", i)
@@ -264,11 +264,11 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	}
 
 	waitForRefreshTokenExpiry := func() {
-		time.Sleep(reg.Config(ctx).RefreshTokenLifespan() + time.Second)
+		time.Sleep(reg.Config().GetRefreshTokenLifespan(ctx) + time.Second)
 	}
 
 	t.Run("case=checks if request fails when audience does not match", func(t *testing.T) {
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
+		testhelpers.NewLoginConsentUI(t, reg.Config(), testhelpers.HTTPServerNoExpectedCallHandler(t), testhelpers.HTTPServerNoExpectedCallHandler(t))
 		_, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
 		code, _ := getAuthorizeCode(t, conf, nil, oauth2.SetAuthURLParam("audience", "https://not-ory-api/"))
 		require.Empty(t, code)
@@ -279,7 +279,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=perform authorize code flow with ID token and refresh tokens", func(t *testing.T) {
 		run := func(t *testing.T, strategy string) {
 			c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-			testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+			testhelpers.NewLoginConsentUI(t, reg.Config(),
 				acceptLoginHandler(t, c, subject, nil),
 				acceptConsentHandler(t, c, subject, nil),
 			)
@@ -330,18 +330,18 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 
 		t.Run("strategy=jwt", func(t *testing.T) {
-			reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "jwt")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "jwt")
 			run(t, "jwt")
 		})
 
 		t.Run("strategy=opaque", func(t *testing.T) {
-			reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
+			reg.Config().MustSet(ctx, config.KeyAccessTokenStrategy, "opaque")
 			run(t, "opaque")
 		})
 	})
 
 	t.Run("case=checks if request fails when subject is empty", func(t *testing.T) {
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx), func(w http.ResponseWriter, r *http.Request) {
+		testhelpers.NewLoginConsentUI(t, reg.Config(), func(w http.ResponseWriter, r *http.Request) {
 			_, err := adminClient.Admin.AcceptLoginRequest(admin.NewAcceptLoginRequestParams().
 				WithLoginChallenge(r.URL.Query().Get("login_challenge")).
 				WithBody(&models.AcceptLoginRequest{Subject: pointerx.String(""), Remember: true}))
@@ -357,7 +357,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	t.Run("case=perform flow with audience", func(t *testing.T) {
 		expectAud := "https://api.ory.sh/"
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
 				assert.False(t, *r.Payload.Skip)
 				assert.EqualValues(t, []string{expectAud}, r.Payload.RequestedAccessTokenAudience)
@@ -386,7 +386,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=use remember feature and prompt=none", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
 		)
@@ -403,7 +403,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		introspectAccessToken(t, conf, token, subject)
 
 		// Reset UI to check for skip values
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
 				require.True(t, *r.Payload.Skip)
 				require.EqualValues(t, subject, *r.Payload.Subject)
@@ -457,7 +457,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 			})
 
 			t.Run("followup=passes and resets skip when prompt=login", func(t *testing.T) {
-				testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+				testhelpers.NewLoginConsentUI(t, reg.Config(),
 					acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
 						require.False(t, *r.Payload.Skip)
 						require.Empty(t, *r.Payload.Subject)
@@ -484,7 +484,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=should fail if prompt=none but no auth session given", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
 		)
@@ -498,7 +498,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=requires re-authentication when id_token_hint is set to a user 'patrik-neu' but the session is 'aeneas-rekkas' and then fails because the user id from the log in endpoint is 'aeneas-rekkas'", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
 				require.False(t, *r.Payload.Skip)
 				require.Empty(t, *r.Payload.Subject)
@@ -522,7 +522,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=should not cause issues if max_age is very low and consent takes a long time", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, func(r *admin.GetLoginRequestOK) *models.AcceptLoginRequest {
 				time.Sleep(time.Second * 2)
 				return nil
@@ -536,7 +536,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 
 	t.Run("case=ensure consistent claims returned for userinfo", func(t *testing.T) {
 		c, conf := newOAuth2Client(t, testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler))
-		testhelpers.NewLoginConsentUI(t, reg.Config(ctx),
+		testhelpers.NewLoginConsentUI(t, reg.Config(),
 			acceptLoginHandler(t, c, subject, nil),
 			acceptConsentHandler(t, c, subject, nil),
 		)
@@ -586,13 +586,14 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 // - [x] should pass with prompt=login when authentication time is recent
 // - [x] should fail with prompt=login when authentication time is in the past
 func TestAuthCodeWithMockStrategy(t *testing.T) {
+	ctx := context.Background()
 	for _, strat := range []struct{ d string }{{d: "opaque"}, {d: "jwt"}} {
 		t.Run("strategy="+strat.d, func(t *testing.T) {
 			conf := internal.NewConfigurationWithDefaults()
-			conf.MustSet(config.KeyAccessTokenLifespan, time.Second*2)
-			conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-			conf.MustSet(config.KeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+			conf.MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
+			conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+			conf.MustSet(ctx, config.KeyAccessTokenStrategy, strat.d)
+			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
@@ -942,8 +943,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -973,8 +974,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -992,8 +993,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -1011,8 +1012,8 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)

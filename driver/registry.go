@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ory/hydra/hsm"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/oauth2/trust"
 
@@ -38,12 +38,13 @@ type Registry interface {
 	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error
 
 	WithBuildInfo(v, h, d string) Registry
-	WithConfig(c *config.Provider) Registry
+	WithConfig(c *config.DefaultProvider) Registry
 	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
-	WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry
+	x.HTTPClientProvider
+	GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy
 
-	Config(ctx context.Context) *config.Provider
+	config.Provider
 	persistence.Provider
 	x.RegistryLogger
 	x.RegistryWriter
@@ -56,7 +57,7 @@ type Registry interface {
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
 
-	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
+	RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler
@@ -69,8 +70,8 @@ type Registry interface {
 	WithHsmContext(h hsm.Context)
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
-	driver, err := dbal.GetDriverFor(c.DSN())
+func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
+	driver, err := dbal.GetDriverFor(c.DSN(ctx))
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
@@ -90,19 +91,17 @@ func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logg
 }
 
 func CallRegistry(ctx context.Context, r Registry) {
-	r.ClientValidator(ctx)
+	r.ClientValidator()
 	r.ClientManager()
 	r.ClientHasher()
 	r.ConsentManager()
 	r.ConsentStrategy()
 	r.SubjectIdentifierAlgorithm(ctx)
 	r.KeyManager()
-	r.KeyGenerators()
 	r.KeyCipher()
 	r.OAuth2Storage()
 	r.OAuth2Provider()
 	r.AudienceStrategy()
-	r.ScopeStrategy()
 	r.AccessTokenJWTStrategy()
 	r.OpenIDJWTStrategy()
 	r.OpenIDConnectRequestValidator()

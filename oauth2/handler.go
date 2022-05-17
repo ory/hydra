@@ -72,10 +72,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.Provider
+	c *config.DefaultProvider
 }
 
-func NewHandler(r InternalRegistry, c *config.Provider) *Handler {
+func NewHandler(r InternalRegistry, c *config.DefaultProvider) *Handler {
 	return &Handler{r: r, c: c}
 }
 
@@ -126,7 +126,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 //     Responses:
 //       302: emptyResponse
 func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(w, r)
+	ctx := r.Context()
+	handled, err := h.r.ConsentStrategy().HandleOpenIDConnectLogout(ctx, w, r)
 
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		return
@@ -227,17 +228,17 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //       500: jsonError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.Writer().Write(w, r, &WellKnown{
-		Issuer:                                 strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
-		AuthURL:                                h.c.OAuth2AuthURL().String(),
-		TokenURL:                               h.c.OAuth2TokenURL().String(),
-		JWKsURI:                                h.c.JWKSURL().String(),
-		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(), RevocationPath).String(),
-		RegistrationEndpoint:                   h.c.OAuth2ClientRegistrationURL().String(),
-		SubjectTypes:                           h.c.SubjectTypesSupported(),
+		Issuer:                                 strings.TrimRight(h.c.IssuerURL(r.Context()).String(), "/") + "/",
+		AuthURL:                                h.c.OAuth2AuthURL(r.Context()).String(),
+		TokenURL:                               h.c.OAuth2TokenURL(r.Context()).String(),
+		JWKsURI:                                h.c.JWKSURL(r.Context()).String(),
+		RevocationEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(r.Context()), RevocationPath).String(),
+		RegistrationEndpoint:                   h.c.OAuth2ClientRegistrationURL(r.Context()).String(),
+		SubjectTypes:                           h.c.SubjectTypesSupported(r.Context()),
 		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                        h.c.OIDCDiscoverySupportedClaims(),
-		ScopesSupported:                        h.c.OIDCDiscoverySupportedScope(),
-		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint().String(),
+		ClaimsSupported:                        h.c.OIDCDiscoverySupportedClaims(r.Context()),
+		ScopesSupported:                        h.c.OIDCDiscoverySupportedScope(r.Context()),
+		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint(r.Context()).String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
 		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
 		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
@@ -250,7 +251,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		BackChannelLogoutSessionSupported:      true,
 		FrontChannelLogoutSupported:            true,
 		FrontChannelLogoutSessionSupported:     true,
-		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(), LogoutPath).String(),
+		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(r.Context()), LogoutPath).String(),
 		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
 		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	})
@@ -282,8 +283,9 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //       401: jsonError
 //       500: jsonError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
-	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
-	tokenType, ar, err := h.r.OAuth2Provider().IntrospectToken(r.Context(), fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
+	ctx := r.Context()
+	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
+	tokenType, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
 	if err != nil {
 		rfcerr := fosite.ErrorToRFC6749Error(err)
 		if rfcerr.StatusCode() == http.StatusUnauthorized {
@@ -341,7 +343,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		token, _, err := h.r.OpenIDJWTStrategy().Generate(r.Context(), jwt2.MapClaims(interim), &jwt.Headers{
+		token, _, err := h.r.OpenIDJWTStrategy().Generate(ctx, jwt2.MapClaims(interim), &jwt.Headers{
 			Extra: map[string]interface{}{"kid": keyID},
 		})
 		if err != nil {
@@ -389,7 +391,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 		x.LogError(r, err, h.r.Logger())
 	}
 
-	h.r.OAuth2Provider().WriteRevocationResponse(w, err)
+	h.r.OAuth2Provider().WriteRevocationResponse(ctx, w, err)
 }
 
 // swagger:route POST /oauth2/introspect admin introspectOAuth2Token
@@ -415,23 +417,23 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //       401: jsonError
 //       500: jsonError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
+	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
 
 	if r.Method != "POST" {
 		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf("HTTP method is \"%s\", expected \"POST\".", r.Method))
 		x.LogError(r, err, h.r.Logger())
-		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
+		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	} else if err := r.ParseMultipartForm(1 << 20); err != nil && err != http.ErrNotMultipart {
 		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("Unable to parse HTTP body, make sure to send a properly formatted form request body.").WithDebug(err.Error()))
 		x.LogError(r, err, h.r.Logger())
-		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
+		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	} else if len(r.PostForm) == 0 {
 		err := errorsx.WithStack(fosite.ErrInvalidRequest.WithHint("The POST body can not be empty."))
 		x.LogError(r, err, h.r.Logger())
-		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
+		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	}
 
@@ -443,7 +445,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	if err != nil {
 		x.LogAudit(r, err, h.r.Logger())
 		err := errorsx.WithStack(fosite.ErrInactiveToken.WithHint("An introspection strategy indicated that the token is inactive.").WithDebug(err.Error()))
-		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
+		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	}
 
@@ -457,9 +459,9 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	exp := resp.GetAccessRequester().GetSession().GetExpiresAt(tt)
 	if exp.IsZero() {
 		if tt == fosite.RefreshToken {
-			exp = resp.GetAccessRequester().GetRequestedAt().Add(h.c.RefreshTokenLifespan())
+			exp = resp.GetAccessRequester().GetRequestedAt().Add(h.c.GetRefreshTokenLifespan(ctx))
 		} else {
-			exp = resp.GetAccessRequester().GetRequestedAt().Add(h.c.AccessTokenLifespan())
+			exp = resp.GetAccessRequester().GetRequestedAt().Add(h.c.GetAccessTokenLifespan(ctx))
 		}
 	}
 
@@ -467,7 +469,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	if !ok {
 		err := errorsx.WithStack(fosite.ErrServerError.WithHint("Expected session to be of type *Session, but got another type.").WithDebug(fmt.Sprintf("Got type %s", reflect.TypeOf(resp.GetAccessRequester().GetSession()))))
 		x.LogError(r, err, h.r.Logger())
-		h.r.OAuth2Provider().WriteIntrospectionError(w, err)
+		h.r.OAuth2Provider().WriteIntrospectionError(ctx, w, err)
 		return
 	}
 
@@ -493,7 +495,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Username:          session.GetUsername(),
 		Extra:             session.Extra,
 		Audience:          audience,
-		Issuer:            strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
+		Issuer:            strings.TrimRight(h.c.IssuerURL(ctx).String(), "/") + "/",
 		ObfuscatedSubject: obfuscated,
 		TokenType:         resp.GetAccessTokenType(),
 		TokenUse:          string(resp.GetTokenUse()),
@@ -576,24 +578,23 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       400: jsonError
 //       500: jsonError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
-	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims())
+	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
 
 	accessRequest, err := h.r.OAuth2Provider().NewAccessRequest(ctx, r, session)
-
 	if err != nil {
 		h.logOrAudit(err, r)
-		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 		return
 	}
 
 	if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
 		var accessTokenKeyID string
-		if h.c.AccessTokenStrategy() == "jwt" {
-			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
+		if h.c.AccessTokenStrategy(ctx) == "jwt" {
+			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 			if err != nil {
 				x.LogError(r, err, h.r.Logger())
-				h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+				h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 				return
 			}
 		}
@@ -601,20 +602,20 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		session.Subject = accessRequest.GetClient().GetID()
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID
-		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.c.IssuerURL().String(), "/") + "/"
+		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.c.IssuerURL(r.Context()).String(), "/") + "/"
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
 		var scopes = accessRequest.GetRequestedScopes()
 
 		// Added for compatibility with MITREid
-		if h.c.GrantAllClientCredentialsScopesPerDefault() && len(scopes) == 0 {
+		if h.c.GrantAllClientCredentialsScopesPerDefault(r.Context()) && len(scopes) == 0 {
 			for _, scope := range accessRequest.GetClient().GetScopes() {
 				accessRequest.GrantScope(scope)
 			}
 		}
 
 		for _, scope := range scopes {
-			if h.r.ScopeStrategy()(accessRequest.GetClient().GetScopes(), scope) {
+			if h.r.Config().GetScopeStrategy(ctx)(accessRequest.GetClient().GetScopes(), scope) {
 				accessRequest.GrantScope(scope)
 			}
 		}
@@ -629,7 +630,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	for _, hook := range h.r.AccessRequestHooks() {
 		if err := hook(ctx, accessRequest); err != nil {
 			h.logOrAudit(err, r)
-			h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+			h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 			return
 		}
 	}
@@ -638,11 +639,11 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		h.logOrAudit(err, r)
-		h.r.OAuth2Provider().WriteAccessError(w, accessRequest, err)
+		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 		return
 	}
 
-	h.r.OAuth2Provider().WriteAccessResponse(w, accessRequest, accessResponse)
+	h.r.OAuth2Provider().WriteAccessResponse(ctx, w, accessRequest, accessResponse)
 }
 
 func (h *Handler) logOrAudit(err error, r *http.Request) {
@@ -681,7 +682,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(w, r, authorizeRequest)
+	session, err := h.r.ConsentStrategy().HandleOAuth2AuthorizationRequest(ctx, w, r, authorizeRequest)
 	if errors.Is(err, consent.ErrAbortOAuth2Request) {
 		x.LogAudit(r, nil, h.r.AuditLogger())
 		// do nothing
@@ -704,7 +705,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		authorizeRequest.GrantAudience(audience)
 	}
 
-	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(r.Context())
+	openIDKeyID, err := h.r.OpenIDJWTStrategy().GetPublicKeyID(ctx)
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
 		h.writeAuthorizeError(w, r, authorizeRequest, err)
@@ -712,8 +713,8 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	}
 
 	var accessTokenKeyID string
-	if h.c.AccessTokenStrategy() == "jwt" {
-		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(r.Context())
+	if h.c.AccessTokenStrategy(r.Context()) == "jwt" {
+		accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
 		if err != nil {
 			x.LogError(r, err, h.r.Logger())
 			h.writeAuthorizeError(w, r, authorizeRequest, err)
@@ -735,7 +736,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 	authorizeRequest.SetID(session.ID)
 	claims := &jwt.IDTokenClaims{
 		Subject: obfuscatedSubject,
-		Issuer:  strings.TrimRight(h.c.IssuerURL().String(), "/") + "/",
+		Issuer:  strings.TrimRight(h.c.IssuerURL(ctx).String(), "/") + "/",
 
 		AuthTime:                            time.Time(session.AuthenticatedAt),
 		RequestedAt:                         session.RequestedAt,
@@ -767,8 +768,8 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		KID:                   accessTokenKeyID,
 		ClientID:              authorizeRequest.GetClient().GetID(),
 		ConsentChallenge:      session.ID,
-		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(),
-		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(),
+		ExcludeNotBeforeClaim: h.c.ExcludeNotBeforeClaim(ctx),
+		AllowedTopLevelClaims: h.c.AllowedTopLevelClaims(ctx),
 	})
 	if err != nil {
 		x.LogError(r, err, h.r.Logger())
@@ -776,7 +777,7 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 		return
 	}
 
-	h.r.OAuth2Provider().WriteAuthorizeResponse(w, authorizeRequest, response)
+	h.r.OAuth2Provider().WriteAuthorizeResponse(ctx, w, authorizeRequest, response)
 }
 
 func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar fosite.AuthorizeRequester, err error) {
@@ -785,13 +786,13 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 		return
 	}
 
-	h.r.OAuth2Provider().WriteAuthorizeError(w, ar, err)
+	h.r.OAuth2Provider().WriteAuthorizeError(r.Context(), w, ar, err)
 }
 
 func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error) {
-	rfcErr := fosite.ErrorToRFC6749Error(err).WithLegacyFormat(h.c.OAuth2LegacyErrors()).WithExposeDebug(h.c.ShareOAuth2Debug())
+	rfcErr := fosite.ErrorToRFC6749Error(err).WithLegacyFormat(h.c.GetUseLegacyErrorFormat(r.Context())).WithExposeDebug(h.c.GetSendDebugMessagesToClients(r.Context()))
 	query := rfcErr.ToValues()
-	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(), query).String(), http.StatusFound)
+	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(r.Context()), query).String(), http.StatusFound)
 }
 
 // swagger:route DELETE /oauth2/tokens admin deleteOAuth2Token
@@ -810,14 +811,14 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //       401: jsonError
 //       500: jsonError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	client := r.URL.Query().Get("client_id")
+	clientID := r.URL.Query().Get("client_id")
 
-	if client == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client' is not defined but it should have been.`)))
+	if clientID == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))
 		return
 	}
 
-	if err := h.r.OAuth2Storage().DeleteAccessTokens(r.Context(), client); err != nil {
+	if err := h.r.OAuth2Storage().DeleteAccessTokens(r.Context(), clientID); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

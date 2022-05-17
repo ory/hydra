@@ -3,22 +3,22 @@ package config
 import (
 	"context"
 	"fmt"
+	"github.com/gofrs/uuid"
+	"github.com/ory/x/otelx"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/ory/x/dbal"
-	"github.com/ory/x/otelx"
-
 	"github.com/ory/hydra/spec"
+	"github.com/ory/x/dbal"
 
 	"github.com/ory/x/configx"
 
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/cmdx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/urlx"
 )
@@ -41,6 +41,7 @@ const (
 	KeySubjectTypesSupported                     = "oidc.subject_identifiers.supported_types"
 	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
 	KeyDSN                                       = "dsn"
+	ViperKeyClientHTTPNoPrivateIPRanges          = "clients.http.disallow_private_ip_ranges"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
 	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
@@ -80,13 +81,15 @@ const (
 
 const DSNMemory = "memory"
 
-type Provider struct {
-	l               *logrusx.Logger
+type DefaultProvider struct {
 	generatedSecret []byte
-	p               *configx.Provider
+	l               *logrusx.Logger
+
+	provider *configx.Provider
+	c        contextx.Contextualizer
 }
 
-func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *Provider {
+func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *DefaultProvider {
 	p, err := New(ctx, l, opts...)
 	if err != nil {
 		l.WithError(err).Fatalf("Unable to load config.")
@@ -94,7 +97,11 @@ func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModif
 	return p
 }
 
-func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*Provider, error) {
+func (p *DefaultProvider) getProvider(ctx context.Context) *configx.Provider {
+	return p.c.Config(ctx, p.provider)
+}
+
+func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*DefaultProvider, error) {
 	opts = append([]configx.OptionModifier{
 		configx.WithStderrValidationReporter(),
 		configx.OmitKeysFromTracing("dsn", "secrets.system", "secrets.cookie"),
@@ -108,47 +115,51 @@ func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier)
 	}
 
 	l.UseConfig(p)
-	return &Provider{l: l, p: p}, nil
+	return &DefaultProvider{l: l, provider: p, c: &contextx.Default{}}, nil
 }
 
-func (p *Provider) Set(key string, value interface{}) error {
-	return p.p.Set(key, value)
+func (p *DefaultProvider) Set(ctx context.Context, key string, value interface{}) error {
+	return p.getProvider(ctx).Set(key, value)
 }
 
-func (p *Provider) MustSet(key string, value interface{}) {
-	if err := p.Set(key, value); err != nil {
+func (p *DefaultProvider) MustSet(ctx context.Context, key string, value interface{}) {
+	if err := p.Set(ctx, key, value); err != nil {
 		p.l.WithError(err).Fatalf("Unable to set \"%s\" to \"%s\".", key, value)
 	}
 }
 
-func (p *Provider) Source() *configx.Provider {
-	return p.p
+func (p *DefaultProvider) Source(ctx context.Context) *configx.Provider {
+	return p.getProvider(ctx)
 }
 
-func (p *Provider) InsecureRedirects() []string {
-	return p.p.Strings("dangerous-allow-insecure-redirect-urls")
+func (p *DefaultProvider) InsecureRedirects(ctx context.Context) []string {
+	return p.getProvider(ctx).Strings("dangerous-allow-insecure-redirect-urls")
 }
 
-func (p *Provider) WellKnownKeys(include ...string) []string {
-	if p.AccessTokenStrategy() == "jwt" {
+func (p *DefaultProvider) WellKnownKeys(ctx context.Context, include ...string) []string {
+	if p.AccessTokenStrategy(ctx) == AccessTokenJWTStrategy {
 		include = append(include, x.OAuth2JWTKeyName)
 	}
 
 	include = append(include, x.OpenIDConnectKeyName)
-	return stringslice.Unique(append(p.p.Strings(KeyWellKnownKeys), include...))
+	return stringslice.Unique(append(p.getProvider(ctx).Strings(KeyWellKnownKeys), include...))
 }
 
-func (p *Provider) IsUsingJWTAsAccessTokens() bool {
-	return p.AccessTokenStrategy() != "opaque"
+func (p *DefaultProvider) IsUsingJWTAsAccessTokens(ctx context.Context) bool {
+	return p.AccessTokenStrategy(ctx) != "opaque"
 }
 
-func (p *Provider) AllowedTopLevelClaims() []string {
-	return stringslice.Unique(p.p.Strings(KeyAllowedTopLevelClaims))
+func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(ViperKeyClientHTTPNoPrivateIPRanges)
 }
 
-func (p *Provider) SubjectTypesSupported() []string {
+func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
+	return stringslice.Unique(p.getProvider(ctx).Strings(KeyAllowedTopLevelClaims))
+}
+
+func (p *DefaultProvider) SubjectTypesSupported(ctx context.Context) []string {
 	types := stringslice.Filter(
-		p.p.StringsF(KeySubjectTypesSupported, []string{"public"}),
+		p.getProvider(ctx).StringsF(KeySubjectTypesSupported, []string{"public"}),
 		func(s string) bool {
 			return !(s == "public" || s == "pairwise")
 		},
@@ -159,33 +170,33 @@ func (p *Provider) SubjectTypesSupported() []string {
 	}
 
 	if stringslice.Has(types, "pairwise") {
-		if p.AccessTokenStrategy() == "jwt" {
+		if p.AccessTokenStrategy(ctx) == AccessTokenJWTStrategy {
 			p.l.Warn(`The pairwise subject identifier algorithm is not supported by the JWT OAuth 2.0 Access Token Strategy and is thus being disabled. Please remove "pairwise" from oidc.subject_identifiers.supported_types" (e.g. oidc.subject_identifiers.supported_types=public) or set strategies.access_token to "opaque".`)
 			types = stringslice.Filter(types,
 				func(s string) bool {
 					return !(s == "public")
 				},
 			)
-		} else if len(p.SubjectIdentifierAlgorithmSalt()) < 8 {
-			p.l.Fatalf(`The pairwise subject identifier algorithm was set but length of oidc.subject_identifier.salt is too small (%d < 8), please set oidc.subject_identifiers.pairwise.salt to a random string with 8 characters or more.`, len(p.SubjectIdentifierAlgorithmSalt()))
+		} else if len(p.SubjectIdentifierAlgorithmSalt(ctx)) < 8 {
+			p.l.Fatalf(`The pairwise subject identifier algorithm was set but length of oidc.subject_identifier.salt is too small (%d < 8), please set oidc.subject_identifiers.pairwise.salt to a random string with 8 characters or more.`, len(p.SubjectIdentifierAlgorithmSalt(ctx)))
 		}
 	}
 
 	return types
 }
 
-func (p *Provider) DefaultClientScope() []string {
-	return p.p.StringsF(
+func (p *DefaultProvider) DefaultClientScope(ctx context.Context) []string {
+	return p.getProvider(ctx).StringsF(
 		KeyDefaultClientScope,
 		[]string{"offline_access", "offline", "openid"},
 	)
 }
 
-func (p *Provider) DSN() string {
-	dsn := p.p.String(KeyDSN)
+func (p *DefaultProvider) DSN(ctx context.Context) string {
+	dsn := p.getProvider(ctx).String(KeyDSN)
 
 	if dsn == DSNMemory {
-		return dbal.SQLiteInMemory
+		return dbal.NewSQLiteInMemoryDatabase(uuid.Must(uuid.NewV4()).String())
 	}
 
 	if len(dsn) > 0 {
@@ -196,82 +207,58 @@ func (p *Provider) DSN() string {
 	return ""
 }
 
-func (p *Provider) EncryptSessionData() bool {
-	return p.p.BoolF(KeyEncryptSessionData, true)
+func (p *DefaultProvider) EncryptSessionData(ctx context.Context) bool {
+	return p.getProvider(ctx).BoolF(KeyEncryptSessionData, true)
 }
 
-func (p *Provider) ExcludeNotBeforeClaim() bool {
-	return p.p.BoolF(KeyExcludeNotBeforeClaim, false)
+func (p *DefaultProvider) ExcludeNotBeforeClaim(ctx context.Context) bool {
+	return p.getProvider(ctx).BoolF(KeyExcludeNotBeforeClaim, false)
 }
 
-func (p *Provider) DataSourcePlugin() string {
-	return p.p.String(KeyDSN)
+func (p *DefaultProvider) DataSourcePlugin(ctx context.Context) string {
+	return p.getProvider(ctx).String(KeyDSN)
 }
 
-func (p *Provider) BCryptCost() int {
-	return p.p.IntF(KeyBCryptCost, 10)
-}
-
-func (p *Provider) CookieSameSiteMode() http.SameSite {
-	sameSiteModeStr := p.p.String(KeyCookieSameSiteMode)
+func (p *DefaultProvider) CookieSameSiteMode(ctx context.Context) http.SameSite {
+	sameSiteModeStr := p.getProvider(ctx).String(KeyCookieSameSiteMode)
 	switch strings.ToLower(sameSiteModeStr) {
 	case "lax":
 		return http.SameSiteLaxMode
 	case "strict":
 		return http.SameSiteStrictMode
 	case "none":
-		if tls := p.TLS(PublicInterface); !tls.Enabled() {
+		if tls := p.TLS(ctx, PublicInterface); !tls.Enabled() {
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteNoneMode
 	default:
-		if tls := p.TLS(PublicInterface); !tls.Enabled() {
+		if tls := p.TLS(ctx, PublicInterface); !tls.Enabled() {
 			return http.SameSiteLaxMode
 		}
 		return http.SameSiteDefaultMode
 	}
 }
 
-func (p *Provider) PublicAllowDynamicRegistration() bool {
-	return p.p.Bool(KeyPublicAllowDynamicRegistration)
+func (p *DefaultProvider) PublicAllowDynamicRegistration(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyPublicAllowDynamicRegistration)
 }
 
-func (p *Provider) CookieSameSiteLegacyWorkaround() bool {
-	return p.p.Bool(KeyCookieSameSiteLegacyWorkaround)
+func (p *DefaultProvider) CookieSameSiteLegacyWorkaround(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyCookieSameSiteLegacyWorkaround)
 }
 
-func (p *Provider) ConsentRequestMaxAge() time.Duration {
-	return p.p.DurationF(KeyConsentRequestMaxAge, time.Minute*30)
+func (p *DefaultProvider) ConsentRequestMaxAge(ctx context.Context) time.Duration {
+	return p.getProvider(ctx).DurationF(KeyConsentRequestMaxAge, time.Minute*30)
 }
 
-func (p *Provider) AccessTokenLifespan() time.Duration {
-	return p.p.DurationF(KeyAccessTokenLifespan, time.Hour)
+func (p *DefaultProvider) Tracing(ctx context.Context) *otelx.Config {
+	return p.getProvider(ctx).TracingConfig("Ory Hydra")
 }
 
-func (p *Provider) RefreshTokenLifespan() time.Duration {
-	return p.p.DurationF(KeyRefreshTokenLifespan, time.Hour*720)
-}
-
-func (p *Provider) IDTokenLifespan() time.Duration {
-	return p.p.DurationF(KeyIDTokenLifespan, time.Hour)
-}
-
-func (p *Provider) AuthCodeLifespan() time.Duration {
-	return p.p.DurationF(KeyAuthCodeLifespan, time.Minute*10)
-}
-
-func (p *Provider) ScopeStrategy() string {
-	return p.p.String(KeyScopeStrategy)
-}
-
-func (p *Provider) Tracing() *otelx.Config {
-	return p.p.TracingConfig("Ory Hydra")
-}
-
-func (p *Provider) GetCookieSecrets() [][]byte {
-	secrets := p.p.Strings(KeyGetCookieSecrets)
+func (p *DefaultProvider) GetCookieSecrets(ctx context.Context) [][]byte {
+	secrets := p.getProvider(ctx).Strings(KeyGetCookieSecrets)
 	if len(secrets) == 0 {
-		return [][]byte{p.GetSystemSecret()}
+		return [][]byte{p.GetGlobalSecret(ctx)}
 	}
 
 	bs := make([][]byte, len(secrets))
@@ -281,64 +268,21 @@ func (p *Provider) GetCookieSecrets() [][]byte {
 	return bs
 }
 
-func (p *Provider) GetRotatedSystemSecrets() [][]byte {
-	secrets := p.p.Strings(KeyGetSystemSecret)
-
-	if len(secrets) < 2 {
-		return nil
-	}
-
-	var rotated [][]byte
-	for _, secret := range secrets[1:] {
-		rotated = append(rotated, x.HashStringSecret(secret))
-	}
-
-	return rotated
+func (p *DefaultProvider) LogoutRedirectURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyLogoutRedirectURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/logout/callback")))
 }
 
-func (p *Provider) GetSystemSecret() []byte {
-	secrets := p.p.Strings(KeyGetSystemSecret)
-
-	if len(secrets) == 0 {
-		if p.generatedSecret != nil {
-			return p.generatedSecret
-		}
-
-		p.l.Warnf("Configuration secrets.system is not set, generating a temporary, random secret...")
-		secret, err := x.GenerateSecret(32)
-		cmdx.Must(err, "Could not generate secret: %s", err)
-
-		p.l.Warnf("Generated secret: %s", secret)
-		p.generatedSecret = x.HashByteSecret(secret)
-
-		p.l.Warnln("Do not use generate secrets in production. The secret will be leaked to the logs.")
-		return x.HashByteSecret(secret)
+func (p *DefaultProvider) publicFallbackURL(ctx context.Context, path string) *url.URL {
+	if len(p.PublicURL(ctx).String()) > 0 {
+		return urlx.AppendPaths(p.PublicURL(ctx), path)
 	}
-
-	secret := secrets[0]
-	if len(secret) >= 16 {
-		return x.HashStringSecret(secret)
-	}
-
-	p.l.Fatalf("System secret must be undefined or have at least 16 characters but only has %d characters.", len(secret))
-	return nil
+	return p.fallbackURL(ctx, path, p.host(ctx, PublicInterface), p.port(ctx, PublicInterface))
 }
 
-func (p *Provider) LogoutRedirectURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyLogoutRedirectURL, p.publicFallbackURL("oauth2/fallbacks/logout/callback")))
-}
-
-func (p *Provider) publicFallbackURL(path string) *url.URL {
-	if len(p.PublicURL().String()) > 0 {
-		return urlx.AppendPaths(p.PublicURL(), path)
-	}
-	return p.fallbackURL(path, p.host(PublicInterface), p.port(PublicInterface))
-}
-
-func (p *Provider) fallbackURL(path string, host string, port int) *url.URL {
+func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host string, port int) *url.URL {
 	var u url.URL
 	u.Scheme = "http"
-	if tls := p.TLS(PublicInterface); tls.Enabled() {
+	if tls := p.TLS(ctx, PublicInterface); tls.Enabled() {
 		u.Scheme = "https"
 	}
 	if host == "" {
@@ -348,135 +292,141 @@ func (p *Provider) fallbackURL(path string, host string, port int) *url.URL {
 	return &u
 }
 
-func (p *Provider) LoginURL() *url.URL {
-	return urlRoot(p.p.URIF(KeyLoginURL, p.publicFallbackURL("oauth2/fallbacks/login")))
+func (p *DefaultProvider) LoginURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).URIF(KeyLoginURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/login")))
 }
 
-func (p *Provider) LogoutURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyLogoutURL, p.publicFallbackURL("oauth2/fallbacks/logout")))
+func (p *DefaultProvider) LogoutURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyLogoutURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/logout")))
 }
 
-func (p *Provider) ConsentURL() *url.URL {
-	return urlRoot(p.p.URIF(KeyConsentURL, p.publicFallbackURL("oauth2/fallbacks/consent")))
+func (p *DefaultProvider) ConsentURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).URIF(KeyConsentURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/consent")))
 }
 
-func (p *Provider) ErrorURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyErrorURL, p.publicFallbackURL("oauth2/fallbacks/error")))
+func (p *DefaultProvider) ErrorURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyErrorURL, p.publicFallbackURL(ctx, "oauth2/fallbacks/error")))
 }
 
-func (p *Provider) PublicURL() *url.URL {
-	return urlRoot(p.p.RequestURIF(KeyPublicURL, p.IssuerURL()))
+func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyPublicURL, p.IssuerURL(ctx)))
 }
 
-func (p *Provider) IssuerURL() *url.URL {
-	issuerURL := p.p.RequestURIF(KeyIssuerURL, p.fallbackURL("/", p.host(PublicInterface), p.port(PublicInterface)))
+func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
+	issuerURL := p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(ctx, PublicInterface), p.port(ctx, PublicInterface)))
 	issuerURL.Path = strings.TrimRight(issuerURL.Path, "/") + "/"
 	return urlRoot(issuerURL)
 }
 
-func (p *Provider) OAuth2ClientRegistrationURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2ClientRegistrationURL, new(url.URL))
+func (p *DefaultProvider) OAuth2ClientRegistrationURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyOAuth2ClientRegistrationURL, new(url.URL))
 }
 
-func (p *Provider) OAuth2TokenURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.PublicURL(), "/oauth2/token"))
+func (p *DefaultProvider) OAuth2TokenURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyOAuth2TokenURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/token"))
 }
 
-func (p *Provider) OAuth2AuthURL() *url.URL {
-	return p.p.RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.PublicURL(), "/oauth2/auth"))
+func (p *DefaultProvider) OAuth2AuthURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyOAuth2AuthURL, urlx.AppendPaths(p.PublicURL(ctx), "/oauth2/auth"))
 }
 
-func (p *Provider) JWKSURL() *url.URL {
-	return p.p.RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(), "/.well-known/jwks.json"))
+func (p *DefaultProvider) JWKSURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyJWKSURL, urlx.AppendPaths(p.IssuerURL(ctx), "/.well-known/jwks.json"))
 }
 
-func (p *Provider) TokenRefreshHookURL() *url.URL {
-	return p.p.URIF(KeyRefreshTokenHookURL, nil)
+func (p *DefaultProvider) TokenRefreshHookURL(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).URIF(KeyRefreshTokenHookURL, nil)
 }
 
-func (p *Provider) AccessTokenStrategy() string {
-	return strings.ToLower(p.p.StringF(KeyAccessTokenStrategy, "opaque"))
+func (p *DefaultProvider) AccessTokenStrategy(ctx context.Context) AccessTokenStrategyType {
+	s, err := ToAccessTokenStrategyType(p.getProvider(ctx).String(KeyAccessTokenStrategy))
+	if err != nil {
+		p.l.WithError(err).Warn("Key `strategies.access_token` contains an invalid value, falling back to `opaque` strategy.")
+		return AccessTokenDefaultStrategy
+	}
+
+	return s
 }
 
-func (p *Provider) SubjectIdentifierAlgorithmSalt() string {
-	return p.p.String(KeySubjectIdentifierAlgorithmSalt)
+func (p *DefaultProvider) SubjectIdentifierAlgorithmSalt(ctx context.Context) string {
+	return p.getProvider(ctx).String(KeySubjectIdentifierAlgorithmSalt)
 }
 
-func (p *Provider) OIDCDiscoverySupportedClaims() []string {
+func (p *DefaultProvider) OIDCDiscoverySupportedClaims(ctx context.Context) []string {
 	return stringslice.Unique(
 		append(
 			[]string{"sub"},
-			p.p.Strings(KeyOIDCDiscoverySupportedClaims)...,
+			p.getProvider(ctx).Strings(KeyOIDCDiscoverySupportedClaims)...,
 		),
 	)
 }
 
-func (p *Provider) OIDCDiscoverySupportedScope() []string {
+func (p *DefaultProvider) OIDCDiscoverySupportedScope(ctx context.Context) []string {
 	return stringslice.Unique(
 		append(
 			[]string{"offline_access", "offline", "openid"},
-			p.p.Strings(KeyOIDCDiscoverySupportedScope)...,
+			p.getProvider(ctx).Strings(KeyOIDCDiscoverySupportedScope)...,
 		),
 	)
 }
 
-func (p *Provider) OIDCDiscoveryUserinfoEndpoint() *url.URL {
-	return p.p.RequestURIF(KeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(p.PublicURL(), "/userinfo"))
+func (p *DefaultProvider) OIDCDiscoveryUserinfoEndpoint(ctx context.Context) *url.URL {
+	return p.getProvider(ctx).RequestURIF(KeyOIDCDiscoveryUserinfoEndpoint, urlx.AppendPaths(p.PublicURL(ctx), "/userinfo"))
 }
 
-func (p *Provider) ShareOAuth2Debug() bool {
-	return p.p.Bool(KeyExposeOAuth2Debug)
+func (p *DefaultProvider) GetSendDebugMessagesToClients(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyExposeOAuth2Debug)
 }
 
-func (p *Provider) OAuth2LegacyErrors() bool {
-	return p.p.Bool(KeyOAuth2LegacyErrors)
+func (p *DefaultProvider) GetUseLegacyErrorFormat(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyOAuth2LegacyErrors)
 }
 
-func (p *Provider) PKCEEnforced() bool {
-	return p.p.Bool(KeyPKCEEnforced)
+func (p *DefaultProvider) GetEnforcePKCE(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyPKCEEnforced)
 }
 
-func (p *Provider) EnforcePKCEForPublicClients() bool {
-	return p.p.Bool(KeyPKCEEnforcedForPublicClients)
+func (p *DefaultProvider) GetEnforcePKCEForPublicClients(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyPKCEEnforcedForPublicClients)
 }
 
-func (p *Provider) CGroupsV1AutoMaxProcsEnabled() bool {
-	return p.p.Bool(KeyCGroupsV1AutoMaxProcsEnabled)
+func (p *DefaultProvider) CGroupsV1AutoMaxProcsEnabled(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyCGroupsV1AutoMaxProcsEnabled)
 }
 
-func (p *Provider) GrantAllClientCredentialsScopesPerDefault() bool {
-	return p.p.Bool(KeyGrantAllClientCredentialsScopesPerDefault)
+func (p *DefaultProvider) GrantAllClientCredentialsScopesPerDefault(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyGrantAllClientCredentialsScopesPerDefault)
 }
 
-func (p *Provider) HsmEnabled() bool {
-	return p.p.Bool(HsmEnabled)
+func (p *DefaultProvider) HsmEnabled(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(HsmEnabled)
 }
 
-func (p *Provider) HsmLibraryPath() string {
-	return p.p.String(HsmLibraryPath)
+func (p *DefaultProvider) HsmLibraryPath(ctx context.Context) string {
+	return p.getProvider(ctx).String(HsmLibraryPath)
 }
 
-func (p *Provider) HsmSlotNumber() *int {
-	n := p.p.Int(HsmSlotNumber)
+func (p *DefaultProvider) HsmSlotNumber(ctx context.Context) *int {
+	n := p.getProvider(ctx).Int(HsmSlotNumber)
 	return &n
 }
 
-func (p *Provider) HsmPin() string {
-	return p.p.String(HsmPin)
+func (p *DefaultProvider) HsmPin(ctx context.Context) string {
+	return p.getProvider(ctx).String(HsmPin)
 }
 
-func (p *Provider) HsmTokenLabel() string {
-	return p.p.String(HsmTokenLabel)
+func (p *DefaultProvider) HsmTokenLabel(ctx context.Context) string {
+	return p.getProvider(ctx).String(HsmTokenLabel)
 }
 
-func (p *Provider) GrantTypeJWTBearerIDOptional() bool {
-	return p.p.Bool(KeyOAuth2GrantJWTIDOptional)
+func (p *DefaultProvider) GetGrantTypeJWTBearerIDOptional(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyOAuth2GrantJWTIDOptional)
 }
 
-func (p *Provider) GrantTypeJWTBearerIssuedDateOptional() bool {
-	return p.p.Bool(KeyOAuth2GrantJWTIssuedDateOptional)
+func (p *DefaultProvider) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyOAuth2GrantJWTIssuedDateOptional)
 }
 
-func (p *Provider) GrantTypeJWTBearerMaxDuration() time.Duration {
-	return p.p.DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
+func (p *DefaultProvider) GetJWTMaxDuration(ctx context.Context) time.Duration {
+	return p.getProvider(ctx).DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
 }

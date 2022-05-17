@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/hsm"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/gobuffalo/pop/v6"
 
@@ -86,7 +86,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		}
 
 		// new db connection
-		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.Config(ctx).DSN())
+		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.Config().DSN(ctx))
 		c, err := pop.NewConnection(&pop.ConnectionDetails{
 			URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
 			IdlePool:                  idlePool,
@@ -103,7 +103,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 			return errorsx.WithStack(err)
 		}
 
-		p, err := sql.NewPersister(ctx, c, m, m.Config(ctx), m.l)
+		p, err := sql.NewPersister(ctx, c, m, m.Config(), m.l)
 		if err != nil {
 			return err
 		}
@@ -114,7 +114,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		// - shared connection
 		// - shared but unique in the same process
 		// see: https://sqlite.org/inmemorydb.html
-		if dbal.IsMemorySQLite(m.Config(ctx).DSN()) {
+		if dbal.IsMemorySQLite(m.Config().DSN(ctx)) {
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
 			if err := p.MigrateUp(context.Background()); err != nil {
@@ -138,7 +138,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 			m.persister = p.WithFallbackNetworkID(net.ID)
 		}
 
-		if m.Config(ctx).HsmEnabled() {
+		if m.Config().HsmEnabled(ctx) {
 			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext())
 			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
 		} else {

@@ -23,6 +23,7 @@ package jwk
 import (
 	"context"
 	"crypto/rand"
+	"github.com/ory/x/assertx"
 	"io"
 	"testing"
 	"time"
@@ -72,18 +73,18 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 
 		got, err := m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
 		require.NoError(t, err)
-		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
+		assertx.EqualAsJSON(t, priv, canonicalizeThumbprints(got.Keys))
 
 		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
 		require.NoError(t, err)
 
 		got, err = m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
 		require.NoError(t, err)
-		assert.Equal(t, priv, canonicalizeThumbprints(got.Keys))
+		assertx.EqualAsJSON(t, priv, canonicalizeThumbprints(got.Keys))
 
 		got, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
 		require.NoError(t, err)
-		assert.Equal(t, pub, canonicalizeThumbprints(got.Keys))
+		assertx.EqualAsJSON(t, pub, canonicalizeThumbprints(got.Keys))
 
 		// Because MySQL
 		time.Sleep(time.Second * 2)
@@ -136,8 +137,8 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 
 		got, err := m.GetKeySet(context.TODO(), algo+"bar")
 		require.NoError(t, err)
-		assert.Equal(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
-		assert.Equal(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
+		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
+		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
 
 		for i, _ := range got.Keys {
 			got.Keys[i].Use = "enc"
@@ -179,8 +180,8 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 		gotPriv, err := FindPrivateKey(got)
 		require.NoError(t, err)
 
-		assert.Equal(t, canonicalizeKeyThumbprints(genPub), canonicalizeKeyThumbprints(gotPub))
-		assert.Equal(t, canonicalizeKeyThumbprints(genPriv), canonicalizeKeyThumbprints(gotPriv))
+		assertx.EqualAsJSON(t, canonicalizeKeyThumbprints(genPub), canonicalizeKeyThumbprints(gotPub))
+		assertx.EqualAsJSON(t, canonicalizeKeyThumbprints(genPriv), canonicalizeKeyThumbprints(gotPriv))
 
 		err = m.DeleteKeySet(context.TODO(), "foo")
 		require.NoError(t, err)
@@ -239,8 +240,7 @@ func TestHelperManagerNIDIsolationKeySet(t1 Manager, t2 Manager, alg string) fun
 func TestHelperNID(t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.Background()
-		kg := RS256Generator{}
-		jwks, err := kg.Generate("2022-03-11-ks-1-kid", "test")
+		jwks, err := GenerateJWK(ctx, jose.RS256, "2022-03-11-ks-1-kid", "test")
 		require.NoError(t, err)
 		require.Error(t, t2InvalidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))
 		require.NoError(t, t1ValidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))

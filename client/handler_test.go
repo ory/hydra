@@ -16,7 +16,7 @@ import (
 	"github.com/ory/hydra/internal/testhelpers"
 
 	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
@@ -43,8 +43,8 @@ func newResponseSnapshot(body string, res *http.Response) *responseSnapshot {
 }
 
 func TestHandler(t *testing.T) {
-	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
+	ctx := context.Background()
+	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	h := client.NewHandler(reg)
 	reg.WithContextualizer(&contextx.TestContextualizer{})
 
@@ -82,7 +82,7 @@ func TestHandler(t *testing.T) {
 
 				if tc.dynamic {
 					require.NotEmpty(t, c.OutfacingID)
-					assert.Equal(t, reg.Config(ctx).PublicURL().String()+"oauth2/register/"+c.OutfacingID, c.RegistrationClientURI)
+					assert.Equal(t, reg.Config().PublicURL(ctx).String()+"oauth2/register/"+c.OutfacingID, c.RegistrationClientURI)
 					except = append(except, "client_id", "client_secret", "registration_client_uri")
 				}
 
@@ -123,7 +123,7 @@ func TestHandler(t *testing.T) {
 	})
 
 	newServer := func(t *testing.T, dynamicEnabled bool) (*httptest.Server, *http.Client) {
-		require.NoError(t, reg.Config(ctx).Set(config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
+		require.NoError(t, reg.Config().Set(ctx, config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
 		router := httprouter.New()
 		h.SetRoutes(&x.RouterAdmin{Router: router}, &x.RouterPublic{Router: router})
 		ts := httptest.NewServer(router)

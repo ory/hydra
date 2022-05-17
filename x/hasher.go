@@ -36,7 +36,7 @@ type BCrypt struct {
 }
 
 type config interface {
-	BCryptCost() int
+	GetBCryptCost(ctx context.Context) int
 }
 
 // NewBCrypt returns a new BCrypt instance.
@@ -47,7 +47,7 @@ func NewBCrypt(c config) *BCrypt {
 }
 
 func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
-	cf := b.c.BCryptCost()
+	cf := b.c.GetBCryptCost(ctx)
 	if cf == 0 {
 		cf = defaultBCryptWorkFactor
 	}

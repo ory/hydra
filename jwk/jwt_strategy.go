@@ -82,5 +82,5 @@ func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (interface{}, erro
 		return nil, errors.New("public and private key pair kids do not match")
 	}
 
-	return private.Key, nil
+	return private, nil
 }

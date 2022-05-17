@@ -21,7 +21,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/x/sqlxx"
@@ -34,7 +34,7 @@ type JanitorConsentTestHelper struct {
 	flushAccessRequests  []*fosite.Request
 	flushRefreshRequests []*fosite.AccessRequest
 	flushGrants          []*createGrantRequest
-	conf                 *config.Provider
+	conf                 *config.DefaultProvider
 	Lifespan             time.Duration
 }
 
@@ -47,12 +47,12 @@ const lifespan = time.Hour
 
 func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(config.KeyAccessTokenLifespan, lifespan)
-	conf.MustSet(config.KeyRefreshTokenLifespan, lifespan)
-	conf.MustSet(config.KeyConsentRequestMaxAge, lifespan)
-	conf.MustSet(config.KeyLogLevel, "trace")
+	conf.MustSet(context.Background(), config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+	conf.MustSet(context.Background(), config.KeyIssuerURL, "http://hydra.localhost")
+	conf.MustSet(context.Background(), config.KeyAccessTokenLifespan, lifespan)
+	conf.MustSet(context.Background(), config.KeyRefreshTokenLifespan, lifespan)
+	conf.MustSet(context.Background(), config.KeyConsentRequestMaxAge, lifespan)
+	conf.MustSet(context.Background(), config.KeyLogLevel, "trace")
 
 	return &JanitorConsentTestHelper{
 		uniqueName:           uniqueName,
@@ -66,11 +66,11 @@ func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 	}
 }
 
-func (j *JanitorConsentTestHelper) GetDSN() string {
-	return j.conf.DSN()
+func (j *JanitorConsentTestHelper) GetDSN(ctx context.Context) string {
+	return j.conf.DSN(ctx)
 }
 
-func (j *JanitorConsentTestHelper) GetConfig() *config.Provider {
+func (j *JanitorConsentTestHelper) GetConfig() *config.DefaultProvider {
 	return j.conf
 }
 
@@ -83,8 +83,8 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 }
 
 func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
-	j.conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", dbname))
-	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), false, true, &contextx.DefaultContextualizer{})
+	j.conf.MustSet(ctx, config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", dbname))
+	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), false, true, &contextx.Default{})
 }
 
 func (j *JanitorConsentTestHelper) AccessTokenNotAfterSetup(ctx context.Context, cl client.Manager, store x.FositeStorer) func(t *testing.T) {
@@ -103,7 +103,7 @@ func (j *JanitorConsentTestHelper) AccessTokenNotAfterValidate(ctx context.Conte
 		var err error
 		ds := new(oauth2.Session)
 
-		accessTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.AccessTokenLifespan())
+		accessTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.GetAccessTokenLifespan(ctx))
 
 		for _, r := range j.flushAccessRequests {
 			t.Logf("access flush check: %s", r.ID)
@@ -132,7 +132,7 @@ func (j *JanitorConsentTestHelper) RefreshTokenNotAfterValidate(ctx context.Cont
 		var err error
 		ds := new(oauth2.Session)
 
-		refreshTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.RefreshTokenLifespan())
+		refreshTokenLifespan := time.Now().Round(time.Second).Add(-j.conf.GetRefreshTokenLifespan(ctx))
 
 		for _, r := range j.flushRefreshRequests {
 			t.Logf("refresh flush check: %s", r.ID)
@@ -438,16 +438,16 @@ func (j *JanitorConsentTestHelper) LoginConsentNotAfterValidate(ctx context.Cont
 	}
 }
 
-func (j *JanitorConsentTestHelper) GetConsentRequestLifespan() time.Duration {
-	return j.conf.ConsentRequestMaxAge()
+func (j *JanitorConsentTestHelper) GetConsentRequestLifespan(ctx context.Context) time.Duration {
+	return j.conf.ConsentRequestMaxAge(ctx)
 }
 
-func (j *JanitorConsentTestHelper) GetAccessTokenLifespan() time.Duration {
-	return j.conf.AccessTokenLifespan()
+func (j *JanitorConsentTestHelper) GetAccessTokenLifespan(ctx context.Context) time.Duration {
+	return j.conf.GetAccessTokenLifespan(ctx)
 }
 
-func (j *JanitorConsentTestHelper) GetRefreshTokenLifespan() time.Duration {
-	return j.conf.RefreshTokenLifespan()
+func (j *JanitorConsentTestHelper) GetRefreshTokenLifespan(ctx context.Context) time.Duration {
+	return j.conf.GetRefreshTokenLifespan(ctx)
 }
 
 func (j *JanitorConsentTestHelper) notAfterCheck(notAfter time.Time, lifespan time.Time, requestedAt time.Time) bool {
@@ -467,7 +467,7 @@ func (j *JanitorConsentTestHelper) notAfterCheck(notAfter time.Time, lifespan ti
 	return lesser.Unix() > requestedAt.Unix()
 }
 
-func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, tenant string, parallel bool) func(t *testing.T) {
+func JanitorTests(conf *config.DefaultProvider, consentManager consent.Manager, clientManager client.Manager, fositeManager x.FositeStorer, tenant string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
 		if parallel {
 			t.Parallel()
@@ -476,7 +476,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 
 		jt := NewConsentJanitorTestHelper(tenant + t.Name())
 
-		conf.MustSet(config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan())
+		conf.MustSet(context.Background(), config.KeyConsentRequestMaxAge, jt.GetConsentRequestLifespan(ctx))
 
 		t.Run("case=flush-consent-request-not-after", func(t *testing.T) {
 
@@ -486,7 +486,7 @@ func JanitorTests(conf *config.Provider, consentManager consent.Manager, clientM
 				jt := NewConsentJanitorTestHelper(tenant + k)
 				t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
 					notAfter := time.Now().Round(time.Second).Add(-v)
-					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan())
+					consentRequestLifespan := time.Now().Round(time.Second).Add(-jt.GetConsentRequestLifespan(ctx))
 
 					// setup test
 					t.Run("step=setup", jt.LoginConsentNotAfterSetup(ctx, consentManager, clientManager))

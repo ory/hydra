@@ -36,7 +36,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/driver/config"
 
@@ -78,11 +78,12 @@ func createTestClient(prefix string) *models.OAuth2Client {
 }
 
 func TestClientSDK(t *testing.T) {
+	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
-	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
-	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
-	r := internal.NewRegistryMemory(t, conf, &contextx.StaticContextualizer{C: conf})
+	conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"public"})
+	conf.MustSet(ctx, config.KeyDefaultClientScope, []string{"foo", "bar"})
+	conf.MustSet(ctx, config.KeyPublicAllowDynamicRegistration, true)
+	r := internal.NewRegistryMemory(t, conf, &contextx.Static{C: conf.Source(ctx)})
 
 	routerAdmin := x.NewRouterAdmin()
 	routerPublic := x.NewRouterPublic()
@@ -97,7 +98,7 @@ func TestClientSDK(t *testing.T) {
 			ClientID: "scoped",
 		}))
 		require.NoError(t, err)
-		assert.EqualValues(t, conf.DefaultClientScope(), strings.Split(result.Payload.Scope, " "))
+		assert.EqualValues(t, conf.DefaultClientScope(ctx), strings.Split(result.Payload.Scope, " "))
 
 		_, err = c.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID("scoped"))
 		require.NoError(t, err)

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/hydra/driver"
@@ -20,29 +20,29 @@ import (
 	"github.com/ory/x/logrusx"
 )
 
-func resetConfig(p *config.Provider) {
-	p.MustSet(config.KeyBCryptCost, "4")
-	p.MustSet(config.KeySubjectIdentifierAlgorithmSalt, "00000000")
-	p.MustSet(config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
-	p.MustSet(config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
-	p.MustSet(config.KeyLogLevel, "trace")
+func resetConfig(p *config.DefaultProvider) {
+	p.MustSet(context.Background(), config.KeyBCryptCost, "4")
+	p.MustSet(context.Background(), config.KeySubjectIdentifierAlgorithmSalt, "00000000")
+	p.MustSet(context.Background(), config.KeyGetSystemSecret, []string{"000000000000000000000000000000000000000000000000"})
+	p.MustSet(context.Background(), config.KeyGetCookieSecrets, []string{"000000000000000000000000000000000000000000000000"})
+	p.MustSet(context.Background(), config.KeyLogLevel, "trace")
 }
 
-func NewConfigurationWithDefaults() *config.Provider {
+func NewConfigurationWithDefaults() *config.DefaultProvider {
 	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.MustSet("dangerous-force-http", true)
+	p.MustSet(context.Background(), "dangerous-force-http", true)
 	return p
 }
 
-func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
+func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
 	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.MustSet("dangerous-force-http", false)
+	p.MustSet(context.Background(), "dangerous-force-http", false)
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.Provider, ctxer contextx.Contextualizer) driver.Registry {
+func NewRegistryMemory(t *testing.T, c *config.DefaultProvider, ctxer contextx.Contextualizer) driver.Registry {
 	return newRegistryDefault(t, "memory", c, true, ctxer)
 }
 
@@ -54,23 +54,13 @@ func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool, ctxer context
 	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate, ctxer)
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.Provider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
-	c.MustSet(config.KeyLogLevel, "trace")
-	c.MustSet(config.KeyDSN, url)
+func newRegistryDefault(t *testing.T, url string, c *config.DefaultProvider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+	ctx := context.Background()
+	c.MustSet(ctx, config.KeyLogLevel, "trace")
+	c.MustSet(ctx, config.KeyDSN, url)
 
-	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"), false, migrate, ctxer)
+	r, err := driver.NewRegistryFromDSN(ctx, c, logrusx.New("test_hydra", "master"), false, migrate, ctxer)
 	require.NoError(t, err)
-
-	kg := map[string]jwk.KeyGenerator{
-		"RS256": new(veryInsecureRS256Generator),
-		"ES256": &jwk.ECDSA256Generator{},
-		"ES512": &jwk.ECDSA512Generator{},
-		"EdDSA": &jwk.EdDSAGenerator{},
-		"HS256": &jwk.HS256Generator{},
-		"HS512": &jwk.HS512Generator{},
-	}
-
-	r = r.WithKeyGenerators(kg)
 
 	return r
 }

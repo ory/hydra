@@ -5,11 +5,9 @@
 package jwk_test
 
 import (
-	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-
 	herodot "github.com/ory/herodot"
 	config "github.com/ory/hydra/driver/config"
 	jwk "github.com/ory/hydra/jwk"
@@ -54,17 +52,17 @@ func (mr *MockInternalRegistryMockRecorder) AuditLogger() *gomock.Call {
 }
 
 // Config mocks base method.
-func (m *MockInternalRegistry) Config(ctx context.Context) *config.Provider {
+func (m *MockInternalRegistry) Config() *config.DefaultProvider {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Config", ctx)
-	ret0, _ := ret[0].(*config.Provider)
+	ret := m.ctrl.Call(m, "Config")
+	ret0, _ := ret[0].(*config.DefaultProvider)
 	return ret0
 }
 
 // Config indicates an expected call of Config.
-func (mr *MockInternalRegistryMockRecorder) Config(ctx interface{}) *gomock.Call {
+func (mr *MockInternalRegistryMockRecorder) Config() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockInternalRegistry)(nil).Config), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockInternalRegistry)(nil).Config))
 }
 
 // KeyCipher mocks base method.
@@ -175,17 +173,17 @@ func (m *MockRegistry) EXPECT() *MockRegistryMockRecorder {
 }
 
 // Config mocks base method.
-func (m *MockRegistry) Config(ctx context.Context) *config.Provider {
+func (m *MockRegistry) Config() *config.DefaultProvider {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Config", ctx)
-	ret0, _ := ret[0].(*config.Provider)
+	ret := m.ctrl.Call(m, "Config")
+	ret0, _ := ret[0].(*config.DefaultProvider)
 	return ret0
 }
 
 // Config indicates an expected call of Config.
-func (mr *MockRegistryMockRecorder) Config(ctx interface{}) *gomock.Call {
+func (mr *MockRegistryMockRecorder) Config() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockRegistry)(nil).Config), ctx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Config", reflect.TypeOf((*MockRegistry)(nil).Config))
 }
 
 // KeyCipher mocks base method.

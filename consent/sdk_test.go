@@ -37,7 +37,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/urlx"
 )
@@ -47,11 +47,12 @@ func makeID(base string, tenant string, key string) string {
 }
 
 func TestSDK(t *testing.T) {
+	ctx := context.Background()
 	tenant := "t1"
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeyIssuerURL, "https://www.ory.sh")
-	conf.MustSet(config.KeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+	conf.MustSet(ctx, config.KeyIssuerURL, "https://www.ory.sh")
+	conf.MustSet(ctx, config.KeyAccessTokenLifespan, time.Minute)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)

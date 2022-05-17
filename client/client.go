@@ -34,6 +34,11 @@ import (
 	"github.com/ory/x/sqlxx"
 )
 
+var (
+	_ fosite.OpenIDConnectClient = (*Client)(nil)
+	_ fosite.Client              = (*Client)(nil)
+)
+
 // Client represents an OAuth 2.0 Client.
 //
 // swagger:model oAuth2Client

@@ -15,7 +15,7 @@ import (
 	"testing"
 
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/driver/config"

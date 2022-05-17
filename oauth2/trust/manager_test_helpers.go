@@ -35,7 +35,6 @@ import (
 )
 
 func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) func(t *testing.T) {
-	testGenerator := &jwk.RS256Generator{}
 	tokenServicePubKey1 := jose.JSONWebKey{}
 	tokenServicePubKey2 := jose.JSONWebKey{}
 	mikePubKey := jose.JSONWebKey{}
@@ -44,15 +43,15 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 		if parallel {
 			t.Parallel()
 		}
-		keySet, err := testGenerator.Generate("tokenServicePubKey1", "sig")
+		keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "tokenServicePubKey1", "sig")
 		require.NoError(t, err)
 		tokenServicePubKey1 = keySet.Keys[1]
 
-		keySet, err = testGenerator.Generate("tokenServicePubKey2", "sig")
+		keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "tokenServicePubKey2", "sig")
 		require.NoError(t, err)
 		tokenServicePubKey2 = keySet.Keys[1]
 
-		keySet, err = testGenerator.Generate("mikePubKey", "sig")
+		keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "mikePubKey", "sig")
 		require.NoError(t, err)
 		mikePubKey = keySet.Keys[1]
 
@@ -167,17 +166,16 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 }
 
 func TestHelperGrantManagerErrors(m GrantManager, parallel bool) func(t *testing.T) {
-	testGenerator := &jwk.RS256Generator{}
 	pubKey1 := jose.JSONWebKey{}
 	pubKey2 := jose.JSONWebKey{}
 
 	return func(t *testing.T) {
 		t.Parallel()
-		keySet, err := testGenerator.Generate("pubKey1", "sig")
+		keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "pubKey1", "sig")
 		require.NoError(t, err)
 		pubKey1 = keySet.Keys[1]
 
-		keySet, err = testGenerator.Generate("pubKey2", "sig")
+		keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "pubKey2", "sig")
 		require.NoError(t, err)
 		pubKey2 = keySet.Keys[1]
 

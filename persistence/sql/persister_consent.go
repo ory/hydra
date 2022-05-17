@@ -521,7 +521,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	var f flow.Flow
 
 	// The value of notAfter should be the minimum between input parameter and request max expire based on its configured age
-	requestMaxExpire := time.Now().Add(-p.config.ConsentRequestMaxAge())
+	requestMaxExpire := time.Now().Add(-p.config.ConsentRequestMaxAge(ctx))
 	if requestMaxExpire.Before(notAfter) {
 		notAfter = requestMaxExpire
 	}

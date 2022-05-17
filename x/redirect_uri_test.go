@@ -1,6 +1,7 @@
 package x
 
 import (
+	"context"
 	"net/url"
 	"testing"
 
@@ -10,7 +11,7 @@ import (
 
 type mockrc struct{}
 
-func (m *mockrc) InsecureRedirects() []string {
+func (m *mockrc) InsecureRedirects(ctx context.Context) []string {
 	return []string{
 		"http://foo.com/bar",
 		"http://baz.com/bar",
@@ -32,6 +33,6 @@ func TestIsRedirectURISecure(t *testing.T) {
 	} {
 		uu, err := url.Parse(c.u)
 		require.NoError(t, err)
-		assert.Equal(t, !c.err, IsRedirectURISecure(new(mockrc))(uu), "case %d", d)
+		assert.Equal(t, !c.err, IsRedirectURISecure(new(mockrc))(context.Background(), uu), "case %d", d)
 	}
 }

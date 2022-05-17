@@ -34,7 +34,7 @@ import (
 
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/x"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/internal"
@@ -61,7 +61,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
@@ -115,7 +115,7 @@ func TestGetLoginRequest(t *testing.T) {
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
@@ -174,7 +174,7 @@ func TestGetConsentRequest(t *testing.T) {
 			requestURL := "http://192.0.2.1"
 
 			conf := internal.NewConfigurationWithDefaults()
-			reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
 				cl := &client.Client{OutfacingID: "client" + key}
@@ -236,7 +236,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		requestURL := "http://192.0.2.1"
 
 		conf := internal.NewConfigurationWithDefaults()
-		reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 		cl := &client.Client{OutfacingID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))

@@ -2,6 +2,7 @@ package sql_test
 
 import (
 	"context"
+	"gopkg.in/square/go-jose.v2"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -13,7 +14,7 @@ import (
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 
@@ -43,38 +44,34 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 	t.Run("package=consent/manager="+k, consent.ManagerTests(t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
 
 	t.Run("parallel-boundary", func(t *testing.T) {
-		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1.Config(ctx), t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
-		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t2.Config(ctx), t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t1.Config(), t1.ConsentManager(), t1.ClientManager(), t1.OAuth2Storage(), "t1", parallel))
+		t.Run("package=consent/janitor="+k, testhelpers.JanitorTests(t2.Config(), t2.ConsentManager(), t2.ClientManager(), t2.OAuth2Storage(), "t2", parallel))
 	})
 
 	t.Run("package=jwk/manager="+k, func(t *testing.T) {
-		keyGenerators := new(driver.RegistryBase).KeyGenerators()
-		assert.Equalf(t, 6, len(keyGenerators), "Test for key generator is not implemented")
-
 		for _, tc := range []struct {
-			keyGenerator jwk.KeyGenerator
-			alg          string
-			skip         bool
+			alg  string
+			skip bool
 		}{
-			{keyGenerator: keyGenerators["RS256"], alg: "RS256", skip: false},
-			{keyGenerator: keyGenerators["ES256"], alg: "ES256", skip: false},
-			{keyGenerator: keyGenerators["ES512"], alg: "ES512", skip: false},
-			{keyGenerator: keyGenerators["HS256"], alg: "HS256", skip: true},
-			{keyGenerator: keyGenerators["HS512"], alg: "HS512", skip: true},
-			{keyGenerator: keyGenerators["EdDSA"], alg: "EdDSA", skip: t1.Config(ctx).HsmEnabled()},
+			{alg: "RS256", skip: false},
+			{alg: "ES256", skip: false},
+			{alg: "ES512", skip: false},
+			{alg: "HS256", skip: true},
+			{alg: "HS512", skip: true},
+			{alg: "EdDSA", skip: t1.Config().HsmEnabled(ctx)},
 		} {
 			t.Run("key_generator="+tc.alg, func(t *testing.T) {
 				if tc.skip {
 					t.Skipf("Skipping test. Not applicable for alg: %s", tc.alg)
 				}
-				if t1.Config(ctx).HsmEnabled() {
+				if t1.Config().HsmEnabled(ctx) {
 					t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerGenerateAndPersistKeySet(t1.KeyManager(), tc.alg, false))
 					// We don't support NID isolation with HSM at the moment
 					// t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerNIDIsolationKeySet(t1.KeyManager(), t2.KeyManager(), tc.alg))
 				} else {
 					kid, err := uuid.NewV4()
 					require.NoError(t, err)
-					ks, err := tc.keyGenerator.Generate(kid.String(), "sig")
+					ks, err := jwk.GenerateJWK(context.Background(), jose.SignatureAlgorithm(tc.alg), kid.String(), "sig")
 					require.NoError(t, err)
 					t.Run("TestManagerKey", jwk.TestHelperManagerKey(t1.KeyManager(), tc.alg, ks, kid.String()))
 					t.Run("Parallel", func(t *testing.T) {
@@ -110,11 +107,11 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 
 func TestManagersNextGen(t *testing.T) {
 	regs := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true, &contextx.DefaultContextualizer{}),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, &contextx.Default{}),
 	}
 
 	if !testing.Short() {
-		regs["postgres"], regs["mysql"], regs["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.DefaultContextualizer{})
+		regs["postgres"], regs["mysql"], regs["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.Default{})
 	}
 
 	ctx := context.Background()
@@ -143,16 +140,16 @@ func TestManagersNextGen(t *testing.T) {
 func TestManagers(t *testing.T) {
 	ctx := context.TODO()
 	t1registries := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true, &contextx.DefaultContextualizer{}),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true, &contextx.Default{}),
 	}
 
 	t2registries := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, false, &contextx.DefaultContextualizer{}),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, false, &contextx.Default{}),
 	}
 
 	if !testing.Short() {
-		t2registries["postgres"], t2registries["mysql"], t2registries["cockroach"], _ = internal.ConnectDatabases(t, false, &contextx.DefaultContextualizer{})
-		t1registries["postgres"], t1registries["mysql"], t1registries["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.DefaultContextualizer{})
+		t2registries["postgres"], t2registries["mysql"], t2registries["cockroach"], _ = internal.ConnectDatabases(t, false, &contextx.Default{})
+		t1registries["postgres"], t1registries["mysql"], t1registries["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.Default{})
 	}
 
 	tenant1NID, _ := uuid.NewV4()
@@ -162,16 +159,16 @@ func TestManagers(t *testing.T) {
 		t2 := t2registries[k]
 		require.NoError(t, t1.Persister().Connection(ctx).Create(&networkx.Network{ID: tenant1NID}))
 		require.NoError(t, t2.Persister().Connection(ctx).Create(&networkx.Network{ID: tenant2NID}))
-		t1.WithContextualizer(&contextx.StaticContextualizer{NID: tenant1NID, C: t1.Config(ctx)})
-		t2.WithContextualizer(&contextx.StaticContextualizer{NID: tenant2NID, C: t2.Config(ctx)})
+		t1.WithContextualizer(&contextx.Static{NID: tenant1NID, C: t1.Config().Source(context.Background())})
+		t2.WithContextualizer(&contextx.Static{NID: tenant2NID, C: t2.Config().Source(context.Background())})
 		t.Run("parallel-boundary", func(t *testing.T) { testRegistry(t, ctx, k, t1, t2) })
 	}
 
 	for k, t1 := range t1registries {
 		t2 := t2registries[k]
-		t2.WithContextualizer(&contextx.StaticContextualizer{NID: uuid.Nil, C: t2.Config(ctx)})
+		t2.WithContextualizer(&contextx.Static{NID: uuid.Nil, C: t2.Config().Source(context.Background())})
 
-		if !t1.Config(ctx).HsmEnabled() { // We don't support NID isolation with HSM at the moment
+		if !t1.Config().HsmEnabled(ctx) { // We don't support NID isolation with HSM at the moment
 			t.Run("package=jwk/manager="+k+"/case=nid",
 				jwk.TestHelperNID(t1.KeyManager(), t2.KeyManager()),
 			)

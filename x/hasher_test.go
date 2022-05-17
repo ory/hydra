@@ -12,7 +12,7 @@ type hasherConfig struct {
 	cost int
 }
 
-func (c hasherConfig) BCryptCost() int {
+func (c hasherConfig) GetBCryptCost(ctx context.Context) int {
 	return c.cost
 }
 

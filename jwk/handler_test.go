@@ -29,7 +29,7 @@ import (
 	"testing"
 
 	"github.com/ory/hydra/jwk"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,9 +42,8 @@ import (
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
-	var testGenerator = &jwk.RS256Generator{}
-	conf.MustSet(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
+	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
 	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
@@ -54,10 +53,10 @@ func TestHandlerWellKnown(t *testing.T) {
 	JWKPath := "/.well-known/jwks.json"
 
 	t.Run("Test_Handler_WellKnown/Run_public_key_With_public_prefix", func(t *testing.T) {
-		if conf.HsmEnabled() {
+		if conf.HsmEnabled(context.Background()) {
 			t.Skip("Skipping test. Not applicable when Hardware Security Module is enabled. Public/private keys on HSM are generated with equal key id's and are not using prefixes")
 		}
-		IDKS, _ := testGenerator.Generate("test-id-1", "sig")
+		IDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		res, err := http.Get(testServer.URL + JWKPath)
 		require.NoError(t, err, "problem in http request")
@@ -81,10 +80,10 @@ func TestHandlerWellKnown(t *testing.T) {
 	t.Run("Test_Handler_WellKnown/Run_public_key_Without_public_prefix", func(t *testing.T) {
 		var IDKS *jose.JSONWebKeySet
 
-		if conf.HsmEnabled() {
+		if conf.HsmEnabled(context.Background()) {
 			IDKS, _ = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
 		} else {
-			IDKS, _ = testGenerator.Generate("test-id-2", "sig")
+			IDKS, _ = jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-2", "sig")
 			if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {
 				IDKS.Keys[1].KeyID = "test-id-2"
 			} else {

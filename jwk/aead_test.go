@@ -21,6 +21,7 @@
 package jwk_test
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"io"
@@ -43,68 +44,69 @@ func secret(t *testing.T) string {
 }
 
 func TestAEAD(t *testing.T) {
+	ctx := context.Background()
 	c := internal.NewConfigurationWithDefaults()
 	t.Run("case=without-rotation", func(t *testing.T) {
-		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
 		a := NewAEAD(c)
 
 		plain := []byte(uuid.New())
-		ct, err := a.Encrypt(plain)
+		ct, err := a.Encrypt(ctx, plain)
 		assert.NoError(t, err)
 
-		res, err := a.Decrypt(ct)
+		res, err := a.Decrypt(ctx, ct)
 		assert.NoError(t, err)
 		assert.Equal(t, plain, res)
 	})
 
 	t.Run("case=wrong-secret", func(t *testing.T) {
-		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
 		a := NewAEAD(c)
 
-		ct, err := a.Encrypt([]byte(uuid.New()))
+		ct, err := a.Encrypt(ctx, []byte(uuid.New()))
 		require.NoError(t, err)
 
-		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
-		_, err = a.Decrypt(ct)
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
+		_, err = a.Decrypt(ctx, ct)
 		require.Error(t, err)
 	})
 
 	t.Run("case=with-rotation", func(t *testing.T) {
 		old := secret(t)
-		c.MustSet(config.KeyGetSystemSecret, []string{old})
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{old})
 		a := NewAEAD(c)
 
 		plain := []byte(uuid.New())
-		ct, err := a.Encrypt(plain)
+		ct, err := a.Encrypt(ctx, plain)
 		require.NoError(t, err)
 
 		// Sets the old secret as a rotated secret and creates a new one.
-		c.MustSet(config.KeyGetSystemSecret, []string{secret(t), old})
-		res, err := a.Decrypt(ct)
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t), old})
+		res, err := a.Decrypt(ctx, ct)
 		require.NoError(t, err)
 		assert.Equal(t, plain, res)
 
 		// THis should also work when we re-encrypt the same plain text.
-		ct2, err := a.Encrypt(plain)
+		ct2, err := a.Encrypt(ctx, plain)
 		require.NoError(t, err)
 		assert.NotEqual(t, ct2, ct)
 
-		res, err = a.Decrypt(ct)
+		res, err = a.Decrypt(ctx, ct)
 		require.NoError(t, err)
 		assert.Equal(t, plain, res)
 	})
 
 	t.Run("case=with-rotation-wrong-secret", func(t *testing.T) {
-		c.MustSet(config.KeyGetSystemSecret, []string{secret(t)})
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t)})
 		a := NewAEAD(c)
 
 		plain := []byte(uuid.New())
-		ct, err := a.Encrypt(plain)
+		ct, err := a.Encrypt(ctx, plain)
 		require.NoError(t, err)
 
 		// When the secrets do not match, an error should be thrown during decryption.
-		c.MustSet(config.KeyGetSystemSecret, []string{secret(t), secret(t)})
-		_, err = a.Decrypt(ct)
+		c.MustSet(ctx, config.KeyGetSystemSecret, []string{secret(t), secret(t)})
+		_, err = a.Decrypt(ctx, ct)
 		require.Error(t, err)
 	})
 }

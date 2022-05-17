@@ -3,21 +3,24 @@ package driver
 import (
 	"context"
 	"fmt"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/ory/hydra/fositex"
+	ctxx "github.com/ory/x/contextx"
+	"github.com/ory/x/httpx"
+	"github.com/ory/x/otelx"
 	"net"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/ory/hydra/hsm"
 
-	"github.com/ory/x/otelx"
 	prometheus "github.com/ory/x/prometheusx"
 
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/hydra/x/oauth2cors"
+	"github.com/ory/x/contextx"
 
 	"github.com/ory/hydra/persistence"
 
@@ -32,27 +35,25 @@ import (
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
-	"github.com/ory/x/healthx"
-	"github.com/ory/x/resilience"
-	"github.com/ory/x/tracing"
-	"github.com/ory/x/urlx"
-
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/healthx"
+	"github.com/ory/x/resilience"
+	"github.com/ory/x/tracing"
 )
 
 var (
-	_ contextx.ContextualizerProvider = (*RegistryBase)(nil)
+	_ contextx.Provider = (*RegistryBase)(nil)
 )
 
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
-	C            *config.Provider
+	C            *config.DefaultProvider
 	ch           *client.Handler
 	fh           fosite.Hasher
 	jwtGrantH    *trust.Handler
@@ -61,18 +62,16 @@ type RegistryBase struct {
 	cv           *client.Validator
 	ctxer        contextx.Contextualizer
 	hh           *healthx.Handler
-	kg           map[string]jwk.KeyGenerator
 	kc           *jwk.AEAD
 	cs           sessions.Store
 	csPrev       [][]byte
 	cos          consent.Strategy
 	writer       herodot.Writer
 	fsc          fosite.ScopeStrategy
-	atjs         jwk.JWTStrategy
-	idtjs        jwk.JWTStrategy
+	atjs         jwk.JWTSigner
+	idtjs        jwk.JWTSigner
 	hsm          hsm.Context
 	fscPrev      string
-	fos          *openid.DefaultStrategy
 	forv         *openid.OpenIDConnectRequestValidator
 	fop          fosite.OAuth2Provider
 	coh          *consent.Handler
@@ -82,12 +81,26 @@ type RegistryBase struct {
 	pmm          *prometheus.MetricsManager
 	oa2mw        func(h http.Handler) http.Handler
 	o2mc         *foauth2.HMACSHAStrategy
+	o2jwt        *foauth2.DefaultJWTStrategy
 	arhs         []oauth2.AccessRequestHook
 	buildVersion string
 	buildHash    string
 	buildDate    string
 	r            Registry
 	persister    persistence.Persister
+	jfs          fosite.JWKSFetcherStrategy
+	oc           fosite.Configurator
+	oidcs        jwk.JWTSigner
+	ats          jwk.JWTSigner
+	hmacs        *foauth2.HMACSHAStrategy
+	fc           *fositex.Config
+}
+
+func (m *RegistryBase) GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy {
+	if m.jfs == nil {
+		m.jfs = fosite.NewDefaultJWKSFetcherStrategy(fosite.JWKSFetcherWithHTTPClient(m.HTTPClient(ctx)))
+	}
+	return m.jfs
 }
 
 func (m *RegistryBase) WithContextualizer(ctxer contextx.Contextualizer) Registry {
@@ -114,14 +127,14 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 	return m.r
 }
 
-func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
+func (m *RegistryBase) OAuth2AwareMiddleware(ctx context.Context) func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = oauth2cors.Middleware(m.r)
+		m.oa2mw = oauth2cors.Middleware(ctx, m.r)
 	}
 	return m.oa2mw
 }
 
-func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 
@@ -130,9 +143,9 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
 	m.ClientHandler().SetRoutes(admin, public)
-	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 
@@ -148,13 +161,8 @@ func (m *RegistryBase) BuildHash() string {
 	return m.buildHash
 }
 
-func (m *RegistryBase) WithConfig(c *config.Provider) Registry {
+func (m *RegistryBase) WithConfig(c *config.DefaultProvider) Registry {
 	m.C = c
-	return m.r
-}
-
-func (m *RegistryBase) WithKeyGenerators(kg map[string]jwk.KeyGenerator) Registry {
-	m.kg = kg
 	return m.r
 }
 
@@ -182,18 +190,14 @@ func (m *RegistryBase) Logger() *logrusx.Logger {
 func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 	if m.al == nil {
 		m.al = logrusx.NewAudit("Ory Hydra", m.BuildVersion())
-		m.al.UseConfig(m.Config(contextx.RootContext).Source())
+		m.al.UseConfig(m.Config().Source(ctxx.RootContext))
 	}
 	return m.al
 }
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		if m.Tracer(contextx.RootContext).IsLoaded() {
-			m.fh = &tracing.TracedBCrypt{WorkFactor: m.Config(contextx.RootContext).BCryptCost()}
-		} else {
-			m.fh = x.NewBCrypt(m.Config(contextx.RootContext))
-		}
+		m.fh = &tracing.TracedBCrypt{GetWorkFactor: m.Config().GetBCryptCost}
 	}
 	return m.fh
 }
@@ -205,7 +209,7 @@ func (m *RegistryBase) ClientHandler() *client.Handler {
 	return m.ch
 }
 
-func (m *RegistryBase) ClientValidator(ctx context.Context) *client.Validator {
+func (m *RegistryBase) ClientValidator() *client.Validator {
 	if m.cv == nil {
 		m.cv = client.NewValidator(m.r)
 	}
@@ -266,20 +270,6 @@ func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	return m.cos
 }
 
-func (m *RegistryBase) KeyGenerators() map[string]jwk.KeyGenerator {
-	if m.kg == nil {
-		m.kg = map[string]jwk.KeyGenerator{
-			"RS256": &jwk.RS256Generator{},
-			"ES256": &jwk.ECDSA256Generator{},
-			"ES512": &jwk.ECDSA512Generator{},
-			"HS256": &jwk.HS256Generator{},
-			"HS512": &jwk.HS512Generator{},
-			"EdDSA": &jwk.EdDSAGenerator{},
-		}
-	}
-	return m.kg
-}
-
 func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	if m.kc == nil {
 		m.kc = jwk.NewAEAD(m.C)
@@ -287,9 +277,9 @@ func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	return m.kc
 }
 
-func (m *RegistryBase) CookieStore() sessions.Store {
+func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
 	if m.cs == nil {
-		cs := sessions.NewCookieStore(m.C.GetCookieSecrets()...)
+		cs := sessions.NewCookieStore(m.C.GetCookieSecrets(ctx)...)
 		// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.
 		// MaxAge(0) disables internal MaxAge check by SecureCookie, see:
 		//
@@ -297,108 +287,106 @@ func (m *RegistryBase) CookieStore() sessions.Store {
 		cs.MaxAge(0)
 
 		m.cs = cs
-		m.csPrev = m.C.GetCookieSecrets()
+		m.csPrev = m.C.GetCookieSecrets(ctx)
 	}
 	return m.cs
 }
 
-func (m *RegistryBase) oAuth2Config() *compose.Config {
-	return &compose.Config{
-		AccessTokenLifespan:                  m.C.AccessTokenLifespan(),
-		RefreshTokenLifespan:                 m.C.RefreshTokenLifespan(),
-		AuthorizeCodeLifespan:                m.C.AuthCodeLifespan(),
-		IDTokenLifespan:                      m.C.IDTokenLifespan(),
-		IDTokenIssuer:                        m.C.IssuerURL().String(),
-		HashCost:                             m.C.BCryptCost(),
-		ScopeStrategy:                        m.ScopeStrategy(),
-		SendDebugMessagesToClients:           m.C.ShareOAuth2Debug(),
-		UseLegacyErrorFormat:                 m.C.OAuth2LegacyErrors(),
-		EnforcePKCE:                          m.C.PKCEEnforced(),
-		EnforcePKCEForPublicClients:          m.C.EnforcePKCEForPublicClients(),
-		EnablePKCEPlainChallengeMethod:       false,
-		TokenURL:                             urlx.AppendPaths(m.C.PublicURL(), oauth2.TokenPath).String(),
-		RedirectSecureChecker:                x.IsRedirectURISecure(m.C),
-		GrantTypeJWTBearerCanSkipClientAuth:  false,
-		GrantTypeJWTBearerIDOptional:         m.C.GrantTypeJWTBearerIDOptional(),
-		GrantTypeJWTBearerIssuedDateOptional: m.C.GrantTypeJWTBearerIssuedDateOptional(),
-		GrantTypeJWTBearerMaxDuration:        m.C.GrantTypeJWTBearerMaxDuration(),
-	}
-}
+func (m *RegistryBase) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
+	opts = append(opts,
+		httpx.ResilientClientWithLogger(m.Logger()),
+		httpx.ResilientClientWithMaxRetry(2),
+		httpx.ResilientClientWithConnectionTimeout(30*time.Second))
 
-func (m *RegistryBase) OAuth2HMACStrategy() *foauth2.HMACSHAStrategy {
-	if m.o2mc == nil {
-		m.o2mc = compose.NewOAuth2HMACStrategy(m.oAuth2Config(), m.C.GetSystemSecret(), m.C.GetRotatedSystemSecrets())
+	tracer := m.Tracer(ctx)
+	if tracer.IsLoaded() {
+		opts = append(opts, httpx.ResilientClientWithTracer(tracer.Tracer()))
 	}
-	return m.o2mc
+
+	if m.Config().ClientHTTPNoPrivateIPRanges(ctx) {
+		opts = append(opts, httpx.ResilientClientDisallowInternalIPs())
+	}
+	return httpx.NewResilientClient(opts...)
 }
 
 func (m *RegistryBase) OAuth2Provider() fosite.OAuth2Provider {
-	if m.fop == nil {
-		fc := m.oAuth2Config()
-		oidcStrategy := &openid.DefaultStrategy{
-			JWTStrategy: m.OpenIDJWTStrategy(),
-			Expiry:      m.C.IDTokenLifespan(),
-			Issuer:      m.C.IssuerURL().String(),
-		}
-
-		var coreStrategy foauth2.CoreStrategy
-		hmacStrategy := m.OAuth2HMACStrategy()
-
-		switch ats := strings.ToLower(m.C.AccessTokenStrategy()); ats {
-		case "jwt":
-			coreStrategy = &foauth2.DefaultJWTStrategy{
-				JWTStrategy:     m.AccessTokenJWTStrategy(),
-				HMACSHAStrategy: hmacStrategy,
-			}
-		case "opaque":
-			coreStrategy = hmacStrategy
-		default:
-			m.Logger().Fatalf(`Environment variable OAUTH2_ACCESS_TOKEN_STRATEGY is set to "%s" but only "opaque" and "jwt" are valid values.`, ats)
-		}
-
-		return compose.Compose(
-			fc,
-			m.r.OAuth2Storage(),
-			&compose.CommonStrategy{
-				CoreStrategy:               coreStrategy,
-				OpenIDConnectTokenStrategy: oidcStrategy,
-				JWTStrategy:                m.OpenIDJWTStrategy(),
-			},
-			m.ClientHasher(),
-			compose.OAuth2AuthorizeExplicitFactory,
-			compose.OAuth2AuthorizeImplicitFactory,
-			compose.OAuth2ClientCredentialsGrantFactory,
-			compose.OAuth2RefreshTokenGrantFactory,
-			compose.OpenIDConnectExplicitFactory,
-			compose.OpenIDConnectHybridFactory,
-			compose.OpenIDConnectImplicitFactory,
-			compose.OpenIDConnectRefreshFactory,
-			compose.OAuth2TokenRevocationFactory,
-			compose.OAuth2TokenIntrospectionFactory,
-			compose.OAuth2PKCEFactory,
-			compose.RFC7523AssertionGrantFactory,
-		)
+	if m.fop != nil {
+		return m.fop
 	}
+
+	m.fop = fosite.NewOAuth2Provider(m.r.OAuth2Storage(), m.OAuth2ProviderConfig())
 	return m.fop
 }
 
-func (m *RegistryBase) ScopeStrategy() fosite.ScopeStrategy {
-	if m.fsc == nil {
-		if m.C.ScopeStrategy() == "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY" {
-			m.Logger().Warn(`Using deprecated hierarchical scope strategy, consider upgrading to "wildcard"" or "exact"".`)
-			m.fsc = fosite.HierarchicScopeStrategy
-		} else if strings.ToLower(m.C.ScopeStrategy()) == "exact" {
-			m.fsc = fosite.ExactScopeStrategy
-		} else {
-			m.fsc = fosite.WildcardScopeStrategy
-		}
-		m.fscPrev = m.C.ScopeStrategy()
+func (m *RegistryBase) OpenIDJWTStrategy() jwk.JWTSigner {
+	if m.oidcs != nil {
+		return m.oidcs
 	}
-	return m.fsc
+
+	m.oidcs = m.newKeyStrategy(x.OpenIDConnectKeyName)
+	return m.oidcs
 }
 
-func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
+func (m *RegistryBase) AccessTokenJWTStrategy() jwk.JWTSigner {
+	if m.ats != nil {
+		return m.ats
+	}
 
+	m.ats = m.newKeyStrategy(x.OAuth2JWTKeyName)
+	return m.ats
+}
+
+func (m *RegistryBase) OAuth2HMACStrategy() *foauth2.HMACSHAStrategy {
+	if m.hmacs != nil {
+		return m.hmacs
+	}
+
+	m.hmacs = compose.NewOAuth2HMACStrategy(m.OAuth2Config())
+	return m.hmacs
+}
+
+func (m *RegistryBase) OAuth2Config() *fositex.Config {
+	if m.fc != nil {
+		return m.fc
+	}
+
+	m.fc = fositex.NewConfig(m.r)
+	return m.fc
+}
+
+func (m *RegistryBase) OAuth2ProviderConfig() fosite.Configurator {
+	if m.oc != nil {
+		return m.oc
+	}
+
+	conf := m.OAuth2Config()
+	hmacAtStrategy := m.OAuth2HMACStrategy()
+	oidcSigner := m.OpenIDJWTStrategy()
+	atSigner := m.AccessTokenJWTStrategy()
+	jwtAtStrategy := &foauth2.DefaultJWTStrategy{
+		Signer:          atSigner,
+		HMACSHAStrategy: hmacAtStrategy,
+		Config:          conf,
+	}
+
+	conf.LoadDefaultHanlders(&compose.CommonStrategy{
+		CoreStrategy: fositex.NewTokenStrategy(m.Config(), hmacAtStrategy, &foauth2.DefaultJWTStrategy{
+			Signer:          jwtAtStrategy,
+			HMACSHAStrategy: hmacAtStrategy,
+			Config:          conf,
+		}),
+		OpenIDConnectTokenStrategy: &openid.DefaultStrategy{
+			Config: conf,
+			Signer: oidcSigner,
+		},
+		Signer: oidcSigner,
+	})
+
+	m.oc = conf
+	return m.oc
+}
+
+func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTSigner) {
 	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, "RS256", key); err != nil {
 		var netError net.Error
 		if errors.As(err, &netError) {
@@ -410,9 +398,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
-		s, err = jwk.NewRS256JWTStrategy(*m.C, m.r, func() string {
-			return key
-		})
+		s, err = jwk.NewDefaultJWTSigner(*m.C, m.r, key)
 		return err
 	}); err != nil {
 		m.Logger().WithError(err).Fatalf("Unable to initialize JSON Web Token strategy.")
@@ -421,32 +407,12 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTStrategy) {
 	return s
 }
 
-func (m *RegistryBase) AccessTokenJWTStrategy() jwk.JWTStrategy {
-	if m.atjs == nil {
-		m.atjs = m.newKeyStrategy(x.OAuth2JWTKeyName)
-	}
-	return m.atjs
-}
-
-func (m *RegistryBase) OpenIDJWTStrategy() jwk.JWTStrategy {
-	if m.idtjs == nil {
-		m.idtjs = m.newKeyStrategy(x.OpenIDConnectKeyName)
-	}
-	return m.idtjs
-}
-
-func (m *RegistryBase) FositeOpenIDDefaultStrategy() *openid.DefaultStrategy {
-	if m.fos == nil {
-		m.fos = &openid.DefaultStrategy{
-			JWTStrategy: m.OpenIDJWTStrategy(),
-		}
-	}
-	return m.fos
-}
-
 func (m *RegistryBase) OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator {
 	if m.forv == nil {
-		m.forv = openid.NewOpenIDConnectRequestValidator([]string{"login", "none", "consent"}, m.FositeOpenIDDefaultStrategy())
+		m.forv = openid.NewOpenIDConnectRequestValidator(&openid.DefaultStrategy{
+			Config: m.OAuth2ProviderConfig(),
+			Signer: m.OpenIDJWTStrategy(),
+		}, m.OAuth2ProviderConfig())
 	}
 	return m.forv
 }
@@ -472,12 +438,12 @@ func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[string]consent.SubjectIdentifierAlgorithm {
 	if m.sia == nil {
 		m.sia = map[string]consent.SubjectIdentifierAlgorithm{}
-		for _, t := range m.Config(ctx).SubjectTypesSupported() {
+		for _, t := range m.Config().SubjectTypesSupported(ctx) {
 			switch t {
 			case "public":
 				m.sia["public"] = consent.NewSubjectIdentifierAlgorithmPublic()
 			case "pairwise":
-				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.Config(ctx).SubjectIdentifierAlgorithmSalt()))
+				m.sia["pairwise"] = consent.NewSubjectIdentifierAlgorithmPairwise([]byte(m.Config().SubjectIdentifierAlgorithmSalt(ctx)))
 			}
 		}
 	}
@@ -486,7 +452,7 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[strin
 
 func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
 	if m.trc == nil {
-		t, err := otelx.New("Ory Hydra", m.l, m.C.Tracing())
+		t, err := otelx.New("Ory Hydra", m.l, m.C.Tracing(ctx))
 		if err != nil {
 			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
 		} else {
@@ -509,8 +475,8 @@ func (m *RegistryBase) Persister() persistence.Persister {
 }
 
 // Config returns the configuration for the given context. It may or may not be the same as the global configuration.
-func (m *RegistryBase) Config(ctx context.Context) *config.Provider {
-	return m.Contextualizer().Config(ctx, m.C)
+func (m *RegistryBase) Config() *config.DefaultProvider {
+	return m.C
 }
 
 // WithOAuth2Provider forces an oauth2 provider which is only used for testing.

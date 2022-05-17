@@ -40,11 +40,11 @@ type RefreshTokenHookResponse struct {
 }
 
 // RefreshTokenHook is an AccessRequestHook called for `refresh_token` grant type.
-func RefreshTokenHook(config *config.Provider) AccessRequestHook {
+func RefreshTokenHook(config *config.DefaultProvider) AccessRequestHook {
 	client := cleanhttp.DefaultPooledClient()
 
 	return func(ctx context.Context, requester fosite.AccessRequester) error {
-		hookURL := config.TokenRefreshHookURL()
+		hookURL := config.TokenRefreshHookURL(ctx)
 		if hookURL == nil {
 			return nil
 		}

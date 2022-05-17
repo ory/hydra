@@ -1,6 +1,7 @@
 package trust_test
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/rsa"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/hydra/x/contextx"
+	"github.com/ory/x/contextx"
 
 	"github.com/go-openapi/strfmt"
 	"github.com/google/uuid"
@@ -44,9 +45,9 @@ type HandlerTestSuite struct {
 // Setup will run before the tests in the suite are run.
 func (s *HandlerTestSuite) SetupSuite() {
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
-	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
-	s.registry = internal.NewRegistryMemory(s.T(), conf, &contextx.DefaultContextualizer{})
+	conf.MustSet(context.Background(), config.KeySubjectTypesSupported, []string{"public"})
+	conf.MustSet(context.Background(), config.KeyDefaultClientScope, []string{"foo", "bar"})
+	s.registry = internal.NewRegistryMemory(s.T(), conf, &contextx.Default{})
 
 	router := x.NewRouterAdmin()
 	handler := trust.NewHandler(s.registry)

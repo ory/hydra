@@ -1,0 +1,52 @@
+{
+  "client_id": "client-0014",
+  "client_name": "Client 0014",
+  "client_secret": "secret-0014",
+  "redirect_uris": [
+    "http://redirect/0014_1"
+  ],
+  "grant_types": [
+    "grant-0014_1"
+  ],
+  "response_types": [
+    "response-0014_1"
+  ],
+  "scope": "scope-0014",
+  "audience": [
+    "autdience-0014_1"
+  ],
+  "owner": "owner-0014",
+  "policy_uri": "http://policy/0014",
+  "allowed_cors_origins": [
+    "http://cors/0014_1"
+  ],
+  "tos_uri": "http://tos/0014",
+  "client_uri": "http://client/0014",
+  "logo_uri": "http://logo/0014",
+  "contacts": [
+    "contact-0014_1"
+  ],
+  "client_secret_expires_at": 0,
+  "subject_type": "subject-0014",
+  "sector_identifier_uri": "http://sector_id/0014",
+  "jwks_uri": "http://jwks/0014",
+  "jwks": {},
+  "token_endpoint_auth_method": "token_auth-0014",
+  "request_uris": [
+    "http://request/0014_1"
+  ],
+  "request_object_signing_alg": "r_alg-0014",
+  "userinfo_signed_response_alg": "u_alg-0014",
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "frontchannel_logout_uri": "http://front_logout/0014",
+  "frontchannel_logout_session_required": true,
+  "post_logout_redirect_uris": [
+    "http://post_redirect/0014_1"
+  ],
+  "backchannel_logout_uri": "http://back_logout/0014",
+  "backchannel_logout_session_required": true,
+  "metadata": {
+    "migration": "0014"
+  }
+}

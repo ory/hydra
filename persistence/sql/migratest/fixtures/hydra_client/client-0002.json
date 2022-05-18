@@ -1,0 +1,32 @@
+{
+  "client_id": "client-0002",
+  "client_name": "Client 0002",
+  "client_secret": "secret-0002",
+  "redirect_uris": [
+    "http://redirect/0002_1"
+  ],
+  "grant_types": [
+    "grant-0002_1"
+  ],
+  "response_types": [
+    "response-0002_1"
+  ],
+  "scope": "scope-0002",
+  "audience": [],
+  "owner": "owner-0002",
+  "policy_uri": "http://policy/0002",
+  "allowed_cors_origins": [],
+  "tos_uri": "http://tos/0002",
+  "client_uri": "http://client/0002",
+  "logo_uri": "http://logo/0002",
+  "contacts": [
+    "contact-0002_1"
+  ],
+  "client_secret_expires_at": 0,
+  "subject_type": "",
+  "jwks": {},
+  "token_endpoint_auth_method": "none",
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "metadata": {}
+}

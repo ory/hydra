@@ -3,9 +3,11 @@ package jwk
 import (
 	"context"
 	"crypto/x509"
-	"github.com/ory/x/josex"
+
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/x/josex"
 )
 
 func GenerateJWK(ctx context.Context, alg jose.SignatureAlgorithm, kid, use string) (*jose.JSONWebKeySet, error) {

@@ -22,9 +22,10 @@ package jwk
 
 import (
 	"context"
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2"
-	"testing"
 
 	"github.com/stretchr/testify/assert"
 )

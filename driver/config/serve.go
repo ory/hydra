@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ory/x/contextx"
+
 	"github.com/rs/cors"
 
 	"github.com/ory/x/configx"
@@ -49,19 +51,19 @@ func (iface *servePrefix) String() string {
 	return iface.prefix
 }
 
-func (p *DefaultProvider) ListenOn(ctx context.Context, iface ServeInterface) string {
-	host, port := p.host(ctx, iface), p.port(ctx, iface)
+func (p *DefaultProvider) ListenOn(iface ServeInterface) string {
+	host, port := p.host(iface), p.port(iface)
 	if strings.HasPrefix(host, "unix:") {
 		return host
 	}
 	return fmt.Sprintf("%s:%d", host, port)
 }
 
-func (p *DefaultProvider) SocketPermission(ctx context.Context, iface ServeInterface) *configx.UnixPermission {
+func (p *DefaultProvider) SocketPermission(iface ServeInterface) *configx.UnixPermission {
 	return &configx.UnixPermission{
-		Owner: p.getProvider(ctx).String(iface.Key(KeySuffixSocketOwner)),
-		Group: p.getProvider(ctx).String(iface.Key(KeySuffixSocketGroup)),
-		Mode:  os.FileMode(p.getProvider(ctx).IntF(iface.Key(KeySuffixSocketMode), 0755)),
+		Owner: p.getProvider(contextx.RootContext).String(iface.Key(KeySuffixSocketOwner)),
+		Group: p.getProvider(contextx.RootContext).String(iface.Key(KeySuffixSocketGroup)),
+		Mode:  os.FileMode(p.getProvider(contextx.RootContext).IntF(iface.Key(KeySuffixSocketMode), 0755)),
 	}
 }
 
@@ -74,14 +76,14 @@ func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.
 	})
 }
 
-func (p *DefaultProvider) DisableHealthAccessLog(ctx context.Context, iface ServeInterface) bool {
-	return p.getProvider(ctx).Bool(iface.Key(KeySuffixDisableHealthAccessLog))
+func (p *DefaultProvider) DisableHealthAccessLog(iface ServeInterface) bool {
+	return p.getProvider(contextx.RootContext).Bool(iface.Key(KeySuffixDisableHealthAccessLog))
 }
 
-func (p *DefaultProvider) host(ctx context.Context, iface ServeInterface) string {
-	return p.getProvider(ctx).String(iface.Key(KeySuffixListenOnHost))
+func (p *DefaultProvider) host(iface ServeInterface) string {
+	return p.getProvider(contextx.RootContext).String(iface.Key(KeySuffixListenOnHost))
 }
 
-func (p *DefaultProvider) port(ctx context.Context, iface ServeInterface) int {
-	return p.getProvider(ctx).Int(iface.Key(KeySuffixListenOnPort))
+func (p *DefaultProvider) port(iface ServeInterface) int {
+	return p.getProvider(contextx.RootContext).Int(iface.Key(KeySuffixListenOnPort))
 }

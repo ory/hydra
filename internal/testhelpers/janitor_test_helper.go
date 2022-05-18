@@ -364,6 +364,7 @@ func (j *JanitorConsentTestHelper) ConsentTimeoutSetup(ctx context.Context, cm c
 		_, err = cm.HandleConsentRequest(ctx, j.flushConsentRequests[0].ID, &consent.HandledConsentRequest{
 			ID:              j.flushConsentRequests[0].ID,
 			WasHandled:      true,
+			HandledAt:       sqlxx.NullTime(time.Now()),
 			RequestedAt:     j.flushConsentRequests[0].RequestedAt,
 			AuthenticatedAt: j.flushConsentRequests[0].AuthenticatedAt,
 		})
@@ -728,6 +729,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-1", uniqueName)),
 			RequestedAt:          time.Now().Round(time.Second),
 			Verifier:             fmt.Sprintf("%s_flush-consent-1", uniqueName),
+			CSRF:                 fmt.Sprintf("%s_flush-consent-1", uniqueName),
 		},
 		{
 			ID:                   fmt.Sprintf("%s_flush-consent-2", uniqueName),
@@ -739,6 +741,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-2", uniqueName)),
 			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
 			Verifier:             fmt.Sprintf("%s_flush-consent-2", uniqueName),
+			CSRF:                 fmt.Sprintf("%s_flush-consent-2", uniqueName),
 		},
 		{
 			ID:                   fmt.Sprintf("%s_flush-consent-3", uniqueName),
@@ -750,6 +753,7 @@ func genConsentRequests(uniqueName string, lifespan time.Duration) []*consent.Co
 			LoginChallenge:       sqlxx.NullString(fmt.Sprintf("%s_flush-login-3", uniqueName)),
 			RequestedAt:          time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
 			Verifier:             fmt.Sprintf("%s_flush-consent-3", uniqueName),
+			CSRF:                 fmt.Sprintf("%s_flush-consent-3", uniqueName),
 		},
 	}
 }

@@ -33,7 +33,7 @@ type ForcedObfuscatedLoginSession struct {
 	SubjectObfuscated string `db:"subject_obfuscated"`
 }
 
-func (_ *ForcedObfuscatedLoginSession) TableName() string {
+func (_ ForcedObfuscatedLoginSession) TableName() string {
 	return "hydra_oauth2_obfuscated_authentication_session"
 }
 

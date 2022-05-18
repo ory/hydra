@@ -1,0 +1,52 @@
+{
+  "client_id": "client-2005",
+  "client_name": "Client 2005",
+  "client_secret": "secret-2005",
+  "redirect_uris": [
+    "http://redirect/2005_1"
+  ],
+  "grant_types": [
+    "grant-2005_1"
+  ],
+  "response_types": [
+    "response-2005_1"
+  ],
+  "scope": "scope-2005",
+  "audience": [
+    "autdience-2005_1"
+  ],
+  "owner": "owner-2005",
+  "policy_uri": "http://policy/2005",
+  "allowed_cors_origins": [
+    "http://cors/2005_1"
+  ],
+  "tos_uri": "http://tos/2005",
+  "client_uri": "http://client/2005",
+  "logo_uri": "http://logo/2005",
+  "contacts": [
+    "contact-2005_1"
+  ],
+  "client_secret_expires_at": 0,
+  "subject_type": "subject-2005",
+  "sector_identifier_uri": "http://sector_id/2005",
+  "jwks_uri": "http://jwks/2005",
+  "jwks": {},
+  "token_endpoint_auth_method": "token_auth-2005",
+  "request_uris": [
+    "http://request/2005_1"
+  ],
+  "request_object_signing_alg": "r_alg-2005",
+  "userinfo_signed_response_alg": "u_alg-2005",
+  "created_at": "0001-01-01T00:00:00Z",
+  "updated_at": "0001-01-01T00:00:00Z",
+  "frontchannel_logout_uri": "http://front_logout/2005",
+  "frontchannel_logout_session_required": true,
+  "post_logout_redirect_uris": [
+    "http://post_redirect/2005_1"
+  ],
+  "backchannel_logout_uri": "http://back_logout/2005",
+  "backchannel_logout_session_required": true,
+  "metadata": {
+    "migration": "2005"
+  }
+}

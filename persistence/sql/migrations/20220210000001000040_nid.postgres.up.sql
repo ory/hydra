@@ -4,6 +4,6 @@
 
 
 
--- hydra_oauth2_oidc
-ALTER TABLE "hydra_oauth2_oidc" ADD COLUMN "nid" UUID;
-ALTER TABLE "hydra_oauth2_oidc" ADD CONSTRAINT "hydra_oauth2_oidc_nid_fk_idx" FOREIGN KEY ("nid") REFERENCES "networks" ("id") ON UPDATE RESTRICT ON DELETE CASCADE;
+-- hydra_oauth2_obfuscated_authentication_session
+ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD COLUMN "nid" UUID;
+ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD CONSTRAINT hydra_oauth2_obfuscated_authentication_session_nid_fk_idx FOREIGN KEY ("nid") REFERENCES "networks" ("id") ON UPDATE RESTRICT ON DELETE CASCADE;

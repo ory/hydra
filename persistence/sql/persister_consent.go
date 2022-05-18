@@ -311,14 +311,12 @@ func (p *Persister) GetRememberedLoginSession(ctx context.Context, id string) (*
 }
 
 func (p *Persister) ConfirmLoginSession(ctx context.Context, id string, authenticatedAt time.Time, subject string, remember bool) error {
-	return sqlcon.HandleError(
-		p.UpdateWithNetwork(ctx, &consent.LoginSession{
-			ID:              id,
-			NID:             p.NetworkID(ctx),
-			AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
-			Subject:         subject,
-			Remember:        remember,
-		}))
+	_, err := p.Connection(ctx).Where("id = ? AND nid = ?", id, p.NetworkID(ctx)).UpdateQuery(&consent.LoginSession{
+		AuthenticatedAt: sqlxx.NullTime(authenticatedAt),
+		Subject:         subject,
+		Remember:        remember,
+	}, "authenticated_at", "subject", "remember")
+	return sqlcon.HandleError(err)
 }
 
 func (p *Persister) CreateLoginSession(ctx context.Context, session *consent.LoginSession) error {

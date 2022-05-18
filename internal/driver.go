@@ -6,8 +6,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/gofrs/uuid"
 	"github.com/ory/x/configx"
+	"github.com/ory/x/networkx"
 
 	"github.com/stretchr/testify/require"
 
@@ -42,23 +42,23 @@ func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.Provider, defaultDefaultNID *uuid.UUID) driver.Registry {
-	return newRegistryDefault(t, "memory", c, defaultDefaultNID, true)
+func NewRegistryMemory(t *testing.T, c *config.Provider) driver.Registry {
+	return newRegistryDefault(t, "memory", c, true)
 }
 
-func NewMockedRegistry(t *testing.T, defaultDefaultNID *uuid.UUID) driver.Registry {
-	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), defaultDefaultNID, true)
+func NewMockedRegistry(t *testing.T) driver.Registry {
+	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), true)
 }
 
-func NewRegistrySQLFromURL(t *testing.T, url string, defaultDefaultNID *uuid.UUID, migrate bool) driver.Registry {
-	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), defaultDefaultNID, migrate)
+func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool) driver.Registry {
+	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate)
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.Provider, defaultDefaultNID *uuid.UUID, migrate bool) driver.Registry {
+func newRegistryDefault(t *testing.T, url string, c *config.Provider, migrate bool) driver.Registry {
 	c.MustSet(config.KeyLogLevel, "trace")
 	c.MustSet(config.KeyDSN, url)
 
-	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"), defaultDefaultNID, false, migrate)
+	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"), false, migrate)
 	require.NoError(t, err)
 
 	kg := map[string]jwk.KeyGenerator{
@@ -77,8 +77,14 @@ func newRegistryDefault(t *testing.T, url string, c *config.Provider, defaultDef
 
 func CleanAndMigrate(reg driver.Registry) func(*testing.T) {
 	return func(t *testing.T) {
+		net := &networkx.Network{}
+		recreateNetwork := reg.Persister().Connection(context.Background()).First(net) == nil
 		x.CleanSQLPop(t, reg.Persister().Connection(context.Background()))
 		require.NoError(t, reg.Persister().MigrateUp(context.Background()))
+		if recreateNetwork {
+			require.NoError(t, reg.Persister().Connection(context.Background()).RawQuery("DELETE FROM networks").Exec())
+			require.NoError(t, reg.Persister().Connection(context.Background()).Create(net))
+		}
 		t.Log("clean and migrate done")
 	}
 }
@@ -109,7 +115,7 @@ func ConnectToCRDB(t *testing.T) string {
 	return url
 }
 
-func ConnectDatabases(t *testing.T, defaultDefaultNID *uuid.UUID) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
+func ConnectDatabases(t *testing.T, migrate bool) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
 	var pgURL, mysqlURL, crdbURL string
 	wg := sync.WaitGroup{}
 
@@ -133,9 +139,9 @@ func ConnectDatabases(t *testing.T, defaultDefaultNID *uuid.UUID) (pg, mysql, cr
 	wg.Wait()
 	t.Log("done waiting")
 
-	pg = NewRegistrySQLFromURL(t, pgURL, defaultDefaultNID, true)
-	mysql = NewRegistrySQLFromURL(t, mysqlURL, defaultDefaultNID, true)
-	crdb = NewRegistrySQLFromURL(t, crdbURL, defaultDefaultNID, true)
+	pg = NewRegistrySQLFromURL(t, pgURL, migrate)
+	mysql = NewRegistrySQLFromURL(t, mysqlURL, migrate)
+	crdb = NewRegistrySQLFromURL(t, crdbURL, migrate)
 	dbs := []driver.Registry{pg, mysql, crdb}
 
 	clean = func(t *testing.T) {

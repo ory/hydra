@@ -36,7 +36,7 @@ import (
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t, nil)
+	reg := internal.NewMockedRegistry(t)
 	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
 	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)
 	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)

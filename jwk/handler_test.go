@@ -41,7 +41,7 @@ import (
 
 func TestHandlerWellKnown(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, nil)
+	reg := internal.NewRegistryMemory(t, conf)
 	var testGenerator = &jwk.RS256Generator{}
 	conf.MustSet(config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 	router := x.NewRouterPublic()

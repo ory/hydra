@@ -86,7 +86,7 @@ type clientCreator interface {
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t, nil)
+	reg := internal.NewMockedRegistry(t)
 	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
@@ -708,7 +708,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			conf.MustSet(config.KeyAccessTokenLifespan, time.Second*2)
 			conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			conf.MustSet(config.KeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistryMemory(t, conf, nil)
+			reg := internal.NewRegistryMemory(t, conf)
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 

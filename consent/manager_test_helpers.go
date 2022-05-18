@@ -261,6 +261,53 @@ func makeID(base string, tenant string, key string) string {
 	return fmt.Sprintf("%s-%s-%s", base, tenant, key)
 }
 
+func TestHelperNID(t1ClientManager client.Manager, t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
+	testClient := client.Client{OutfacingID: fmt.Sprintf("2022-03-11-client-nid-test-1")}
+	testLS := LoginSession{
+		ID:      "2022-03-11-ls-nid-test-1",
+		Subject: "2022-03-11-test-1-sub",
+	}
+	testLR := LoginRequest{
+		ID:          "2022-03-11-lr-nid-test-1",
+		Subject:     "2022-03-11-test-1-sub",
+		Verifier:    "2022-03-11-test-1-ver",
+		RequestedAt: time.Now(),
+		Client:      &client.Client{OutfacingID: fmt.Sprintf("2022-03-11-client-nid-test-1")},
+	}
+	testHLR := HandledLoginRequest{
+		LoginRequest:           &testLR,
+		RememberFor:            120,
+		Remember:               true,
+		ID:                     testLR.ID,
+		RequestedAt:            testLR.RequestedAt,
+		AuthenticatedAt:        sqlxx.NullTime(time.Now()),
+		Error:                  nil,
+		Subject:                testLR.Subject,
+		ACR:                    "acr",
+		ForceSubjectIdentifier: "2022-03-11-test-1-forced-sub",
+		WasHandled:             false,
+	}
+	return func(t *testing.T) {
+		t1ClientManager.CreateClient(context.Background(), &testClient)
+		require.Error(t, t2InvalidNID.CreateLoginSession(context.Background(), &testLS))
+		require.NoError(t, t1ValidNID.CreateLoginSession(context.Background(), &testLS))
+		require.Error(t, t2InvalidNID.CreateLoginRequest(context.Background(), &testLR))
+		require.NoError(t, t1ValidNID.CreateLoginRequest(context.Background(), &testLR))
+		_, err := t2InvalidNID.GetLoginRequest(context.Background(), testLR.ID)
+		require.Error(t, err)
+		_, err = t1ValidNID.GetLoginRequest(context.Background(), testLR.ID)
+		require.NoError(t, err)
+		_, err = t2InvalidNID.HandleLoginRequest(context.Background(), testLR.ID, &testHLR)
+		require.Error(t, err)
+		_, err = t1ValidNID.HandleLoginRequest(context.Background(), testLR.ID, &testHLR)
+		require.NoError(t, err)
+		require.Error(t, t2InvalidNID.ConfirmLoginSession(context.Background(), testLS.ID, time.Now(), testLS.Subject, true))
+		require.NoError(t, t1ValidNID.ConfirmLoginSession(context.Background(), testLS.ID, time.Now(), testLS.Subject, true))
+		require.Error(t, t2InvalidNID.DeleteLoginSession(context.Background(), testLS.ID))
+		require.NoError(t, t1ValidNID.DeleteLoginSession(context.Background(), testLS.ID))
+	}
+}
+
 func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.FositeStorer, tenant string, parallel bool) func(t *testing.T) {
 	lr := make(map[string]*LoginRequest)
 
@@ -344,10 +391,10 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				id string
 			}{
 				{
-					id: "session1",
+					id: makeID("session", tenant, "1"),
 				},
 				{
-					id: "session2",
+					id: makeID("session", tenant, "2"),
 				},
 			} {
 				t.Run("case=delete-get-"+tc.id, func(t *testing.T) {

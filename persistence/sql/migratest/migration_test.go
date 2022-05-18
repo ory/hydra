@@ -59,7 +59,7 @@ func TestMigrations(t *testing.T) {
 	connections := make(map[string]*pop.Connection, 1)
 
 	if testing.Short() {
-		reg := internal.NewMockedRegistry(t, nil)
+		reg := internal.NewMockedRegistry(t)
 		reg.Persister().MigrateUp(context.Background())
 		c := reg.Persister().Connection(context.Background())
 		connections["sqlite"] = c
@@ -107,7 +107,9 @@ func TestMigrations(t *testing.T) {
 						c.CreatedAt = time.Time{} // Some CreatedAt and UpdatedAt values are generated during migrations so we zero them in the fixtures
 						c.UpdatedAt = time.Time{}
 						testhelpersuuid.AssertUUID(t, &c.ID)
+						testhelpersuuid.AssertUUID(t, &c.NID)
 						c.ID = uuid.Nil
+						c.NID = uuid.Nil
 						CompareWithFixture(t, structs.Map(c), "hydra_client", c.OutfacingID)
 					}
 				})
@@ -118,7 +120,9 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 7, len(js))
 					for _, j := range js {
 						testhelpersuuid.AssertUUID(t, &j.ID)
+						testhelpersuuid.AssertUUID(t, &j.NID)
 						j.ID = uuid.Nil // Some IDs are generated at migration time so we zero them in the fixtures
+						j.NID = uuid.Nil
 						require.False(t, j.CreatedAt.IsZero())
 						j.CreatedAt = time.Time{}
 						CompareWithFixture(t, j, "hydra_jwk", j.KID)
@@ -142,6 +146,8 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 14, len(ss))
 
 					for _, s := range ss {
+						testhelpersuuid.AssertUUID(t, &s.NID)
+						s.NID = uuid.Nil
 						s.AuthenticatedAt = sqlxx.NullTime(time.Time{})
 						CompareWithFixture(t, s, "hydra_oauth2_authentication_session", s.ID)
 					}
@@ -153,6 +159,8 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(ss))
 
 					for _, s := range ss {
+						testhelpersuuid.AssertUUID(t, &s.NID)
+						s.NID = uuid.Nil
 						CompareWithFixture(t, s, "hydra_oauth2_obfuscated_authentication_session", fmt.Sprintf("%s_%s", s.Subject, s.ClientID))
 					}
 				})
@@ -163,6 +171,8 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 6, len(lrs))
 
 					for _, s := range lrs {
+						testhelpersuuid.AssertUUID(t, &s.NID)
+						s.NID = uuid.Nil
 						s.Client = nil
 						CompareWithFixture(t, s, "hydra_oauth2_logout_request", s.ID)
 					}
@@ -173,6 +183,8 @@ func TestMigrations(t *testing.T) {
 					c.All(&bjtis)
 					require.Equal(t, 1, len(bjtis))
 					for _, bjti := range bjtis {
+						testhelpersuuid.AssertUUID(t, &bjti.NID)
+						bjti.NID = uuid.Nil
 						bjti.Expiry = time.Time{}
 						CompareWithFixture(t, bjti, "hydra_oauth2_jti_blacklist", bjti.ID)
 					}
@@ -184,6 +196,8 @@ func TestMigrations(t *testing.T) {
 					require.Equal(t, 13, len(as))
 
 					for _, a := range as {
+						testhelpersuuid.AssertUUID(t, &a.NID)
+						a.NID = uuid.Nil
 						require.False(t, a.RequestedAt.IsZero())
 						a.RequestedAt = time.Time{}
 						require.NotZero(t, a.Client)
@@ -197,12 +211,14 @@ func TestMigrations(t *testing.T) {
 					c.RawQuery("SELECT * FROM hydra_oauth2_refresh").All(&rs)
 					require.Equal(t, 13, len(rs))
 
-					for _, a := range rs {
-						require.False(t, a.RequestedAt.IsZero())
-						a.RequestedAt = time.Time{}
-						require.NotZero(t, a.Client)
-						a.Client = ""
-						CompareWithFixture(t, a, "hydra_oauth2_refresh", a.ID)
+					for _, r := range rs {
+						testhelpersuuid.AssertUUID(t, &r.NID)
+						r.NID = uuid.Nil
+						require.False(t, r.RequestedAt.IsZero())
+						r.RequestedAt = time.Time{}
+						require.NotZero(t, r.Client)
+						r.Client = ""
+						CompareWithFixture(t, r, "hydra_oauth2_refresh", r.ID)
 					}
 				})
 
@@ -211,12 +227,14 @@ func TestMigrations(t *testing.T) {
 					c.RawQuery("SELECT * FROM hydra_oauth2_code").All(&cs)
 					require.Equal(t, 13, len(cs))
 
-					for _, a := range cs {
-						require.False(t, a.RequestedAt.IsZero())
-						a.RequestedAt = time.Time{}
-						require.NotZero(t, a.Client)
-						a.Client = ""
-						CompareWithFixture(t, a, "hydra_oauth2_code", a.ID)
+					for _, c := range cs {
+						testhelpersuuid.AssertUUID(t, &c.NID)
+						c.NID = uuid.Nil
+						require.False(t, c.RequestedAt.IsZero())
+						c.RequestedAt = time.Time{}
+						require.NotZero(t, c.Client)
+						c.Client = ""
+						CompareWithFixture(t, c, "hydra_oauth2_code", c.ID)
 					}
 				})
 
@@ -225,12 +243,14 @@ func TestMigrations(t *testing.T) {
 					c.RawQuery("SELECT * FROM hydra_oauth2_oidc").All(&os)
 					require.Equal(t, 13, len(os))
 
-					for _, a := range os {
-						require.False(t, a.RequestedAt.IsZero())
-						a.RequestedAt = time.Time{}
-						require.NotZero(t, a.Client)
-						a.Client = ""
-						CompareWithFixture(t, a, "hydra_oauth2_oidc", a.ID)
+					for _, o := range os {
+						testhelpersuuid.AssertUUID(t, &o.NID)
+						o.NID = uuid.Nil
+						require.False(t, o.RequestedAt.IsZero())
+						o.RequestedAt = time.Time{}
+						require.NotZero(t, o.Client)
+						o.Client = ""
+						CompareWithFixture(t, o, "hydra_oauth2_oidc", o.ID)
 					}
 				})
 
@@ -239,12 +259,14 @@ func TestMigrations(t *testing.T) {
 					c.RawQuery("SELECT * FROM hydra_oauth2_pkce").All(&ps)
 					require.Equal(t, 11, len(ps))
 
-					for _, a := range ps {
-						require.False(t, a.RequestedAt.IsZero())
-						a.RequestedAt = time.Time{}
-						require.NotZero(t, a.Client)
-						a.Client = ""
-						CompareWithFixture(t, a, "hydra_oauth2_pkce", a.ID)
+					for _, p := range ps {
+						testhelpersuuid.AssertUUID(t, &p.NID)
+						p.NID = uuid.Nil
+						require.False(t, p.RequestedAt.IsZero())
+						p.RequestedAt = time.Time{}
+						require.NotZero(t, p.Client)
+						p.Client = ""
+						CompareWithFixture(t, p, "hydra_oauth2_pkce", p.ID)
 					}
 				})
 
@@ -253,6 +275,8 @@ func TestMigrations(t *testing.T) {
 					c.RawQuery("SELECT * FROM networks").All(&ns)
 					require.Equal(t, 1, len(ns))
 					for _, n := range ns {
+						testhelpersuuid.AssertUUID(t, &n.ID)
+						n.ID = uuid.Nil
 						require.NotZero(t, n.CreatedAt)
 						require.NotZero(t, n.UpdatedAt)
 						CompareWithFixture(t, n, "networks", n.ID.String())

@@ -25,11 +25,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/hydra/internal/httpclient/models"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/internal/httpclient/models"
 
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/x"
@@ -235,7 +236,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		requestURL := "http://192.0.2.1"
 
 		conf := internal.NewConfigurationWithDefaults()
-		reg := internal.NewRegistryMemory(t, conf)
+		reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 		cl := &client.Client{OutfacingID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))

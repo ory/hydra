@@ -14,9 +14,9 @@ replace (
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
-replace github.com/ory/fosite => ../fosite
+replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 
-replace github.com/ory/x => ../x
+replace github.com/ory/x => github.com/ory/x v0.0.390
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4

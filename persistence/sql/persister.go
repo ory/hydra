@@ -107,6 +107,11 @@ func (p *Persister) Connection(ctx context.Context) *pop.Connection {
 	return p.conn.WithContext(ctx)
 }
 
+func (p *Persister) Ping() error {
+	type pinger interface{ Ping() error }
+	return p.conn.Store.(pinger).Ping()
+}
+
 func (p *Persister) transaction(ctx context.Context, f func(ctx context.Context, c *pop.Connection) error) error {
 	isNested := true
 	c, ok := ctx.Value(transactionContextKey).(*pop.Connection)

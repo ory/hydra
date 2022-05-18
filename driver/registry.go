@@ -68,22 +68,26 @@ type Registry interface {
 }
 
 func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger) (Registry, error) {
+	registry, err := NewRegistryWithoutInit(c, l)
+	if err != nil {
+		return nil, err
+	}
+	if err := registry.Init(ctx); err != nil {
+		return nil, err
+	}
+	return registry, nil
+}
+
+func NewRegistryWithoutInit(c *config.Provider, l *logrusx.Logger) (Registry, error) {
 	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}
-
 	registry, ok := driver.(Registry)
 	if !ok {
 		return nil, errors.Errorf("driver of type %T does not implement interface Registry", driver)
 	}
-
 	registry = registry.WithLogger(l).WithConfig(c).WithBuildInfo(config.Version, config.Commit, config.Date)
-
-	if err := registry.Init(ctx); err != nil {
-		return nil, err
-	}
-
 	return registry, nil
 }
 

@@ -41,7 +41,17 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 		// set the internal primary key
 		cl.ID = o.ID
 
-		return sqlcon.HandleError(p.UpdateWithNetwork(ctx, cl))
+		if err = cl.BeforeSave(c); err != nil {
+			return sqlcon.HandleError(err)
+		}
+
+		count, err := p.UpdateWithNetwork(ctx, cl)
+		if err != nil {
+			return sqlcon.HandleError(err)
+		} else if count == 0 {
+			return sqlcon.HandleError(sqlcon.ErrNoRows)
+		}
+		return sqlcon.HandleError(err)
 	})
 }
 

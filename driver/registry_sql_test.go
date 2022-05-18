@@ -17,7 +17,7 @@ func TestDefaultKeyManager_HsmDisabled(t *testing.T) {
 	l := logrusx.New("", "")
 	c := config.MustNew(context.Background(), l, configx.SkipValidation())
 	c.MustSet(context.Background(), config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
-	c.MustSet(context.Background(), config.HsmEnabled, "false")
+	c.MustSet(context.Background(), config.HSMEnabled, "false")
 	reg, err := NewRegistryFromDSN(context.Background(), c, l, true, false, &contextx.Default{})
 	assert.NoError(t, err)
 	assert.IsType(t, &sql.Persister{}, reg.KeyManager())

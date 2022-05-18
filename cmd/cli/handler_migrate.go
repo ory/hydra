@@ -230,7 +230,6 @@ func (h *MigrateHandler) MigrateGen(cmd *cobra.Command, args []string) {
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	ctx := cmd.Context()
 	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
@@ -242,7 +241,7 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			driver.DisableValidation(),
 			driver.DisablePreloading(),
 			driver.SkipNetworkInit())
-		if len(d.Config().DSN(ctx)) == 0 {
+		if len(d.Config().DSN()) == 0 {
 			fmt.Println(cmd.UsageString())
 			fmt.Println("")
 			fmt.Println("When using flag -e, environment variable DSN must be set")

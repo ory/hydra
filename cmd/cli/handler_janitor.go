@@ -114,7 +114,7 @@ func purge(cmd *cobra.Command, args []string) error {
 
 	d = driver.New(ctx, do...)
 
-	if len(d.Config().DSN(ctx)) == 0 {
+	if len(d.Config().DSN()) == 0 {
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
 			"When using flag -e, environment variable DSN must be set.",
 			"When using flag -c, the dsn property should be set.")

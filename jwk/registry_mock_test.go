@@ -8,6 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+
 	herodot "github.com/ory/herodot"
 	config "github.com/ory/hydra/driver/config"
 	jwk "github.com/ory/hydra/jwk"

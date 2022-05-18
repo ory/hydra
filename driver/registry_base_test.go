@@ -32,7 +32,7 @@ func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	// Create a config and set a valid but unresolvable DSN
 	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
 	c.MustSet(ctx, config.KeyDSN, "postgres://user:password@127.0.0.1:9999/postgres")
-	c.MustSet(ctx, config.HsmEnabled, "false")
+	c.MustSet(ctx, config.HSMEnabled, "false")
 
 	registry, err := NewRegistryFromDSN(context.Background(), c, l, true, false, &contextx.Static{NID: uuid.Must(uuid.NewV4()), C: c.Source(ctx)})
 	if err != nil {

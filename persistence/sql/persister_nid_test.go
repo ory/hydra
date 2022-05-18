@@ -3,12 +3,16 @@ package sql_test
 import (
 	"context"
 	"database/sql"
-	"github.com/ory/x/assertx"
 	"testing"
 	"time"
 
+	"github.com/ory/x/assertx"
+
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/require"
+	"github.com/stretchr/testify/suite"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -24,8 +28,6 @@ import (
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
-	"github.com/stretchr/testify/suite"
-	"gopkg.in/square/go-jose.v2"
 )
 
 type PersisterTestSuite struct {

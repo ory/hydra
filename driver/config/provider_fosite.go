@@ -2,11 +2,12 @@ package config
 
 import (
 	"context"
+	"strings"
+	"time"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
-	"strings"
-	"time"
 )
 
 var _ fosite.GlobalSecretProvider = (*DefaultProvider)(nil)
@@ -93,4 +94,8 @@ func (p *DefaultProvider) GetScopeStrategy(ctx context.Context) fosite.ScopeStra
 		return fosite.WildcardScopeStrategy
 	}
 	return fosite.ExactScopeStrategy
+}
+
+func (p *DefaultProvider) GetUseLegacyErrorFormat(context.Context) bool {
+	return false
 }

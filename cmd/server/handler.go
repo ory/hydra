@@ -24,11 +24,12 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/otelx"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/ory/x/otelx"
 
 	analytics "github.com/ory/analytics-go/v4"
 	"github.com/ory/x/configx"
@@ -83,7 +84,7 @@ func EnhanceMiddleware(ctx context.Context, d driver.Registry, n *negroni.Negron
 }
 
 func isDSNAllowed(ctx context.Context, r driver.Registry) {
-	if r.Config().DSN(ctx) == "memory" {
+	if r.Config().DSN() == "memory" {
 		r.Logger().Fatalf(`When using "hydra serve admin" or "hydra serve public" the DSN can not be set to "memory".`)
 	}
 }
@@ -107,9 +108,9 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 		cmd,
 		&wg,
 		config.AdminInterface,
-		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(ctx, config.AdminInterface), admin.Router, true, config.AdminInterface),
-		d.Config().ListenOn(ctx, config.AdminInterface),
-		d.Config().SocketPermission(ctx, config.AdminInterface),
+		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+		d.Config().ListenOn(config.AdminInterface),
+		d.Config().SocketPermission(config.AdminInterface),
 		cert,
 	)
 
@@ -135,9 +136,9 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 		cmd,
 		&wg,
 		config.PublicInterface,
-		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(ctx, config.PublicInterface), public.Router, false, config.PublicInterface),
-		d.Config().ListenOn(ctx, config.PublicInterface),
-		d.Config().SocketPermission(ctx, config.PublicInterface),
+		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+		d.Config().ListenOn(config.PublicInterface),
+		d.Config().SocketPermission(config.PublicInterface),
 		cert,
 	)
 
@@ -162,9 +163,9 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 		cmd,
 		&wg,
 		config.PublicInterface,
-		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(ctx, config.PublicInterface), public.Router, false, config.PublicInterface),
-		d.Config().ListenOn(ctx, config.PublicInterface),
-		d.Config().SocketPermission(ctx, config.PublicInterface),
+		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
+		d.Config().ListenOn(config.PublicInterface),
+		d.Config().SocketPermission(config.PublicInterface),
 		GetOrCreateTLSCertificate(ctx, cmd, d, config.PublicInterface),
 	)
 
@@ -174,9 +175,9 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 		cmd,
 		&wg,
 		config.AdminInterface,
-		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(ctx, config.AdminInterface), admin.Router, true, config.AdminInterface),
-		d.Config().ListenOn(ctx, config.AdminInterface),
-		d.Config().SocketPermission(ctx, config.AdminInterface),
+		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
+		d.Config().ListenOn(config.AdminInterface),
+		d.Config().SocketPermission(config.AdminInterface),
 		GetOrCreateTLSCertificate(ctx, cmd, d, config.AdminInterface),
 	)
 
@@ -186,7 +187,7 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {
 	fmt.Println(banner(config.Version))
 
-	if d.Config().CGroupsV1AutoMaxProcsEnabled(ctx) {
+	if d.Config().CGroupsV1AutoMaxProcsEnabled() {
 		_, err := maxprocs.Set(maxprocs.Logger(d.Logger().Infof))
 
 		if err != nil {
@@ -203,7 +204,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 	adminLogger := reqlog.
 		NewMiddlewareFromLogger(d.Logger(),
 			fmt.Sprintf("hydra/admin: %s", d.Config().IssuerURL(ctx).String()))
-	if d.Config().DisableHealthAccessLog(ctx, config.AdminInterface) {
+	if d.Config().DisableHealthAccessLog(config.AdminInterface) {
 		adminLogger = adminLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
@@ -214,7 +215,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 		d.Logger(),
 		fmt.Sprintf("hydra/public: %s", d.Config().IssuerURL(ctx).String()),
 	)
-	if d.Config().DisableHealthAccessLog(ctx, config.PublicInterface) {
+	if d.Config().DisableHealthAccessLog(config.PublicInterface) {
 		publicLogger.ExcludePaths(healthx.AliveCheckPath, healthx.ReadyCheckPath)
 	}
 
@@ -229,9 +230,9 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 			Service: "ory-hydra",
 			ClusterID: metricsx.Hash(fmt.Sprintf("%s|%s",
 				d.Config().IssuerURL(ctx).String(),
-				d.Config().DSN(ctx),
+				d.Config().DSN(),
 			)),
-			IsDevelopment: d.Config().DSN(ctx) == "memory" ||
+			IsDevelopment: d.Config().DSN() == "memory" ||
 				d.Config().IssuerURL(ctx).String() == "" ||
 				strings.Contains(d.Config().IssuerURL(ctx).String(), "localhost"),
 			WriteKey: "h8dRH3kVCWKkIFWydBmWsyYHR4M0u0vr",

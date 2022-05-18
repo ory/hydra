@@ -149,6 +149,13 @@ MIGRATION_CLEAN_TARGETS=$(addsuffix -clean, $(MIGRATION_TARGETS))
 $(MIGRATION_CLEAN_TARGETS): $(MIGRATIONS_DST_DIR)%:
 	find $(MIGRATIONS_DST_DIR) -type f -name $$(echo "$*" | cut -c1-14)* -delete
 
+
+.PHONY: $(MIGRATIONS_DST_DIR:%/=%)
+$(MIGRATIONS_DST_DIR:%/=%): $(MIGRATION_TARGETS)
+
+.PHONY: $(MIGRATIONS_DST_DIR:%/=%-clean)
+$(MIGRATIONS_DST_DIR:%/=%-clean): $(MIGRATION_CLEAN_TARGETS)
+
 .PHONY: install-stable
 install-stable:
 		HYDRA_LATEST=$$(git describe --abbrev=0 --tags)

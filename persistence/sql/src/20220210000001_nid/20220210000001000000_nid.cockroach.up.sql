@@ -103,6 +103,9 @@ DROP INDEX hydra_oauth2_jti_blacklist_expires_at_idx;
 --split
 CREATE INDEX hydra_oauth2_jti_blacklist_expires_at_idx ON hydra_oauth2_jti_blacklist (expires_at ASC, nid ASC);
 --split
+ALTER TABLE hydra_oauth2_jti_blacklist DROP CONSTRAINT "primary";
+ALTER TABLE hydra_oauth2_jti_blacklist ADD PRIMARY KEY (signature ASC, nid ASC);
+--split
 
 -- hydra_oauth2_logout_request
 ALTER TABLE hydra_oauth2_logout_request ADD COLUMN "nid" UUID;

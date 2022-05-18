@@ -236,7 +236,8 @@ func (p *Persister) HandleConsentRequest(ctx context.Context, r *consent.Handled
 		return nil, errorsx.WithStack(err)
 	}
 
-	if err := p.UpdateWithNetwork(ctx, f); err != nil {
+	_, err := p.UpdateWithNetwork(ctx, f)
+	if err != nil {
 		return nil, sqlcon.HandleError(err)
 	}
 
@@ -256,7 +257,8 @@ func (p *Persister) VerifyAndInvalidateConsentRequest(ctx context.Context, verif
 		}
 
 		r = *f.GetHandledConsentRequest()
-		return p.UpdateWithNetwork(ctx, &f)
+		_, err := p.UpdateWithNetwork(ctx, &f)
+		return err
 	})
 }
 
@@ -271,7 +273,7 @@ func (p *Persister) HandleLoginRequest(ctx context.Context, challenge string, r 
 			return err
 		}
 
-		err = p.UpdateWithNetwork(ctx, f)
+		_, err = p.UpdateWithNetwork(ctx, f)
 		if err != nil {
 			return sqlcon.HandleError(err)
 		}
@@ -294,7 +296,8 @@ func (p *Persister) VerifyAndInvalidateLoginRequest(ctx context.Context, verifie
 		}
 
 		d = f.GetHandledLoginRequest()
-		return sqlcon.HandleError(p.UpdateWithNetwork(ctx, &f))
+		_, err := p.UpdateWithNetwork(ctx, &f)
+		return sqlcon.HandleError(err)
 	})
 }
 

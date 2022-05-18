@@ -178,7 +178,7 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 }
 
 func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
-	// delete expired
+	// delete expired; this cleanup spares us the need for a background worker
 	if err := p.QueryWithNetwork(ctx).Where("expires_at < CURRENT_TIMESTAMP").Delete(&oauth2.BlacklistedJTI{}); err != nil {
 		return sqlcon.HandleError(err)
 	}

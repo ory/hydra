@@ -122,9 +122,17 @@ func (p *Persister) CreateWithNetwork(ctx context.Context, v interface{}) error 
 	return p.Connection(ctx).Create(p.mustSetNetwork(n, v))
 }
 
-func (p *Persister) UpdateWithNetwork(ctx context.Context, v interface{}) error {
+func (p *Persister) UpdateWithNetwork(ctx context.Context, v interface{}) (int64, error) {
 	n := p.NetworkID(ctx)
-	return p.Connection(ctx).Update(p.mustSetNetwork(n, v))
+	v = p.mustSetNetwork(n, v)
+
+	m := pop.NewModel(v, ctx)
+	var cs []string
+	for _, t := range m.Columns().Cols {
+		cs = append(cs, t.Name)
+	}
+
+	return p.Connection(ctx).Where(m.IDField()+" = ? AND nid = ?", m.ID(), n).UpdateQuery(v, cs...)
 }
 
 func (p *Persister) NetworkID(ctx context.Context) uuid.UUID {

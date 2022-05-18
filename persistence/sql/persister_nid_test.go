@@ -61,6 +61,7 @@ func (s *PersisterTestSuite) SetupSuite() {
 
 func (s *PersisterTestSuite) TearDownTest() {
 	for _, r := range s.registries {
+		r.WithContextualizer(&contextx.TestContextualizer{})
 		x.DeleteHydraRows(s.T(), r.Persister().Connection(context.Background()))
 	}
 }
@@ -72,17 +73,18 @@ func (s *PersisterTestSuite) TestAcceptLogoutRequest() {
 	for k, r := range s.registries {
 		t.Run("dialect="+k, func(*testing.T) {
 			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+
+			expected, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			require.NoError(t, err)
+			require.Equal(t, false, expected.Accepted)
+
 			lrAccepted, err := r.ConsentManager().AcceptLogoutRequest(s.t2, lr.ID)
 			require.Error(t, err)
 			require.Equal(t, &consent.LogoutRequest{}, lrAccepted)
 
 			actual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
 			require.NoError(t, err)
-			require.Equal(t, lr, actual)
-
-			lrActual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
-			require.NoError(t, err)
-			require.Equal(t, false, lrActual.Accepted)
+			require.Equal(t, expected, actual)
 		})
 	}
 }
@@ -123,10 +125,7 @@ func (s *PersisterTestSuite) TestAddKeySetGetKeySetDeleteKeySet() {
 			require.Equal(t, (*jose.JSONWebKeySet)(nil), actual)
 			actual, err = r.Persister().GetKeySet(s.t1, ksID)
 			require.NoError(t, err)
-			if actual.Keys[0].KeyID == ks.Keys[1].KeyID {
-				actual.Keys[0], actual.Keys[1] = actual.Keys[1], actual.Keys[0]
-			}
-			require.Equal(t, ks, actual)
+			requireKeySetEqual(t, ks, actual)
 
 			r.Persister().DeleteKeySet(s.t2, ksID)
 			_, err = r.Persister().GetKeySet(s.t1, ksID)
@@ -134,6 +133,37 @@ func (s *PersisterTestSuite) TestAddKeySetGetKeySetDeleteKeySet() {
 			r.Persister().DeleteKeySet(s.t1, ksID)
 			_, err = r.Persister().GetKeySet(s.t1, ksID)
 			require.Error(t, err)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestAuthenticate() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			client := &client.Client{OutfacingID: "client-id", Secret: "secret"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+
+			actual, err := r.Persister().Authenticate(s.t2, "client-id", []byte("secret"))
+			require.Error(t, err)
+			require.Nil(t, actual)
+
+			actual, err = r.Persister().Authenticate(s.t1, "client-id", []byte("secret"))
+			require.NoError(t, err)
+			require.NotNil(t, actual)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestClientAssertionJWTValid() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
+
+			require.NoError(t, r.Persister().ClientAssertionJWTValid(s.t2, jti.JTI))
+			require.Error(t, r.Persister().ClientAssertionJWTValid(s.t1, jti.JTI))
 		})
 	}
 }
@@ -431,13 +461,8 @@ func (s *PersisterTestSuite) TestCreateOpenIDConnectSession() {
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 
-			requester := fosite.AccessRequest{
-				GrantTypes:       nil,
-				HandledGrantType: nil,
-				Request:          *request,
-			}
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, &requester))
+			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "oidc"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
@@ -456,16 +481,11 @@ func (s *PersisterTestSuite) TestCreatePKCERequestSession() {
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 
-			requester := fosite.AccessRequest{
-				GrantTypes:       nil,
-				HandledGrantType: nil,
-				Request:          *request,
-			}
-
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, &requester)
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "pkce"}
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
+			require.NoError(t, r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, request))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
 			require.Equal(t, s.t1NID, actual.NID)
 		})
@@ -482,17 +502,29 @@ func (s *PersisterTestSuite) TestCreateRefreshTokenSession() {
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 
-			requester := fosite.AccessRequest{
-				GrantTypes:       nil,
-				HandledGrantType: nil,
-				Request:          *request,
-			}
-
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, authorizeCode, &requester))
-
 			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, authorizeCode, request))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, authorizeCode))
+			require.Equal(t, s.t1NID, actual.NID)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestCreateWithNetwork() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			expected := &client.Client{OutfacingID: "client-id"}
+			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+			store.CreateWithNetwork(s.t1, expected)
+
+			actual := &client.Client{}
+			require.NoError(t, r.Persister().Connection(context.Background()).Where("id = ?", expected.OutfacingID).First(actual))
 			require.Equal(t, s.t1NID, actual.NID)
 		})
 	}
@@ -607,13 +639,8 @@ func (s *PersisterTestSuite) TestDeleteOpenIDConnectSession() {
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 
-			requester := fosite.AccessRequest{
-				GrantTypes:       nil,
-				HandledGrantType: nil,
-				Request:          *request,
-			}
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, &requester))
+			require.NoError(t, r.Persister().CreateOpenIDConnectSession(s.t1, authorizeCode, request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "oidc"}
 
@@ -635,14 +662,8 @@ func (s *PersisterTestSuite) TestDeletePKCERequestSession() {
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 
-			requester := fosite.AccessRequest{
-				GrantTypes:       nil,
-				HandledGrantType: nil,
-				Request:          *request,
-			}
-
 			authorizeCode := uuid.Must(uuid.NewV4()).String()
-			r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, &requester)
+			r.Persister().CreatePKCERequestSession(s.t1, authorizeCode, request)
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "pkce"}
 
@@ -664,14 +685,8 @@ func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 			request := fosite.NewRequest()
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
 
-			requester := fosite.AccessRequest{
-				GrantTypes:       nil,
-				HandledGrantType: nil,
-				Request:          *request,
-			}
-
 			signature := uuid.Must(uuid.NewV4()).String()
-			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, &requester))
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
 
@@ -679,6 +694,24 @@ func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
 			require.NoError(t, r.Persister().DeleteRefreshTokenSession(s.t1, signature))
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestDetermineNetwork() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			r.Persister().Connection(context.Background()).Where("id <> ? AND id <> ?", s.t1NID, s.t2NID).Delete(&networkx.Network{})
+
+			actual, err := store.DetermineNetwork(context.Background())
+			require.NoError(t, err)
+			require.True(t, actual.ID == s.t1NID || actual.ID == s.t2NID)
 		})
 	}
 }
@@ -779,6 +812,25 @@ func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
 			require.NoError(t, r.Persister().FlushInactiveAccessTokens(s.t1, time.Now().Add(time.Hour), 100, 100))
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			actual := &jwk.SQLData{}
+
+			ks, err := store.GenerateAndPersistKeySet(s.t1, "ks", "kid", "RS256", "use")
+			require.NoError(t, err)
+			require.Error(t, r.Persister().Connection(context.Background()).Where("sid = ? AND kid = ? AND nid = ?", "ks", ks.Keys[0].KeyID, s.t2NID).First(actual))
+			require.NoError(t, r.Persister().Connection(context.Background()).Where("sid = ? AND kid = ? AND nid = ?", "ks", ks.Keys[0].KeyID, s.t1NID).First(actual))
 		})
 	}
 }
@@ -1363,7 +1415,587 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 	}
 }
 
-func TestExampleTestSuite(t *testing.T) {
+func (s *PersisterTestSuite) TestInvalidateAuthorizeCodeSession() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			client := &client.Client{OutfacingID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			require.NoError(t, r.Persister().CreateClient(s.t2, client))
+			sig := uuid.Must(uuid.NewV4()).String()
+			fr := fosite.NewRequest()
+			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
+
+			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t2, sig))
+			actual := persistencesql.OAuth2RequestSQL{Table: "code"}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Equal(t, true, actual.Active)
+
+			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t1, sig))
+			actual = persistencesql.OAuth2RequestSQL{Table: "code"}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Equal(t, false, actual.Active)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestIsJWTUsed() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
+
+			actual, err := r.Persister().IsJWTUsed(s.t2, jti.JTI)
+			require.NoError(t, err)
+			require.False(t, actual)
+
+			actual, err = r.Persister().IsJWTUsed(s.t1, jti.JTI)
+			require.NoError(t, err)
+			require.True(t, actual)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogout() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			c1 := &client.Client{OutfacingID: "client-1", BackChannelLogoutURI: "not-null"}
+			c2 := &client.Client{OutfacingID: "client-2", BackChannelLogoutURI: "not-null"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
+			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
+
+			t1f1 := newFlow(s.t1NID, c1.OutfacingID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
+			t1f1.ConsentChallengeID = "t1f1-consent-challenge"
+			t1f1.LoginVerifier = "t1f1-login-verifier"
+			t1f1.ConsentVerifier = "t1f1-consent-verifier"
+
+			t2f1 := newFlow(s.t2NID, c1.OutfacingID, "sub", t1f1.SessionID)
+			t2f1.ConsentChallengeID = "t2f1-consent-challenge"
+			t2f1.LoginVerifier = "t2f1-login-verifier"
+			t2f1.ConsentVerifier = "t2f1-consent-verifier"
+
+			t2f2 := newFlow(s.t2NID, c2.OutfacingID, "sub", t1f1.SessionID)
+			t2f2.ConsentChallengeID = "t2f2-consent-challenge"
+			t2f2.LoginVerifier = "t2f2-login-verifier"
+			t2f2.ConsentVerifier = "t2f2-consent-verifier"
+
+			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: t1f1.SessionID.String()}))
+
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(t1f1))
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f1))
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f2))
+
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, &consent.ConsentRequest{ID: t1f1.ID, LoginChallenge: sqlxx.NullString(t1f1.ID), Skip: false, Verifier: t1f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f1.ID, LoginChallenge: sqlxx.NullString(t2f1.ID), Skip: false, Verifier: t2f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f2.ID, LoginChallenge: sqlxx.NullString(t2f2.ID), Skip: false, Verifier: t2f2.ConsentVerifier.String(), CSRF: "csrf"}))
+
+			_, err := r.Persister().HandleConsentRequest(s.t1, &consent.HandledConsentRequest{ID: t1f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			require.NoError(t, err)
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			require.NoError(t, err)
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			require.NoError(t, err)
+
+			cs, err := r.Persister().ListUserAuthenticatedClientsWithBackChannelLogout(s.t1, "sub", t1f1.SessionID.String())
+			require.NoError(t, err)
+			require.Equal(t, 1, len(cs))
+
+			cs, err = r.Persister().ListUserAuthenticatedClientsWithBackChannelLogout(s.t2, "sub", t1f1.SessionID.String())
+			require.NoError(t, err)
+			require.Equal(t, 2, len(cs))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLogout() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			c1 := &client.Client{OutfacingID: "client-1", FrontChannelLogoutURI: "not-null"}
+			c2 := &client.Client{OutfacingID: "client-2", FrontChannelLogoutURI: "not-null"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
+			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
+
+			t1f1 := newFlow(s.t1NID, c1.OutfacingID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
+			t1f1.ConsentChallengeID = "t1f1-consent-challenge"
+			t1f1.LoginVerifier = "t1f1-login-verifier"
+			t1f1.ConsentVerifier = "t1f1-consent-verifier"
+
+			t2f1 := newFlow(s.t2NID, c1.OutfacingID, "sub", t1f1.SessionID)
+			t2f1.ConsentChallengeID = "t2f1-consent-challenge"
+			t2f1.LoginVerifier = "t2f1-login-verifier"
+			t2f1.ConsentVerifier = "t2f1-consent-verifier"
+
+			t2f2 := newFlow(s.t2NID, c2.OutfacingID, "sub", t1f1.SessionID)
+			t2f2.ConsentChallengeID = "t2f2-consent-challenge"
+			t2f2.LoginVerifier = "t2f2-login-verifier"
+			t2f2.ConsentVerifier = "t2f2-consent-verifier"
+
+			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: t1f1.SessionID.String()}))
+
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(t1f1))
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f1))
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(t2f2))
+
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t1, &consent.ConsentRequest{ID: t1f1.ID, LoginChallenge: sqlxx.NullString(t1f1.ID), Skip: false, Verifier: t1f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f1.ID, LoginChallenge: sqlxx.NullString(t2f1.ID), Skip: false, Verifier: t2f1.ConsentVerifier.String(), CSRF: "csrf"}))
+			require.NoError(t, r.Persister().CreateConsentRequest(s.t2, &consent.ConsentRequest{ID: t2f2.ID, LoginChallenge: sqlxx.NullString(t2f2.ID), Skip: false, Verifier: t2f2.ConsentVerifier.String(), CSRF: "csrf"}))
+
+			_, err := r.Persister().HandleConsentRequest(s.t1, &consent.HandledConsentRequest{ID: t1f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			require.NoError(t, err)
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f1.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			require.NoError(t, err)
+			_, err = r.Persister().HandleConsentRequest(s.t2, &consent.HandledConsentRequest{ID: t2f2.ID, HandledAt: sqlxx.NullTime(time.Now()), Remember: true})
+			require.NoError(t, err)
+
+			cs, err := r.Persister().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t1, "sub", t1f1.SessionID.String())
+			require.NoError(t, err)
+			require.Equal(t, 1, len(cs))
+
+			cs, err = r.Persister().ListUserAuthenticatedClientsWithFrontChannelLogout(s.t2, "sub", t1f1.SessionID.String())
+			require.NoError(t, err)
+			require.Equal(t, 2, len(cs))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestMarkJWTUsedForTime() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			r.Persister().SetClientAssertionJWT(s.t1, "a", time.Now().Add(-24*time.Hour))
+			r.Persister().SetClientAssertionJWT(s.t2, "a", time.Now().Add(-24*time.Hour))
+			r.Persister().SetClientAssertionJWT(s.t2, "b", time.Now().Add(-24*time.Hour))
+
+			require.NoError(t, r.Persister().MarkJWTUsedForTime(s.t2, "a", time.Now().Add(48*time.Hour)))
+
+			store, ok := r.OAuth2Storage().(oauth2.AssertionJWTReader)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			_, err := store.GetClientAssertionJWT(s.t1, "a")
+			require.NoError(t, err)
+			_, err = store.GetClientAssertionJWT(s.t2, "a")
+			require.NoError(t, err)
+			_, err = store.GetClientAssertionJWT(s.t2, "b")
+			require.Error(t, err)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestQueryWithNetwork() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			r.Persister().CreateClient(s.t1, &client.Client{OutfacingID: "client-1", FrontChannelLogoutURI: "not-null"})
+
+			store, ok := r.Persister().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			var actual []client.Client
+			store.QueryWithNetwork(s.t2).All(&actual)
+			require.Equal(t, 0, len(actual))
+			store.QueryWithNetwork(s.t1).All(&actual)
+			require.Equal(t, 1, len(actual))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestRejectLogoutRequest() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			lr := newLogoutRequest()
+			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+
+			require.Error(t, r.ConsentManager().RejectLogoutRequest(s.t2, lr.ID))
+			actual, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			require.NoError(t, err)
+			require.Equal(t, lr, actual)
+
+			require.NoError(t, r.ConsentManager().RejectLogoutRequest(s.t1, lr.ID))
+			actual, err = r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			require.Error(t, err)
+			require.Equal(t, &consent.LogoutRequest{}, actual)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestRevokeAccessToken() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			client := &client.Client{OutfacingID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			sig := uuid.Must(uuid.NewV4()).String()
+			fr := fosite.NewRequest()
+			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
+			require.NoError(t, r.Persister().RevokeAccessToken(s.t2, fr.ID))
+
+			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+			require.Equal(t, s.t1NID, actual.NID)
+
+			require.NoError(t, r.Persister().RevokeAccessToken(s.t1, fr.ID))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestRevokeRefreshToken() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			client := &client.Client{OutfacingID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+
+			request := fosite.NewRequest()
+			request.Client = &fosite.DefaultClient{ID: "client-id"}
+
+			signature := uuid.Must(uuid.NewV4()).String()
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
+
+			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+
+			require.NoError(t, r.Persister().RevokeRefreshToken(s.t2, request.ID))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
+			require.Equal(t, true, actual.Active)
+			require.NoError(t, r.Persister().RevokeRefreshToken(s.t1, request.ID))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
+			require.Equal(t, false, actual.Active)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestRevokeRefreshTokenMaybeGracePeriod() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			client := &client.Client{OutfacingID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+
+			request := fosite.NewRequest()
+			request.Client = &fosite.DefaultClient{ID: "client-id"}
+
+			signature := uuid.Must(uuid.NewV4()).String()
+			require.NoError(t, r.Persister().CreateRefreshTokenSession(s.t1, signature, request))
+
+			actual := persistencesql.OAuth2RequestSQL{Table: "refresh"}
+
+			store, ok := r.Persister().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			require.NoError(t, store.RevokeRefreshTokenMaybeGracePeriod(s.t2, request.ID, signature))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
+			require.Equal(t, true, actual.Active)
+			require.NoError(t, store.RevokeRefreshTokenMaybeGracePeriod(s.t1, request.ID, signature))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, signature))
+			require.Equal(t, false, actual.Active)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestRevokeSubjectClientConsentSession() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			sessionID := uuid.Must(uuid.NewV4()).String()
+			client := &client.Client{OutfacingID: "client-id"}
+			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			f.RequestedAt = time.Now().Add(-24 * time.Hour)
+			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+
+			actual := flow.Flow{}
+
+			require.Error(t, r.Persister().RevokeSubjectClientConsentSession(s.t2, "sub", client.OutfacingID))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
+			require.NoError(t, r.Persister().RevokeSubjectClientConsentSession(s.t1, "sub", client.OutfacingID))
+			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestSetClientAssertionJWT() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
+			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
+
+			actual := &oauth2.BlacklistedJTI{}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, jti.ID))
+			require.Equal(t, s.t1NID, actual.NID)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestSetClientAssertionJWTRaw() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			store, ok := r.Persister().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
+			require.NoError(t, store.SetClientAssertionJWTRaw(s.t1, jti))
+
+			actual := &oauth2.BlacklistedJTI{}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, jti.ID))
+			require.Equal(t, s.t1NID, actual.NID)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestUpdateClient() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			t1c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret"}
+			t2c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, t1c1))
+			require.NoError(t, r.Persister().CreateClient(s.t2, t2c1))
+			expectedHash := t1c1.Secret
+
+			u1 := *t1c1
+			u1.Name = "updated"
+			u1.Secret = ""
+			require.NoError(t, r.Persister().UpdateClient(s.t2, &u1))
+
+			actual := &client.Client{}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, t1c1.ID))
+			require.Equal(t, "original", actual.Name)
+			require.Equal(t, expectedHash, actual.Secret)
+
+			u2 := *t1c1
+			u2.Name = "updated"
+			u2.Secret = ""
+			require.NoError(t, r.Persister().UpdateClient(s.t1, &u2))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, t1c1.ID))
+			require.Equal(t, "updated", actual.Name)
+			require.Equal(t, expectedHash, actual.Secret)
+
+			u3 := *t1c1
+			u3.Name = "updated"
+			u3.Secret = "updated-secret"
+			require.NoError(t, r.Persister().UpdateClient(s.t1, &u3))
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, t1c1.ID))
+			require.Equal(t, "updated", actual.Name)
+			require.NotEqual(t, expectedHash, actual.Secret)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestUpdateKey() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run("dialect="+k, func(*testing.T) {
+			k1 := newKey("test-ks", "test")
+			ks := "key-set"
+			require.NoError(t, r.Persister().AddKey(s.t1, ks, &k1))
+			actual, err := r.Persister().GetKey(s.t1, ks, k1.KeyID)
+			require.NoError(t, err)
+			require.Equal(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
+
+			k2 := newKey("test-ks", "test")
+			r.Persister().UpdateKey(s.t2, ks, &k2)
+			actual, err = r.Persister().GetKey(s.t1, ks, k1.KeyID)
+			require.NoError(t, err)
+			require.Equal(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
+
+			r.Persister().UpdateKey(s.t1, ks, &k2)
+			actual, err = r.Persister().GetKey(s.t1, ks, k2.KeyID)
+			require.NoError(t, err)
+			require.NotEqual(t, &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{k1}}, actual)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestUpdateKeySet() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run("dialect="+k, func(*testing.T) {
+			ks := "key-set"
+			ks1 := newKeySet(ks, "test")
+			require.NoError(t, r.Persister().AddKeySet(s.t1, ks, ks1))
+			actual, err := r.Persister().GetKeySet(s.t1, ks)
+			require.NoError(t, err)
+			requireKeySetEqual(t, ks1, actual)
+
+			ks2 := newKeySet(ks, "test")
+			r.Persister().UpdateKeySet(s.t2, ks, ks2)
+			actual, err = r.Persister().GetKeySet(s.t1, ks)
+			require.NoError(t, err)
+			requireKeySetEqual(t, ks1, actual)
+
+			r.Persister().UpdateKeySet(s.t1, ks, ks2)
+			actual, err = r.Persister().GetKeySet(s.t1, ks)
+			require.NoError(t, err)
+			requireKeySetEqual(t, ks2, actual)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestUpdateWithNetwork() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			t1c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret"}
+			t2c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret", Owner: "erase-me"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, t1c1))
+			require.NoError(t, r.Persister().CreateClient(s.t2, t2c1))
+
+			store, ok := r.Persister().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			count, err := store.UpdateWithNetwork(s.t1, &client.Client{ID: t1c1.ID, OutfacingID: "client-id", Name: "updated", Secret: "original-secret"})
+			require.NoError(t, err)
+			require.Equal(t, int64(1), count)
+			actualt1, err := store.GetConcreteClient(s.t1, "client-id")
+			require.NoError(t, err)
+			require.Equal(t, "updated", actualt1.Name)
+			require.Equal(t, "", actualt1.Owner)
+			actualt2, err := store.GetConcreteClient(s.t2, "client-id")
+			require.NoError(t, err)
+			require.Equal(t, "original", actualt2.Name)
+			require.Equal(t, "erase-me", actualt2.Owner)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			sub := uuid.Must(uuid.NewV4()).String()
+			sessionID := uuid.Must(uuid.NewV4()).String()
+			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
+			client := &client.Client{OutfacingID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			f := newFlow(s.t1NID, client.OutfacingID, sub, sqlxx.NullString(sessionID))
+			f.ConsentSkip = false
+			f.GrantedScope = sqlxx.StringSlicePipeDelimiter{}
+			f.ConsentRemember = false
+			crf := 86400
+			f.ConsentRememberFor = &crf
+			f.ConsentError = &consent.RequestDeniedError{}
+			f.SessionAccessToken = map[string]interface{}{}
+			f.SessionIDToken = map[string]interface{}{}
+			f.ConsentWasHandled = false
+			f.State = flow.FlowStateConsentUnused
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+
+			actual := &flow.Flow{}
+			_, err := r.ConsentManager().VerifyAndInvalidateConsentRequest(s.t2, f.ConsentVerifier.String())
+			require.Error(t, err)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, f.ID))
+			require.Equal(t, flow.FlowStateConsentUnused, actual.State)
+			require.Equal(t, false, actual.ConsentWasHandled)
+			_, err = r.ConsentManager().VerifyAndInvalidateConsentRequest(s.t1, f.ConsentVerifier.String())
+			require.NoError(t, err)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, f.ID))
+			require.Equal(t, flow.FlowStateConsentUsed, actual.State)
+			require.Equal(t, true, actual.ConsentWasHandled)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestVerifyAndInvalidateLoginRequest() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			sub := uuid.Must(uuid.NewV4()).String()
+			sessionID := uuid.Must(uuid.NewV4()).String()
+			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
+			client := &client.Client{OutfacingID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			f := newFlow(s.t1NID, client.OutfacingID, sub, sqlxx.NullString(sessionID))
+			f.State = flow.FlowStateLoginUnused
+			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
+
+			actual := &flow.Flow{}
+			_, err := r.ConsentManager().VerifyAndInvalidateLoginRequest(s.t2, f.LoginVerifier)
+			require.Error(t, err)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, f.ID))
+			require.Equal(t, flow.FlowStateLoginUnused, actual.State)
+			require.Equal(t, false, actual.LoginWasUsed)
+			_, err = r.ConsentManager().VerifyAndInvalidateLoginRequest(s.t1, f.LoginVerifier)
+			require.NoError(t, err)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, f.ID))
+			require.Equal(t, flow.FlowStateLoginUsed, actual.State)
+			require.Equal(t, true, actual.LoginWasUsed)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			lr := newLogoutRequest()
+			lr.Verifier = uuid.Must(uuid.NewV4()).String()
+			lr.Accepted = true
+			lr.Rejected = false
+			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
+
+			expected, err := r.ConsentManager().GetLogoutRequest(s.t1, lr.ID)
+			require.NoError(t, err)
+
+			lrInvalidated, err := r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t2, lr.Verifier)
+			require.Error(t, err)
+			require.Equal(t, &consent.LogoutRequest{}, lrInvalidated)
+			actual := &consent.LogoutRequest{}
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
+			require.Equal(t, expected, actual)
+
+			lrInvalidated, err = r.ConsentManager().VerifyAndInvalidateLogoutRequest(s.t1, lr.Verifier)
+			require.NoError(t, err)
+			require.NoError(t, r.Persister().Connection(context.Background()).Find(actual, lr.ID))
+			require.Equal(t, lrInvalidated, actual)
+			require.Equal(t, true, actual.WasHandled)
+		})
+	}
+}
+
+func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
+	t := s.T()
+	for k, r := range s.registries {
+		t.Run(k, func(*testing.T) {
+			r.WithContextualizer(&contextx.DefaultContextualizer{})
+			store, ok := r.Persister().(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+			original := store.NetworkID(context.Background())
+			expected := uuid.Must(uuid.NewV4())
+			store, ok = store.WithFallbackNetworkID(expected).(*persistencesql.Persister)
+			if !ok {
+				t.Fatal("type assertion failed")
+			}
+
+			require.NotEqual(t, original, expected)
+			require.Equal(t, expected, store.NetworkID(context.Background()))
+		})
+	}
+}
+
+func TestPersisterTestSuite(t *testing.T) {
 	suite.Run(t, new(PersisterTestSuite))
 }
 
@@ -1434,4 +2066,11 @@ func newLoginSession() *consent.LoginSession {
 		Subject:         uuid.Must(uuid.NewV4()).String(),
 		Remember:        false,
 	}
+}
+
+func requireKeySetEqual(t *testing.T, expected *jose.JSONWebKeySet, actual *jose.JSONWebKeySet) {
+	if expected.Keys[0].KeyID == actual.Keys[1].KeyID {
+		actual.Keys[0], actual.Keys[1] = actual.Keys[1], actual.Keys[0]
+	}
+	require.Equal(t, expected, actual)
 }

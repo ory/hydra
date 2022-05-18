@@ -23,9 +23,10 @@ package jwk_test
 import (
 	"context"
 	"encoding/base64"
-	"github.com/tidwall/gjson"
 	"strings"
 	"testing"
+
+	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/internal"
 	"github.com/ory/x/contextx"
@@ -85,7 +86,7 @@ func TestJWTStrategy(t *testing.T) {
 			kidBar, err := s.GetPublicKeyID(context.Background())
 			assert.NoError(t, err)
 
-			if conf.HsmEnabled(context.Background()) {
+			if conf.HSMEnabled() {
 				assert.Equal(t, "foo", kidFoo)
 				assert.Equal(t, "bar", kidBar)
 			} else {

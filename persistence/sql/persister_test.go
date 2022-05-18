@@ -2,8 +2,9 @@ package sql_test
 
 import (
 	"context"
-	"gopkg.in/square/go-jose.v2"
 	"testing"
+
+	"gopkg.in/square/go-jose.v2"
 
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/assert"
@@ -58,13 +59,13 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 			{alg: "ES512", skip: false},
 			{alg: "HS256", skip: true},
 			{alg: "HS512", skip: true},
-			{alg: "EdDSA", skip: t1.Config().HsmEnabled(ctx)},
+			{alg: "EdDSA", skip: t1.Config().HSMEnabled()},
 		} {
 			t.Run("key_generator="+tc.alg, func(t *testing.T) {
 				if tc.skip {
 					t.Skipf("Skipping test. Not applicable for alg: %s", tc.alg)
 				}
-				if t1.Config().HsmEnabled(ctx) {
+				if t1.Config().HSMEnabled() {
 					t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerGenerateAndPersistKeySet(t1.KeyManager(), tc.alg, false))
 					// We don't support NID isolation with HSM at the moment
 					// t.Run("TestManagerGenerateAndPersistKeySet", jwk.TestHelperManagerNIDIsolationKeySet(t1.KeyManager(), t2.KeyManager(), tc.alg))
@@ -140,11 +141,11 @@ func TestManagersNextGen(t *testing.T) {
 func TestManagers(t *testing.T) {
 	ctx := context.TODO()
 	t1registries := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true, &contextx.Default{}),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), true, &contextx.Default{}),
 	}
 
 	t2registries := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, false, &contextx.Default{}),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.NewSQLiteTestDatabase(t), false, &contextx.Default{}),
 	}
 
 	if !testing.Short() {
@@ -168,7 +169,7 @@ func TestManagers(t *testing.T) {
 		t2 := t2registries[k]
 		t2.WithContextualizer(&contextx.Static{NID: uuid.Nil, C: t2.Config().Source(context.Background())})
 
-		if !t1.Config().HsmEnabled(ctx) { // We don't support NID isolation with HSM at the moment
+		if !t1.Config().HSMEnabled() { // We don't support NID isolation with HSM at the moment
 			t.Run("package=jwk/manager="+k+"/case=nid",
 				jwk.TestHelperNID(t1.KeyManager(), t2.KeyManager()),
 			)

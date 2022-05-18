@@ -107,12 +107,12 @@ func TestProviderAdminDisableHealthAccessLog(t *testing.T) {
 
 	p := MustNew(context.Background(), l)
 
-	value := p.DisableHealthAccessLog(ctx, AdminInterface)
+	value := p.DisableHealthAccessLog(AdminInterface)
 	assert.Equal(t, false, value)
 
 	p.MustSet(ctx, AdminInterface.Key(KeySuffixDisableHealthAccessLog), "true")
 
-	value = p.DisableHealthAccessLog(ctx, AdminInterface)
+	value = p.DisableHealthAccessLog(AdminInterface)
 	assert.Equal(t, true, value)
 }
 
@@ -123,12 +123,12 @@ func TestProviderPublicDisableHealthAccessLog(t *testing.T) {
 
 	p := MustNew(context.Background(), l)
 
-	value := p.DisableHealthAccessLog(ctx, PublicInterface)
+	value := p.DisableHealthAccessLog(PublicInterface)
 	assert.Equal(t, false, value)
 
 	p.MustSet(ctx, PublicInterface.Key(KeySuffixDisableHealthAccessLog), "true")
 
-	value = p.DisableHealthAccessLog(ctx, PublicInterface)
+	value = p.DisableHealthAccessLog(PublicInterface)
 	assert.Equal(t, true, value)
 }
 
@@ -221,8 +221,8 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "json", c.Source(ctx).String("log.format"))
 
 	// serve
-	assert.Equal(t, "localhost:1", c.ListenOn(ctx, PublicInterface))
-	assert.Equal(t, "localhost:2", c.ListenOn(ctx, AdminInterface))
+	assert.Equal(t, "localhost:1", c.ListenOn(PublicInterface))
+	assert.Equal(t, "localhost:2", c.ListenOn(AdminInterface))
 
 	expectedPublicPermission := &configx.UnixPermission{
 		Owner: "hydra",
@@ -234,8 +234,8 @@ func TestViperProviderValidates(t *testing.T) {
 		Group: "hydra-admin-api",
 		Mode:  0770,
 	}
-	assert.Equal(t, expectedPublicPermission, c.SocketPermission(ctx, PublicInterface))
-	assert.Equal(t, expectedAdminPermission, c.SocketPermission(ctx, AdminInterface))
+	assert.Equal(t, expectedPublicPermission, c.SocketPermission(PublicInterface))
+	assert.Equal(t, expectedAdminPermission, c.SocketPermission(AdminInterface))
 
 	expectedCors := cors.Options{
 		AllowedOrigins:     []string{"https://example.com"},
@@ -263,7 +263,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, true, c.CookieSameSiteLegacyWorkaround(ctx))
 
 	// dsn
-	assert.Contains(t, c.DSN(ctx), "sqlite://")
+	assert.Contains(t, c.DSN(), "sqlite://")
 
 	// webfinger
 	assert.Equal(t, []string{"hydra.openid.id-token"}, c.WellKnownKeys(ctx))
@@ -304,7 +304,6 @@ func TestViperProviderValidates(t *testing.T) {
 
 	// oauth2
 	assert.Equal(t, true, c.GetSendDebugMessagesToClients(ctx))
-	assert.Equal(t, true, c.GetUseLegacyErrorFormat(ctx))
 	assert.Equal(t, 20, c.GetBCryptCost(ctx))
 	assert.Equal(t, true, c.GetEnforcePKCE(ctx))
 	assert.Equal(t, true, c.GetEnforcePKCEForPublicClients(ctx))
@@ -328,7 +327,7 @@ func TestViperProviderValidates(t *testing.T) {
 				},
 			},
 		},
-	}, c.Tracing(ctx))
+	}, c.Tracing())
 }
 
 func TestSetPerm(t *testing.T) {

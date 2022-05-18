@@ -3,9 +3,10 @@ package sql_test
 import (
 	"context"
 	"database/sql"
-	"github.com/ory/x/assertx"
 	"testing"
 	"time"
+
+	"github.com/ory/x/assertx"
 
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/require"

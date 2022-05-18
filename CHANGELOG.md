@@ -754,8 +754,16 @@ This release introduces two new features:
 
 # [1.11.8](https://github.com/ory/hydra/compare/v1.11.7...v1.11.8) (2022-05-04)
 
-This release resolves issues in the log module, improves the SDK type
-definitions, and introduces new configuration options to HSM.
+This release resolves issues in the log module, improves the SDK type definitions, and introduces new configuration options to HSM.
+
+
+
+
+## Breaking Changes
+
+This patch merges four SQL Tables into a new table, deleting the old tables in the process. The migrations in this patch are expected to be applied offline. Please be aware that *there are no down migrations*, and if something goes wrong, data loss is possible. Always back up your database before applying migrations. For more information, see [Hydra 2.x Migration Guide](https://tld/TODO-MIGRATION-GUIDE).
+
+Rows with NULL login_challenge in `hydra_oauth2_consent_request` and corresponding `hydra_oauth2_consent_request_handled` are deleted as a side effect of the merge migration. This is done with the assumption that only a very small number of sessions, issued by pre-1.0 Hydra, will be affected. Please contact us if this assumption doesn't apply or if the deletion adversely affects your deployment.
 
 ### Bug Fixes
 
@@ -1377,35 +1385,22 @@ Please note that the location of our Homebrew tap has changed for Ory Hydra from
 
 ### Features
 
-- Add EdDSA support ([#2782](https://github.com/ory/hydra/issues/2782))
-  ([2ea49da](https://github.com/ory/hydra/commit/2ea49daca624ede51fba604ddf1f2c5ded9c523a))
-- Add method to detect public keys without prefixing
-  ([#2758](https://github.com/ory/hydra/issues/2758))
-  ([b12e70c](https://github.com/ory/hydra/commit/b12e70c9a08ad62490731f57b5bfcb52c64217f0)),
-  closes [#2459](https://github.com/ory/hydra/issues/2459)
-- Include amr claim in ID token
-  ([#2770](https://github.com/ory/hydra/issues/2770))
-  ([f701310](https://github.com/ory/hydra/commit/f701310a8b78eef1f0fb090509ae9385150e1424)),
-  closes [#1756](https://github.com/ory/hydra/issues/1756)
-- Introduce cve scanning ([#2772](https://github.com/ory/hydra/issues/2772))
-  ([e5295c6](https://github.com/ory/hydra/commit/e5295c6bb7188978ba6310c049f33c47a407d7a7))
-- Making use of the updated instrumentedsql version
-  ([#2713](https://github.com/ory/hydra/issues/2713))
-  ([0a9df15](https://github.com/ory/hydra/commit/0a9df1579bb3196134c8b3ede8f28977365518e3))
-- Refresh token hook to update claims
-  ([#2649](https://github.com/ory/hydra/issues/2649))
-  ([1a7dcd1](https://github.com/ory/hydra/commit/1a7dcd1c464a9707237108a894f7b1d10f27c79a)),
-  closes [#2570](https://github.com/ory/hydra/issues/2570):
+* Add EdDSA support ([#2782](https://github.com/ory/hydra/issues/2782)) ([2ea49da](https://github.com/ory/hydra/commit/2ea49daca624ede51fba604ddf1f2c5ded9c523a))
+* Add method to detect public keys without prefixing ([#2758](https://github.com/ory/hydra/issues/2758)) ([b12e70c](https://github.com/ory/hydra/commit/b12e70c9a08ad62490731f57b5bfcb52c64217f0)), closes [#2459](https://github.com/ory/hydra/issues/2459)
+* Include amr claim in ID token ([#2770](https://github.com/ory/hydra/issues/2770)) ([f701310](https://github.com/ory/hydra/commit/f701310a8b78eef1f0fb090509ae9385150e1424)), closes [#1756](https://github.com/ory/hydra/issues/1756)
+* Introduce cve scanning ([#2772](https://github.com/ory/hydra/issues/2772)) ([e5295c6](https://github.com/ory/hydra/commit/e5295c6bb7188978ba6310c049f33c47a407d7a7))
+* Making use of the updated instrumentedsql version ([#2713](https://github.com/ory/hydra/issues/2713)) ([0a9df15](https://github.com/ory/hydra/commit/0a9df1579bb3196134c8b3ede8f28977365518e3))
+* Refresh token hook to update claims ([#2649](https://github.com/ory/hydra/issues/2649)) ([1a7dcd1](https://github.com/ory/hydra/commit/1a7dcd1c464a9707237108a894f7b1d10f27c79a)), closes [#2570](https://github.com/ory/hydra/issues/2570):
 
-  This patch adds a new feature to Ory Hydra which allows the updating of access
-  and ID tokens during the refresh flow. To set it up, use the
-  `oauth2.refresh_token_hook` configuration to set up a HTTP(S) endpoint which
-  receives a POST request when a refresh token is about to be issued.
+    This patch adds a new feature to Ory Hydra which allows the updating of access and ID tokens during the refresh flow. To set it up, use the `oauth2.refresh_token_hook` configuration to set up a HTTP(S) endpoint which receives a POST request when a refresh token is about to be issued.
 
-- Support updating keys in CLI
-  ([#2460](https://github.com/ory/hydra/issues/2460))
-  ([e874f4f](https://github.com/ory/hydra/commit/e874f4f300012f363c0bdf685458d0c56c5a8477)),
-  closes [#2436](https://github.com/ory/hydra/issues/2436)
+* Support updating keys in CLI ([#2460](https://github.com/ory/hydra/issues/2460)) ([e874f4f](https://github.com/ory/hydra/commit/e874f4f300012f363c0bdf685458d0c56c5a8477)), closes [#2436](https://github.com/ory/hydra/issues/2436)
+
+### Dev Tools
+
+* Introduce the `hydra sql gen` command and a convenience Make target with autocompletion. The command reads migration templates from a source directory and produces migration files in a target directory. Its main function is to split a single source file into multiple files using split marks.
+
+* Introduce the `hack/db-diff.sh` command to generate database schema diffs at different commits. This script is used to view and review the impact of migrations on the database schema.
 
 # [1.10.6](https://github.com/ory/hydra/compare/v1.10.5...v1.10.6) (2021-08-28)
 

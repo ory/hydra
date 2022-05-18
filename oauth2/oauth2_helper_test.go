@@ -24,9 +24,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/x/sqlxx"
 
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 )
 
@@ -45,9 +48,8 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 
 	return &consent.HandledConsentRequest{
 		ConsentRequest: &consent.ConsentRequest{
-			Subject:           "foo",
-			SubjectIdentifier: "foo",
-			ACR:               "1",
+			Subject: "foo",
+			ACR:     "1",
 		},
 		AuthenticatedAt: sqlxx.NullTime(c.authTime),
 		GrantedScope:    []string{"offline", "openid", "hydra.*"},
@@ -61,4 +63,13 @@ func (c *consentMock) HandleOAuth2AuthorizationRequest(w http.ResponseWriter, r 
 
 func (c *consentMock) HandleOpenIDConnectLogout(w http.ResponseWriter, r *http.Request) (*consent.LogoutResult, error) {
 	panic("not implemented")
+}
+
+func (c *consentMock) ObfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error) {
+	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
+		panic("not implemented")
+	} else if !ok {
+		return "", errors.New("Unable to type assert OAuth 2.0 Client to *client.Client")
+	}
+	return subject, nil
 }

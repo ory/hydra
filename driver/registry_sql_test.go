@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ory/x/errorsx"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/x/errorsx"
 
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/persistence/sql"

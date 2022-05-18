@@ -94,6 +94,8 @@ DROP INDEX hydra_oauth2_jti_blacklist_expiry ON hydra_oauth2_jti_blacklist;
 --split
 CREATE INDEX hydra_oauth2_jti_blacklist_expiry ON hydra_oauth2_jti_blacklist (expires_at ASC, nid ASC);
 --split
+ALTER TABLE hydra_oauth2_jti_blacklist DROP PRIMARY KEY, ADD PRIMARY KEY (signature, nid);
+--split
 
 
 

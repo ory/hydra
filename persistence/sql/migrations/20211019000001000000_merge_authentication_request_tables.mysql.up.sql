@@ -10,7 +10,7 @@ CREATE TABLE hydra_oauth2_flow
     `request_url` text NOT NULL,
     `login_skip` tinyint(1) NOT NULL,
     `client_id` varchar(255) NOT NULL,
-    `requested_at` timestamp NOT NULL DEFAULT now(),
+    `requested_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `login_initialized_at` timestamp NULL DEFAULT NULL,
     `oidc_context` text NOT NULL,
     `login_session_id` varchar(40),

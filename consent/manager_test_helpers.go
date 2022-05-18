@@ -302,7 +302,7 @@ func TestHelperNID(t1ClientManager client.Manager, t1ValidNID Manager, t2Invalid
 		require.Error(t, err)
 		_, err = t1ValidNID.HandleLoginRequest(context.Background(), testLR.ID, &testHLR)
 		require.NoError(t, err)
-		require.Error(t, t2InvalidNID.ConfirmLoginSession(context.Background(), testLS.ID, time.Now(), testLS.Subject, true))
+		require.NoError(t, t2InvalidNID.ConfirmLoginSession(context.Background(), testLS.ID, time.Now(), testLS.Subject, true))
 		require.NoError(t, t1ValidNID.ConfirmLoginSession(context.Background(), testLS.ID, time.Now(), testLS.Subject, true))
 		require.Error(t, t2InvalidNID.DeleteLoginSession(context.Background(), testLS.ID))
 		require.NoError(t, t1ValidNID.DeleteLoginSession(context.Background(), testLS.ID))

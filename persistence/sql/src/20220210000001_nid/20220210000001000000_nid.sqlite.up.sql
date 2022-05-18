@@ -127,7 +127,8 @@ ALTER TABLE "_hydra_client_tmp" RENAME TO "hydra_client";
 
 UPDATE hydra_client SET nid = (SELECT id FROM networks LIMIT 1);
 
-CREATE UNIQUE INDEX hydra_client_id_nid_idx ON hydra_client (id, nid);
+CREATE UNIQUE INDEX hydra_client_id_nid_uq_idx ON hydra_client (id, nid);
+CREATE INDEX hydra_client_id_nid_idx ON hydra_client (id, nid);
 
 -- hydra_oauth2_flow
 ALTER TABLE hydra_oauth2_flow ADD COLUMN nid CHAR(36) NULL REFERENCES networks(id) ON DELETE CASCADE ON UPDATE RESTRICT;

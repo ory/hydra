@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/ory/x/stringsx"
 	"strings"
+
+	"github.com/ory/x/stringsx"
 )
 
 // AccessTokenStrategyType is the type of access token strategy.
@@ -25,13 +26,4 @@ func ToAccessTokenStrategyType(strategy string) (AccessTokenStrategyType, error)
 	default:
 		return "", f.ToUnknownCaseErr()
 	}
-}
-
-// ToAccessTokenStrategyTypeOrDefault converts a string to an AccessTokenStrategyType or the default
-// if argument strategy is not a valid AccessTokenStrategyType.
-func ToAccessTokenStrategyTypeOrDefault(strategy string) AccessTokenStrategyType {
-	if s, err := ToAccessTokenStrategyType(strategy); err == nil {
-		return s
-	}
-	return AccessTokenDefaultStrategy
 }

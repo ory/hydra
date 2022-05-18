@@ -67,7 +67,7 @@ func NewConsentJanitorTestHelper(uniqueName string) *JanitorConsentTestHelper {
 }
 
 func (j *JanitorConsentTestHelper) GetDSN(ctx context.Context) string {
-	return j.conf.DSN(ctx)
+	return j.conf.DSN()
 }
 
 func (j *JanitorConsentTestHelper) GetConfig() *config.DefaultProvider {

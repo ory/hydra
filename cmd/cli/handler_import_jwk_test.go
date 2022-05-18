@@ -20,7 +20,7 @@ import (
 
 func TestImportJSONWebKey(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, nil)
+	reg := internal.NewRegistryMemory(t, conf)
 	router := x.NewRouterPublic()
 
 	if conf.HsmEnabled() {

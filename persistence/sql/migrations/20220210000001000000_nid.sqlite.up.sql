@@ -70,7 +70,8 @@ CREATE TABLE "_hydra_oauth2_authentication_session_tmp" (
     authenticated_at TIMESTAMP    NULL,
     subject          VARCHAR(255) NOT NULL,
     nid              CHAR(36)     NOT NULL,
-    remember         INTEGER      NOT NULL DEFAULT false
+    remember         INTEGER      NOT NULL DEFAULT false,
+    CHECK (nid != '00000000-0000-0000-0000-000000000000')
 );
 INSERT INTO "_hydra_oauth2_authentication_session_tmp" (id, authenticated_at, subject, remember, nid) SELECT id, authenticated_at, subject, remember, nid FROM "hydra_oauth2_authentication_session";
 DROP TABLE "hydra_oauth2_authentication_session";
@@ -454,7 +455,8 @@ CREATE TABLE "_hydra_jwk_tmp" (
     keydata         TEXT         NOT NULL,
     created_at      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL,
     pk              TEXT         PRIMARY KEY,
-    pk_deprecated   INTEGER      NULL DEFAULT NULL
+    pk_deprecated   INTEGER      NULL DEFAULT NULL,
+    CHECK (nid != '00000000-0000-0000-0000-000000000000')
 );
 INSERT INTO "_hydra_jwk_tmp" (sid, kid, version, keydata, created_at, pk, pk_deprecated, nid) SELECT sid, kid, version, keydata, created_at, pk, pk_deprecated, nid FROM "hydra_jwk";
 DROP TABLE "hydra_jwk";

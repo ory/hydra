@@ -41,7 +41,7 @@ func newResponseSnapshot(body string, res *http.Response) *responseSnapshot {
 
 func TestHandler(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t, nil)
+	reg := internal.NewMockedRegistry(t)
 	h := client.NewHandler(reg)
 
 	t.Run("create client registration tokens", func(t *testing.T) {

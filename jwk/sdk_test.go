@@ -43,7 +43,7 @@ import (
 
 func TestJWKSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, nil)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterAdmin()
 	h := NewHandler(reg, conf)

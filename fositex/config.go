@@ -3,7 +3,12 @@ package fositex
 import (
 	"context"
 	"crypto/sha512"
+	"hash"
+	"html/template"
+	"net/url"
+
 	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/i18n"
@@ -14,9 +19,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
-	"hash"
-	"html/template"
-	"net/url"
 )
 
 type configDependencies interface {

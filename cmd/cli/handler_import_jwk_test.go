@@ -20,12 +20,11 @@ import (
 )
 
 func TestImportJSONWebKey(t *testing.T) {
-	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 	router := x.NewRouterPublic()
 
-	if conf.HsmEnabled(ctx) {
+	if conf.HSMEnabled() {
 		t.Skip("Skipping test. Keys cannot be imported when Hardware Security Module is enabled")
 	}
 

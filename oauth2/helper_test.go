@@ -2,6 +2,7 @@ package oauth2_test
 
 import (
 	"context"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/token/hmac"

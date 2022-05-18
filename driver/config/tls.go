@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"crypto/tls"
+
 	"github.com/ory/x/tlsx"
 )
 

@@ -3,14 +3,16 @@ package driver
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/http"
+	"time"
+
 	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/ory/hydra/fositex"
 	ctxx "github.com/ory/x/contextx"
 	"github.com/ory/x/httpx"
 	"github.com/ory/x/otelx"
-	"net"
-	"net/http"
-	"time"
 
 	"github.com/ory/hydra/hsm"
 
@@ -303,7 +305,7 @@ func (m *RegistryBase) HTTPClient(ctx context.Context, opts ...httpx.ResilientOp
 		opts = append(opts, httpx.ResilientClientWithTracer(tracer.Tracer()))
 	}
 
-	if m.Config().ClientHTTPNoPrivateIPRanges(ctx) {
+	if m.Config().ClientHTTPNoPrivateIPRanges() {
 		opts = append(opts, httpx.ResilientClientDisallowInternalIPs())
 	}
 	return httpx.NewResilientClient(opts...)
@@ -452,7 +454,7 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[strin
 
 func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
 	if m.trc == nil {
-		t, err := otelx.New("Ory Hydra", m.l, m.C.Tracing(ctx))
+		t, err := otelx.New("Ory Hydra", m.l, m.C.Tracing())
 		if err != nil {
 			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
 		} else {

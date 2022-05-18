@@ -23,10 +23,11 @@ package jwk
 import (
 	"context"
 	"crypto/rand"
-	"github.com/ory/x/assertx"
 	"io"
 	"testing"
 	"time"
+
+	"github.com/ory/x/assertx"
 
 	"github.com/ory/x/errorsx"
 

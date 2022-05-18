@@ -3,12 +3,14 @@ package config
 import (
 	"context"
 	"fmt"
-	"github.com/gofrs/uuid"
-	"github.com/ory/x/otelx"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/gofrs/uuid"
+
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/hydra/spec"
 	"github.com/ory/x/dbal"
@@ -25,12 +27,12 @@ import (
 
 const (
 	KeyRoot                                      = ""
-	HsmEnabled                                   = "hsm.enabled"
-	HsmLibraryPath                               = "hsm.library"
-	HsmPin                                       = "hsm.pin"
-	HsmSlotNumber                                = "hsm.slot"
-	HsmKeySetPrefix                              = "hsm.key_set_prefix"
-	HsmTokenLabel                                = "hsm.token_label" // #nosec G101
+	HSMEnabled                                   = "hsm.enabled"
+	HSMLibraryPath                               = "hsm.library"
+	HSMPin                                       = "hsm.pin"
+	HSMSlotNumber                                = "hsm.slot"
+	HSMKeySetPrefix                              = "hsm.key_set_prefix"
+	HSMTokenLabel                                = "hsm.token_label" // #nosec G101
 	KeyWellKnownKeys                             = "webfinger.jwks.broadcast_keys"
 	KeyOAuth2ClientRegistrationURL               = "webfinger.oidc_discovery.client_registration_url"
 	KeyOAuth2TokenURL                            = "webfinger.oidc_discovery.token_url" // #nosec G101
@@ -149,8 +151,8 @@ func (p *DefaultProvider) IsUsingJWTAsAccessTokens(ctx context.Context) bool {
 	return p.AccessTokenStrategy(ctx) != "opaque"
 }
 
-func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges(ctx context.Context) bool {
-	return p.getProvider(ctx).Bool(ViperKeyClientHTTPNoPrivateIPRanges)
+func (p *DefaultProvider) ClientHTTPNoPrivateIPRanges() bool {
+	return p.getProvider(contextx.RootContext).Bool(ViperKeyClientHTTPNoPrivateIPRanges)
 }
 
 func (p *DefaultProvider) AllowedTopLevelClaims(ctx context.Context) []string {
@@ -192,8 +194,8 @@ func (p *DefaultProvider) DefaultClientScope(ctx context.Context) []string {
 	)
 }
 
-func (p *DefaultProvider) DSN(ctx context.Context) string {
-	dsn := p.getProvider(ctx).String(KeyDSN)
+func (p *DefaultProvider) DSN() string {
+	dsn := p.getProvider(contextx.RootContext).String(KeyDSN)
 
 	if dsn == DSNMemory {
 		return dbal.NewSQLiteInMemoryDatabase(uuid.Must(uuid.NewV4()).String())
@@ -213,10 +215,6 @@ func (p *DefaultProvider) EncryptSessionData(ctx context.Context) bool {
 
 func (p *DefaultProvider) ExcludeNotBeforeClaim(ctx context.Context) bool {
 	return p.getProvider(ctx).BoolF(KeyExcludeNotBeforeClaim, false)
-}
-
-func (p *DefaultProvider) DataSourcePlugin(ctx context.Context) string {
-	return p.getProvider(ctx).String(KeyDSN)
 }
 
 func (p *DefaultProvider) CookieSameSiteMode(ctx context.Context) http.SameSite {
@@ -251,8 +249,8 @@ func (p *DefaultProvider) ConsentRequestMaxAge(ctx context.Context) time.Duratio
 	return p.getProvider(ctx).DurationF(KeyConsentRequestMaxAge, time.Minute*30)
 }
 
-func (p *DefaultProvider) Tracing(ctx context.Context) *otelx.Config {
-	return p.getProvider(ctx).TracingConfig("Ory Hydra")
+func (p *DefaultProvider) Tracing() *otelx.Config {
+	return p.getProvider(contextx.RootContext).TracingConfig("Ory Hydra")
 }
 
 func (p *DefaultProvider) GetCookieSecrets(ctx context.Context) [][]byte {
@@ -276,7 +274,7 @@ func (p *DefaultProvider) publicFallbackURL(ctx context.Context, path string) *u
 	if len(p.PublicURL(ctx).String()) > 0 {
 		return urlx.AppendPaths(p.PublicURL(ctx), path)
 	}
-	return p.fallbackURL(ctx, path, p.host(ctx, PublicInterface), p.port(ctx, PublicInterface))
+	return p.fallbackURL(ctx, path, p.host(PublicInterface), p.port(PublicInterface))
 }
 
 func (p *DefaultProvider) fallbackURL(ctx context.Context, path string, host string, port int) *url.URL {
@@ -313,7 +311,7 @@ func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
-	issuerURL := p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(ctx, PublicInterface), p.port(ctx, PublicInterface)))
+	issuerURL := p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)))
 	issuerURL.Path = strings.TrimRight(issuerURL.Path, "/") + "/"
 	return urlRoot(issuerURL)
 }
@@ -386,33 +384,33 @@ func (p *DefaultProvider) GetEnforcePKCEForPublicClients(ctx context.Context) bo
 	return p.getProvider(ctx).Bool(KeyPKCEEnforcedForPublicClients)
 }
 
-func (p *DefaultProvider) CGroupsV1AutoMaxProcsEnabled(ctx context.Context) bool {
-	return p.getProvider(ctx).Bool(KeyCGroupsV1AutoMaxProcsEnabled)
+func (p *DefaultProvider) CGroupsV1AutoMaxProcsEnabled() bool {
+	return p.getProvider(contextx.RootContext).Bool(KeyCGroupsV1AutoMaxProcsEnabled)
 }
 
 func (p *DefaultProvider) GrantAllClientCredentialsScopesPerDefault(ctx context.Context) bool {
 	return p.getProvider(ctx).Bool(KeyGrantAllClientCredentialsScopesPerDefault)
 }
 
-func (p *DefaultProvider) HsmEnabled(ctx context.Context) bool {
-	return p.getProvider(ctx).Bool(HsmEnabled)
+func (p *DefaultProvider) HSMEnabled() bool {
+	return p.getProvider(contextx.RootContext).Bool(HSMEnabled)
 }
 
-func (p *DefaultProvider) HsmLibraryPath(ctx context.Context) string {
-	return p.getProvider(ctx).String(HsmLibraryPath)
+func (p *DefaultProvider) HSMLibraryPath() string {
+	return p.getProvider(contextx.RootContext).String(HSMLibraryPath)
 }
 
-func (p *DefaultProvider) HsmSlotNumber(ctx context.Context) *int {
-	n := p.getProvider(ctx).Int(HsmSlotNumber)
+func (p *DefaultProvider) HSMSlotNumber() *int {
+	n := p.getProvider(contextx.RootContext).Int(HSMSlotNumber)
 	return &n
 }
 
-func (p *DefaultProvider) HsmPin(ctx context.Context) string {
-	return p.getProvider(ctx).String(HsmPin)
+func (p *DefaultProvider) HSMPin() string {
+	return p.getProvider(contextx.RootContext).String(HSMPin)
 }
 
-func (p *DefaultProvider) HsmTokenLabel(ctx context.Context) string {
-	return p.getProvider(ctx).String(HsmTokenLabel)
+func (p *DefaultProvider) HSMTokenLabel() string {
+	return p.getProvider(contextx.RootContext).String(HSMTokenLabel)
 }
 
 func (p *DefaultProvider) GetGrantTypeJWTBearerIDOptional(ctx context.Context) bool {

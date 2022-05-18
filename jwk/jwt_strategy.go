@@ -22,8 +22,9 @@ package jwk
 
 import (
 	"context"
-	"github.com/ory/hydra/driver/config"
 	"strings"
+
+	"github.com/ory/hydra/driver/config"
 
 	"github.com/pkg/errors"
 

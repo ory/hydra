@@ -2,6 +2,7 @@ package fositex
 
 import (
 	"context"
+
 	"github.com/ory/fosite"
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/hydra/driver/config"

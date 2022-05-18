@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/ory/x/configx"
+	"github.com/ory/x/otelx"
 
 	analytics "github.com/ory/analytics-go/v4"
 
@@ -201,8 +202,8 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 	public = x.NewRouterPublic()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		adminmw.Use(tracer)
-		publicmw.Use(tracer)
+		adminmw.UseHandler(otelx.NewHandler(admin, "cmd.daemon.Admin"))
+		publicmw.UseHandler(otelx.NewHandler(public, "cmd.daemon.Public"))
 	}
 
 	adminLogger := reqlog.
@@ -320,10 +321,6 @@ func serve(
 			Certificates: cert,
 		},
 	})
-
-	if d.Tracer(cmd.Context()).IsLoaded() {
-		srv.RegisterOnShutdown(d.Tracer(cmd.Context()).Close)
-	}
 
 	if err := graceful.Graceful(func() error {
 		d.Logger().Infof("Setting up http server on %s", address)

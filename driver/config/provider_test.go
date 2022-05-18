@@ -12,12 +12,12 @@ import (
 
 	"github.com/ory/x/configx"
 	"github.com/ory/x/dbal"
+	"github.com/ory/x/otelx"
 
 	"github.com/rs/cors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
 
 	"github.com/ory/x/logrusx"
@@ -314,22 +314,15 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, "cpu", c.Source().String("profiling"))
 
 	// tracing
-	assert.EqualValues(t, &tracing.Config{
+	assert.EqualValues(t, &otelx.Config{
 		ServiceName: "hydra service",
 		Provider:    "jaeger",
-		Providers: &tracing.ProvidersConfig{
-			Jaeger: &tracing.JaegerConfig{
+		Providers: otelx.ProvidersConfig{
+			Jaeger: otelx.JaegerConfig{
 				LocalAgentAddress: "127.0.0.1:6831",
-				Sampling: &tracing.JaegerSampling{
-					Type:      "const",
-					Value:     1,
+				Sampling: otelx.JaegerSampling{
 					ServerURL: "http://sampling",
 				},
-				Propagation:       "jaeger",
-				MaxTagValueLength: 1024,
-			},
-			Zipkin: &tracing.ZipkinConfig{
-				ServerURL: "http://zipkin/api/v2/spans",
 			},
 		},
 	}, c.Tracing())

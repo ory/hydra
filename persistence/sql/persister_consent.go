@@ -455,6 +455,7 @@ func (p *Persister) FlushInactiveLoginConsentRequests(ctx context.Context, notAf
 	}
 
 	consent_challenges := []string{}
+	// Order by requested_at field to avoid full scan and use requested_at index
 	queryFormat := `
 	SELECT %[1]s.challenge
 	FROM %[1]s

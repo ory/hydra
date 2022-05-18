@@ -377,6 +377,7 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 	signatures := []string{}
 
 	// Select tokens' signatures with limit
+	// Order by requested_at field to avoid full scan and use requested_at index
 	q := p.Connection(ctx).RawQuery(
 		fmt.Sprintf("SELECT signature FROM %s WHERE requested_at < ? ORDER BY requested_at LIMIT %d",
 			OAuth2RequestSQL{Table: table}.TableName(), limit),

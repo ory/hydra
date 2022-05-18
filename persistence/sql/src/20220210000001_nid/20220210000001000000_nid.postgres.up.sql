@@ -21,6 +21,8 @@ UPDATE hydra_oauth2_access SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_access ALTER nid SET NOT NULL;
 --split
+ALTER TABLE hydra_oauth2_access ADD CONSTRAINT hydra_oauth2_access_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+--split
 DROP INDEX hydra_oauth2_access_requested_at_idx;
 DROP INDEX hydra_oauth2_access_client_id_idx;
 DROP INDEX hydra_oauth2_access_challenge_id_idx;
@@ -59,6 +61,8 @@ UPDATE hydra_oauth2_code SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_code ALTER nid SET NOT NULL;
 --split
+ALTER TABLE hydra_oauth2_code ADD CONSTRAINT hydra_oauth2_code_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+--split
 DROP INDEX hydra_oauth2_code_client_id_idx;
 DROP INDEX hydra_oauth2_code_challenge_id_idx;
 DROP INDEX hydra_oauth2_code_request_id_idx;
@@ -66,6 +70,7 @@ DROP INDEX hydra_oauth2_code_request_id_idx;
 CREATE INDEX hydra_oauth2_code_client_id_idx ON hydra_oauth2_code (client_id, nid);
 CREATE INDEX hydra_oauth2_code_challenge_id_idx ON hydra_oauth2_code (challenge_id, nid);
 CREATE INDEX hydra_oauth2_code_request_id_idx ON hydra_oauth2_code (request_id, nid);
+--split
 
 
 
@@ -76,6 +81,8 @@ ALTER TABLE "hydra_oauth2_flow" ADD CONSTRAINT "hydra_oauth2_flow_nid_fk_idx" FO
 UPDATE hydra_oauth2_flow SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_flow ALTER nid SET NOT NULL;
+--split
+ALTER TABLE hydra_oauth2_flow ADD CONSTRAINT hydra_oauth2_flow_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
 --split
 DROP INDEX hydra_oauth2_flow_client_id_subject_idx;
 DROP INDEX hydra_oauth2_flow_cid_idx;
@@ -90,6 +97,7 @@ CREATE INDEX hydra_oauth2_flow_login_session_id_idx ON hydra_oauth2_flow (login_
 CREATE INDEX hydra_oauth2_flow_sub_idx ON hydra_oauth2_flow (subject ASC, nid ASC);
 CREATE UNIQUE INDEX hydra_oauth2_flow_login_verifier_idx ON hydra_oauth2_flow (login_verifier ASC);
 CREATE UNIQUE INDEX hydra_oauth2_flow_consent_verifier_idx ON hydra_oauth2_flow (consent_verifier ASC);
+--split
 
 
 
@@ -117,13 +125,15 @@ UPDATE hydra_oauth2_logout_request SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_logout_request ALTER nid SET NOT NULL;
 --split
+ALTER TABLE hydra_oauth2_logout_request ADD CONSTRAINT hydra_oauth2_logout_request_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+--split
 DROP INDEX hydra_oauth2_logout_request_client_id_idx;
 --split
 CREATE INDEX hydra_oauth2_logout_request_client_id_idx ON hydra_oauth2_logout_request (client_id ASC, nid ASC);
-
-
-
 --split
+
+
+
 -- hydra_oauth2_obfuscated_authentication_session
 ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD COLUMN "nid" UUID;
 ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD CONSTRAINT hydra_oauth2_obfuscated_authentication_session_nid_fk_idx FOREIGN KEY ("nid") REFERENCES "networks" ("id") ON UPDATE RESTRICT ON DELETE CASCADE;
@@ -131,6 +141,8 @@ ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD CONSTRAINT hydra_
 UPDATE hydra_oauth2_obfuscated_authentication_session SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_obfuscated_authentication_session ALTER nid SET NOT NULL;
+--split
+ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD CONSTRAINT hydra_oauth2_obfuscated_authentication_session_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
 --split
 ALTER TABLE hydra_oauth2_obfuscated_authentication_session DROP CONSTRAINT "hydra_oauth2_obfuscated_authentication_session_pkey";
 ALTER TABLE hydra_oauth2_obfuscated_authentication_session ADD PRIMARY KEY (subject, client_id, nid);
@@ -149,6 +161,8 @@ ALTER TABLE "hydra_oauth2_oidc" ADD CONSTRAINT "hydra_oauth2_oidc_nid_fk_idx" FO
 UPDATE hydra_oauth2_oidc SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_oidc ALTER nid SET NOT NULL;
+--split
+ALTER TABLE hydra_oauth2_oidc ADD CONSTRAINT hydra_oauth2_oidc_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
 --split
 DROP INDEX hydra_oauth2_oidc_client_id_idx;
 DROP INDEX hydra_oauth2_oidc_challenge_id_idx;
@@ -169,6 +183,8 @@ UPDATE hydra_oauth2_pkce SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_pkce ALTER nid SET NOT NULL;
 --split
+ALTER TABLE hydra_oauth2_pkce ADD CONSTRAINT hydra_oauth2_pkce_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+--split
 DROP INDEX hydra_oauth2_pkce_client_id_idx;
 DROP INDEX hydra_oauth2_pkce_challenge_id_idx;
 DROP INDEX hydra_oauth2_pkce_request_id_idx;
@@ -188,6 +204,8 @@ UPDATE hydra_oauth2_refresh SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_refresh ALTER nid SET NOT NULL;
 --split
+ALTER TABLE hydra_oauth2_refresh ADD CONSTRAINT hydra_oauth2_refresh_client_id_fk FOREIGN KEY (client_id, nid) REFERENCES hydra_client(id, nid) ON DELETE CASCADE;
+--split
 DROP INDEX hydra_oauth2_refresh_client_id_idx;
 DROP INDEX hydra_oauth2_refresh_challenge_id_idx;
 DROP INDEX hydra_oauth2_refresh_client_id_subject_idx;
@@ -197,6 +215,7 @@ CREATE INDEX hydra_oauth2_refresh_client_id_idx ON hydra_oauth2_refresh (client_
 CREATE INDEX hydra_oauth2_refresh_challenge_id_idx ON hydra_oauth2_refresh (challenge_id ASC);
 CREATE INDEX hydra_oauth2_refresh_client_id_subject_idx ON hydra_oauth2_refresh (client_id ASC, subject ASC);
 CREATE INDEX hydra_oauth2_refresh_request_id_idx ON hydra_oauth2_refresh (request_id ASC);
+--split
 
 
 
@@ -209,8 +228,10 @@ UPDATE hydra_jwk SET nid = (SELECT id FROM networks LIMIT 1);
 ALTER TABLE hydra_jwk ALTER nid SET NOT NULL;
 --split
 CREATE UNIQUE INDEX hydra_jwk_sid_kid_nid_key ON hydra_jwk (sid ASC, kid ASC, nid ASC);
-
 --split
+
+
+
 -- hydra_oauth2_trusted_jwt_bearer_issuer
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ADD COLUMN "nid" UUID;
 --split
@@ -220,16 +241,17 @@ ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT hydra_oauth2_
 --split
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ADD CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issue_issuer_subject_key_id_key UNIQUE (issuer, subject, key_id, nid);
 --split
-
-ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issuer_key_set_fkey ;
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issuer_key_set_fkey;
 --split
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ADD CONSTRAINT hydra_oauth2_trusted_jwt_bearer_issuer_key_set_fkey FOREIGN KEY (key_set, key_id, nid) REFERENCES hydra_jwk(sid, kid, nid) ON DELETE CASCADE;
 --split
 UPDATE hydra_oauth2_trusted_jwt_bearer_issuer SET nid = (SELECT id FROM networks LIMIT 1);
 --split
 ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ALTER nid SET NOT NULL;
-
 --split
+
+
+
 DROP INDEX hydra_jwk_idx_id_uq;
 DROP INDEX hydra_oauth2_trusted_jwt_bearer_issuer_expires_at_idx;
 --split

@@ -181,7 +181,7 @@ func TestExcludeOpaquePrivateKeys(t *testing.T) {
 }
 
 func TestGetOrGenerateKeys(t *testing.T) {
-	reg := internal.NewMockedRegistry(t, nil)
+	reg := internal.NewMockedRegistry(t)
 	ctrl := gomock.NewController(t)
 	keyManager := NewMockManager(ctrl)
 	defer ctrl.Finish()

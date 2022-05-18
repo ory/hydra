@@ -332,10 +332,12 @@ func (p *Persister) CreateLoginSession(ctx context.Context, session *consent.Log
 }
 
 func (p *Persister) DeleteLoginSession(ctx context.Context, id string) error {
-	return sqlcon.HandleError(
-		p.Connection(ctx).Destroy(
-			&consent.LoginSession{ID: id},
-		))
+	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id=? AND nid = ?", id, p.NetworkID(ctx)).ExecWithCount()
+	if count == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
+	} else {
+		return sqlcon.HandleError(err)
+	}
 }
 
 func (p *Persister) FindGrantedAndRememberedConsentRequests(ctx context.Context, client, subject string) ([]consent.HandledConsentRequest, error) {

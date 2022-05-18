@@ -50,7 +50,7 @@ func TestSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeyIssuerURL, "https://www.ory.sh")
 	conf.MustSet(config.KeyAccessTokenLifespan, time.Minute)
-	reg := internal.NewRegistryMemory(t, conf, nil)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	router := x.NewRouterPublic()
 	h := NewHandler(reg, conf)

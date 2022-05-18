@@ -790,7 +790,7 @@ func (h *Handler) writeAuthorizeError(w http.ResponseWriter, r *http.Request, ar
 }
 
 func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error) {
-	rfcErr := fosite.ErrorToRFC6749Error(err).WithLegacyFormat(h.c.GetUseLegacyErrorFormat(r.Context())).WithExposeDebug(h.c.GetSendDebugMessagesToClients(r.Context()))
+	rfcErr := fosite.ErrorToRFC6749Error(err).WithExposeDebug(h.c.GetSendDebugMessagesToClients(r.Context()))
 	query := rfcErr.ToValues()
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(r.Context()), query).String(), http.StatusFound)
 }

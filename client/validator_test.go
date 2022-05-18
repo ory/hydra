@@ -21,6 +21,7 @@
 package client_test
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -34,6 +35,7 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 )
 
 func TestValidate(t *testing.T) {
@@ -41,7 +43,10 @@ func TestValidate(t *testing.T) {
 	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
 
-	v := NewValidator(c)
+	testCtx := context.TODO()
+
+	ctxer := &contextx.DefaultContextualizer{}
+	v := NewValidator(ctxer, c)
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)
@@ -111,7 +116,7 @@ func TestValidate(t *testing.T) {
 		{
 			v: func(t *testing.T) *Validator {
 				c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise"})
-				return NewValidator(c)
+				return NewValidator(ctxer, c)
 			},
 			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
@@ -135,7 +140,7 @@ func TestValidate(t *testing.T) {
 					return v
 				}
 			}
-			err := tc.v(t).Validate(tc.in)
+			err := tc.v(t).Validate(testCtx, tc.in)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {
@@ -155,7 +160,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()
 
-	v := NewValidatorWithClient(nil, ts.Client())
+	v := NewValidatorWithClient(&contextx.DefaultContextualizer{}, nil, ts.Client())
 
 	for k, tc := range []struct {
 		p         string
@@ -205,7 +210,8 @@ func TestValidateDynamicRegistration(t *testing.T) {
 	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
 
-	v := NewValidator(c)
+	testCtx := context.TODO()
+	v := NewValidator(&contextx.DefaultContextualizer{}, c)
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)
@@ -256,7 +262,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 					return v
 				}
 			}
-			err := tc.v(t).ValidateDynamicRegistration(tc.in)
+			err := tc.v(t).ValidateDynamicRegistration(testCtx, tc.in)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {

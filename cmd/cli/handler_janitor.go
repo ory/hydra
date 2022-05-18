@@ -75,6 +75,7 @@ func (_ *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func purge(cmd *cobra.Command, args []string) error {
+	ctx := context.TODO()
 	var d driver.Registry
 
 	co := []configx.OptionModifier{
@@ -112,7 +113,7 @@ func purge(cmd *cobra.Command, args []string) error {
 
 	d = driver.New(cmd.Context(), do...)
 
-	if len(d.Config().DSN()) == 0 {
+	if len(d.Config(ctx).DSN()) == 0 {
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),
 			"When using flag -e, environment variable DSN must be set.",
 			"When using flag -c, the dsn property should be set.")

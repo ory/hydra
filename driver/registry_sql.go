@@ -5,12 +5,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/ory/hydra/hsm"
+	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/x/errorsx"
+	"github.com/ory/x/networkx"
+	"github.com/ory/x/popx"
 
 	"github.com/luna-duclos/instrumentedsql"
 	"github.com/luna-duclos/instrumentedsql/opentracing"
@@ -67,7 +71,23 @@ func NewRegistrySQL() *RegistrySQL {
 	return r
 }
 
-func (m *RegistrySQL) Init(ctx context.Context) error {
+func (m *RegistrySQL) determineNetwork(c *pop.Connection, ctx context.Context) (*networkx.Network, error) {
+	mb, err := popx.NewMigrationBox(networkx.Migrations, popx.NewMigrator(c, m.Logger(), m.Tracer(ctx), 0))
+	if err != nil {
+		return nil, err
+	}
+	s, err := mb.Status(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if s.HasPending() {
+		return nil, errors.WithStack(errors.New("some migrations are pending"))
+	}
+
+	return networkx.NewManager(c, m.Logger(), m.Tracer(ctx)).Determine(ctx)
+}
+
+func (m *RegistrySQL) Init(ctx context.Context, defaultDefaultNID *uuid.UUID, skipNetworkInit bool, migrate bool) error {
 	if m.persister == nil {
 		var opts []instrumentedsql.Opt
 		if m.Tracer(ctx).IsLoaded() {
@@ -93,10 +113,12 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		if err := resilience.Retry(m.l, 5*time.Second, 5*time.Minute, c.Open); err != nil {
 			return errorsx.WithStack(err)
 		}
-		m.persister, err = sql.NewPersister(ctx, c, m, m.C, m.l)
+
+		p, err := sql.NewPersister(ctx, c, m, m.C, m.l)
 		if err != nil {
 			return err
 		}
+		m.persister = p
 		if err := m.initialPing(m); err != nil {
 			return err
 		}
@@ -117,10 +139,36 @@ func (m *RegistrySQL) Init(ctx context.Context) error {
 		if dbal.IsMemorySQLite(m.C.DSN()) {
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
-			if err := m.persister.MigrateUp(context.Background()); err != nil {
+			if err := p.MigrateUp(context.Background()); err != nil {
+				return err
+			}
+		} else if migrate {
+			if err := p.MigrateUp(context.Background()); err != nil {
 				return err
 			}
 		}
+
+		if !skipNetworkInit && defaultDefaultNID != nil {
+			m.persister = p.WithNetworkID(*defaultDefaultNID)
+		} else if !skipNetworkInit {
+			net, err := p.DetermineNetwork(ctx)
+			if err != nil {
+				m.Logger().WithError(err).Warnf("Unable to determine network, retrying.")
+				return err
+			}
+
+			m.persister = p.WithNetworkID(net.ID)
+		} else {
+			m.persister = p
+		}
+
+		if m.C.HsmEnabled() {
+			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext(), m.C)
+			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
+		} else {
+			m.defaultKeyManager = m.persister
+		}
+
 	}
 
 	return nil

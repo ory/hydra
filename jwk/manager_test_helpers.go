@@ -123,8 +123,11 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 	}
 }
 
-func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
+func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
+		if parallel {
+			t.Parallel()
+		}
 		_, err := m.GetKeySet(context.TODO(), algo+"foo")
 		require.Error(t, err)
 
@@ -154,8 +157,11 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 	}
 }
 
-func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string) func(t *testing.T) {
+func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel bool) func(t *testing.T) {
 	return func(t *testing.T) {
+		if parallel {
+			t.Parallel()
+		}
 		_, err := m.GetKeySet(context.TODO(), "foo")
 		require.Error(t, err)
 
@@ -180,6 +186,52 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string) func(t *te
 		require.NoError(t, err)
 
 		_, err = m.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+	}
+}
+
+func TestHelperManagerNIDIsolationKeySet(t1 Manager, t2 Manager, alg string) func(t *testing.T) {
+	return func(t *testing.T) {
+		_, err := t1.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+		_, err = t2.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		_, err = t1.GenerateAndPersistKeySet(context.TODO(), "foo", "bar", alg, "sig")
+		require.NoError(t, err)
+		keys, err := t1.GetKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+		_, err = t2.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		err = t2.DeleteKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+		err = t1.DeleteKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+		_, err = t1.GetKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		err = t1.AddKeySet(context.TODO(), "foo", keys)
+		require.NoError(t, err)
+		err = t2.DeleteKeySet(context.TODO(), "foo")
+		require.Error(t, err)
+
+		for i := range keys.Keys {
+			keys.Keys[i].Use = "enc"
+		}
+		err = t1.UpdateKeySet(context.TODO(), "foo", keys)
+		for i := range keys.Keys {
+			keys.Keys[i].Use = "err"
+		}
+		err = t2.UpdateKeySet(context.TODO(), "foo", keys)
+		require.Error(t, err)
+		updated, err := t1.GetKeySet(context.TODO(), "foo")
+		require.NoError(t, err)
+		for i := range updated.Keys {
+			assert.EqualValues(t, "enc", updated.Keys[i].Use)
+		}
+
+		err = t1.DeleteKeySet(context.TODO(), "foo")
 		require.Error(t, err)
 	}
 }

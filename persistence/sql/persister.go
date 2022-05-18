@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/gofrs/uuid"
 
 	"github.com/gobuffalo/x/randx"
 	"github.com/pkg/errors"
@@ -15,8 +16,10 @@ import (
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/persistence"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/networkx"
 	"github.com/ory/x/popx"
 )
 
@@ -37,11 +40,14 @@ type (
 		r      Dependencies
 		config *config.Provider
 		l      *logrusx.Logger
+		nid    uuid.UUID
+		p      *networkx.Manager
 	}
 	Dependencies interface {
 		ClientHasher() fosite.Hasher
 		KeyCipher() *jwk.AEAD
 		KeyGenerators() map[string]jwk.KeyGenerator
+		contextx.ContextualizerProvider
 		x.RegistryLogger
 		x.TracingProvider
 	}
@@ -97,7 +103,17 @@ func NewPersister(ctx context.Context, c *pop.Connection, r Dependencies, config
 		r:      r,
 		config: config,
 		l:      l,
+		p:      networkx.NewManager(c, r.Logger(), r.Tracer(ctx)),
 	}, nil
+}
+
+func (p *Persister) DetermineNetwork(ctx context.Context) (*networkx.Network, error) {
+	return p.p.Determine(ctx)
+}
+
+func (p Persister) WithNetworkID(nid uuid.UUID) persistence.Persister {
+	p.nid = nid
+	return &p
 }
 
 func (p *Persister) Connection(ctx context.Context) *pop.Connection {

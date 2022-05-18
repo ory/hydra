@@ -79,7 +79,7 @@ func countAccessTokens(t *testing.T, c *pop.Connection) int {
 
 func TestRevoke(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf, nil)
+	reg := internal.NewRegistryMemory(t, conf)
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

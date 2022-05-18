@@ -86,7 +86,7 @@ func (p *Persister) AddKeySet(ctx context.Context, set string, keys *jose.JSONWe
 
 func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil {
+		if err := p.DeleteKey(ctx, set, key.KeyID); err != nil && errorsx.Cause(err) != x.ErrNotFound {
 			return err
 		}
 		if err := p.AddKey(ctx, set, key); err != nil {
@@ -98,7 +98,7 @@ func (p *Persister) UpdateKey(ctx context.Context, set string, key *jose.JSONWeb
 
 func (p *Persister) UpdateKeySet(ctx context.Context, set string, keySet *jose.JSONWebKeySet) error {
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		if err := p.DeleteKeySet(ctx, set); err != nil {
+		if err := p.DeleteKeySet(ctx, set); err != nil && errorsx.Cause(err) != x.ErrNotFound {
 			return err
 		}
 		if err := p.AddKeySet(ctx, set, keySet); err != nil {
@@ -167,9 +167,19 @@ func (p *Persister) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKey
 }
 
 func (p *Persister) DeleteKey(ctx context.Context, set, kid string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND kid=? AND nid = ?", set, kid, p.NetworkID(ctx)).Exec())
+	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND kid=? AND nid = ?", set, kid, p.NetworkID(ctx)).ExecWithCount()
+	if count == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
+	} else {
+		return sqlcon.HandleError(err)
+	}
 }
 
 func (p *Persister) DeleteKeySet(ctx context.Context, set string) error {
-	return sqlcon.HandleError(p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND nid = ?", set, p.NetworkID(ctx)).Exec())
+	count, err := p.Connection(ctx).RawQuery("DELETE FROM hydra_jwk WHERE sid=? AND nid = ?", set, p.NetworkID(ctx)).ExecWithCount()
+	if count == 0 {
+		return errorsx.WithStack(x.ErrNotFound)
+	} else {
+		return sqlcon.HandleError(err)
+	}
 }

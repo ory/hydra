@@ -4,13 +4,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	"github.com/instana/testify/require"
 
 	"github.com/ory/hydra/flow"
+	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/x/sqlxx"
 )
 
 func fixturizeFlow(t *testing.T, f *flow.Flow) {
+	testhelpersuuid.AssertUUID(t, &f.NID)
+	f.NID = uuid.Nil
 	require.NotZero(t, f.ClientID)
 	f.ClientID = ""
 	require.NotNil(t, f.Client)

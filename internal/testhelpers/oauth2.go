@@ -51,12 +51,12 @@ func NewIDTokenWithClaims(t *testing.T, reg driver.Registry, claims djwt.MapClai
 	return token
 }
 
-func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
+func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (publicTS, adminTS *httptest.Server) {
 	// Lifespan is two seconds to avoid time synchronization issues with SQL.
-	reg.Config().MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
-	reg.Config().MustSet(config.KeyAccessTokenLifespan, time.Second*2)
-	reg.Config().MustSet(config.KeyRefreshTokenLifespan, time.Second*3)
-	reg.Config().MustSet(config.KeyScopeStrategy, "exact")
+	reg.Config(ctx).MustSet(config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
+	reg.Config(ctx).MustSet(config.KeyAccessTokenLifespan, time.Second*2)
+	reg.Config(ctx).MustSet(config.KeyRefreshTokenLifespan, time.Second*3)
+	reg.Config(ctx).MustSet(config.KeyScopeStrategy, "exact")
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()
 
@@ -66,13 +66,13 @@ func NewOAuth2Server(t *testing.T, reg driver.Registry) (publicTS, adminTS *http
 	adminTS = httptest.NewServer(admin)
 	t.Cleanup(adminTS.Close)
 
-	reg.Config().MustSet(config.KeyIssuerURL, publicTS.URL)
+	reg.Config(ctx).MustSet(config.KeyIssuerURL, publicTS.URL)
 	// SendDebugMessagesToClients: true,
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
-	reg.RegisterRoutes(admin, public)
+	reg.RegisterRoutes(ctx, admin, public)
 	return publicTS, adminTS
 }
 

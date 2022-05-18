@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ory/hydra/oauth2/trust"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/hydra/x/oauth2cors"
 
 	"github.com/ory/hydra/persistence"
@@ -43,6 +44,10 @@ import (
 	"github.com/ory/hydra/x"
 )
 
+var (
+	_ contextx.ContextualizerProvider = (*RegistryBase)(nil)
+)
+
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
@@ -53,6 +58,7 @@ type RegistryBase struct {
 	jwtGrantV    *trust.GrantValidator
 	kh           *jwk.Handler
 	cv           *client.Validator
+	ctxer        contextx.Contextualizer
 	hh           *healthx.Handler
 	kg           map[string]jwk.KeyGenerator
 	kc           *jwk.AEAD
@@ -83,6 +89,18 @@ type RegistryBase struct {
 	persister    persistence.Persister
 }
 
+func (m *RegistryBase) WithContextualizer(ctxer contextx.Contextualizer) Registry {
+	m.ctxer = ctxer
+	return m.r
+}
+
+func (m *RegistryBase) Contextualizer() contextx.Contextualizer {
+	if m.ctxer == nil {
+		m.ctxer = &contextx.DefaultContextualizer{}
+	}
+	return m.ctxer
+}
+
 func (m *RegistryBase) with(r Registry) *RegistryBase {
 	m.r = r
 	return m
@@ -95,14 +113,14 @@ func (m *RegistryBase) WithBuildInfo(version, hash, date string) Registry {
 	return m.r
 }
 
-func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler {
+func (m *RegistryBase) OAuth2AwareMiddleware(ctx context.Context) func(h http.Handler) http.Handler {
 	if m.oa2mw == nil {
-		m.oa2mw = oauth2cors.Middleware(m.r)
+		m.oa2mw = oauth2cors.Middleware(ctx, m.r)
 	}
 	return m.oa2mw
 }
 
-func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
+func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 
@@ -111,9 +129,9 @@ func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPubl
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 
 	m.ConsentHandler().SetRoutes(admin)
-	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
-	m.ClientHandler().SetRoutes(admin, public)
-	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware())
+	m.KeyHandler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
+	m.ClientHandler().SetRoutes(ctx, admin, public)
+	m.OAuth2Handler().SetRoutes(admin, public, m.OAuth2AwareMiddleware(ctx))
 	m.JWTGrantHandler().SetRoutes(admin)
 }
 
@@ -186,9 +204,9 @@ func (m *RegistryBase) ClientHandler() *client.Handler {
 	return m.ch
 }
 
-func (m *RegistryBase) ClientValidator() *client.Validator {
+func (m *RegistryBase) ClientValidator(ctx context.Context) *client.Validator {
 	if m.cv == nil {
-		m.cv = client.NewValidator(m.C)
+		m.cv = client.NewValidator(m.Contextualizer(), m.C)
 	}
 	return m.cv
 }
@@ -489,8 +507,8 @@ func (m *RegistryBase) Persister() persistence.Persister {
 	return m.persister
 }
 
-func (m *RegistryBase) Config() *config.Provider {
-	return m.C
+func (m *RegistryBase) Config(ctx context.Context) *config.Provider {
+	return m.Contextualizer().Config(ctx, m.C)
 }
 
 // WithOAuth2Provider forces an oauth2 provider which is only used for testing.

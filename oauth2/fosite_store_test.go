@@ -25,6 +25,7 @@ import (
 	"flag"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
@@ -44,16 +45,16 @@ func TestMain(m *testing.M) {
 
 var registries = make(map[string]driver.Registry)
 var cleanRegistries = func(t *testing.T) {
-	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults())
+	registries["memory"] = internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), nil)
 }
 
 // returns clean registries that can safely be used for one test
 // to reuse call cleanRegistries
-func setupRegistries(t *testing.T) {
+func setupRegistries(t *testing.T, nid uuid.UUID) {
 	if len(registries) == 0 && !testing.Short() {
 		// first time called and sql tests
 		var cleanSQL func(*testing.T)
-		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t)
+		registries["postgres"], registries["mysql"], registries["cockroach"], cleanSQL = internal.ConnectDatabases(t, nil)
 		cleanMem := cleanRegistries
 		cleanMem(t)
 		cleanRegistries = func(t *testing.T) {
@@ -67,6 +68,7 @@ func setupRegistries(t *testing.T) {
 }
 
 func TestManagers(t *testing.T) {
+	ctx := context.TODO()
 	tests := []struct {
 		name                   string
 		enableSessionEncrypted bool
@@ -81,12 +83,13 @@ func TestManagers(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
+		nid := uuid.Must(uuid.NewV4())
 		t.Run(tc.name, func(t *testing.T) {
-			setupRegistries(t)
+			setupRegistries(t, nid)
 			require.NoError(t, registries["memory"].ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foobar"})) // this is a workaround because the client is not being created for memory store by test helpers.
 
 			for k, store := range registries {
-				store.Config().MustSet(config.KeyEncryptSessionData, tc.enableSessionEncrypted)
+				store.Config(ctx).MustSet(config.KeyEncryptSessionData, tc.enableSessionEncrypted)
 				TestHelperRunner(t, store, k)
 			}
 		})

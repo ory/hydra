@@ -109,11 +109,11 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 
 func TestManagersNextGen(t *testing.T) {
 	regs := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true, &contextx.DefaultContextualizer{}),
 	}
 
 	if !testing.Short() {
-		regs["postgres"], regs["mysql"], regs["cockroach"], _ = internal.ConnectDatabases(t, true)
+		regs["postgres"], regs["mysql"], regs["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.DefaultContextualizer{})
 	}
 
 	ctx := context.Background()
@@ -142,29 +142,29 @@ func TestManagersNextGen(t *testing.T) {
 func TestManagers(t *testing.T) {
 	ctx := context.TODO()
 	t1registries := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, true, &contextx.DefaultContextualizer{}),
 	}
 
 	tenant2NID, _ := uuid.NewV4()
 	t2registries := map[string]driver.Registry{
-		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, false),
+		"memory": internal.NewRegistrySQLFromURL(t, dbal.SQLiteSharedInMemory, false, &contextx.DefaultContextualizer{}),
 	}
 
 	if !testing.Short() {
-		t1registries["postgres"], t1registries["mysql"], t1registries["cockroach"], _ = internal.ConnectDatabases(t, true)
-		t2registries["postgres"], t2registries["mysql"], t2registries["cockroach"], _ = internal.ConnectDatabases(t, false)
+		t1registries["postgres"], t1registries["mysql"], t1registries["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.DefaultContextualizer{})
+		t2registries["postgres"], t2registries["mysql"], t2registries["cockroach"], _ = internal.ConnectDatabases(t, false, &contextx.DefaultContextualizer{})
 	}
 
 	for k, t1 := range t1registries {
 		t2 := t2registries[k]
 		require.NoError(t, t2.Persister().Connection(ctx).Create(&networkx.Network{ID: tenant2NID}))
-		t2.WithContextualizer(&contextx.StaticContextualizer{NID: tenant2NID})
+		t2.WithContextualizer(&contextx.StaticContextualizer{NID: tenant2NID, C: t2.Config(ctx)})
 		t.Run("parallel-boundary", func(t *testing.T) { testRegistry(t, ctx, k, t1, t2) })
 	}
 
 	for k, t1 := range t1registries {
 		t2 := t2registries[k]
-		t2.WithContextualizer(&contextx.StaticContextualizer{NID: uuid.Nil})
+		t2.WithContextualizer(&contextx.StaticContextualizer{NID: uuid.Nil, C: t2.Config(ctx)})
 
 		t.Run("package=jwk/manager="+k+"/case=nid",
 			jwk.TestHelperNID(t1.KeyManager(), t2.KeyManager()),

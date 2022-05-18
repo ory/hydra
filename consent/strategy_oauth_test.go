@@ -22,6 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/urlx"
@@ -36,7 +37,7 @@ import (
 
 func TestStrategyLoginConsentNext(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t)
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
 	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
 	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)
 	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)

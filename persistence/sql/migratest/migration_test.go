@@ -25,6 +25,7 @@ import (
 	"github.com/ory/hydra/internal"
 	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/x/popx"
 
@@ -59,7 +60,7 @@ func TestMigrations(t *testing.T) {
 	connections := make(map[string]*pop.Connection, 1)
 
 	if testing.Short() {
-		reg := internal.NewMockedRegistry(t)
+		reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
 		reg.Persister().MigrateUp(context.Background())
 		c := reg.Persister().Connection(context.Background())
 		connections["sqlite"] = c

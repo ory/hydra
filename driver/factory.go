@@ -8,6 +8,7 @@ import (
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x/contextx"
 )
 
 type options struct {
@@ -75,12 +76,12 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		config.MustValidate(l, c)
 	}
 
-	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false)
+	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, &contextx.DefaultContextualizer{})
 	if err != nil {
 		l.WithError(err).Fatal("Unable to create service registry.")
 	}
 
-	if err = r.Init(ctx, o.skipNetworkInit, false); err != nil {
+	if err = r.Init(ctx, o.skipNetworkInit, false, &contextx.DefaultContextualizer{}); err != nil {
 		l.WithError(err).Fatal("Unable to initialize service registry.")
 	}
 

@@ -25,8 +25,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ory/hydra/driver/config"
-
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/x/stringslice"
@@ -44,11 +42,10 @@ const (
 
 type Handler struct {
 	r InternalRegistry
-	c *config.Provider
 }
 
-func NewHandler(r InternalRegistry, c *config.Provider) *Handler {
-	return &Handler{r: r, c: c}
+func NewHandler(r InternalRegistry) *Handler {
+	return &Handler{r: r}
 }
 
 func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
@@ -89,7 +86,7 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
-	for _, set := range stringslice.Unique(h.c.WellKnownKeys()) {
+	for _, set := range stringslice.Unique(h.r.Config(r.Context()).WellKnownKeys()) {
 		keys, err := h.r.KeyManager().GetKeySet(r.Context(), set)
 		if err != nil {
 			h.r.Writer().WriteError(w, r, err)

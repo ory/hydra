@@ -33,6 +33,7 @@ import (
 	"gopkg.in/square/go-jose.v2/cryptosigner"
 
 	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -45,7 +46,7 @@ import (
 
 func TestRS256JWTStrategy(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 	m := reg.KeyManager()
 
 	_, err := m.GenerateAndPersistKeySet(context.TODO(), "foo-set", "foo", "RS256", "sig")

@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/driver"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/hydra/x/oauth2cors"
 
 	"github.com/ory/hydra/x"
@@ -44,7 +45,7 @@ import (
 
 func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 	ctx := context.TODO()
-	r := internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults())
+	r := internal.NewRegistryMemory(t, internal.NewConfigurationWithDefaults(), &contextx.DefaultContextualizer{})
 	token, signature, _ := r.OAuth2HMACStrategy().GenerateAccessToken(nil, nil)
 	for k, tc := range []struct {
 		prep         func(*testing.T, driver.Registry)
@@ -261,7 +262,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 			}
 
 			res := httptest.NewRecorder()
-			oauth2cors.Middleware(ctx, r)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			oauth2cors.Middleware(r)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusNotImplemented)
 			})).ServeHTTP(res, req)
 			require.NoError(t, err)

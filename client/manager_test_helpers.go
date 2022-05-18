@@ -132,6 +132,7 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 		t.Run(fmt.Sprintf("nid=%s", nid), func(t *testing.T) {
 			var client Client
 			require.NoError(t, faker.FakeData(&client))
+			client.CreatedAt = time.Now()
 
 			t.Run("lifecycle=does not exist", func(t *testing.T) {
 				_, err := m.GetClient(ctx, "1234")

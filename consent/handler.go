@@ -218,7 +218,7 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
+	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/sqlcon/dockertest"
 
 	"github.com/ory/hydra/driver"
@@ -42,23 +43,23 @@ func NewConfigurationWithDefaultsAndHTTPS() *config.Provider {
 	return p
 }
 
-func NewRegistryMemory(t *testing.T, c *config.Provider) driver.Registry {
-	return newRegistryDefault(t, "memory", c, true)
+func NewRegistryMemory(t *testing.T, c *config.Provider, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, "memory", c, true, ctxer)
 }
 
-func NewMockedRegistry(t *testing.T) driver.Registry {
-	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), true)
+func NewMockedRegistry(t *testing.T, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, "memory", NewConfigurationWithDefaults(), true, ctxer)
 }
 
-func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool) driver.Registry {
-	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate)
+func NewRegistrySQLFromURL(t *testing.T, url string, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
+	return newRegistryDefault(t, url, NewConfigurationWithDefaults(), migrate, ctxer)
 }
 
-func newRegistryDefault(t *testing.T, url string, c *config.Provider, migrate bool) driver.Registry {
+func newRegistryDefault(t *testing.T, url string, c *config.Provider, migrate bool, ctxer contextx.Contextualizer) driver.Registry {
 	c.MustSet(config.KeyLogLevel, "trace")
 	c.MustSet(config.KeyDSN, url)
 
-	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"), false, migrate)
+	r, err := driver.NewRegistryFromDSN(context.Background(), c, logrusx.New("test_hydra", "master"), false, migrate, ctxer)
 	require.NoError(t, err)
 
 	kg := map[string]jwk.KeyGenerator{
@@ -115,7 +116,7 @@ func ConnectToCRDB(t *testing.T) string {
 	return url
 }
 
-func ConnectDatabases(t *testing.T, migrate bool) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
+func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
 	var pgURL, mysqlURL, crdbURL string
 	wg := sync.WaitGroup{}
 
@@ -139,9 +140,9 @@ func ConnectDatabases(t *testing.T, migrate bool) (pg, mysql, crdb driver.Regist
 	wg.Wait()
 	t.Log("done waiting")
 
-	pg = NewRegistrySQLFromURL(t, pgURL, migrate)
-	mysql = NewRegistrySQLFromURL(t, mysqlURL, migrate)
-	crdb = NewRegistrySQLFromURL(t, crdbURL, migrate)
+	pg = NewRegistrySQLFromURL(t, pgURL, migrate, ctxer)
+	mysql = NewRegistrySQLFromURL(t, mysqlURL, migrate, ctxer)
+	crdb = NewRegistrySQLFromURL(t, crdbURL, migrate, ctxer)
 	dbs := []driver.Registry{pg, mysql, crdb}
 
 	clean = func(t *testing.T) {

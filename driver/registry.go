@@ -35,7 +35,7 @@ import (
 type Registry interface {
 	dbal.Driver
 
-	Init(ctx context.Context, skipNetworkInit bool, migrate bool) error
+	Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error
 
 	WithBuildInfo(v, h, d string) Registry
 	WithConfig(c *config.Provider) Registry
@@ -56,7 +56,7 @@ type Registry interface {
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
 
-	RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic)
+	RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler
@@ -69,12 +69,12 @@ type Registry interface {
 	WithHsmContext(h hsm.Context)
 }
 
-func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, skipNetworkInit bool, migrate bool) (Registry, error) {
+func NewRegistryFromDSN(ctx context.Context, c *config.Provider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
 	registry, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
 		return nil, err
 	}
-	if err := registry.Init(ctx, skipNetworkInit, migrate); err != nil {
+	if err := registry.Init(ctx, skipNetworkInit, migrate, ctxer); err != nil {
 		return nil, err
 	}
 	return registry, nil
@@ -100,7 +100,7 @@ func CallRegistry(ctx context.Context, r Registry) {
 	r.ClientHasher()
 	r.ConsentManager()
 	r.ConsentStrategy()
-	r.SubjectIdentifierAlgorithm()
+	r.SubjectIdentifierAlgorithm(ctx)
 	r.KeyManager()
 	r.KeyGenerators()
 	r.KeyCipher()

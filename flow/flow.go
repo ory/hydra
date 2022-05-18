@@ -442,11 +442,6 @@ func (_ Flow) TableName() string {
 	return "hydra_oauth2_flow"
 }
 
-// FindByConsentChallengeID retrieves a flow given its consent challenge ID.
-func (f *Flow) FindByConsentChallengeID(c *pop.Connection, id string, nid uuid.UUID) error {
-	return c.Where("consent_challenge_id = ? AND nid = ?", id, nid).First(f)
-}
-
 func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	if f.Client != nil {
 		f.ClientID = f.Client.OutfacingID
@@ -462,7 +457,7 @@ func (f *Flow) BeforeSave(_ *pop.Connection) error {
 func (f *Flow) AfterFind(c *pop.Connection) error {
 	f.AfterSave(c)
 	f.Client = &client.Client{}
-	return sqlcon.HandleError(c.Where("id = ?", f.ClientID).First(f.Client))
+	return sqlcon.HandleError(c.Where("id = ? AND nid = ?", f.ClientID, f.NID).First(f.Client))
 }
 
 func (f *Flow) AfterSave(c *pop.Connection) {

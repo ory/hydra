@@ -96,6 +96,7 @@ format: .bin/goimports node_modules
 .PHONY: mocks
 mocks: .bin/mockgen
 		mockgen -package oauth2_test -destination oauth2/oauth2_provider_mock_test.go github.com/ory/fosite OAuth2Provider
+		mockgen -package jwk_test -destination jwk/registry_mock_test.go -source=jwk/registry.go
 
 # Generates the SDKs
 .PHONY: sdk

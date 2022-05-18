@@ -21,6 +21,7 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/oauth2/trust"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/logrusx"
 
 	"github.com/ory/x/sqlxx"
@@ -83,7 +84,7 @@ func (j *JanitorConsentTestHelper) GetNotAfterTestCycles() map[string]time.Durat
 
 func (j *JanitorConsentTestHelper) GetRegistry(ctx context.Context, dbname string) (driver.Registry, error) {
 	j.conf.MustSet(config.KeyDSN, fmt.Sprintf("sqlite://file:%s?mode=memory&_fk=true&cache=shared", dbname))
-	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), false, true)
+	return driver.NewRegistryFromDSN(ctx, j.conf, logrusx.New("test_hydra", "master"), false, true, &contextx.DefaultContextualizer{})
 }
 
 func (j *JanitorConsentTestHelper) AccessTokenNotAfterSetup(ctx context.Context, cl client.Manager, store x.FositeStorer) func(t *testing.T) {

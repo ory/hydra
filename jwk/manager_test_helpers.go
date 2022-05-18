@@ -246,7 +246,7 @@ func TestHelperNID(t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) 
 		require.NoError(t, t1ValidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))
 		require.Error(t, t2InvalidNID.AddKeySet(ctx, "2022-03-11-ks-1", jwks))
 		require.NoError(t, t1ValidNID.AddKeySet(ctx, "2022-03-11-ks-1", jwks))
-		require.Error(t, t2InvalidNID.DeleteKey(ctx, "2022-03-11-ks-1", jwks.Keys[0].KeyID))
+		require.NoError(t, t2InvalidNID.DeleteKey(ctx, "2022-03-11-ks-1", jwks.Keys[0].KeyID)) // Delete doesn't report error if key doesn't exist
 		require.NoError(t, t1ValidNID.DeleteKey(ctx, "2022-03-11-ks-1", jwks.Keys[0].KeyID))
 		_, err = t2InvalidNID.GenerateAndPersistKeySet(ctx, "2022-03-11-ks-2", "2022-03-11-ks-2-kid", "RS256", "sig")
 		require.Error(t, err)
@@ -269,7 +269,7 @@ func TestHelperNID(t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) 
 		gks2.Keys[1].Use = "enc"
 		require.Error(t, t2InvalidNID.UpdateKeySet(ctx, "2022-03-11-ks-2", gks2))
 		require.NoError(t, t1ValidNID.UpdateKeySet(ctx, "2022-03-11-ks-2", gks2))
-		require.Error(t, t2InvalidNID.DeleteKeySet(ctx, "2022-03-11-ks-2"))
+		require.NoError(t, t2InvalidNID.DeleteKeySet(ctx, "2022-03-11-ks-2"))
 		require.NoError(t, t1ValidNID.DeleteKeySet(ctx, "2022-03-11-ks-2"))
 	}
 }

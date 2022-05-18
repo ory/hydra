@@ -26,13 +26,14 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/ioutilx"
 	"github.com/ory/x/urlx"
 )
 
 func TestLogoutFlows(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t)
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
 	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
 	reg.Config(ctx).MustSet(config.KeyConsentRequestMaxAge, time.Hour)
 

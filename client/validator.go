@@ -32,8 +32,6 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/ory/hydra/driver/config"
-	"github.com/ory/hydra/x/contextx"
 	"github.com/ory/x/stringslice"
 	"github.com/ory/x/stringsx"
 )
@@ -53,24 +51,21 @@ var (
 )
 
 type Validator struct {
-	c              *http.Client
-	contextualizer contextx.Contextualizer
-	defaultConf    *config.Provider
+	c *http.Client
+	r Registry
 }
 
-func NewValidator(contextualizerProvider contextx.Contextualizer, defaultConf *config.Provider) *Validator {
+func NewValidator(registry Registry) *Validator {
 	return &Validator{
-		c:              http.DefaultClient,
-		contextualizer: contextualizerProvider,
-		defaultConf:    defaultConf,
+		c: http.DefaultClient,
+		r: registry,
 	}
 }
 
-func NewValidatorWithClient(contextualizer contextx.Contextualizer, defaultConf *config.Provider, client *http.Client) *Validator {
+func NewValidatorWithClient(registry Registry, client *http.Client) *Validator {
 	return &Validator{
-		c:              client,
-		contextualizer: contextualizer,
-		defaultConf:    defaultConf,
+		c: client,
+		r: registry,
 	}
 }
 
@@ -98,7 +93,7 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if len(c.Scope) == 0 {
-		c.Scope = strings.Join(v.contextualizer.Config(ctx, v.defaultConf).DefaultClientScope(), " ")
+		c.Scope = strings.Join(v.r.Config(ctx).DefaultClientScope(), " ")
 	}
 
 	for k, origin := range c.AllowedCORSOrigins {
@@ -154,14 +149,14 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	}
 
 	if c.SubjectType != "" {
-		if !stringslice.Has(v.contextualizer.Config(ctx, v.defaultConf).SubjectTypesSupported(), c.SubjectType) {
-			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.contextualizer.Config(ctx, v.defaultConf).SubjectTypesSupported()))
+		if !stringslice.Has(v.r.Config(ctx).SubjectTypesSupported(), c.SubjectType) {
+			return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Subject type %s is not supported by server, only %v are allowed.", c.SubjectType, v.r.Config(ctx).SubjectTypesSupported()))
 		}
 	} else {
-		if stringslice.Has(v.contextualizer.Config(ctx, v.defaultConf).SubjectTypesSupported(), "public") {
+		if stringslice.Has(v.r.Config(ctx).SubjectTypesSupported(), "public") {
 			c.SubjectType = "public"
 		} else {
-			c.SubjectType = v.contextualizer.Config(ctx, v.defaultConf).SubjectTypesSupported()[0]
+			c.SubjectType = v.r.Config(ctx).SubjectTypesSupported()[0]
 		}
 	}
 

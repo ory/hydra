@@ -16,11 +16,12 @@ import (
 
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 )
 
 func TestImportJSONWebKey(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 	router := x.NewRouterPublic()
 
 	if conf.HsmEnabled() {

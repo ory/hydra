@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ory/hydra/hsm"
+	"github.com/ory/hydra/x/contextx"
 	"github.com/pkg/errors"
 
 	"github.com/gobuffalo/pop/v6"
@@ -86,8 +87,9 @@ func (m *RegistrySQL) determineNetwork(c *pop.Connection, ctx context.Context) (
 	return networkx.NewManager(c, m.Logger(), m.Tracer(ctx)).Determine(ctx)
 }
 
-func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bool) error {
+func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) error {
 	if m.persister == nil {
+		m.WithContextualizer(ctxer)
 		var opts []instrumentedsql.Opt
 		if m.Tracer(ctx).IsLoaded() {
 			opts = []instrumentedsql.Opt{
@@ -96,7 +98,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		}
 
 		// new db connection
-		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.C.DSN())
+		pool, idlePool, connMaxLifetime, connMaxIdleTime, cleanedDSN := sqlcon.ParseConnectionOptions(m.l, m.Config(ctx).DSN())
 		c, err := pop.NewConnection(&pop.ConnectionDetails{
 			URL:                       sqlcon.FinalizeDSN(m.l, cleanedDSN),
 			IdlePool:                  idlePool,
@@ -113,7 +115,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 			return errorsx.WithStack(err)
 		}
 
-		p, err := sql.NewPersister(ctx, c, m, m.C, m.l)
+		p, err := sql.NewPersister(ctx, c, m, m.Config(ctx), m.l)
 		if err != nil {
 			return err
 		}
@@ -135,7 +137,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		// - shared connection
 		// - shared but unique in the same process
 		// see: https://sqlite.org/inmemorydb.html
-		if dbal.IsMemorySQLite(m.C.DSN()) {
+		if dbal.IsMemorySQLite(m.Config(ctx).DSN()) {
 			m.Logger().Print("Hydra is running migrations on every startup as DSN is memory.\n")
 			m.Logger().Print("This means your data is lost when Hydra terminates.\n")
 			if err := p.MigrateUp(context.Background()); err != nil {
@@ -156,7 +158,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 				return err
 			}
 
-			m.persister = p.WithNetworkID(net.ID)
+			m.persister = p.WithFallbackNetworkID(net.ID)
 		}
 
 		if m.C.HsmEnabled() {

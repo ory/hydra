@@ -178,10 +178,7 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 
 func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
 	// delete expired
-	c := p.Connection(ctx)
-	nid := p.NetworkID(ctx)
-	/* #nosec G201 table is static */
-	if err := c.RawQuery(fmt.Sprintf("DELETE FROM %s WHERE expires_at < CURRENT_TIMESTAMP AND nid = ?", oauth2.BlacklistedJTI{}.TableName()), nid).Exec(); err != nil {
+	if err := p.QueryWithNetwork(ctx).Where("expires_at < CURRENT_TIMESTAMP").Delete(&oauth2.BlacklistedJTI{}); err != nil {
 		return sqlcon.HandleError(err)
 	}
 
@@ -198,12 +195,11 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 
 func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
 	jti := oauth2.NewBlacklistedJTI(j, time.Time{})
-	return jti, sqlcon.HandleError(p.Connection(ctx).Find(jti, jti.ID))
+	return jti, sqlcon.HandleError(p.QueryWithNetwork(ctx).Find(jti, jti.ID))
 }
 
 func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
-	jti.NID = p.NetworkID(ctx)
-	return sqlcon.HandleError(p.Connection(ctx).Create(jti))
+	return sqlcon.HandleError(p.CreateWithNetwork(ctx, jti))
 }
 
 func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
@@ -212,9 +208,7 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 		return err
 	}
 
-	req.NID = p.NetworkID(ctx)
-
-	if err := sqlcon.HandleError(p.Connection(ctx).Create(req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
+	if err := sqlcon.HandleError(p.CreateWithNetwork(ctx, req)); errors.Is(err, sqlcon.ErrConcurrentUpdate) {
 		return errors.Wrap(fosite.ErrSerializationFailure, err.Error())
 	} else if err != nil {
 		return err
@@ -229,7 +223,7 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 	var fr fosite.Requester
 
 	return fr, p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
-		err := p.Connection(ctx).Where("signature = ? AND nid = ?", rawSignature, p.NetworkID(ctx)).First(&r)
+		err := p.QueryWithNetwork(ctx).Where("signature = ?", rawSignature).First(&r)
 		if errors.Is(err, sql.ErrNoRows) {
 			return errorsx.WithStack(fosite.ErrNotFound)
 		} else if err != nil {
@@ -255,18 +249,16 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(fmt.Sprintf("DELETE FROM %s WHERE signature=? AND nid = ?", OAuth2RequestSQL{Table: table}.TableName()), signature, p.NetworkID(ctx)).
-			Exec())
+		p.QueryWithNetwork(ctx).
+			Where("signature=?", signature).
+			Delete(&OAuth2RequestSQL{Table: table}))
 }
 
 func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) error {
 	/* #nosec G201 table is static */
-	if err := p.Connection(ctx).RawQuery(
-		fmt.Sprintf("DELETE FROM %s WHERE request_id=? AND nid = ?", OAuth2RequestSQL{Table: table}.TableName()),
-		id,
-		p.NetworkID(ctx),
-	).Exec(); errors.Is(err, sql.ErrNoRows) {
+	if err := p.QueryWithNetwork(ctx).
+		Where("request_id=?", id).
+		Delete(&OAuth2RequestSQL{Table: table}); errors.Is(err, sql.ErrNoRows) {
 		return errorsx.WithStack(fosite.ErrNotFound)
 	} else if err := sqlcon.HandleError(err); err != nil {
 		if errors.Is(err, sqlcon.ErrConcurrentUpdate) {
@@ -405,11 +397,7 @@ func (p *Persister) flushInactiveTokens(ctx context.Context, notAfter time.Time,
 		}
 
 		if i != j {
-			err = p.Connection(ctx).RawQuery(
-				fmt.Sprintf("DELETE FROM %s WHERE signature in (?) AND nid = ?", OAuth2RequestSQL{Table: table}.TableName()),
-				signatures[i:j],
-				p.NetworkID(ctx),
-			).Exec()
+			err = p.QueryWithNetwork(ctx).Where("signature in (?)", signatures[i:j]).Delete(&OAuth2RequestSQL{Table: table})
 			if err != nil {
 				return sqlcon.HandleError(err)
 			}
@@ -429,12 +417,6 @@ func (p *Persister) FlushInactiveRefreshTokens(ctx context.Context, notAfter tim
 func (p *Persister) DeleteAccessTokens(ctx context.Context, clientID string) error {
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
-		p.Connection(ctx).
-			RawQuery(
-				fmt.Sprintf("DELETE FROM %s WHERE client_id=? AND nid = ?", OAuth2RequestSQL{Table: sqlTableAccess}.TableName()),
-				clientID,
-				p.NetworkID(ctx),
-			).
-			Exec(),
+		p.QueryWithNetwork(ctx).Where("client_id=?", clientID).Delete(&OAuth2RequestSQL{Table: sqlTableAccess}),
 	)
 }

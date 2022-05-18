@@ -31,6 +31,7 @@ import (
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/persistence/sql"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/internal/httpclient/client/public"
 	"github.com/ory/x/urlx"
@@ -79,7 +80,7 @@ func countAccessTokens(t *testing.T, c *pop.Connection) int {
 
 func TestRevoke(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
-	reg := internal.NewRegistryMemory(t, conf)
+	reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.AddFositeExamples(reg)

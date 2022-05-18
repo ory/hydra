@@ -62,6 +62,7 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 
 	migrateCmd := NewMigrateCmd()
 	parent.AddCommand(migrateCmd)
+	migrateCmd.AddCommand(NewMigrateGenCmd())
 	migrateCmd.AddCommand(NewMigrateSqlCmd())
 
 	serveCmd := NewServeCmd()

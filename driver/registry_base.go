@@ -8,7 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/hydra/health"
 	"github.com/ory/hydra/hsm"
+	"github.com/rs/cors"
 
 	prometheus "github.com/ory/x/prometheusx"
 
@@ -102,19 +104,26 @@ func (m *RegistryBase) OAuth2AwareMiddleware() func(h http.Handler) http.Handler
 	return m.oa2mw
 }
 
+func (m *RegistryBase) AddCORSonHandler(h http.Handler) http.Handler {
+	c := cors.New(cors.Options{
+		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
+	})
+	return c.Handler(h)
+}
+
 func (m *RegistryBase) RegisterRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 
-	// TODO: add cors to this handler
-	// Current thoughts
-	// 1. Add a sub router group, add that as something that can also be passed to EnhanceMiddleware and just routes inside the
-	// cors will have the headers (needs quite a bit of refactoring, less preferred)
-	// 2. enable cors for the entire public router by just sending `true` to EnhanceMiddleware which will work but adds unnecessary
-	// cors to redirections (the simplest solution , might have unknown side-effects)
-	// 3. wrap the handlers with cors in `github.com/ory/x/healthx` instead but that won't work cause it's needs a router / http.Handler
-	// which the functions there are not.
-	m.HealthHandler().SetHealthRoutes(public.Router, false)
+	// Register a healthcheck setup
+	hcHandlers := health.HealthCheck{}
+	hcHandlers.RegisterHealthHandlers(m.HealthHandler(), false)
+
+	public.Handler("GET", healthx.AliveCheckPath, m.AddCORSonHandler(hcHandlers.Alive))
+	public.Handler("GET", healthx.ReadyCheckPath, m.AddCORSonHandler(hcHandlers.Ready))
 
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 

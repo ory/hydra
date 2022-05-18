@@ -89,7 +89,7 @@ func isDSNAllowed(ctx context.Context, r driver.Registry) {
 }
 
 func RunServeAdmin(cmd *cobra.Command, args []string) {
-	ctx := context.TODO()
+	ctx := cmd.Context()
 	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 	isDSNAllowed(ctx, d)
 
@@ -117,7 +117,7 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 }
 
 func RunServePublic(cmd *cobra.Command, args []string) {
-	ctx := context.TODO()
+	ctx := cmd.Context()
 	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 	isDSNAllowed(ctx, d)
 
@@ -145,7 +145,7 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 }
 
 func RunServeAll(cmd *cobra.Command, args []string) {
-	ctx := context.TODO()
+	ctx := cmd.Context()
 	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
 
 	admin, public, adminmw, publicmw := setup(ctx, d, cmd)
@@ -295,7 +295,7 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 	adminmw.Use(metrics)
 	publicmw.Use(metrics)
 
-	d.RegisterRoutes(ctx, admin, public)
+	d.RegisterRoutes(admin, public)
 
 	return
 }

@@ -75,7 +75,7 @@ func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (pu
 	internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 	internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 
-	reg.RegisterRoutes(ctx, admin, public)
+	reg.RegisterRoutes(admin, public)
 	return publicTS, adminTS
 }
 

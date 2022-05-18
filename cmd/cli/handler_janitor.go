@@ -75,7 +75,7 @@ func (_ *JanitorHandler) RunE(cmd *cobra.Command, args []string) error {
 }
 
 func purge(cmd *cobra.Command, args []string) error {
-	ctx := context.TODO()
+	ctx := cmd.Context()
 	var d driver.Registry
 
 	co := []configx.OptionModifier{

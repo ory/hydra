@@ -36,6 +36,7 @@ import (
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/hydra/x"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/ory/hydra/driver/config"
 
@@ -77,17 +78,16 @@ func createTestClient(prefix string) *models.OAuth2Client {
 }
 
 func TestClientSDK(t *testing.T) {
-	ctx := context.TODO()
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
 	conf.MustSet(config.KeyPublicAllowDynamicRegistration, true)
-	r := internal.NewRegistryMemory(t, conf)
+	r := internal.NewRegistryMemory(t, conf, &contextx.StaticContextualizer{C: conf})
 
 	routerAdmin := x.NewRouterAdmin()
 	routerPublic := x.NewRouterPublic()
 	handler := client.NewHandler(r)
-	handler.SetRoutes(ctx, routerAdmin, routerPublic)
+	handler.SetRoutes(routerAdmin, routerPublic)
 	server := httptest.NewServer(routerAdmin)
 
 	c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})

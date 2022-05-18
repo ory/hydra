@@ -86,7 +86,7 @@ var ErrNoAuthenticationSessionFound = errors.New("no previous login session was 
 var ErrHintDoesNotMatchAuthentication = errors.New("subject from hint does not match subject from session")
 
 func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.Client, hintSubject string, sessionSubject string) error {
-	obfuscatedUserID, err := s.ObfuscateSubjectIdentifier(c, sessionSubject, "")
+	obfuscatedUserID, err := s.ObfuscateSubjectIdentifier(ctx, c, sessionSubject, "")
 	if err != nil {
 		return err
 	}
@@ -355,7 +355,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The login request is marked as remember, but the subject from the login confirmation does not match the original subject from the cookie."))
 	}
 
-	subjectIdentifier, err := s.ObfuscateSubjectIdentifier(req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
+	subjectIdentifier, err := s.ObfuscateSubjectIdentifier(ctx, req.GetClient(), session.Subject, session.ForceSubjectIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -992,9 +992,9 @@ func (s *DefaultStrategy) HandleOAuth2AuthorizationRequest(w http.ResponseWriter
 	return consentSession, nil
 }
 
-func (s *DefaultStrategy) ObfuscateSubjectIdentifier(cl fosite.Client, subject, forcedIdentifier string) (string, error) {
+func (s *DefaultStrategy) ObfuscateSubjectIdentifier(ctx context.Context, cl fosite.Client, subject, forcedIdentifier string) (string, error) {
 	if c, ok := cl.(*client.Client); ok && c.SubjectType == "pairwise" {
-		algorithm, ok := s.r.SubjectIdentifierAlgorithm()[c.SubjectType]
+		algorithm, ok := s.r.SubjectIdentifierAlgorithm(ctx)[c.SubjectType]
 		if !ok {
 			return "", errorsx.WithStack(fosite.ErrInvalidRequest.WithHintf(`Subject Identifier Algorithm '%s' was requested by OAuth 2.0 Client '%s' but is not configured.`, c.SubjectType, c.OutfacingID))
 		}

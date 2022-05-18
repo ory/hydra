@@ -1,6 +1,5 @@
 {
   "challenge": "challenge-0010",
-  "nid": "00000000-0000-0000-0000-000000000000",
   "subject": "subject-0010",
   "sid": "session_id-0010",
   "request_url": "http://request/0010",

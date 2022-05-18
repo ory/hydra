@@ -60,7 +60,7 @@ func NewHandler(r InternalRegistry) *Handler {
 	}
 }
 
-func (h *Handler) SetRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
+func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic) {
 	admin.GET(ClientsHandlerPath, h.List)
 	admin.POST(ClientsHandlerPath, h.Create)
 	admin.GET(ClientsHandlerPath+"/:id", h.Get)

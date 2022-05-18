@@ -14,6 +14,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
@@ -41,8 +42,9 @@ func newResponseSnapshot(body string, res *http.Response) *responseSnapshot {
 
 func TestHandler(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t)
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
 	h := client.NewHandler(reg)
+	reg.WithContextualizer(&contextx.TestContextualizer{})
 
 	t.Run("create client registration tokens", func(t *testing.T) {
 		for k, tc := range []struct {
@@ -121,7 +123,7 @@ func TestHandler(t *testing.T) {
 	newServer := func(t *testing.T, dynamicEnabled bool) (*httptest.Server, *http.Client) {
 		require.NoError(t, reg.Config(ctx).Set(config.KeyPublicAllowDynamicRegistration, dynamicEnabled))
 		router := httprouter.New()
-		h.SetRoutes(ctx, &x.RouterAdmin{Router: router}, &x.RouterPublic{Router: router})
+		h.SetRoutes(&x.RouterAdmin{Router: router}, &x.RouterPublic{Router: router})
 		ts := httptest.NewServer(router)
 		t.Cleanup(ts.Close)
 		return ts, ts.Client()

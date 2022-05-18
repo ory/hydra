@@ -36,6 +36,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 
 	hc "github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
@@ -45,7 +46,7 @@ import (
 
 func TestClientCredentials(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t)
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
 	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
 	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 

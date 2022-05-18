@@ -1,6 +1,8 @@
 package consent
 
 import (
+	"context"
+
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/hydra/client"
@@ -24,5 +26,5 @@ type InternalRegistry interface {
 type Registry interface {
 	ConsentManager() Manager
 	ConsentStrategy() Strategy
-	SubjectIdentifierAlgorithm() map[string]SubjectIdentifierAlgorithm
+	SubjectIdentifierAlgorithm(ctx context.Context) map[string]SubjectIdentifierAlgorithm
 }

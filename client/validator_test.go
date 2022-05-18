@@ -42,11 +42,11 @@ func TestValidate(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
 	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
+	reg := internal.NewRegistryMemory(t, c, &contextx.StaticContextualizer{C: c})
+	v := NewValidator(reg)
 
 	testCtx := context.TODO()
 
-	ctxer := &contextx.DefaultContextualizer{}
-	v := NewValidator(ctxer, c)
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)
@@ -116,7 +116,7 @@ func TestValidate(t *testing.T) {
 		{
 			v: func(t *testing.T) *Validator {
 				c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise"})
-				return NewValidator(ctxer, c)
+				return NewValidator(reg)
 			},
 			in: &Client{OutfacingID: "foo"},
 			check: func(t *testing.T, c *Client) {
@@ -160,7 +160,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()
 
-	v := NewValidatorWithClient(&contextx.DefaultContextualizer{}, nil, ts.Client())
+	v := NewValidatorWithClient(nil, ts.Client())
 
 	for k, tc := range []struct {
 		p         string
@@ -209,9 +209,10 @@ func TestValidateDynamicRegistration(t *testing.T) {
 	c := internal.NewConfigurationWithDefaults()
 	c.MustSet(config.KeySubjectTypesSupported, []string{"pairwise", "public"})
 	c.MustSet(config.KeyDefaultClientScope, []string{"openid"})
+	reg := internal.NewRegistryMemory(t, c, &contextx.StaticContextualizer{C: c})
 
 	testCtx := context.TODO()
-	v := NewValidator(&contextx.DefaultContextualizer{}, c)
+	v := NewValidator(reg)
 	for k, tc := range []struct {
 		in        *Client
 		check     func(t *testing.T, c *Client)

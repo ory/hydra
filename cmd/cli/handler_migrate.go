@@ -230,7 +230,7 @@ func (h *MigrateHandler) MigrateGen(cmd *cobra.Command, args []string) {
 }
 
 func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
-	ctx := context.TODO()
+	ctx := cmd.Context()
 	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {

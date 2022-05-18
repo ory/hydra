@@ -40,6 +40,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/hydra/x/contextx"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
@@ -83,7 +84,7 @@ type clientCreator interface {
 //   - [x] What happens if `id_token_hint` does not match the value from the handled authentication request ("accept login")
 func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	ctx := context.TODO()
-	reg := internal.NewMockedRegistry(t)
+	reg := internal.NewMockedRegistry(t, &contextx.DefaultContextualizer{})
 	reg.Config(ctx).MustSet(config.KeyAccessTokenStrategy, "opaque")
 	publicTS, adminTS := testhelpers.NewOAuth2Server(ctx, t, reg)
 
@@ -591,7 +592,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			conf.MustSet(config.KeyAccessTokenLifespan, time.Second*2)
 			conf.MustSet(config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
 			conf.MustSet(config.KeyAccessTokenStrategy, strat.d)
-			reg := internal.NewRegistryMemory(t, conf)
+			reg := internal.NewRegistryMemory(t, conf, &contextx.DefaultContextualizer{})
 			internal.MustEnsureRegistryKeys(reg, x.OpenIDConnectKeyName)
 			internal.MustEnsureRegistryKeys(reg, x.OAuth2JWTKeyName)
 

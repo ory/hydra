@@ -61,8 +61,8 @@ func TestSDK(t *testing.T) {
 		Subject: "subject1",
 	}))
 
-	ar1, _ := MockAuthRequest("1", false)
-	ar2, _ := MockAuthRequest("2", false)
+	ar1, _ := MockAuthRequest("ar-1", false)
+	ar2, _ := MockAuthRequest("ar-2", false)
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar1.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), ar2.Client))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{
@@ -76,15 +76,17 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, m.CreateLoginRequest(context.Background(), ar1))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), ar2))
 
-	cr1, hcr1 := MockConsentRequest("1", false, 0, false, false, false)
-	cr2, hcr2 := MockConsentRequest("2", false, 0, false, false, false)
-	cr3, hcr3 := MockConsentRequest("3", true, 3600, false, false, false)
-	cr4, hcr4 := MockConsentRequest("4", true, 3600, false, false, false)
+	cr1, hcr1 := MockConsentRequest("1", false, 0, false, false, false, "fk-login-challenge-")
+	cr2, hcr2 := MockConsentRequest("2", false, 0, false, false, false, "fk-login-challenge-")
+	cr3, hcr3 := MockConsentRequest("3", true, 3600, false, false, false, "fk-login-challenge-")
+	cr4, hcr4 := MockConsentRequest("4", true, 3600, false, false, false, "fk-login-challenge-")
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr1.Client))
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr2.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr3.Client))
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cr4.Client))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr1.LoginChallenge.String(), Client: cr1.Client, Verifier: cr1.ID}))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr2.LoginChallenge.String(), Client: cr2.Client, Verifier: cr2.ID}))
-	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Client: cr3.Client, Verifier: cr3.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr1.LoginChallenge.String(), Subject: cr1.Subject, Client: cr1.Client, Verifier: cr1.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr2.LoginChallenge.String(), Subject: cr2.Subject, Client: cr2.Client, Verifier: cr2.ID}))
+	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr3.LoginChallenge.String(), Subject: cr3.Subject, Client: cr3.Client, Verifier: cr3.ID, RequestedAt: hcr3.RequestedAt}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr3.LoginSessionID.String()}))
 	require.NoError(t, m.CreateLoginRequest(context.Background(), &LoginRequest{ID: cr4.LoginChallenge.String(), Client: cr4.Client, Verifier: cr4.ID}))
 	require.NoError(t, m.CreateLoginSession(context.Background(), &LoginSession{ID: cr4.LoginSessionID.String()}))
@@ -116,11 +118,11 @@ func TestSDK(t *testing.T) {
 	require.NoError(t, err)
 	compareSDKConsentRequest(t, cr2, *crGot.Payload)
 
-	arGot, err := sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge("challenge1"))
+	arGot, err := sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge("challengear-1"))
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar1, *arGot.Payload)
 
-	arGot, err = sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge("challenge2"))
+	arGot, err = sdk.Admin.GetLoginRequest(admin.NewGetLoginRequestParams().WithLoginChallenge("challengear-2"))
 	require.NoError(t, err)
 	compareSDKLoginRequest(t, ar2, *arGot.Payload)
 

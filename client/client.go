@@ -147,7 +147,7 @@ type Client struct {
 	// can use jwks_uri, it MUST NOT use jwks. One significant downside of jwks is that it does not enable key rotation
 	// (which jwks_uri does, as described in Section 10 of OpenID Connect Core 1.0 [OpenID.Core]). The jwks_uri and jwks
 	// parameters MUST NOT be used together.
-	JSONWebKeys *x.JoseJSONWebKeySet `json:"jwks,omitempty" db:"jwks"`
+	JSONWebKeys *x.JoseJSONWebKeySet `json:"jwks,omitempty" db:"jwks" faker:"-"`
 
 	// Requested Client Authentication method for the Token Endpoint. The options are client_secret_post,
 	// client_secret_basic, private_key_jwt, and none.

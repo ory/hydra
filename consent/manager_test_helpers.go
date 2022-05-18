@@ -287,8 +287,9 @@ func TestHelperNID(t1ClientManager client.Manager, t1ValidNID Manager, t2Invalid
 		ForceSubjectIdentifier: "2022-03-11-test-1-forced-sub",
 		WasHandled:             false,
 	}
+
 	return func(t *testing.T) {
-		t1ClientManager.CreateClient(context.Background(), &testClient)
+		require.NoError(t, t1ClientManager.CreateClient(context.Background(), &testClient))
 		require.Error(t, t2InvalidNID.CreateLoginSession(context.Background(), &testLS))
 		require.NoError(t, t1ValidNID.CreateLoginSession(context.Background(), &testLS))
 		require.Error(t, t2InvalidNID.CreateLoginRequest(context.Background(), &testLR))

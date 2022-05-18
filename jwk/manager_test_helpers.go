@@ -235,3 +235,41 @@ func TestHelperManagerNIDIsolationKeySet(t1 Manager, t2 Manager, alg string) fun
 		require.Error(t, err)
 	}
 }
+
+func TestHelperNID(t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) {
+	return func(t *testing.T) {
+		ctx := context.Background()
+		kg := RS256Generator{}
+		jwks, err := kg.Generate("2022-03-11-ks-1-kid", "test")
+		require.NoError(t, err)
+		require.Error(t, t2InvalidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))
+		require.NoError(t, t1ValidNID.AddKey(ctx, "2022-03-11-k-1", &jwks.Keys[0]))
+		require.Error(t, t2InvalidNID.AddKeySet(ctx, "2022-03-11-ks-1", jwks))
+		require.NoError(t, t1ValidNID.AddKeySet(ctx, "2022-03-11-ks-1", jwks))
+		require.Error(t, t2InvalidNID.DeleteKey(ctx, "2022-03-11-ks-1", jwks.Keys[0].KeyID))
+		require.NoError(t, t1ValidNID.DeleteKey(ctx, "2022-03-11-ks-1", jwks.Keys[0].KeyID))
+		_, err = t2InvalidNID.GenerateAndPersistKeySet(ctx, "2022-03-11-ks-2", "2022-03-11-ks-2-kid", "RS256", "sig")
+		require.Error(t, err)
+		gks2, err := t1ValidNID.GenerateAndPersistKeySet(ctx, "2022-03-11-ks-2", "2022-03-11-ks-2-kid", "RS256", "sig")
+		require.NoError(t, err)
+
+		_, err = t1ValidNID.GetKey(ctx, "2022-03-11-ks-2", gks2.Keys[0].KeyID)
+		require.NoError(t, err)
+		_, err = t2InvalidNID.GetKey(ctx, "2022-03-11-ks-2", gks2.Keys[0].KeyID)
+		require.Error(t, err)
+
+		_, err = t1ValidNID.GetKeySet(ctx, "2022-03-11-ks-2")
+		require.NoError(t, err)
+		_, err = t2InvalidNID.GetKeySet(ctx, "2022-03-11-ks-2")
+		require.Error(t, err)
+		updatedKey := &gks2.Keys[0]
+		updatedKey.Use = "enc"
+		require.Error(t, t2InvalidNID.UpdateKey(ctx, "2022-03-11-ks-2", updatedKey))
+		require.NoError(t, t1ValidNID.UpdateKey(ctx, "2022-03-11-ks-2", updatedKey))
+		gks2.Keys[1].Use = "enc"
+		require.Error(t, t2InvalidNID.UpdateKeySet(ctx, "2022-03-11-ks-2", gks2))
+		require.NoError(t, t1ValidNID.UpdateKeySet(ctx, "2022-03-11-ks-2", gks2))
+		require.Error(t, t2InvalidNID.DeleteKeySet(ctx, "2022-03-11-ks-2"))
+		require.NoError(t, t1ValidNID.DeleteKeySet(ctx, "2022-03-11-ks-2"))
+	}
+}

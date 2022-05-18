@@ -45,7 +45,7 @@ func (s *HandlerTestSuite) SetupSuite() {
 	conf := internal.NewConfigurationWithDefaults()
 	conf.MustSet(config.KeySubjectTypesSupported, []string{"public"})
 	conf.MustSet(config.KeyDefaultClientScope, []string{"foo", "bar"})
-	s.registry = internal.NewRegistryMemory(s.T(), conf, nil)
+	s.registry = internal.NewRegistryMemory(s.T(), conf)
 
 	router := x.NewRouterAdmin()
 	handler := trust.NewHandler(s.registry)

@@ -72,6 +72,11 @@ function hydra::util::ensure-mysqldump {
 }
 
 function dump_pg {
+	if [[ ! -v TEST_DATABASE_POSTGRESQL ]]; then
+		echo 'Error: TEST_DATABASE_POSTGRESQL is not set; try running "source scripts/test-env.sh"' >&2
+		exit 1
+	fi
+
 	hydra::util::ensure-pg_dump
 
 	make test-resetdb >/dev/null 2>&1
@@ -82,6 +87,11 @@ function dump_pg {
 }
 
 function dump_cockroach {
+	if [[ ! -v TEST_DATABASE_COCKROACHDB ]]; then
+		echo 'Error: TEST_DATABASE_COCKROACHDB is not set; try running "source scripts/test-env.sh"' >&2
+		exit 1
+	fi
+
 	make test-resetdb >/dev/null 2>&1
 	sleep 4
 	yes | go run . migrate sql "$TEST_DATABASE_COCKROACHDB" > /dev/null || true
@@ -90,6 +100,10 @@ function dump_cockroach {
 }
 
 function dump_sqlite {
+	if [[ ! -v SQLITE_PATH ]]; then
+		SQLITE_PATH="$(mktemp -d)/temp.sqlite"
+	fi
+
 	hydra::util::ensure-sqlite
 
 	rm "$SQLITE_PATH" > /dev/null 2>&1 || true
@@ -98,6 +112,11 @@ function dump_sqlite {
 }
 
 function dump_mysql {
+	if [[ ! -v TEST_DATABASE_MYSQL ]]; then
+		echo 'Error: TEST_DATABASE_MYSQL is not set; try running "source scripts/test-env.sh"' >&2
+		exit 1
+	fi
+
 	hydra::util::ensure-mysqldump
 	make test-resetdb >/dev/null 2>&1
 	sleep 10
@@ -140,7 +159,12 @@ mkdir -p ./output/sql/
 
 set -x
 # shellcheck disable=SC2064
-trap "git checkout -q $(git symbolic-ref HEAD); git symbolic-ref HEAD $(git symbolic-ref HEAD)" EXIT
+
+if git symbolic-ref --quiet HEAD; then
+	trap "git checkout -q $(git symbolic-ref HEAD); git symbolic-ref HEAD $(git symbolic-ref HEAD)" EXIT
+else
+	trap "git checkout $(git rev-parse HEAD)" EXIT
+fi
 
 git checkout "$COMMIT_FROM" >/dev/null 2>&1
 $DUMP_CMD > "$DDL_FROM"

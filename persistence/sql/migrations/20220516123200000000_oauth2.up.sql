@@ -1,4 +1,3 @@
-CREATE INDEX hydra_oauth2_access_expiry ON hydra_oauth2_access (requested_at);
-CREATE INDEX hydra_oauth2_refresh_expiry ON hydra_oauth2_refresh (requested_at);
-CREATE INDEX hydra_oauth2_authentication_request_expiry ON hydra_oauth2_authentication_request (requested_at);
-CREATE INDEX hydra_oauth2_consent_request_expiry ON hydra_oauth2_consent_request (requested_at);
+CREATE INDEX hydra_oauth2_refresh_requested_at_idx ON hydra_oauth2_refresh (requested_at);
+CREATE INDEX hydra_oauth2_authentication_request_requested_at_idx ON hydra_oauth2_authentication_request (requested_at);
+CREATE INDEX hydra_oauth2_consent_request_requested_at_idx ON hydra_oauth2_consent_request (requested_at);

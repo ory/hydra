@@ -1,3 +1,12 @@
+-- Encode key_id in ascii as a workaround for the 3072-byte index entry size limit[1]
+-- This is a breaking change for MySQL key IDs with utf-8 symbols higher than 127
+-- [1]: https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer DROP FOREIGN KEY `hydra_oauth2_trusted_jwt_bearer_issuer_ibfk_1`;
+ALTER TABLE hydra_jwk MODIFY `kid` varchar(255) CHARACTER SET 'ascii' NOT NULL;
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer MODIFY `key_id` varchar(255) CHARACTER SET `ascii` NOT NULL;
+ALTER TABLE hydra_oauth2_trusted_jwt_bearer_issuer ADD CONSTRAINT `hydra_oauth2_trusted_jwt_bearer_issuer_ibfk_1` FOREIGN KEY (`key_set`, `key_id`) REFERENCES `hydra_jwk` (`sid`, `kid`) ON DELETE CASCADE;
+--split
+
 -- hydra_client
 ALTER TABLE `hydra_client` ADD COLUMN `nid` char(36);
 ALTER TABLE `hydra_client` ADD CONSTRAINT `hydra_client_nid_fk_idx` FOREIGN KEY (`nid`) REFERENCES `networks` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE;

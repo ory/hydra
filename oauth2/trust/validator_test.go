@@ -11,9 +11,10 @@ func TestEmptyIssuerIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "",
-		Subject:   "valid-subject",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:          "",
+		Subject:         "valid-subject",
+		AllowAnySubject: false,
+		ExpiresAt:       time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -24,13 +25,14 @@ func TestEmptyIssuerIsInvalid(t *testing.T) {
 	}
 }
 
-func TestEmptySubjectIsInvalid(t *testing.T) {
+func TestEmptySubjectAndNoAnySubjectFlagIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:          "valid-issuer",
+		Subject:         "",
+		AllowAnySubject: false,
+		ExpiresAt:       time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -41,13 +43,50 @@ func TestEmptySubjectIsInvalid(t *testing.T) {
 	}
 }
 
+func TestEmptySubjectWithAnySubjectFlagIsValid(t *testing.T) {
+	v := GrantValidator{}
+
+	r := createGrantRequest{
+		Issuer:          "valid-issuer",
+		Subject:         "",
+		AllowAnySubject: true,
+		ExpiresAt:       time.Now().Add(time.Hour * 10),
+		PublicKeyJWK: jose.JSONWebKey{
+			KeyID: "valid-key-id",
+		},
+	}
+
+	if err := v.Validate(r); err != nil {
+		t.Error("an empty subject with the allow_any_subject flag should be valid")
+	}
+}
+
+func TestNonEmptySubjectWithAnySubjectFlagIsInvalid(t *testing.T) {
+	v := GrantValidator{}
+
+	r := createGrantRequest{
+		Issuer:          "valid-issuer",
+		Subject:         "some-issuer",
+		AllowAnySubject: true,
+		ExpiresAt:       time.Now().Add(time.Hour * 10),
+		PublicKeyJWK: jose.JSONWebKey{
+			KeyID: "valid-key-id",
+		},
+	}
+
+	if err := v.Validate(r); err == nil {
+		t.Error("a non empty subject with the allow_any_subject flag should not be valid")
+	}
+}
+
 func TestEmptyExpiresAtIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		ExpiresAt: time.Time{},
+		Issuer:          "valid-issuer",
+		Subject:         "valid-subject",
+		AllowAnySubject: false,
+		ExpiresAt:       time.Time{},
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},
@@ -62,9 +101,10 @@ func TestEmptyPublicKeyIdIsInvalid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:          "valid-issuer",
+		Subject:         "valid-subject",
+		AllowAnySubject: false,
+		ExpiresAt:       time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "",
 		},
@@ -79,9 +119,10 @@ func TestIsValid(t *testing.T) {
 	v := GrantValidator{}
 
 	r := createGrantRequest{
-		Issuer:    "valid-issuer",
-		Subject:   "valid-subject",
-		ExpiresAt: time.Now().Add(time.Hour * 10),
+		Issuer:          "valid-issuer",
+		Subject:         "valid-subject",
+		AllowAnySubject: false,
+		ExpiresAt:       time.Now().Add(time.Hour * 10),
 		PublicKeyJWK: jose.JSONWebKey{
 			KeyID: "valid-key-id",
 		},

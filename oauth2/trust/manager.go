@@ -17,14 +17,15 @@ type GrantManager interface {
 }
 
 type SQLData struct {
-	ID        string    `db:"id"`
-	Issuer    string    `db:"issuer"`
-	Subject   string    `db:"subject"`
-	Scope     string    `db:"scope"`
-	KeySet    string    `db:"key_set"`
-	KeyID     string    `db:"key_id"`
-	CreatedAt time.Time `db:"created_at"`
-	ExpiresAt time.Time `db:"expires_at"`
+	ID              string    `db:"id"`
+	Issuer          string    `db:"issuer"`
+	Subject         string    `db:"subject"`
+	AllowAnySubject bool      `db:"allow_any_subject"`
+	Scope           string    `db:"scope"`
+	KeySet          string    `db:"key_set"`
+	KeyID           string    `db:"key_id"`
+	CreatedAt       time.Time `db:"created_at"`
+	ExpiresAt       time.Time `db:"expires_at"`
 }
 
 func (SQLData) TableName() string {

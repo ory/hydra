@@ -1,22 +1,20 @@
 FROM golang:1.17-alpine3.15 AS builder
 
-RUN apk -U --no-cache add build-base git gcc bash
+RUN apk -U --no-cache --upgrade --latest add build-base git gcc bash
 
 WORKDIR /go/src/github.com/ory/hydra
 
-ADD go.mod go.mod
-ADD go.sum go.sum
-
+COPY go.mod go.sum ./
 ENV GO111MODULE on
 ENV CGO_ENABLED 1
 
 RUN go mod download
 
-ADD . .
+COPY . .
 
 RUN go build -tags sqlite -o /usr/bin/hydra
 
-FROM alpine:3.15.1
+FROM alpine:3.15
 
 RUN addgroup -S ory; \
     adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin; \
@@ -26,8 +24,9 @@ COPY --from=builder /usr/bin/hydra /usr/bin/hydra
 
 # By creating the sqlite folder as the ory user, the mounted volume will be owned by ory:ory, which
 # is required for read/write of SQLite.
-RUN mkdir -p /var/lib/sqlite
-RUN chown ory:ory /var/lib/sqlite
+RUN mkdir -p /var/lib/sqlite && \
+    chown ory:ory /var/lib/sqlite
+
 VOLUME /var/lib/sqlite
 
 # Exposing the ory home directory
@@ -40,3 +39,5 @@ USER ory
 
 ENTRYPOINT ["hydra"]
 CMD ["serve"]
+
+

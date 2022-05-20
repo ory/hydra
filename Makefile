@@ -116,6 +116,8 @@ sdk: .bin/swagger .bin/ory node_modules
 					--health-path-tags metadata \
 					-p https://raw.githubusercontent.com/ory/x/master/healthx/openapi/patch.yaml \
 					-p file://.schema/openapi/patches/meta.yaml \
+					-p file://.schema/openapi/patches/health.yaml \
+					-p file://.schema/openapi/patches/oauth2.yaml \
 					spec/swagger.json spec/api.json
 
 		rm -rf internal/httpclient internal/httpclient-next

@@ -121,6 +121,8 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 // - https://openid.net/specs/openid-connect-frontchannel-1_0.html
 // - https://openid.net/specs/openid-connect-backchannel-1_0.html
 //
+// Back-channel logout is performed asynchronously and does not affect logout flow.
+//
 //     Schemes: http, https
 //
 //     Responses:

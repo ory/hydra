@@ -26,6 +26,7 @@ type (
 		MigrateUp(context.Context) error
 		PrepareMigration(context.Context) error
 		Connection(context.Context) *pop.Connection
+		Ping() error
 	}
 	Provider interface {
 		Persister() Persister

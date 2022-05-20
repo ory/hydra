@@ -3304,10 +3304,20 @@ type AdminApiApiListSubjectConsentSessionsRequest struct {
 	ctx        context.Context
 	ApiService AdminApi
 	subject    *string
+	limit      *int64
+	offset     *int64
 }
 
 func (r AdminApiApiListSubjectConsentSessionsRequest) Subject(subject string) AdminApiApiListSubjectConsentSessionsRequest {
 	r.subject = &subject
+	return r
+}
+func (r AdminApiApiListSubjectConsentSessionsRequest) Limit(limit int64) AdminApiApiListSubjectConsentSessionsRequest {
+	r.limit = &limit
+	return r
+}
+func (r AdminApiApiListSubjectConsentSessionsRequest) Offset(offset int64) AdminApiApiListSubjectConsentSessionsRequest {
+	r.offset = &offset
 	return r
 }
 
@@ -3363,6 +3373,12 @@ func (a *AdminApiService) ListSubjectConsentSessionsExecute(r AdminApiApiListSub
 	}
 
 	localVarQueryParams.Add("subject", parameterToString(*r.subject, ""))
+	if r.limit != nil {
+		localVarQueryParams.Add("limit", parameterToString(*r.limit, ""))
+	}
+	if r.offset != nil {
+		localVarQueryParams.Add("offset", parameterToString(*r.offset, ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

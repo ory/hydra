@@ -69,7 +69,10 @@ and success.`,
 				Transport: &transporter{
 					FakeTLSTermination: flagx.MustGetBool(cmd, "fake-tls-termination"),
 					Transport: &http.Transport{
-						TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
+						TLSClientConfig: &tls.Config{
+							// nolint:gosec
+							InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify"),
+						},
 					},
 				},
 			})

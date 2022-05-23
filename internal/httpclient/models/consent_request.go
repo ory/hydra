@@ -24,7 +24,7 @@ type ConsentRequest struct {
 	Acr string `json:"acr,omitempty"`
 
 	// amr
-	Amr StringSlicePipeDelimiter `json:"amr,omitempty"`
+	Amr StringSliceJSONFormat `json:"amr,omitempty"`
 
 	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.
@@ -56,10 +56,10 @@ type ConsentRequest struct {
 	RequestURL string `json:"request_url,omitempty"`
 
 	// requested access token audience
-	RequestedAccessTokenAudience StringSlicePipeDelimiter `json:"requested_access_token_audience,omitempty"`
+	RequestedAccessTokenAudience StringSliceJSONFormat `json:"requested_access_token_audience,omitempty"`
 
 	// requested scope
-	RequestedScope StringSlicePipeDelimiter `json:"requested_scope,omitempty"`
+	RequestedScope StringSliceJSONFormat `json:"requested_scope,omitempty"`
 
 	// Skip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you must not ask the user to grant the requested scopes. You must however either allow or deny the

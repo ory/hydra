@@ -125,8 +125,8 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 			return err
 		}
 
-		if m.C.HsmEnabled() {
-			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext(), m.C)
+		if m.Config().HSMEnabled() {
+			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext(), m.Config())
 			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
 		} else {
 			m.defaultKeyManager = m.persister
@@ -163,7 +163,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		}
 
 		if m.Config().HSMEnabled() {
-			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext())
+			hardwareKeyManager := hsm.NewKeyManager(m.HsmContext(), m.Config())
 			m.defaultKeyManager = jwk.NewManagerStrategy(hardwareKeyManager, m.persister)
 		} else {
 			m.defaultKeyManager = m.persister

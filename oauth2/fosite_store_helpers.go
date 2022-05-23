@@ -914,7 +914,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=only returns the key when subject matches", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("issuer-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[1]
@@ -956,7 +956,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 		})
 
 		t.Run("case=returns the key when any subject is allowed", func(t *testing.T) {
-			keySet, err := keyGenerator.Generate("issuer-key", "sig")
+			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
 			require.NoError(t, err)
 
 			publicKey := keySet.Keys[1]

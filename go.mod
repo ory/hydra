@@ -12,7 +12,6 @@ replace (
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.9
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
-	github.com/ory/x => github.com/ory/x v0.0.382
 )
 
 replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d

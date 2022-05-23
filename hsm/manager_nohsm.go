@@ -34,7 +34,7 @@ func NewContext(c *config.DefaultProvider, l *logrusx.Logger) Context {
 	return nil
 }
 
-func NewKeyManager(hsm Context, config *config.Provider) *KeyManager {
+func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 	return nil
 }
 

@@ -32,100 +32,6 @@
       }
     },
     "schemas": {
-      "DefaultSession": {
-        "description": "IDTokenSession is a session container for the id token",
-        "properties": {
-          "expires_at": {
-            "additionalProperties": {
-              "format": "date-time",
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "headers": {
-            "$ref": "#/components/schemas/Headers"
-          },
-          "id_token_claims": {
-            "$ref": "#/components/schemas/IDTokenClaims"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "Headers": {
-        "description": "Headers is the jwt headers",
-        "properties": {
-          "extra": {
-            "additionalProperties": true,
-            "type": "object"
-          }
-        },
-        "type": "object"
-      },
-      "IDTokenClaims": {
-        "description": "IDTokenClaims represent the claims used in open id connect requests",
-        "properties": {
-          "acr": {
-            "type": "string"
-          },
-          "amr": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "at_hash": {
-            "type": "string"
-          },
-          "aud": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "auth_time": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "c_hash": {
-            "type": "string"
-          },
-          "exp": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "ext": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "iat": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "iss": {
-            "type": "string"
-          },
-          "jti": {
-            "type": "string"
-          },
-          "nonce": {
-            "type": "string"
-          },
-          "rat": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "sub": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
       "JSONRawMessage": {
         "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger.",
         "type": "object"
@@ -246,10 +152,10 @@
             "$ref": "#/components/schemas/consentRequest"
           },
           "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "grant_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "handled_at": {
             "$ref": "#/components/schemas/nullTime"
@@ -269,57 +175,11 @@
         },
         "type": "object"
       },
-      "Session": {
-        "properties": {
-          "allowed_top_level_claims": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "client_id": {
-            "type": "string"
-          },
-          "consent_challenge": {
-            "type": "string"
-          },
-          "exclude_not_before_claim": {
-            "type": "boolean"
-          },
-          "expires_at": {
-            "additionalProperties": {
-              "format": "date-time",
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "extra": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "headers": {
-            "$ref": "#/components/schemas/Headers"
-          },
-          "id_token_claims": {
-            "$ref": "#/components/schemas/IDTokenClaims"
-          },
-          "kid": {
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "StringSlicePipeDelimiter": {
+      "StringSliceJSONFormat": {
         "items": {
           "type": "string"
         },
-        "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
+        "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
         "type": "array"
       },
       "UUID": {
@@ -372,10 +232,10 @@
       "acceptConsentRequest": {
         "properties": {
           "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "grant_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "handled_at": {
             "$ref": "#/components/schemas/nullTime"
@@ -403,7 +263,7 @@
             "type": "string"
           },
           "amr": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "context": {
             "$ref": "#/components/schemas/JSONRawMessage"
@@ -452,7 +312,7 @@
             "type": "string"
           },
           "amr": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "challenge": {
             "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -480,10 +340,10 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "skip": {
             "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -668,10 +528,10 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "session_id": {
             "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -738,44 +598,13 @@
         "title": "NullTime implements sql.NullTime functionality.",
         "type": "string"
       },
-      "oAuth2AccessRequest": {
-        "properties": {
-          "client_id": {
-            "description": "ClientID is the identifier of the OAuth 2.0 client.",
-            "type": "string"
-          },
-          "grant_types": {
-            "description": "GrantTypes is the requests grant types.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "granted_audience": {
-            "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "granted_scopes": {
-            "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "title": "Requester is a token endpoint's request context.",
-        "type": "object"
-      },
       "oAuth2Client": {
         "properties": {
           "allowed_cors_origins": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "authorization_code_grant_access_token_lifespan": {
             "$ref": "#/components/schemas/NullDuration"
@@ -819,7 +648,7 @@
             "type": "string"
           },
           "contacts": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "created_at": {
             "description": "CreatedAt returns the timestamp of the client's creation.",
@@ -835,7 +664,7 @@
             "type": "string"
           },
           "grant_types": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "implicit_grant_access_token_lifespan": {
             "$ref": "#/components/schemas/NullDuration"
@@ -875,10 +704,10 @@
             "type": "string"
           },
           "post_logout_redirect_uris": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "redirect_uris": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "refresh_token_grant_access_token_lifespan": {
             "$ref": "#/components/schemas/NullDuration"
@@ -902,10 +731,10 @@
             "type": "string"
           },
           "request_uris": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "response_types": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "scope": {
             "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
@@ -1163,12 +992,6 @@
               "type": "string"
             },
             "type": "array"
-          },
-          "requester": {
-            "$ref": "#/components/schemas/oAuth2AccessRequest"
-          },
-          "session": {
-            "$ref": "#/components/schemas/Session"
           },
           "subject": {
             "description": "Subject is the identifier of the authenticated end-user.",

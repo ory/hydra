@@ -492,7 +492,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					require.Equal(t, time.Now().UTC().Round(time.Minute), time.Time(h.HandledAt).Round(time.Minute))
 					compareConsentRequest(t, c, got1)
 
-					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience"}
+					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience"}
 					_, err = m.HandleConsentRequest(context.Background(), h)
 					require.NoError(t, err)
 
@@ -503,7 +503,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 					assert.Equal(t, h.GrantedAudience, got2.GrantedAudience)
 
 					// Trying to update this again should return an error because the consent request was used.
-					h.GrantedAudience = sqlxx.StringSlicePipeDelimiter{"new-audience", "new-audience-2"}
+					h.GrantedAudience = sqlxx.StringSliceJSONFormat{"new-audience", "new-audience-2"}
 					_, err = m.HandleConsentRequest(context.Background(), h)
 					require.Error(t, err)
 

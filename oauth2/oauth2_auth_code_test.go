@@ -147,7 +147,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 				Subject:  &subject,
 				Remember: !*rr.Payload.Skip,
 				Acr:      "1",
-				Amr:      models.StringSlicePipeDelimiter{"pwd"},
+				Amr:      models.StringSliceJSONFormat{"pwd"},
 				Context:  map[string]interface{}{"context": "bar"},
 			}
 			if checkRequestPayload != nil {

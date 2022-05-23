@@ -2369,10 +2369,10 @@
           "$ref": "#/definitions/consentRequest"
         },
         "grant_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "grant_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "handled_at": {
           "$ref": "#/definitions/nullTime"
@@ -2391,9 +2391,9 @@
         }
       }
     },
-    "StringSlicePipeDelimiter": {
+    "StringSliceJSONFormat": {
       "type": "array",
-      "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
+      "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
       "items": {
         "type": "string"
       }
@@ -2403,10 +2403,10 @@
       "title": "The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "grant_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "handled_at": {
           "$ref": "#/definitions/nullTime"
@@ -2437,7 +2437,7 @@
           "type": "string"
         },
         "amr": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
@@ -2486,7 +2486,7 @@
           "type": "string"
         },
         "amr": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "challenge": {
           "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -2514,10 +2514,10 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "requested_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -2712,10 +2712,10 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "requested_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "session_id": {
           "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -2770,10 +2770,10 @@
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "backchannel_logout_session_required": {
           "description": "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout\nToken to identify the RP session with the OP when the backchannel_logout_uri is used.\nIf omitted, the default value is false.",
@@ -2805,7 +2805,7 @@
           "type": "string"
         },
         "contacts": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "created_at": {
           "description": "CreatedAt returns the timestamp of the client's creation.",
@@ -2821,7 +2821,7 @@
           "type": "string"
         },
         "grant_types": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "jwks": {
           "$ref": "#/definitions/JoseJSONWebKeySet"
@@ -2846,10 +2846,10 @@
           "type": "string"
         },
         "post_logout_redirect_uris": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "redirect_uris": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "registration_access_token": {
           "description": "RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.",
@@ -2864,10 +2864,10 @@
           "type": "string"
         },
         "request_uris": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "response_types": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "scope": {
           "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",

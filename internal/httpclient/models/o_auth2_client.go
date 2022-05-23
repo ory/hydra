@@ -20,10 +20,10 @@ import (
 type OAuth2Client struct {
 
 	// allowed cors origins
-	AllowedCorsOrigins StringSlicePipeDelimiter `json:"allowed_cors_origins,omitempty"`
+	AllowedCorsOrigins StringSliceJSONFormat `json:"allowed_cors_origins,omitempty"`
 
 	// audience
-	Audience StringSlicePipeDelimiter `json:"audience,omitempty"`
+	Audience StringSliceJSONFormat `json:"audience,omitempty"`
 
 	// Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout
 	// Token to identify the RP session with the OP when the backchannel_logout_uri is used.
@@ -60,7 +60,7 @@ type OAuth2Client struct {
 	ClientURI string `json:"client_uri,omitempty"`
 
 	// contacts
-	Contacts StringSlicePipeDelimiter `json:"contacts,omitempty"`
+	Contacts StringSliceJSONFormat `json:"contacts,omitempty"`
 
 	// CreatedAt returns the timestamp of the client's creation.
 	// Format: date-time
@@ -78,7 +78,7 @@ type OAuth2Client struct {
 	FrontchannelLogoutURI string `json:"frontchannel_logout_uri,omitempty"`
 
 	// grant types
-	GrantTypes StringSlicePipeDelimiter `json:"grant_types,omitempty"`
+	GrantTypes StringSliceJSONFormat `json:"grant_types,omitempty"`
 
 	// jwks
 	Jwks JoseJSONWebKeySet `json:"jwks,omitempty"`
@@ -108,10 +108,10 @@ type OAuth2Client struct {
 	PolicyURI string `json:"policy_uri,omitempty"`
 
 	// post logout redirect uris
-	PostLogoutRedirectUris StringSlicePipeDelimiter `json:"post_logout_redirect_uris,omitempty"`
+	PostLogoutRedirectUris StringSliceJSONFormat `json:"post_logout_redirect_uris,omitempty"`
 
 	// redirect uris
-	RedirectUris StringSlicePipeDelimiter `json:"redirect_uris,omitempty"`
+	RedirectUris StringSliceJSONFormat `json:"redirect_uris,omitempty"`
 
 	// RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.
 	RegistrationAccessToken string `json:"registration_access_token,omitempty"`
@@ -124,10 +124,10 @@ type OAuth2Client struct {
 	RequestObjectSigningAlg string `json:"request_object_signing_alg,omitempty"`
 
 	// request uris
-	RequestUris StringSlicePipeDelimiter `json:"request_uris,omitempty"`
+	RequestUris StringSliceJSONFormat `json:"request_uris,omitempty"`
 
 	// response types
-	ResponseTypes StringSlicePipeDelimiter `json:"response_types,omitempty"`
+	ResponseTypes StringSliceJSONFormat `json:"response_types,omitempty"`
 
 	// Scope is a string containing a space-separated list of scope values (as
 	// described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client

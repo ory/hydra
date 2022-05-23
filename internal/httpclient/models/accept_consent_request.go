@@ -19,10 +19,10 @@ import (
 type AcceptConsentRequest struct {
 
 	// grant access token audience
-	GrantAccessTokenAudience StringSlicePipeDelimiter `json:"grant_access_token_audience,omitempty"`
+	GrantAccessTokenAudience StringSliceJSONFormat `json:"grant_access_token_audience,omitempty"`
 
 	// grant scope
-	GrantScope StringSlicePipeDelimiter `json:"grant_scope,omitempty"`
+	GrantScope StringSliceJSONFormat `json:"grant_scope,omitempty"`
 
 	// handled at
 	// Format: date-time

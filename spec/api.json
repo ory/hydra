@@ -146,10 +146,10 @@
             "$ref": "#/components/schemas/consentRequest"
           },
           "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "grant_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "handled_at": {
             "$ref": "#/components/schemas/nullTime"
@@ -169,11 +169,11 @@
         },
         "type": "object"
       },
-      "StringSlicePipeDelimiter": {
+      "StringSliceJSONFormat": {
         "items": {
           "type": "string"
         },
-        "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
+        "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
         "type": "array"
       },
       "UUID": {
@@ -183,10 +183,10 @@
       "acceptConsentRequest": {
         "properties": {
           "grant_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "grant_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "handled_at": {
             "$ref": "#/components/schemas/nullTime"
@@ -214,7 +214,7 @@
             "type": "string"
           },
           "amr": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "context": {
             "$ref": "#/components/schemas/JSONRawMessage"
@@ -263,7 +263,7 @@
             "type": "string"
           },
           "amr": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "challenge": {
             "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -291,10 +291,10 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "skip": {
             "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -479,10 +479,10 @@
             "type": "string"
           },
           "requested_access_token_audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "requested_scope": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "session_id": {
             "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -546,10 +546,10 @@
       "oAuth2Client": {
         "properties": {
           "allowed_cors_origins": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "audience": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "backchannel_logout_session_required": {
             "description": "Boolean value specifying whether the RP requires that a sid (session ID) Claim be included in the Logout\nToken to identify the RP session with the OP when the backchannel_logout_uri is used.\nIf omitted, the default value is false.",
@@ -581,7 +581,7 @@
             "type": "string"
           },
           "contacts": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "created_at": {
             "description": "CreatedAt returns the timestamp of the client's creation.",
@@ -597,7 +597,7 @@
             "type": "string"
           },
           "grant_types": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "jwks": {
             "$ref": "#/components/schemas/JoseJSONWebKeySet"
@@ -622,10 +622,10 @@
             "type": "string"
           },
           "post_logout_redirect_uris": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "redirect_uris": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "registration_access_token": {
             "description": "RegistrationAccessToken can be used to update, get, or delete the OAuth2 Client.",
@@ -640,10 +640,10 @@
             "type": "string"
           },
           "request_uris": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "response_types": {
-            "$ref": "#/components/schemas/StringSlicePipeDelimiter"
+            "$ref": "#/components/schemas/StringSliceJSONFormat"
           },
           "scope": {
             "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",

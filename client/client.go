@@ -57,18 +57,18 @@ type Client struct {
 	Secret string `json:"client_secret,omitempty" db:"client_secret"`
 
 	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
-	RedirectURIs sqlxx.StringSlicePipeDelimiter `json:"redirect_uris" db:"redirect_uris"`
+	RedirectURIs sqlxx.StringSliceJSONFormat `json:"redirect_uris" db:"redirect_uris"`
 
 	// GrantTypes is an array of grant types the client is allowed to use.
 	//
 	// Pattern: client_credentials|authorization_code|implicit|refresh_token
-	GrantTypes sqlxx.StringSlicePipeDelimiter `json:"grant_types" db:"grant_types"`
+	GrantTypes sqlxx.StringSliceJSONFormat `json:"grant_types" db:"grant_types"`
 
 	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can
 	// use at the authorization endpoint.
 	//
 	// Pattern: id_token|code|token
-	ResponseTypes sqlxx.StringSlicePipeDelimiter `json:"response_types" db:"response_types"`
+	ResponseTypes sqlxx.StringSliceJSONFormat `json:"response_types" db:"response_types"`
 
 	// Scope is a string containing a space-separated list of scope values (as
 	// described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
@@ -80,7 +80,7 @@ type Client struct {
 	// Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits
 	// the applicability of an OAuth 2.0 Access Token to, for example, certain API endpoints. The value is a list
 	// of URLs. URLs MUST NOT contain whitespaces.
-	Audience sqlxx.StringSlicePipeDelimiter `json:"audience" db:"audience"`
+	Audience sqlxx.StringSliceJSONFormat `json:"audience" db:"audience"`
 
 	// Owner is a string identifying the owner of the OAuth 2.0 Client.
 	Owner string `json:"owner" db:"owner"`
@@ -94,7 +94,7 @@ type Client struct {
 	// to the /oauth/token endpoint. If this array is empty, the sever's CORS origin configuration (`CORS_ALLOWED_ORIGINS`)
 	// will be used instead. If this array is set, the allowed origins are appended to the server's CORS origin configuration.
 	// Be aware that environment variable `CORS_ENABLED` MUST be set to `true` for this to work.
-	AllowedCORSOrigins sqlxx.StringSlicePipeDelimiter `json:"allowed_cors_origins" db:"allowed_cors_origins"`
+	AllowedCORSOrigins sqlxx.StringSliceJSONFormat `json:"allowed_cors_origins" db:"allowed_cors_origins"`
 
 	// TermsOfServiceURI is a URL string that points to a human-readable terms of service
 	// document for the client that describes a contractual relationship
@@ -112,7 +112,7 @@ type Client struct {
 
 	// Contacts is a array of strings representing ways to contact people responsible
 	// for this client, typically email addresses.
-	Contacts sqlxx.StringSlicePipeDelimiter `json:"contacts" db:"contacts"`
+	Contacts sqlxx.StringSliceJSONFormat `json:"contacts" db:"contacts"`
 
 	// SecretExpiresAt is an integer holding the time at which the client
 	// secret will expire or 0 if it will not expire. The time is
@@ -161,7 +161,7 @@ type Client struct {
 	// contents of the files referenced by these URIs and not retrieve them at the time they are used in a request.
 	// OPs can require that request_uri values used be pre-registered with the require_request_uri_registration
 	// discovery parameter.
-	RequestURIs sqlxx.StringSlicePipeDelimiter `json:"request_uris,omitempty" db:"request_uris"`
+	RequestURIs sqlxx.StringSliceJSONFormat `json:"request_uris,omitempty" db:"request_uris"`
 
 	// JWS [JWS] alg algorithm [JWA] that MUST be used for signing Request Objects sent to the OP. All Request Objects
 	// from this Client MUST be rejected, if not signed with this algorithm.
@@ -191,7 +191,7 @@ type Client struct {
 
 	// Array of URLs supplied by the RP to which it MAY request that the End-User's User Agent be redirected using the
 	// post_logout_redirect_uri parameter after a logout has been performed.
-	PostLogoutRedirectURIs sqlxx.StringSlicePipeDelimiter `json:"post_logout_redirect_uris,omitempty" db:"post_logout_redirect_uris"`
+	PostLogoutRedirectURIs sqlxx.StringSliceJSONFormat `json:"post_logout_redirect_uris,omitempty" db:"post_logout_redirect_uris"`
 
 	// RP URL that will cause the RP to log itself out when sent a Logout Token by the OP.
 	BackChannelLogoutURI string `json:"backchannel_logout_uri,omitempty" db:"backchannel_logout_uri"`
@@ -228,11 +228,11 @@ func (c *Client) BeforeSave(_ *pop.Connection) error {
 	}
 
 	if c.Audience == nil {
-		c.Audience = sqlxx.StringSlicePipeDelimiter{}
+		c.Audience = sqlxx.StringSliceJSONFormat{}
 	}
 
 	if c.AllowedCORSOrigins == nil {
-		c.AllowedCORSOrigins = sqlxx.StringSlicePipeDelimiter{}
+		c.AllowedCORSOrigins = sqlxx.StringSliceJSONFormat{}
 	}
 
 	if c.CreatedAt.IsZero() {

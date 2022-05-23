@@ -44,7 +44,7 @@ var ErrPreGeneratedKeys = &fosite.RFC6749Error{
 	DescriptionField: "Cannot add/update pre generated keys on Hardware Security Module",
 }
 
-func NewKeyManager(hsm Context, config *config.ConfigProvider) *KeyManager {
+func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 	return &KeyManager{
 		Context:      hsm,
 		KeySetPrefix: config.HSMKeySetPrefix(),

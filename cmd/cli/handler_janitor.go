@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/ory/hydra/persistence"
-	"github.com/ory/x/contextx"
 
 	"github.com/pkg/errors"
 

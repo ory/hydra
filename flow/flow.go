@@ -86,12 +86,12 @@ type Flow struct {
 	// RequestedScope contains the OAuth 2.0 Scope requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedScope sqlxx.StringSlicePipeDelimiter `db:"requested_scope"`
+	RequestedScope sqlxx.StringSliceJSONFormat `db:"requested_scope"`
 
 	// RequestedAudience contains the access token audience as requested by the OAuth 2.0 Client.
 	//
 	// required: true
-	RequestedAudience sqlxx.StringSlicePipeDelimiter `db:"requested_at_audience"`
+	RequestedAudience sqlxx.StringSliceJSONFormat `db:"requested_at_audience"`
 
 	// LoginSkip, if true, implies that the client has requested the same scopes from the same user previously.
 	// If true, you can skip asking the user to grant the requested scopes, and simply forward the user to the redirect URL.
@@ -157,7 +157,7 @@ type Flow struct {
 	// authentication session. You can use it to specify the method a user used to
 	// authenticate. For example, if the acr indicates a user used two factor
 	// authentication, the amr can express they used a software-secured key.
-	AMR sqlxx.StringSlicePipeDelimiter `db:"amr"`
+	AMR sqlxx.StringSliceJSONFormat `db:"amr"`
 
 	// ForceSubjectIdentifier forces the "pairwise" user ID of the end-user that authenticated. The "pairwise" user ID refers to the
 	// (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID
@@ -205,10 +205,10 @@ type Flow struct {
 	ConsentCSRF     sqlxx.NullString `db:"consent_csrf"`
 
 	// GrantedScope sets the scope the user authorized the client to use. Should be a subset of `requested_scope`.
-	GrantedScope sqlxx.StringSlicePipeDelimiter `db:"granted_scope"`
+	GrantedScope sqlxx.StringSliceJSONFormat `db:"granted_scope"`
 
 	// GrantedAudience sets the audience the user authorized the client to use. Should be a subset of `requested_access_token_audience`.
-	GrantedAudience sqlxx.StringSlicePipeDelimiter `db:"granted_at_audience"`
+	GrantedAudience sqlxx.StringSliceJSONFormat `db:"granted_at_audience"`
 
 	// ConsentRemember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same
 	// client asks the same user for the same, or a subset of, scope.

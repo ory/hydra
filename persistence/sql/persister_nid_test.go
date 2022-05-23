@@ -8,6 +8,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/require"
+	"github.com/stretchr/testify/suite"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -23,8 +26,6 @@ import (
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/networkx"
 	"github.com/ory/x/sqlxx"
-	"github.com/stretchr/testify/suite"
-	"gopkg.in/square/go-jose.v2"
 )
 
 type PersisterTestSuite struct {
@@ -1890,7 +1891,7 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			f := newFlow(s.t1NID, client.OutfacingID, sub, sqlxx.NullString(sessionID))
 			f.ConsentSkip = false
-			f.GrantedScope = sqlxx.StringSlicePipeDelimiter{}
+			f.GrantedScope = sqlxx.StringSliceJSONFormat{}
 			f.ConsentRemember = false
 			crf := 86400
 			f.ConsentRememberFor = &crf
@@ -2015,7 +2016,7 @@ func newFlow(nid uuid.UUID, clientID string, subject string, sessionID sqlxx.Nul
 		State:              flow.FlowStateConsentUnused,
 		LoginError:         &consent.RequestDeniedError{},
 		Context:            sqlxx.JSONRawMessage{},
-		AMR:                sqlxx.StringSlicePipeDelimiter{},
+		AMR:                sqlxx.StringSliceJSONFormat{},
 		ConsentChallengeID: sqlxx.NullString("not-null"),
 		ConsentVerifier:    sqlxx.NullString("not-null"),
 		ConsentCSRF:        sqlxx.NullString("not-null"),

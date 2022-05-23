@@ -24,7 +24,7 @@ type AcceptLoginRequest struct {
 	Acr string `json:"acr,omitempty"`
 
 	// amr
-	Amr StringSlicePipeDelimiter `json:"amr,omitempty"`
+	Amr StringSliceJSONFormat `json:"amr,omitempty"`
 
 	// context
 	Context JSONRawMessage `json:"context,omitempty"`

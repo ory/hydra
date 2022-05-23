@@ -2300,100 +2300,6 @@
     }
   },
   "definitions": {
-    "DefaultSession": {
-      "description": "IDTokenSession is a session container for the id token",
-      "type": "object",
-      "properties": {
-        "expires_at": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "id_token_claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "Headers": {
-      "description": "Headers is the jwt headers",
-      "type": "object",
-      "properties": {
-        "extra": {
-          "type": "object",
-          "additionalProperties": true
-        }
-      }
-    },
-    "IDTokenClaims": {
-      "description": "IDTokenClaims represent the claims used in open id connect requests",
-      "type": "object",
-      "properties": {
-        "acr": {
-          "type": "string"
-        },
-        "amr": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "at_hash": {
-          "type": "string"
-        },
-        "aud": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "auth_time": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "c_hash": {
-          "type": "string"
-        },
-        "exp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "ext": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "iat": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "iss": {
-          "type": "string"
-        },
-        "jti": {
-          "type": "string"
-        },
-        "nonce": {
-          "type": "string"
-        },
-        "rat": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "sub": {
-          "type": "string"
-        }
-      }
-    },
     "JSONRawMessage": {
       "type": "object",
       "title": "JSONRawMessage represents a json.RawMessage that works well with JSON, SQL, and Swagger."
@@ -2514,10 +2420,10 @@
           "$ref": "#/definitions/consentRequest"
         },
         "grant_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "grant_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "handled_at": {
           "$ref": "#/definitions/nullTime"
@@ -2536,55 +2442,9 @@
         }
       }
     },
-    "Session": {
-      "type": "object",
-      "properties": {
-        "allowed_top_level_claims": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "client_id": {
-          "type": "string"
-        },
-        "consent_challenge": {
-          "type": "string"
-        },
-        "exclude_not_before_claim": {
-          "type": "boolean"
-        },
-        "expires_at": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "extra": {
-          "type": "object",
-          "additionalProperties": true
-        },
-        "headers": {
-          "$ref": "#/definitions/Headers"
-        },
-        "id_token_claims": {
-          "$ref": "#/definitions/IDTokenClaims"
-        },
-        "kid": {
-          "type": "string"
-        },
-        "subject": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string"
-        }
-      }
-    },
-    "StringSlicePipeDelimiter": {
+    "StringSliceJSONFormat": {
       "type": "array",
-      "title": "StringSlicePipeDelimiter de/encodes the string slice to/from a SQL string.",
+      "title": "StringSliceJSONFormat represents []string{} which is encoded to/from JSON for SQL storage.",
       "items": {
         "type": "string"
       }
@@ -2637,10 +2497,10 @@
       "title": "The request payload used to accept a consent request.",
       "properties": {
         "grant_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "grant_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "handled_at": {
           "$ref": "#/definitions/nullTime"
@@ -2671,7 +2531,7 @@
           "type": "string"
         },
         "amr": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "context": {
           "$ref": "#/definitions/JSONRawMessage"
@@ -2720,7 +2580,7 @@
           "type": "string"
         },
         "amr": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "challenge": {
           "description": "ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to\nidentify the session.",
@@ -2748,10 +2608,10 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "requested_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "skip": {
           "description": "Skip, if true, implies that the client has requested the same scopes from the same user previously.\nIf true, you must not ask the user to grant the requested scopes. You must however either allow or deny the\nconsent request using the usual API call.",
@@ -2946,10 +2806,10 @@
           "type": "string"
         },
         "requested_access_token_audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "requested_scope": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "session_id": {
           "description": "SessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag)\nthis ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false)\nthis will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back-\nchannel logout. It's value can generally be used to associate consecutive login requests by a certain user.",
@@ -2999,46 +2859,15 @@
       "format": "date-time",
       "title": "NullTime implements sql.NullTime functionality."
     },
-    "oAuth2AccessRequest": {
-      "type": "object",
-      "title": "Requester is a token endpoint's request context.",
-      "properties": {
-        "client_id": {
-          "description": "ClientID is the identifier of the OAuth 2.0 client.",
-          "type": "string"
-        },
-        "grant_types": {
-          "description": "GrantTypes is the requests grant types.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_audience": {
-          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_scopes": {
-          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "oAuth2Client": {
       "type": "object",
       "title": "Client represents an OAuth 2.0 Client.",
       "properties": {
         "allowed_cors_origins": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "audience": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "authorization_code_grant_access_token_lifespan": {
           "$ref": "#/definitions/NullDuration"
@@ -3082,7 +2911,7 @@
           "type": "string"
         },
         "contacts": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "created_at": {
           "description": "CreatedAt returns the timestamp of the client's creation.",
@@ -3098,7 +2927,7 @@
           "type": "string"
         },
         "grant_types": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "implicit_grant_access_token_lifespan": {
           "$ref": "#/definitions/NullDuration"
@@ -3138,10 +2967,10 @@
           "type": "string"
         },
         "post_logout_redirect_uris": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "redirect_uris": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "refresh_token_grant_access_token_lifespan": {
           "$ref": "#/definitions/NullDuration"
@@ -3165,10 +2994,10 @@
           "type": "string"
         },
         "request_uris": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "response_types": {
-          "$ref": "#/definitions/StringSlicePipeDelimiter"
+          "$ref": "#/definitions/StringSliceJSONFormat"
         },
         "scope": {
           "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
@@ -3426,12 +3255,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "requester": {
-          "$ref": "#/definitions/oAuth2AccessRequest"
-        },
-        "session": {
-          "$ref": "#/definitions/Session"
         },
         "subject": {
           "description": "Subject is the identifier of the authenticated end-user.",

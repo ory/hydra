@@ -417,8 +417,8 @@ func (p *DefaultProvider) GetGrantTypeJWTBearerIDOptional(ctx context.Context) b
 	return p.getProvider(ctx).Bool(KeyOAuth2GrantJWTIDOptional)
 }
 
-func (p *DefaultProvider) HSMKeySetPrefix(ctx context.Context) string {
-	return p.getProvider(ctx).String(HSMKeySetPrefix)
+func (p *DefaultProvider) HSMKeySetPrefix() string {
+	return p.getProvider(contextx.RootContext).String(HSMKeySetPrefix)
 }
 
 func (p *DefaultProvider) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Context) bool {

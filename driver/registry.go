@@ -71,7 +71,7 @@ type Registry interface {
 }
 
 func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger, skipNetworkInit bool, migrate bool, ctxer contextx.Contextualizer) (Registry, error) {
-	registry, err := NewRegistryWithoutInit(ctx, c, l)
+	registry, err := NewRegistryWithoutInit(c, l)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +81,8 @@ func NewRegistryFromDSN(ctx context.Context, c *config.DefaultProvider, l *logru
 	return registry, nil
 }
 
-func NewRegistryWithoutInit(ctx context.Context, c *config.DefaultProvider, l *logrusx.Logger) (Registry, error) {
-	driver, err := dbal.GetDriverFor(c.DSN(ctx))
+func NewRegistryWithoutInit(c *config.DefaultProvider, l *logrusx.Logger) (Registry, error) {
+	driver, err := dbal.GetDriverFor(c.DSN())
 	if err != nil {
 		return nil, errorsx.WithStack(err)
 	}

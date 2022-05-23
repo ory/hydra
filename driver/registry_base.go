@@ -55,7 +55,7 @@ var (
 type RegistryBase struct {
 	l            *logrusx.Logger
 	al           *logrusx.Logger
-	C            *config.DefaultProvider
+	conf         *config.DefaultProvider
 	ch           *client.Handler
 	fh           fosite.Hasher
 	jwtGrantH    *trust.Handler
@@ -164,7 +164,7 @@ func (m *RegistryBase) BuildHash() string {
 }
 
 func (m *RegistryBase) WithConfig(c *config.DefaultProvider) Registry {
-	m.C = c
+	m.conf = c
 	return m.r
 }
 
@@ -267,21 +267,21 @@ func (m *RegistryBase) HealthHandler() *healthx.Handler {
 
 func (m *RegistryBase) ConsentStrategy() consent.Strategy {
 	if m.cos == nil {
-		m.cos = consent.NewStrategy(m.r, m.C)
+		m.cos = consent.NewStrategy(m.r, m.Config())
 	}
 	return m.cos
 }
 
 func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 	if m.kc == nil {
-		m.kc = jwk.NewAEAD(m.C)
+		m.kc = jwk.NewAEAD(m.Config())
 	}
 	return m.kc
 }
 
 func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
 	if m.cs == nil {
-		cs := sessions.NewCookieStore(m.C.GetCookieSecrets(ctx)...)
+		cs := sessions.NewCookieStore(m.conf.GetCookieSecrets(ctx)...)
 		// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.
 		// MaxAge(0) disables internal MaxAge check by SecureCookie, see:
 		//
@@ -289,7 +289,7 @@ func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
 		cs.MaxAge(0)
 
 		m.cs = cs
-		m.csPrev = m.C.GetCookieSecrets(ctx)
+		m.csPrev = m.conf.GetCookieSecrets(ctx)
 	}
 	return m.cs
 }
@@ -400,7 +400,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTSigner) {
 	}
 
 	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
-		s, err = jwk.NewDefaultJWTSigner(*m.C, m.r, key)
+		s, err = jwk.NewDefaultJWTSigner(*m.Config(), m.r, key)
 		return err
 	}); err != nil {
 		m.Logger().WithError(err).Fatalf("Unable to initialize JSON Web Token strategy.")
@@ -425,14 +425,14 @@ func (m *RegistryBase) AudienceStrategy() fosite.AudienceMatchingStrategy {
 
 func (m *RegistryBase) ConsentHandler() *consent.Handler {
 	if m.coh == nil {
-		m.coh = consent.NewHandler(m.r, m.C)
+		m.coh = consent.NewHandler(m.r, m.Config())
 	}
 	return m.coh
 }
 
 func (m *RegistryBase) OAuth2Handler() *oauth2.Handler {
 	if m.oah == nil {
-		m.oah = oauth2.NewHandler(m.r, m.C)
+		m.oah = oauth2.NewHandler(m.r, m.Config())
 	}
 	return m.oah
 }
@@ -454,7 +454,7 @@ func (m *RegistryBase) SubjectIdentifierAlgorithm(ctx context.Context) map[strin
 
 func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
 	if m.trc == nil {
-		t, err := otelx.New("Ory Hydra", m.l, m.C.Tracing())
+		t, err := otelx.New("Ory Hydra", m.l, m.conf.Tracing())
 		if err != nil {
 			m.Logger().WithError(err).Error("Unable to initialize Tracer.")
 		} else {
@@ -478,7 +478,7 @@ func (m *RegistryBase) Persister() persistence.Persister {
 
 // Config returns the configuration for the given context. It may or may not be the same as the global configuration.
 func (m *RegistryBase) Config() *config.DefaultProvider {
-	return m.C
+	return m.conf
 }
 
 // WithOAuth2Provider forces an oauth2 provider which is only used for testing.
@@ -494,7 +494,7 @@ func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
 func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	if m.arhs == nil {
 		m.arhs = []oauth2.AccessRequestHook{
-			oauth2.RefreshTokenHook(m.C),
+			oauth2.RefreshTokenHook(m.Config()),
 		}
 	}
 	return m.arhs
@@ -504,9 +504,9 @@ func (m *RegistryBase) WithHsmContext(h hsm.Context) {
 	m.hsm = h
 }
 
-func (m *RegistryBase) HsmContext() hsm.Context {
+func (m *RegistryBase) HSMContext() hsm.Context {
 	if m.hsm == nil {
-		m.hsm = hsm.NewContext(m.C, m.l)
+		m.hsm = hsm.NewContext(m.Config(), m.l)
 	}
 	return m.hsm
 }

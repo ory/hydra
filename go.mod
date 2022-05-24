@@ -10,7 +10,7 @@ replace (
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/luna-duclos/instrumentedsql => github.com/ory/instrumentedsql v1.2.0
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
-	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.9
+	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
@@ -61,7 +61,7 @@ require (
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
-	github.com/ory/fosite v0.42.3-0.20220728130632-c3e0133cfed9
+	github.com/ory/fosite v0.42.3-0.20220508104133-3a0c9520791b
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13

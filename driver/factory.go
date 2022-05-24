@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"github.com/ory/x/servicelocator"
 
 	"github.com/ory/x/configx"
 
@@ -64,7 +65,8 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		f(o)
 	}
 
-	l := logrusx.New("Ory Hydra", config.Version)
+	l := servicelocator.Logger(ctx, logrusx.New("Ory Hydra", config.Version))
+
 	c, err := config.New(ctx, l, o.opts...)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to instantiate configuration.")

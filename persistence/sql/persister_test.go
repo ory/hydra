@@ -3,9 +3,11 @@ package sql_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"gopkg.in/square/go-jose.v2"
 
+	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 	"github.com/instana/testify/assert"
 	"github.com/instana/testify/require"
@@ -24,6 +26,12 @@ import (
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/internal"
 )
+
+func init() {
+	pop.SetNowFunc(func() time.Time {
+		return time.Date(2019, 1, 1, 0, 0, 0, 0, time.UTC)
+	})
+}
 
 func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registry, t2 driver.Registry) {
 	t.Run("package=client/manager="+k, func(t *testing.T) {

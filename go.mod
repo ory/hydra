@@ -14,6 +14,12 @@ replace (
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
+replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
+
+replace github.com/ory/x => github.com/ory/x v0.0.390
+
+replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.3-dev.5.0.20220521014312-db86847bd4be
+
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
@@ -42,8 +48,8 @@ require (
 	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/instana/testify v1.6.2-0.20200721153833-94b1851f4d65
-	github.com/jackc/pgx/v4 v4.15.0
-	github.com/jmoiron/sqlx v1.3.4
+	github.com/jackc/pgx/v4 v4.16.1
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20201103091713-40d03108b6f4

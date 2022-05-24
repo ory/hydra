@@ -16,9 +16,9 @@ replace (
 
 replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 
-replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.3-dev.5.0.20220524113609-012ea29c84cd
+replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 
-replace github.com/ory/x => github.com/ory/x v0.0.403-0.20220524154508-625030c7b432
+replace github.com/ory/x => github.com/ory/x v0.0.403
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4

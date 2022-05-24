@@ -4,7 +4,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [0.0.0 (2022-05-18)](#000-2022-05-18)
+- [0.0.0 (2022-05-24)](#000-2022-05-24)
     - [Bug Fixes](#bug-fixes)
 - [1.11.8 (2022-05-04)](#1118-2022-05-04)
     - [Bug Fixes](#bug-fixes-1)
@@ -633,7 +633,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [0.0.0](https://github.com/ory/hydra/compare/v1.11.8...v0.0.0) (2022-05-18)
+# [0.0.0](https://github.com/ory/hydra/compare/v1.11.8...v0.0.0) (2022-05-24)
 
 
 ### Bug Fixes
@@ -642,6 +642,7 @@
 
     Closes https://github.com/ory/docs/issues/722
 
+* Link OIDC Certification image ([#3124](https://github.com/ory/hydra/issues/3124)) ([17b517f](https://github.com/ory/hydra/commit/17b517f355f63788b237b2964984df02b56b8c63))
 * Ping logic for SQL Registry ([#3095](https://github.com/ory/hydra/issues/3095)) ([a383b5a](https://github.com/ory/hydra/commit/a383b5a655688b203aba49c35c0f9c3cda84483d)), closes [#2734](https://github.com/ory/hydra/issues/2734)
 
 

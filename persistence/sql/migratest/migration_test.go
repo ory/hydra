@@ -22,11 +22,8 @@ import (
 	"github.com/ory/x/sqlxx"
 
 	"github.com/ory/hydra/flow"
-	"github.com/ory/hydra/internal"
 	testhelpersuuid "github.com/ory/hydra/internal/testhelpers/uuid"
 	"github.com/ory/hydra/persistence/sql"
-	"github.com/ory/x/contextx"
-
 	"github.com/ory/x/popx"
 
 	"github.com/ory/x/sqlcon/dockertest"
@@ -57,13 +54,14 @@ func CompareWithFixture(t *testing.T, actual interface{}, prefix string, id stri
 }
 
 func TestMigrations(t *testing.T) {
+	//pop.Debug = true
 	connections := make(map[string]*pop.Connection, 1)
 
 	if testing.Short() {
-		reg := internal.NewMockedRegistry(t, &contextx.Default{})
-		reg.Persister().MigrateUp(context.Background())
-		c := reg.Persister().Connection(context.Background())
-		connections["sqlite"] = c
+		//reg := internal.NewMockedRegistry(t, &contextx.Default{})
+		//require.NoError(t, reg.Persister().MigrateUp(context.Background()))
+		//c := reg.Persister().Connection(context.Background())
+		//connections["sqlite"] = c
 	}
 
 	if !testing.Short() {
@@ -72,10 +70,10 @@ func TestMigrations(t *testing.T) {
 				connections["postgres"] = dockertest.ConnectToTestPostgreSQLPop(t)
 			},
 			func() {
-				connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
+				//connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
 			},
 			func() {
-				connections["cockroach"] = dockertest.ConnectToTestCockroachDBPop(t)
+				//connections["cockroach"] = dockertest.ConnectPop(t, internal.NewEmptyTestCRDBServer(t))
 			},
 		})
 	}
@@ -94,7 +92,12 @@ func TestMigrations(t *testing.T) {
 			}
 
 			l := logrusx.New("", "", logrusx.ForceLevel(logrus.DebugLevel))
-			tm := popx.NewTestMigrator(t, c, os.DirFS("../migrations"), os.DirFS("./testdata"), l)
+
+			tm, err := popx.NewMigrationBox(
+				os.DirFS("../migrations"),
+				popx.NewMigrator(c, l, nil, 1*time.Minute),
+				popx.WithTestdata(t, os.DirFS("./testdata")))
+			require.NoError(t, err)
 			require.NoError(t, tm.Up(ctx))
 
 			t.Run("suite=fixtures", func(t *testing.T) {

@@ -6,7 +6,6 @@ replace (
 	github.com/bradleyjkemp/cupaloy/v2 => github.com/aeneasr/cupaloy/v2 v2.6.1-0.20210924214125-3dfdd01210a3
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
-	github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.2-alpha-ci.0.20220421231416-e6ba76ba3be3
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	github.com/luna-duclos/instrumentedsql => github.com/ory/instrumentedsql v1.2.0
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
@@ -17,6 +16,8 @@ replace (
 replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 
 replace github.com/ory/x => github.com/ory/x v0.0.390
+
+replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.3-dev.5.0.20220521014312-db86847bd4be
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -46,8 +47,8 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-retryablehttp v0.7.0
 	github.com/instana/testify v1.6.2-0.20200721153833-94b1851f4d65
-	github.com/jackc/pgx/v4 v4.15.0
-	github.com/jmoiron/sqlx v1.3.4
+	github.com/jackc/pgx/v4 v4.16.1
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
 	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20201103091713-40d03108b6f4

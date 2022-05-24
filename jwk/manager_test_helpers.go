@@ -90,8 +90,8 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 		// Because MySQL
 		time.Sleep(time.Second * 2)
 
-		First(pub).KeyID = "new-key-id:" + suffix
-		First(pub).Use = "sig"
+		pub[0].KeyID = "new-key-id:" + suffix
+		pub[0].Use = "sig"
 		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
 		require.NoError(t, err)
 
@@ -110,7 +110,14 @@ func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suff
 
 		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
 		require.NoError(t, err)
-		assert.EqualValues(t, "new-key-id:"+suffix, First(keys.Keys).KeyID)
+		var found bool
+		for _, k := range keys.Keys {
+			if k.KeyID == "new-key-id:"+suffix {
+				found = true
+				break
+			}
+		}
+		assert.True(t, found, "Key not found in key set: %s\n%+v", "new-key-id:"+suffix, keys)
 
 		beforeDeleteKeysCount := len(keys.Keys)
 		err = m.DeleteKey(context.TODO(), algo+"faz", "public:"+suffix)

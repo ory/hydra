@@ -328,7 +328,7 @@ and the OpenID Foundation:
 Ory Hydra is an OpenID Foundation [certified OpenID Provider (OP)](http://openid.net/certification/#OPs).
 
 <p align="center">
-    <img src="docs/static/img/docs/oidc-cert.png" alt="Ory Hydra is a certified OpenID Providier" width="256px">
+    <img src="https://github.com/ory/docs/blob/master/docs/hydra/images/oidc-cert.png" alt="Ory Hydra is a certified OpenID Providier" width="256px">
 </p>
 
 The following OpenID profiles are certified:

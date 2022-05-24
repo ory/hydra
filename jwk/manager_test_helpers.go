@@ -183,9 +183,7 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 
 		assertx.EqualAsJSON(t, canonicalizeKeyThumbprints(genPub), canonicalizeKeyThumbprints(gotPub))
 
-		genPriv.Key = nil
-		gotPriv.Key = nil
-		assertx.EqualAsJSON(t, canonicalizeKeyThumbprints(genPriv), canonicalizeKeyThumbprints(gotPriv))
+		assert.EqualValues(t, genPriv.KeyID, gotPriv.KeyID)
 
 		err = m.DeleteKeySet(context.TODO(), "foo")
 		require.NoError(t, err)

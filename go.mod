@@ -12,13 +12,14 @@ replace (
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
+
 )
 
 replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 
-replace github.com/gobuffalo/pop/v6 => github.com/zepatrik/pop/v6 v6.0.0-20220519141323-ce05da9328cd
+replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.3-dev.5.0.20220524113609-012ea29c84cd
 
-replace github.com/ory/x => github.com/ory/x v0.0.396
+replace github.com/ory/x => github.com/ory/x v0.0.403-0.20220524154508-625030c7b432
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -26,7 +27,7 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.0.0
-	github.com/cockroachdb/cockroach-go/v2 v2.2.7
+	github.com/cockroachdb/cockroach-go/v2 v2.2.10
 	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
@@ -82,7 +83,7 @@ require (
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.uber.org/automaxprocs v1.3.0
-	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
+	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/tools v0.1.10

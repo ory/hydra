@@ -26,7 +26,6 @@ require (
 	github.com/bradleyjkemp/cupaloy/v2 v2.6.0
 	github.com/bxcodec/faker/v3 v3.7.0
 	github.com/cenkalti/backoff/v3 v3.0.0
-	github.com/cockroachdb/cockroach-go/v2 v2.2.10
 	github.com/evanphx/json-patch v4.11.0+incompatible
 	github.com/fatih/structs v1.1.0
 	github.com/go-bindata/go-bindata v3.1.2+incompatible
@@ -80,6 +79,7 @@ require (
 	github.com/tidwall/gjson v1.14.0
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
+	go.opentelemetry.io/otel v1.7.0
 	go.uber.org/automaxprocs v1.3.0
 	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8

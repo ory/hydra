@@ -40,9 +40,6 @@ func (p *Persister) RevokeSubjectClientConsentSession(ctx context.Context, user,
 }
 
 func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interface{}) func(context.Context, *pop.Connection) error {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.revokeConsentSession")
-	defer span.End()
-
 	return func(ctx context.Context, c *pop.Connection) error {
 		fs := make([]*flow.Flow, 0)
 		if err := p.QueryWithNetwork(ctx).

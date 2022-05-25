@@ -52,6 +52,9 @@ type (
 )
 
 func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.BeginTX")
+	defer span.End()
+
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	if popx.GetConnection(ctx, fallback).TX != fallback.TX {
 		return ctx, errorsx.WithStack(ErrTransactionOpen)
@@ -71,6 +74,9 @@ func (p *Persister) BeginTX(ctx context.Context) (context.Context, error) {
 }
 
 func (p *Persister) Commit(ctx context.Context) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Commit")
+	defer span.End()
+
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
 	if tx.TX == fallback.TX || tx.TX == nil {
@@ -81,6 +87,9 @@ func (p *Persister) Commit(ctx context.Context) error {
 }
 
 func (p *Persister) Rollback(ctx context.Context) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.Rollback")
+	defer span.End()
+
 	fallback := &pop.Connection{TX: &pop.Tx{}}
 	tx := popx.GetConnection(ctx, fallback)
 	if tx.TX == fallback.TX || tx.TX == nil {

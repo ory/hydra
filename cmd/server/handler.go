@@ -44,6 +44,7 @@ import (
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/xnew/otelx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -308,7 +309,7 @@ func serve(
 	defer wg.Done()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		handler = x.TraceHandler(handler)
+		handler = otelx.TraceHandler(handler)
 	}
 
 	var srv = graceful.WithDefaults(&http.Server{

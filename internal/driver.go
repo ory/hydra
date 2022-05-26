@@ -7,8 +7,6 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/cockroachdb/cockroach-go/v2/testserver"
-
 	"github.com/ory/x/configx"
 
 	"github.com/stretchr/testify/require"
@@ -102,14 +100,6 @@ func ConnectToCRDB(t *testing.T) string {
 	return url
 }
 
-func NewEmptyTestCRDBServer(t *testing.T) string {
-	ts, err := testserver.NewTestServer()
-	require.NoError(t, err)
-
-	ts.PGURL().Scheme = "cockroach"
-	return ts.PGURL().String()
-}
-
 func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer) (pg, mysql, crdb driver.Registry, clean func(*testing.T)) {
 	var pgURL, mysqlURL, crdbURL string
 	wg := sync.WaitGroup{}
@@ -126,7 +116,7 @@ func ConnectDatabases(t *testing.T, migrate bool, ctxer contextx.Contextualizer)
 		wg.Done()
 	}()
 	go func() {
-		crdbURL = NewEmptyTestCRDBServer(t)
+		crdbURL = ConnectToCRDB(t)
 		t.Log("crdb done")
 		wg.Done()
 	}()

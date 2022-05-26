@@ -481,7 +481,7 @@ nid = ?`, flow.FlowStateConsentUsed, flow.FlowStateConsentUnused,
 }
 
 func (p *Persister) filterExpiredConsentRequests(ctx context.Context, requests []consent.HandledConsentRequest) ([]consent.HandledConsentRequest, error) {
-	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.filterExpiredConsentRequests")
+	_, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.filterExpiredConsentRequests")
 	defer span.End()
 
 	var result []consent.HandledConsentRequest

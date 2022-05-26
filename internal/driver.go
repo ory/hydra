@@ -105,7 +105,6 @@ func ConnectToCRDB(t *testing.T) string {
 func NewEmptyTestCRDBServer(t *testing.T) string {
 	ts, err := testserver.NewTestServer()
 	require.NoError(t, err)
-	t.Cleanup(ts.Stop)
 
 	ts.PGURL().Scheme = "cockroach"
 	return ts.PGURL().String()

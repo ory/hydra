@@ -76,7 +76,7 @@ func TestMigrations(t *testing.T) {
 				connections["mysql"] = dockertest.ConnectToTestMySQLPop(t)
 			},
 			func() {
-				connections["cockroach"] = dockertest.ConnectPop(t, internal.NewEmptyTestCRDBServer(t))
+				connections["cockroach"] = dockertest.ConnectToTestCockroachDBPop(t)
 			},
 		})
 	}

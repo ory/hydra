@@ -29,8 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/x/otelx"
-
 	analytics "github.com/ory/analytics-go/v4"
 	"github.com/ory/x/configx"
 
@@ -310,7 +308,7 @@ func serve(
 	defer wg.Done()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		handler = otelx.NewHandler(handler, "cmd."+iface.String())
+		handler = x.TraceHandler(handler)
 	}
 
 	var srv = graceful.WithDefaults(&http.Server{

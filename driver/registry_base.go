@@ -37,6 +37,10 @@ import (
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
+	"github.com/ory/x/healthx"
+	"github.com/ory/x/resilience"
+	"github.com/ory/x/urlx"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/config"
@@ -199,7 +203,7 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		m.fh = &tracing.TracedBCrypt{GetWorkFactor: m.Config().GetBCryptCost}
+		m.fh = x.NewBCrypt(m.Config(contextx.RootContext))
 	}
 	return m.fh
 }

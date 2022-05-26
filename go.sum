@@ -1430,8 +1430,6 @@ github.com/ory/jsonschema/v3 v3.0.7 h1:GQ9qfZDiJqs4l2d3p56dozCChvejQFZyLKGHYzDzO
 github.com/ory/jsonschema/v3 v3.0.7/go.mod h1:g8c8YOtN4TrR2wYeMdT02GDmzJDI0fEW2nI26BECafY=
 github.com/ory/viper v1.7.5 h1:+xVdq7SU3e1vNaCsk/ixsfxE4zylk1TJUiJrY647jUE=
 github.com/ory/viper v1.7.5/go.mod h1:ypOuyJmEUb3oENywQZRgeAMwqgOyDqwboO1tj3DjTaM=
-github.com/ory/x v0.0.403 h1:DLoi8NJxJd1gChJ+KxfuNwmkvN4KA9GV03ACMYk1+Ac=
-github.com/ory/x v0.0.403/go.mod h1:9cSWY2P/Kb3CHk7hk8ewRX9KX8fqGpKCild2Rcbw/n4=
 github.com/ory/x v0.0.404 h1:fOJXqgaNrposX3IhkM5+WWylEzveb8+DPBK9BSOvTV8=
 github.com/ory/x v0.0.404/go.mod h1:9cSWY2P/Kb3CHk7hk8ewRX9KX8fqGpKCild2Rcbw/n4=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=

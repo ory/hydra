@@ -2,8 +2,6 @@ module github.com/ory/hydra
 
 go 1.16
 
-require github.com/ory/xnew v0.0.0-00010101000000-000000000000
-
 replace (
 	github.com/bradleyjkemp/cupaloy/v2 => github.com/aeneasr/cupaloy/v2 v2.6.1-0.20210924214125-3dfdd01210a3
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.0.0
@@ -13,14 +11,13 @@ replace (
 	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
-	github.com/ory/xnew => github.com/ory/x v0.0.404
 )
 
 replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 
-replace github.com/ory/x => github.com/ory/x v0.0.403
+replace github.com/ory/x => github.com/ory/x v0.0.404
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4

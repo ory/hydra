@@ -44,7 +44,7 @@ import (
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 	"github.com/ory/x/networkx"
-	"github.com/ory/xnew/otelx"
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"

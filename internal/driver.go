@@ -3,10 +3,11 @@ package internal
 import (
 	"context"
 
-	"github.com/cockroachdb/cockroach-go/v2/testserver"
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/cockroachdb/cockroach-go/v2/testserver"
 
 	"github.com/ory/x/configx"
 

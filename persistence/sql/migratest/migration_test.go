@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/hydra/internal"
-	"github.com/ory/x/contextx"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/ory/hydra/internal"
+	"github.com/ory/x/contextx"
 
 	"github.com/bradleyjkemp/cupaloy/v2"
 	"github.com/fatih/structs"

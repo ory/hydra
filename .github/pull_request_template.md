@@ -50,7 +50,7 @@ If you're unsure about any of them, don't hesitate to ask. We're here to help!
       the changes.
 - [ ] I have added tests that prove my fix is effective or that my feature
       works.
-- [ ] I have added or changed [the documentation](docs/docs).
+- [ ] I have added or changed [the documentation](https://github.com/ory/docs).
 
 ## Further Comments
 

@@ -23,8 +23,9 @@ package x
 import (
 	"context"
 
-	"github.com/ory/x/errorsx"
 	"go.opentelemetry.io/otel"
+
+	"github.com/ory/x/errorsx"
 
 	"golang.org/x/crypto/bcrypt"
 )

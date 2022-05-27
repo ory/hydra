@@ -7,8 +7,6 @@ replace (
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/gobuffalo/packr => github.com/gobuffalo/packr v1.30.1
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
-	github.com/luna-duclos/instrumentedsql => github.com/ory/instrumentedsql v1.2.0
-	github.com/luna-duclos/instrumentedsql/opentracing => github.com/ory/instrumentedsql/opentracing v0.0.0-20210903114257-c8963b546c5c
 	github.com/mattn/go-sqlite3 => github.com/mattn/go-sqlite3 v1.14.13
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
@@ -54,7 +52,6 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/luna-duclos/instrumentedsql v1.1.3
-	github.com/luna-duclos/instrumentedsql/opentracing v0.0.0-20201103091713-40d03108b6f4
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/goveralls v0.0.11 // indirect
 	github.com/miekg/pkcs11 v1.0.3

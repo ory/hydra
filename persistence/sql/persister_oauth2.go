@@ -113,6 +113,9 @@ func (p *Persister) sqlSchemaFromRequest(ctx context.Context, rawSignature strin
 }
 
 func (r *OAuth2RequestSQL) toRequest(ctx context.Context, session fosite.Session, p *Persister) (*fosite.Request, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.toRequest")
+	defer span.End()
+
 	sess := r.Session
 	if !gjson.ValidBytes(sess) {
 		var err error
@@ -162,6 +165,9 @@ func (p *Persister) hashSignature(ctx context.Context, signature string, table t
 }
 
 func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.ClientAssertionJWTValid")
+	defer span.End()
+
 	j, err := p.GetClientAssertionJWT(ctx, jti)
 	if errors.Is(err, sqlcon.ErrNoRows) {
 		// the jti is not known => valid
@@ -178,6 +184,9 @@ func (p *Persister) ClientAssertionJWTValid(ctx context.Context, jti string) err
 }
 
 func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp time.Time) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.SetClientAssertionJWT")
+	defer span.End()
+
 	// delete expired; this cleanup spares us the need for a background worker
 	if err := p.QueryWithNetwork(ctx).Where("expires_at < CURRENT_TIMESTAMP").Delete(&oauth2.BlacklistedJTI{}); err != nil {
 		return sqlcon.HandleError(err)
@@ -195,15 +204,24 @@ func (p *Persister) SetClientAssertionJWT(ctx context.Context, jti string, exp t
 }
 
 func (p *Persister) GetClientAssertionJWT(ctx context.Context, j string) (*oauth2.BlacklistedJTI, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetClientAssertionJWT")
+	defer span.End()
+
 	jti := oauth2.NewBlacklistedJTI(j, time.Time{})
 	return jti, sqlcon.HandleError(p.QueryWithNetwork(ctx).Find(jti, jti.ID))
 }
 
 func (p *Persister) SetClientAssertionJWTRaw(ctx context.Context, jti *oauth2.BlacklistedJTI) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.SetClientAssertionJWTRaw")
+	defer span.End()
+
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, jti))
 }
 
 func (p *Persister) createSession(ctx context.Context, signature string, requester fosite.Requester, table tableName) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.createSession")
+	defer span.End()
+
 	req, err := p.sqlSchemaFromRequest(ctx, signature, requester, table)
 	if err != nil {
 		return err
@@ -218,6 +236,9 @@ func (p *Persister) createSession(ctx context.Context, signature string, request
 }
 
 func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature string, session fosite.Session, table tableName) (fosite.Requester, error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.findSessionBySignature")
+	defer span.End()
+
 	rawSignature = p.hashSignature(ctx, rawSignature, table)
 
 	r := OAuth2RequestSQL{Table: table}
@@ -246,6 +267,9 @@ func (p *Persister) findSessionBySignature(ctx context.Context, rawSignature str
 }
 
 func (p *Persister) deleteSessionBySignature(ctx context.Context, signature string, table tableName) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deleteSessionBySignature")
+	defer span.End()
+
 	signature = p.hashSignature(ctx, signature, table)
 
 	/* #nosec G201 table is static */
@@ -256,6 +280,9 @@ func (p *Persister) deleteSessionBySignature(ctx context.Context, signature stri
 }
 
 func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, table tableName) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deleteSessionByRequestID")
+	defer span.End()
+
 	/* #nosec G201 table is static */
 	if err := p.QueryWithNetwork(ctx).
 		Where("request_id=?", id).
@@ -273,6 +300,9 @@ func (p *Persister) deleteSessionByRequestID(ctx context.Context, id string, tab
 }
 
 func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string, table tableName) error {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.deactivateSessionByRequestID")
+	defer span.End()
+
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
@@ -286,14 +316,23 @@ func (p *Persister) deactivateSessionByRequestID(ctx context.Context, id string,
 }
 
 func (p *Persister) CreateAuthorizeCodeSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.CreateAuthorizeCodeSession")
+	defer span.End()
+
 	return p.createSession(ctx, signature, requester, sqlTableCode)
 }
 
 func (p *Persister) GetAuthorizeCodeSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.GetAuthorizeCodeSession")
+	defer span.End()
+
 	return p.findSessionBySignature(ctx, signature, session, sqlTableCode)
 }
 
 func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signature string) (err error) {
+	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.InvalidateAuthorizeCodeSession")
+	defer span.End()
+
 	/* #nosec G201 table is static */
 	return sqlcon.HandleError(
 		p.Connection(ctx).
@@ -307,14 +346,17 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 }
 
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
+
 	return p.createSession(ctx, signature, requester, sqlTableAccess)
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
+
 	return p.findSessionBySignature(ctx, signature, session, sqlTableAccess)
 }
 
 func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature string) (err error) {
+
 	return p.deleteSessionBySignature(ctx, signature, sqlTableAccess)
 }
 

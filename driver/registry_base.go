@@ -37,6 +37,7 @@ import (
 	foauth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/herodot"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver/config"
@@ -45,7 +46,6 @@ import (
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/resilience"
-	"github.com/ory/x/tracing"
 )
 
 var (
@@ -199,7 +199,7 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		m.fh = &tracing.TracedBCrypt{GetWorkFactor: m.Config().GetBCryptCost}
+		m.fh = x.NewBCrypt(m.Config())
 	}
 	return m.fh
 }
@@ -460,6 +460,9 @@ func (m *RegistryBase) Tracer(ctx context.Context) *otelx.Tracer {
 		} else {
 			m.trc = t
 		}
+	}
+	if m.trc.Tracer() == nil {
+		m.trc = otelx.NewNoop(m.l, m.Config().Tracing())
 	}
 
 	return m.trc

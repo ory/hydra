@@ -18,7 +18,6 @@ import (
 	"github.com/ory/x/popx"
 
 	"github.com/luna-duclos/instrumentedsql"
-	"github.com/luna-duclos/instrumentedsql/opentracing"
 
 	"github.com/ory/x/resilience"
 
@@ -29,6 +28,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/ory/x/dbal"
+	otelsql "github.com/ory/x/otelx/sql"
 	"github.com/ory/x/sqlcon"
 
 	"github.com/ory/hydra/client"
@@ -94,7 +94,7 @@ func (m *RegistrySQL) Init(ctx context.Context, skipNetworkInit bool, migrate bo
 		var opts []instrumentedsql.Opt
 		if m.Tracer(ctx).IsLoaded() {
 			opts = []instrumentedsql.Opt{
-				instrumentedsql.WithTracer(opentracing.NewTracer(true)),
+				instrumentedsql.WithTracer(otelsql.NewTracer()),
 			}
 		}
 

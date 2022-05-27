@@ -29,8 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ory/x/otelx"
-
 	analytics "github.com/ory/analytics-go/v4"
 	"github.com/ory/x/configx"
 
@@ -46,6 +44,7 @@ import (
 	"github.com/ory/x/healthx"
 	"github.com/ory/x/metricsx"
 	"github.com/ory/x/networkx"
+	"github.com/ory/x/otelx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -310,7 +309,7 @@ func serve(
 	defer wg.Done()
 
 	if tracer := d.Tracer(cmd.Context()); tracer.IsLoaded() {
-		handler = otelx.NewHandler(handler, "cmd."+iface.String())
+		handler = otelx.TraceHandler(handler)
 	}
 
 	var srv = graceful.WithDefaults(&http.Server{

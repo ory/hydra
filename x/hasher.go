@@ -23,12 +23,15 @@ package x
 import (
 	"context"
 
+	"go.opentelemetry.io/otel"
+
 	"github.com/ory/x/errorsx"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 const defaultBCryptWorkFactor = 12
+const tracingComponent = "github.com/ory/hydra/x"
 
 // BCrypt implements a BCrypt hasher.
 type BCrypt struct {
@@ -47,6 +50,9 @@ func NewBCrypt(c config) *BCrypt {
 }
 
 func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
+	defer span.End()
+
 	cf := b.c.GetBCryptCost(ctx)
 	if cf == 0 {
 		cf = defaultBCryptWorkFactor
@@ -59,6 +65,9 @@ func (b *BCrypt) Hash(ctx context.Context, data []byte) ([]byte, error) {
 }
 
 func (b *BCrypt) Compare(ctx context.Context, hash, data []byte) error {
+	_, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "x.hasher.Hash")
+	defer span.End()
+
 	if err := bcrypt.CompareHashAndPassword(hash, data); err != nil {
 		return errorsx.WithStack(err)
 	}

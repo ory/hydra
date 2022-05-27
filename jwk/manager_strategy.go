@@ -4,10 +4,14 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/x"
+	"github.com/ory/x/otelx"
 )
+
+const tracingComponent = "github.com/ory/hydra/jwk"
 
 type ManagerStrategy struct {
 	hardwareKeyManager Manager
@@ -22,26 +26,72 @@ func NewManagerStrategy(hardwareKeyManager Manager, softwareKeyManager Manager) 
 }
 
 func (m ManagerStrategy) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+		"kid": kid,
+		"alg": alg,
+		"use": use,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	return m.hardwareKeyManager.GenerateAndPersistKeySet(ctx, set, kid, alg, use)
 }
 
 func (m ManagerStrategy) AddKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	return m.softwareKeyManager.AddKey(ctx, set, key)
 }
 
 func (m ManagerStrategy) AddKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	return m.softwareKeyManager.AddKeySet(ctx, set, keys)
 }
 
 func (m ManagerStrategy) UpdateKey(ctx context.Context, set string, key *jose.JSONWebKey) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	return m.softwareKeyManager.UpdateKey(ctx, set, key)
 }
 
 func (m ManagerStrategy) UpdateKeySet(ctx context.Context, set string, keys *jose.JSONWebKeySet) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	return m.softwareKeyManager.UpdateKeySet(ctx, set, keys)
 }
 
 func (m ManagerStrategy) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+		"kid": kid,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	keySet, err := m.hardwareKeyManager.GetKey(ctx, set, kid)
 	if err != nil && !errors.Is(err, x.ErrNotFound) {
 		return nil, err
@@ -53,6 +103,13 @@ func (m ManagerStrategy) GetKey(ctx context.Context, set, kid string) (*jose.JSO
 }
 
 func (m ManagerStrategy) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	keySet, err := m.hardwareKeyManager.GetKeySet(ctx, set)
 	if err != nil && !errors.Is(err, x.ErrNotFound) {
 		return nil, err
@@ -64,6 +121,14 @@ func (m ManagerStrategy) GetKeySet(ctx context.Context, set string) (*jose.JSONW
 }
 
 func (m ManagerStrategy) DeleteKey(ctx context.Context, set, kid string) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+		"kid": kid,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	err := m.hardwareKeyManager.DeleteKey(ctx, set, kid)
 	if err != nil && !errors.Is(err, x.ErrNotFound) {
 		return err
@@ -75,6 +140,13 @@ func (m ManagerStrategy) DeleteKey(ctx context.Context, set, kid string) error {
 }
 
 func (m ManagerStrategy) DeleteKeySet(ctx context.Context, set string) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "jwk.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	err := m.hardwareKeyManager.DeleteKeySet(ctx, set)
 	if err != nil && !errors.Is(err, x.ErrNotFound) {
 		return err

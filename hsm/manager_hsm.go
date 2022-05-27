@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/ory/hydra/driver/config"
+	"github.com/ory/x/otelx"
 
 	"github.com/pkg/errors"
 
@@ -27,9 +28,12 @@ import (
 	"github.com/ory/hydra/x"
 
 	"github.com/ThalesIgnite/crypto11"
+	"go.opentelemetry.io/otel"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/cryptosigner"
 )
+
+const tracingComponent = "github.com/ory/hydra/hsm"
 
 type KeyManager struct {
 	jwk.Manager
@@ -51,7 +55,17 @@ func NewKeyManager(hsm Context, config *config.DefaultProvider) *KeyManager {
 	}
 }
 
-func (m *KeyManager) GenerateAndPersistKeySet(_ context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+func (m *KeyManager) GenerateAndPersistKeySet(ctx context.Context, set, kid, alg, use string) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GenerateAndPersistKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+		"kid": kid,
+		"alg": alg,
+		"use": use,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	m.Lock()
 	defer m.Unlock()
 
@@ -102,7 +116,15 @@ func (m *KeyManager) GenerateAndPersistKeySet(_ context.Context, set, kid, alg, 
 	}
 }
 
-func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
+func (m *KeyManager) GetKey(ctx context.Context, set, kid string) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKey")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+		"kid": kid,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	m.RLock()
 	defer m.RUnlock()
 
@@ -125,7 +147,14 @@ func (m *KeyManager) GetKey(_ context.Context, set, kid string) (*jose.JSONWebKe
 	return createKeySet(keyPair, id, alg, use)
 }
 
-func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeySet, error) {
+func (m *KeyManager) GetKeySet(ctx context.Context, set string) (*jose.JSONWebKeySet, error) {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	m.RLock()
 	defer m.RUnlock()
 
@@ -154,7 +183,15 @@ func (m *KeyManager) GetKeySet(_ context.Context, set string) (*jose.JSONWebKeyS
 	}, nil
 }
 
-func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
+func (m *KeyManager) DeleteKey(ctx context.Context, set, kid string) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+		"kid": kid,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	m.Lock()
 	defer m.Unlock()
 
@@ -176,7 +213,14 @@ func (m *KeyManager) DeleteKey(_ context.Context, set, kid string) error {
 	return nil
 }
 
-func (m *KeyManager) DeleteKeySet(_ context.Context, set string) error {
+func (m *KeyManager) DeleteKeySet(ctx context.Context, set string) error {
+	ctx, span := otel.GetTracerProvider().Tracer(tracingComponent).Start(ctx, "hsm.GetKeySet")
+	defer span.End()
+	attrs := map[string]string{
+		"set": set,
+	}
+	span.SetAttributes(otelx.StringAttrs(attrs)...)
+
 	m.Lock()
 	defer m.Unlock()
 

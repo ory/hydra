@@ -110,13 +110,7 @@ func ExcludePublicKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
 
 	for _, k := range set.Keys {
-		_, ecdsaOk := k.Key.(*ecdsa.PublicKey)
-		_, ed25519OK := k.Key.(ed25519.PublicKey)
-		_, rsaOK := k.Key.(*rsa.PublicKey)
-
-		if !ecdsaOk && !ed25519OK && !rsaOK {
-			keys.Keys = append(keys.Keys, k)
-		}
+		keys.Keys = append(keys.Keys, k.Public())
 	}
 	return keys
 }

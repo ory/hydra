@@ -221,6 +221,11 @@
       "type": "object",
       "description": "Configures HTTPS (HTTP over TLS). If configured, the server automatically supports HTTP/2.",
       "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Setting enabled to false drops the TLS requirement for the admin endpoint, even if TLS is enabled on the public endpoint.",
+          "default": true
+        },
         "key": {
           "description": "Configures the private key (pem encoded).",
           "allOf": [
@@ -408,16 +413,6 @@
               "allOf": [
                 {
                   "$ref": "#/definitions/tls_config"
-                },
-                {
-                  "type": "object",
-                  "properties": {
-                    "enabled": {
-                      "type": "boolean",
-                      "description": "Setting enabled to false drops the TLS requirement for the admin endpoint, even if TLS is enabled on the public endpoint.",
-                      "default": true
-                    }
-                  }
                 }
               ]
             }
@@ -1232,7 +1227,7 @@
     "dangerous-allow-insecure-redirect-urls": {
       "type": "array",
       "items": {
-          "type": "string"
+        "type": "string"
       },
       "title": "Disable HTTPS enforcement for the provided redirect URLs.",
       "description": "DO NOT USE THIS IN PRODUCTION - Disable HTTPS enforcement for the provided redirect URLs. This is only available as CLI flag `--dangerous-allow-insecure-redirect-urls`."

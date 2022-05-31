@@ -24,6 +24,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/ory/x/servicelocator"
 	"net/http"
 	"strings"
 	"sync"
@@ -62,8 +63,12 @@ func EnhanceMiddleware(ctx context.Context, d driver.Registry, n *negroni.Negron
 	if !networkx.AddressIsUnixSocket(address) {
 		n.UseFunc(x.RejectInsecureRequests(d, d.Config().TLS(ctx, iface)))
 	}
-	n.UseHandler(router)
 
+	for _, mw := range servicelocator.HTTPMiddlewares(ctx) {
+		n.Use(mw)
+	}
+
+	n.UseHandler(router)
 	if !enableCORS {
 		return n
 	}
@@ -94,8 +99,6 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 	isDSNAllowed(ctx, d)
 
 	admin, _, adminmw, _ := setup(ctx, d, cmd)
-	cert := GetOrCreateTLSCertificate(ctx, cmd, d, config.AdminInterface) // we do not want to run this concurrently.
-
 	d.PrometheusManager().RegisterRouter(admin.Router)
 
 	var wg sync.WaitGroup
@@ -110,7 +113,6 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
 		d.Config().ListenOn(config.AdminInterface),
 		d.Config().SocketPermission(config.AdminInterface),
-		cert,
 	)
 
 	wg.Wait()
@@ -122,8 +124,6 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 	isDSNAllowed(ctx, d)
 
 	_, public, _, publicmw := setup(ctx, d, cmd)
-	cert := GetOrCreateTLSCertificate(ctx, cmd, d, config.PublicInterface) // we do not want to run this concurrently.
-
 	d.PrometheusManager().RegisterRouter(public.Router)
 
 	var wg sync.WaitGroup
@@ -138,7 +138,6 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
 		d.Config().ListenOn(config.PublicInterface),
 		d.Config().SocketPermission(config.PublicInterface),
-		cert,
 	)
 
 	wg.Wait()
@@ -165,7 +164,6 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 		EnhanceMiddleware(ctx, d, publicmw, d.Config().ListenOn(config.PublicInterface), public.Router, false, config.PublicInterface),
 		d.Config().ListenOn(config.PublicInterface),
 		d.Config().SocketPermission(config.PublicInterface),
-		GetOrCreateTLSCertificate(ctx, cmd, d, config.PublicInterface),
 	)
 
 	go serve(
@@ -177,7 +175,6 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 		EnhanceMiddleware(ctx, d, adminmw, d.Config().ListenOn(config.AdminInterface), admin.Router, true, config.AdminInterface),
 		d.Config().ListenOn(config.AdminInterface),
 		d.Config().SocketPermission(config.AdminInterface),
-		GetOrCreateTLSCertificate(ctx, cmd, d, config.AdminInterface),
 	)
 
 	wg.Wait()
@@ -304,7 +301,6 @@ func serve(
 	handler http.Handler,
 	address string,
 	permission *configx.UnixPermission,
-	cert []tls.Certificate,
 ) {
 	defer wg.Done()
 
@@ -312,12 +308,15 @@ func serve(
 		handler = otelx.TraceHandler(handler)
 	}
 
+	var tlsConfig *tls.Config
+	if tc := d.Config().TLS(ctx, iface); tc.Enabled() && len(tc.AllowTerminationFrom()) == 0 {
+		tlsConfig = &tls.Config{Certificates: GetOrCreateTLSCertificate(ctx, cmd, d, iface)}
+	}
+
 	var srv = graceful.WithDefaults(&http.Server{
 		Handler: handler,
 		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
-		TLSConfig: &tls.Config{
-			Certificates: cert,
-		},
+		TLSConfig: tlsConfig,
 	})
 
 	if err := graceful.Graceful(func() error {
@@ -329,20 +328,17 @@ func serve(
 
 		if networkx.AddressIsUnixSocket(address) {
 			return srv.Serve(listener)
-		} else {
-			tls := d.Config().TLS(ctx, iface)
-			if !tls.Enabled() {
-				if iface == config.PublicInterface {
-					d.Logger().Warnln("HTTPS disabled. Never do this in production.")
-				}
-				return srv.Serve(listener)
-			} else if len(tls.AllowTerminationFrom()) > 0 {
-				d.Logger().Infoln("Upstream TLS termination enabled, disabling https.")
-				return srv.Serve(listener)
-			} else {
-				return srv.ServeTLS(listener, "", "")
-			}
 		}
+
+		if tlsConfig != nil {
+			return srv.ServeTLS(listener, "", "")
+		}
+
+		if iface == config.PublicInterface {
+			d.Logger().Warnln("HTTPS is disabled. Please ensure that your proxy is configured to provide HTTPS, and that it redirects HTTP to HTTPS.")
+		}
+
+		return srv.Serve(listener)
 	}, srv.Shutdown); err != nil {
 		d.Logger().WithError(err).Fatal("Could not gracefully run server")
 	}

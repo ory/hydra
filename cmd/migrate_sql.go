@@ -45,7 +45,7 @@ You can read in the database URL using the -e flag, for example:
 
 Before running this command on an existing database, create a back up!
 `,
-		Run: cli.NewHandler().Migration.MigrateSQL,
+		RunE: cli.NewHandler().Migration.MigrateSQL,
 	}
 
 	cmd.Flags().BoolP("read-from-env", "e", false, "If set, reads the database connection string from the environment variable DSN or config file key dsn.")

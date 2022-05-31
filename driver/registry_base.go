@@ -47,7 +47,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/healthx"
-	"github.com/ory/x/resilience"
 )
 
 var (
@@ -417,13 +416,7 @@ func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTSigner) {
 		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql"..`, key)
 	}
 
-	if err := resilience.Retry(m.Logger(), time.Second*15, time.Minute*15, func() (err error) {
-		s, err = jwk.NewDefaultJWTSigner(*m.Config(), m.r, key)
-		return err
-	}); err != nil {
-		m.Logger().WithError(err).Fatalf("Unable to initialize JSON Web Token strategy.")
-	}
-
+	s = jwk.NewDefaultJWTSigner(*m.Config(), m.r, key)
 	return s
 }
 

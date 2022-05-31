@@ -87,8 +87,8 @@ type DefaultProvider struct {
 	generatedSecret []byte
 	l               *logrusx.Logger
 
-	provider *configx.Provider
-	c        contextx.Contextualizer
+	p *configx.Provider
+	c contextx.Contextualizer
 }
 
 func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *DefaultProvider {
@@ -100,7 +100,7 @@ func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModif
 }
 
 func (p *DefaultProvider) getProvider(ctx context.Context) *configx.Provider {
-	return p.c.Config(ctx, p.provider)
+	return p.c.Config(ctx, p.p)
 }
 
 func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) (*DefaultProvider, error) {
@@ -115,9 +115,12 @@ func New(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier)
 	if err != nil {
 		return nil, err
 	}
+	return NewCustom(l, p, &contextx.Default{}), nil
+}
 
+func NewCustom(l *logrusx.Logger, p *configx.Provider, ctxt contextx.Contextualizer) *DefaultProvider {
 	l.UseConfig(p)
-	return &DefaultProvider{l: l, provider: p, c: &contextx.Default{}}, nil
+	return &DefaultProvider{l: l, p: p, c: ctxt}
 }
 
 func (p *DefaultProvider) Set(ctx context.Context, key string, value interface{}) error {

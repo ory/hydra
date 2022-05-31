@@ -254,7 +254,7 @@ func (h *MigrateHandler) MigrateGen(cmd *cobra.Command, args []string) {
 	os.Exit(0)
 }
 
-func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
+func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) error {
 	var d driver.Registry
 
 	if flagx.MustGetBool(cmd, "read-from-env") {
@@ -267,17 +267,13 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 			driver.DisablePreloading(),
 			driver.SkipNetworkInit())
 		if len(d.Config().DSN()) == 0 {
-			fmt.Println(cmd.UsageString())
-			fmt.Println("")
-			fmt.Println("When using flag -e, environment variable DSN must be set")
-			os.Exit(1)
-			return
+			fmt.Fprintln(cmd.ErrOrStderr(), "When using flag -e, environment variable DSN must be set.")
+			return cmdx.FailSilently(cmd)
 		}
 	} else {
 		if len(args) != 1 {
-			fmt.Println(cmd.UsageString())
-			os.Exit(1)
-			return
+			fmt.Fprintln(cmd.ErrOrStderr(), "Please provide the database URL.")
+			return cmdx.FailSilently(cmd)
 		}
 		d = driver.New(
 			cmd.Context(),
@@ -294,51 +290,45 @@ func (h *MigrateHandler) MigrateSQL(cmd *cobra.Command, args []string) {
 	p := d.Persister()
 	conn := p.Connection(context.Background())
 	if conn == nil {
-		fmt.Println(cmd.UsageString())
-		fmt.Println("")
-		fmt.Printf("Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.\n")
-		os.Exit(1)
-		return
+		fmt.Fprintln(cmd.ErrOrStderr(), "Migrations can only be executed against a SQL-compatible driver but DSN is not a SQL source.")
+		return cmdx.FailSilently(cmd)
 	}
 
 	if err := conn.Open(); err != nil {
-		fmt.Printf("Could not open the database connection:\n%+v\n", err)
-		os.Exit(1)
-		return
+		fmt.Fprintf(cmd.ErrOrStderr(), "Could not open the database connection:\n%+v\n", err)
+		return cmdx.FailSilently(cmd)
 	}
 
 	// convert migration tables
 	if err := p.PrepareMigration(context.Background()); err != nil {
-		fmt.Printf("Could not convert the migration table:\n%+v\n", err)
-		os.Exit(1)
-		return
+		fmt.Fprintf(cmd.ErrOrStderr(), "Could not convert the migration table:\n%+v\n", err)
+		return cmdx.FailSilently(cmd)
 	}
 
 	// print migration status
-	fmt.Println("The following migration is planned:")
-	fmt.Println("")
+	fmt.Fprintln(cmd.OutOrStdout(), "The following migration is planned:")
 
 	status, err := p.MigrationStatus(context.Background())
 	if err != nil {
-		fmt.Printf("Could not get the migration status:\n%+v\n", errorsx.WithStack(err))
-		os.Exit(1)
-		return
+		fmt.Fprintf(cmd.ErrOrStderr(), "Could not get the migration status:\n%+v\n", errorsx.WithStack(err))
+		return cmdx.FailSilently(cmd)
 	}
 	_ = status.Write(os.Stdout)
 
 	if !flagx.MustGetBool(cmd, "yes") {
-		fmt.Println("")
-		fmt.Println("To skip the next question use flag --yes (at your own risk).")
+		fmt.Fprintln(cmd.ErrOrStderr(), "To skip the next question use flag --yes (at your own risk).")
 		if !cmdx.AskForConfirmation("Do you wish to execute this migration plan?", nil, nil) {
 			fmt.Println("Migration aborted.")
-			return
+			return nil
 		}
 	}
 
 	// apply migrations
 	if err := p.MigrateUp(context.Background()); err != nil {
-		fmt.Printf("Could not apply migrations:\n%+v\n", errorsx.WithStack(err))
+		_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not apply migrations:\n%+v\n", errorsx.WithStack(err))
+		return cmdx.FailSilently(cmd)
 	}
 
-	fmt.Println("Successfully applied migrations!")
+	fmt.Fprintln(cmd.OutOrStdout(), "Successfully applied migrations!")
+	return nil
 }

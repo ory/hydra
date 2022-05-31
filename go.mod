@@ -61,7 +61,7 @@ require (
 	github.com/oleiade/reflections v1.0.1
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/ory/analytics-go/v4 v4.0.3
-	github.com/ory/fosite v0.42.3-0.20220508104133-3a0c9520791b
+	github.com/ory/fosite v0.42.3-0.20220513181618-5f156bd07d5d
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13

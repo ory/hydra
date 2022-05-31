@@ -3,7 +3,6 @@ package driver
 import (
 	"context"
 	"fmt"
-	"net"
 	"net/http"
 	"time"
 
@@ -342,7 +341,7 @@ func (m *RegistryBase) OpenIDJWTStrategy() jwk.JWTSigner {
 		return m.oidcs
 	}
 
-	m.oidcs = m.newKeyStrategy(x.OpenIDConnectKeyName)
+	m.oidcs = jwk.NewDefaultJWTSigner(*m.Config(), m.r, x.OpenIDConnectKeyName)
 	return m.oidcs
 }
 
@@ -351,7 +350,7 @@ func (m *RegistryBase) AccessTokenJWTStrategy() jwk.JWTSigner {
 		return m.ats
 	}
 
-	m.ats = m.newKeyStrategy(x.OAuth2JWTKeyName)
+	m.ats = jwk.NewDefaultJWTSigner(*m.Config(), m.r, x.OAuth2JWTKeyName)
 	return m.ats
 }
 
@@ -403,21 +402,6 @@ func (m *RegistryBase) OAuth2ProviderConfig() fosite.Configurator {
 
 	m.oc = conf
 	return m.oc
-}
-
-func (m *RegistryBase) newKeyStrategy(key string) (s jwk.JWTSigner) {
-	if err := jwk.EnsureAsymmetricKeypairExists(context.Background(), m.r, "RS256", key); err != nil {
-		var netError net.Error
-		if errors.As(err, &netError) {
-			m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, key)
-			return
-		}
-
-		m.Logger().WithError(err).Fatalf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql"..`, key)
-	}
-
-	s = jwk.NewDefaultJWTSigner(*m.Config(), m.r, key)
-	return s
 }
 
 func (m *RegistryBase) OpenIDConnectRequestValidator() *openid.OpenIDConnectRequestValidator {

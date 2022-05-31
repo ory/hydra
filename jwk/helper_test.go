@@ -47,18 +47,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIder(t *testing.T) {
-	assert.True(t, len(jwk.Ider("public", "")) > len("public:"))
-	assert.Equal(t, "public:foo", jwk.Ider("public", "foo"))
-}
-
 func TestHandlerFindPublicKey(t *testing.T) {
 	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
 		RSIDKS, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(RSIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, keys.KeyID, jwk.Ider("public", "test-id-1"))
+		assert.Equal(t, keys.KeyID, "test-id-1")
 		assert.IsType(t, keys.Key, new(rsa.PublicKey))
 	})
 
@@ -67,7 +62,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(ECDSAIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, keys.KeyID, jwk.Ider("public", "test-id-2"))
+		assert.Equal(t, keys.KeyID, "test-id-2")
 		assert.IsType(t, keys.Key, new(ecdsa.PublicKey))
 	})
 
@@ -76,7 +71,7 @@ func TestHandlerFindPublicKey(t *testing.T) {
 		require.NoError(t, err)
 		keys, err := jwk.FindPublicKey(EdDSAIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, keys.KeyID, jwk.Ider("public", "test-id-3"))
+		assert.Equal(t, keys.KeyID, "test-id-3")
 		assert.IsType(t, keys.Key, ed25519.PublicKey{})
 	})
 
@@ -93,7 +88,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 		RSIDKS, _ := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
 		keys, err := jwk.FindPrivateKey(RSIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, keys.KeyID, jwk.Ider("private", "test-id-1"))
+		assert.Equal(t, keys.KeyID, "test-id-1")
 		assert.IsType(t, keys.Key, new(rsa.PrivateKey))
 	})
 
@@ -102,7 +97,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 		require.NoError(t, err)
 		keys, err := jwk.FindPrivateKey(ECDSAIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, keys.KeyID, jwk.Ider("private", "test-id-2"))
+		assert.Equal(t, keys.KeyID, "test-id-2")
 		assert.IsType(t, keys.Key, new(ecdsa.PrivateKey))
 	})
 
@@ -111,7 +106,7 @@ func TestHandlerFindPrivateKey(t *testing.T) {
 		require.NoError(t, err)
 		keys, err := jwk.FindPrivateKey(EdDSAIDKS)
 		require.NoError(t, err)
-		assert.Equal(t, keys.KeyID, jwk.Ider("private", "test-id-3"))
+		assert.Equal(t, keys.KeyID, "test-id-3")
 		assert.IsType(t, keys.Key, ed25519.PrivateKey{})
 	})
 

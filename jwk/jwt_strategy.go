@@ -22,9 +22,11 @@ package jwk
 
 import (
 	"context"
-	"strings"
-
+	"github.com/gofrs/uuid"
+	"github.com/ory/fosite"
 	"github.com/ory/hydra/driver/config"
+	"gopkg.in/square/go-jose.v2"
+	"net"
 
 	"github.com/pkg/errors"
 
@@ -43,44 +45,40 @@ type DefaultJWTSigner struct {
 	setID string
 }
 
-func NewDefaultJWTSigner(c config.DefaultProvider, r InternalRegistry, keyID string) (*DefaultJWTSigner, error) {
+func NewDefaultJWTSigner(c config.DefaultProvider, r InternalRegistry, keyID string) *DefaultJWTSigner {
 	j := &DefaultJWTSigner{c: &c, r: r, setID: keyID, DefaultSigner: &jwt.DefaultSigner{}}
 	j.DefaultSigner.GetPrivateKey = j.getPrivateKey
-	return j, nil
+	return j
+}
+
+func (j *DefaultJWTSigner) getKeys(ctx context.Context) (public, private *jose.JSONWebKey, err error) {
+	private, public, err = GetOrGenerateKeys(ctx, j.r, j.r.KeyManager(), j.setID, uuid.Must(uuid.NewV4()).String(), "ES256")
+	if err == nil {
+		return private, public, nil
+	}
+
+	var netError net.Error
+	if errors.As(err, &netError) {
+		return nil, nil, errors.WithStack(fosite.ErrServerError.
+			WithHintf(`Could not ensure that signing keys for "%s" exists. A network error occurred, see error for specific details.`, j.setID))
+	}
+
+	return nil, nil, errors.WithStack(fosite.ErrServerError.
+		WithHintf(`Could not ensure that signing keys for "%s" exists. If you are running against a persistent SQL database this is most likely because your "secrets.system" ("SECRETS_SYSTEM" environment variable) is not set or changed. When running with an SQL database backend you need to make sure that the secret is set and stays the same, unless when doing key rotation. This may also happen when you forget to run "hydra migrate sql..`, j.setID))
 }
 
 func (j *DefaultJWTSigner) GetPublicKeyID(ctx context.Context) (string, error) {
-	keys, err := j.r.KeyManager().GetKeySet(ctx, j.setID)
+	_, public, err := j.getKeys(ctx)
 	if err != nil {
-		return "", err
+		return "", errors.WithStack(err)
 	}
-
-	public, err := FindPublicKey(keys)
-	if err != nil {
-		return "", err
-	}
-
 	return public.KeyID, nil
 }
 
 func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (interface{}, error) {
-	keys, err := j.r.KeyManager().GetKeySet(ctx, j.setID)
+	private, _, err := j.getKeys(ctx)
 	if err != nil {
 		return nil, err
-	}
-
-	public, err := FindPublicKey(keys)
-	if err != nil {
-		return nil, err
-	}
-
-	private, err := FindPrivateKey(keys)
-	if err != nil {
-		return nil, err
-	}
-
-	if strings.Replace(public.KeyID, "public:", "", 1) != strings.Replace(private.KeyID, "private:", "", 1) {
-		return nil, errors.New("public and private key pair kids do not match")
 	}
 
 	return private, nil

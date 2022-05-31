@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"github.com/ory/hydra/x/servicelocatorx"
 	"github.com/ory/x/servicelocator"
 
 	"github.com/ory/x/configx"
@@ -66,16 +67,22 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 	}
 
 	l := servicelocator.Logger(ctx, logrusx.New("Ory Hydra", config.Version))
-	c, err := config.New(ctx, l, o.opts...)
-	if err != nil {
-		l.WithError(err).Fatal("Unable to instantiate configuration.")
+	ctxter := servicelocator.Contextualizer(ctx, &contextx.Default{})
+
+	c := servicelocatorx.ConfigFromContext(ctx, nil)
+	if c == nil {
+		var err error
+		c, err = config.New(ctx, l, o.opts...)
+		if err != nil {
+			l.WithError(err).Fatal("Unable to instantiate configuration.")
+		}
 	}
 
 	if o.validate {
 		config.MustValidate(ctx, l, c)
 	}
 
-	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, servicelocator.Contextualizer(ctx, &contextx.Default{}))
+	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, ctxter)
 	if err != nil {
 		l.WithError(err).Fatal("Unable to create service registry.")
 	}

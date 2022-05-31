@@ -20,6 +20,7 @@ const (
 	KeyTLSKeyString            = "serve." + KeySuffixTLSKeyString
 	KeyTLSCertPath             = "serve." + KeySuffixTLSCertPath
 	KeyTLSKeyPath              = "serve." + KeySuffixTLSKeyPath
+	KeyTLSEnabled              = "serve." + KeySuffixTLSEnabled
 )
 
 type TLSConfig interface {
@@ -47,16 +48,8 @@ func (c *tlsConfig) AllowTerminationFrom() []string {
 }
 
 func (p *DefaultProvider) TLS(ctx context.Context, iface ServeInterface) TLSConfig {
-	enabled := true
-	if p.forcedHTTP(ctx) {
-		enabled = false
-	} else if iface == AdminInterface {
-		// Support `tls.enabled` for admin interface only
-		enabled = p.getProvider(ctx).Bool(iface.Key(KeySuffixTLSEnabled))
-	}
-
 	return &tlsConfig{
-		enabled:              enabled,
+		enabled:              p.getProvider(ctx).Bool(iface.Key(KeySuffixTLSEnabled)),
 		allowTerminationFrom: p.getProvider(ctx).StringsF(iface.Key(KeySuffixTLSAllowTerminationFrom), p.getProvider(ctx).Strings(KeyTLSAllowTerminationFrom)),
 
 		certString: p.getProvider(ctx).StringF(iface.Key(KeySuffixTLSCertString), p.getProvider(ctx).String(KeyTLSCertString)),

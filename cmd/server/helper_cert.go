@@ -63,7 +63,7 @@ func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver
 		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 
-	_, priv, err := jwk.GetOrGenerateKeys(context.Background(), d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
+	_, priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 	}

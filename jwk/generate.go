@@ -16,7 +16,7 @@ func GenerateJWK(ctx context.Context, alg jose.SignatureAlgorithm, kid, use stri
 		bits = 4096
 	}
 
-	pub, priv, err := josex.NewSigningKey(alg, bits)
+	_, priv, err := josex.NewSigningKey(alg, bits)
 	if err != nil {
 		return nil, errors.Wrapf(ErrUnsupportedKeyAlgorithm, "%s", err)
 	}
@@ -27,16 +27,7 @@ func GenerateJWK(ctx context.Context, alg jose.SignatureAlgorithm, kid, use stri
 				Algorithm:                   string(alg),
 				Key:                         priv,
 				Use:                         use,
-				KeyID:                       Ider("private", kid),
-				Certificates:                []*x509.Certificate{},
-				CertificateThumbprintSHA256: []byte{},
-				CertificateThumbprintSHA1:   []byte{},
-			},
-			{
-				Algorithm:                   string(alg),
-				Key:                         pub,
-				Use:                         use,
-				KeyID:                       Ider("public", kid),
+				KeyID:                       kid,
 				Certificates:                []*x509.Certificate{},
 				CertificateThumbprintSHA256: []byte{},
 				CertificateThumbprintSHA1:   []byte{},

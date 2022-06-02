@@ -11,6 +11,8 @@ import (
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
+	"github.com/pkg/errors"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
@@ -19,7 +21,6 @@ import (
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/sqlcon"
 	"github.com/ory/x/sqlxx"
-	"github.com/pkg/errors"
 )
 
 var _ consent.Manager = &Persister{}

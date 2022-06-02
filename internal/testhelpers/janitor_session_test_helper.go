@@ -3,13 +3,15 @@ package testhelpers
 import (
 	"context"
 	"fmt"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/x/sqlxx"
-	"github.com/stretchr/testify/require"
-	"testing"
-	"time"
 )
 
 type JanitorSessionTestHelper struct {

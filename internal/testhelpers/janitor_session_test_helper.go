@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/fosite"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
@@ -39,6 +41,8 @@ func (h *JanitorSessionTestHelper) ValidateSessionExist(t *testing.T, ctx contex
 func (h *JanitorSessionTestHelper) ValidateSessionNotExist(t *testing.T, ctx context.Context, id string) {
 	session, err := h.reg.ConsentManager().GetRememberedLoginSession(ctx, id)
 	require.Error(t, err)
+	rpcErr := fosite.ErrorToRFC6749Error(err)
+	require.Equal(t, fosite.ErrNotFound.StatusCode(), rpcErr.StatusCode())
 	require.Nil(t, session)
 }
 

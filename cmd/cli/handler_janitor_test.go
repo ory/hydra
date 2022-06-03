@@ -208,7 +208,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"janitor",
 		"memory")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Janitor requires either --tokens or --requests or both to be set")
+	require.Contains(t, err.Error(), "hydra janitor [<database-url>] [flags]")
 
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
 		"janitor",

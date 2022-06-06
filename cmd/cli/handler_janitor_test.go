@@ -204,6 +204,11 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"memory",
 	)
 
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyLoginSessions),
+		"memory")
+
 	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
 		"janitor",
 		"memory")

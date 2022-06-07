@@ -28,6 +28,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"sync"
 
 	"github.com/ory/x/errorsx"
 
@@ -38,46 +39,54 @@ import (
 	jose "gopkg.in/square/go-jose.v2"
 )
 
+var mapLock sync.RWMutex
+var locks = map[string]*sync.RWMutex{}
+
+func getLock(set string) *sync.RWMutex {
+	mapLock.Lock()
+	defer mapLock.Unlock()
+	if _, ok := locks[set]; !ok {
+		locks[set] = new(sync.RWMutex)
+	}
+	return locks[set]
+}
+
 func EnsureAsymmetricKeypairExists(ctx context.Context, r InternalRegistry, alg, set string) error {
-	_, _, err := GetOrGenerateKeys(ctx, r, r.KeyManager(), set, set, alg)
+	_, err := GetOrGenerateKeys(ctx, r, r.KeyManager(), set, set, alg)
 	return err
 }
 
-func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (public, private *jose.JSONWebKey, err error) {
+func GetOrGenerateKeys(ctx context.Context, r InternalRegistry, m Manager, set, kid, alg string) (private *jose.JSONWebKey, err error) {
+	getLock(set).Lock()
+	defer getLock(set).Unlock()
+
 	keys, err := m.GetKeySet(ctx, set)
 	if errors.Is(err, x.ErrNotFound) || keys != nil && len(keys.Keys) == 0 {
 		r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
 		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	} else if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	pubKey, pubKeyErr := FindPublicKey(keys)
 	privKey, privKeyErr := FindPrivateKey(keys)
-	if pubKeyErr == nil && privKeyErr == nil {
-		return pubKey, privKey, nil
+	if privKeyErr == nil {
+		return privKey, nil
 	} else {
-		if pubKeyErr != nil {
-			r.Logger().Warnf("Public JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
-		} else {
-			r.Logger().Warnf("Private JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
-		}
+		r.Logger().WithField("jwks", set).Warnf("JSON Web Key not found in JSON Web Key Set %s, generating new key pair...", set)
+
 		keys, err = m.GenerateAndPersistKeySet(ctx, set, kid, alg, "sig")
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		pubKey, err := FindPublicKey(keys)
-		if err != nil {
-			return nil, nil, err
-		}
+
 		privKey, err := FindPrivateKey(keys)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
-		return pubKey, privKey, nil
+		return privKey, nil
 	}
 }
 
@@ -108,31 +117,25 @@ func FindPrivateKey(set *jose.JSONWebKeySet) (key *jose.JSONWebKey, err error) {
 
 func ExcludePublicKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
+	for _, k := range set.Keys {
+		if !k.IsPublic() {
+			keys.Keys = append(keys.Keys, k)
+		}
+	}
 
+	return keys
+}
+
+func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
+	keys := new(jose.JSONWebKeySet)
 	for _, k := range set.Keys {
 		keys.Keys = append(keys.Keys, k.Public())
 	}
 	return keys
 }
 
-func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
-	keys := new(jose.JSONWebKeySet)
-
-	for _, k := range set.Keys {
-		_, ecdsaOk := k.Key.(*ecdsa.PublicKey)
-		_, ed25519OK := k.Key.(ed25519.PublicKey)
-		_, rsaOK := k.Key.(*rsa.PublicKey)
-
-		if ecdsaOk || ed25519OK || rsaOK {
-			keys.Keys = append(keys.Keys, k)
-		}
-	}
-	return keys
-}
-
 func ExcludeOpaquePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
-
 	for _, k := range set.Keys {
 		if _, opaque := k.Key.(jose.OpaqueSigner); !opaque {
 			keys.Keys = append(keys.Keys, k)

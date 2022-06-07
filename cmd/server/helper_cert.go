@@ -27,8 +27,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/gofrs/uuid"
 	"sync"
+
+	"github.com/gofrs/uuid"
 
 	"gopkg.in/square/go-jose.v2"
 

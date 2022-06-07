@@ -24,11 +24,12 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/ory/x/servicelocator"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/ory/x/servicelocator"
 
 	analytics "github.com/ory/analytics-go/v4"
 	"github.com/ory/x/configx"

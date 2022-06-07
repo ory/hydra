@@ -27,6 +27,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"github.com/gofrs/uuid"
+	"sync"
 
 	"gopkg.in/square/go-jose.v2"
 
@@ -54,7 +56,22 @@ func AttachCertificate(priv *jose.JSONWebKey, cert *x509.Certificate) {
 	priv.CertificateThumbprintSHA1 = sig1[:]
 }
 
+var mapLock sync.RWMutex
+var locks = map[string]*sync.RWMutex{}
+
+func getLock(set string) *sync.RWMutex {
+	mapLock.Lock()
+	defer mapLock.Unlock()
+	if _, ok := locks[set]; !ok {
+		locks[set] = new(sync.RWMutex)
+	}
+	return locks[set]
+}
+
 func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver.Registry, iface config.ServeInterface) []tls.Certificate {
+	getLock(TlsKeyName).Lock()
+	defer getLock(TlsKeyName).Unlock()
+
 	cert, err := d.Config().TLS(ctx, iface).Certificate()
 
 	if err == nil {
@@ -63,7 +80,7 @@ func GetOrCreateTLSCertificate(ctx context.Context, cmd *cobra.Command, d driver
 		d.Logger().WithError(err).Fatalf("Unable to load HTTPS TLS Certificate")
 	}
 
-	_, priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, TlsKeyName, "RS256")
+	priv, err := jwk.GetOrGenerateKeys(ctx, d, d.SoftwareKeyManager(), TlsKeyName, uuid.Must(uuid.NewV4()).String(), "RS256")
 	if err != nil {
 		d.Logger().WithError(err).Fatal("Unable to fetch or generate HTTPS TLS key pair")
 	}

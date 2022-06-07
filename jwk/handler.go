@@ -23,6 +23,8 @@ package jwk
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gofrs/uuid"
+	"github.com/pkg/errors"
 	"net/http"
 
 	"github.com/ory/x/errorsx"
@@ -89,10 +91,18 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	for _, set := range stringslice.Unique(h.r.Config().WellKnownKeys(ctx)) {
 		keys, err := h.r.KeyManager().GetKeySet(ctx, set)
-		if err != nil {
+		if errors.Is(err, x.ErrNotFound) {
+			h.r.Logger().Warnf("JSON Web Key Set \"%s\" does not exist yet, generating new key pair...", set)
+			keys, err = h.r.KeyManager().GenerateAndPersistKeySet(ctx, set, uuid.Must(uuid.NewV4()).String(), string(jose.ES256), "sig")
+			if err != nil {
+				h.r.Writer().WriteError(w, r, err)
+				return
+			}
+		} else if err != nil {
 			h.r.Writer().WriteError(w, r, err)
 			return
 		}
+
 		keys = ExcludePrivateKeys(keys)
 		jwks.Keys = append(jwks.Keys, keys.Keys...)
 	}

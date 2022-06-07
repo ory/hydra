@@ -27,14 +27,12 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"fmt"
 	"sync"
 
 	"github.com/ory/x/errorsx"
 
 	"github.com/ory/hydra/x"
 
-	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 	jose "gopkg.in/square/go-jose.v2"
 )
@@ -163,11 +161,4 @@ func PEMBlockForKey(key interface{}) (*pem.Block, error) {
 	default:
 		return nil, errors.New("Invalid key type")
 	}
-}
-
-func Ider(typ, id string) string {
-	if id == "" {
-		id = uuid.New()
-	}
-	return fmt.Sprintf("%s:%s", typ, id)
 }

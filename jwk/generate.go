@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/x509"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 
@@ -19,6 +21,14 @@ func GenerateJWK(ctx context.Context, alg jose.SignatureAlgorithm, kid, use stri
 	_, priv, err := josex.NewSigningKey(alg, bits)
 	if err != nil {
 		return nil, errors.Wrapf(ErrUnsupportedKeyAlgorithm, "%s", err)
+	}
+
+	if len(kid) == 0 {
+		kid = uuid.Must(uuid.NewV4()).String()
+	}
+
+	if len(use) == 0 {
+		use = "sig"
 	}
 
 	return &jose.JSONWebKeySet{

@@ -2,6 +2,7 @@ package servicelocatorx
 
 import (
 	"context"
+
 	"github.com/ory/hydra/driver/config"
 )
 

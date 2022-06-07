@@ -22,11 +22,13 @@ package jwk
 
 import (
 	"context"
+	"net"
+
 	"github.com/gofrs/uuid"
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/driver/config"
-	"gopkg.in/square/go-jose.v2"
-	"net"
 
 	"github.com/pkg/errors"
 

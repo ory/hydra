@@ -17,5 +17,5 @@
   "subject_type": "",
   "jwks": {},
   "metadata": {},
-  "registration_client_uri": "http://localhost:4444/oauth2/register/create-client-1"
+  "registration_client_uri": "https://localhost:4444/oauth2/register/create-client-1"
 }

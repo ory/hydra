@@ -77,7 +77,7 @@ CREATE TABLE hydra_oauth2_obfuscated_authentication_session (
 	subject varchar(255) NOT NULL,
 	client_id varchar(255) NOT NULL,
 	subject_obfuscated varchar(255) NOT NULL,
-	PRIMARY KEY(subject, client_id),
+	CONSTRAINT "primary" PRIMARY KEY(subject, client_id),
 	INDEX (client_id, subject_obfuscated)
 );
 CREATE TABLE hydra_oauth2_logout_request (

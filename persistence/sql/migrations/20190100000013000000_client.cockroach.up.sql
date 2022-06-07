@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS hydra_client (
 	userinfo_signed_response_alg VARCHAR(10) NOT NULL DEFAULT '',
 	subject_type VARCHAR(15) NOT NULL DEFAULT '',
 	allowed_cors_origins text NOT NULL,
-	pk SERIAL PRIMARY KEY,
+	pk SERIAL,
 	audience text NOT NULL,
 	created_at timestamp NOT NULL DEFAULT now(),
 	updated_at timestamp NOT NULL DEFAULT now(),
@@ -31,5 +31,6 @@ CREATE TABLE IF NOT EXISTS hydra_client (
 	post_logout_redirect_uris TEXT NOT NULL DEFAULT '',
 	backchannel_logout_uri TEXT NOT NULL DEFAULT '',
 	backchannel_logout_session_required BOOL NOT NULL DEFAULT FALSE,
-	UNIQUE (id)
+	UNIQUE (id),
+  CONSTRAINT "primary" PRIMARY KEY (pk ASC)
 );

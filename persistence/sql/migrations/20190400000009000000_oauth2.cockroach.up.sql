@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS hydra_oauth2_access (
-	signature varchar(255) NOT NULL PRIMARY KEY,
+	signature varchar(255) NOT NULL,
 	request_id varchar(40) NOT NULL,
 	requested_at timestamp NOT NULL DEFAULT now(),
 	client_id varchar(255) NOT NULL,
@@ -15,10 +15,11 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_access (
 	UNIQUE (request_id),
 	INDEX (requested_at),
 	INDEX (client_id),
-	INDEX (challenge_id)
+	INDEX (challenge_id),
+  CONSTRAINT "primary" PRIMARY KEY (signature ASC)
 );
 CREATE TABLE IF NOT EXISTS hydra_oauth2_refresh (
-	signature varchar(255) NOT NULL PRIMARY KEY,
+	signature varchar(255) NOT NULL,
 	request_id varchar(40) NOT NULL,
 	requested_at timestamp NOT NULL DEFAULT now(),
 	client_id varchar(255) NOT NULL,
@@ -33,10 +34,11 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_refresh (
 	challenge_id varchar(40) NULL,
 	UNIQUE (request_id),
 	INDEX (client_id),
-	INDEX (challenge_id)
+	INDEX (challenge_id),
+  CONSTRAINT "primary" PRIMARY KEY (signature ASC)
 );
 CREATE TABLE IF NOT EXISTS hydra_oauth2_code (
-	signature varchar(255) NOT NULL PRIMARY KEY,
+	signature varchar(255) NOT NULL,
 	request_id varchar(40) NOT NULL,
 	requested_at timestamp NOT NULL DEFAULT now(),
 	client_id varchar(255) NOT NULL,
@@ -50,10 +52,11 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_code (
 	granted_audience text NULL DEFAULT '',
 	challenge_id varchar(40) NULL,
 	INDEX (client_id),
-	INDEX (challenge_id)
+	INDEX (challenge_id),
+  CONSTRAINT "primary" PRIMARY KEY (signature ASC)
 );
 CREATE TABLE IF NOT EXISTS hydra_oauth2_oidc (
-	signature varchar(255) NOT NULL PRIMARY KEY,
+	signature varchar(255) NOT NULL,
 	request_id varchar(40) NOT NULL,
 	requested_at timestamp NOT NULL DEFAULT now(),
 	client_id varchar(255) NOT NULL,
@@ -67,10 +70,11 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_oidc (
 	granted_audience text NULL DEFAULT '',
 	challenge_id varchar(40) NULL,
 	INDEX (client_id),
-	INDEX (challenge_id)
+	INDEX (challenge_id),
+  CONSTRAINT "primary" PRIMARY KEY (signature ASC)
 );
 CREATE TABLE IF NOT EXISTS hydra_oauth2_pkce (
-	signature varchar(255) NOT NULL PRIMARY KEY,
+	signature varchar(255) NOT NULL,
 	request_id varchar(40) NOT NULL,
 	requested_at timestamp NOT NULL DEFAULT now(),
 	client_id varchar(255) NOT NULL,
@@ -84,7 +88,8 @@ CREATE TABLE IF NOT EXISTS hydra_oauth2_pkce (
 	granted_audience TEXT NULL DEFAULT '',
 	challenge_id varchar(40) NULL,
 	INDEX (client_id),
-	INDEX (challenge_id)
+	INDEX (challenge_id),
+  CONSTRAINT "primary" PRIMARY KEY (signature ASC)
 );
 
 ALTER TABLE hydra_oauth2_access ADD CONSTRAINT hydra_oauth2_access_client_id_fk FOREIGN KEY (client_id) REFERENCES hydra_client(id) ON DELETE CASCADE;

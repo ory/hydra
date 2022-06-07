@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+
 	"github.com/ory/hydra/x/servicelocatorx"
 	"github.com/ory/x/servicelocator"
 

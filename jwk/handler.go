@@ -22,10 +22,12 @@ package jwk
 
 import (
 	"encoding/json"
-	"fmt"
+	"net/http"
+
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
-	"net/http"
+
+	"github.com/ory/x/urlx"
 
 	"github.com/ory/x/errorsx"
 
@@ -207,7 +209,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 
 	if keys, err := h.r.KeyManager().GenerateAndPersistKeySet(r.Context(), set, keyRequest.KeyID, keyRequest.Algorithm, keyRequest.Use); err == nil {
 		keys = ExcludeOpaquePrivateKeys(keys)
-		h.r.Writer().WriteCreated(w, r, fmt.Sprintf("%s://%s/keys/%s", r.URL.Scheme, r.URL.Host, set), keys)
+		h.r.Writer().WriteCreated(w, r, urlx.AppendPaths(h.r.Config().IssuerURL(r.Context()), "/keys/"+set).String(), keys)
 	} else {
 		h.r.Writer().WriteError(w, r, err)
 	}

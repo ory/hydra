@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **Aud** | Pointer to **[]string** | Audience contains a list of the token&#39;s intended audiences. | [optional] 
 **ClientId** | Pointer to **string** | ID is aclient identifier for the OAuth 2.0 client that requested this token. | [optional] 
 **Exp** | Pointer to **int64** | Expires at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token will expire. | [optional] 
-**Ext** | Pointer to **map[string]map[string]interface{}** | Extra is arbitrary data set by the session. | [optional] 
+**Ext** | Pointer to **map[string]interface{}** | Extra is arbitrary data set by the session. | [optional] 
 **Iat** | Pointer to **int64** | Issued at is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token was originally issued. | [optional] 
 **Iss** | Pointer to **string** | IssuerURL is a string representing the issuer of this token | [optional] 
 **Nbf** | Pointer to **int64** | NotBefore is an integer timestamp, measured in the number of seconds since January 1 1970 UTC, indicating when this token is not to be used before. | [optional] 
@@ -135,20 +135,20 @@ HasExp returns a boolean if a field has been set.
 
 ### GetExt
 
-`func (o *OAuth2TokenIntrospection) GetExt() map[string]map[string]interface{}`
+`func (o *OAuth2TokenIntrospection) GetExt() map[string]interface{}`
 
 GetExt returns the Ext field if non-nil, zero value otherwise.
 
 ### GetExtOk
 
-`func (o *OAuth2TokenIntrospection) GetExtOk() (*map[string]map[string]interface{}, bool)`
+`func (o *OAuth2TokenIntrospection) GetExtOk() (*map[string]interface{}, bool)`
 
 GetExtOk returns a tuple with the Ext field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetExt
 
-`func (o *OAuth2TokenIntrospection) SetExt(v map[string]map[string]interface{})`
+`func (o *OAuth2TokenIntrospection) SetExt(v map[string]interface{})`
 
 SetExt sets Ext field to given value.
 

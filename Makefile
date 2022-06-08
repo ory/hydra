@@ -119,6 +119,7 @@ sdk: .bin/swagger .bin/ory node_modules
 					-p file://.schema/openapi/patches/meta.yaml \
 					-p file://.schema/openapi/patches/health.yaml \
 					-p file://.schema/openapi/patches/oauth2.yaml \
+					-p file://.schema/openapi/patches/common.yaml \
 					spec/swagger.json spec/api.json
 
 		rm -rf internal/httpclient internal/httpclient-next
@@ -131,8 +132,7 @@ sdk: .bin/swagger .bin/ory node_modules
 				--git-user-id ory \
 				--git-repo-id hydra-client-go \
 				--git-host github.com \
-				-t .schema/openapi/templates/go \
-				-c .schema/openapi/gen.go.yml
+				-t .schema/openapi/templates/go
 
 		make format
 

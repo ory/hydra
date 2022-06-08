@@ -44,6 +44,8 @@
 //           offline: "A scope required when requesting refresh tokens (alias for `offline_access`)"
 //           offline_access: "A scope required when requesting refresh tokens"
 //           openid: "Request an OpenID Connect ID Token"
+//     dynamic_client_registration_token:
+//         type: apiKey
 //     basic:
 //         type: basic
 //

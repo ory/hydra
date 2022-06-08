@@ -10,7 +10,7 @@ All URIs are relative to _http://localhost_
 
 ## GetVersion
 
-> InlineResponse2001 GetVersion(ctx).Execute()
+> GetVersion200Response GetVersion(ctx).Execute()
 
 Return Running Software Version.
 
@@ -35,7 +35,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.GetVersion``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `GetVersion`: InlineResponse2001
+    // response from `GetVersion`: GetVersion200Response
     fmt.Fprintf(os.Stdout, "Response from `MetadataApi.GetVersion`: %v\n", resp)
 }
 ```
@@ -51,7 +51,7 @@ via the builder pattern
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**GetVersion200Response**](GetVersion200Response.md)
 
 ### Authorization
 
@@ -128,7 +128,7 @@ No authorization required
 
 ## IsReady
 
-> InlineResponse200 IsReady(ctx).Execute()
+> IsReady200Response IsReady(ctx).Execute()
 
 Check HTTP Server and Database Status
 
@@ -153,7 +153,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `MetadataApi.IsReady``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `IsReady`: InlineResponse200
+    // response from `IsReady`: IsReady200Response
     fmt.Fprintf(os.Stdout, "Response from `MetadataApi.IsReady`: %v\n", resp)
 }
 ```
@@ -169,7 +169,7 @@ the builder pattern
 
 ### Return type
 
-[**InlineResponse200**](InlineResponse200.md)
+[**IsReady200Response**](IsReady200Response.md)
 
 ### Authorization
 

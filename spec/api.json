@@ -489,6 +489,42 @@
         "title": "Generic Error Response",
         "type": "object"
       },
+      "jsonPatch": {
+        "description": "A JSONPatch document as defined by RFC 6902",
+        "properties": {
+          "from": {
+            "description": "This field is used together with operation \"move\" and uses JSON Pointer notation.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
+            "example": "/name",
+            "type": "string"
+          },
+          "op": {
+            "description": "The operation to be performed. One of \"add\", \"remove\", \"replace\", \"move\", \"copy\", or \"test\".",
+            "example": "replace",
+            "type": "string"
+          },
+          "path": {
+            "description": "The path to the target path. Uses JSON pointer notation.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
+            "example": "/name",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value to be used within the operations.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
+            "example": "foobar"
+          }
+        },
+        "required": [
+          "op",
+          "path"
+        ],
+        "type": "object"
+      },
+      "jsonPatchDocument": {
+        "description": "A JSONPatch request",
+        "items": {
+          "$ref": "#/components/schemas/jsonPatch"
+        },
+        "type": "array"
+      },
       "jsonWebKeySetGeneratorRequest": {
         "properties": {
           "alg": {
@@ -937,41 +973,6 @@
         },
         "title": "Contains optional information about the OpenID Connect request.",
         "type": "object"
-      },
-      "patchDocument": {
-        "description": "A JSONPatch document as defined by RFC 6902",
-        "properties": {
-          "from": {
-            "description": "A JSON-pointer",
-            "type": "string"
-          },
-          "op": {
-            "description": "The operation to be performed",
-            "example": "\"replace\"",
-            "type": "string"
-          },
-          "path": {
-            "description": "A JSON-pointer",
-            "example": "\"/name\"",
-            "type": "string"
-          },
-          "value": {
-            "description": "The value to be used within the operations",
-            "type": "object"
-          }
-        },
-        "required": [
-          "op",
-          "path"
-        ],
-        "type": "object"
-      },
-      "patchRequest": {
-        "description": "A JSONPatch request",
-        "items": {
-          "$ref": "#/components/schemas/patchDocument"
-        },
-        "type": "array"
       },
       "refreshTokenHookRequest": {
         "properties": {
@@ -1721,7 +1722,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/patchRequest"
+                "$ref": "#/components/schemas/jsonPatchDocument"
               }
             }
           },
@@ -3430,6 +3431,11 @@
             "description": "jsonError"
           }
         },
+        "security": [
+          {
+            "dynamic_client_registration_token": []
+          }
+        ],
         "summary": "Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
           "public"

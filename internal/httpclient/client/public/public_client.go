@@ -38,7 +38,7 @@ type ClientService interface {
 
 	DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error)
 
-	DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error)
+	DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error)
 
 	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
 
@@ -253,7 +253,7 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error) {
+func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationGetOAuth2ClientParams()
@@ -267,6 +267,7 @@ func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientR
 		Schemes:            []string{"http", "https"},
 		Params:             params,
 		Reader:             &DynamicClientRegistrationGetOAuth2ClientReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

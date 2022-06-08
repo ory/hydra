@@ -1545,7 +1545,7 @@ No authorization required
 
 ## PatchOAuth2Client
 
-> OAuth2Client PatchOAuth2Client(ctx, id).PatchDocument(patchDocument).Execute()
+> OAuth2Client PatchOAuth2Client(ctx, id).JsonPatch(jsonPatch).Execute()
 
 Patch an OAuth 2.0 Client
 
@@ -1565,11 +1565,11 @@ import (
 
 func main() {
     id := "id_example" // string | The id of the OAuth 2.0 Client.
-    patchDocument := []openapiclient.PatchDocument{*openapiclient.NewPatchDocument(""replace"", ""/name"")} // []PatchDocument | 
+    jsonPatch := []openapiclient.JsonPatch{*openapiclient.NewJsonPatch("replace", "/name")} // []JsonPatch | 
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.PatchOAuth2Client(context.Background(), id).PatchDocument(patchDocument).Execute()
+    resp, r, err := apiClient.AdminApi.PatchOAuth2Client(context.Background(), id).JsonPatch(jsonPatch).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.PatchOAuth2Client``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1595,7 +1595,7 @@ Other parameters are passed through a pointer to a apiPatchOAuth2ClientRequest s
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **patchDocument** | [**[]PatchDocument**](PatchDocument.md) |  | 
+ **jsonPatch** | [**[]JsonPatch**](JsonPatch.md) |  | 
 
 ### Return type
 

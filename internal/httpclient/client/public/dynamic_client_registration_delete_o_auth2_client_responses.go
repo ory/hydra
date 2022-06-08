@@ -55,7 +55,7 @@ type DynamicClientRegistrationDeleteOAuth2ClientNoContent struct {
 }
 
 func (o *DynamicClientRegistrationDeleteOAuth2ClientNoContent) Error() string {
-	return fmt.Sprintf("[DELETE /connect/register/{id}][%d] dynamicClientRegistrationDeleteOAuth2ClientNoContent ", 204)
+	return fmt.Sprintf("[DELETE /oauth2/register/{id}][%d] dynamicClientRegistrationDeleteOAuth2ClientNoContent ", 204)
 }
 
 func (o *DynamicClientRegistrationDeleteOAuth2ClientNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
@@ -86,7 +86,7 @@ func (o *DynamicClientRegistrationDeleteOAuth2ClientDefault) Code() int {
 }
 
 func (o *DynamicClientRegistrationDeleteOAuth2ClientDefault) Error() string {
-	return fmt.Sprintf("[DELETE /connect/register/{id}][%d] dynamicClientRegistrationDeleteOAuth2Client default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[DELETE /oauth2/register/{id}][%d] dynamicClientRegistrationDeleteOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
 func (o *DynamicClientRegistrationDeleteOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload

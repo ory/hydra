@@ -55,7 +55,7 @@ type DynamicClientRegistrationUpdateOAuth2ClientOK struct {
 }
 
 func (o *DynamicClientRegistrationUpdateOAuth2ClientOK) Error() string {
-	return fmt.Sprintf("[PUT /connect/register/{id}][%d] dynamicClientRegistrationUpdateOAuth2ClientOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/register/{id}][%d] dynamicClientRegistrationUpdateOAuth2ClientOK  %+v", 200, o.Payload)
 }
 func (o *DynamicClientRegistrationUpdateOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 	return o.Payload
@@ -96,7 +96,7 @@ func (o *DynamicClientRegistrationUpdateOAuth2ClientDefault) Code() int {
 }
 
 func (o *DynamicClientRegistrationUpdateOAuth2ClientDefault) Error() string {
-	return fmt.Sprintf("[PUT /connect/register/{id}][%d] dynamicClientRegistrationUpdateOAuth2Client default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[PUT /oauth2/register/{id}][%d] dynamicClientRegistrationUpdateOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
 func (o *DynamicClientRegistrationUpdateOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload

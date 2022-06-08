@@ -55,7 +55,7 @@ type DynamicClientRegistrationGetOAuth2ClientOK struct {
 }
 
 func (o *DynamicClientRegistrationGetOAuth2ClientOK) Error() string {
-	return fmt.Sprintf("[GET /connect/register/{id}][%d] dynamicClientRegistrationGetOAuth2ClientOK  %+v", 200, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/register/{id}][%d] dynamicClientRegistrationGetOAuth2ClientOK  %+v", 200, o.Payload)
 }
 func (o *DynamicClientRegistrationGetOAuth2ClientOK) GetPayload() *models.OAuth2Client {
 	return o.Payload
@@ -96,7 +96,7 @@ func (o *DynamicClientRegistrationGetOAuth2ClientDefault) Code() int {
 }
 
 func (o *DynamicClientRegistrationGetOAuth2ClientDefault) Error() string {
-	return fmt.Sprintf("[GET /connect/register/{id}][%d] dynamicClientRegistrationGetOAuth2Client default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /oauth2/register/{id}][%d] dynamicClientRegistrationGetOAuth2Client default  %+v", o._statusCode, o.Payload)
 }
 func (o *DynamicClientRegistrationGetOAuth2ClientDefault) GetPayload() *models.JSONError {
 	return o.Payload

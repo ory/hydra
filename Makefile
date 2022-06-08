@@ -131,8 +131,7 @@ sdk: .bin/swagger .bin/ory node_modules
 				-o "internal/httpclient-next" \
 				--git-user-id ory \
 				--git-repo-id hydra-client-go \
-				--git-host github.com \
-				-t .schema/openapi/templates/go
+				--git-host github.com
 
 		make format
 

@@ -36,11 +36,11 @@ type ClientService interface {
 
 	DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error)
 
-	DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error)
+	DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error)
 
 	DynamicClientRegistrationGetOAuth2Client(params *DynamicClientRegistrationGetOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationGetOAuth2ClientOK, error)
 
-	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
+	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
 
 	IsInstanceReady(params *IsInstanceReadyParams, opts ...ClientOption) (*IsInstanceReadyOK, error)
 
@@ -204,7 +204,7 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error) {
+func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClientRegistrationDeleteOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationDeleteOAuth2ClientNoContent, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationDeleteOAuth2ClientParams()
@@ -218,6 +218,7 @@ func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClie
 		Schemes:            []string{"http", "https"},
 		Params:             params,
 		Reader:             &DynamicClientRegistrationDeleteOAuth2ClientReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -306,7 +307,7 @@ If it uses `client_secret_basic`, present the Client ID and the Client Secret in
 OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 */
-func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error) {
+func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewDynamicClientRegistrationUpdateOAuth2ClientParams()
@@ -320,6 +321,7 @@ func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClie
 		Schemes:            []string{"http", "https"},
 		Params:             params,
 		Reader:             &DynamicClientRegistrationUpdateOAuth2ClientReader{formats: a.formats},
+		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}

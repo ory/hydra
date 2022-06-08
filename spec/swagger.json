@@ -349,7 +349,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/patchRequest"
+              "$ref": "#/definitions/jsonPatchDocument"
             }
           }
         ],
@@ -1715,6 +1715,11 @@
     },
     "/oauth2/register/{id}": {
       "get": {
+        "security": [
+          {
+            "dynamic_client_registration_token": []
+          }
+        ],
         "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
@@ -2756,6 +2761,43 @@
         }
       }
     },
+    "jsonPatch": {
+      "description": "A JSONPatch document as defined by RFC 6902",
+      "type": "object",
+      "required": [
+        "op",
+        "path"
+      ],
+      "properties": {
+        "from": {
+          "description": "This field is used together with operation \"move\" and uses JSON Pointer notation.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
+          "type": "string",
+          "example": "/name"
+        },
+        "op": {
+          "description": "The operation to be performed. One of \"add\", \"remove\", \"replace\", \"move\", \"copy\", or \"test\".",
+          "type": "string",
+          "example": "replace"
+        },
+        "path": {
+          "description": "The path to the target path. Uses JSON pointer notation.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
+          "type": "string",
+          "example": "/name"
+        },
+        "value": {
+          "description": "The value to be used within the operations.\n\nLearn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).",
+          "type": "object",
+          "example": "foobar"
+        }
+      }
+    },
+    "jsonPatchDocument": {
+      "description": "A JSONPatch request",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/jsonPatch"
+      }
+    },
     "jsonWebKeySetGeneratorRequest": {
       "type": "object",
       "required": [
@@ -3197,41 +3239,6 @@
             "type": "string"
           }
         }
-      }
-    },
-    "patchDocument": {
-      "description": "A JSONPatch document as defined by RFC 6902",
-      "type": "object",
-      "required": [
-        "op",
-        "path"
-      ],
-      "properties": {
-        "from": {
-          "description": "A JSON-pointer",
-          "type": "string"
-        },
-        "op": {
-          "description": "The operation to be performed",
-          "type": "string",
-          "example": "\"replace\""
-        },
-        "path": {
-          "description": "A JSON-pointer",
-          "type": "string",
-          "example": "\"/name\""
-        },
-        "value": {
-          "description": "The value to be used within the operations",
-          "type": "object"
-        }
-      }
-    },
-    "patchRequest": {
-      "description": "A JSONPatch request",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/patchDocument"
       }
     },
     "refreshTokenHookRequest": {

@@ -14,13 +14,13 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// PatchRequest A JSONPatch request
+// JSONPatchDocument A JSONPatch request
 //
-// swagger:model patchRequest
-type PatchRequest []*PatchDocument
+// swagger:model jsonPatchDocument
+type JSONPatchDocument []*JSONPatch
 
-// Validate validates this patch request
-func (m PatchRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this json patch document
+func (m JSONPatchDocument) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {
@@ -45,8 +45,8 @@ func (m PatchRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this patch request based on the context it is used
-func (m PatchRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validate this json patch document based on the context it is used
+func (m JSONPatchDocument) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 
 	for i := 0; i < len(m); i++ {

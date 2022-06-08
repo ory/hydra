@@ -62,7 +62,7 @@ func NewPatchOAuth2ClientParamsWithHTTPClient(client *http.Client) *PatchOAuth2C
 type PatchOAuth2ClientParams struct {
 
 	// Body.
-	Body models.PatchRequest
+	Body models.JSONPatchDocument
 
 	/* ID.
 
@@ -124,13 +124,13 @@ func (o *PatchOAuth2ClientParams) SetHTTPClient(client *http.Client) {
 }
 
 // WithBody adds the body to the patch o auth2 client params
-func (o *PatchOAuth2ClientParams) WithBody(body models.PatchRequest) *PatchOAuth2ClientParams {
+func (o *PatchOAuth2ClientParams) WithBody(body models.JSONPatchDocument) *PatchOAuth2ClientParams {
 	o.SetBody(body)
 	return o
 }
 
 // SetBody adds the body to the patch o auth2 client params
-func (o *PatchOAuth2ClientParams) SetBody(body models.PatchRequest) {
+func (o *PatchOAuth2ClientParams) SetBody(body models.JSONPatchDocument) {
 	o.Body = body
 }
 

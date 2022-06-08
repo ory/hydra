@@ -76,34 +76,44 @@ type swaggerPatchClientPayload struct {
 
 	// in: body
 	// required: true
-	Body patchRequest
+	Body jsonPatchDocument
 }
 
 // A JSONPatch request
 //
 // swagger:model jsonPatchDocument
-type patchRequest []patchDocument
+type jsonPatchDocument []jsonPatch
 
 // A JSONPatch document as defined by RFC 6902
 //
 // swagger:model jsonPatch
-type patchDocument struct {
-	// The operation to be performed
+type jsonPatch struct {
+	// The operation to be performed. One of "add", "remove", "replace", "move", "copy", or "test".
 	//
 	// required: true
-	// example: "replace"
+	// example: replace
 	Op string `json:"op"`
 
-	// A JSON-pointer
+	// The path to the target path. Uses JSON pointer notation.
+	//
+	// Learn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).
 	//
 	// required: true
-	// example: "/name"
+	// example: /name
 	Path string `json:"path"`
 
-	// The value to be used within the operations
+	// The value to be used within the operations.
+	//
+	// Learn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).
+	//
+	// example: foobar
 	Value interface{} `json:"value"`
 
-	// A JSON-pointer
+	// This field is used together with operation "move" and uses JSON Pointer notation.
+	//
+	// Learn more [about JSON Pointers](https://datatracker.ietf.org/doc/html/rfc6901#section-5).
+	//
+	// example: /name
 	From string `json:"from"`
 }
 

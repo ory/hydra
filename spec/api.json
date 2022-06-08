@@ -1423,6 +1423,10 @@
         "scheme": "basic",
         "type": "http"
       },
+      "bearer": {
+        "scheme": "bearer",
+        "type": "http"
+      },
       "oauth2": {
         "flows": {
           "authorizationCode": {
@@ -3390,6 +3394,11 @@
             "description": "jsonError"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
           "public"
@@ -3433,7 +3442,7 @@
         },
         "security": [
           {
-            "dynamic_client_registration_token": []
+            "bearer": []
           }
         ],
         "summary": "Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
@@ -3488,6 +3497,11 @@
             "description": "jsonError"
           }
         },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "summary": "Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
           "public"

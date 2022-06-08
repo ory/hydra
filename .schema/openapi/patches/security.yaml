@@ -1,0 +1,3 @@
+- op: replace
+  path: /components/securitySchemes/bearer/scheme
+  value: bearer

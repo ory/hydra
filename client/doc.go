@@ -77,12 +77,12 @@ type swaggerPatchClientPayload struct {
 
 // A JSONPatch request
 //
-// swagger:model patchRequest
+// swagger:model jsonPatchDocument
 type patchRequest []patchDocument
 
 // A JSONPatch document as defined by RFC 6902
 //
-// swagger:model patchDocument
+// swagger:model jsonPatch
 type patchDocument struct {
 	// The operation to be performed
 	//

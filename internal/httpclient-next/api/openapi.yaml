@@ -1497,6 +1497,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/jsonError'
           description: jsonError
+      security:
+      - bearer: []
       summary: Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
         Registration Management Protocol
       tags:
@@ -1538,7 +1540,7 @@ paths:
                 $ref: '#/components/schemas/jsonError'
           description: jsonError
       security:
-      - dynamic_client_registration_token: []
+      - bearer: []
       summary: Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
         Management Protocol
       tags:
@@ -1589,6 +1591,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/jsonError'
           description: jsonError
+      security:
+      - bearer: []
       summary: Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
         Registration Management Protocol
       tags:
@@ -4033,6 +4037,9 @@ components:
   securitySchemes:
     basic:
       scheme: basic
+      type: http
+    bearer:
+      scheme: bearer
       type: http
     oauth2:
       flows:

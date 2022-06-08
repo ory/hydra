@@ -310,174 +310,6 @@ paths:
       summary: Update an OAuth 2.0 Client
       tags:
       - admin
-  /connect/register:
-    post:
-      description: |-
-        This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
-        public internet directly and can be used in self-service. It implements the OpenID Connect
-        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-        is disabled by default. It can be enabled by an administrator.
-
-        Please note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those
-        values will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or
-        `client_secret_post`.
-
-        The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
-        Write the secret down and keep it somewhere safe.
-      operationId: dynamicClientRegistrationCreateOAuth2Client
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/oAuth2Client'
-        required: true
-        x-originalParamName: Body
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/oAuth2Client'
-          description: oAuth2Client
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jsonError'
-          description: jsonError
-      summary: Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
-        Registration Management Protocol
-      tags:
-      - public
-  /connect/register/{id}:
-    delete:
-      description: |-
-        This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
-        public internet directly and can be used in self-service. It implements the OpenID Connect
-        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-        is disabled by default. It can be enabled by an administrator.
-
-        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-      operationId: dynamicClientRegistrationDeleteOAuth2Client
-      parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "204":
-          description: |-
-            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
-            typically 201.
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jsonError'
-          description: jsonError
-      summary: Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
-        Registration Management Protocol
-      tags:
-      - public
-    get:
-      description: |-
-        This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
-        public internet directly and can be used in self-service. It implements the OpenID Connect
-        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-        is disabled by default. It can be enabled by an administrator.
-
-        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-      operationId: dynamicClientRegistrationGetOAuth2Client
-      parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/oAuth2Client'
-          description: oAuth2Client
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jsonError'
-          description: jsonError
-      summary: Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
-        Management Protocol
-      tags:
-      - public
-    put:
-      description: |-
-        This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
-        public internet directly and can be used in self-service. It implements the OpenID Connect
-        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
-        is disabled by default. It can be enabled by an administrator.
-
-        If you pass `client_secret` the secret will be updated and returned via the API.
-        This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
-
-        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
-        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
-        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
-
-        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
-        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
-      operationId: dynamicClientRegistrationUpdateOAuth2Client
-      parameters:
-      - description: The id of the OAuth 2.0 Client.
-        explode: false
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/oAuth2Client'
-        required: true
-        x-originalParamName: Body
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/oAuth2Client'
-          description: oAuth2Client
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jsonError'
-          description: jsonError
-      summary: Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
-        Registration Management Protocol
-      tags:
-      - public
   /health/alive:
     get:
       description: |-
@@ -1601,6 +1433,174 @@ paths:
       summary: Introspect OAuth2 Tokens
       tags:
       - admin
+  /oauth2/register:
+    post:
+      description: |-
+        This endpoint behaves like the administrative counterpart (`createOAuth2Client`) but is capable of facing the
+        public internet directly and can be used in self-service. It implements the OpenID Connect
+        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+        is disabled by default. It can be enabled by an administrator.
+
+        Please note that using this endpoint you are not able to choose the `client_secret` nor the `client_id` as those
+        values will be server generated when specifying `token_endpoint_auth_method` as `client_secret_basic` or
+        `client_secret_post`.
+
+        The `client_secret` will be returned in the response and you will not be able to retrieve it later on.
+        Write the secret down and keep it somewhere safe.
+      operationId: dynamicClientRegistrationCreateOAuth2Client
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/oAuth2Client'
+        required: true
+        x-originalParamName: Body
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oAuth2Client'
+          description: oAuth2Client
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jsonError'
+          description: jsonError
+      summary: Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+        Registration Management Protocol
+      tags:
+      - public
+  /oauth2/register/{id}:
+    delete:
+      description: |-
+        This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the
+        public internet directly and can be used in self-service. It implements the OpenID Connect
+        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+        is disabled by default. It can be enabled by an administrator.
+
+        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+      operationId: dynamicClientRegistrationDeleteOAuth2Client
+      parameters:
+      - description: The id of the OAuth 2.0 Client.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: |-
+            Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is
+            typically 201.
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jsonError'
+          description: jsonError
+      summary: Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+        Registration Management Protocol
+      tags:
+      - public
+    get:
+      description: |-
+        This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the
+        public internet directly and can be used in self-service. It implements the OpenID Connect
+        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+        is disabled by default. It can be enabled by an administrator.
+
+        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+      operationId: dynamicClientRegistrationGetOAuth2Client
+      parameters:
+      - description: The id of the OAuth 2.0 Client.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oAuth2Client'
+          description: oAuth2Client
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jsonError'
+          description: jsonError
+      summary: Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration
+        Management Protocol
+      tags:
+      - public
+    put:
+      description: |-
+        This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the
+        public internet directly and can be used in self-service. It implements the OpenID Connect
+        Dynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint
+        is disabled by default. It can be enabled by an administrator.
+
+        If you pass `client_secret` the secret will be updated and returned via the API.
+        This is the only time you will be able to retrieve the client secret, so write it down and keep it safe.
+
+        To use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client
+        uses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.
+        If it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.
+
+        OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
+        generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
+      operationId: dynamicClientRegistrationUpdateOAuth2Client
+      parameters:
+      - description: The id of the OAuth 2.0 Client.
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/oAuth2Client'
+        required: true
+        x-originalParamName: Body
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/oAuth2Client'
+          description: oAuth2Client
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jsonError'
+          description: jsonError
+      summary: Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client
+        Registration Management Protocol
+      tags:
+      - public
   /oauth2/revoke:
     post:
       description: |-

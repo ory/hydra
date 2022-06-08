@@ -116,10 +116,10 @@ Class | Method | HTTP request | Description
 *MetadataApi* | [**IsReady**](docs/MetadataApi.md#isready) | **Get** /health/ready | Check HTTP Server and Database Status
 *PublicApi* | [**DisconnectUser**](docs/PublicApi.md#disconnectuser) | **Get** /oauth2/sessions/logout | OpenID Connect Front-Backchannel Enabled Logout
 *PublicApi* | [**DiscoverOpenIDConfiguration**](docs/PublicApi.md#discoveropenidconfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
-*PublicApi* | [**DynamicClientRegistrationCreateOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationcreateoauth2client) | **Post** /connect/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-*PublicApi* | [**DynamicClientRegistrationDeleteOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationdeleteoauth2client) | **Delete** /connect/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-*PublicApi* | [**DynamicClientRegistrationGetOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationgetoauth2client) | **Get** /connect/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-*PublicApi* | [**DynamicClientRegistrationUpdateOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationupdateoauth2client) | **Put** /connect/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*PublicApi* | [**DynamicClientRegistrationCreateOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationcreateoauth2client) | **Post** /oauth2/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*PublicApi* | [**DynamicClientRegistrationDeleteOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationdeleteoauth2client) | **Delete** /oauth2/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*PublicApi* | [**DynamicClientRegistrationGetOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationgetoauth2client) | **Get** /oauth2/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
+*PublicApi* | [**DynamicClientRegistrationUpdateOAuth2Client**](docs/PublicApi.md#dynamicclientregistrationupdateoauth2client) | **Put** /oauth2/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 *PublicApi* | [**Oauth2Token**](docs/PublicApi.md#oauth2token) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
 *PublicApi* | [**OauthAuth**](docs/PublicApi.md#oauthauth) | **Get** /oauth2/auth | The OAuth 2.0 Authorize Endpoint
 *PublicApi* | [**RevokeOAuth2Token**](docs/PublicApi.md#revokeoauth2token) | **Post** /oauth2/revoke | Revoke OAuth2 Tokens

@@ -163,7 +163,7 @@ func (a *Client) DynamicClientRegistrationCreateOAuth2Client(params *DynamicClie
 	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationCreateOAuth2Client",
 		Method:             "POST",
-		PathPattern:        "/connect/register",
+		PathPattern:        "/oauth2/register",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -212,7 +212,7 @@ func (a *Client) DynamicClientRegistrationDeleteOAuth2Client(params *DynamicClie
 	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationDeleteOAuth2Client",
 		Method:             "DELETE",
-		PathPattern:        "/connect/register/{id}",
+		PathPattern:        "/oauth2/register/{id}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
 		Schemes:            []string{"http", "https"},
@@ -261,7 +261,7 @@ func (a *Client) DynamicClientRegistrationGetOAuth2Client(params *DynamicClientR
 	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationGetOAuth2Client",
 		Method:             "GET",
-		PathPattern:        "/connect/register/{id}",
+		PathPattern:        "/oauth2/register/{id}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},
@@ -313,7 +313,7 @@ func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClie
 	op := &runtime.ClientOperation{
 		ID:                 "dynamicClientRegistrationUpdateOAuth2Client",
 		Method:             "PUT",
-		PathPattern:        "/connect/register/{id}",
+		PathPattern:        "/oauth2/register/{id}",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http", "https"},

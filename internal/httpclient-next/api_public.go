@@ -536,7 +536,7 @@ func (a *PublicApiService) DynamicClientRegistrationCreateOAuth2ClientExecute(r 
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/connect/register"
+	localVarPath := localBasePath + "/oauth2/register"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -660,7 +660,7 @@ func (a *PublicApiService) DynamicClientRegistrationDeleteOAuth2ClientExecute(r 
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/connect/register/{id}"
+	localVarPath := localBasePath + "/oauth2/register/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -773,7 +773,7 @@ func (a *PublicApiService) DynamicClientRegistrationGetOAuth2ClientExecute(r Pub
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/connect/register/{id}"
+	localVarPath := localBasePath + "/oauth2/register/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -904,7 +904,7 @@ func (a *PublicApiService) DynamicClientRegistrationUpdateOAuth2ClientExecute(r 
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/connect/register/{id}"
+	localVarPath := localBasePath + "/oauth2/register/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterToString(r.id, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)

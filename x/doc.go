@@ -46,6 +46,8 @@
 //           openid: "Request an OpenID Connect ID Token"
 //     basic:
 //         type: basic
+//     bearer:
+//         type: basic
 //
 //     Extensions:
 //     ---

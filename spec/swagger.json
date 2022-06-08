@@ -1717,7 +1717,7 @@
       "get": {
         "security": [
           {
-            "dynamic_client_registration_token": []
+            "bearer": []
           }
         ],
         "description": "This endpoint behaves like the administrative counterpart (`getOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
@@ -1761,6 +1761,11 @@
         }
       },
       "put": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "description": "This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nIf you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "consumes": [
           "application/json"
@@ -1810,6 +1815,11 @@
         }
       },
       "delete": {
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
         "description": "This endpoint behaves like the administrative counterpart (`deleteOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "produces": [
           "application/json"
@@ -3710,6 +3720,9 @@
   },
   "securityDefinitions": {
     "basic": {
+      "type": "basic"
+    },
+    "bearer": {
       "type": "basic"
     },
     "oauth2": {

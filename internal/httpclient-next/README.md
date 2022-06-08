@@ -65,12 +65,9 @@ ignored.
 
 ### URLs Configuration per Operation
 
-Each operation can use different server URL defined using `OperationServers` map
-in the `Configuration`. An operation is uniquely identifield by
-`"{classname}Service.{nickname}"` string. Similar rules for overriding default
-operation server index and variables applies by using
-`sw.ContextOperationServerIndices` and `sw.ContextOperationServerVariables`
-context maps.
+Each operation can use different server URL defined using `OperationServers` map in the `Configuration`.
+An operation is uniquely identified by `"{classname}Service.{nickname}"` string.
+Similar rules for overriding default operation server index and variables applies by using `sw.ContextOperationServerIndices` and `sw.ContextOperationServerVariables` context maps.
 
 ```
 ctx := context.WithValue(context.Background(), openapi.ContextOperationServerIndices, map[string]int{
@@ -192,6 +189,19 @@ auth := context.WithValue(context.Background(), sw.ContextBasicAuth, sw.BasicAut
 })
 r, err := client.Service.Operation(auth, args)
 ```
+
+
+### bearer
+
+- **Type**: HTTP Bearer token authentication
+
+Example
+
+```golang
+auth := context.WithValue(context.Background(), sw.ContextAccessToken, "BEARER_TOKEN_STRING")
+r, err := client.Service.Operation(auth, args)
+```
+
 
 ### oauth2
 

@@ -280,6 +280,9 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(co
 //     Produces:
 //     - application/json
 //
+//     Security:
+//       bearer:
+//
 //     Schemes: http, https
 //
 //     Responses:
@@ -520,6 +523,9 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 //
 //     Schemes: http, https
 //
+//     Security:
+//       bearer:
+//
 //     Responses:
 //       200: oAuth2Client
 //       default: jsonError
@@ -528,6 +534,7 @@ func (h *Handler) GetDynamicRegistration(w http.ResponseWriter, r *http.Request,
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -648,6 +655,9 @@ func (h *Handler) UpdateLifespans(w http.ResponseWriter, r *http.Request, ps htt
 //     - application/json
 //
 //     Schemes: http, https
+//
+//     Security:
+//       bearer:
 //
 //     Responses:
 //       204: emptyResponse

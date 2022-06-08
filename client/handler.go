@@ -294,6 +294,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
+
 	client, err := h.ValidDynamicAuth(r, ps)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)

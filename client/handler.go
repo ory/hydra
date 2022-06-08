@@ -108,7 +108,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 	h.r.Writer().WriteCreated(w, r, ClientsHandlerPath+"/"+c.GetID(), &c)
 }
 
-// swagger:route POST /connect/register public dynamicClientRegistrationCreateOAuth2Client
+// swagger:route POST /oauth2/register public dynamicClientRegistrationCreateOAuth2Client
 //
 // Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -251,7 +251,7 @@ func (h *Handler) updateClient(ctx context.Context, c *Client, validator func(*C
 	return nil
 }
 
-// swagger:route PUT /connect/register/{id} public dynamicClientRegistrationUpdateOAuth2Client
+// swagger:route PUT /oauth2/register/{id} public dynamicClientRegistrationUpdateOAuth2Client
 //
 // Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -488,7 +488,7 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	h.r.Writer().Write(w, r, c)
 }
 
-// swagger:route GET /connect/register/{id} public dynamicClientRegistrationGetOAuth2Client
+// swagger:route GET /oauth2/register/{id} public dynamicClientRegistrationGetOAuth2Client
 //
 // Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //
@@ -566,7 +566,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /connect/register/{id} public dynamicClientRegistrationDeleteOAuth2Client
+// swagger:route DELETE /oauth2/register/{id} public dynamicClientRegistrationDeleteOAuth2Client
 //
 // Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 //

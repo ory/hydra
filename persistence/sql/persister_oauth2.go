@@ -345,17 +345,14 @@ func (p *Persister) InvalidateAuthorizeCodeSession(ctx context.Context, signatur
 }
 
 func (p *Persister) CreateAccessTokenSession(ctx context.Context, signature string, requester fosite.Requester) (err error) {
-
 	return p.createSession(ctx, signature, requester, sqlTableAccess)
 }
 
 func (p *Persister) GetAccessTokenSession(ctx context.Context, signature string, session fosite.Session) (request fosite.Requester, err error) {
-
 	return p.findSessionBySignature(ctx, signature, session, sqlTableAccess)
 }
 
 func (p *Persister) DeleteAccessTokenSession(ctx context.Context, signature string) (err error) {
-
 	return p.deleteSessionBySignature(ctx, signature, sqlTableAccess)
 }
 

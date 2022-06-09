@@ -50,7 +50,7 @@ func TestJWTStrategy(t *testing.T) {
 			_, err := m.GenerateAndPersistKeySet(context.Background(), "foo-set", "foo", alg, "sig")
 			require.NoError(t, err)
 
-			s := NewDefaultJWTSigner(*conf, reg, "foo-set")
+			s := NewDefaultJWTSigner(conf, reg, "foo-set")
 			a, b, err := s.Generate(context.Background(), jwt2.MapClaims{"foo": "bar"}, &jwt.Headers{})
 			require.NoError(t, err)
 			assert.NotEmpty(t, a)

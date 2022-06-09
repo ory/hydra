@@ -386,26 +386,26 @@ func TestJWTBearer(t *testing.T) {
 	l.Logrus().SetOutput(ioutil.Discard)
 	p := MustNew(context.Background(), l)
 
-	p.MustSet(KeyOAuth2GrantJWTClientAuthOptional, false)
-	p.MustSet(KeyOAuth2GrantJWTMaxDuration, "1h")
-	p.MustSet(KeyOAuth2GrantJWTIssuedDateOptional, false)
-	p.MustSet(KeyOAuth2GrantJWTIDOptional, false)
+	ctx := context.Background()
+	//p.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, false)
+	p.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "1h")
+	p.MustSet(ctx, KeyOAuth2GrantJWTIssuedDateOptional, false)
+	p.MustSet(ctx, KeyOAuth2GrantJWTIDOptional, false)
 
-	assert.Equal(t, false, p.GrantTypeJWTBearerClientAuthOptional())
-	assert.Equal(t, 1.0, p.GrantTypeJWTBearerMaxDuration().Hours())
-	assert.Equal(t, false, p.GrantTypeJWTBearerIssuedDateOptional())
-	assert.Equal(t, false, p.GrantTypeJWTBearerIDOptional())
+	//assert.Equal(t, false, p.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
+	assert.Equal(t, 1.0, p.GetJWTMaxDuration(ctx).Hours())
+	assert.Equal(t, false, p.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
+	assert.Equal(t, false, p.GetGrantTypeJWTBearerIDOptional(ctx))
 
 	p2 := MustNew(context.Background(), l)
 
-	p2.MustSet(KeyOAuth2GrantJWTClientAuthOptional, true)
-	p2.MustSet(KeyOAuth2GrantJWTMaxDuration, "24h")
-	p2.MustSet(KeyOAuth2GrantJWTIssuedDateOptional, true)
-	p2.MustSet(KeyOAuth2GrantJWTIDOptional, true)
+	//p2.MustSet(ctx, KeyOAuth2GrantJWTClientAuthOptional, true)
+	p2.MustSet(ctx, KeyOAuth2GrantJWTMaxDuration, "24h")
+	p2.MustSet(ctx, KeyOAuth2GrantJWTIssuedDateOptional, true)
+	p2.MustSet(ctx, KeyOAuth2GrantJWTIDOptional, true)
 
-	assert.Equal(t, true, p2.GrantTypeJWTBearerClientAuthOptional())
-	assert.Equal(t, 24.0, p2.GrantTypeJWTBearerMaxDuration().Hours())
-	assert.Equal(t, true, p2.GrantTypeJWTBearerIssuedDateOptional())
-	assert.Equal(t, true, p2.GrantTypeJWTBearerIDOptional())
-
+	//assert.Equal(t, true, p2.GetGrantTypeJWTBearerCanSkipClientAuth(ctx))
+	assert.Equal(t, 24.0, p2.GetJWTMaxDuration(ctx).Hours())
+	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIssuedDateOptional(ctx))
+	assert.Equal(t, true, p2.GetGrantTypeJWTBearerIDOptional(ctx))
 }

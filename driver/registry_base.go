@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rs/cors"
+
 	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/ory/hydra/fositex"
@@ -96,6 +98,7 @@ type RegistryBase struct {
 	ats          jwk.JWTSigner
 	hmacs        *foauth2.HMACSHAStrategy
 	fc           *fositex.Config
+	publicCORS   *cors.Cors
 }
 
 func (m *RegistryBase) GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy {
@@ -136,11 +139,26 @@ func (m *RegistryBase) OAuth2AwareMiddleware(ctx context.Context) func(h http.Ha
 	return m.oa2mw
 }
 
+func (m *RegistryBase) addPublicCORSOnHandler(ctx context.Context) func(http.Handler) http.Handler {
+	corsConfig, corsEnabled := m.Config().CORS(ctx, config.PublicInterface)
+	if !corsEnabled {
+		return func(h http.Handler) http.Handler {
+			return h
+		}
+	}
+	if m.publicCORS == nil {
+		m.publicCORS = cors.New(corsConfig)
+	}
+	return func(h http.Handler) http.Handler {
+		return m.publicCORS.Handler(h)
+	}
+}
+
 func (m *RegistryBase) RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic) {
 	m.HealthHandler().SetHealthRoutes(admin.Router, true)
 	m.HealthHandler().SetVersionRoutes(admin.Router)
 
-	m.HealthHandler().SetHealthRoutes(public.Router, false)
+	m.HealthHandler().SetHealthRoutes(public.Router, false, healthx.WithMiddleware(m.addPublicCORSOnHandler(ctx)))
 
 	admin.Handler("GET", prometheus.MetricsPrometheusPath, promhttp.Handler())
 

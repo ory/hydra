@@ -311,12 +311,12 @@ func serve(
 
 	var tlsConfig *tls.Config
 	if tc := d.Config().TLS(ctx, iface); tc.Enabled() && len(tc.AllowTerminationFrom()) == 0 {
+		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
 		tlsConfig = &tls.Config{Certificates: GetOrCreateTLSCertificate(ctx, cmd, d, iface)}
 	}
 
 	var srv = graceful.WithDefaults(&http.Server{
-		Handler: handler,
-		// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
+		Handler:   handler,
 		TLSConfig: tlsConfig,
 	})
 

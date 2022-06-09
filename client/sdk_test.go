@@ -253,7 +253,7 @@ func TestClientSDK(t *testing.T) {
 		expected := deepcopy.Copy(client).(*models.OAuth2Client)
 		expected.RedirectUris = append(expected.RedirectUris, value)
 
-		result, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		result, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.JSONPatchDocument{{Op: &op, Path: &path, Value: value}}))
 		require.NoError(t, err)
 		expected.CreatedAt = result.Payload.CreatedAt
 		expected.UpdatedAt = result.Payload.UpdatedAt
@@ -272,7 +272,7 @@ func TestClientSDK(t *testing.T) {
 		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
 		require.NoError(t, err)
 
-		_, err = c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		_, err = c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.JSONPatchDocument{{Op: &op, Path: &path, Value: value}}))
 		require.Error(t, err)
 	})
 
@@ -286,9 +286,9 @@ func TestClientSDK(t *testing.T) {
 		_, err := c.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(client))
 		require.NoError(t, err)
 
-		result1, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		result1, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.JSONPatchDocument{{Op: &op, Path: &path, Value: value}}))
 		require.NoError(t, err)
-		result2, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.PatchRequest{{Op: &op, Path: &path, Value: value}}))
+		result2, err := c.Admin.PatchOAuth2Client(admin.NewPatchOAuth2ClientParams().WithID(client.ClientID).WithBody(models.JSONPatchDocument{{Op: &op, Path: &path, Value: value}}))
 		require.NoError(t, err)
 
 		// secret hashes shouldn't change between these PUT calls

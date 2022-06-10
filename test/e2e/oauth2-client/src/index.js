@@ -75,7 +75,12 @@ const nc = (req) =>
       config.admin,
     ).toString()
 
-    return Promise.resolve(new issuer.Client(req.session.oidc_credentials))
+    return Promise.resolve(
+      new issuer.Client({
+        ...issuer.metadata,
+        ...req.session.oidc_credentials
+      })
+    )
   })
 
 app.get("/oauth2/code", async (req, res) => {

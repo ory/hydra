@@ -22,6 +22,7 @@ package jwk
 
 import (
 	"context"
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
@@ -126,8 +127,19 @@ func ExcludePublicKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 
 func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
-	for _, k := range set.Keys {
-		keys.Keys = append(keys.Keys, k.Public())
+	for i, k := range set.Keys {
+		if k.Public().Key != nil {
+			keys.Keys = append(keys.Keys, k.Public())
+			continue
+		}
+
+		// HSM workaround - jose does not understand crypto.Signer / HSM so we need to manually
+		// extract the public key.
+		if pub, ok := k.Key.(crypto.Signer); ok {
+			newKey := set.Keys[i]
+			newKey.Key = pub.Public()
+			keys.Keys = append(keys.Keys, newKey)
+		}
 	}
 	return keys
 }

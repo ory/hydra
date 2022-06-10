@@ -34,7 +34,7 @@ import (
 	"github.com/ory/hydra/jwk"
 )
 
-func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) func(t *testing.T) {
+func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager, parallel bool) func(t *testing.T) {
 	tokenServicePubKey1 := jose.JSONWebKey{}
 	tokenServicePubKey2 := jose.JSONWebKey{}
 	mikePubKey := jose.JSONWebKey{}
@@ -43,17 +43,21 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 		if parallel {
 			t.Parallel()
 		}
-		keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "tokenServicePubKey1", "sig")
-		require.NoError(t, err)
-		tokenServicePubKey1 = keySet.Keys[1]
+		kid1, kid2 := uuid.NewString(), uuid.NewString()
+		kid3 := uuid.NewString()
+		set := uuid.NewString()
 
-		keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "tokenServicePubKey2", "sig")
+		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		tokenServicePubKey2 = keySet.Keys[1]
+		tokenServicePubKey1 = keySet.Keys[0].Public()
 
-		keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "mikePubKey", "sig")
+		keySet, err = km.GenerateAndPersistKeySet(context.Background(), set, kid2, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		mikePubKey = keySet.Keys[1]
+		tokenServicePubKey2 = keySet.Keys[0].Public()
+
+		keySet, err = km.GenerateAndPersistKeySet(context.Background(), "https://mike.example.com", kid3, string(jose.RS256), "sig")
+		require.NoError(t, err)
+		mikePubKey = keySet.Keys[0].Public()
 
 		storedGrants, err := t1.GetGrants(context.TODO(), 100, 0, "")
 		require.NoError(t, err)
@@ -67,16 +71,17 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 		expiresAt := createdAt.AddDate(1, 0, 0)
 		grant := Grant{
 			ID:      uuid.New().String(),
-			Issuer:  "token-service",
+			Issuer:  set,
 			Subject: "bob@example.com",
 			Scope:   []string{"openid", "offline"},
 			PublicKey: PublicKey{
-				Set:   "token-service",
-				KeyID: "public:tokenServicePubKey1",
+				Set:   set,
+				KeyID: kid1,
 			},
 			CreatedAt: createdAt,
 			ExpiresAt: expiresAt,
 		}
+
 		err = t1.CreateGrant(context.TODO(), grant, tokenServicePubKey1)
 		require.NoError(t, err)
 
@@ -92,12 +97,12 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 
 		grant2 := Grant{
 			ID:      uuid.New().String(),
-			Issuer:  "token-service",
+			Issuer:  set,
 			Subject: "maria@example.com",
 			Scope:   []string{"openid"},
 			PublicKey: PublicKey{
-				Set:   "token-service",
-				KeyID: "public:tokenServicePubKey2",
+				Set:   set,
+				KeyID: kid2,
 			},
 			CreatedAt: createdAt.Add(time.Minute * 5),
 			ExpiresAt: createdAt.Add(-time.Minute * 5),
@@ -112,11 +117,12 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 			Scope:   []string{"permissions", "openid", "offline"},
 			PublicKey: PublicKey{
 				Set:   "https://mike.example.com",
-				KeyID: "public:mikePubKey",
+				KeyID: kid3,
 			},
 			CreatedAt: createdAt.Add(time.Hour),
 			ExpiresAt: createdAt.Add(-time.Hour * 24),
 		}
+
 		err = t1.CreateGrant(context.TODO(), grant3, mikePubKey)
 		require.NoError(t, err)
 
@@ -134,7 +140,7 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 		assert.Equal(t, grant2.ID, storedGrants[1].ID)
 		assert.Equal(t, grant3.ID, storedGrants[2].ID)
 
-		storedGrants, err = t1.GetGrants(context.TODO(), 100, 0, "token-service")
+		storedGrants, err = t1.GetGrants(context.TODO(), 100, 0, set)
 		sort.Slice(storedGrants, func(i, j int) bool {
 			return storedGrants[i].CreatedAt.Before(storedGrants[j].CreatedAt)
 		})
@@ -165,19 +171,22 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, parallel bool) 
 	}
 }
 
-func TestHelperGrantManagerErrors(m GrantManager, parallel bool) func(t *testing.T) {
+func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool) func(t *testing.T) {
 	pubKey1 := jose.JSONWebKey{}
 	pubKey2 := jose.JSONWebKey{}
 
 	return func(t *testing.T) {
-		t.Parallel()
-		keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "pubKey1", "sig")
-		require.NoError(t, err)
-		pubKey1 = keySet.Keys[1]
+		set := uuid.NewString()
+		kid1, kid2 := uuid.NewString(), uuid.NewString()
 
-		keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "pubKey2", "sig")
+		t.Parallel()
+		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		pubKey2 = keySet.Keys[1]
+		pubKey1 = keySet.Keys[0].Public()
+
+		keySet, err = km.GenerateAndPersistKeySet(context.Background(), set, kid2, string(jose.RS256), "sig")
+		require.NoError(t, err)
+		pubKey2 = keySet.Keys[0].Public()
 
 		createdAt := time.Now()
 		expiresAt := createdAt.AddDate(1, 0, 0)
@@ -187,12 +196,13 @@ func TestHelperGrantManagerErrors(m GrantManager, parallel bool) func(t *testing
 			Subject: "subject",
 			Scope:   []string{"openid", "offline"},
 			PublicKey: PublicKey{
-				Set:   "set",
-				KeyID: "public:pubKey1",
+				Set:   set,
+				KeyID: kid1,
 			},
 			CreatedAt: createdAt,
 			ExpiresAt: expiresAt,
 		}
+
 		err = m.CreateGrant(context.TODO(), grant, pubKey1)
 		require.NoError(t, err)
 
@@ -202,8 +212,8 @@ func TestHelperGrantManagerErrors(m GrantManager, parallel bool) func(t *testing
 
 		grant2 := grant
 		grant2.PublicKey = PublicKey{
-			Set:   "set",
-			KeyID: "public:pubKey2",
+			Set:   set,
+			KeyID: kid2,
 		}
 		err = m.CreateGrant(context.TODO(), grant2, pubKey2)
 		require.NoError(t, err)

@@ -59,6 +59,8 @@ func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (pu
 	reg.Config().MustSet(ctx, config.KeySubjectIdentifierAlgorithmSalt, "76d5d2bf-747f-4592-9fbd-d2b895a54b3a")
 	reg.Config().MustSet(ctx, config.KeyAccessTokenLifespan, time.Second*2)
 	reg.Config().MustSet(ctx, config.KeyRefreshTokenLifespan, time.Second*3)
+	reg.Config().MustSet(ctx, config.PublicInterface.Key(config.KeySuffixTLSEnabled), false)
+	reg.Config().MustSet(ctx, config.AdminInterface.Key(config.KeySuffixTLSEnabled), false)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
 	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()

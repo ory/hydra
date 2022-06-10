@@ -16,7 +16,7 @@ replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-
 
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 
-replace github.com/ory/x => github.com/ory/x v0.0.404
+replace github.com/ory/x => github.com/ory/x v0.0.411
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -35,7 +35,7 @@ require (
 	github.com/go-openapi/swag v0.19.15
 	github.com/go-openapi/validate v0.20.1
 	github.com/go-swagger/go-swagger v0.26.1
-	github.com/gobuffalo/pop/v6 v6.0.3
+	github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 	github.com/gobuffalo/x v0.0.0-20181007152206-913e47c59ca7
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/uuid v4.2.0+incompatible

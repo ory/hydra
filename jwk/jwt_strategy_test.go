@@ -84,13 +84,8 @@ func TestJWTStrategy(t *testing.T) {
 			kidBar, err := s.GetPublicKeyID(context.Background())
 			assert.NoError(t, err)
 
-			if conf.HSMEnabled() {
-				assert.Equal(t, "foo", kidFoo)
-				assert.Equal(t, "bar", kidBar)
-			} else {
-				assert.Equal(t, "public:foo", kidFoo)
-				assert.Equal(t, "public:bar", kidBar)
-			}
+			assert.Equal(t, "foo", kidFoo)
+			assert.Equal(t, "bar", kidBar)
 		})
 	}
 }

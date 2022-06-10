@@ -67,6 +67,7 @@ func init() {
 
 	os.Setenv("SERVE_PUBLIC_PORT", fmt.Sprintf("%d", frontendPort))
 	os.Setenv("SERVE_ADMIN_PORT", fmt.Sprintf("%d", backendPort))
+	os.Setenv("SERVE_TLS_ENABLED", "true")
 	os.Setenv("DSN", "memory")
 	//os.Setenv("HYDRA_URL", fmt.Sprintf("https://localhost:%d/", frontendPort))
 	os.Setenv("URLS_SELF_ISSUER", fmt.Sprintf("https://localhost:%d/", frontendPort))

@@ -29,6 +29,8 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/pborman/uuid"
 
 	"github.com/ory/x/errorsx"
@@ -229,6 +231,11 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //       401: jsonError
 //       500: jsonError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
+	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
+	if err != nil {
+		h.r.Writer().WriteError(w, r, err)
+		return
+	}
 	h.r.Writer().Write(w, r, &WellKnown{
 		Issuer:                                 strings.TrimRight(h.c.IssuerURL(r.Context()).String(), "/") + "/",
 		AuthURL:                                h.c.OAuth2AuthURL(r.Context()).String(),
@@ -242,10 +249,12 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		ScopesSupported:                        h.c.OIDCDiscoverySupportedScope(r.Context()),
 		UserinfoEndpoint:                       h.c.OIDCDiscoveryUserinfoEndpoint(r.Context()).String(),
 		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
-		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
+		IDTokenSigningAlgValuesSupported:       []string{key.Algorithm},
+		IDTokenSignedResponseAlg:               []string{key.Algorithm},
+		UserinfoSignedResponseAlg:              []string{key.Algorithm},
 		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
 		ResponseModesSupported:                 []string{"query", "fragment"},
-		UserinfoSigningAlgValuesSupported:      []string{"none", "RS256"},
+		UserinfoSigningAlgValuesSupported:      []string{"none", key.Algorithm},
 		RequestParameterSupported:              true,
 		RequestURIParameterSupported:           true,
 		RequireRequestURIRegistration:          true,
@@ -254,7 +263,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		FrontChannelLogoutSupported:            true,
 		FrontChannelLogoutSessionSupported:     true,
 		EndSessionEndpoint:                     urlx.AppendPaths(h.c.IssuerURL(r.Context()), LogoutPath).String(),
-		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
+		RequestObjectSigningAlgValuesSupported: []string{"none", string(jose.RS256), string(jose.ES256)},
 		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
 	})
 }

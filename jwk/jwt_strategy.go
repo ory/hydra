@@ -22,8 +22,9 @@ package jwk
 
 import (
 	"context"
-	"github.com/ory/x/josex"
 	"net"
+
+	"github.com/ory/x/josex"
 
 	"github.com/gofrs/uuid"
 	"gopkg.in/square/go-jose.v2"
@@ -38,6 +39,7 @@ import (
 
 type JWTSigner interface {
 	GetPublicKeyID(ctx context.Context) (string, error)
+	GetPublicKey(ctx context.Context) (jose.JSONWebKey, error)
 	jwt.Signer
 }
 
@@ -77,6 +79,14 @@ func (j *DefaultJWTSigner) GetPublicKeyID(ctx context.Context) (string, error) {
 		return "", errors.WithStack(err)
 	}
 	return josex.ToPublicKey(private).KeyID, nil
+}
+
+func (j *DefaultJWTSigner) GetPublicKey(ctx context.Context) (jose.JSONWebKey, error) {
+	private, err := j.getKeys(ctx)
+	if err != nil {
+		return jose.JSONWebKey{}, errors.WithStack(err)
+	}
+	return josex.ToPublicKey(private), nil
 }
 
 func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (interface{}, error) {

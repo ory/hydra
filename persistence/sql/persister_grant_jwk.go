@@ -5,11 +5,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/gobuffalo/pop/v6"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/ory/hydra/oauth2/trust"
-	"github.com/ory/x/errorsx"
 	"github.com/ory/x/stringsx"
 
 	"github.com/ory/x/sqlcon"
@@ -24,7 +25,7 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// add key, if it doesn't exist
 		if _, err := p.GetKey(ctx, g.PublicKey.Set, g.PublicKey.KeyID); err != nil {
-			if errorsx.Cause(err) != sqlcon.ErrNoRows {
+			if errors.Is(err, sqlcon.ErrNoRows) {
 				return sqlcon.HandleError(err)
 			}
 
@@ -34,7 +35,6 @@ func (p *Persister) CreateGrant(ctx context.Context, g trust.Grant, publicKey jo
 		}
 
 		data := p.sqlDataFromJWTGrant(g)
-
 		return sqlcon.HandleError(p.CreateWithNetwork(ctx, &data))
 	})
 }

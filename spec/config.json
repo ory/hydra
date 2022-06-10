@@ -198,8 +198,7 @@
       "properties": {
         "enabled": {
           "type": "boolean",
-          "description": "Setting enabled to false drops the TLS requirement for the admin endpoint, even if TLS is enabled on the public endpoint.",
-          "default": true
+          "description": "Setting enabled to false drops the TLS requirement for the admin endpoint, even if TLS is enabled on the public endpoint."
         },
         "key": {
           "description": "Configures the private key (pem encoded).",

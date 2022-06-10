@@ -27,6 +27,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/ory/x/assertx"
 
 	"github.com/ory/x/errorsx"
@@ -62,71 +64,75 @@ func canonicalizeKeyThumbprints(v *jose.JSONWebKey) jose.JSONWebKey {
 }
 
 func TestHelperManagerKey(m Manager, algo string, keys *jose.JSONWebKeySet, suffix string) func(t *testing.T) {
-	pub := canonicalizeThumbprints(keys.Key("public:" + suffix))
-	priv := canonicalizeThumbprints(keys.Key("private:" + suffix))
+	priv := canonicalizeThumbprints(keys.Key(suffix))
+	var pub []jose.JSONWebKey
+	for _, k := range priv {
+		pub = append(pub, canonicalizeThumbprints([]jose.JSONWebKey{k.Public()})...)
+	}
 
 	return func(t *testing.T) {
-		_, err := m.GetKey(context.TODO(), algo+"faz", "baz")
+		set := algo + uuid.NewString()
+
+		_, err := m.GetKey(context.TODO(), set, suffix)
 		assert.NotNil(t, err)
 
-		err = m.AddKey(context.TODO(), algo+"faz", First(priv))
+		err = m.AddKey(context.TODO(), set, First(priv))
 		require.NoError(t, err)
 
-		got, err := m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
+		got, err := m.GetKey(context.TODO(), set, suffix)
 		require.NoError(t, err)
 		assertx.EqualAsJSON(t, priv, canonicalizeThumbprints(got.Keys))
 
-		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
+		addKey := First(pub)
+		addKey.KeyID = uuid.NewString()
+		err = m.AddKey(context.TODO(), set, addKey)
 		require.NoError(t, err)
 
-		got, err = m.GetKey(context.TODO(), algo+"faz", "private:"+suffix)
+		got, err = m.GetKey(context.TODO(), set, suffix)
 		require.NoError(t, err)
 		assertx.EqualAsJSON(t, priv, canonicalizeThumbprints(got.Keys))
-
-		got, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
-		require.NoError(t, err)
-		assertx.EqualAsJSON(t, pub, canonicalizeThumbprints(got.Keys))
 
 		// Because MySQL
 		time.Sleep(time.Second * 2)
 
-		pub[0].KeyID = "new-key-id:" + suffix
+		newKID := "new-key-id:" + suffix
+		pub[0].KeyID = newKID
 		pub[0].Use = "sig"
-		err = m.AddKey(context.TODO(), algo+"faz", First(pub))
+		err = m.AddKey(context.TODO(), set, First(pub))
 		require.NoError(t, err)
 
-		got, err = m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
+		got, err = m.GetKey(context.TODO(), set, newKID)
 		require.NoError(t, err)
 		newKey := First(got.Keys)
 		assert.EqualValues(t, "sig", newKey.Use)
 
 		newKey.Use = "enc"
-		err = m.UpdateKey(context.TODO(), algo+"faz", newKey)
+		err = m.UpdateKey(context.TODO(), set, newKey)
 		require.NoError(t, err)
-		updated, err := m.GetKey(context.TODO(), algo+"faz", "new-key-id:"+suffix)
+		updated, err := m.GetKey(context.TODO(), set, newKID)
 		require.NoError(t, err)
 		updatedKey := First(updated.Keys)
 		assert.EqualValues(t, "enc", updatedKey.Use)
 
-		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
+		keys, err = m.GetKeySet(context.TODO(), set)
 		require.NoError(t, err)
 		var found bool
 		for _, k := range keys.Keys {
-			if k.KeyID == "new-key-id:"+suffix {
+			if k.KeyID == newKID {
 				found = true
 				break
 			}
 		}
-		assert.True(t, found, "Key not found in key set: %s\n%+v", "new-key-id:"+suffix, keys)
+		assert.True(t, found, "Key not found in key set: %s / %s\n%+v", keys, newKID)
 
 		beforeDeleteKeysCount := len(keys.Keys)
-		err = m.DeleteKey(context.TODO(), algo+"faz", "public:"+suffix)
+		err = m.DeleteKey(context.TODO(), set, suffix)
 		require.NoError(t, err)
 
-		_, err = m.GetKey(context.TODO(), algo+"faz", "public:"+suffix)
+		_, err = m.GetKey(context.TODO(), set, suffix)
 		require.Error(t, err)
 
-		keys, err = m.GetKeySet(context.TODO(), algo+"faz")
+		keys, err = m.GetKeySet(context.TODO(), set)
 		require.NoError(t, err)
 		assert.EqualValues(t, beforeDeleteKeysCount-1, len(keys.Keys))
 	}
@@ -137,31 +143,33 @@ func TestHelperManagerKeySet(m Manager, algo string, keys *jose.JSONWebKeySet, s
 		if parallel {
 			t.Parallel()
 		}
-		_, err := m.GetKeySet(context.TODO(), algo+"foo")
+		set := uuid.NewString()
+		_, err := m.GetKeySet(context.TODO(), algo+set)
 		require.Error(t, err)
 
-		err = m.AddKeySet(context.TODO(), algo+"bar", keys)
+		err = m.AddKeySet(context.TODO(), algo+set, keys)
 		require.NoError(t, err)
 
-		got, err := m.GetKeySet(context.TODO(), algo+"bar")
+		got, err := m.GetKeySet(context.TODO(), algo+set)
 		require.NoError(t, err)
-		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key("public:"+suffix)), canonicalizeThumbprints(got.Key("public:"+suffix)))
-		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key("private:"+suffix)), canonicalizeThumbprints(got.Key("private:"+suffix)))
+		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key(suffix)), canonicalizeThumbprints(got.Key(suffix)))
+		assertx.EqualAsJSON(t, canonicalizeThumbprints(keys.Key(suffix)), canonicalizeThumbprints(got.Key(suffix)))
 
 		for i, _ := range got.Keys {
 			got.Keys[i].Use = "enc"
 		}
-		err = m.UpdateKeySet(context.TODO(), algo+"bar", got)
-		require.NoError(t, err)
-		updated, err := m.GetKeySet(context.TODO(), algo+"bar")
-		require.NoError(t, err)
-		assert.EqualValues(t, "enc", First(updated.Key("public:"+suffix)).Use)
-		assert.EqualValues(t, "enc", First(updated.Key("private:"+suffix)).Use)
-
-		err = m.DeleteKeySet(context.TODO(), algo+"bar")
+		err = m.UpdateKeySet(context.TODO(), algo+set, got)
 		require.NoError(t, err)
 
-		_, err = m.GetKeySet(context.TODO(), algo+"bar")
+		updated, err := m.GetKeySet(context.TODO(), algo+set)
+		require.NoError(t, err)
+		assert.EqualValues(t, "enc", updated.Key(suffix)[0].Public().Use)
+		assert.EqualValues(t, "enc", updated.Key(suffix)[0].Use)
+
+		err = m.DeleteKeySet(context.TODO(), algo+set)
+		require.NoError(t, err)
+
+		_, err = m.GetKeySet(context.TODO(), algo+set)
 		require.Error(t, err)
 	}
 }
@@ -275,7 +283,7 @@ func TestHelperNID(t1ValidNID Manager, t2InvalidNID Manager) func(t *testing.T) 
 		updatedKey.Use = "enc"
 		require.Error(t, t2InvalidNID.UpdateKey(ctx, "2022-03-11-ks-2", updatedKey))
 		require.NoError(t, t1ValidNID.UpdateKey(ctx, "2022-03-11-ks-2", updatedKey))
-		gks2.Keys[1].Use = "enc"
+		gks2.Keys[0].Use = "enc"
 		require.Error(t, t2InvalidNID.UpdateKeySet(ctx, "2022-03-11-ks-2", gks2))
 		require.NoError(t, t1ValidNID.UpdateKeySet(ctx, "2022-03-11-ks-2", gks2))
 		require.NoError(t, t2InvalidNID.DeleteKeySet(ctx, "2022-03-11-ks-2"))

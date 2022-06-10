@@ -127,8 +127,8 @@ func ExcludePublicKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 
 func ExcludePrivateKeys(set *jose.JSONWebKeySet) *jose.JSONWebKeySet {
 	keys := new(jose.JSONWebKeySet)
-	for _, k := range set.Keys {
-		keys.Keys = append(keys.Keys, josex.ToPublicKey(k))
+	for i := range set.Keys {
+		keys.Keys = append(keys.Keys, josex.ToPublicKey(&set.Keys[i]))
 	}
 	return keys
 }

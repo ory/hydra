@@ -27,8 +27,9 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/ory/x/josex"
 	"sync"
+
+	"github.com/ory/x/josex"
 
 	"github.com/ory/x/errorsx"
 

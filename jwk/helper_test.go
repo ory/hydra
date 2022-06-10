@@ -22,11 +22,14 @@ package jwk_test
 
 import (
 	"context"
+	"crypto"
 	"crypto/dsa"
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/rsa"
+	"crypto/x509"
 	"encoding/pem"
+	"io"
 	"strings"
 	"testing"
 
@@ -47,6 +50,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+type fakeSigner struct {
+	pk crypto.PublicKey
+}
+
+func (f *fakeSigner) Sign(_ io.Reader, _ []byte, _ crypto.SignerOpts) ([]byte, error) {
+	return []byte("signature"), nil
+}
+
+func (f *fakeSigner) Public() crypto.PublicKey {
+	return f.pk
+}
+
 func TestHandlerFindPublicKey(t *testing.T) {
 	t.Run("Test_Helper/Run_FindPublicKey_With_RSA", func(t *testing.T) {
 		RSIDKS, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
@@ -55,6 +70,32 @@ func TestHandlerFindPublicKey(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, keys.KeyID, "test-id-1")
 		assert.IsType(t, keys.Key, new(rsa.PublicKey))
+	})
+
+	t.Run("Test_Helper/Run_FindPublicKey_With_Opaque", func(t *testing.T) {
+		key, err := jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-1", "sig")
+		RSIDKS := &jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{
+			Algorithm:                   "RS256",
+			Use:                         "sig",
+			Key:                         cryptosigner.Opaque(&fakeSigner{pk: key.Keys[0].Public().Key}),
+			KeyID:                       "test-id-1",
+			Certificates:                []*x509.Certificate{},
+			CertificateThumbprintSHA1:   []uint8{},
+			CertificateThumbprintSHA256: []uint8{},
+		}, {
+			Algorithm:                   "RS256",
+			Use:                         "sig",
+			Key:                         key.Keys[0].Public().Key,
+			KeyID:                       "test-id-1",
+			Certificates:                []*x509.Certificate{},
+			CertificateThumbprintSHA1:   []uint8{},
+			CertificateThumbprintSHA256: []uint8{},
+		}}}
+		require.NoError(t, err)
+		keys, err := jwk.FindPublicKey(RSIDKS)
+		require.NoError(t, err)
+		assert.Equal(t, "test-id-1", keys.KeyID)
+		assert.IsType(t, new(rsa.PublicKey), keys.Key)
 	})
 
 	t.Run("Test_Helper/Run_FindPublicKey_With_ECDSA", func(t *testing.T) {

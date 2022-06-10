@@ -186,6 +186,7 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 		require.NoError(t, err)
 		genPub, err := FindPublicKey(keys)
 		require.NoError(t, err)
+		require.NotEmpty(t, genPub)
 		genPriv, err := FindPrivateKey(keys)
 		require.NoError(t, err)
 
@@ -193,6 +194,7 @@ func TestHelperManagerGenerateAndPersistKeySet(m Manager, alg string, parallel b
 		require.NoError(t, err)
 		gotPub, err := FindPublicKey(got)
 		require.NoError(t, err)
+		require.NotEmpty(t, gotPub)
 		gotPriv, err := FindPrivateKey(got)
 		require.NoError(t, err)
 

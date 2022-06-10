@@ -80,9 +80,13 @@ func TestHandlerWellKnown(t *testing.T) {
 		var IDKS *jose.JSONWebKeySet
 
 		if conf.HSMEnabled() {
-			IDKS, _ = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
+			var err error
+			IDKS, err = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
+			require.NoError(t, err, "problem in generating keys")
 		} else {
-			IDKS, _ = jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-2", "sig")
+			var err error
+			IDKS, err = jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-2", "sig")
+			require.NoError(t, err, "problem in generating keys")
 			IDKS.Keys[0].KeyID = "test-id-2"
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}

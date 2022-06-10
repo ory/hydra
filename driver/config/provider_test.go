@@ -198,6 +198,8 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	l.Logrus().SetOutput(ioutil.Discard)
 
 	p := MustNew(context.Background(), l, configx.SkipValidation())
+	p.MustSet(ctx, KeyTLSEnabled, true)
+
 	p.MustSet(ctx, KeyCookieSameSiteMode, "")
 	assert.Equal(t, http.SameSiteDefaultMode, p.CookieSameSiteMode(ctx))
 

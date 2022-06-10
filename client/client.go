@@ -64,22 +64,20 @@ type Client struct {
 	// RedirectURIs is an array of allowed redirect urls for the client, for example http://mydomain/oauth/callback .
 	RedirectURIs sqlxx.StringSliceJSONFormat `json:"redirect_uris" db:"redirect_uris"`
 
-	// GrantTypes is an array of grant types the client is allowed to use.
-	//
-	// Pattern: client_credentials|authorization_code|implicit|refresh_token
+	// GrantTypes is an array of grant types the client is allowed to use. Can be one
+	// of `client_credentials`, `authorization_code`, `implicit`, `refresh_token`,
+	// `urn:ietf:params:oauth:grant-type:jwt-bearer`.
 	GrantTypes sqlxx.StringSliceJSONFormat `json:"grant_types" db:"grant_types"`
 
 	// ResponseTypes is an array of the OAuth 2.0 response type strings that the client can
-	// use at the authorization endpoint.
-	//
-	// Pattern: id_token|code|token
+	// use at the authorization endpoint. Can be one of `id_token`, `code`, `token`.
 	ResponseTypes sqlxx.StringSliceJSONFormat `json:"response_types" db:"response_types"`
 
 	// Scope is a string containing a space-separated list of scope values (as
 	// described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
 	// can use when requesting access tokens.
 	//
-	// Pattern: ([a-zA-Z0-9\.\*]+\s?)+
+	// Example: scope1 scope-2 scope.3 scope:4
 	Scope string `json:"scope" db:"scope"`
 
 	// Audience is a whitelist defining the audiences this client is allowed to request tokens for. An audience limits

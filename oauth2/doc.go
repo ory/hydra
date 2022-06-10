@@ -110,6 +110,16 @@ type WellKnown struct {
 	// required: true
 	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 
+	// Algorithm used to sign OpenID Connect ID Tokens.
+	//
+	// required: true
+	IDTokenSignedResponseAlg []string `json:"id_token_signed_response_alg"`
+
+	// Algorithm used to sign OpenID Connect Userinfo Responses.
+	//
+	// required: true
+	UserinfoSignedResponseAlg []string `json:"userinfo_signed_response_alg"`
+
 	// 	Boolean value specifying whether the OP supports use of the request parameter, with true indicating support.
 	RequestParameterSupported bool `json:"request_parameter_supported"`
 

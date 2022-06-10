@@ -34,12 +34,14 @@ func TestMustRSAPrivate(t *testing.T) {
 	keys, err := GenerateJWK(context.Background(), jose.RS256, "foo", "sig")
 	require.NoError(t, err)
 
-	_, err = ToRSAPrivate(&keys.Key("private:foo")[0])
+	priv := keys.Key("foo")[0]
+	_, err = ToRSAPrivate(&priv)
 	assert.Nil(t, err)
 
-	MustRSAPrivate(&keys.Key("private:foo")[0])
+	MustRSAPrivate(&priv)
 
-	_, err = ToRSAPublic(&keys.Key("public:foo")[0])
+	pub := keys.Key("foo")[0].Public()
+	_, err = ToRSAPublic(&pub)
 	assert.Nil(t, err)
-	MustRSAPublic(&keys.Key("public:foo")[0])
+	MustRSAPublic(&pub)
 }

@@ -25,7 +25,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/ory/hydra/jwk"
@@ -68,7 +67,7 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		require.Len(t, known.Keys, 1)
 
-		knownKey := known.Key("public:test-id-1")[0]
+		knownKey := known.Key("test-id-1")[0].Public()
 		require.NotNil(t, knownKey, "Could not find key public")
 
 		expectedKey, err := jwk.FindPublicKey(IDKS)
@@ -84,11 +83,7 @@ func TestHandlerWellKnown(t *testing.T) {
 			IDKS, _ = reg.KeyManager().GenerateAndPersistKeySet(context.TODO(), x.OpenIDConnectKeyName, "test-id-2", "RS256", "sig")
 		} else {
 			IDKS, _ = jwk.GenerateJWK(context.Background(), jose.RS256, "test-id-2", "sig")
-			if strings.ContainsAny(IDKS.Keys[1].KeyID, "public") {
-				IDKS.Keys[1].KeyID = "test-id-2"
-			} else {
-				IDKS.Keys[0].KeyID = "test-id-2"
-			}
+			IDKS.Keys[0].KeyID = "test-id-2"
 			require.NoError(t, reg.KeyManager().AddKeySet(context.TODO(), x.OpenIDConnectKeyName, IDKS))
 		}
 

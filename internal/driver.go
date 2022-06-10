@@ -32,14 +32,14 @@ func resetConfig(p *config.DefaultProvider) {
 func NewConfigurationWithDefaults() *config.DefaultProvider {
 	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.MustSet(context.Background(), "dangerous-force-http", true)
+	p.MustSet(context.Background(), config.KeyTLSEnabled, false)
 	return p
 }
 
 func NewConfigurationWithDefaultsAndHTTPS() *config.DefaultProvider {
 	p := config.MustNew(context.Background(), logrusx.New("", ""), configx.SkipValidation())
 	resetConfig(p)
-	p.MustSet(context.Background(), "dangerous-force-http", false)
+	p.MustSet(context.Background(), config.KeyTLSEnabled, true)
 	return p
 }
 

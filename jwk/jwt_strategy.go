@@ -22,6 +22,7 @@ package jwk
 
 import (
 	"context"
+	"github.com/ory/x/josex"
 	"net"
 
 	"github.com/gofrs/uuid"
@@ -75,7 +76,7 @@ func (j *DefaultJWTSigner) GetPublicKeyID(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
-	return private.Public().KeyID, nil
+	return josex.ToPublicKey(private).KeyID, nil
 }
 
 func (j *DefaultJWTSigner) getPrivateKey(ctx context.Context) (interface{}, error) {

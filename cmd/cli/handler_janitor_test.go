@@ -204,11 +204,16 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"memory",
 	)
 
+	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
+		"janitor",
+		fmt.Sprintf("--%s", cli.OnlyLoginSessions),
+		"memory")
+
 	_, _, err := cmdx.ExecCtx(context.Background(), cmd.NewRootCmd(), nil,
 		"janitor",
 		"memory")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Janitor requires either --tokens or --requests or both to be set")
+	require.Contains(t, err.Error(), "hydra janitor [<database-url>] [flags]")
 
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(),
 		"janitor",
@@ -258,4 +263,93 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"memory")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "Value for --batch-size must not be greater than value for --limit")
+}
+
+func TestJanitorHandler_PurgeLoginSessions(t *testing.T) {
+	t.Run("case=cleanup-login-session", func(t *testing.T) {
+		t.Run("case=clean session without consent-request", func(t *testing.T) {
+			ctx := context.Background()
+			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			reg, err := jt.GetRegistry(ctx, t.Name())
+			require.NoError(t, err)
+
+			const sessionID = "session_id"
+
+			// setup
+			sessionHelper := testhelpers.NewJanitorSessionTestHelper(reg, t.Name())
+			sessionHelper.CreateLoginSession(t, ctx, sessionID)
+
+			// cleanup
+			t.Run("step=cleanup", func(t *testing.T) {
+				cmdx.ExecNoErr(t, newJanitorCmd(),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyLoginSessions),
+					jt.GetDSN(),
+				)
+			})
+
+			// validate
+			sessionHelper.ValidateSessionNotExist(t, ctx, sessionID)
+		})
+
+		t.Run("case=clean sessions with consent-request", func(t *testing.T) {
+			ctx := context.Background()
+			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			reg, err := jt.GetRegistry(ctx, t.Name())
+			require.NoError(t, err)
+
+			const (
+				sessionID = "session_id_1"
+			)
+
+			//setup
+			sessionHelper := testhelpers.NewJanitorSessionTestHelper(reg, t.Name())
+			sessionHelper.CreateLoginSession(t, ctx, sessionID)
+			sessionHelper.CreateEnvironmentForSession(t, ctx, sessionID)
+
+			// cleanup
+			t.Run("step=cleanup", func(t *testing.T) {
+				cmdx.ExecNoErr(t, newJanitorCmd(),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyLoginSessions),
+					jt.GetDSN(),
+				)
+			})
+
+			// validate
+			sessionHelper.ValidateSessionExist(t, ctx, sessionID)
+		})
+
+		t.Run("case=alive session and flush session", func(t *testing.T) {
+			ctx := context.Background()
+			jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
+			reg, err := jt.GetRegistry(ctx, t.Name())
+			require.NoError(t, err)
+
+			const (
+				aliveSessionID = "session_id_1"
+				flushSessionID = "session_id_flush"
+			)
+
+			//setup
+			sessionHelper := testhelpers.NewJanitorSessionTestHelper(reg, t.Name())
+			sessionHelper.CreateLoginSession(t, ctx, aliveSessionID)
+			sessionHelper.CreateEnvironmentForSession(t, ctx, aliveSessionID)
+			sessionHelper.CreateLoginSession(t, ctx, flushSessionID)
+
+			// cleanup
+			t.Run("step=cleanup", func(t *testing.T) {
+				cmdx.ExecNoErr(t, newJanitorCmd(),
+					"janitor",
+					fmt.Sprintf("--%s", cli.OnlyLoginSessions),
+					jt.GetDSN(),
+				)
+			})
+
+			// validate
+			sessionHelper.ValidateSessionExist(t, ctx, aliveSessionID)
+			sessionHelper.ValidateSessionNotExist(t, ctx, flushSessionID)
+		})
+
+	})
 }

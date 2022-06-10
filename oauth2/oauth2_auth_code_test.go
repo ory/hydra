@@ -733,7 +733,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					cb: func(t *testing.T) httprouter.Handle {
 						return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 							require.Empty(t, r.URL.Query().Get("code"))
-							assert.Equal(t, fosite.ErrRequestForbidden.Error(), r.URL.Query().Get("error"))
+							assert.Equal(t, fosite.ErrRequestForbidden.ErrorField, r.URL.Query().Get("error"))
 						}
 					},
 				},
@@ -999,7 +999,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 						var errBody fosite.RFC6749ErrorJson
 						require.NoError(t, json.NewDecoder(res.Body).Decode(&errBody))
-						require.Equal(t, fosite.ErrAccessDenied.Error(), errBody.Name)
+						require.Equal(t, fosite.ErrAccessDenied.ErrorField, errBody.Name)
 						require.Equal(t, fosite.ErrAccessDenied.GetDescription(), errBody.Description)
 					})
 

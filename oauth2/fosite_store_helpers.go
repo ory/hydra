@@ -755,7 +755,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "token-service-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "token-service"
 			subject := "bob@example.com"
 			grant := trust.Grant{
@@ -807,7 +807,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			keySet, err = jwk.GenerateJWK(context.Background(), jose.RS256, "maria-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "maria"
 			subject := "maria@example.com"
 			grant := trust.Grant{
@@ -843,7 +843,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "hackerman-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "aeneas"
 			subject := "aeneas@example.com"
 			grant := trust.Grant{
@@ -880,7 +880,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "vladimir-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "vladimir"
 			subject := "vladimir@example.com"
 			grant := trust.Grant{
@@ -917,7 +917,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "limited-issuer"
 			subject := "jagoba"
 			grant := trust.Grant{
@@ -959,7 +959,7 @@ func testFositeJWTBearerGrantStorage(x InternalRegistry) func(t *testing.T) {
 			keySet, err := jwk.GenerateJWK(context.Background(), jose.RS256, "issuer-key", "sig")
 			require.NoError(t, err)
 
-			publicKey := keySet.Keys[1]
+			publicKey := keySet.Keys[0].Public()
 			issuer := "unlimited-issuer"
 			grant := trust.Grant{
 				ID:              uuid.New(),

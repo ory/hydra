@@ -104,12 +104,12 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 
 	t.Run("package=grant/trust/manager="+k, func(t *testing.T) {
 		t.Run("parallel-boundary", func(t *testing.T) {
-			t.Run("case=create-get-delete/tenant=t1", trust.TestHelperGrantManagerCreateGetDeleteGrant(t1.GrantManager(), parallel))
-			t.Run("case=create-get-delete/tenant=t2", trust.TestHelperGrantManagerCreateGetDeleteGrant(t2.GrantManager(), parallel))
+			t.Run("case=create-get-delete/tenant=t1", trust.TestHelperGrantManagerCreateGetDeleteGrant(t1.GrantManager(), t1.KeyManager(), parallel))
+			t.Run("case=create-get-delete/tenant=t2", trust.TestHelperGrantManagerCreateGetDeleteGrant(t2.GrantManager(), t2.KeyManager(), parallel))
 		})
 		t.Run("parallel-boundary", func(t *testing.T) {
-			t.Run("case=errors", trust.TestHelperGrantManagerErrors(t1.GrantManager(), parallel))
-			t.Run("case=errors", trust.TestHelperGrantManagerErrors(t2.GrantManager(), parallel))
+			t.Run("case=errors", trust.TestHelperGrantManagerErrors(t1.GrantManager(), t1.KeyManager(), parallel))
+			t.Run("case=errors", trust.TestHelperGrantManagerErrors(t2.GrantManager(), t2.KeyManager(), parallel))
 		})
 	})
 }

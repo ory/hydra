@@ -54,11 +54,7 @@ func TestJWKSDK(t *testing.T) {
 	server := httptest.NewServer(router)
 	sdk := client.NewHTTPClientWithConfig(nil, &client.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(server.URL).Host})
 
-	expectedPublicKid := "public:key-bar"
-	if conf.HSMEnabled() {
-		expectedPublicKid = "key-bar"
-	}
-
+	expectedKid := "key-bar"
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
@@ -68,28 +64,18 @@ func TestJWKSDK(t *testing.T) {
 				Use: pointerx.String("sig"),
 			}))
 			require.NoError(t, err)
-			if conf.HSMEnabled() {
-				require.Len(t, resultKeys.Payload.Keys, 1)
-				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
-				assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
-			} else {
-				require.Len(t, resultKeys.Payload.Keys, 2)
-				assert.Equal(t, "private:key-bar", *resultKeys.Payload.Keys[0].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
-				assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
-				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[1].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[1].Alg)
-				assert.Equal(t, "sig", *resultKeys.Payload.Keys[1].Use)
-			}
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			assert.Equal(t, "key-bar", *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
+			assert.Equal(t, "sig", *resultKeys.Payload.Keys[0].Use)
 		})
 
 		var resultKeys *models.JSONWebKeySet
 		t.Run("GetJwkSetKey after create", func(t *testing.T) {
-			result, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid(expectedPublicKid).WithSet("set-foo"))
+			result, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid(expectedKid).WithSet("set-foo"))
 			require.NoError(t, err)
 			require.Len(t, result.Payload.Keys, 1)
-			require.Equal(t, expectedPublicKid, *result.Payload.Keys[0].Kid)
+			require.Equal(t, expectedKid, *result.Payload.Keys[0].Kid)
 			require.Equal(t, "RS256", *result.Payload.Keys[0].Alg)
 
 			resultKeys = result.Payload
@@ -102,19 +88,19 @@ func TestJWKSDK(t *testing.T) {
 			require.Len(t, resultKeys.Keys, 1)
 			resultKeys.Keys[0].Alg = pointerx.String("ES256")
 
-			resultKey, err := sdk.Admin.UpdateJSONWebKey(admin.NewUpdateJSONWebKeyParams().WithKid(expectedPublicKid).WithSet("set-foo").WithBody(resultKeys.Keys[0]))
+			resultKey, err := sdk.Admin.UpdateJSONWebKey(admin.NewUpdateJSONWebKeyParams().WithKid(expectedKid).WithSet("set-foo").WithBody(resultKeys.Keys[0]))
 			require.NoError(t, err)
-			assert.Equal(t, expectedPublicKid, *resultKey.Payload.Kid)
+			assert.Equal(t, expectedKid, *resultKey.Payload.Kid)
 			assert.Equal(t, "ES256", *resultKey.Payload.Alg)
 		})
 
 		t.Run("DeleteJwkSetKey after delete", func(t *testing.T) {
-			_, err := sdk.Admin.DeleteJSONWebKey(admin.NewDeleteJSONWebKeyParams().WithKid(expectedPublicKid).WithSet("set-foo"))
+			_, err := sdk.Admin.DeleteJSONWebKey(admin.NewDeleteJSONWebKeyParams().WithKid(expectedKid).WithSet("set-foo"))
 			require.NoError(t, err)
 		})
 
 		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
-			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid(expectedPublicKid).WithSet("set-foo"))
+			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithKid(expectedKid).WithSet("set-foo"))
 			require.Error(t, err)
 		})
 
@@ -127,17 +113,9 @@ func TestJWKSDK(t *testing.T) {
 				Kid: pointerx.String("key-bar"),
 			}))
 			require.NoError(t, err)
-			if conf.HSMEnabled() {
-				require.Len(t, resultKeys.Payload.Keys, 1)
-				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
-			} else {
-				require.Len(t, resultKeys.Payload.Keys, 2)
-				assert.Equal(t, "private:key-bar", *resultKeys.Payload.Keys[0].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
-				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[1].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[1].Alg)
-			}
+			require.Len(t, resultKeys.Payload.Keys, 1)
+			assert.Equal(t, expectedKid, *resultKeys.Payload.Keys[0].Kid)
+			assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
 		})
 
 		resultKeys, err := sdk.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet("set-foo2"))
@@ -145,14 +123,12 @@ func TestJWKSDK(t *testing.T) {
 			require.NoError(t, err)
 			if conf.HSMEnabled() {
 				require.Len(t, resultKeys.Payload.Keys, 1)
-				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
+				assert.Equal(t, expectedKid, *resultKeys.Payload.Keys[0].Kid)
 				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
 			} else {
-				require.Len(t, resultKeys.Payload.Keys, 2)
-				assert.Equal(t, expectedPublicKid, *resultKeys.Payload.Keys[0].Kid)
+				require.Len(t, resultKeys.Payload.Keys, 1)
+				assert.Equal(t, expectedKid, *resultKeys.Payload.Keys[0].Kid)
 				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[0].Alg)
-				assert.Equal(t, "private:key-bar", *resultKeys.Payload.Keys[1].Kid)
-				assert.Equal(t, "RS256", *resultKeys.Payload.Keys[1].Alg)
 			}
 		})
 
@@ -160,17 +136,14 @@ func TestJWKSDK(t *testing.T) {
 			if conf.HSMEnabled() {
 				t.Skip("Skipping test. Keys cannot be updated when Hardware Security Module is enabled")
 			}
-			require.Len(t, resultKeys.Payload.Keys, 2)
+			require.Len(t, resultKeys.Payload.Keys, 1)
 			resultKeys.Payload.Keys[0].Alg = pointerx.String("ES256")
-			resultKeys.Payload.Keys[1].Alg = pointerx.String("ES256")
 
 			result, err := sdk.Admin.UpdateJSONWebKeySet(admin.NewUpdateJSONWebKeySetParams().WithSet("set-foo2").WithBody(resultKeys.Payload))
 			require.NoError(t, err)
-			require.Len(t, result.Payload.Keys, 2)
-			assert.Equal(t, expectedPublicKid, *result.Payload.Keys[0].Kid)
+			require.Len(t, result.Payload.Keys, 1)
+			assert.Equal(t, expectedKid, *result.Payload.Keys[0].Kid)
 			assert.Equal(t, "ES256", *result.Payload.Keys[0].Alg)
-			assert.Equal(t, "private:key-bar", *result.Payload.Keys[1].Kid)
-			assert.Equal(t, "ES256", *result.Payload.Keys[1].Alg)
 		})
 
 		t.Run("DeleteJwkSet", func(t *testing.T) {
@@ -184,7 +157,7 @@ func TestJWKSDK(t *testing.T) {
 		})
 
 		t.Run("GetJwkSetKey after delete", func(t *testing.T) {
-			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithSet("set-foo2").WithKid(expectedPublicKid))
+			_, err := sdk.Admin.GetJSONWebKey(admin.NewGetJSONWebKeyParams().WithSet("set-foo2").WithKid(expectedKid))
 			require.Error(t, err)
 		})
 	})

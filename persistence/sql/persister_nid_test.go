@@ -2070,8 +2070,5 @@ func newLoginSession() *consent.LoginSession {
 }
 
 func requireKeySetEqual(t *testing.T, expected *jose.JSONWebKeySet, actual *jose.JSONWebKeySet) {
-	if expected.Keys[0].KeyID == actual.Keys[1].KeyID {
-		actual.Keys[0], actual.Keys[1] = actual.Keys[1], actual.Keys[0]
-	}
 	assertx.EqualAsJSON(t, expected, actual)
 }

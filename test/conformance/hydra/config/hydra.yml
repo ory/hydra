@@ -2,6 +2,7 @@ serve:
   cookies:
     same_site_mode: Lax
   tls:
+    enabled: true
     cert:
       path: /etc/ssl/certs/ory-conformity.crt
     key:

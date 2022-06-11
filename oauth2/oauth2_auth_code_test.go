@@ -968,6 +968,24 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.True(t, gjson.GetBytes(idTokenBody, "hooked").Bool())
 					})
 
+					t.Run("should not override session data if token refresh hook returns no content", func(t *testing.T) {
+						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+							w.WriteHeader(http.StatusNoContent)
+						}))
+						defer hs.Close()
+
+						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+
+						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
+						require.NoError(t, err)
+						assert.Equal(t, http.StatusOK, res.StatusCode)
+
+						body, err := ioutil.ReadAll(res.Body)
+						require.NoError(t, err)
+						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+					})
+
 					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {
 						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 							w.WriteHeader(http.StatusInternalServerError)

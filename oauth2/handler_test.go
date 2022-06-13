@@ -24,7 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/ory/x/snapshotx"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -32,6 +31,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ory/x/snapshotx"
 
 	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/contextx"

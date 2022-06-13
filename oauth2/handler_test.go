@@ -24,6 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/ory/x/snapshotx"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -373,7 +374,7 @@ func TestUserinfo(t *testing.T) {
 					require.NoError(t, err)
 					t.Logf("%+v", keys)
 					key, err := jwk.FindPublicKey(keys)
-					return jwk.MustRSAPublic(key), nil
+					return key.Key, nil
 				})
 				require.NoError(t, err)
 				assert.EqualValues(t, "alice", claims.Claims["sub"])
@@ -406,57 +407,31 @@ func TestUserinfo(t *testing.T) {
 func TestHandlerWellKnown(t *testing.T) {
 	ctx := context.Background()
 	conf := internal.NewConfigurationWithDefaults()
-	conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
-	conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
-	conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
-	conf.MustSet(ctx, config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
-	conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
-	conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
-	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
+	t.Run(fmt.Sprintf("hsm_enabled=%v", conf.HSMEnabled()), func(t *testing.T) {
+		conf.MustSet(ctx, config.KeyScopeStrategy, "DEPRECATED_HIERARCHICAL_SCOPE_STRATEGY")
+		conf.MustSet(ctx, config.KeyIssuerURL, "http://hydra.localhost")
+		conf.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise", "public"})
+		conf.MustSet(ctx, config.KeyOIDCDiscoverySupportedClaims, []string{"sub"})
+		conf.MustSet(ctx, config.KeyOAuth2ClientRegistrationURL, "http://client-register/registration")
+		conf.MustSet(ctx, config.KeyOIDCDiscoveryUserinfoEndpoint, "/userinfo")
+		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	h := oauth2.NewHandler(reg, conf)
+		h := oauth2.NewHandler(reg, conf)
 
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-		return h
+		r := x.NewRouterAdmin()
+		h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+			return h
+		})
+		ts := httptest.NewServer(r)
+		defer ts.Close()
+
+		res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
+		require.NoError(t, err)
+		defer res.Body.Close()
+
+		var wellKnownResp oauth2.WellKnown
+		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
+		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
+		snapshotx.SnapshotT(t, wellKnownResp)
 	})
-	ts := httptest.NewServer(r)
-	defer ts.Close()
-
-	res, err := http.Get(ts.URL + "/.well-known/openid-configuration")
-	require.NoError(t, err)
-	defer res.Body.Close()
-
-	trueConfig := oauth2.WellKnown{
-		Issuer:                                 strings.TrimRight(conf.IssuerURL(ctx).String(), "/") + "/",
-		AuthURL:                                conf.OAuth2AuthURL(ctx).String(),
-		TokenURL:                               conf.OAuth2TokenURL(ctx).String(),
-		JWKsURI:                                conf.JWKSURL(ctx).String(),
-		RevocationEndpoint:                     urlx.AppendPaths(conf.IssuerURL(ctx), oauth2.RevocationPath).String(),
-		RegistrationEndpoint:                   conf.OAuth2ClientRegistrationURL(ctx).String(),
-		SubjectTypes:                           []string{"pairwise", "public"},
-		ResponseTypes:                          []string{"code", "code id_token", "id_token", "token id_token", "token", "token id_token code"},
-		ClaimsSupported:                        conf.OIDCDiscoverySupportedClaims(ctx),
-		ScopesSupported:                        conf.OIDCDiscoverySupportedScope(ctx),
-		UserinfoEndpoint:                       conf.OIDCDiscoveryUserinfoEndpoint(ctx).String(),
-		TokenEndpointAuthMethodsSupported:      []string{"client_secret_post", "client_secret_basic", "private_key_jwt", "none"},
-		GrantTypesSupported:                    []string{"authorization_code", "implicit", "client_credentials", "refresh_token"},
-		ResponseModesSupported:                 []string{"query", "fragment"},
-		IDTokenSigningAlgValuesSupported:       []string{"RS256"},
-		UserinfoSigningAlgValuesSupported:      []string{"none", "RS256"},
-		RequestParameterSupported:              true,
-		RequestURIParameterSupported:           true,
-		RequireRequestURIRegistration:          true,
-		BackChannelLogoutSupported:             true,
-		BackChannelLogoutSessionSupported:      true,
-		FrontChannelLogoutSupported:            true,
-		FrontChannelLogoutSessionSupported:     true,
-		EndSessionEndpoint:                     urlx.AppendPaths(conf.IssuerURL(ctx), oauth2.LogoutPath).String(),
-		RequestObjectSigningAlgValuesSupported: []string{"RS256", "none"},
-		CodeChallengeMethodsSupported:          []string{"plain", "S256"},
-	}
-	var wellKnownResp oauth2.WellKnown
-	err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
-	require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
-	assert.EqualValues(t, trueConfig, wellKnownResp)
 }

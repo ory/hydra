@@ -76,5 +76,8 @@ To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--
 	cmd.Flags().String("pgp-key-url", "", "PGP encryption key URL for encrypting client secret")
 	cmd.Flags().String("keybase", "", "Keybase username for encrypting client secret")
 
+	// authentication signing algorithm for the Token Endpoint
+	cmd.Flags().String("token-endpoint-auth-signing-alg", "", "Authentication signing algorithm for the Token Endpoint")
+
 	return cmd
 }

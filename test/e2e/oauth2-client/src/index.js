@@ -398,18 +398,20 @@ app.get("/openid/session/end/fc", async (req, res) => {
 app.post("/openid/session/end/bc", (req, res) => {
   const client = jwksClient({
     jwksUri: new URL('/.well-known/jwks.json', config.public).toString(),
-    cache: false,
+    cache: false
   })
 
-  console.log({logout_token: req.body.logout_token})
+  console.log({ logout_token: req.body.logout_token })
 
   jwt.verify(
     req.body.logout_token,
     (header, callback) => {
       client.getSigningKey(header.kid, (err, key) => {
         console.log({
-        err, header, key
-      })
+          err,
+          header,
+          key
+        })
         if (err) {
           console.error(err)
           res.sendStatus(400)
@@ -462,7 +464,12 @@ app.get('/openid/session/check', async (req, res) => {
     return
   }
 
-  console.log('BLACKLISTED', req.session.oauth2_flow, Boolean(req.session.openid_token), Boolean(req.session.openid_claims))
+  console.log(
+    'BLACKLISTED',
+    req.session.oauth2_flow,
+    Boolean(req.session.openid_token),
+    Boolean(req.session.openid_claims)
+  )
   res.json({
     has_session:
       Boolean(req.session.oauth2_flow) ||

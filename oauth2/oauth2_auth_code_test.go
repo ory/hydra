@@ -969,21 +969,40 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 
 					t.Run("should not override session data if token refresh hook returns no content", func(t *testing.T) {
+						if strat.d != "jwt" {
+							t.Skip()
+						}
+
 						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 							w.WriteHeader(http.StatusNoContent)
 						}))
 						defer hs.Close()
 
-						conf.MustSet(config.KeyRefreshTokenHookURL, hs.URL)
-						defer conf.MustSet(config.KeyRefreshTokenHookURL, nil)
+						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
+						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
+
+						body, err := x.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
+						require.NoError(t, err)
+
+						origPayload := map[string]interface{}{}
+						require.NoError(t, json.Unmarshal(body, &origPayload))
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
 						assert.Equal(t, http.StatusOK, res.StatusCode)
 
-						body, err := ioutil.ReadAll(res.Body)
+						body, err = ioutil.ReadAll(res.Body)
 						require.NoError(t, err)
+
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
+
+						body, err = x.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
+						require.NoError(t, err)
+
+						refreshedPayload := map[string]interface{}{}
+						require.NoError(t, json.Unmarshal(body, &refreshedPayload))
+
+						assert.Equal(t, origPayload["ext"], refreshedPayload["ext"])
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {

@@ -22,6 +22,7 @@ package trust
 
 import (
 	"context"
+	"github.com/ory/x/josex"
 	"sort"
 	"testing"
 	"time"
@@ -49,15 +50,15 @@ func TestHelperGrantManagerCreateGetDeleteGrant(t1 GrantManager, km jwk.Manager,
 
 		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		tokenServicePubKey1 = keySet.Keys[0].Public()
+		tokenServicePubKey1 = josex.ToPublicKey(&keySet.Keys[0])
 
 		keySet, err = km.GenerateAndPersistKeySet(context.Background(), set, kid2, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		tokenServicePubKey2 = keySet.Keys[0].Public()
+		tokenServicePubKey2 = josex.ToPublicKey(&keySet.Keys[0])
 
 		keySet, err = km.GenerateAndPersistKeySet(context.Background(), "https://mike.example.com", kid3, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		mikePubKey = keySet.Keys[0].Public()
+		mikePubKey = josex.ToPublicKey(&keySet.Keys[0])
 
 		storedGrants, err := t1.GetGrants(context.TODO(), 100, 0, "")
 		require.NoError(t, err)
@@ -182,11 +183,11 @@ func TestHelperGrantManagerErrors(m GrantManager, km jwk.Manager, parallel bool)
 		t.Parallel()
 		keySet, err := km.GenerateAndPersistKeySet(context.Background(), set, kid1, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		pubKey1 = keySet.Keys[0].Public()
+		pubKey1 = josex.ToPublicKey(&keySet.Keys[0])
 
 		keySet, err = km.GenerateAndPersistKeySet(context.Background(), set, kid2, string(jose.RS256), "sig")
 		require.NoError(t, err)
-		pubKey2 = keySet.Keys[0].Public()
+		pubKey2 = josex.ToPublicKey(&keySet.Keys[0])
 
 		createdAt := time.Now()
 		expiresAt := createdAt.AddDate(1, 0, 0)

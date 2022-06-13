@@ -22,10 +22,11 @@ package trust
 
 import (
 	"context"
-	"github.com/ory/x/josex"
 	"sort"
 	"testing"
 	"time"
+
+	"github.com/ory/x/josex"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

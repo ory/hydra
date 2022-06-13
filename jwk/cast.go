@@ -22,6 +22,7 @@ package jwk
 
 import (
 	"crypto/rsa"
+
 	"github.com/ory/x/josex"
 
 	"github.com/pkg/errors"

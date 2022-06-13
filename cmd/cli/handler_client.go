@@ -123,6 +123,7 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 		BackchannelLogoutURI:              flagx.MustGetString(cmd, "backchannel-logout-callback"),
 		FrontchannelLogoutSessionRequired: flagx.MustGetBool(cmd, "frontchannel-logout-session-required"),
 		FrontchannelLogoutURI:             flagx.MustGetString(cmd, "frontchannel-logout-callback"),
+		TokenEndpointAuthSigningAlg:       flagx.MustGetString(cmd, "token-endpoint-auth-signing-alg"),
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))
@@ -188,6 +189,7 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 		BackchannelLogoutURI:              flagx.MustGetString(cmd, "backchannel-logout-callback"),
 		FrontchannelLogoutSessionRequired: flagx.MustGetBool(cmd, "frontchannel-logout-session-required"),
 		FrontchannelLogoutURI:             flagx.MustGetString(cmd, "frontchannel-logout-callback"),
+		TokenEndpointAuthSigningAlg:       flagx.MustGetString(cmd, "token-endpoint-auth-signing-alg"),
 	}
 
 	response, err := m.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(id).WithBody(&cc))

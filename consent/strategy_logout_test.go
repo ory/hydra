@@ -309,7 +309,7 @@ func TestLogoutFlows(t *testing.T) {
 				checkAndAcceptLogout(t, wg, nil)
 				tc.claims["sub"] = subject
 				tc.claims["sid"] = <-sid
-				tc.claims["aud"] = c.OutfacingID
+				tc.claims["aud"] = c.GetID()
 				tc.claims["exp"] = time.Now().Add(-time.Hour).Unix()
 
 				logoutAndExpectErrorPage(t, browser, http.MethodGet, url.Values{
@@ -332,7 +332,7 @@ func TestLogoutFlows(t *testing.T) {
 			"state":                    {"1234"},
 			"post_logout_redirect_uri": {"https://this-is-not-a-valid-redirect-url/custom"},
 			"id_token_hint": {testhelpers.NewIDTokenWithClaims(t, reg, jwtgo.MapClaims{
-				"aud": c.OutfacingID,
+				"aud": c.GetID(),
 				"iss": reg.Config().IssuerURL(ctx).String(),
 				"sub": subject,
 				"sid": "logout-session-temp4",
@@ -356,7 +356,7 @@ func TestLogoutFlows(t *testing.T) {
 
 				sendClaims := jwtgo.MapClaims{
 					"iss": reg.Config().IssuerURL(ctx).String(),
-					"aud": c.OutfacingID,
+					"aud": c.GetID(),
 					"sid": <-sid,
 					"sub": subject,
 					"exp": time.Now().Add(time.Hour).Unix(),
@@ -388,7 +388,7 @@ func TestLogoutFlows(t *testing.T) {
 
 		t.Run("case=should pass even if audience is an array not a string", func(t *testing.T) {
 			// formerly: should pass rp-inititated flow"
-			claims := jwtgo.MapClaims{"aud": []string{c.OutfacingID}}
+			claims := jwtgo.MapClaims{"aud": []string{c.GetID()}}
 			t.Run("method=GET", run("GET", claims))
 			t.Run("method=POST", run("POST", claims))
 		})
@@ -407,7 +407,7 @@ func TestLogoutFlows(t *testing.T) {
 			"state":                    {"1234"},
 			"post_logout_redirect_uri": {customPostLogoutURL},
 			"id_token_hint": {genIDToken(t, reg, jwtgo.MapClaims{
-				"aud": []string{c.OutfacingID}, // make sure this works with string slices too
+				"aud": []string{c.GetID()}, // make sure this works with string slices too
 				"iss": reg.Config().IssuerURL(ctx).String(),
 				"sub": subject,
 				"sid": "i-do-not-exist",
@@ -429,7 +429,7 @@ func TestLogoutFlows(t *testing.T) {
 			"post_logout_redirect_uri": {customPostLogoutURL},
 			"id_token_hint": {testhelpers.NewIDTokenWithClaims(t, reg, jwtgo.MapClaims{
 				"iss": reg.Config().IssuerURL(ctx).String(),
-				"aud": c.OutfacingID,
+				"aud": c.GetID(),
 				"sid": <-sid,
 				"sub": subject,
 				"exp": time.Now().Add(time.Hour).Unix(),
@@ -458,7 +458,7 @@ func TestLogoutFlows(t *testing.T) {
 			"post_logout_redirect_uri": {customPostLogoutURL},
 			"id_token_hint": {testhelpers.NewIDTokenWithClaims(t, reg, jwtgo.MapClaims{
 				"iss": reg.Config().IssuerURL(ctx).String(),
-				"aud": c.OutfacingID,
+				"aud": c.GetID(),
 				"sid": <-sid,
 				"sub": subject,
 				"exp": time.Now().Add(time.Hour).Unix(),

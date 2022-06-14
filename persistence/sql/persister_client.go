@@ -3,8 +3,9 @@ package sql
 import (
 	"context"
 
-	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
+
+	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/x/errorsx"
 
@@ -18,7 +19,7 @@ func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.C
 	defer span.End()
 
 	var cl client.Client
-	return &cl, sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).First(&cl))
+	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("nid = ? AND (pk = ? OR id = ?)", p.NetworkID(ctx), id, id).First(&cl))
 }
 
 func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -46,6 +47,9 @@ func (p *Persister) UpdateClient(ctx context.Context, cl *client.Client) error {
 		}
 		// set the internal primary key
 		cl.ID = o.ID
+
+		// Set the legacy client ID
+		cl.LegacyClientID = o.LegacyClientID
 
 		if err = cl.BeforeSave(c); err != nil {
 			return sqlcon.HandleError(err)
@@ -87,7 +91,12 @@ func (p *Persister) CreateClient(ctx context.Context, c *client.Client) error {
 	}
 
 	c.Secret = string(h)
-	c.ID = uuid.Must(uuid.NewV4())
+	if c.ID == uuid.Nil {
+		c.ID = uuid.Must(uuid.NewV4())
+	}
+	if c.LegacyClientID == "" {
+		c.LegacyClientID = c.ID.String()
+	}
 	return sqlcon.HandleError(p.CreateWithNetwork(ctx, c))
 }
 
@@ -111,7 +120,7 @@ func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]cl
 
 	query := p.QueryWithNetwork(ctx).
 		Paginate(filters.Offset/filters.Limit+1, filters.Limit).
-		Order("id")
+		Order("pk")
 
 	if filters.Name != "" {
 		query.Where("client_name = ?", filters.Name)

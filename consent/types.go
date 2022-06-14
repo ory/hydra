@@ -420,7 +420,7 @@ func (r *LogoutRequest) BeforeSave(_ *pop.Connection) error {
 	if r.Client != nil {
 		r.ClientID = sql.NullString{
 			Valid:  true,
-			String: r.Client.OutfacingID,
+			String: r.Client.GetID(),
 		}
 	}
 	return nil

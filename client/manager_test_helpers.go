@@ -49,7 +49,6 @@ func TestHelperClientAutoGenerateKey(k string, m Storage) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		c := &Client{
-			OutfacingID:       "foo",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
 			TermsOfServiceURI: "foo",
@@ -68,9 +67,9 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
 		ctx := context.TODO()
 		require.NoError(t, m.CreateClient(ctx, &Client{
-			OutfacingID:  "1234321",
-			Secret:       "secret",
-			RedirectURIs: []string{"http://redirect"},
+			LegacyClientID: "1234321",
+			Secret:         "secret",
+			RedirectURIs:   []string{"http://redirect"},
 		}))
 
 		c, err := m.Authenticate(ctx, "1234321", []byte("secret1"))
@@ -84,23 +83,23 @@ func TestHelperClientAuthenticate(k string, m Manager) func(t *testing.T) {
 
 func TestHelperUpdateTwoClients(_ string, m Manager) func(t *testing.T) {
 	return func(t *testing.T) {
-		c1, c2 := &Client{OutfacingID: "klojdfc", Name: "test client 1"}, &Client{OutfacingID: "jlsdfkj", Name: "test client 2"}
+		c1, c2 := &Client{Name: "test client 1"}, &Client{Name: "test client 2"}
 
 		require.NoError(t, m.CreateClient(context.Background(), c1))
 		require.NoError(t, m.CreateClient(context.Background(), c2))
 
-		c1.Name, c2.Name = "updated klojdfc client 1", "updated klojdfc client 2"
+		c1.Name, c2.Name = "updated client 1", "updated client 2"
 
 		assert.NoError(t, m.UpdateClient(context.Background(), c1))
 		assert.NoError(t, m.UpdateClient(context.Background(), c2))
 	}
 }
 
-func testHelperUpdateClient(t *testing.T, ctx context.Context, tenant Storage, k string) {
-	d, err := tenant.GetClient(ctx, "1234")
+func testHelperUpdateClient(t *testing.T, ctx context.Context, network Storage, k string) {
+	d, err := network.GetClient(ctx, "1234")
 	assert.NoError(t, err)
-	err = tenant.UpdateClient(ctx, &Client{
-		OutfacingID:       "2-1234",
+	err = network.UpdateClient(ctx, &Client{
+		LegacyClientID:    "2-1234",
 		Name:              "name-new",
 		Secret:            "secret-new",
 		RedirectURIs:      []string{"http://redirect/new"},
@@ -109,7 +108,7 @@ func testHelperUpdateClient(t *testing.T, ctx context.Context, tenant Storage, k
 	})
 	require.NoError(t, err)
 
-	nc, err := tenant.GetConcreteClient(ctx, "2-1234")
+	nc, err := network.GetConcreteClient(ctx, "2-1234")
 	require.NoError(t, err)
 
 	if k != "http" {
@@ -142,11 +141,9 @@ func TestHelperCreateGetUpdateDeleteClientNext(t *testing.T, m Storage, networks
 			})
 
 			t.Run("lifecycle=exists", func(t *testing.T) {
-				fakeID := client.ID
 				require.NoError(t, m.CreateClient(ctx, &client))
 				c, err := m.GetClient(ctx, client.GetID())
 				require.NoError(t, err)
-				require.NotEqual(t, fakeID.String(), c.(*Client).ID.String(), "create must generate a new ID instead of using the original")
 				assertx.EqualAsJSONExcept(t, &client, c, []string{
 					"registration_access_token",
 					"registration_client_uri",
@@ -228,7 +225,8 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		require.Error(t, err)
 
 		t1c1 := &Client{
-			OutfacingID:                       "1234",
+			ID:                                uuid.FromStringOrNil("96bfe52e-af88-4cba-ab00-ae7a8b082228"),
+			LegacyClientID:                    "1234",
 			Name:                              "name",
 			Secret:                            "secret",
 			RedirectURIs:                      []string{"http://redirect", "http://redirect1"},
@@ -263,15 +261,16 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		require.NoError(t, t1.CreateClient(ctx, t1c1))
 		{
 			t2c1 := *t1c1
-			require.Error(t, connection.Create(&t2c1), "should not be able to create the same client in other manager/tenant; are they backed by the same database?")
-			require.NoError(t, t2.CreateClient(ctx, &t2c1), "we should be able to create a client with the same OutfacingID but different ID in other tenant")
+			require.Error(t, connection.Create(&t2c1), "should not be able to create the same client in other manager/network; are they backed by the same database?")
+			t2c1.ID = uuid.Nil
+			require.NoError(t, t2.CreateClient(ctx, &t2c1), "we should be able to create a client with the same GetID() but different ID in other network")
 		}
 
 		t2c3 := *t1c1
 		{
 			pk, _ := uuid.NewV4()
 			t2c3.ID = pk
-			t2c3.OutfacingID = "t2c2-1234"
+			t2c3.LegacyClientID = "t2c2-1234"
 			require.NoError(t, t2.CreateClient(ctx, &t2c3))
 			require.Error(t, t2.CreateClient(ctx, &t2c3))
 		}
@@ -281,7 +280,8 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		}
 
 		c2Template := &Client{
-			OutfacingID:       "2-1234",
+			ID:                uuid.FromStringOrNil("a6bfe52e-af88-4cba-ab00-ae7a8b082228"),
+			LegacyClientID:    "2-1234",
 			Name:              "name2",
 			Secret:            "secret",
 			RedirectURIs:      []string{"http://redirect"},
@@ -303,8 +303,8 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 		ds, err := t1.GetClients(ctx, Filter{Limit: 100, Offset: 0})
 		assert.NoError(t, err)
 		assert.Len(t, ds, 2)
-		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
-		assert.NotEqual(t, ds[0].OutfacingID, ds[1].OutfacingID)
+		assert.NotEqual(t, ds[0].GetID(), ds[1].GetID())
+		assert.NotEqual(t, ds[0].GetID(), ds[1].GetID())
 		// test if SecretExpiresAt was set properly
 		assert.Equal(t, ds[0].SecretExpiresAt, 0)
 		assert.Equal(t, ds[1].SecretExpiresAt, 1)
@@ -338,8 +338,8 @@ func TestHelperCreateGetUpdateDeleteClient(k string, connection *pop.Connection,
 
 		err = t1.DeleteClient(ctx, "1234")
 		assert.NoError(t, err)
-		err = t1.DeleteClient(ctx, t2c3.OutfacingID)
-		assert.Error(t, err, "tenant 1 should not be able to delete tenant 2's client")
+		err = t1.DeleteClient(ctx, t2c3.GetID())
+		assert.Error(t, err)
 
 		_, err = t1.GetClient(ctx, "1234")
 		assert.NotNil(t, err)

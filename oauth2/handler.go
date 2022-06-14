@@ -598,6 +598,9 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		h.r.OAuth2Provider().WriteAccessError(ctx, w, accessRequest, err)
 		return
 	}
+	accessRequest.GetClient()
+
+	session.SetExpiresAt(fosite.AccessToken, time.Now().UTC().Add(time.Hour))
 
 	if accessRequest.GetGrantTypes().ExactOne("client_credentials") || accessRequest.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") {
 		var accessTokenKeyID string

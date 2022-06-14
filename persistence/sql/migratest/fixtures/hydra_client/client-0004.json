@@ -18,11 +18,11 @@
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/0004",
+  "LegacyClientID": "client-0004",
   "LogoURI": "http://logo/0004",
   "Metadata": {},
   "NID": "00000000-0000-0000-0000-000000000000",
   "Name": "Client 0004",
-  "OutfacingID": "client-0004",
   "Owner": "owner-0004",
   "PKDeprecated": 4,
   "PolicyURI": "http://policy/0004",

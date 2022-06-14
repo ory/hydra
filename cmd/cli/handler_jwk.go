@@ -28,11 +28,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/ory/x/uuidx"
+
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/pointerx"
 
-	"github.com/pborman/uuid"
 	"github.com/spf13/cobra"
 	jose "gopkg.in/square/go-jose.v2"
 
@@ -149,7 +150,7 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 
 		keyID := flagx.MustGetString(cmd, "default-key-id")
 		if keyID == "" {
-			keyID = uuid.New()
+			keyID = uuidx.NewV4().String()
 		}
 
 		if key, privateErr := josex.LoadPrivateKey(file); privateErr != nil {

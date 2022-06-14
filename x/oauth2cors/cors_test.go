@@ -79,7 +79,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-2", Secret: "bar", AllowedCORSOrigins: []string{"http://not-foobar.com"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-2", Secret: "bar", AllowedCORSOrigins: []string{"http://not-foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-2", "bar"))}},
@@ -91,7 +91,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.enabled", true)
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-3", "bar"))}},
@@ -104,7 +104,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-3", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-3", "bar"))}},
@@ -117,7 +117,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*.foobar.com"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-4", Secret: "bar", AllowedCORSOrigins: []string{"http://*.foobar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-4", "bar"))}},
@@ -130,7 +130,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"*"})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-5", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-5", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"*"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-5", "bar"))}},
@@ -143,7 +143,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://*.foobar.com"})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-6", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-6", Secret: "bar", AllowedCORSOrigins: []string{"http://barbar.com"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foo.foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-6", "bar"))}},
@@ -156,7 +156,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-7", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-7", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-7", "bar"))}},
@@ -191,7 +191,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				sess := oauth2.NewSession("foo-9")
 				sess.SetExpiresAt(fosite.AccessToken, time.Now().Add(time.Hour))
 				ar := fosite.NewAccessRequest(sess)
-				cl := &client.Client{OutfacingID: "foo-9", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}}
+				cl := &client.Client{LegacyClientID: "foo-9", Secret: "bar", AllowedCORSOrigins: []string{"http://foobar.com"}}
 				ar.Client = cl
 
 				// Ignore unique violations
@@ -208,7 +208,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.enabled", true)
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-11", Secret: "bar", AllowedCORSOrigins: []string{"*"}})
 				r.Config().MustSet(context.Background(), "serve.public.cors.enabled", true)
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://*", "https://*"})
 			},
@@ -223,7 +223,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://**.example.com"})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-12", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-12", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://myapp.example.biz"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-12", "bar"))}},
@@ -236,7 +236,7 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://**.example.com"})
 
 				// Ignore unique violations
-				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{OutfacingID: "foo-13", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
+				_ = r.ClientManager().CreateClient(context.Background(), &client.Client{LegacyClientID: "foo-13", Secret: "bar", AllowedCORSOrigins: []string{"http://myapp.example.biz"}})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://client-app.example.com"}, "Authorization": {fmt.Sprintf("Basic %s", x.BasicAuth("foo-13", "bar"))}},

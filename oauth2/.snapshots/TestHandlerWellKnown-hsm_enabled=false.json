@@ -43,16 +43,16 @@
   ],
   "userinfo_signing_alg_values_supported": [
     "none",
-    "ES256"
+    "RS256"
   ],
   "id_token_signing_alg_values_supported": [
-    "ES256"
+    "RS256"
   ],
   "id_token_signed_response_alg": [
-    "ES256"
+    "RS256"
   ],
   "userinfo_signed_response_alg": [
-    "ES256"
+    "RS256"
   ],
   "request_parameter_supported": true,
   "request_uri_parameter_supported": true,

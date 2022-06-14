@@ -35,14 +35,15 @@ func (o *DiscoverOpenIDConfigurationReader) ReadResponse(response runtime.Client
 			return nil, err
 		}
 		return nil, result
-	case 500:
-		result := NewDiscoverOpenIDConfigurationInternalServerError()
+	default:
+		result := NewDiscoverOpenIDConfigurationDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -110,27 +111,36 @@ func (o *DiscoverOpenIDConfigurationUnauthorized) readResponse(response runtime.
 	return nil
 }
 
-// NewDiscoverOpenIDConfigurationInternalServerError creates a DiscoverOpenIDConfigurationInternalServerError with default headers values
-func NewDiscoverOpenIDConfigurationInternalServerError() *DiscoverOpenIDConfigurationInternalServerError {
-	return &DiscoverOpenIDConfigurationInternalServerError{}
+// NewDiscoverOpenIDConfigurationDefault creates a DiscoverOpenIDConfigurationDefault with default headers values
+func NewDiscoverOpenIDConfigurationDefault(code int) *DiscoverOpenIDConfigurationDefault {
+	return &DiscoverOpenIDConfigurationDefault{
+		_statusCode: code,
+	}
 }
 
-/* DiscoverOpenIDConfigurationInternalServerError describes a response with status code 500, with default header values.
+/* DiscoverOpenIDConfigurationDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type DiscoverOpenIDConfigurationInternalServerError struct {
+type DiscoverOpenIDConfigurationDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *DiscoverOpenIDConfigurationInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIdConfigurationInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the discover open ID configuration default response
+func (o *DiscoverOpenIDConfigurationDefault) Code() int {
+	return o._statusCode
 }
-func (o *DiscoverOpenIDConfigurationInternalServerError) GetPayload() *models.JSONError {
+
+func (o *DiscoverOpenIDConfigurationDefault) Error() string {
+	return fmt.Sprintf("[GET /.well-known/openid-configuration][%d] discoverOpenIDConfiguration default  %+v", o._statusCode, o.Payload)
+}
+func (o *DiscoverOpenIDConfigurationDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *DiscoverOpenIDConfigurationInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *DiscoverOpenIDConfigurationDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

@@ -490,7 +490,7 @@ Name | Type | Description  | Notes
 
 ## OauthAuth
 
-> OauthAuth(ctx).Execute()
+> JsonError OauthAuth(ctx).Execute()
 
 The OAuth 2.0 Authorize Endpoint
 
@@ -517,6 +517,8 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.OauthAuth``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
+    // response from `OauthAuth`: JsonError
+    fmt.Fprintf(os.Stdout, "Response from `PublicApi.OauthAuth`: %v\n", resp)
 }
 ```
 
@@ -531,7 +533,7 @@ Other parameters are passed through a pointer to a apiOauthAuthRequest struct vi
 
 ### Return type
 
- (empty response body)
+[**JsonError**](JsonError.md)
 
 ### Authorization
 

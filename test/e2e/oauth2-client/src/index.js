@@ -401,17 +401,10 @@ app.post("/openid/session/end/bc", (req, res) => {
     cache: false
   })
 
-  console.log({ logout_token: req.body.logout_token })
-
   jwt.verify(
     req.body.logout_token,
     (header, callback) => {
       client.getSigningKey(header.kid, (err, key) => {
-        console.log({
-          err,
-          header,
-          key
-        })
         if (err) {
           console.error(err)
           res.sendStatus(400)
@@ -454,22 +447,14 @@ app.post("/openid/session/end/bc", (req, res) => {
 
 app.get('/openid/session/check', async (req, res) => {
   const { openid_claims: { sid = '' } = {} } = req.session
-  console.log({ session: req.session, blacklistedSid })
 
   if (blacklistedSid.indexOf(sid) > -1) {
-    console.log('BLACKLISTED', { session: req.session, blacklistedSid })
     req.session.destroy(() => {
       res.json({ has_session: false })
     })
     return
   }
 
-  console.log(
-    'BLACKLISTED',
-    req.session.oauth2_flow,
-    Boolean(req.session.openid_token),
-    Boolean(req.session.openid_claims)
-  )
   res.json({
     has_session:
       Boolean(req.session.oauth2_flow) ||

@@ -229,7 +229,7 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //     Responses:
 //       200: wellKnown
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
@@ -292,7 +292,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //     Responses:
 //       200: userinfoResponse
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
@@ -393,7 +393,7 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 //     Responses:
 //       200: emptyResponse
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
@@ -426,7 +426,7 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //     Responses:
 //       200: oAuth2TokenIntrospection
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -532,7 +532,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 //     Responses:
 //       204: emptyResponse
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var fr FlushInactiveOAuth2TokensRequest
 	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
@@ -587,7 +587,7 @@ func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprou
 //       200: oauth2TokenResponse
 //       401: jsonError
 //       400: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
@@ -685,7 +685,7 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 //     Responses:
 //       302: emptyResponse
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
 
@@ -823,7 +823,7 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //     Responses:
 //       204: emptyResponse
 //       401: jsonError
-//       500: jsonError
+//       default: jsonError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
 

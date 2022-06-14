@@ -41,14 +41,15 @@ func (o *Oauth2TokenReader) ReadResponse(response runtime.ClientResponse, consum
 			return nil, err
 		}
 		return nil, result
-	case 500:
-		result := NewOauth2TokenInternalServerError()
+	default:
+		result := NewOauth2TokenDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -148,27 +149,36 @@ func (o *Oauth2TokenUnauthorized) readResponse(response runtime.ClientResponse, 
 	return nil
 }
 
-// NewOauth2TokenInternalServerError creates a Oauth2TokenInternalServerError with default headers values
-func NewOauth2TokenInternalServerError() *Oauth2TokenInternalServerError {
-	return &Oauth2TokenInternalServerError{}
+// NewOauth2TokenDefault creates a Oauth2TokenDefault with default headers values
+func NewOauth2TokenDefault(code int) *Oauth2TokenDefault {
+	return &Oauth2TokenDefault{
+		_statusCode: code,
+	}
 }
 
-/* Oauth2TokenInternalServerError describes a response with status code 500, with default header values.
+/* Oauth2TokenDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type Oauth2TokenInternalServerError struct {
+type Oauth2TokenDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *Oauth2TokenInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the oauth2 token default response
+func (o *Oauth2TokenDefault) Code() int {
+	return o._statusCode
 }
-func (o *Oauth2TokenInternalServerError) GetPayload() *models.JSONError {
+
+func (o *Oauth2TokenDefault) Error() string {
+	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2Token default  %+v", o._statusCode, o.Payload)
+}
+func (o *Oauth2TokenDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *Oauth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *Oauth2TokenDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

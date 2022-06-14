@@ -1,7 +1,6 @@
 import { deleteClients, prng } from "../../helpers"
 
 const nc = () => ({
-  client_id: prng(),
   client_secret: prng(),
   scope: "openid",
   subject_type: "public",

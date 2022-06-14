@@ -54,7 +54,6 @@ func TestClientCredentials(t *testing.T) {
 	var newClient = func(t *testing.T) (*hc.Client, clientcredentials.Config) {
 		secret := uuid.New().String()
 		c := &hc.Client{
-			OutfacingID:   uuid.New().String(),
 			Secret:        secret,
 			RedirectURIs:  []string{public.URL + "/callback"},
 			ResponseTypes: []string{"token"},
@@ -64,7 +63,7 @@ func TestClientCredentials(t *testing.T) {
 		}
 		require.NoError(t, reg.ClientManager().CreateClient(ctx, c))
 		return c, clientcredentials.Config{
-			ClientID:       c.OutfacingID,
+			ClientID:       c.GetID(),
 			ClientSecret:   secret,
 			TokenURL:       reg.Config().OAuth2TokenURL(ctx).String(),
 			Scopes:         strings.Split(c.Scope, " "),
@@ -100,12 +99,12 @@ func TestClientCredentials(t *testing.T) {
 		return string(out)
 	}
 
-	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string, expectedExp time.Time) {
-		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.OutfacingID, ClientSecret: conf.ClientSecret}, token.AccessToken, admin)
+	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, conf clientcredentials.Config, strategy string) {
+		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: conf.ClientSecret}, token, admin)
 
 		check := func(res gjson.Result) {
-			assert.EqualValues(t, cl.OutfacingID, res.Get("client_id").String(), "%s", res.Raw)
-			assert.EqualValues(t, cl.OutfacingID, res.Get("sub").String(), "%s", res.Raw)
+			assert.EqualValues(t, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)
+			assert.EqualValues(t, cl.GetID(), res.Get("sub").String(), "%s", res.Raw)
 			assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), res.Get("iss").String(), "%s", res.Raw)
 
 			assert.EqualValues(t, res.Get("nbf").Int(), res.Get("iat").Int(), "%s", res.Raw)

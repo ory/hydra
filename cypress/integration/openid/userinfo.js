@@ -2,7 +2,7 @@ import { prng } from "../../helpers"
 
 describe("OpenID Connect Userinfo", () => {
   const nc = () => ({
-    client_id: prng(),
+
     client_secret: prng(),
     scope: "openid",
     redirect_uris: [`${Cypress.env("client_url")}/openid/callback`],

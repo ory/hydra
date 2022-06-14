@@ -118,7 +118,7 @@ func TestMigrations(t *testing.T) {
 						testhelpersuuid.AssertUUID(t, &c.NID)
 						c.ID = uuid.Nil
 						c.NID = uuid.Nil
-						CompareWithFixture(t, structs.Map(c), "hydra_client", c.OutfacingID)
+						CompareWithFixture(t, structs.Map(c), "hydra_client", c.LegacyClientID)
 					}
 				})
 

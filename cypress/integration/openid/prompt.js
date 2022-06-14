@@ -3,16 +3,15 @@ import qs from "querystring"
 
 describe("OpenID Connect Prompt", () => {
   const nc = () => ({
-    client_id: prng(),
+
     client_secret: prng(),
     scope: "openid",
     redirect_uris: [`${Cypress.env("client_url")}/openid/callback`],
     grant_types: ["authorization_code", "refresh_token"],
   })
 
-  it("should fail prompt=none when no session exists", function () {
-    const client = nc()
-    createClient(client)
+  it('should fail prompt=none when no session exists', function () {
+    const client = createClient(nc())
 
     cy.visit(
       `${Cypress.env("client_url")}/openid/code?client_id=${

@@ -2,7 +2,6 @@ import { prng } from "../../helpers"
 
 describe("OpenID Connect Token Introspection", () => {
   const nc = () => ({
-    client_id: prng(),
     client_secret: prng(),
     scope: "offline_access",
     redirect_uris: [`${Cypress.env("client_url")}/oauth2/callback`],
@@ -11,7 +10,7 @@ describe("OpenID Connect Token Introspection", () => {
 
   it("should introspect access token", function () {
     const client = nc()
-    cy.authCodeFlow(client, { consent: { scope: ["offline_access"] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access'], createClient: true } })
 
     cy.get("body")
       .invoke("text")
@@ -33,7 +32,7 @@ describe("OpenID Connect Token Introspection", () => {
 
   it("should introspect refresh token", function () {
     const client = nc()
-    cy.authCodeFlow(client, { consent: { scope: ["offline_access"] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access'], createClient: true } })
 
     cy.get("body")
       .invoke("text")

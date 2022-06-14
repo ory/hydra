@@ -26,6 +26,7 @@ import (
 
 	"github.com/ory/fosite"
 	"github.com/ory/x/urlx"
+	"github.com/ory/x/uuidx"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/driver/config"
@@ -50,7 +51,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 
 	oauth2Config := func(t *testing.T, c *client.Client) *oauth2.Config {
 		return &oauth2.Config{
-			ClientID:     c.OutfacingID,
+			ClientID:     c.GetID(),
 			ClientSecret: c.Secret,
 			Endpoint: oauth2.Endpoint{
 				AuthURL:   publicTS.URL + "/oauth2/auth",
@@ -306,7 +307,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 		// - This should fail because prompt=none, client is public, and redirection scheme is not HTTPS but a custom scheme
 		// - This should pass because prompt=none, client is public, redirection scheme is HTTP and host is localhost
 
-		c := &client.Client{OutfacingID: uuid.New(), TokenEndpointAuthMethod: "none",
+		c := &client.Client{LegacyClientID: uuidx.NewV4().String(), TokenEndpointAuthMethod: "none",
 			RedirectURIs: []string{
 				testhelpers.NewCallbackURL(t, "callback", testhelpers.HTTPServerNotImplementedHandler),
 				"custom://redirection-scheme/path",
@@ -341,7 +342,7 @@ func TestStrategyLoginConsentNext(t *testing.T) {
 						"response_type": {"code"},
 						"state":         {uuid.New()},
 						"redirect_uri":  {redir},
-						"client_id":     {c.OutfacingID},
+						"client_id":     {c.GetID()},
 						"prompt":        {"none"},
 					}).String())
 

@@ -95,7 +95,6 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 	newOAuth2Client := func(t *testing.T, cb string) (*hc.Client, *oauth2.Config) {
 		secret := uuid.New()
 		c := &hc.Client{
-			OutfacingID:   uuid.New(),
 			Secret:        secret,
 			RedirectURIs:  []string{cb},
 			ResponseTypes: []string{"id_token", "code", "token"},
@@ -105,7 +104,7 @@ func TestAuthCodeWithDefaultStrategy(t *testing.T) {
 		}
 		require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), c))
 		return c, &oauth2.Config{
-			ClientID:     c.OutfacingID,
+			ClientID:     c.GetID(),
 			ClientSecret: secret,
 			Endpoint: oauth2.Endpoint{
 				AuthURL:   reg.Config().OAuth2AuthURL(ctx).String(),
@@ -733,12 +732,12 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 			var mutex sync.Mutex
 
 			require.NoError(t, reg.ClientManager().CreateClient(context.TODO(), &hc.Client{
-				OutfacingID:   "app-client",
-				Secret:        "secret",
-				RedirectURIs:  []string{ts.URL + "/callback"},
-				ResponseTypes: []string{"id_token", "code", "token"},
-				GrantTypes:    []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
-				Scope:         "hydra.* offline openid",
+				LegacyClientID: "app-client",
+				Secret:         "secret",
+				RedirectURIs:   []string{ts.URL + "/callback"},
+				ResponseTypes:  []string{"id_token", "code", "token"},
+				GrantTypes:     []string{"implicit", "refresh_token", "authorization_code", "password", "client_credentials"},
+				Scope:          "hydra.* offline openid",
 			}))
 
 			oauthConfig := &oauth2.Config{

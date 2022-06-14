@@ -1,9 +1,6 @@
-export const prng = () => {
-  var array = new Uint32Array(2)
-  crypto.getRandomValues(array)
+import { v4 as uuidv4 } from 'uuid'
 
-  return `${array[0].toString()}${array[1].toString()}`
-}
+export const prng = () => uuidv4()
 
 const isStatusOk = (res) =>
   res.ok
@@ -33,7 +30,7 @@ export const createClient = (client) =>
   cy
     .request("POST", Cypress.env("admin_url") + "/clients", client)
     .then(({ body }) =>
-      getClient(client.client_id).then((actual) => {
+      getClient(body.client_id).then((actual) => {
         if (actual.client_id !== body.client_id) {
           return Promise.reject(
             new Error(
@@ -42,8 +39,8 @@ export const createClient = (client) =>
           )
         }
 
-        return Promise.resolve(body)
-      }),
+        return body
+      })
     )
 
 export const deleteClients = () =>

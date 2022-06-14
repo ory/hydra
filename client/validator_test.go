@@ -27,6 +27,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gofrs/uuid"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
@@ -57,59 +59,59 @@ func TestValidate(t *testing.T) {
 		{
 			in: new(Client),
 			check: func(t *testing.T, c *Client) {
-				assert.NotEmpty(t, c.OutfacingID)
-				assert.NotEmpty(t, c.GetID())
-				assert.Equal(t, c.GetID(), c.OutfacingID)
+				assert.Equal(t, uuid.Nil.String(), c.GetID())
+				assert.EqualValues(t, c.GetID(), c.ID.String())
+				assert.Empty(t, c.LegacyClientID)
 			},
 		},
 		{
-			in: &Client{OutfacingID: "foo"},
+			in: &Client{LegacyClientID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.GetID(), c.OutfacingID)
+				assert.EqualValues(t, c.GetID(), c.LegacyClientID)
 			},
 		},
 		{
-			in: &Client{OutfacingID: "foo"},
+			in: &Client{LegacyClientID: "foo"},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, c.GetID(), c.OutfacingID)
+				assert.EqualValues(t, c.GetID(), c.LegacyClientID)
 			},
 		},
 		{
-			in:        &Client{OutfacingID: "foo", UserinfoSignedResponseAlg: "foo"},
+			in:        &Client{LegacyClientID: "foo", UserinfoSignedResponseAlg: "foo"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{OutfacingID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{LegacyClientID: "foo", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{OutfacingID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
+			in:        &Client{LegacyClientID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, JSONWebKeysURI: "asdf", TokenEndpointAuthMethod: "private_key_jwt"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{OutfacingID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, TokenEndpointAuthMethod: "private_key_jwt", TokenEndpointAuthSigningAlgorithm: "HS256"},
+			in:        &Client{LegacyClientID: "foo", JSONWebKeys: &x.JoseJSONWebKeySet{JSONWebKeySet: new(jose.JSONWebKeySet)}, TokenEndpointAuthMethod: "private_key_jwt", TokenEndpointAuthSigningAlgorithm: "HS256"},
 			expectErr: true,
 		},
 		{
-			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{LegacyClientID: "foo", PostLogoutRedirectURIs: []string{"https://bar/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{LegacyClientID: "foo", PostLogoutRedirectURIs: []string{"http://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in:        &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
+			in:        &Client{LegacyClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo:1234/"}, RedirectURIs: []string{"https://foo/"}},
 			expectErr: true,
 		},
 		{
-			in: &Client{OutfacingID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
+			in: &Client{LegacyClientID: "foo", PostLogoutRedirectURIs: []string{"https://foo/"}, RedirectURIs: []string{"https://foo/"}},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, []string{"https://foo/"}, []string(c.PostLogoutRedirectURIs))
 			},
 		},
 		{
-			in: &Client{OutfacingID: "foo"},
+			in: &Client{LegacyClientID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "public", c.SubjectType)
 			},
@@ -119,19 +121,19 @@ func TestValidate(t *testing.T) {
 				c.MustSet(ctx, config.KeySubjectTypesSupported, []string{"pairwise"})
 				return NewValidator(reg)
 			},
-			in: &Client{OutfacingID: "foo"},
+			in: &Client{LegacyClientID: "foo"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
 			},
 		},
 		{
-			in: &Client{OutfacingID: "foo", SubjectType: "pairwise"},
+			in: &Client{LegacyClientID: "foo", SubjectType: "pairwise"},
 			check: func(t *testing.T, c *Client) {
 				assert.Equal(t, "pairwise", c.SubjectType)
 			},
 		},
 		{
-			in:        &Client{OutfacingID: "foo", SubjectType: "foo"},
+			in:        &Client{LegacyClientID: "foo", SubjectType: "foo"},
 			expectErr: true,
 		},
 	} {
@@ -223,7 +225,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 	}{
 		{
 			in: &Client{
-				OutfacingID:            "foo",
+				LegacyClientID:         "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
 				Metadata:               []byte("{\"access_token_ttl\":10}"),
@@ -232,7 +234,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 		},
 		{
 			in: &Client{
-				OutfacingID:            "foo",
+				LegacyClientID:         "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
 				Metadata:               []byte("{\"id_token_ttl\":10}"),
@@ -241,7 +243,7 @@ func TestValidateDynamicRegistration(t *testing.T) {
 		},
 		{
 			in: &Client{
-				OutfacingID:            "foo",
+				LegacyClientID:         "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
 				Metadata:               []byte("{\"anything\":10}"),
@@ -250,12 +252,12 @@ func TestValidateDynamicRegistration(t *testing.T) {
 		},
 		{
 			in: &Client{
-				OutfacingID:            "foo",
+				LegacyClientID:         "foo",
 				PostLogoutRedirectURIs: []string{"https://foo/"},
 				RedirectURIs:           []string{"https://foo/"},
 			},
 			check: func(t *testing.T, c *Client) {
-				assert.Equal(t, "foo", c.OutfacingID)
+				assert.EqualValues(t, "foo", c.LegacyClientID)
 			},
 		},
 	} {

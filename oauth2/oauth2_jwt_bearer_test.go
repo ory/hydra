@@ -61,16 +61,15 @@ func TestJWTBearer(t *testing.T) {
 
 	secret := uuid.New().String()
 	client := &hc.Client{
-		OutfacingID: uuid.New().String(),
-		Secret:      secret,
-		GrantTypes:  []string{"client_credentials", "urn:ietf:params:oauth:grant-type:jwt-bearer"},
-		Scope:       "offline_access",
+		Secret:     secret,
+		GrantTypes: []string{"client_credentials", "urn:ietf:params:oauth:grant-type:jwt-bearer"},
+		Scope:      "offline_access",
 	}
 	require.NoError(t, reg.ClientManager().CreateClient(ctx, client))
 
 	newConf := func(client *hc.Client) *clientcredentials.Config {
 		return &clientcredentials.Config{
-			ClientID:       client.OutfacingID,
+			ClientID:       client.GetID(),
 			ClientSecret:   secret,
 			TokenURL:       reg.Config().OAuth2TokenURL(ctx).String(),
 			Scopes:         strings.Split(client.Scope, " "),
@@ -84,10 +83,10 @@ func TestJWTBearer(t *testing.T) {
 	}
 
 	var inspectToken = func(t *testing.T, token *goauth2.Token, cl *hc.Client, strategy string, grant trust.Grant) {
-		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.OutfacingID, ClientSecret: cl.Secret}, token, admin)
+		introspection := testhelpers.IntrospectToken(t, &goauth2.Config{ClientID: cl.GetID(), ClientSecret: cl.Secret}, token, admin)
 
 		check := func(res gjson.Result) {
-			assert.EqualValues(t, cl.OutfacingID, res.Get("client_id").String(), "%s", res.Raw)
+			assert.EqualValues(t, cl.GetID(), res.Get("client_id").String(), "%s", res.Raw)
 			assert.EqualValues(t, grant.Subject, res.Get("sub").String(), "%s", res.Raw)
 			assert.EqualValues(t, reg.Config().IssuerURL(ctx).String(), res.Get("iss").String(), "%s", res.Raw)
 
@@ -134,10 +133,9 @@ func TestJWTBearer(t *testing.T) {
 
 	t.Run("case=unable to request grant if not set", func(t *testing.T) {
 		client := &hc.Client{
-			OutfacingID: uuid.New().String(),
-			Secret:      secret,
-			GrantTypes:  []string{"client_credentials"},
-			Scope:       "offline_access",
+			Secret:     secret,
+			GrantTypes: []string{"client_credentials"},
+			Scope:      "offline_access",
 		}
 		require.NoError(t, reg.ClientManager().CreateClient(ctx, client))
 

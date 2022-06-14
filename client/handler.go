@@ -28,7 +28,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pborman/uuid"
+	"github.com/ory/x/uuidx"
 
 	"github.com/ory/x/jsonx"
 	"github.com/ory/x/urlx"
@@ -152,17 +152,22 @@ func (h *Handler) CreateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 
 func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, *Client) error, isDynamic bool) (*Client, error) {
 	var c Client
-
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		return nil, err
 	}
 
 	if isDynamic {
-		c.OutfacingID = uuid.New()
 		if c.Secret != "" {
-			return nil, errorsx.WithStack(herodot.ErrForbidden.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
+			return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("It is not allowed to choose your own OAuth2 Client secret."))
 		}
 	}
+
+	if len(c.LegacyClientID) > 0 {
+		return nil, errorsx.WithStack(herodot.ErrBadRequest.WithReason("It is no longer possible to set an OAuth2 Client ID as a user. The system will generate a unique ID for you."))
+	}
+
+	c.ID = uuidx.NewV4()
+	c.LegacyClientID = c.ID.String()
 
 	if len(c.Secret) == 0 {
 		secretb, err := x.GenerateSecret(26)
@@ -187,7 +192,7 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
-	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath+"/"+c.OutfacingID).String()
+	c.RegistrationClientURI = urlx.AppendPaths(h.r.Config().PublicURL(r.Context()), DynClientsHandlerPath+"/"+c.GetID()).String()
 
 	if err := h.r.ClientManager().CreateClient(r.Context(), &c); err != nil {
 		return nil, err
@@ -222,13 +227,12 @@ func (h *Handler) CreateClient(r *http.Request, validator func(context.Context, 
 //       default: jsonError
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var c Client
-
 	if err := json.NewDecoder(r.Body).Decode(&c); err != nil {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(herodot.ErrBadRequest.WithReasonf("Unable to decode the request body: %s", err)))
 		return
 	}
 
-	c.OutfacingID = ps.ByName("id")
+	c.LegacyClientID = ps.ByName("id")
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().Validate); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -321,7 +325,7 @@ func (h *Handler) UpdateDynamicRegistration(w http.ResponseWriter, r *http.Reque
 	c.RegistrationAccessToken = token
 	c.RegistrationAccessTokenSignature = signature
 
-	c.OutfacingID = client.GetID()
+	c.LegacyClientID = client.GetID()
 	if err := h.updateClient(r.Context(), &c, h.r.ClientValidator().ValidateDynamicRegistration); err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
@@ -489,7 +493,6 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 //       default: jsonError
 func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
-
 	c, err := h.r.ClientManager().GetConcreteClient(r.Context(), id)
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)

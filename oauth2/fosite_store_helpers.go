@@ -96,7 +96,7 @@ type AssertionJWTReader interface {
 var defaultRequest = fosite.Request{
 	ID:                "blank",
 	RequestedAt:       time.Now().UTC().Round(time.Second),
-	Client:            &client.Client{OutfacingID: "foobar"},
+	Client:            &client.Client{LegacyClientID: "foobar"},
 	RequestedScope:    fosite.Arguments{"fa", "ba"},
 	GrantedScope:      fosite.Arguments{"fa", "ba"},
 	RequestedAudience: fosite.Arguments{"ad1", "ad2"},
@@ -110,7 +110,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -119,7 +119,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-2",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Minute)),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -128,7 +128,7 @@ var flushRequests = []*fosite.Request{
 	{
 		ID:             "flush-3",
 		RequestedAt:    time.Now().Round(time.Second).Add(-(lifespan + time.Hour)),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -137,7 +137,7 @@ var flushRequests = []*fosite.Request{
 }
 
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
-	cl := &client.Client{OutfacingID: "foobar"}
+	cl := &client.Client{LegacyClientID: "foobar"}
 	cr := &consent.ConsentRequest{
 		Client:               cl,
 		OpenIDConnectContext: new(consent.OpenIDConnectContext),
@@ -202,7 +202,7 @@ func testHelperRequestIDMultiples(m InternalRegistry, _ string) func(t *testing.
 	return func(t *testing.T) {
 		requestId := uuid.New()
 		mockRequestForeignKey(t, requestId, m, true)
-		cl := &client.Client{OutfacingID: "foobar"}
+		cl := &client.Client{LegacyClientID: "foobar"}
 
 		fositeRequest := &fosite.Request{
 			ID:          requestId,
@@ -287,10 +287,10 @@ func testHelperRevokeRefreshToken(x InternalRegistry) func(t *testing.T) {
 		mockRequestForeignKey(t, reqIdOne, x, false)
 		mockRequestForeignKey(t, reqIdTwo, x, false)
 
-		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{OutfacingID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1111", &fosite.Request{ID: reqIdOne, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
 		require.NoError(t, err)
 
-		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{OutfacingID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
+		err = m.CreateRefreshTokenSession(ctx, "1122", &fosite.Request{ID: reqIdTwo, Client: &client.Client{LegacyClientID: "foobar"}, RequestedAt: time.Now().UTC().Round(time.Second), Session: &Session{}})
 		require.NoError(t, err)
 
 		_, err = m.GetRefreshTokenSession(ctx, "1111", &Session{})
@@ -344,7 +344,7 @@ func testHelperCreateGetDeleteAuthorizeCodes(x InternalRegistry) func(t *testing
 func testHelperNilAccessToken(x InternalRegistry) func(t *testing.T) {
 	return func(t *testing.T) {
 		m := x.OAuth2Storage()
-		c := &client.Client{OutfacingID: "nil-request-client-id-123"}
+		c := &client.Client{LegacyClientID: "nil-request-client-id-123"}
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), c))
 		err := m.CreateAccessTokenSession(context.TODO(), "nil-request-id", &fosite.Request{
 			ID:                "",
@@ -1072,7 +1072,7 @@ func createTestRequest(id string) *fosite.Request {
 	return &fosite.Request{
 		ID:                id,
 		RequestedAt:       time.Now().UTC().Round(time.Second),
-		Client:            &client.Client{OutfacingID: "foobar"},
+		Client:            &client.Client{LegacyClientID: "foobar"},
 		RequestedScope:    fosite.Arguments{"fa", "ba"},
 		GrantedScope:      fosite.Arguments{"fa", "ba"},
 		RequestedAudience: fosite.Arguments{"ad1", "ad2"},

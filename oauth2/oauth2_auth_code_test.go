@@ -969,10 +969,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					})
 
 					t.Run("should not override session data if token refresh hook returns no content", func(t *testing.T) {
-						if strat.d != "jwt" {
-							t.Skip()
-						}
-
 						hs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 							w.WriteHeader(http.StatusNoContent)
 						}))
@@ -981,11 +977,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						conf.MustSet(ctx, config.KeyRefreshTokenHookURL, hs.URL)
 						defer conf.MustSet(ctx, config.KeyRefreshTokenHookURL, nil)
 
-						body, err := x.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
-						require.NoError(t, err)
-
-						origPayload := map[string]interface{}{}
-						require.NoError(t, json.Unmarshal(body, &origPayload))
+						origAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
 
 						res, err := testRefresh(t, &refreshedToken, ts.URL, false)
 						require.NoError(t, err)
@@ -996,13 +988,9 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
-						body, err = x.DecodeSegment(strings.Split(refreshedToken.AccessToken, ".")[1])
-						require.NoError(t, err)
+						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
 
-						refreshedPayload := map[string]interface{}{}
-						require.NoError(t, json.Unmarshal(body, &refreshedPayload))
-
-						assert.Equal(t, origPayload["ext"], refreshedPayload["ext"])
+						assert.Equal(t, origAccessTokenClaims, refreshedAccessTokenClaims)
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {

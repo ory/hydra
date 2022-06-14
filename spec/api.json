@@ -683,7 +683,7 @@
           },
           "scope": {
             "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
-            "pattern": "([a-zA-Z0-9\\.\\*]+\\s?)+",
+            "example": "scope1 scope-2 scope.3 scope:4",
             "type": "string"
           },
           "sector_identifier_uri": {
@@ -1217,6 +1217,13 @@
             },
             "type": "array"
           },
+          "id_token_signed_response_alg": {
+            "description": "Algorithm used to sign OpenID Connect ID Tokens.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "id_token_signing_alg_values_supported": {
             "description": "JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token\nto encode the Claims in a JWT.",
             "items": {
@@ -1306,6 +1313,13 @@
             "description": "URL of the OP's UserInfo Endpoint.",
             "type": "string"
           },
+          "userinfo_signed_response_alg": {
+            "description": "Algorithm used to sign OpenID Connect Userinfo Responses.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "userinfo_signing_alg_values_supported": {
             "description": "JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].",
             "items": {
@@ -1321,7 +1335,9 @@
           "jwks_uri",
           "subject_types_supported",
           "response_types_supported",
-          "id_token_signing_alg_values_supported"
+          "id_token_signing_alg_values_supported",
+          "id_token_signed_response_alg",
+          "userinfo_signed_response_alg"
         ],
         "title": "WellKnown represents important OpenID Connect discovery metadata",
         "type": "object"
@@ -1422,7 +1438,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -2283,7 +2299,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -3092,7 +3108,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -3161,7 +3177,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -3404,7 +3420,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -3516,7 +3532,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -3569,7 +3585,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {
@@ -3828,7 +3844,7 @@
             },
             "description": "jsonError"
           },
-          "500": {
+          "default": {
             "content": {
               "application/json": {
                 "schema": {

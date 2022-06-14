@@ -35,14 +35,15 @@ func (o *FlushInactiveOAuth2TokensReader) ReadResponse(response runtime.ClientRe
 			return nil, err
 		}
 		return nil, result
-	case 500:
-		result := NewFlushInactiveOAuth2TokensInternalServerError()
+	default:
+		result := NewFlushInactiveOAuth2TokensDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -100,27 +101,36 @@ func (o *FlushInactiveOAuth2TokensUnauthorized) readResponse(response runtime.Cl
 	return nil
 }
 
-// NewFlushInactiveOAuth2TokensInternalServerError creates a FlushInactiveOAuth2TokensInternalServerError with default headers values
-func NewFlushInactiveOAuth2TokensInternalServerError() *FlushInactiveOAuth2TokensInternalServerError {
-	return &FlushInactiveOAuth2TokensInternalServerError{}
+// NewFlushInactiveOAuth2TokensDefault creates a FlushInactiveOAuth2TokensDefault with default headers values
+func NewFlushInactiveOAuth2TokensDefault(code int) *FlushInactiveOAuth2TokensDefault {
+	return &FlushInactiveOAuth2TokensDefault{
+		_statusCode: code,
+	}
 }
 
-/* FlushInactiveOAuth2TokensInternalServerError describes a response with status code 500, with default header values.
+/* FlushInactiveOAuth2TokensDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type FlushInactiveOAuth2TokensInternalServerError struct {
+type FlushInactiveOAuth2TokensDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *FlushInactiveOAuth2TokensInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /oauth2/flush][%d] flushInactiveOAuth2TokensInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the flush inactive o auth2 tokens default response
+func (o *FlushInactiveOAuth2TokensDefault) Code() int {
+	return o._statusCode
 }
-func (o *FlushInactiveOAuth2TokensInternalServerError) GetPayload() *models.JSONError {
+
+func (o *FlushInactiveOAuth2TokensDefault) Error() string {
+	return fmt.Sprintf("[POST /oauth2/flush][%d] flushInactiveOAuth2Tokens default  %+v", o._statusCode, o.Payload)
+}
+func (o *FlushInactiveOAuth2TokensDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *FlushInactiveOAuth2TokensInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *FlushInactiveOAuth2TokensDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

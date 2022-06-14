@@ -132,7 +132,7 @@ type OAuth2Client struct {
 	// Scope is a string containing a space-separated list of scope values (as
 	// described in Section 3.3 of OAuth 2.0 [RFC6749]) that the client
 	// can use when requesting access tokens.
-	// Pattern: ([a-zA-Z0-9\.\*]+\s?)+
+	// Example: scope1 scope-2 scope.3 scope:4
 	Scope string `json:"scope,omitempty"`
 
 	// URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a
@@ -203,10 +203,6 @@ func (m *OAuth2Client) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateResponseTypes(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateScope(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -346,18 +342,6 @@ func (m *OAuth2Client) validateResponseTypes(formats strfmt.Registry) error {
 		if ve, ok := err.(*errors.Validation); ok {
 			return ve.ValidateName("response_types")
 		}
-		return err
-	}
-
-	return nil
-}
-
-func (m *OAuth2Client) validateScope(formats strfmt.Registry) error {
-	if swag.IsZero(m.Scope) { // not required
-		return nil
-	}
-
-	if err := validate.Pattern("scope", "body", m.Scope, `([a-zA-Z0-9\.\*]+\s?)+`); err != nil {
 		return err
 	}
 

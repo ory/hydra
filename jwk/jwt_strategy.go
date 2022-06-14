@@ -50,8 +50,8 @@ type DefaultJWTSigner struct {
 	setID string
 }
 
-func NewDefaultJWTSigner(c config.DefaultProvider, r InternalRegistry, keyID string) *DefaultJWTSigner {
-	j := &DefaultJWTSigner{c: &c, r: r, setID: keyID, DefaultSigner: &jwt.DefaultSigner{}}
+func NewDefaultJWTSigner(c *config.DefaultProvider, r InternalRegistry, setID string) *DefaultJWTSigner {
+	j := &DefaultJWTSigner{c: c, r: r, setID: setID, DefaultSigner: &jwt.DefaultSigner{}}
 	j.DefaultSigner.GetPrivateKey = j.getPrivateKey
 	return j
 }

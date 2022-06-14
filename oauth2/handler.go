@@ -599,7 +599,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
+	if accessRequest.GetGrantTypes().ExactOne("client_credentials") || accessRequest.GetGrantTypes().ExactOne("urn:ietf:params:oauth:grant-type:jwt-bearer") {
 		var accessTokenKeyID string
 		if h.c.AccessTokenStrategy(ctx) == "jwt" {
 			accessTokenKeyID, err = h.r.AccessTokenJWTStrategy().GetPublicKeyID(ctx)
@@ -610,7 +610,10 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		session.Subject = accessRequest.GetClient().GetID()
+		// only for client_credentials, otherwise Authentication is included in session
+		if accessRequest.GetGrantTypes().ExactOne("client_credentials") {
+			session.Subject = accessRequest.GetClient().GetID()
+		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID
 		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.c.IssuerURL(r.Context()).String(), "/") + "/"

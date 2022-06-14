@@ -15,10 +15,6 @@ replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220513181618-
 
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 
-replace github.com/ory/x => github.com/ory/x v0.0.413
-
-//replace github.com/ory/x => ../x
-
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
@@ -67,7 +63,7 @@ require (
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
-	github.com/ory/x v0.0.404
+	github.com/ory/x v0.0.415
 	github.com/pborman/uuid v1.2.1
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2

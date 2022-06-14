@@ -104,8 +104,8 @@ func testRegistry(t *testing.T, ctx context.Context, k string, t1 driver.Registr
 
 	t.Run("package=grant/trust/manager="+k, func(t *testing.T) {
 		t.Run("parallel-boundary", func(t *testing.T) {
-			t.Run("case=create-get-delete/tenant=t1", trust.TestHelperGrantManagerCreateGetDeleteGrant(t1.GrantManager(), t1.KeyManager(), parallel))
-			t.Run("case=create-get-delete/tenant=t2", trust.TestHelperGrantManagerCreateGetDeleteGrant(t2.GrantManager(), t2.KeyManager(), parallel))
+			t.Run("case=create-get-delete/network=t1", trust.TestHelperGrantManagerCreateGetDeleteGrant(t1.GrantManager(), t1.KeyManager(), parallel))
+			t.Run("case=create-get-delete/network=t2", trust.TestHelperGrantManagerCreateGetDeleteGrant(t2.GrantManager(), t2.KeyManager(), parallel))
 		})
 		t.Run("parallel-boundary", func(t *testing.T) {
 			t.Run("case=errors", trust.TestHelperGrantManagerErrors(t1.GrantManager(), t1.KeyManager(), parallel))
@@ -161,15 +161,15 @@ func TestManagers(t *testing.T) {
 		t1registries["postgres"], t1registries["mysql"], t1registries["cockroach"], _ = internal.ConnectDatabases(t, true, &contextx.Default{})
 	}
 
-	tenant1NID, _ := uuid.NewV4()
-	tenant2NID, _ := uuid.NewV4()
+	network1NID, _ := uuid.NewV4()
+	network2NID, _ := uuid.NewV4()
 
 	for k, t1 := range t1registries {
 		t2 := t2registries[k]
-		require.NoError(t, t1.Persister().Connection(ctx).Create(&networkx.Network{ID: tenant1NID}))
-		require.NoError(t, t2.Persister().Connection(ctx).Create(&networkx.Network{ID: tenant2NID}))
-		t1.WithContextualizer(&contextx.Static{NID: tenant1NID, C: t1.Config().Source(context.Background())})
-		t2.WithContextualizer(&contextx.Static{NID: tenant2NID, C: t2.Config().Source(context.Background())})
+		require.NoError(t, t1.Persister().Connection(ctx).Create(&networkx.Network{ID: network1NID}))
+		require.NoError(t, t2.Persister().Connection(ctx).Create(&networkx.Network{ID: network2NID}))
+		t1.WithContextualizer(&contextx.Static{NID: network1NID, C: t1.Config().Source(context.Background())})
+		t2.WithContextualizer(&contextx.Static{NID: network2NID, C: t2.Config().Source(context.Background())})
 		t.Run("parallel-boundary", func(t *testing.T) { testRegistry(t, ctx, k, t1, t2) })
 	}
 

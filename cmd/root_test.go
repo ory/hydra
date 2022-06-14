@@ -22,9 +22,7 @@ package cmd
 
 import (
 	"crypto/tls"
-	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
@@ -74,9 +72,12 @@ func init() {
 }
 
 func TestExecute(t *testing.T) {
-	frontend := fmt.Sprintf("https://localhost:%d/", frontendPort)
+	//frontend := fmt.Sprintf("https://localhost:%d/", frontendPort)
 	backend := fmt.Sprintf("https://localhost:%d/", backendPort)
 	conf := internal.NewConfigurationWithDefaults()
+
+	//clientID1 := uuidx.NewV4().String()
+	//clientID2 := uuidx.NewV4().String()
 
 	rootCmd := NewRootCmd()
 	for _, c := range []struct {
@@ -115,11 +116,6 @@ func TestExecute(t *testing.T) {
 				return false
 			},
 		},
-		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "foobarbaz", "--secret", "foobar", "-g", "client_credentials"}},
-		{args: []string{"clients", "get", "--skip-tls-verify", "--endpoint", backend, "foobarbaz"}},
-		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "public-foo"}},
-		{args: []string{"clients", "create", "--skip-tls-verify", "--endpoint", backend, "--id", "confidential-foo", "--pgp-key", base64EncodedPGPPublicKey(t), "--grant-types", "client_credentials", "--response-types", "token"}},
-		{args: []string{"clients", "delete", "--skip-tls-verify", "--endpoint", backend, "public-foo"}},
 		{args: []string{"keys", "create", "--skip-tls-verify", "foo", "--endpoint", backend, "-a", "RS256"}},
 		{args: []string{"keys", "get", "--skip-tls-verify", "--endpoint", backend, "foo"}},
 		// {args: []string{"keys", "rotate", "--skip-tls-verify", "--endpoint", backend, "foo"}},
@@ -128,8 +124,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-1", "../test/stub/ecdh.key", "../test/stub/ecdh.pub"}, skipTest: conf.HSMEnabled()},
 		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}, skipTest: conf.HSMEnabled()},
 		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}, skipTest: conf.HSMEnabled()},
-		{args: []string{"token", "revoke", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz", "foo"}},
-		{args: []string{"token", "client", "--skip-tls-verify", "--endpoint", frontend, "--client-secret", "foobar", "--client-id", "foobarbaz"}},
 		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"version"}},
 		{args: []string{"token", "flush", "--skip-tls-verify", "--endpoint", backend}},
@@ -167,14 +161,4 @@ func TestExecute(t *testing.T) {
 			}
 		})
 	}
-}
-
-func base64EncodedPGPPublicKey(t *testing.T) string {
-	t.Helper()
-
-	gpgPublicKey, err := ioutil.ReadFile("../test/stub/pgp.pub")
-	if err != nil {
-		t.Fatal(err)
-	}
-	return base64.StdEncoding.EncodeToString(gpgPublicKey)
 }

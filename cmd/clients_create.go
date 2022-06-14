@@ -45,8 +45,7 @@ To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--
 `,
 		Run: cli.NewHandler().Clients.CreateClient,
 	}
-	cmd.Flags().String("id", "", "Give the client this id")
-	cmd.Flags().StringSliceP("callbacks", "c", []string{}, "REQUIRED list of allowed callback URLs")
+	cmd.Flags().StringSliceP("redirect-uris", "c", []string{}, "List of allowed OAuth2 Redirect URIs.")
 	cmd.Flags().StringSliceP("grant-types", "g", []string{"authorization_code"}, "A list of allowed grant types")
 	cmd.Flags().StringSliceP("response-types", "r", []string{"code"}, "A list of allowed response types")
 	cmd.Flags().StringSliceP("scope", "a", []string{""}, "The scope the client is allowed to request")

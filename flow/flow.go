@@ -453,7 +453,7 @@ func (_ Flow) TableName() string {
 
 func (f *Flow) BeforeSave(_ *pop.Connection) error {
 	if f.Client != nil {
-		f.ClientID = f.Client.OutfacingID
+		f.ClientID = f.Client.GetID()
 	}
 	if f.State == FlowStateLoginUnused && string(f.Context) == "" {
 		f.Context = sqlxx.JSONRawMessage("{}")

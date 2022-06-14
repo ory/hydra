@@ -64,7 +64,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
-				cl := &client.Client{OutfacingID: "client" + key}
+				cl := &client.Client{LegacyClientID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLogoutRequest(context.TODO(), &LogoutRequest{
 					Client:     cl,
@@ -118,7 +118,7 @@ func TestGetLoginRequest(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
-				cl := &client.Client{OutfacingID: "client" + key}
+				cl := &client.Client{LegacyClientID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
 					Client:     cl,
@@ -177,7 +177,7 @@ func TestGetConsentRequest(t *testing.T) {
 			reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
 			if tc.exists {
-				cl := &client.Client{OutfacingID: "client" + key}
+				cl := &client.Client{LegacyClientID: "client" + key}
 				require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 				lr := &LoginRequest{ID: "login-" + challenge, Client: cl, RequestURL: requestURL}
 				require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), lr))
@@ -238,7 +238,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		conf := internal.NewConfigurationWithDefaults()
 		reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-		cl := &client.Client{OutfacingID: "client"}
+		cl := &client.Client{LegacyClientID: "client"}
 		require.NoError(t, reg.ClientManager().CreateClient(context.Background(), cl))
 		require.NoError(t, reg.ConsentManager().CreateLoginRequest(context.Background(), &LoginRequest{
 			Client:     cl,

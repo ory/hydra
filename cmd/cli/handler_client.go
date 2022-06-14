@@ -102,12 +102,11 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	cc := models.OAuth2Client{
-		ClientID:                          flagx.MustGetString(cmd, "id"),
 		ClientSecret:                      secret,
 		ResponseTypes:                     flagx.MustGetStringSlice(cmd, "response-types"),
 		Scope:                             strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
 		GrantTypes:                        flagx.MustGetStringSlice(cmd, "grant-types"),
-		RedirectUris:                      flagx.MustGetStringSlice(cmd, "callbacks"),
+		RedirectUris:                      flagx.MustGetStringSlice(cmd, "redirect-uris"),
 		ClientName:                        flagx.MustGetString(cmd, "name"),
 		TokenEndpointAuthMethod:           flagx.MustGetString(cmd, "token-endpoint-auth-method"),
 		JwksURI:                           flagx.MustGetString(cmd, "jwks-uri"),

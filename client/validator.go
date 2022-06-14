@@ -30,10 +30,7 @@ import (
 
 	"github.com/ory/x/errorsx"
 
-	"github.com/pborman/uuid"
-
 	"github.com/ory/x/stringslice"
-	"github.com/ory/x/stringsx"
 )
 
 var (
@@ -70,9 +67,6 @@ func NewValidatorWithClient(registry Registry, client *http.Client) *Validator {
 }
 
 func (v *Validator) Validate(ctx context.Context, c *Client) error {
-	id := uuid.New()
-	c.OutfacingID = stringsx.Coalesce(c.OutfacingID, id)
-
 	if c.TokenEndpointAuthMethod == "" {
 		c.TokenEndpointAuthMethod = "client_secret_basic"
 	} else if c.TokenEndpointAuthMethod == "private_key_jwt" {

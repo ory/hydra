@@ -80,7 +80,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -899,7 +899,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -1605,7 +1605,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -1660,7 +1660,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -1896,7 +1896,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -1997,7 +1997,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -2039,7 +2039,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -2283,7 +2283,7 @@
               "$ref": "#/definitions/jsonError"
             }
           },
-          "500": {
+          "default": {
             "description": "jsonError",
             "schema": {
               "$ref": "#/definitions/jsonError"
@@ -3054,7 +3054,7 @@
         "scope": {
           "description": "Scope is a string containing a space-separated list of scope values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the client\ncan use when requesting access tokens.",
           "type": "string",
-          "pattern": "([a-zA-Z0-9\\.\\*]+\\s?)+"
+          "example": "scope1 scope-2 scope.3 scope:4"
         },
         "sector_identifier_uri": {
           "description": "URL using the https scheme to be used in calculating Pseudonymous Identifiers by the OP. The URL references a\nfile with a single JSON array of redirect_uri values.",
@@ -3543,7 +3543,9 @@
         "jwks_uri",
         "subject_types_supported",
         "response_types_supported",
-        "id_token_signing_alg_values_supported"
+        "id_token_signing_alg_values_supported",
+        "id_token_signed_response_alg",
+        "userinfo_signed_response_alg"
       ],
       "properties": {
         "authorization_endpoint": {
@@ -3591,6 +3593,13 @@
         },
         "grant_types_supported": {
           "description": "JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id_token_signed_response_alg": {
+          "description": "Algorithm used to sign OpenID Connect ID Tokens.",
           "type": "array",
           "items": {
             "type": "string"
@@ -3684,6 +3693,13 @@
         "userinfo_endpoint": {
           "description": "URL of the OP's UserInfo Endpoint.",
           "type": "string"
+        },
+        "userinfo_signed_response_alg": {
+          "description": "Algorithm used to sign OpenID Connect Userinfo Responses.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "userinfo_signing_alg_values_supported": {
           "description": "JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].",

@@ -35,14 +35,15 @@ func (o *IntrospectOAuth2TokenReader) ReadResponse(response runtime.ClientRespon
 			return nil, err
 		}
 		return nil, result
-	case 500:
-		result := NewIntrospectOAuth2TokenInternalServerError()
+	default:
+		result := NewIntrospectOAuth2TokenDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -110,27 +111,36 @@ func (o *IntrospectOAuth2TokenUnauthorized) readResponse(response runtime.Client
 	return nil
 }
 
-// NewIntrospectOAuth2TokenInternalServerError creates a IntrospectOAuth2TokenInternalServerError with default headers values
-func NewIntrospectOAuth2TokenInternalServerError() *IntrospectOAuth2TokenInternalServerError {
-	return &IntrospectOAuth2TokenInternalServerError{}
+// NewIntrospectOAuth2TokenDefault creates a IntrospectOAuth2TokenDefault with default headers values
+func NewIntrospectOAuth2TokenDefault(code int) *IntrospectOAuth2TokenDefault {
+	return &IntrospectOAuth2TokenDefault{
+		_statusCode: code,
+	}
 }
 
-/* IntrospectOAuth2TokenInternalServerError describes a response with status code 500, with default header values.
+/* IntrospectOAuth2TokenDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type IntrospectOAuth2TokenInternalServerError struct {
+type IntrospectOAuth2TokenDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *IntrospectOAuth2TokenInternalServerError) Error() string {
-	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2TokenInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the introspect o auth2 token default response
+func (o *IntrospectOAuth2TokenDefault) Code() int {
+	return o._statusCode
 }
-func (o *IntrospectOAuth2TokenInternalServerError) GetPayload() *models.JSONError {
+
+func (o *IntrospectOAuth2TokenDefault) Error() string {
+	return fmt.Sprintf("[POST /oauth2/introspect][%d] introspectOAuth2Token default  %+v", o._statusCode, o.Payload)
+}
+func (o *IntrospectOAuth2TokenDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *IntrospectOAuth2TokenInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *IntrospectOAuth2TokenDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

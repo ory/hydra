@@ -314,9 +314,7 @@ func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
 }
 
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {
-	issuerURL := p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)))
-	issuerURL.Path = strings.TrimRight(issuerURL.Path, "/") + "/"
-	return urlRoot(issuerURL)
+	return p.getProvider(ctx).RequestURIF(KeyIssuerURL, p.fallbackURL(ctx, "/", p.host(PublicInterface), p.port(PublicInterface)))
 }
 
 func (p *DefaultProvider) OAuth2ClientRegistrationURL(ctx context.Context) *url.URL {

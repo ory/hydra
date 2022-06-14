@@ -1,6 +1,5 @@
 {
   "body": {
-    "client_id": "update-existing-client-admin",
     "client_name": "",
     "client_secret": "averylongsecret",
     "redirect_uris": [

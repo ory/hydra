@@ -12,7 +12,6 @@ describe("OAuth 2.0 JSON Web Token Access Tokens", () => {
   })
 
   const nc = () => ({
-    client_id: prng(),
     client_secret: prng(),
     scope: "offline_access",
     redirect_uris: [`${Cypress.env("client_url")}/oauth2/callback`],
@@ -21,7 +20,7 @@ describe("OAuth 2.0 JSON Web Token Access Tokens", () => {
 
   it("should return an Access Token in JWT format and validate it and a Refresh Token in opaque format", () => {
     const client = nc()
-    cy.authCodeFlow(client, { consent: { scope: ["offline_access"] } })
+    cy.authCodeFlow(client, { consent: { scope: ['offline_access'], createClient: true } })
 
     cy.request(`${Cypress.env("client_url")}/oauth2/refresh`)
       .its("body")

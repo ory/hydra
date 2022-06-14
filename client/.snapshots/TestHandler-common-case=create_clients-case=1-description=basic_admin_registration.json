@@ -1,5 +1,4 @@
 {
-  "client_id": "create-client-2",
   "client_name": "",
   "client_secret": "averylongsecret",
   "redirect_uris": [
@@ -23,6 +22,5 @@
   "userinfo_signed_response_alg": "none",
   "metadata": {
     "foo": "bar"
-  },
-  "registration_client_uri": "http://localhost:4444/oauth2/register/create-client-2"
+  }
 }

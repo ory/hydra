@@ -22,13 +22,13 @@
     "JSONWebKeySet": null
   },
   "JSONWebKeysURI": "http://jwks/20",
+  "LegacyClientID": "client-20",
   "LogoURI": "http://logo/20",
   "Metadata": {
     "migration": "20"
   },
   "NID": "00000000-0000-0000-0000-000000000000",
   "Name": "Client 20",
-  "OutfacingID": "client-20",
   "Owner": "owner-20",
   "PKDeprecated": 0,
   "PolicyURI": "http://policy/20",

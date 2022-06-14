@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/uuidx"
+
 	"github.com/ory/x/assertx"
 
 	"github.com/gofrs/uuid"
@@ -120,7 +122,7 @@ func (s *PersisterTestSuite) TestAddKeySetGetKeySetDeleteKeySet() {
 	t := s.T()
 	ks := newKeySet("test-ks", "test")
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ksID := "key-set"
 			r.Persister().AddKeySet(s.t1, ksID, ks)
 			actual, err := r.Persister().GetKeySet(s.t2, ksID)
@@ -143,8 +145,8 @@ func (s *PersisterTestSuite) TestAddKeySetGetKeySetDeleteKeySet() {
 func (s *PersisterTestSuite) TestAuthenticate() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id", Secret: "secret"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id", Secret: "secret"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			actual, err := r.Persister().Authenticate(s.t2, "client-id", []byte("secret"))
@@ -161,7 +163,7 @@ func (s *PersisterTestSuite) TestAuthenticate() {
 func (s *PersisterTestSuite) TestClientAssertionJWTValid() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
 			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
 
@@ -210,7 +212,7 @@ func (s *PersisterTestSuite) TestCreateSession() {
 func (s *PersisterTestSuite) TestCountClients() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			count, err := r.Persister().CountClients(s.t1)
 			require.NoError(t, err)
 			require.Equal(t, 0, count)
@@ -235,7 +237,7 @@ func (s *PersisterTestSuite) TestCountClients() {
 func (s *PersisterTestSuite) TestCountGrants() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			count, err := r.Persister().CountGrants(s.t1)
 			require.NoError(t, err)
 			require.Equal(t, 0, count)
@@ -264,7 +266,7 @@ func (s *PersisterTestSuite) TestCountGrants() {
 func (s *PersisterTestSuite) TestCountSubjectsGrantedConsentRequests() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sub := uuid.Must(uuid.NewV4()).String()
 			count, err := r.Persister().CountSubjectsGrantedConsentRequests(s.t1, sub)
 			require.NoError(t, err)
@@ -276,9 +278,9 @@ func (s *PersisterTestSuite) TestCountSubjectsGrantedConsentRequests() {
 
 			sessionID := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
-			client := &client.Client{OutfacingID: "client-id"}
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			f := newFlow(s.t1NID, client.OutfacingID, sub, sqlxx.NullString(sessionID))
+			f := newFlow(s.t1NID, client.LegacyClientID, sub, sqlxx.NullString(sessionID))
 			f.ConsentSkip = false
 			f.ConsentError = &consent.RequestDeniedError{}
 			f.State = flow.FlowStateConsentUnused
@@ -298,13 +300,15 @@ func (s *PersisterTestSuite) TestCountSubjectsGrantedConsentRequests() {
 func (s *PersisterTestSuite) TestCreateAccessTokenSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateClient(s.t2, client))
+		t.Run(k, func(t *testing.T) {
+			c1 := &client.Client{LegacyClientID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			c2 := &client.Client{LegacyClientID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+
+			fr.Client = &fosite.DefaultClient{ID: c1.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
@@ -316,13 +320,14 @@ func (s *PersisterTestSuite) TestCreateAccessTokenSession() {
 func (s *PersisterTestSuite) TestCreateAuthorizeCodeSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateClient(s.t2, client))
+		t.Run(k, func(t *testing.T) {
+			c1 := &client.Client{LegacyClientID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			c2 := &client.Client{LegacyClientID: "client-id"}
+			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: c1.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 			actual := persistencesql.OAuth2RequestSQL{Table: "code"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
@@ -334,8 +339,8 @@ func (s *PersisterTestSuite) TestCreateAuthorizeCodeSession() {
 func (s *PersisterTestSuite) TestCreateClient() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			expected := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			expected := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, expected))
 			actual := client.Client{}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, expected.ID))
@@ -347,10 +352,10 @@ func (s *PersisterTestSuite) TestCreateClient() {
 func (s *PersisterTestSuite) TestCreateConsentRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
@@ -374,12 +379,12 @@ func (s *PersisterTestSuite) TestCreateConsentRequest() {
 func (s *PersisterTestSuite) TestCreateForcedObfuscatedLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
-			session := &consent.ForcedObfuscatedLoginSession{ClientID: client.OutfacingID}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
+			session := &consent.ForcedObfuscatedLoginSession{ClientID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().CreateForcedObfuscatedLoginSession(s.t1, session))
-			actual, err := r.Persister().GetForcedObfuscatedLoginSession(s.t1, client.OutfacingID, "")
+			actual, err := r.Persister().GetForcedObfuscatedLoginSession(s.t1, client.LegacyClientID, "")
 			require.NoError(t, err)
 			require.Equal(t, s.t1NID, actual.NID)
 		})
@@ -389,7 +394,7 @@ func (s *PersisterTestSuite) TestCreateForcedObfuscatedLoginSession() {
 func (s *PersisterTestSuite) TestCreateGrant() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -408,9 +413,9 @@ func (s *PersisterTestSuite) TestCreateGrant() {
 func (s *PersisterTestSuite) TestCreateLoginRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
-			lr := consent.LoginRequest{ID: "lr-id", ClientID: client.OutfacingID, RequestedAt: time.Now()}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
+			lr := consent.LoginRequest{ID: "lr-id", ClientID: client.LegacyClientID, RequestedAt: time.Now()}
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.ConsentManager().CreateLoginRequest(s.t1, &lr))
@@ -424,7 +429,7 @@ func (s *PersisterTestSuite) TestCreateLoginRequest() {
 func (s *PersisterTestSuite) TestCreateLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ls := consent.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &ls))
 			actual, err := r.Persister().GetRememberedLoginSession(s.t1, ls.ID)
@@ -437,12 +442,12 @@ func (s *PersisterTestSuite) TestCreateLoginSession() {
 func (s *PersisterTestSuite) TestCreateLogoutRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			lr := consent.LogoutRequest{
 				// TODO there is not FK for SessionID so we don't need it here; TODO make sure the missing FK is intentional
 				ID:       uuid.Must(uuid.NewV4()).String(),
-				ClientID: sql.NullString{Valid: true, String: client.OutfacingID},
+				ClientID: sql.NullString{Valid: true, String: client.LegacyClientID},
 			}
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
@@ -457,8 +462,8 @@ func (s *PersisterTestSuite) TestCreateLogoutRequest() {
 func (s *PersisterTestSuite) TestCreateOpenIDConnectSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -477,8 +482,8 @@ func (s *PersisterTestSuite) TestCreateOpenIDConnectSession() {
 func (s *PersisterTestSuite) TestCreatePKCERequestSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -498,8 +503,8 @@ func (s *PersisterTestSuite) TestCreatePKCERequestSession() {
 func (s *PersisterTestSuite) TestCreateRefreshTokenSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -518,8 +523,8 @@ func (s *PersisterTestSuite) TestCreateRefreshTokenSession() {
 func (s *PersisterTestSuite) TestCreateWithNetwork() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			expected := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			expected := &client.Client{LegacyClientID: "client-id"}
 			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
 			if !ok {
 				t.Fatal("type assertion failed")
@@ -527,7 +532,7 @@ func (s *PersisterTestSuite) TestCreateWithNetwork() {
 			store.CreateWithNetwork(s.t1, expected)
 
 			actual := &client.Client{}
-			require.NoError(t, r.Persister().Connection(context.Background()).Where("id = ?", expected.OutfacingID).First(actual))
+			require.NoError(t, r.Persister().Connection(context.Background()).Where("id = ?", expected.LegacyClientID).First(actual))
 			require.Equal(t, s.t1NID, actual.NID)
 		})
 	}
@@ -536,12 +541,12 @@ func (s *PersisterTestSuite) TestCreateWithNetwork() {
 func (s *PersisterTestSuite) DeleteAccessTokenSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			require.NoError(t, r.Persister().DeleteAccessTokenSession(s.t2, sig))
 
@@ -558,20 +563,20 @@ func (s *PersisterTestSuite) DeleteAccessTokenSession() {
 func (s *PersisterTestSuite) TestDeleteAccessTokens() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
-			require.NoError(t, r.Persister().DeleteAccessTokens(s.t2, client.OutfacingID))
+			require.NoError(t, r.Persister().DeleteAccessTokens(s.t2, client.LegacyClientID))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
 			require.Equal(t, s.t1NID, actual.NID)
 
-			require.NoError(t, r.Persister().DeleteAccessTokens(s.t1, client.OutfacingID))
+			require.NoError(t, r.Persister().DeleteAccessTokens(s.t1, client.LegacyClientID))
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, sig))
 		})
 	}
@@ -580,13 +585,13 @@ func (s *PersisterTestSuite) TestDeleteAccessTokens() {
 func (s *PersisterTestSuite) TestDeleteClient() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			c := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			c := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c))
 			actual := client.Client{}
-			require.Error(t, r.Persister().DeleteClient(s.t2, c.OutfacingID))
+			require.Error(t, r.Persister().DeleteClient(s.t2, c.LegacyClientID))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, c.ID))
-			require.NoError(t, r.Persister().DeleteClient(s.t1, c.OutfacingID))
+			require.NoError(t, r.Persister().DeleteClient(s.t1, c.LegacyClientID))
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, c.ID))
 		})
 	}
@@ -595,7 +600,7 @@ func (s *PersisterTestSuite) TestDeleteClient() {
 func (s *PersisterTestSuite) TestDeleteGrant() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -617,7 +622,7 @@ func (s *PersisterTestSuite) TestDeleteGrant() {
 func (s *PersisterTestSuite) TestDeleteLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ls := consent.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &ls))
 
@@ -635,8 +640,8 @@ func (s *PersisterTestSuite) TestDeleteLoginSession() {
 func (s *PersisterTestSuite) TestDeleteOpenIDConnectSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -658,8 +663,8 @@ func (s *PersisterTestSuite) TestDeleteOpenIDConnectSession() {
 func (s *PersisterTestSuite) TestDeletePKCERequestSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -681,8 +686,8 @@ func (s *PersisterTestSuite) TestDeletePKCERequestSession() {
 func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -704,7 +709,7 @@ func (s *PersisterTestSuite) TestDeleteRefreshTokenSession() {
 func (s *PersisterTestSuite) TestDetermineNetwork() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
 			if !ok {
 				t.Fatal("type assertion failed")
@@ -722,10 +727,10 @@ func (s *PersisterTestSuite) TestDetermineNetwork() {
 func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
@@ -747,11 +752,11 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 			_, err := r.Persister().HandleConsentRequest(s.t1, hcr)
 			require.NoError(t, err)
 
-			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t2, client.OutfacingID, f.Subject)
+			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t2, client.LegacyClientID, f.Subject)
 			require.Error(t, err)
 			require.Equal(t, 0, len(actual))
 
-			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, client.OutfacingID, f.Subject)
+			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, client.LegacyClientID, f.Subject)
 			require.NoError(t, err)
 			require.Equal(t, 1, len(actual))
 		})
@@ -761,10 +766,10 @@ func (s *PersisterTestSuite) TestFindGrantedAndRememberedConsentRequests() {
 func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
@@ -800,13 +805,13 @@ func (s *PersisterTestSuite) TestFindSubjectsGrantedConsentRequests() {
 func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
 			fr.RequestedAt = time.Now().UTC().Add(-24 * time.Hour)
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 
 			actual := persistencesql.OAuth2RequestSQL{Table: "access"}
@@ -822,7 +827,7 @@ func (s *PersisterTestSuite) TestFlushInactiveAccessTokens() {
 func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			store, ok := r.OAuth2Storage().(*persistencesql.Persister)
 			if !ok {
 				t.Fatal("type assertion failed")
@@ -841,7 +846,7 @@ func (s *PersisterTestSuite) TestGenerateAndPersistKeySet() {
 func (s *PersisterTestSuite) TestFlushInactiveGrants() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -863,10 +868,10 @@ func (s *PersisterTestSuite) TestFlushInactiveGrants() {
 func (s *PersisterTestSuite) TestFlushInactiveLoginConsentRequests() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			f.RequestedAt = time.Now().Add(-24 * time.Hour)
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
@@ -885,8 +890,8 @@ func (s *PersisterTestSuite) TestFlushInactiveLoginConsentRequests() {
 func (s *PersisterTestSuite) TestFlushInactiveRefreshTokens() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			request := fosite.NewRequest()
 			request.RequestedAt = time.Now().Add(-240 * 365 * time.Hour)
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
@@ -908,12 +913,12 @@ func (s *PersisterTestSuite) TestFlushInactiveRefreshTokens() {
 func (s *PersisterTestSuite) TestGetAccessTokenSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 
 			actual, err := r.Persister().GetAccessTokenSession(s.t2, sig, &fosite.DefaultSession{})
@@ -929,12 +934,12 @@ func (s *PersisterTestSuite) TestGetAccessTokenSession() {
 func (s *PersisterTestSuite) TestGetAuthorizeCodeSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 
 			actual, err := r.Persister().GetAuthorizeCodeSession(s.t2, sig, &fosite.DefaultSession{})
@@ -950,16 +955,16 @@ func (s *PersisterTestSuite) TestGetAuthorizeCodeSession() {
 func (s *PersisterTestSuite) TestGetClient() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			expected := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			expected := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, expected))
 
-			actual, err := r.Persister().GetClient(s.t2, expected.OutfacingID)
+			actual, err := r.Persister().GetClient(s.t2, expected.LegacyClientID)
 			require.Error(t, err)
-			require.Equal(t, "", actual.GetID())
-			actual, err = r.Persister().GetClient(s.t1, expected.OutfacingID)
+			require.Equal(t, uuid.Nil.String(), actual.GetID())
+			actual, err = r.Persister().GetClient(s.t1, expected.LegacyClientID)
 			require.NoError(t, err)
-			require.Equal(t, expected.OutfacingID, actual.GetID())
+			require.Equal(t, expected.LegacyClientID, actual.GetID())
 		})
 	}
 }
@@ -967,7 +972,7 @@ func (s *PersisterTestSuite) TestGetClient() {
 func (s *PersisterTestSuite) TestGetClientAssertionJWT() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			store, ok := r.OAuth2Storage().(oauth2.AssertionJWTReader)
 			if !ok {
 				t.Fatal("type assertion failed")
@@ -986,8 +991,8 @@ func (s *PersisterTestSuite) TestGetClientAssertionJWT() {
 func (s *PersisterTestSuite) TestGetClients() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			c := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			c := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c))
 
 			actual, err := r.Persister().GetClients(s.t2, client.Filter{Offset: 0, Limit: 100})
@@ -1003,16 +1008,16 @@ func (s *PersisterTestSuite) TestGetClients() {
 func (s *PersisterTestSuite) TestGetConcreteClient() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			expected := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			expected := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, expected))
 
-			actual, err := r.Persister().GetConcreteClient(s.t2, expected.OutfacingID)
+			actual, err := r.Persister().GetConcreteClient(s.t2, expected.LegacyClientID)
 			require.Error(t, err)
-			require.Equal(t, "", actual.GetID())
-			actual, err = r.Persister().GetConcreteClient(s.t1, expected.OutfacingID)
+			require.Equal(t, uuid.Nil.String(), actual.GetID())
+			actual, err = r.Persister().GetConcreteClient(s.t1, expected.LegacyClientID)
 			require.NoError(t, err)
-			require.Equal(t, expected.OutfacingID, actual.GetID())
+			require.Equal(t, expected.LegacyClientID, actual.GetID())
 		})
 	}
 }
@@ -1020,7 +1025,7 @@ func (s *PersisterTestSuite) TestGetConcreteClient() {
 func (s *PersisterTestSuite) TestGetConcreteGrant() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -1044,10 +1049,10 @@ func (s *PersisterTestSuite) TestGetConcreteGrant() {
 func (s *PersisterTestSuite) TestGetConsentRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
@@ -1075,10 +1080,10 @@ func (s *PersisterTestSuite) TestGetConsentRequest() {
 func (s *PersisterTestSuite) TestGetFlow() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
@@ -1100,10 +1105,10 @@ func (s *PersisterTestSuite) TestGetFlow() {
 func (s *PersisterTestSuite) TestGetFlowByConsentChallenge() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
@@ -1125,17 +1130,17 @@ func (s *PersisterTestSuite) TestGetFlowByConsentChallenge() {
 func (s *PersisterTestSuite) TestGetForcedObfuscatedLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
-			session := &consent.ForcedObfuscatedLoginSession{ClientID: client.OutfacingID}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
+			session := &consent.ForcedObfuscatedLoginSession{ClientID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.Persister().CreateForcedObfuscatedLoginSession(s.t1, session))
 
-			actual, err := r.Persister().GetForcedObfuscatedLoginSession(s.t2, client.OutfacingID, "")
+			actual, err := r.Persister().GetForcedObfuscatedLoginSession(s.t2, client.LegacyClientID, "")
 			require.Error(t, err)
 			require.Nil(t, actual)
 
-			actual, err = r.Persister().GetForcedObfuscatedLoginSession(s.t1, client.OutfacingID, "")
+			actual, err = r.Persister().GetForcedObfuscatedLoginSession(s.t1, client.LegacyClientID, "")
 			require.NoError(t, err)
 			require.NotNil(t, actual)
 		})
@@ -1145,7 +1150,7 @@ func (s *PersisterTestSuite) TestGetForcedObfuscatedLoginSession() {
 func (s *PersisterTestSuite) TestGetGrants() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -1169,9 +1174,9 @@ func (s *PersisterTestSuite) TestGetGrants() {
 func (s *PersisterTestSuite) TestGetLoginRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
-			lr := consent.LoginRequest{ID: "lr-id", ClientID: client.OutfacingID, RequestedAt: time.Now()}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
+			lr := consent.LoginRequest{ID: "lr-id", ClientID: client.LegacyClientID, RequestedAt: time.Now()}
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			require.NoError(t, r.ConsentManager().CreateLoginRequest(s.t1, &lr))
@@ -1193,11 +1198,11 @@ func (s *PersisterTestSuite) TestGetLoginRequest() {
 func (s *PersisterTestSuite) TestGetLogoutRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			lr := consent.LogoutRequest{
 				ID:       uuid.Must(uuid.NewV4()).String(),
-				ClientID: sql.NullString{Valid: true, String: client.OutfacingID},
+				ClientID: sql.NullString{Valid: true, String: client.LegacyClientID},
 			}
 
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
@@ -1217,8 +1222,8 @@ func (s *PersisterTestSuite) TestGetLogoutRequest() {
 func (s *PersisterTestSuite) TestGetOpenIDConnectSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			request := fosite.NewRequest()
 			request.SetID("request-id")
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
@@ -1240,8 +1245,8 @@ func (s *PersisterTestSuite) TestGetOpenIDConnectSession() {
 func (s *PersisterTestSuite) TestGetPKCERequestSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			request := fosite.NewRequest()
 			request.SetID("request-id")
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
@@ -1263,7 +1268,7 @@ func (s *PersisterTestSuite) TestGetPKCERequestSession() {
 func (s *PersisterTestSuite) TestGetPublicKey() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -1287,7 +1292,7 @@ func (s *PersisterTestSuite) TestGetPublicKey() {
 func (s *PersisterTestSuite) TestGetPublicKeyScopes() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -1312,7 +1317,7 @@ func (s *PersisterTestSuite) TestGetPublicKeyScopes() {
 func (s *PersisterTestSuite) TestGetPublicKeys() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ks := newKeySet("ks-id", "use")
 			grant := trust.Grant{
 				ID:        uuid.Must(uuid.NewV4()).String(),
@@ -1336,8 +1341,8 @@ func (s *PersisterTestSuite) TestGetPublicKeys() {
 func (s *PersisterTestSuite) TestGetRefreshTokenSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			request := fosite.NewRequest()
 			request.SetID("request-id")
 			request.Client = &fosite.DefaultClient{ID: "client-id"}
@@ -1359,7 +1364,7 @@ func (s *PersisterTestSuite) TestGetRefreshTokenSession() {
 func (s *PersisterTestSuite) TestGetRememberedLoginSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			ls := consent.LoginSession{ID: uuid.Must(uuid.NewV4()).String(), Remember: true}
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &ls))
 
@@ -1377,13 +1382,14 @@ func (s *PersisterTestSuite) TestGetRememberedLoginSession() {
 func (s *PersisterTestSuite) TestHandleConsentRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			c1 := &client.Client{LegacyClientID: uuidx.NewV4().String()}
+			f := newFlow(s.t1NID, c1.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
-			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			require.NoError(t, r.Persister().CreateClient(s.t2, client))
+			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			c1.ID = uuid.Nil
+			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
 			req := &consent.ConsentRequest{
@@ -1404,14 +1410,14 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 			actualCR, err := r.Persister().HandleConsentRequest(s.t2, hcr)
 			require.Error(t, err)
 			require.Nil(t, actualCR)
-			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, client.OutfacingID, f.Subject)
+			actual, err := r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, c1.LegacyClientID, f.Subject)
 			require.Error(t, err)
 			require.Equal(t, 0, len(actual))
 
 			actualCR, err = r.Persister().HandleConsentRequest(s.t1, hcr)
 			require.NoError(t, err)
 			require.NotNil(t, actualCR)
-			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, client.OutfacingID, f.Subject)
+			actual, err = r.Persister().FindGrantedAndRememberedConsentRequests(s.t1, c1.LegacyClientID, f.Subject)
 			require.NoError(t, err)
 			require.Equal(t, 1, len(actual))
 		})
@@ -1421,13 +1427,14 @@ func (s *PersisterTestSuite) TestHandleConsentRequest() {
 func (s *PersisterTestSuite) TestInvalidateAuthorizeCodeSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: uuidx.NewV4().String()}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
+			client.ID = uuid.Nil
 			require.NoError(t, r.Persister().CreateClient(s.t2, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAuthorizeCodeSession(s.t1, sig, fr))
 
 			require.NoError(t, r.Persister().InvalidateAuthorizeCodeSession(s.t2, sig))
@@ -1446,7 +1453,7 @@ func (s *PersisterTestSuite) TestInvalidateAuthorizeCodeSession() {
 func (s *PersisterTestSuite) TestIsJWTUsed() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
 			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
 
@@ -1464,24 +1471,25 @@ func (s *PersisterTestSuite) TestIsJWTUsed() {
 func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogout() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			c1 := &client.Client{OutfacingID: "client-1", BackChannelLogoutURI: "not-null"}
-			c2 := &client.Client{OutfacingID: "client-2", BackChannelLogoutURI: "not-null"}
+		t.Run(k, func(t *testing.T) {
+			c1 := &client.Client{LegacyClientID: "client-1", BackChannelLogoutURI: "not-null"}
+			c2 := &client.Client{LegacyClientID: "client-2", BackChannelLogoutURI: "not-null"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			c1.ID = uuid.Nil
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
 
-			t1f1 := newFlow(s.t1NID, c1.OutfacingID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
+			t1f1 := newFlow(s.t1NID, c1.LegacyClientID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
 			t1f1.ConsentChallengeID = "t1f1-consent-challenge"
 			t1f1.LoginVerifier = "t1f1-login-verifier"
 			t1f1.ConsentVerifier = "t1f1-consent-verifier"
 
-			t2f1 := newFlow(s.t2NID, c1.OutfacingID, "sub", t1f1.SessionID)
+			t2f1 := newFlow(s.t2NID, c1.LegacyClientID, "sub", t1f1.SessionID)
 			t2f1.ConsentChallengeID = "t2f1-consent-challenge"
 			t2f1.LoginVerifier = "t2f1-login-verifier"
 			t2f1.ConsentVerifier = "t2f1-consent-verifier"
 
-			t2f2 := newFlow(s.t2NID, c2.OutfacingID, "sub", t1f1.SessionID)
+			t2f2 := newFlow(s.t2NID, c2.LegacyClientID, "sub", t1f1.SessionID)
 			t2f2.ConsentChallengeID = "t2f2-consent-challenge"
 			t2f2.LoginVerifier = "t2f2-login-verifier"
 			t2f2.ConsentVerifier = "t2f2-consent-verifier"
@@ -1517,24 +1525,25 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithBackChannelLogo
 func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLogout() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			c1 := &client.Client{OutfacingID: "client-1", FrontChannelLogoutURI: "not-null"}
-			c2 := &client.Client{OutfacingID: "client-2", FrontChannelLogoutURI: "not-null"}
+		t.Run(k, func(t *testing.T) {
+			c1 := &client.Client{LegacyClientID: "client-1", FrontChannelLogoutURI: "not-null"}
+			c2 := &client.Client{LegacyClientID: "client-2", FrontChannelLogoutURI: "not-null"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c1))
+			c1.ID = uuid.Nil
 			require.NoError(t, r.Persister().CreateClient(s.t2, c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, c2))
 
-			t1f1 := newFlow(s.t1NID, c1.OutfacingID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
+			t1f1 := newFlow(s.t1NID, c1.LegacyClientID, "sub", sqlxx.NullString(uuid.Must(uuid.NewV4()).String()))
 			t1f1.ConsentChallengeID = "t1f1-consent-challenge"
 			t1f1.LoginVerifier = "t1f1-login-verifier"
 			t1f1.ConsentVerifier = "t1f1-consent-verifier"
 
-			t2f1 := newFlow(s.t2NID, c1.OutfacingID, "sub", t1f1.SessionID)
+			t2f1 := newFlow(s.t2NID, c1.LegacyClientID, "sub", t1f1.SessionID)
 			t2f1.ConsentChallengeID = "t2f1-consent-challenge"
 			t2f1.LoginVerifier = "t2f1-login-verifier"
 			t2f1.ConsentVerifier = "t2f1-consent-verifier"
 
-			t2f2 := newFlow(s.t2NID, c2.OutfacingID, "sub", t1f1.SessionID)
+			t2f2 := newFlow(s.t2NID, c2.LegacyClientID, "sub", t1f1.SessionID)
 			t2f2.ConsentChallengeID = "t2f2-consent-challenge"
 			t2f2.LoginVerifier = "t2f2-login-verifier"
 			t2f2.ConsentVerifier = "t2f2-consent-verifier"
@@ -1570,7 +1579,7 @@ func (s *PersisterTestSuite) TestListUserAuthenticatedClientsWithFrontChannelLog
 func (s *PersisterTestSuite) TestMarkJWTUsedForTime() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			r.Persister().SetClientAssertionJWT(s.t1, "a", time.Now().Add(-24*time.Hour))
 			r.Persister().SetClientAssertionJWT(s.t2, "a", time.Now().Add(-24*time.Hour))
 			r.Persister().SetClientAssertionJWT(s.t2, "b", time.Now().Add(-24*time.Hour))
@@ -1595,8 +1604,8 @@ func (s *PersisterTestSuite) TestMarkJWTUsedForTime() {
 func (s *PersisterTestSuite) TestQueryWithNetwork() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			r.Persister().CreateClient(s.t1, &client.Client{OutfacingID: "client-1", FrontChannelLogoutURI: "not-null"})
+		t.Run(k, func(t *testing.T) {
+			r.Persister().CreateClient(s.t1, &client.Client{LegacyClientID: "client-1", FrontChannelLogoutURI: "not-null"})
 
 			store, ok := r.Persister().(*persistencesql.Persister)
 			if !ok {
@@ -1615,7 +1624,7 @@ func (s *PersisterTestSuite) TestQueryWithNetwork() {
 func (s *PersisterTestSuite) TestRejectLogoutRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			lr := newLogoutRequest()
 			require.NoError(t, r.ConsentManager().CreateLogoutRequest(s.t1, lr))
 
@@ -1635,12 +1644,12 @@ func (s *PersisterTestSuite) TestRejectLogoutRequest() {
 func (s *PersisterTestSuite) TestRevokeAccessToken() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 			sig := uuid.Must(uuid.NewV4()).String()
 			fr := fosite.NewRequest()
-			fr.Client = &fosite.DefaultClient{ID: client.OutfacingID}
+			fr.Client = &fosite.DefaultClient{ID: client.LegacyClientID}
 			require.NoError(t, r.Persister().CreateAccessTokenSession(s.t1, sig, fr))
 			require.NoError(t, r.Persister().RevokeAccessToken(s.t2, fr.ID))
 
@@ -1657,8 +1666,8 @@ func (s *PersisterTestSuite) TestRevokeAccessToken() {
 func (s *PersisterTestSuite) TestRevokeRefreshToken() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -1682,8 +1691,8 @@ func (s *PersisterTestSuite) TestRevokeRefreshToken() {
 func (s *PersisterTestSuite) TestRevokeRefreshTokenMaybeGracePeriod() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			client := &client.Client{OutfacingID: "client-id"}
+		t.Run(k, func(t *testing.T) {
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
 
 			request := fosite.NewRequest()
@@ -1712,10 +1721,10 @@ func (s *PersisterTestSuite) TestRevokeRefreshTokenMaybeGracePeriod() {
 func (s *PersisterTestSuite) TestRevokeSubjectClientConsentSession() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sessionID := uuid.Must(uuid.NewV4()).String()
-			client := &client.Client{OutfacingID: "client-id"}
-			f := newFlow(s.t1NID, client.OutfacingID, "sub", sqlxx.NullString(sessionID))
+			client := &client.Client{LegacyClientID: "client-id"}
+			f := newFlow(s.t1NID, client.LegacyClientID, "sub", sqlxx.NullString(sessionID))
 			f.RequestedAt = time.Now().Add(-24 * time.Hour)
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
@@ -1723,9 +1732,9 @@ func (s *PersisterTestSuite) TestRevokeSubjectClientConsentSession() {
 
 			actual := flow.Flow{}
 
-			require.Error(t, r.Persister().RevokeSubjectClientConsentSession(s.t2, "sub", client.OutfacingID))
+			require.Error(t, r.Persister().RevokeSubjectClientConsentSession(s.t2, "sub", client.LegacyClientID))
 			require.NoError(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
-			require.NoError(t, r.Persister().RevokeSubjectClientConsentSession(s.t1, "sub", client.OutfacingID))
+			require.NoError(t, r.Persister().RevokeSubjectClientConsentSession(s.t1, "sub", client.LegacyClientID))
 			require.Error(t, r.Persister().Connection(context.Background()).Find(&actual, f.ID))
 		})
 	}
@@ -1734,7 +1743,7 @@ func (s *PersisterTestSuite) TestRevokeSubjectClientConsentSession() {
 func (s *PersisterTestSuite) TestSetClientAssertionJWT() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			jti := oauth2.NewBlacklistedJTI(uuid.Must(uuid.NewV4()).String(), time.Now().Add(24*time.Hour))
 			require.NoError(t, r.Persister().SetClientAssertionJWT(s.t1, jti.JTI, jti.Expiry))
 
@@ -1748,7 +1757,7 @@ func (s *PersisterTestSuite) TestSetClientAssertionJWT() {
 func (s *PersisterTestSuite) TestSetClientAssertionJWTRaw() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			store, ok := r.Persister().(*persistencesql.Persister)
 			if !ok {
 				t.Fatal("type assertion failed")
@@ -1767,9 +1776,9 @@ func (s *PersisterTestSuite) TestSetClientAssertionJWTRaw() {
 func (s *PersisterTestSuite) TestUpdateClient() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			t1c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret"}
-			t2c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret"}
+		t.Run(k, func(t *testing.T) {
+			t1c1 := &client.Client{LegacyClientID: "client-id", Name: "original", Secret: "original-secret"}
+			t2c1 := &client.Client{LegacyClientID: "client-id", Name: "original", Secret: "original-secret"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, t1c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, t2c1))
 			expectedHash := t1c1.Secret
@@ -1856,9 +1865,9 @@ func (s *PersisterTestSuite) TestUpdateKeySet() {
 func (s *PersisterTestSuite) TestUpdateWithNetwork() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
-			t1c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret"}
-			t2c1 := &client.Client{OutfacingID: "client-id", Name: "original", Secret: "original-secret", Owner: "erase-me"}
+		t.Run(k, func(t *testing.T) {
+			t1c1 := &client.Client{LegacyClientID: "client-id", Name: "original", Secret: "original-secret"}
+			t2c1 := &client.Client{LegacyClientID: "client-id", Name: "original", Secret: "original-secret", Owner: "erase-me"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, t1c1))
 			require.NoError(t, r.Persister().CreateClient(s.t2, t2c1))
 
@@ -1867,7 +1876,7 @@ func (s *PersisterTestSuite) TestUpdateWithNetwork() {
 				t.Fatal("type assertion failed")
 			}
 
-			count, err := store.UpdateWithNetwork(s.t1, &client.Client{ID: t1c1.ID, OutfacingID: "client-id", Name: "updated", Secret: "original-secret"})
+			count, err := store.UpdateWithNetwork(s.t1, &client.Client{ID: t1c1.ID, LegacyClientID: "client-id", Name: "updated", Secret: "original-secret"})
 			require.NoError(t, err)
 			require.Equal(t, int64(1), count)
 			actualt1, err := store.GetConcreteClient(s.t1, "client-id")
@@ -1885,13 +1894,13 @@ func (s *PersisterTestSuite) TestUpdateWithNetwork() {
 func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sub := uuid.Must(uuid.NewV4()).String()
 			sessionID := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
-			client := &client.Client{OutfacingID: "client-id"}
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			f := newFlow(s.t1NID, client.OutfacingID, sub, sqlxx.NullString(sessionID))
+			f := newFlow(s.t1NID, client.LegacyClientID, sub, sqlxx.NullString(sessionID))
 			f.ConsentSkip = false
 			f.GrantedScope = sqlxx.StringSliceJSONFormat{}
 			f.ConsentRemember = false
@@ -1922,13 +1931,13 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateConsentRequest() {
 func (s *PersisterTestSuite) TestVerifyAndInvalidateLoginRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			sub := uuid.Must(uuid.NewV4()).String()
 			sessionID := uuid.Must(uuid.NewV4()).String()
 			require.NoError(t, r.Persister().CreateLoginSession(s.t1, &consent.LoginSession{ID: sessionID}))
-			client := &client.Client{OutfacingID: "client-id"}
+			client := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, client))
-			f := newFlow(s.t1NID, client.OutfacingID, sub, sqlxx.NullString(sessionID))
+			f := newFlow(s.t1NID, client.LegacyClientID, sub, sqlxx.NullString(sessionID))
 			f.State = flow.FlowStateLoginUnused
 			require.NoError(t, r.Persister().Connection(context.Background()).Create(f))
 
@@ -1950,7 +1959,7 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLoginRequest() {
 func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			lr := newLogoutRequest()
 			lr.Verifier = uuid.Must(uuid.NewV4()).String()
 			lr.Accepted = true
@@ -1979,7 +1988,7 @@ func (s *PersisterTestSuite) TestVerifyAndInvalidateLogoutRequest() {
 func (s *PersisterTestSuite) TestWithFallbackNetworkID() {
 	t := s.T()
 	for k, r := range s.registries {
-		t.Run(k, func(*testing.T) {
+		t.Run(k, func(t *testing.T) {
 			r.WithContextualizer(&contextx.Default{})
 			store, ok := r.Persister().(*persistencesql.Persister)
 			if !ok {

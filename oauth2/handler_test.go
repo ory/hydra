@@ -80,7 +80,7 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	deleteRequest := &fosite.Request{
 		ID:             "del-1",
 		RequestedAt:    time.Now().Round(time.Second),
-		Client:         &client.Client{OutfacingID: "foobar"},
+		Client:         &client.Client{LegacyClientID: "foobar"},
 		RequestedScope: fosite.Arguments{"fa", "ba"},
 		GrantedScope:   fosite.Arguments{"fa", "ba"},
 		Form:           url.Values{"foo": []string{"bar", "baz"}},
@@ -229,7 +229,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID: "foobar",
+									LegacyClientID: "foobar",
 								},
 								Session: session,
 							},
@@ -263,7 +263,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID: "foobar",
+									LegacyClientID: "foobar",
 								},
 								Session: session,
 							},
@@ -298,7 +298,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID:               "foobar",
+									LegacyClientID:            "foobar",
 									UserinfoSignedResponseAlg: "none",
 								},
 								Session: session,
@@ -360,7 +360,7 @@ func TestUserinfo(t *testing.T) {
 						return fosite.AccessToken, &fosite.AccessRequest{
 							Request: fosite.Request{
 								Client: &client.Client{
-									OutfacingID:               "foobar-client",
+									LegacyClientID:            "foobar-client",
 									UserinfoSignedResponseAlg: "RS256",
 								},
 								Session: session,

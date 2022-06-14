@@ -154,7 +154,7 @@ func TestProviderIssuerURL(t *testing.T) {
 	l.Logrus().SetOutput(ioutil.Discard)
 	p := MustNew(context.Background(), l)
 	p.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost")
-	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL(ctx).String())
+	assert.Equal(t, "http://hydra.localhost", p.IssuerURL(ctx).String())
 
 	p2 := MustNew(context.Background(), l)
 	p2.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost/")
@@ -169,7 +169,7 @@ func TestProviderIssuerPublicURL(t *testing.T) {
 	p.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost")
 	p.MustSet(ctx, KeyPublicURL, "http://hydra.example")
 
-	assert.Equal(t, "http://hydra.localhost/", p.IssuerURL(ctx).String())
+	assert.Equal(t, "http://hydra.localhost", p.IssuerURL(ctx).String())
 	assert.Equal(t, "http://hydra.example/", p.PublicURL(ctx).String())
 	assert.Equal(t, "http://hydra.localhost/.well-known/jwks.json", p.JWKSURL(ctx).String())
 	assert.Equal(t, "http://hydra.example/oauth2/fallbacks/consent", p.ConsentURL(ctx).String())
@@ -180,7 +180,7 @@ func TestProviderIssuerPublicURL(t *testing.T) {
 	assert.Equal(t, "http://hydra.example/userinfo", p.OIDCDiscoveryUserinfoEndpoint(ctx).String())
 
 	p2 := MustNew(context.Background(), l)
-	p2.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost")
+	p2.MustSet(ctx, KeyIssuerURL, "http://hydra.localhost/")
 	assert.Equal(t, "http://hydra.localhost/", p2.IssuerURL(ctx).String())
 	assert.Equal(t, "http://hydra.localhost/", p2.PublicURL(ctx).String())
 	assert.Equal(t, "http://hydra.localhost/.well-known/jwks.json", p2.JWKSURL(ctx).String())
@@ -283,7 +283,7 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, []string{"whatever"}, c.DefaultClientScope(ctx))
 
 	// urls
-	assert.Equal(t, urlx.ParseOrPanic("https://issuer/"), c.IssuerURL(ctx))
+	assert.Equal(t, urlx.ParseOrPanic("https://issuer"), c.IssuerURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://public/"), c.PublicURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://login/"), c.LoginURL(ctx))
 	assert.Equal(t, urlx.ParseOrPanic("https://consent/"), c.ConsentURL(ctx))

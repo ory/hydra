@@ -12,7 +12,7 @@ services:
     command:
       serve all --dangerous-force-http
     environment:
-      - URLS_SELF_ISSUER=http://127_0_0_1:5004
+      - URLS_SELF_ISSUER=http://127_0_0_1:5004/
       - URLS_CONSENT=http://127_0_0_1:5002/consent
       - URLS_LOGIN=http://127_0_0_1:5002/login
       - URLS_LOGOUT=http://127_0_0_1:5002/logout

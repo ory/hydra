@@ -237,7 +237,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h.r.Writer().Write(w, r, &WellKnown{
-		Issuer:                                 strings.TrimRight(h.c.IssuerURL(r.Context()).String(), "/") + "/",
+		Issuer:                                 h.c.IssuerURL(r.Context()).String(),
 		AuthURL:                                h.c.OAuth2AuthURL(r.Context()).String(),
 		TokenURL:                               h.c.OAuth2TokenURL(r.Context()).String(),
 		JWKsURI:                                h.c.JWKSURL(r.Context()).String(),
@@ -506,7 +506,7 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 		Username:          session.GetUsername(),
 		Extra:             session.Extra,
 		Audience:          audience,
-		Issuer:            strings.TrimRight(h.c.IssuerURL(ctx).String(), "/") + "/",
+		Issuer:            h.c.IssuerURL(ctx).String(),
 		ObfuscatedSubject: obfuscated,
 		TokenType:         resp.GetAccessTokenType(),
 		TokenUse:          string(resp.GetTokenUse()),
@@ -616,7 +616,7 @@ func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		session.ClientID = accessRequest.GetClient().GetID()
 		session.KID = accessTokenKeyID
-		session.DefaultSession.Claims.Issuer = strings.TrimRight(h.c.IssuerURL(r.Context()).String(), "/") + "/"
+		session.DefaultSession.Claims.Issuer = h.c.IssuerURL(r.Context()).String()
 		session.DefaultSession.Claims.IssuedAt = time.Now().UTC()
 
 		var scopes = accessRequest.GetRequestedScopes()
@@ -749,9 +749,8 @@ func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprout
 
 	authorizeRequest.SetID(session.ID)
 	claims := &jwt.IDTokenClaims{
-		Subject: obfuscatedSubject,
-		Issuer:  strings.TrimRight(h.c.IssuerURL(ctx).String(), "/") + "/",
-
+		Subject:                             obfuscatedSubject,
+		Issuer:                              h.c.IssuerURL(ctx).String(),
 		AuthTime:                            time.Time(session.AuthenticatedAt),
 		RequestedAt:                         session.RequestedAt,
 		Extra:                               session.Session.IDToken,

@@ -1,6 +1,5 @@
 {
   "body": {
-    "client_id": "existing-client-fetch",
     "client_name": "",
     "redirect_uris": [
       "http://localhost:3000/cb"

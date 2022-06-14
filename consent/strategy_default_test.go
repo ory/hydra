@@ -84,7 +84,7 @@ func makeOAuth2Request(t *testing.T, reg driver.Registry, hc *http.Client, oc *c
 
 	values.Add("response_type", "code")
 	values.Add("state", uuid.New().String())
-	values.Add("client_id", oc.OutfacingID)
+	values.Add("client_id", oc.GetID())
 	res, err := hc.Get(urlx.CopyWithQuery(reg.Config().OAuth2AuthURL(ctx), values).String())
 	require.NoError(t, err)
 	defer res.Body.Close()
@@ -96,7 +96,7 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	secret := uuid.New().String()
 	c.Secret = secret
 	c.Scope = "openid offline"
-	c.OutfacingID = uuid.New().String()
+	c.LegacyClientID = uuid.New().String()
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 	c.Secret = secret
 	return c

@@ -1,6 +1,5 @@
 {
   "body": {
-    "client_id": "update-existing-client-selfservice",
     "client_name": "",
     "redirect_uris": [
       "http://localhost:3000/cb",

@@ -1,5 +1,5 @@
 {
-  "issuer": "http://hydra.localhost/",
+  "issuer": "http://hydra.localhost",
   "authorization_endpoint": "http://hydra.localhost/oauth2/auth",
   "registration_endpoint": "http://client-register/registration",
   "token_endpoint": "http://hydra.localhost/oauth2/token",

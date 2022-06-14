@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **FrontchannelLogoutSessionSupported** | Pointer to **bool** | Boolean value specifying whether the OP can pass iss (issuer) and sid (session ID) query parameters to identify the RP session with the OP when the frontchannel_logout_uri is used. If supported, the sid Claim is also included in ID Tokens issued by the OP. | [optional] 
 **FrontchannelLogoutSupported** | Pointer to **bool** | Boolean value specifying whether the OP supports HTTP-based logout, with true indicating support. | [optional] 
 **GrantTypesSupported** | Pointer to **[]string** | JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports. | [optional] 
+**IdTokenSignedResponseAlg** | **[]string** | Algorithm used to sign OpenID Connect ID Tokens. | 
 **IdTokenSigningAlgValuesSupported** | **[]string** | JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT. | 
 **Issuer** | **string** | URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier. If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL. | 
 **JwksUri** | **string** | URL of the OP&#39;s JSON Web Key Set [JWK] document. This contains the signing key(s) the RP uses to validate signatures from the OP. The JWK Set MAY also contain the Server&#39;s encryption key(s), which are used by RPs to encrypt requests to the Server. When both signing and encryption keys are made available, a use (Key Use) parameter value is REQUIRED for all keys in the referenced JWK Set to indicate each key&#39;s intended usage. Although some algorithms allow the same key to be used for both signatures and encryption, doing so is NOT RECOMMENDED, as it is less secure. The JWK x5c parameter MAY be used to provide X.509 representations of keys provided. When used, the bare key values MUST still be present and MUST match those in the certificate. | 
@@ -30,13 +31,14 @@ Name | Type | Description | Notes
 **TokenEndpoint** | **string** | URL of the OP&#39;s OAuth 2.0 Token Endpoint | 
 **TokenEndpointAuthMethodsSupported** | Pointer to **[]string** | JSON array containing a list of Client Authentication methods supported by this Token Endpoint. The options are client_secret_post, client_secret_basic, client_secret_jwt, and private_key_jwt, as described in Section 9 of OpenID Connect Core 1.0 | [optional] 
 **UserinfoEndpoint** | Pointer to **string** | URL of the OP&#39;s UserInfo Endpoint. | [optional] 
+**UserinfoSignedResponseAlg** | **[]string** | Algorithm used to sign OpenID Connect Userinfo Responses. | 
 **UserinfoSigningAlgValuesSupported** | Pointer to **[]string** | JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT]. | [optional] 
 
 ## Methods
 
 ### NewWellKnown
 
-`func NewWellKnown(authorizationEndpoint string, idTokenSigningAlgValuesSupported []string, issuer string, jwksUri string, responseTypesSupported []string, subjectTypesSupported []string, tokenEndpoint string, ) *WellKnown`
+`func NewWellKnown(authorizationEndpoint string, idTokenSignedResponseAlg []string, idTokenSigningAlgValuesSupported []string, issuer string, jwksUri string, responseTypesSupported []string, subjectTypesSupported []string, tokenEndpoint string, userinfoSignedResponseAlg []string, ) *WellKnown`
 
 NewWellKnown instantiates a new WellKnown object
 This constructor will assign default values to properties that have it defined,
@@ -295,6 +297,26 @@ SetGrantTypesSupported sets GrantTypesSupported field to given value.
 `func (o *WellKnown) HasGrantTypesSupported() bool`
 
 HasGrantTypesSupported returns a boolean if a field has been set.
+
+### GetIdTokenSignedResponseAlg
+
+`func (o *WellKnown) GetIdTokenSignedResponseAlg() []string`
+
+GetIdTokenSignedResponseAlg returns the IdTokenSignedResponseAlg field if non-nil, zero value otherwise.
+
+### GetIdTokenSignedResponseAlgOk
+
+`func (o *WellKnown) GetIdTokenSignedResponseAlgOk() (*[]string, bool)`
+
+GetIdTokenSignedResponseAlgOk returns a tuple with the IdTokenSignedResponseAlg field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetIdTokenSignedResponseAlg
+
+`func (o *WellKnown) SetIdTokenSignedResponseAlg(v []string)`
+
+SetIdTokenSignedResponseAlg sets IdTokenSignedResponseAlg field to given value.
+
 
 ### GetIdTokenSigningAlgValuesSupported
 
@@ -665,6 +687,26 @@ SetUserinfoEndpoint sets UserinfoEndpoint field to given value.
 `func (o *WellKnown) HasUserinfoEndpoint() bool`
 
 HasUserinfoEndpoint returns a boolean if a field has been set.
+
+### GetUserinfoSignedResponseAlg
+
+`func (o *WellKnown) GetUserinfoSignedResponseAlg() []string`
+
+GetUserinfoSignedResponseAlg returns the UserinfoSignedResponseAlg field if non-nil, zero value otherwise.
+
+### GetUserinfoSignedResponseAlgOk
+
+`func (o *WellKnown) GetUserinfoSignedResponseAlgOk() (*[]string, bool)`
+
+GetUserinfoSignedResponseAlgOk returns a tuple with the UserinfoSignedResponseAlg field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetUserinfoSignedResponseAlg
+
+`func (o *WellKnown) SetUserinfoSignedResponseAlg(v []string)`
+
+SetUserinfoSignedResponseAlg sets UserinfoSignedResponseAlg field to given value.
+
 
 ### GetUserinfoSigningAlgValuesSupported
 

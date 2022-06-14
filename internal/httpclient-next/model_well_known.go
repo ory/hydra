@@ -37,6 +37,8 @@ type WellKnown struct {
 	FrontchannelLogoutSupported *bool `json:"frontchannel_logout_supported,omitempty"`
 	// JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
 	GrantTypesSupported []string `json:"grant_types_supported,omitempty"`
+	// Algorithm used to sign OpenID Connect ID Tokens.
+	IdTokenSignedResponseAlg []string `json:"id_token_signed_response_alg"`
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token to encode the Claims in a JWT.
 	IdTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
 	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier. If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned by WebFinger. This also MUST be identical to the iss Claim value in ID Tokens issued from this IssuerURL.
@@ -69,6 +71,8 @@ type WellKnown struct {
 	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported,omitempty"`
 	// URL of the OP's UserInfo Endpoint.
 	UserinfoEndpoint *string `json:"userinfo_endpoint,omitempty"`
+	// Algorithm used to sign OpenID Connect Userinfo Responses.
+	UserinfoSignedResponseAlg []string `json:"userinfo_signed_response_alg"`
 	// JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
 	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported,omitempty"`
 }
@@ -77,15 +81,17 @@ type WellKnown struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWellKnown(authorizationEndpoint string, idTokenSigningAlgValuesSupported []string, issuer string, jwksUri string, responseTypesSupported []string, subjectTypesSupported []string, tokenEndpoint string) *WellKnown {
+func NewWellKnown(authorizationEndpoint string, idTokenSignedResponseAlg []string, idTokenSigningAlgValuesSupported []string, issuer string, jwksUri string, responseTypesSupported []string, subjectTypesSupported []string, tokenEndpoint string, userinfoSignedResponseAlg []string) *WellKnown {
 	this := WellKnown{}
 	this.AuthorizationEndpoint = authorizationEndpoint
+	this.IdTokenSignedResponseAlg = idTokenSignedResponseAlg
 	this.IdTokenSigningAlgValuesSupported = idTokenSigningAlgValuesSupported
 	this.Issuer = issuer
 	this.JwksUri = jwksUri
 	this.ResponseTypesSupported = responseTypesSupported
 	this.SubjectTypesSupported = subjectTypesSupported
 	this.TokenEndpoint = tokenEndpoint
+	this.UserinfoSignedResponseAlg = userinfoSignedResponseAlg
 	return &this
 }
 
@@ -407,6 +413,30 @@ func (o *WellKnown) HasGrantTypesSupported() bool {
 // SetGrantTypesSupported gets a reference to the given []string and assigns it to the GrantTypesSupported field.
 func (o *WellKnown) SetGrantTypesSupported(v []string) {
 	o.GrantTypesSupported = v
+}
+
+// GetIdTokenSignedResponseAlg returns the IdTokenSignedResponseAlg field value
+func (o *WellKnown) GetIdTokenSignedResponseAlg() []string {
+	if o == nil {
+		var ret []string
+		return ret
+	}
+
+	return o.IdTokenSignedResponseAlg
+}
+
+// GetIdTokenSignedResponseAlgOk returns a tuple with the IdTokenSignedResponseAlg field value
+// and a boolean to check if the value has been set.
+func (o *WellKnown) GetIdTokenSignedResponseAlgOk() ([]string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.IdTokenSignedResponseAlg, true
+}
+
+// SetIdTokenSignedResponseAlg sets field value
+func (o *WellKnown) SetIdTokenSignedResponseAlg(v []string) {
+	o.IdTokenSignedResponseAlg = v
 }
 
 // GetIdTokenSigningAlgValuesSupported returns the IdTokenSigningAlgValuesSupported field value
@@ -873,6 +903,30 @@ func (o *WellKnown) SetUserinfoEndpoint(v string) {
 	o.UserinfoEndpoint = &v
 }
 
+// GetUserinfoSignedResponseAlg returns the UserinfoSignedResponseAlg field value
+func (o *WellKnown) GetUserinfoSignedResponseAlg() []string {
+	if o == nil {
+		var ret []string
+		return ret
+	}
+
+	return o.UserinfoSignedResponseAlg
+}
+
+// GetUserinfoSignedResponseAlgOk returns a tuple with the UserinfoSignedResponseAlg field value
+// and a boolean to check if the value has been set.
+func (o *WellKnown) GetUserinfoSignedResponseAlgOk() ([]string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.UserinfoSignedResponseAlg, true
+}
+
+// SetUserinfoSignedResponseAlg sets field value
+func (o *WellKnown) SetUserinfoSignedResponseAlg(v []string) {
+	o.UserinfoSignedResponseAlg = v
+}
+
 // GetUserinfoSigningAlgValuesSupported returns the UserinfoSigningAlgValuesSupported field value if set, zero value otherwise.
 func (o *WellKnown) GetUserinfoSigningAlgValuesSupported() []string {
 	if o == nil || o.UserinfoSigningAlgValuesSupported == nil {
@@ -938,6 +992,9 @@ func (o WellKnown) MarshalJSON() ([]byte, error) {
 		toSerialize["grant_types_supported"] = o.GrantTypesSupported
 	}
 	if true {
+		toSerialize["id_token_signed_response_alg"] = o.IdTokenSignedResponseAlg
+	}
+	if true {
 		toSerialize["id_token_signing_alg_values_supported"] = o.IdTokenSigningAlgValuesSupported
 	}
 	if true {
@@ -984,6 +1041,9 @@ func (o WellKnown) MarshalJSON() ([]byte, error) {
 	}
 	if o.UserinfoEndpoint != nil {
 		toSerialize["userinfo_endpoint"] = o.UserinfoEndpoint
+	}
+	if true {
+		toSerialize["userinfo_signed_response_alg"] = o.UserinfoSignedResponseAlg
 	}
 	if o.UserinfoSigningAlgValuesSupported != nil {
 		toSerialize["userinfo_signing_alg_values_supported"] = o.UserinfoSigningAlgValuesSupported

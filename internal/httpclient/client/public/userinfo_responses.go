@@ -35,14 +35,15 @@ func (o *UserinfoReader) ReadResponse(response runtime.ClientResponse, consumer 
 			return nil, err
 		}
 		return nil, result
-	case 500:
-		result := NewUserinfoInternalServerError()
+	default:
+		result := NewUserinfoDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -110,27 +111,36 @@ func (o *UserinfoUnauthorized) readResponse(response runtime.ClientResponse, con
 	return nil
 }
 
-// NewUserinfoInternalServerError creates a UserinfoInternalServerError with default headers values
-func NewUserinfoInternalServerError() *UserinfoInternalServerError {
-	return &UserinfoInternalServerError{}
+// NewUserinfoDefault creates a UserinfoDefault with default headers values
+func NewUserinfoDefault(code int) *UserinfoDefault {
+	return &UserinfoDefault{
+		_statusCode: code,
+	}
 }
 
-/* UserinfoInternalServerError describes a response with status code 500, with default header values.
+/* UserinfoDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type UserinfoInternalServerError struct {
+type UserinfoDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *UserinfoInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /userinfo][%d] userinfoInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the userinfo default response
+func (o *UserinfoDefault) Code() int {
+	return o._statusCode
 }
-func (o *UserinfoInternalServerError) GetPayload() *models.JSONError {
+
+func (o *UserinfoDefault) Error() string {
+	return fmt.Sprintf("[GET /userinfo][%d] userinfo default  %+v", o._statusCode, o.Payload)
+}
+func (o *UserinfoDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *UserinfoInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UserinfoDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

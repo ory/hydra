@@ -57,7 +57,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -765,7 +765,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -1418,7 +1418,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -1453,7 +1453,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -1660,7 +1660,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -1723,7 +1723,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -1759,7 +1759,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -1951,7 +1951,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/jsonError"
           description: jsonError
-        "500":
+        default:
           content:
             application/json:
               schema:
@@ -2235,7 +2235,7 @@ components:
             authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
             client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
             updated_at: 2000-01-23T04:56:07.000+00:00
-            scope: scope
+            scope: scope1 scope-2 scope.3 scope:4
             request_uris:
               - request_uris
               - request_uris
@@ -2584,7 +2584,7 @@ components:
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
           client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
-          scope: scope
+          scope: scope1 scope-2 scope.3 scope:4
           request_uris:
             - request_uris
             - request_uris
@@ -2810,6 +2810,11 @@ components:
     jsonError:
       description: "Error responses are sent when an error (e.g. unauthorized, bad\
         \ request, ...) occurred."
+      example:
+        error_debug: The database adapter was unable to find the element
+        status_code: 404
+        error_description: Object with ID 12345 does not exist
+        error: The requested resource could not be found
       properties:
         error:
           description: Name is the error name.
@@ -2923,7 +2928,7 @@ components:
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
           client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
-          scope: scope
+          scope: scope1 scope-2 scope.3 scope:4
           request_uris:
             - request_uris
             - request_uris
@@ -3056,7 +3061,7 @@ components:
           authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
           client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
           updated_at: 2000-01-23T04:56:07.000+00:00
-          scope: scope
+          scope: scope1 scope-2 scope.3 scope:4
           request_uris:
             - request_uris
             - request_uris
@@ -3157,7 +3162,7 @@ components:
         authorization_code_grant_refresh_token_lifespan: authorization_code_grant_refresh_token_lifespan
         client_credentials_grant_access_token_lifespan: client_credentials_grant_access_token_lifespan
         updated_at: 2000-01-23T04:56:07.000+00:00
-        scope: scope
+        scope: scope1 scope-2 scope.3 scope:4
         request_uris:
           - request_uris
           - request_uris
@@ -3430,7 +3435,7 @@ components:
           description: "Scope is a string containing a space-separated list of scope\
             \ values (as\ndescribed in Section 3.3 of OAuth 2.0 [RFC6749]) that the\
             \ client\ncan use when requesting access tokens."
-          pattern: "([a-zA-Z0-9\\.\\*]+\\s?)+"
+          example: scope1 scope-2 scope.3 scope:4
           type: string
         sector_identifier_uri:
           description: |-
@@ -4048,6 +4053,9 @@ components:
           - scopes_supported
           - scopes_supported
         issuer: https://playground.ory.sh/ory-hydra/public/
+        userinfo_signed_response_alg:
+        - userinfo_signed_response_alg
+        - userinfo_signed_response_alg
         authorization_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/auth
         claims_supported:
           - claims_supported
@@ -4060,8 +4068,11 @@ components:
           - token_endpoint_auth_methods_supported
         backchannel_logout_session_supported: true
         response_modes_supported:
-          - response_modes_supported
-          - response_modes_supported
+        - response_modes_supported
+        - response_modes_supported
+        id_token_signed_response_alg:
+        - id_token_signed_response_alg
+        - id_token_signed_response_alg
         token_endpoint: https://playground.ory.sh/ory-hydra/public/oauth2/token
         response_types_supported:
           - response_types_supported
@@ -4142,6 +4153,11 @@ components:
           description:
             JSON array containing a list of the OAuth 2.0 Grant Type values that
             this OP supports.
+          items:
+            type: string
+          type: array
+        id_token_signed_response_alg:
+          description: Algorithm used to sign OpenID Connect ID Tokens.
           items:
             type: string
           type: array
@@ -4249,6 +4265,11 @@ components:
         userinfo_endpoint:
           description: URL of the OP's UserInfo Endpoint.
           type: string
+        userinfo_signed_response_alg:
+          description: Algorithm used to sign OpenID Connect Userinfo Responses.
+          items:
+            type: string
+          type: array
         userinfo_signing_alg_values_supported:
           description: "JSON array containing a list of the JWS [JWS] signing algorithms\
             \ (alg values) [JWA] supported by the UserInfo Endpoint to encode the\
@@ -4257,13 +4278,15 @@ components:
             type: string
           type: array
       required:
-        - authorization_endpoint
-        - id_token_signing_alg_values_supported
-        - issuer
-        - jwks_uri
-        - response_types_supported
-        - subject_types_supported
-        - token_endpoint
+      - authorization_endpoint
+      - id_token_signed_response_alg
+      - id_token_signing_alg_values_supported
+      - issuer
+      - jwks_uri
+      - response_types_supported
+      - subject_types_supported
+      - token_endpoint
+      - userinfo_signed_response_alg
       title: WellKnown represents important OpenID Connect discovery metadata
       type: object
     isReady_200_response:

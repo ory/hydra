@@ -59,6 +59,10 @@ type WellKnown struct {
 	// JSON array containing a list of the OAuth 2.0 Grant Type values that this OP supports.
 	GrantTypesSupported []string `json:"grant_types_supported"`
 
+	// Algorithm used to sign OpenID Connect ID Tokens.
+	// Required: true
+	IDTokenSignedResponseAlg []string `json:"id_token_signed_response_alg"`
+
 	// JSON array containing a list of the JWS signing algorithms (alg values) supported by the OP for the ID Token
 	// to encode the Claims in a JWT.
 	// Required: true
@@ -134,6 +138,10 @@ type WellKnown struct {
 	// URL of the OP's UserInfo Endpoint.
 	UserinfoEndpoint string `json:"userinfo_endpoint,omitempty"`
 
+	// Algorithm used to sign OpenID Connect Userinfo Responses.
+	// Required: true
+	UserinfoSignedResponseAlg []string `json:"userinfo_signed_response_alg"`
+
 	// JSON array containing a list of the JWS [JWS] signing algorithms (alg values) [JWA] supported by the UserInfo Endpoint to encode the Claims in a JWT [JWT].
 	UserinfoSigningAlgValuesSupported []string `json:"userinfo_signing_alg_values_supported"`
 }
@@ -143,6 +151,10 @@ func (m *WellKnown) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAuthorizationEndpoint(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIDTokenSignedResponseAlg(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -170,6 +182,10 @@ func (m *WellKnown) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateUserinfoSignedResponseAlg(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -179,6 +195,15 @@ func (m *WellKnown) Validate(formats strfmt.Registry) error {
 func (m *WellKnown) validateAuthorizationEndpoint(formats strfmt.Registry) error {
 
 	if err := validate.Required("authorization_endpoint", "body", m.AuthorizationEndpoint); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *WellKnown) validateIDTokenSignedResponseAlg(formats strfmt.Registry) error {
+
+	if err := validate.Required("id_token_signed_response_alg", "body", m.IDTokenSignedResponseAlg); err != nil {
 		return err
 	}
 
@@ -233,6 +258,15 @@ func (m *WellKnown) validateSubjectTypesSupported(formats strfmt.Registry) error
 func (m *WellKnown) validateTokenEndpoint(formats strfmt.Registry) error {
 
 	if err := validate.Required("token_endpoint", "body", m.TokenEndpoint); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *WellKnown) validateUserinfoSignedResponseAlg(formats strfmt.Registry) error {
+
+	if err := validate.Required("userinfo_signed_response_alg", "body", m.UserinfoSignedResponseAlg); err != nil {
 		return err
 	}
 

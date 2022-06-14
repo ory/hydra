@@ -35,14 +35,15 @@ func (o *OauthAuthReader) ReadResponse(response runtime.ClientResponse, consumer
 			return nil, err
 		}
 		return nil, result
-	case 500:
-		result := NewOauthAuthInternalServerError()
+	default:
+		result := NewOauthAuthDefault(response.Code())
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
 			return nil, err
 		}
+		if response.Code()/100 == 2 {
+			return result, nil
+		}
 		return nil, result
-	default:
-		return nil, runtime.NewAPIError("response status code does not match any response statuses defined for this endpoint in the swagger spec", response, response.Code())
 	}
 }
 
@@ -100,27 +101,36 @@ func (o *OauthAuthUnauthorized) readResponse(response runtime.ClientResponse, co
 	return nil
 }
 
-// NewOauthAuthInternalServerError creates a OauthAuthInternalServerError with default headers values
-func NewOauthAuthInternalServerError() *OauthAuthInternalServerError {
-	return &OauthAuthInternalServerError{}
+// NewOauthAuthDefault creates a OauthAuthDefault with default headers values
+func NewOauthAuthDefault(code int) *OauthAuthDefault {
+	return &OauthAuthDefault{
+		_statusCode: code,
+	}
 }
 
-/* OauthAuthInternalServerError describes a response with status code 500, with default header values.
+/* OauthAuthDefault describes a response with status code -1, with default header values.
 
 jsonError
 */
-type OauthAuthInternalServerError struct {
+type OauthAuthDefault struct {
+	_statusCode int
+
 	Payload *models.JSONError
 }
 
-func (o *OauthAuthInternalServerError) Error() string {
-	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuthInternalServerError  %+v", 500, o.Payload)
+// Code gets the status code for the oauth auth default response
+func (o *OauthAuthDefault) Code() int {
+	return o._statusCode
 }
-func (o *OauthAuthInternalServerError) GetPayload() *models.JSONError {
+
+func (o *OauthAuthDefault) Error() string {
+	return fmt.Sprintf("[GET /oauth2/auth][%d] oauthAuth default  %+v", o._statusCode, o.Payload)
+}
+func (o *OauthAuthDefault) GetPayload() *models.JSONError {
 	return o.Payload
 }
 
-func (o *OauthAuthInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *OauthAuthDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	o.Payload = new(models.JSONError)
 

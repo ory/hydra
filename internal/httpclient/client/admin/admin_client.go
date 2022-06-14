@@ -541,9 +541,8 @@ func (a *Client) DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...Clie
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*DeleteOAuth2TokenDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -627,9 +626,8 @@ func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensPara
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for flushInactiveOAuth2Tokens: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*FlushInactiveOAuth2TokensDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -1014,9 +1012,8 @@ func (a *Client) IntrospectOAuth2Token(params *IntrospectOAuth2TokenParams, opts
 		return success, nil
 	}
 	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for introspectOAuth2Token: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
+	unexpectedSuccess := result.(*IntrospectOAuth2TokenDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*

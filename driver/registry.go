@@ -42,7 +42,7 @@ type Registry interface {
 	WithContextualizer(ctxer contextx.Contextualizer) Registry
 	WithLogger(l *logrusx.Logger) Registry
 	x.HTTPClientProvider
-	GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy
+	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 
 	config.Provider
 	persistence.Provider

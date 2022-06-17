@@ -24,9 +24,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/ory/hydra/driver/config"
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/x/errorsx"
 
@@ -47,21 +49,17 @@ var (
 	}
 )
 
+type validatorRegistry interface {
+	x.HTTPClientProvider
+	config.Provider
+}
+
 type Validator struct {
-	c *http.Client
-	r Registry
+	r validatorRegistry
 }
 
-func NewValidator(registry Registry) *Validator {
+func NewValidator(registry validatorRegistry) *Validator {
 	return &Validator{
-		c: http.DefaultClient,
-		r: registry,
-	}
-}
-
-func NewValidatorWithClient(registry Registry, client *http.Client) *Validator {
-	return &Validator{
-		c: client,
 		r: registry,
 	}
 }
@@ -116,7 +114,7 @@ func (v *Validator) Validate(ctx context.Context, c *Client) error {
 	c.SecretExpiresAt = 0
 
 	if len(c.SectorIdentifierURI) > 0 {
-		if err := v.ValidateSectorIdentifierURL(c.SectorIdentifierURI, c.GetRedirectURIs()); err != nil {
+		if err := v.ValidateSectorIdentifierURL(ctx, c.SectorIdentifierURI, c.GetRedirectURIs()); err != nil {
 			return err
 		}
 	}
@@ -189,7 +187,7 @@ func (v *Validator) ValidateDynamicRegistration(ctx context.Context, c *Client) 
 	return v.Validate(ctx, c)
 }
 
-func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []string) error {
+func (v *Validator) ValidateSectorIdentifierURL(ctx context.Context, location string, redirectURIs []string) error {
 	l, err := url.Parse(location)
 	if err != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithHintf("Value of sector_identifier_uri could not be parsed because %s.", err))
@@ -199,7 +197,7 @@ func (v *Validator) ValidateSectorIdentifierURL(location string, redirectURIs []
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithDebug("Value sector_identifier_uri must be an HTTPS URL but it is not."))
 	}
 
-	response, err := v.c.Get(location)
+	response, err := v.r.HTTPClient(ctx).Get(location)
 	if err != nil {
 		return errorsx.WithStack(ErrInvalidClientMetadata.WithDebug(fmt.Sprintf("Unable to connect to URL set by sector_identifier_uri: %s", err)))
 	}

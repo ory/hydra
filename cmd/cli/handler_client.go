@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tidwall/gjson"
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
@@ -101,11 +102,14 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
-	var metadata models.JSONRawMessage
+	var metadata json.RawMessage
 	metadataStr := flagx.MustGetString(cmd, "metadata")
 	if metadataStr != "" {
-		err = json.Unmarshal([]byte(flagx.MustGetString(cmd, "metadata")), &metadata)
-		cmdx.Must(err, "Failed to parse metadata: %s", err)
+		if gjson.Valid(metadataStr) {
+			metadata = []byte(metadataStr)
+		} else {
+			fmt.Println("Metadata was provided but it was not valid, provided metadata should be a valid JSON object")
+		}
 	}
 
 	cc := models.OAuth2Client{

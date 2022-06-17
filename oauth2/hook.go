@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/hashicorp/go-cleanhttp"
+	"github.com/hashicorp/go-retryablehttp"
+
+	"github.com/ory/hydra/x"
 
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/consent"
@@ -58,11 +60,12 @@ type RefreshTokenHookResponse struct {
 }
 
 // RefreshTokenHook is an AccessRequestHook called for `refresh_token` grant type.
-func RefreshTokenHook(config *config.DefaultProvider) AccessRequestHook {
-	client := cleanhttp.DefaultPooledClient()
-
+func RefreshTokenHook(reg interface {
+	config.Provider
+	x.HTTPClientProvider
+}) AccessRequestHook {
 	return func(ctx context.Context, requester fosite.AccessRequester) error {
-		hookURL := config.TokenRefreshHookURL(ctx)
+		hookURL := reg.Config().TokenRefreshHookURL(ctx)
 		if hookURL == nil {
 			return nil
 		}
@@ -100,7 +103,7 @@ func RefreshTokenHook(config *config.DefaultProvider) AccessRequestHook {
 			)
 		}
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodPost, hookURL.String(), bytes.NewReader(reqBodyBytes))
+		req, err := retryablehttp.NewRequestWithContext(ctx, http.MethodPost, hookURL.String(), bytes.NewReader(reqBodyBytes))
 		if err != nil {
 			return errorsx.WithStack(
 				fosite.ErrServerError.
@@ -110,7 +113,7 @@ func RefreshTokenHook(config *config.DefaultProvider) AccessRequestHook {
 		}
 		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
-		resp, err := client.Do(req)
+		resp, err := reg.HTTPClient(ctx).Do(req)
 		if err != nil {
 			return errorsx.WithStack(
 				fosite.ErrServerError.

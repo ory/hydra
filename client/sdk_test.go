@@ -22,10 +22,11 @@ package client_test
 
 import (
 	"context"
-	"github.com/ory/x/snapshotx"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/ory/x/snapshotx"
 
 	"github.com/ory/x/uuidx"
 

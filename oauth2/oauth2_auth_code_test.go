@@ -966,9 +966,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						resp := makeRequest(req)
 						require.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 					})
-					t.Logf("Got token: %s", token.AccessToken)
-
-					// time.Sleep(time.Millisecond * 1200) // Makes sure exp/iat/nbf time is different later on
 
 					res, err := testRefresh(t, token, ts.URL, tc.checkExpiry)
 					require.NoError(t, err)
@@ -979,8 +976,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 
 					var refreshedToken oauth2.Token
 					require.NoError(t, json.Unmarshal(body, &refreshedToken))
-
-					t.Logf("Got refresh token: %s", refreshedToken.AccessToken)
 
 					if tc.assertAccessToken != nil {
 						tc.assertAccessToken(t, refreshedToken.AccessToken)
@@ -1127,7 +1122,6 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
 						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
-
 						assert.Equal(t, origAccessTokenClaims, refreshedAccessTokenClaims)
 					})
 

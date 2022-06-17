@@ -1,4 +1,10 @@
-import { createClient, createGrant, deleteClients, deleteGrants, prng } from '../../helpers'
+import {
+  createClient,
+  createGrant,
+  deleteClients,
+  deleteGrants,
+  prng
+} from '../../helpers'
 
 const dayjs = require('dayjs')
 const isBetween = require('dayjs/plugin/isBetween')
@@ -91,8 +97,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   }
 
   it('should return an Access Token when given client credentials and a signed JWT assertion', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -125,8 +130,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when not given client credentials', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -153,8 +157,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion without a jti', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -184,8 +187,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with a duplicated jti', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -243,8 +245,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion without an iat', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -277,8 +278,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with an invalid signature', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -307,8 +307,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with an invalid subject', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -339,8 +338,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Access Token when given client credentials and a JWT assertion with any subject', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr('') // allow any subject
       createGrant(grant)
 
@@ -377,8 +375,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with an invalid issuer', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -409,8 +406,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with an invalid audience', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -441,8 +437,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with an expired date', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -475,7 +470,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Error (400) when given client credentials and a JWT assertion with a nbf that is still not valid', function () {
-    createClient(nc()).then(client => {
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
@@ -508,8 +503,7 @@ describe('The OAuth 2.0 JWT Bearer (RFC 7523) Grant', function () {
   })
 
   it('should return an Access Token when given client credentials and a JWT assertion with a nbf that is valid', function () {
-    createClient(nc()).then(client => {
-
+    createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 

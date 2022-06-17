@@ -3,7 +3,6 @@ import qs from 'querystring'
 
 describe('OpenID Connect Prompt', () => {
   const nc = () => ({
-
     client_secret: prng(),
     scope: 'openid',
     redirect_uris: [`${Cypress.env('client_url')}/openid/callback`],

@@ -10,7 +10,9 @@ describe('The OAuth 2.0 Refresh Token Grant', function () {
 
   it('should return an Access and Refresh Token and refresh the Access Token', function () {
     const client = nc()
-    cy.authCodeFlow(client, { consent: { scope: ['offline_access'], createClient: true } })
+    cy.authCodeFlow(client, {
+      consent: { scope: ['offline_access'], createClient: true }
+    })
 
     cy.request(`${Cypress.env('client_url')}/oauth2/refresh`)
       .its('body')
@@ -51,9 +53,10 @@ describe('The OAuth 2.0 Refresh Token Grant', function () {
       grant_types: ['authorization_code', 'refresh_token'],
       response_types: ['code'],
       token_endpoint_auth_method: 'none'
-    }).then(client => {
+    }).then((client) => {
       cy.authCodeFlowBrowser(client, {
-        consent: { scope: ['offline_access'] }, createClient: false
+        consent: { scope: ['offline_access'] },
+        createClient: false
       }).then((originalResponse) => {
         expect(originalResponse.status).to.eq(200)
         expect(originalResponse.body.refresh_token).to.not.be.empty

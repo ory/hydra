@@ -95,7 +95,10 @@ func RefreshTokenHook(config *config.DefaultProvider) AccessRequestHook {
 
 		switch resp.StatusCode {
 		case http.StatusOK:
-			// We only accept '200 OK' here. Any other status code is considered an error.
+			// Token refresh permitted with new session data
+		case http.StatusNoContent:
+			// Token refresh is permitted without overriding session data
+			return nil
 		case http.StatusForbidden:
 			return errorsx.WithStack(
 				fosite.ErrAccessDenied.

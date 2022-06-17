@@ -6,6 +6,10 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/x/httpx"
+
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
@@ -17,6 +21,21 @@ import (
 
 	"github.com/gorilla/sessions"
 )
+
+func TestGetJWKSFetcherStrategyHostEnforcment(t *testing.T) {
+	ctx := context.Background()
+	l := logrusx.New("", "")
+	c := config.MustNew(context.Background(), l, configx.WithConfigFiles("../internal/.hydra.yaml"))
+	c.MustSet(ctx, config.KeyDSN, "memory")
+	c.MustSet(ctx, config.HSMEnabled, "false")
+	c.MustSet(ctx, config.ViperKeyClientHTTPNoPrivateIPRanges, true)
+
+	registry, err := NewRegistryWithoutInit(c, l)
+	require.NoError(t, err)
+
+	_, err = registry.GetJWKSFetcherStrategy().Resolve(ctx, "http://localhost:8080", true)
+	require.ErrorAs(t, err, new(httpx.ErrPrivateIPAddressDisallowed))
+}
 
 func TestRegistryBase_newKeyStrategy_handlesNetworkError(t *testing.T) {
 	// Test ensures any network specific error is logged with a

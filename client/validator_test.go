@@ -27,6 +27,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hashicorp/go-retryablehttp"
+
+	"github.com/ory/hydra/driver"
+	"github.com/ory/x/httpx"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/stretchr/testify/assert"
@@ -154,7 +159,17 @@ func TestValidate(t *testing.T) {
 	}
 }
 
+type fakeHTTP struct {
+	driver.Registry
+	c *http.Client
+}
+
+func (f *fakeHTTP) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {
+	return httpx.NewResilientClient(httpx.ResilientClientWithClient(f.c))
+}
+
 func TestValidateSectorIdentifierURL(t *testing.T) {
+	reg := internal.NewMockedRegistry(t, &contextx.Default{})
 	var payload string
 
 	var h http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
@@ -163,8 +178,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	ts := httptest.NewTLSServer(h)
 	defer ts.Close()
 
-	v := NewValidatorWithClient(nil, ts.Client())
-
+	v := NewValidator(&fakeHTTP{Registry: reg, c: ts.Client()})
 	for k, tc := range []struct {
 		p         string
 		r         []string
@@ -198,7 +212,7 @@ func TestValidateSectorIdentifierURL(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("case=%d", k), func(t *testing.T) {
 			payload = tc.p
-			err := v.ValidateSectorIdentifierURL(tc.u, tc.r)
+			err := v.ValidateSectorIdentifierURL(context.Background(), tc.u, tc.r)
 			if tc.expectErr {
 				require.Error(t, err)
 			} else {

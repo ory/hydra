@@ -25,20 +25,20 @@ describe("OAuth 2.0 End-User Authorization", () => {
   }
 
   it('should check if end user authorization exists', () => {
-   createClient(nc()).then(client => {
-    cy.authCodeFlow(client, {
-      consent: {
-        scope: ['offline_access'],
-        remember: true
-      },
-      createClient: false,
-    })
+    createClient(nc()).then((client) => {
+      cy.authCodeFlow(client, {
+        consent: {
+          scope: ['offline_access'],
+          remember: true
+        },
+        createClient: false
+      })
 
-      console.log('got ', {client})
+      console.log('got ', { client })
 
       cy.request(
         Cypress.env('admin_url') +
-        '/oauth2/auth/sessions/consent?subject=foo@bar.com'
+          '/oauth2/auth/sessions/consent?subject=foo@bar.com'
       )
         .its('body')
         .then((body) => {
@@ -57,12 +57,12 @@ describe("OAuth 2.0 End-User Authorization", () => {
       cy.request(
         'DELETE',
         Cypress.env('admin_url') +
-        '/oauth2/auth/sessions/consent?subject=foo@bar.com&all=true'
+          '/oauth2/auth/sessions/consent?subject=foo@bar.com&all=true'
       )
 
       cy.request(
         Cypress.env('admin_url') +
-        '/oauth2/auth/sessions/consent?subject=foo@bar.com'
+          '/oauth2/auth/sessions/consent?subject=foo@bar.com'
       )
         .its('body')
         .then((body) => {
@@ -84,5 +84,5 @@ describe("OAuth 2.0 End-User Authorization", () => {
           expect(body.body.active).to.be.false
         })
     })
-    })
+  })
 })

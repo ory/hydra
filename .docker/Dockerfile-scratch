@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.16
 
 RUN apk --no-cache --upgrade --latest add ca-certificates
 
@@ -6,13 +6,22 @@ RUN apk --no-cache --upgrade --latest add ca-certificates
 # - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
 RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
+RUN addgroup -S ory; \
+    adduser -S ory -G ory -D  -h /home/ory -s /bin/nologin;
+
+RUN mkdir -p /var/lib/sqlite && \
+    chown -R ory:ory /var/lib/sqlite
+
 FROM scratch
 
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=0 /etc/nsswitch.conf /etc/nsswitch.conf
+COPY --from=0 /etc/passwd /etc/passwd
+COPY --from=0 /var/lib/sqlite /var/lib/sqlite
+
 COPY hydra /usr/bin/hydra
 
-USER 1000
+USER ory
 
 ENTRYPOINT ["hydra"]
 CMD ["serve", "all"]

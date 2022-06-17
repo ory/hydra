@@ -99,9 +99,11 @@ type RegistryBase struct {
 	publicCORS   *cors.Cors
 }
 
-func (m *RegistryBase) GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy {
+func (m *RegistryBase) GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy {
 	if m.jfs == nil {
-		m.jfs = fosite.NewDefaultJWKSFetcherStrategy(fosite.JWKSFetcherWithHTTPClient(m.HTTPClient(ctx)))
+		m.jfs = fosite.NewDefaultJWKSFetcherStrategy(fosite.JWKSFetcherWithHTTPClientSource(func(ctx context.Context) *retryablehttp.Client {
+			return m.HTTPClient(ctx)
+		}))
 	}
 	return m.jfs
 }
@@ -492,7 +494,7 @@ func (m *RegistryBase) WithConsentStrategy(c consent.Strategy) {
 func (m *RegistryBase) AccessRequestHooks() []oauth2.AccessRequestHook {
 	if m.arhs == nil {
 		m.arhs = []oauth2.AccessRequestHook{
-			oauth2.RefreshTokenHook(m.Config()),
+			oauth2.RefreshTokenHook(m),
 		}
 	}
 	return m.arhs

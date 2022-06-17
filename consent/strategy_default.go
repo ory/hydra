@@ -43,8 +43,6 @@ import (
 
 	"github.com/ory/x/sqlxx"
 
-	"github.com/ory/x/httpx"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/jwt"
@@ -672,14 +670,12 @@ func (s *DefaultStrategy) executeBackChannelLogout(ctx context.Context, r *http.
 		tasks = append(tasks, task{url: c.BackChannelLogoutURI, clientID: c.GetID(), token: t})
 	}
 
-	hc := httpx.NewResilientClient()
-
 	var execute = func(t task) {
 		log := s.r.Logger().WithRequest(r).
 			WithField("client_id", t.clientID).
 			WithField("backchannel_logout_url", t.url)
 
-		res, err := hc.PostForm(t.url, url.Values{"logout_token": {t.token}})
+		res, err := s.r.HTTPClient(ctx).PostForm(t.url, url.Values{"logout_token": {t.token}})
 		if err != nil {
 			log.WithError(err).Error("Unable to execute OpenID Connect Back-Channel Logout Request")
 			return

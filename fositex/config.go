@@ -25,7 +25,7 @@ type configDependencies interface {
 	config.Provider
 	persistence.Provider
 	x.HTTPClientProvider
-	GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy
+	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
 }
 
 type factory func(config fosite.Configurator, storage interface{}, strategy interface{}) interface{}
@@ -84,7 +84,7 @@ func (c *Config) LoadDefaultHanlders(strategy interface{}) {
 }
 
 func (c *Config) GetJWKSFetcherStrategy(ctx context.Context) fosite.JWKSFetcherStrategy {
-	return c.deps.GetJWKSFetcherStrategy(ctx)
+	return c.deps.GetJWKSFetcherStrategy()
 }
 
 func (c *Config) GetHTTPClient(ctx context.Context) *retryablehttp.Client {

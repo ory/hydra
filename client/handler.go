@@ -26,6 +26,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/ory/x/uuidx"
@@ -647,7 +648,7 @@ func (h *Handler) ValidDynamicAuth(r *http.Request, ps httprouter.Params) (fosit
 	}
 
 	token := fosite.AccessTokenFromRequest(r)
-	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(r.Context(), token); err != nil {
+	if err := h.r.OAuth2HMACStrategy().Enigma.Validate(r.Context(), strings.TrimPrefix(token, "ory_at_")); err != nil {
 		return nil, herodot.ErrUnauthorized.
 			WithTrace(err).
 			WithReason("The requested OAuth 2.0 client does not exist or you provided incorrect credentials.").WithDebug(err.Error())

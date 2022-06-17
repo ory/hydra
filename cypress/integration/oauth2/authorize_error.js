@@ -89,7 +89,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       scope: 'foo',
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       grant_types: ['authorization_code']
-    }).then(c => {
+    }).then((c) => {
       cy.visit(
         `${Cypress.env('client_url')}/oauth2/code?client_id=${
           c.client_id
@@ -129,7 +129,7 @@ describe('OAuth 2.0 Authorization Endpoint Error Handling', () => {
       client_secret: prng(),
       redirect_uris: [`${Cypress.env('client_url')}/oauth2/callback`],
       grant_types: ['client_credentials']
-    }).then(c => {
+    }).then((c) => {
       cy.visit(
         `${Cypress.env('client_url')}/oauth2/code?client_id=${
           c.client_id

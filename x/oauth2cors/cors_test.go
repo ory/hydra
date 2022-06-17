@@ -165,8 +165,8 @@ func TestOAuth2AwareCORSMiddleware(t *testing.T) {
 		{
 			d: "should succeed on pre-flight request when token introspection fails",
 			prep: func(t *testing.T, r driver.Registry) {
-				r.Config().MustSet("serve.public.cors.enabled", true)
-				r.Config().MustSet("serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
+				r.Config().MustSet(context.Background(), "serve.public.cors.enabled", true)
+				r.Config().MustSet(context.Background(), "serve.public.cors.allowed_origins", []string{"http://not-test-domain.com"})
 			},
 			code:         http.StatusNotImplemented,
 			header:       http.Header{"Origin": {"http://foobar.com"}, "Authorization": {"Bearer 1234"}},

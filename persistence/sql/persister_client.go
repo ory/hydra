@@ -19,7 +19,7 @@ func (p *Persister) GetConcreteClient(ctx context.Context, id string) (*client.C
 	defer span.End()
 
 	var cl client.Client
-	return &cl, sqlcon.HandleError(p.Connection(ctx).Where("nid = ? AND (pk = ? OR id = ?)", p.NetworkID(ctx), id, id).First(&cl))
+	return &cl, sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).First(&cl))
 }
 
 func (p *Persister) GetClient(ctx context.Context, id string) (fosite.Client, error) {
@@ -104,12 +104,12 @@ func (p *Persister) DeleteClient(ctx context.Context, id string) error {
 	ctx, span := p.r.Tracer(ctx).Tracer().Start(ctx, "persistence.sql.DeleteClient")
 	defer span.End()
 
-	cl, err := p.GetConcreteClient(ctx, id)
+	_, err := p.GetConcreteClient(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("pk = ?", cl.ID).Delete(&client.Client{}))
+	return sqlcon.HandleError(p.QueryWithNetwork(ctx).Where("id = ?", id).Delete(&client.Client{}))
 }
 
 func (p *Persister) GetClients(ctx context.Context, filters client.Filter) ([]client.Client, error) {

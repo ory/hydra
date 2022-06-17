@@ -92,6 +92,12 @@ func Middleware(
 				}
 			}
 
+			// pre-flight requests do not contain credentials (cookies, HTTP authorization)
+			// so we return true in all cases here.
+			if r.Method == http.MethodOptions {
+				return true
+			}
+
 			username, _, ok := r.BasicAuth()
 			if !ok || username == "" {
 				token := fosite.AccessTokenFromRequest(r)

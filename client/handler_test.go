@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/tidwall/sjson"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/tidwall/sjson"
 
 	"github.com/gofrs/uuid"
 	"github.com/tidwall/gjson"

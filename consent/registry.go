@@ -12,6 +12,7 @@ type InternalRegistry interface {
 	x.RegistryWriter
 	x.RegistryCookieStore
 	x.RegistryLogger
+	x.HTTPClientProvider
 	Registry
 	client.Registry
 

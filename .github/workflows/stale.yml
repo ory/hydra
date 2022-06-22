@@ -1,8 +1,8 @@
-name: 'Close Stale Issues'
+name: "Close Stale Issues"
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   stale:
@@ -35,10 +35,10 @@ jobs:
             Thank you for your understanding and to anyone who participated in the conversation! And as written above, please do participate in the conversation if this topic is important to you!
 
             Thank you 🙏✌️
-          stale-issue-label: 'stale'
-          exempt-issue-labels: 'bug,blocking,docs,backlog'
+          stale-issue-label: "stale"
+          exempt-issue-labels: "bug,blocking,docs,backlog"
           days-before-stale: 365
           days-before-close: 30
           exempt-milestones: true
           exempt-assignees: true
-          only-pr-labels: 'stale'
+          only-pr-labels: "stale"

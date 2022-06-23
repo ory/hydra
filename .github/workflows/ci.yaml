@@ -137,7 +137,7 @@ jobs:
       - name: HSM tests
         run: |
           pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --slot 0 --init-token --so-pin 0000 --init-pin --pin 1234 --label hydra
-          go test -p 1 -v -failfast -short -timeout=20m -tags=sqlite,hsm ./...
+          go test -p 1 -failfast -short -timeout=20m -tags=sqlite,hsm ./...
 
   test-e2e:
     name: Run end-to-end tests

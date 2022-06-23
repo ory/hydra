@@ -41,6 +41,7 @@ import (
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
 	"github.com/ory/hydra/internal/testhelpers"
+	"github.com/ory/x/assertx"
 	"github.com/ory/x/contextx"
 
 	"github.com/julienschmidt/httprouter"

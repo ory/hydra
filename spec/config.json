@@ -772,12 +772,22 @@
         "hashers": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Configures hashing algorithms. Supports only BCrypt at the moment.",
+          "description": "Configures hashing algorithms. Supports only BCrypt and PBKDF2 at the moment.",
           "properties": {
+            "algorithm": {
+              "title": "Password hashing algorithm",
+              "description": "One of the values: pbkdf2, bcrypt.\n\nWarning! This value can not be changed once set as all existing OAuth 2.0 Clients will not be able to sign in any more.",
+              "type": "string",
+              "default": "pbkdf2",
+              "enum": [
+                "pbkdf2",
+                "bcrypt"
+              ]
+            },
             "bcrypt": {
               "type": "object",
               "additionalProperties": false,
-              "description": "Configures the BCrypt hashing algorithm used for hashing Client Secrets.",
+              "description": "Configures the BCrypt hashing algorithm used for hashing OAuth 2.0 Client Secrets.",
               "properties": {
                 "cost": {
                   "type": "integer",
@@ -785,6 +795,19 @@
                   "default": 10,
                   "minimum": 4,
                   "maximum": 31
+                }
+              }
+            },
+            "pbkdf2": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configures the PBKDF2 hashing algorithm used for hashing OAuth 2.0 Client Secrets.",
+              "properties": {
+                "iterations": {
+                  "type": "integer",
+                  "description": "Sets the PBKDF2 iterations. The higher the value, the more CPU time is being used to generate hashes.",
+                  "default": 25000,
+                  "minimum": 1
                 }
               }
             }

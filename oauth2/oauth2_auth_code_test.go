@@ -921,17 +921,15 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 					require.NotEmpty(t, code)
 
 					token, err := oauthConfig.Exchange(oauth2.NoContext, code)
-
 					if tc.expectOAuthTokenError {
 						require.Error(t, err)
 						return
 					}
 
+					require.NoError(t, err, code)
 					if tc.assertAccessToken != nil {
 						tc.assertAccessToken(t, token.AccessToken)
 					}
-
-					require.NoError(t, err, code)
 
 					t.Run("case=userinfo", func(t *testing.T) {
 						var makeRequest = func(req *http.Request) *http.Response {
@@ -1123,7 +1121,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
 						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
-						assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp"})
+						assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp", "iat", "nbf"})
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {

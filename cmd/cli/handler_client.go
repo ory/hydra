@@ -23,6 +23,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-openapi/strfmt"
 	"os"
 	"strings"
 
@@ -102,26 +103,33 @@ func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	cc := models.OAuth2Client{
-		ClientSecret:                      secret,
-		ResponseTypes:                     flagx.MustGetStringSlice(cmd, "response-types"),
-		Scope:                             strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
-		GrantTypes:                        flagx.MustGetStringSlice(cmd, "grant-types"),
-		RedirectUris:                      flagx.MustGetStringSlice(cmd, "redirect-uris"),
-		ClientName:                        flagx.MustGetString(cmd, "name"),
-		TokenEndpointAuthMethod:           flagx.MustGetString(cmd, "token-endpoint-auth-method"),
-		JwksURI:                           flagx.MustGetString(cmd, "jwks-uri"),
-		TosURI:                            flagx.MustGetString(cmd, "tos-uri"),
-		PolicyURI:                         flagx.MustGetString(cmd, "policy-uri"),
-		LogoURI:                           flagx.MustGetString(cmd, "logo-uri"),
-		ClientURI:                         flagx.MustGetString(cmd, "client-uri"),
-		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, "allowed-cors-origins"),
-		SubjectType:                       flagx.MustGetString(cmd, "subject-type"),
+		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, "allowed-cors-origin"),
 		Audience:                          flagx.MustGetStringSlice(cmd, "audience"),
-		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, "post-logout-callbacks"),
 		BackchannelLogoutSessionRequired:  flagx.MustGetBool(cmd, "backchannel-logout-session-required"),
 		BackchannelLogoutURI:              flagx.MustGetString(cmd, "backchannel-logout-callback"),
+		ClientName:                        flagx.MustGetString(cmd, "name"),
+		ClientSecret:                      secret,
+		ClientURI:                         flagx.MustGetString(cmd, "client-uri"),
+		Contacts:                          flagx.MustGetStringSlice(cmd, "contact"),
 		FrontchannelLogoutSessionRequired: flagx.MustGetBool(cmd, "frontchannel-logout-session-required"),
 		FrontchannelLogoutURI:             flagx.MustGetString(cmd, "frontchannel-logout-callback"),
+		GrantTypes:                        flagx.MustGetStringSlice(cmd, "grant-type"),
+		JwksURI:                           flagx.MustGetString(cmd, "jwks-uri"),
+		LogoURI:                           flagx.MustGetString(cmd, "logo-uri"),
+		Metadata:                          flagx.MustGetString(cmd, "metadata"),
+		Owner:                             flagx.MustGetString(cmd, "owner"),
+		PolicyURI:                         flagx.MustGetString(cmd, "policy-uri"),
+		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, "post-logout-callback"),
+		RedirectUris:                      flagx.MustGetStringSlice(cmd, "redirect-uri"),
+		RequestObjectSigningAlg:           flagx.MustGetString(cmd, "request-object-signing-alg"),
+		RequestUris:                       flagx.MustGetStringSlice(cmd, "request-uri"),
+		ResponseTypes:                     flagx.MustGetStringSlice(cmd, "response-type"),
+		Scope:                             strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
+		SectorIdentifierURI:               "",
+		SubjectType:                       flagx.MustGetString(cmd, "subject-type"),
+		TokenEndpointAuthMethod:           flagx.MustGetString(cmd, "token-endpoint-auth-method"),
+		TosURI:                            flagx.MustGetString(cmd, "tos-uri"),
+		UpdatedAt:                         strfmt.DateTime{},
 	}
 
 	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))

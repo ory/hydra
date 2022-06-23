@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ory/x/hasherx"
+
 	"github.com/gofrs/uuid"
 
 	"github.com/ory/x/otelx"
@@ -45,7 +47,9 @@ const (
 	KeyDefaultClientScope                        = "oidc.dynamic_client_registration.default_scope"
 	KeyDSN                                       = "dsn"
 	ViperKeyClientHTTPNoPrivateIPRanges          = "clients.http.disallow_private_ip_ranges"
+	KeyHasherAlgorithm                           = "oauth2.hashers.algorithm"
 	KeyBCryptCost                                = "oauth2.hashers.bcrypt.cost"
+	KeyPBKDF2Iterations                          = "oauth2.hashers.pbkdf2.iterations"
 	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
@@ -83,12 +87,41 @@ const (
 
 const DSNMemory = "memory"
 
+var _ hasherx.PBKDF2Configurator = (*DefaultProvider)(nil)
+var _ hasherx.BCryptConfigurator = (*DefaultProvider)(nil)
+
 type DefaultProvider struct {
 	generatedSecret []byte
 	l               *logrusx.Logger
 
 	p *configx.Provider
 	c contextx.Contextualizer
+}
+
+func (p *DefaultProvider) GetHasherAlgorithm(ctx context.Context) x.HashAlgorithm {
+	switch strings.ToLower(p.getProvider(ctx).String(KeyHasherAlgorithm)) {
+	case x.HashAlgorithmBCrypt.String():
+		return x.HashAlgorithmBCrypt
+	case x.HashAlgorithmPBKDF2.String():
+		fallthrough
+	default:
+		return x.HashAlgorithmPBKDF2
+	}
+}
+
+func (p *DefaultProvider) HasherBcryptConfig(ctx context.Context) *hasherx.BCryptConfig {
+	return &hasherx.BCryptConfig{
+		Cost: uint32(p.GetBCryptCost(ctx)),
+	}
+}
+
+func (p *DefaultProvider) HasherPBKDF2Config(ctx context.Context) *hasherx.PBKDF2Config {
+	return &hasherx.PBKDF2Config{
+		Algorithm:  "sha256",
+		Iterations: uint32(p.getProvider(ctx).Int(KeyPBKDF2Iterations)),
+		SaltLength: 16,
+		KeyLength:  32,
+	}
 }
 
 func MustNew(ctx context.Context, l *logrusx.Logger, opts ...configx.OptionModifier) *DefaultProvider {

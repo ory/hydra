@@ -64,7 +64,7 @@ require (
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
-	github.com/ory/x v0.0.418
+	github.com/ory/x v0.0.423
 	github.com/pborman/uuid v1.2.1
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
@@ -92,7 +92,6 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.7.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.7.0 // indirect
 	go.uber.org/automaxprocs v1.3.0
-	golang.org/x/crypto v0.0.0-20220517005047-85d78b3ac167
 	golang.org/x/net v0.0.0-20220524220425-1d687d428aca // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect

@@ -217,7 +217,7 @@ func (m *RegistryBase) AuditLogger() *logrusx.Logger {
 
 func (m *RegistryBase) ClientHasher() fosite.Hasher {
 	if m.fh == nil {
-		m.fh = x.NewBCrypt(m.Config())
+		m.fh = x.NewHasher(m.Config())
 	}
 	return m.fh
 }

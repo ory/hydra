@@ -1,4 +1,4 @@
-import { createClient, prng } from '../../helpers'
+import { createClient, prng } from "../../helpers"
 
 describe("The OAuth 2.0 Refresh Token Grant", function () {
   const nc = () => ({
@@ -11,7 +11,7 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
   it("should return an Access and Refresh Token and refresh the Access Token", function () {
     const client = nc()
     cy.authCodeFlow(client, {
-      consent: { scope: ['offline_access'], createClient: true }
+      consent: { scope: ["offline_access"], createClient: true },
     })
 
     cy.request(`${Cypress.env("client_url")}/oauth2/refresh`)
@@ -27,7 +27,7 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
   it("should return an Access, ID, and Refresh Token and refresh the Access Token and ID Token", function () {
     const client = nc()
     cy.authCodeFlow(client, {
-      consent: { scope: ['offline_access', 'openid'], createClient: true }
+      consent: { scope: ["offline_access", "openid"], createClient: true },
     })
 
     cy.request(`${Cypress.env("client_url")}/oauth2/refresh`)
@@ -48,15 +48,15 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
     })
 
     createClient({
-      scope: 'offline_access',
+      scope: "offline_access",
       redirect_uris: [referrer],
-      grant_types: ['authorization_code', 'refresh_token'],
-      response_types: ['code'],
-      token_endpoint_auth_method: 'none'
+      grant_types: ["authorization_code", "refresh_token"],
+      response_types: ["code"],
+      token_endpoint_auth_method: "none",
     }).then((client) => {
       cy.authCodeFlowBrowser(client, {
-        consent: { scope: ['offline_access'] },
-        createClient: false
+        consent: { scope: ["offline_access"] },
+        createClient: false,
       }).then((originalResponse) => {
         expect(originalResponse.status).to.eq(200)
         expect(originalResponse.body.refresh_token).to.not.be.empty
@@ -74,14 +74,14 @@ describe("The OAuth 2.0 Refresh Token Grant", function () {
               .refreshTokenBrowser(client, originalToken)
               .then((response) => {
                 expect(response.status).to.eq(401)
-                expect(response.body.error).to.eq('token_inactive')
+                expect(response.body.error).to.eq("token_inactive")
               })
               .then(() => cy.refreshTokenBrowser(client, refreshedToken))
               .then((response) => {
                 expect(response.status).to.eq(401)
-                expect(response.body.error).to.eq('token_inactive')
+                expect(response.body.error).to.eq("token_inactive")
               })
-          }
+          },
         )
       })
     })

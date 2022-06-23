@@ -11,7 +11,7 @@ describe("OpenID Connect Token Introspection", () => {
   it("should introspect access token", function () {
     const client = nc()
     cy.authCodeFlow(client, {
-      consent: { scope: ['offline_access'], createClient: true }
+      consent: { scope: ["offline_access"], createClient: true },
     })
 
     cy.get("body")
@@ -35,7 +35,7 @@ describe("OpenID Connect Token Introspection", () => {
   it("should introspect refresh token", function () {
     const client = nc()
     cy.authCodeFlow(client, {
-      consent: { scope: ['offline_access'], createClient: true }
+      consent: { scope: ["offline_access"], createClient: true },
     })
 
     cy.get("body")

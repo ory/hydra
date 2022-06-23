@@ -35,6 +35,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/assertx"
+
 	"github.com/pborman/uuid"
 	"github.com/tidwall/gjson"
 

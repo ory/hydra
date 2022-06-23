@@ -11,7 +11,7 @@ replace (
 	github.com/oleiade/reflections => github.com/oleiade/reflections v1.0.1
 )
 
-replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220617175535-a88d4431f12d
+replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220623093045-89faad818c4c
 
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
 

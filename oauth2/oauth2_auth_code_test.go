@@ -1121,7 +1121,7 @@ func TestAuthCodeWithMockStrategy(t *testing.T) {
 						require.NoError(t, json.Unmarshal(body, &refreshedToken))
 
 						refreshedAccessTokenClaims := testhelpers.IntrospectToken(t, oauthConfig, &refreshedToken, ts)
-						assert.Equal(t, origAccessTokenClaims, refreshedAccessTokenClaims)
+						assertx.EqualAsJSONExcept(t, json.RawMessage(origAccessTokenClaims.Raw), json.RawMessage(refreshedAccessTokenClaims.Raw), []string{"exp"})
 					})
 
 					t.Run("should fail token refresh with `server_error` if hook fails", func(t *testing.T) {

@@ -78,8 +78,8 @@ const nc = (req) =>
     return Promise.resolve(
       new issuer.Client({
         ...issuer.metadata,
-        ...req.session.oidc_credentials
-      })
+        ...req.session.oidc_credentials,
+      }),
     )
   })
 
@@ -397,8 +397,8 @@ app.get("/openid/session/end/fc", async (req, res) => {
 
 app.post("/openid/session/end/bc", (req, res) => {
   const client = jwksClient({
-    jwksUri: new URL('/.well-known/jwks.json', config.public).toString(),
-    cache: false
+    jwksUri: new URL("/.well-known/jwks.json", config.public).toString(),
+    cache: false,
   })
 
   jwt.verify(
@@ -445,8 +445,8 @@ app.post("/openid/session/end/bc", (req, res) => {
   )
 })
 
-app.get('/openid/session/check', async (req, res) => {
-  const { openid_claims: { sid = '' } = {} } = req.session
+app.get("/openid/session/check", async (req, res) => {
+  const { openid_claims: { sid = "" } = {} } = req.session
 
   if (blacklistedSid.indexOf(sid) > -1) {
     req.session.destroy(() => {

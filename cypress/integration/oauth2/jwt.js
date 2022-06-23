@@ -1,4 +1,4 @@
-import { createClient, prng } from '../../helpers'
+import { createClient, prng } from "../../helpers"
 
 describe("OAuth 2.0 JSON Web Token Access Tokens", () => {
   before(function () {
@@ -18,30 +18,30 @@ describe("OAuth 2.0 JSON Web Token Access Tokens", () => {
     grant_types: ["authorization_code", "refresh_token"],
   })
 
-  it('should return an Access Token in JWT format and validate it and a Refresh Token in opaque format', () => {
+  it("should return an Access Token in JWT format and validate it and a Refresh Token in opaque format", () => {
     createClient(nc()).then((client) => {
       cy.authCodeFlow(client, {
-        consent: { scope: ['offline_access'], createClient: true },
-        createClient: false
+        consent: { scope: ["offline_access"], createClient: true },
+        createClient: false,
       })
 
-      cy.request(`${Cypress.env('client_url')}/oauth2/refresh`)
-        .its('body')
+      cy.request(`${Cypress.env("client_url")}/oauth2/refresh`)
+        .its("body")
         .then((body) => {
           const { result, token } = body
-          expect(result).to.equal('success')
+          expect(result).to.equal("success")
 
           expect(token.access_token).to.not.be.empty
           expect(token.refresh_token).to.not.be.empty
-          expect(token.access_token.split('.').length).to.equal(3)
-          expect(token.refresh_token.split('.').length).to.equal(2)
+          expect(token.access_token.split(".").length).to.equal(3)
+          expect(token.refresh_token.split(".").length).to.equal(2)
         })
 
-      cy.request(`${Cypress.env('client_url')}/oauth2/validate-jwt`)
-        .its('body')
+      cy.request(`${Cypress.env("client_url")}/oauth2/validate-jwt`)
+        .its("body")
         .then((body) => {
           console.log(body)
-          expect(body.sub).to.eq('foo@bar.com')
+          expect(body.sub).to.eq("foo@bar.com")
           expect(body.client_id).to.eq(client.client_id)
           expect(body.jti).to.not.be.empty
         })

@@ -3,8 +3,8 @@ import {
   createGrant,
   deleteClients,
   deleteGrants,
-  prng
-} from '../../helpers'
+  prng,
+} from "../../helpers"
 
 const dayjs = require("dayjs")
 const isBetween = require("dayjs/plugin/isBetween")
@@ -100,28 +100,28 @@ describe("The OAuth 2.0 JWT Bearer (RFC 7523) Grant", function () {
     return { ...assert, ...override }
   }
 
-  it('should return an Access Token when given client credentials and a signed JWT assertion', function () {
+  it("should return an Access Token when given client credentials and a signed JWT assertion", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(jwtAssertion(grant), testPrivatePem, {
-        algorithm: 'RS256'
+        algorithm: "RS256",
       })
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
-        }
+          client_id: client.client_id,
+        },
       })
-        .its('body')
+        .its("body")
         .then((body) => {
           const { access_token, expires_in, scope, token_type } = body
 
@@ -133,85 +133,85 @@ describe("The OAuth 2.0 JWT Bearer (RFC 7523) Grant", function () {
     })
   })
 
-  it('should return an Error (400) when not given client credentials', function () {
+  it("should return an Error (400) when not given client credentials", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(jwtAssertion(grant), testPrivatePem, {
-        algorithm: 'RS256'
+        algorithm: "RS256",
       })
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
-          scope: client.scope
+          scope: client.scope,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion without a jti', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion without a jti", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       var ja = jwtAssertion(grant)
-      delete ja['jti']
-      const assertion = jwt.sign(ja, testPrivatePem, { algorithm: 'RS256' })
+      delete ja["jti"]
+      const assertion = jwt.sign(ja, testPrivatePem, { algorithm: "RS256" })
 
       // first token request should work fine
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with a duplicated jti', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with a duplicated jti", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const jwt1 = jwtAssertion(grant)
-      const assertion1 = jwt.sign(jwt1, testPrivatePem, { algorithm: 'RS256' })
+      const assertion1 = jwt.sign(jwt1, testPrivatePem, { algorithm: "RS256" })
 
       // first token request should work fine
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion1,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
-        }
+          client_id: client.client_id,
+        },
       })
-        .its('body')
+        .its("body")
         .then((body) => {
           const { access_token, expires_in, scope, token_type } = body
 
@@ -222,151 +222,151 @@ describe("The OAuth 2.0 JWT Bearer (RFC 7523) Grant", function () {
         })
 
       const assertion2 = jwt.sign(
-        jwtAssertion(grant, { jti: jwt1['jti'] }),
+        jwtAssertion(grant, { jti: jwt1["jti"] }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       // the second should fail
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion2,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion without an iat', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion without an iat", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       var ja = jwtAssertion(grant)
-      delete ja['iat']
+      delete ja["iat"]
       const assertion = jwt.sign(ja, testPrivatePem, {
-        algorithm: 'RS256',
-        noTimestamp: true
+        algorithm: "RS256",
+        noTimestamp: true,
       })
 
       // first token request should work fine
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with an invalid signature', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with an invalid signature", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(jwtAssertion(grant), invalidtestPrivatePem, {
-        algorithm: 'RS256'
+        algorithm: "RS256",
       })
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with an invalid subject', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with an invalid subject", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(
-        jwtAssertion(grant, { sub: 'invalid_subject' }),
+        jwtAssertion(grant, { sub: "invalid_subject" }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Access Token when given client credentials and a JWT assertion with any subject', function () {
+  it("should return an Access Token when given client credentials and a JWT assertion with any subject", function () {
     createClient(nc()).then((client) => {
-      const grant = gr('') // allow any subject
+      const grant = gr("") // allow any subject
       createGrant(grant)
 
       const assertion = jwt.sign(
-        jwtAssertion(grant, { sub: 'any-subject-is-valid' }),
+        jwtAssertion(grant, { sub: "any-subject-is-valid" }),
         testPrivatePem,
         {
-          algorithm: 'RS256'
-        }
+          algorithm: "RS256",
+        },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
-        }
+          client_id: client.client_id,
+        },
       })
-        .its('body')
+        .its("body")
         .then((body) => {
           const { access_token, expires_in, scope, token_type } = body
 
@@ -378,160 +378,160 @@ describe("The OAuth 2.0 JWT Bearer (RFC 7523) Grant", function () {
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with an invalid issuer', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with an invalid issuer", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(
-        jwtAssertion(grant, { iss: 'invalid_issuer' }),
+        jwtAssertion(grant, { iss: "invalid_issuer" }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with an invalid audience', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with an invalid audience", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(
-        jwtAssertion(grant, { aud: 'invalid_audience' }),
+        jwtAssertion(grant, { aud: "invalid_audience" }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with an expired date', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with an expired date", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(
         jwtAssertion(grant, {
-          exp: dayjs().utc().subtract(1, 'minute').set('millisecond', 0).unix()
+          exp: dayjs().utc().subtract(1, "minute").set("millisecond", 0).unix(),
         }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Error (400) when given client credentials and a JWT assertion with a nbf that is still not valid', function () {
+  it("should return an Error (400) when given client credentials and a JWT assertion with a nbf that is still not valid", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(
         jwtAssertion(grant, {
-          nbf: dayjs().utc().add(1, 'minute').set('millisecond', 0).unix()
+          nbf: dayjs().utc().add(1, "minute").set("millisecond", 0).unix(),
         }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
+          client_id: client.client_id,
         },
-        failOnStatusCode: false
+        failOnStatusCode: false,
       })
-        .its('status')
+        .its("status")
         .then((status) => {
           expect(status).to.be.equal(400)
         })
     })
   })
 
-  it('should return an Access Token when given client credentials and a JWT assertion with a nbf that is valid', function () {
+  it("should return an Access Token when given client credentials and a JWT assertion with a nbf that is valid", function () {
     createClient(nc()).then((client) => {
       const grant = gr(prng())
       createGrant(grant)
 
       const assertion = jwt.sign(
         jwtAssertion(grant, {
-          nbf: dayjs().utc().subtract(1, 'minute').set('millisecond', 0).unix()
+          nbf: dayjs().utc().subtract(1, "minute").set("millisecond", 0).unix(),
         }),
         testPrivatePem,
-        { algorithm: 'RS256' }
+        { algorithm: "RS256" },
       )
 
       cy.request({
-        method: 'POST',
+        method: "POST",
         url: tokenUrl,
         form: true,
         body: {
-          grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+          grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
           assertion: assertion,
           scope: client.scope,
           client_secret: client.client_secret,
-          client_id: client.client_id
-        }
+          client_id: client.client_id,
+        },
       })
-        .its('body')
+        .its("body")
         .then((body) => {
           const { access_token, expires_in, scope, token_type } = body
 

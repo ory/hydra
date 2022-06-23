@@ -191,7 +191,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 
 // swagger:route DELETE /oauth2/auth/sessions/login admin revokeAuthenticationSession
 //
-// Invalidates All Login Sessions of a Certain User
+// Invalidates All Login Sessions of a Certain User or by a Session Id
 // Invalidates a Subject's Authentication Session
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
@@ -213,14 +213,25 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //       500: jsonError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
-	if subject == "" {
-		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
+	sessionId := r.URL.Query().Get("sessionId")
+
+	if subject == "" && sessionId == "" {
+		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`At least one of 'subject' or 'sessionId' query parameters should be defined`)))
 		return
 	}
 
-	if err := h.r.ConsentManager().RevokeSubjectLoginSession(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
-		h.r.Writer().WriteError(w, r, err)
-		return
+	if subject != "" {
+		if err := h.r.ConsentManager().RevokeSubjectLoginSessionBySubject(r.Context(), subject); err != nil && !errors.Is(err, x.ErrNotFound) {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
+	}
+
+	if sessionId != "" {
+		if err := h.r.ConsentManager().RevokeSubjectLoginSessionById(r.Context(), sessionId); err != nil && !errors.Is(err, x.ErrNotFound) {
+			h.r.Writer().WriteError(w, r, err)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusNoContent)

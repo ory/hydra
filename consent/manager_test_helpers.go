@@ -519,7 +519,7 @@ func ManagerTests(m Manager, clientManager client.Manager, fositeManager x.Fosit
 				},
 			} {
 				t.Run(fmt.Sprintf("case=%d/subject=%s", i, tc.subject), func(t *testing.T) {
-					require.NoError(t, m.RevokeSubjectLoginSession(context.Background(), tc.subject))
+					require.NoError(t, m.RevokeSubjectLoginSessionBySubject(context.Background(), tc.subject))
 
 					for _, id := range tc.ids {
 						t.Run(fmt.Sprintf("id=%s", id), func(t *testing.T) {

@@ -53,7 +53,8 @@ type Manager interface {
 	GetRememberedLoginSession(ctx context.Context, id string) (*LoginSession, error)
 	CreateLoginSession(ctx context.Context, session *LoginSession) error
 	DeleteLoginSession(ctx context.Context, id string) error
-	RevokeSubjectLoginSession(ctx context.Context, user string) error
+	RevokeSubjectLoginSessionBySubject(ctx context.Context, user string) error
+	RevokeSubjectLoginSessionById(ctx context.Context, user string) error
 	ConfirmLoginSession(ctx context.Context, id string, authTime time.Time, subject string, remember bool) error
 
 	CreateLoginRequest(ctx context.Context, req *LoginRequest) error

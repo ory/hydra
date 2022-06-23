@@ -84,7 +84,16 @@ func (p *Persister) revokeConsentSession(whereStmt string, whereArgs ...interfac
 	}
 }
 
-func (p *Persister) RevokeSubjectLoginSession(ctx context.Context, subject string) error {
+func (p *Persister) RevokeSubjectLoginSessionById(ctx context.Context, id string) error {
+	if err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE id = ?", id).Exec(); errors.Is(err, sql.ErrNoRows) {
+		return errorsx.WithStack(x.ErrNotFound)
+	} else if err != nil {
+		return sqlcon.HandleError(err)
+	}
+	return nil
+}
+
+func (p *Persister) RevokeSubjectLoginSessionBySubject(ctx context.Context, subject string) error {
 	if err := p.Connection(ctx).RawQuery("DELETE FROM hydra_oauth2_authentication_session WHERE subject = ?", subject).Exec(); errors.Is(err, sql.ErrNoRows) {
 		return errorsx.WithStack(x.ErrNotFound)
 	} else if err != nil {

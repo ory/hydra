@@ -1318,10 +1318,17 @@ paths:
       - explode: true
         in: query
         name: subject
-        required: true
+        required: false
         schema:
           type: string
         style: form
+     - explode: true
+       in: query
+       name: sessionId
+       required: false
+       schema:
+         type: string
+       style: form
       responses:
         "204":
           description: |-

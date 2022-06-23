@@ -33,14 +33,18 @@ configuration.
 
 ## BCrypt
 
-ORY Hydra uses BCrypt to obfuscate secrets of OAuth 2.0 Clients. When using flows such as the OAuth 2.0 Client Credentials
-Grant, ORY Hydra validates the client credentials using BCrypt which causes (by design) CPU load. CPU load and performance
-depend on the BCrypt cost which can be set using the environment variable \`BCRYPT_COST\`. For these benchmarks,
-we have set \`BCRYPT_COST=8\`.
+Ory Hydra can use PBKDF2 and BCrypt to obfuscate secrets of OAuth 2.0 Clients. When using flows such as the OAuth 2.0
+Client Credentials Grant, Ory Hydra validates the client credentials using PBKDF2 or BCrypt which causes (by design)
+CPU load. CPU load and performance depend on the hashing cost.
 
+For the default PBKDF2 hasher, we use 25.000 rounds per default. For these benchmarks, 10.000 iterations using
+\`OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000\`. The lower the iterations, the faster the hashing.
+
+For BCrypt, set the cost using the environment variable \`OAUTH2_HASHERS_BCRYPT_COST\`. The lower the cost (minimum is
+6), the faster the hashing. The higher the cost, the slower.
 EOF
 
-BCRYPT_COST=8 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve all --dangerous-force-http --sqa-opt-out > /dev/null 2>&1 &
+OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve all --dangerous-force-http --sqa-opt-out > /dev/null 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done

@@ -14,7 +14,7 @@
 ---
 
 <p align="left">
-    <a href="https://circleci.com/gh/ory/hydra/tree/master"><img src="https://circleci.com/gh/ory/hydra/tree/master.svg?style=shield" alt="Build Status"></a>
+    <a href="https://github.com/ory/hydra/actions/workflows/ci.yaml"><img src="https://github.com/ory/hydra/actions/workflows/ci.yaml/badge.svg?branch=master&event=push" alt="CI Tasks for Ory Hydra"></a>
     <a href="https://codecov.io/gh/ory/hydra"><img src="https://codecov.io/gh/ory/hydra/branch/master/graph/badge.svg?token=y4fVk2Of8a"/></a>
     <a href="https://goreportcard.com/report/github.com/ory/hydra"><img src="https://goreportcard.com/badge/github.com/ory/hydra" alt="Go Report Card"></a>
     <a href="https://pkg.go.dev/github.com/ory/hydra"><img src="https://pkg.go.dev/badge/www.github.com/ory/hydra" alt="PkgGoDev"></a>

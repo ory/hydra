@@ -17,7 +17,6 @@ import (
 	"github.com/ory/hydra/oauth2"
 	"github.com/ory/hydra/persistence"
 	"github.com/ory/hydra/x"
-	"github.com/ory/x/tracing"
 	"github.com/ory/x/urlx"
 )
 
@@ -26,6 +25,7 @@ type configDependencies interface {
 	persistence.Provider
 	x.HTTPClientProvider
 	GetJWKSFetcherStrategy() fosite.JWKSFetcherStrategy
+	ClientHasher() fosite.Hasher
 }
 
 type factory func(config fosite.Configurator, storage interface{}, strategy interface{}) interface{}
@@ -158,7 +158,7 @@ func (c *Config) GetMessageCatalog(ctx context.Context) i18n.MessageCatalog {
 }
 
 func (c *Config) GetSecretsHasher(ctx context.Context) fosite.Hasher {
-	return &tracing.TracedBCrypt{GetWorkFactor: c.deps.Config().GetBCryptCost}
+	return c.deps.ClientHasher()
 }
 
 func (c *Config) GetTokenEntropy(ctx context.Context) int {

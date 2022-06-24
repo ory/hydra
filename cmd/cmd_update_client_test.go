@@ -3,14 +3,16 @@ package cmd_test
 import (
 	"context"
 	"encoding/json"
-	"github.com/ory/hydra/cmd"
-	"github.com/ory/x/cmdx"
-	"github.com/ory/x/snapshotx"
+	"testing"
+
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
-	"testing"
+
+	"github.com/ory/hydra/cmd"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/snapshotx"
 )
 
 func TestUpdateClient(t *testing.T) {

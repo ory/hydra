@@ -22,10 +22,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/tomnomnom/linkheader"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/tomnomnom/linkheader"
 )
 
 var osExit = os.Exit

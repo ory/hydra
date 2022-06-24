@@ -3,12 +3,14 @@ package cmd
 import (
 	"context"
 	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"
-	"github.com/spf13/cobra"
 )
 
 func NewUpdateClientCmd(root *cobra.Command) *cobra.Command {

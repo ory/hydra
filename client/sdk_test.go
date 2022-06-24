@@ -144,7 +144,7 @@ func TestClientSDK(t *testing.T) {
 		assert.True(t, strings.Contains(err.Error(), "404"), err.Error())
 
 		// listing clients returns the only added one
-		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(100)))
+		results, err := c.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithPageSize(pointerx.Int64(100)))
 		require.NoError(t, err)
 		assert.Len(t, results.Payload, 1)
 		assert.NotEmpty(t, results.Payload[0].UpdatedAt)

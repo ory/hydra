@@ -4,17 +4,19 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io/ioutil"
+	"testing"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
+
 	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/cmd"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/pointerx"
 	"github.com/ory/x/snapshotx"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"github.com/tidwall/gjson"
-	"io/ioutil"
-	"testing"
 )
 
 func writeTempFile(t *testing.T, contents interface{}) string {

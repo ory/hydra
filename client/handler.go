@@ -43,8 +43,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-
-	"github.com/ory/x/pagination"
 )
 
 type Handler struct {
@@ -395,14 +393,8 @@ func (h *Handler) Patch(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 }
 
 // swagger:parameters listOAuth2Clients
-type Filter struct {
-	// The maximum amount of clients to returned, upper bound is 500 clients.
-	// in: query
-	Limit int `json:"limit"`
-
-	// The offset from where to start looking.
-	// in: query
-	Offset int `json:"offset"`
+type listOAuth2Clients struct {
+	x.PaginationParams
 
 	// The name of the clients to filter by.
 	// in: query
@@ -439,10 +431,10 @@ type Filter struct {
 //       200: oAuth2ClientList
 //       default: jsonError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	limit, offset := pagination.Parse(r, 100, 0, 500)
+	page, itemsPerPage := x.ParsePagination(r)
 	filters := Filter{
-		Limit:  limit,
-		Offset: offset,
+		Limit:  itemsPerPage,
+		Offset: page * itemsPerPage,
 		Name:   r.URL.Query().Get("client_name"),
 		Owner:  r.URL.Query().Get("owner"),
 	}
@@ -453,22 +445,21 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
+	if c == nil {
+		c = []Client{}
+	}
+
 	for k := range c {
 		c[k].Secret = ""
 	}
 
-	n, err := h.r.ClientManager().CountClients(r.Context())
+	total, err := h.r.ClientManager().CountClients(r.Context())
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
 		return
 	}
 
-	pagination.Header(w, r.URL, n, limit, offset)
-
-	if c == nil {
-		c = []Client{}
-	}
-
+	x.PaginationHeader(w, r.URL, int64(total), page, itemsPerPage)
 	h.r.Writer().Write(w, r, c)
 }
 

@@ -21,40 +21,139 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
-
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/cmd/cli"
+	"github.com/ory/hydra/cmd/cliclient"
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/pointerx"
+	"github.com/spf13/cobra"
+	"io"
+	"os"
 )
 
-func NewClientsImportCmd() *cobra.Command {
+func NewImportClientCmd(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "import <path/to/file.json> [<path/to/other/file.json>...]",
-		Short: "Import OAuth 2.0 Clients from one or more JSON files",
-		Long: `This command reads in each listed JSON file and imports their contents as OAuth 2.0 Clients.
+		Use:   "client [file-1.json] [file-2.json] [file-3.json] [file-n.json]",
+		Short: "Import OAuth 2.0 Clients from files or STDIN",
+		Example: fmt.Sprintf(`Create an example OAuth2 Client:
+	cat > ./file.json <<EOF
+	[
+      {
+	    "grant_types": ["implicit"],
+	    "scope": "openid"
+	  },
+      {
+	    "grant_types": ["authorize_code"],
+	    "scope": "openid"
+	  }
+    ]
+	EOF
+
+	%[1]s import client file.json
+
+Alternatively:
+
+	cat file.json | %[1]s import client
+
+To encrypt an auto-generated OAuth2 Client Secret, use flags `+"`--pgp-key`"+`, `+"`--pgp-key-url`"+` or `+"`--keybase`"+` flag, for example:
+
+  %[1]s create client -n "my app" -g client_credentials -r token -a core,foobar --keybase keybase_username
+`, root.Use),
+		Long: `This command reads in each listed JSON file and imports their contents as a list of OAuth 2.0 Clients.
 
 The format for the JSON file is:
 
-{
-  "client_id": "...",
-  "client_secret": "...",
-  // ... all other fields of the OAuth 2.0 Client model are allowed here
-}
+[
+  {
+    "client_secret": "...",
+    // ... all other fields of the OAuth 2.0 Client model are allowed here
+  }
+]
 
-Please be aware that this command does not update existing clients. If the client exists already, this command will fail.
+Please be aware that this command does not update existing clients. If the client exists already, this command will fail.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			m, err := cliclient.NewClient(cmd)
+			if err != nil {
+				return err
+			}
 
-Example:
-	hydra clients import client-1.json
+			ek, encryptSecret, err := cli.NewEncryptionKey(cmd, nil)
+			if err != nil {
+				_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Failed to load encryption key: %s", err)
+				return cmdx.FailSilently(cmd)
+			}
 
-To encrypt auto generated client secret, use "--pgp-key", "--pgp-key-url" or "--keybase" flag, for example:
-	hydra clients import client-1.json --keybase keybase_username
-`,
-		Run: cli.NewHandler().Clients.ImportClients,
+			streams := map[string]io.Reader{"STDIN": cmd.InOrStdin()}
+			for _, path := range args {
+				contents, err := os.ReadFile(path)
+				if err != nil {
+					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not open file %s: %s", path, err)
+					return cmdx.FailSilently(cmd)
+				}
+				streams[path] = bytes.NewReader(contents)
+			}
+
+			clients := map[string][]hydra.OAuth2Client{}
+			for src, stream := range streams {
+				var current []hydra.OAuth2Client
+				if err := json.NewDecoder(stream).Decode(&current); err != nil {
+					if errors.Is(err, io.EOF) {
+						continue
+					}
+					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not decode JSON: %s", err)
+					return cmdx.FailSilently(cmd)
+				}
+				clients[src] = append(clients[src], current...)
+			}
+
+			imported := make([]hydra.OAuth2Client, 0, len(clients))
+			failed := make(map[string]error)
+
+			for src, cc := range clients {
+				for _, c := range cc {
+					result, _, err := m.AdminApi.CreateOAuth2Client(cmd.Context()).OAuth2Client(c).Execute()
+					if err != nil {
+						failed[src] = cmdx.PrintOpenAPIError(cmd, err)
+						continue
+					}
+
+					if result.ClientSecret == nil {
+						result.ClientSecret = c.ClientSecret
+					}
+
+					if encryptSecret && result.ClientSecret != nil {
+						enc, err := ek.Encrypt([]byte(*result.ClientSecret))
+						if err != nil {
+							_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Failed to encrypt client secret: %s", err)
+							return cmdx.FailSilently(cmd)
+						}
+
+						result.ClientSecret = pointerx.String(enc.Base64Encode())
+					}
+
+					imported = append(imported, *result)
+				}
+			}
+
+			if len(imported) == 1 {
+				cmdx.PrintRow(cmd, (*outputOAuth2Client)(&imported[0]))
+			} else {
+				cmdx.PrintTable(cmd, &outputOAuth2ClientCollection{clients: imported})
+			}
+
+			if len(failed) != 0 {
+				cmdx.PrintErrors(cmd, failed)
+				return cmdx.FailSilently(cmd)
+			}
+
+			return nil
+		},
 	}
 
-	// encrypt client secret options
-	cmd.Flags().String("pgp-key", "", "Base64 encoded PGP encryption key for encrypting client secret")
-	cmd.Flags().String("pgp-key-url", "", "PGP encryption key URL for encrypting client secret")
-	cmd.Flags().String("keybase", "", "Keybase username for encrypting client secret")
-
+	registerEncryptFlags(cmd.Flags())
 	return cmd
 }

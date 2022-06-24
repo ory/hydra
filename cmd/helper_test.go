@@ -1,11 +1,13 @@
 package cmd
 
 import (
-	"github.com/ory/x/pagination/tokenpagination"
-	"github.com/stretchr/testify/assert"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/ory/x/pagination/tokenpagination"
 )
 
 func TestFatal(t *testing.T) {

@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Acr** | Pointer to **string** | ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication. | [optional] 
 **Amr** | Pointer to **[]string** |  | [optional] 
-**Context** | Pointer to **map[string]interface{}** |  | [optional] 
+**Context** | Pointer to **interface{}** |  | [optional] 
 **ForceSubjectIdentifier** | Pointer to **string** | ForceSubjectIdentifier forces the \&quot;pairwise\&quot; user ID of the end-user that authenticated. The \&quot;pairwise\&quot; user ID refers to the (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID Connect specification. It allows you to set an obfuscated subject (\&quot;user\&quot;) identifier that is unique to the client.  Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the sub claim in the OAuth 2.0 Introspection.  Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself you can use this field. Please note that setting this field has no effect if &#x60;pairwise&#x60; is not configured in ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via &#x60;subject_type&#x60; key in the client&#39;s configuration).  Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies that you have to compute this value on every authentication process (probably depending on the client ID or some other unique value).  If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail. | [optional] 
 **Remember** | Pointer to **bool** | Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she will not be asked to log in again. | [optional] 
 **RememberFor** | Pointer to **int64** | RememberFor sets how long the authentication should be remembered for in seconds. If set to &#x60;0&#x60;, the authorization will be remembered for the duration of the browser session (using a session cookie). | [optional] 
@@ -83,20 +83,20 @@ HasAmr returns a boolean if a field has been set.
 
 ### GetContext
 
-`func (o *AcceptLoginRequest) GetContext() map[string]interface{}`
+`func (o *AcceptLoginRequest) GetContext() interface{}`
 
 GetContext returns the Context field if non-nil, zero value otherwise.
 
 ### GetContextOk
 
-`func (o *AcceptLoginRequest) GetContextOk() (*map[string]interface{}, bool)`
+`func (o *AcceptLoginRequest) GetContextOk() (*interface{}, bool)`
 
 GetContextOk returns a tuple with the Context field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetContext
 
-`func (o *AcceptLoginRequest) SetContext(v map[string]interface{})`
+`func (o *AcceptLoginRequest) SetContext(v interface{})`
 
 SetContext sets Context field to given value.
 
@@ -106,6 +106,16 @@ SetContext sets Context field to given value.
 
 HasContext returns a boolean if a field has been set.
 
+### SetContextNil
+
+`func (o *AcceptLoginRequest) SetContextNil(b bool)`
+
+ SetContextNil sets the value for Context to be an explicit nil
+
+### UnsetContext
+`func (o *AcceptLoginRequest) UnsetContext()`
+
+UnsetContext ensures that no value is present for Context, not even an explicit nil
 ### GetForceSubjectIdentifier
 
 `func (o *AcceptLoginRequest) GetForceSubjectIdentifier() string`

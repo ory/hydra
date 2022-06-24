@@ -43,7 +43,7 @@ func newIntrospectionHandler() *IntrospectionHandler {
 
 func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	c := configureClient(cmd)
+	c := ConfigureClient(cmd)
 
 	if clientID, clientSecret := flagx.MustGetString(cmd, "client-id"), flagx.MustGetString(cmd, "client-secret"); clientID != "" || clientSecret != "" {
 		_, _ = fmt.Fprintf(os.Stderr, "Flags --client-id and --client-secret and environment variables OAUTH2_CLIENT_SECRET and OAUTH2_ACCESS_TOKEN are deprecated and have no longer any effect.")
@@ -53,6 +53,6 @@ func (h *IntrospectionHandler) Introspect(cmd *cobra.Command, args []string) {
 		WithToken(args[0]).
 		WithScope(pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "))),
 	)
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	fmt.Println(formatResponse(result.Payload))
 }

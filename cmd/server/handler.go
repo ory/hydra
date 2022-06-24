@@ -252,7 +252,6 @@ func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x
 				oauth2.JWKPath,
 				oauth2.IntrospectPath,
 				oauth2.RevocationPath,
-				oauth2.FlushPath,
 
 				consent.ConsentPath,
 				consent.ConsentPath + "/accept",

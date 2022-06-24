@@ -126,7 +126,6 @@ func TestExecute(t *testing.T) {
 		{args: []string{"keys", "import", "--skip-tls-verify", "--endpoint", backend, "import-2", "../test/stub/rsa.key", "../test/stub/rsa.pub"}, skipTest: conf.HSMEnabled()},
 		{args: []string{"help", "migrate", "sql"}},
 		{args: []string{"version"}},
-		{args: []string{"token", "flush", "--skip-tls-verify", "--endpoint", backend}},
 	} {
 		rootCmd.SetArgs(c.args)
 

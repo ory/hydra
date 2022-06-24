@@ -1,42 +1,42 @@
 # \AdminApi
 
-All URIs are relative to _http://localhost_
+All URIs are relative to *http://localhost*
 
-| Method                                                                     | HTTP request                                     | Description                                                                                         |
-| -------------------------------------------------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| [**AcceptConsentRequest**](AdminApi.md#AcceptConsentRequest)               | **Put** /oauth2/auth/requests/consent/accept     | Accept a Consent Request                                                                            |
-| [**AcceptLoginRequest**](AdminApi.md#AcceptLoginRequest)                   | **Put** /oauth2/auth/requests/login/accept       | Accept a Login Request                                                                              |
-| [**AcceptLogoutRequest**](AdminApi.md#AcceptLogoutRequest)                 | **Put** /oauth2/auth/requests/logout/accept      | Accept a Logout Request                                                                             |
-| [**CreateJsonWebKeySet**](AdminApi.md#CreateJsonWebKeySet)                 | **Post** /keys/{set}                             | Generate a New JSON Web Key                                                                         |
-| [**CreateOAuth2Client**](AdminApi.md#CreateOAuth2Client)                   | **Post** /clients                                | Create an OAuth 2.0 Client                                                                          |
-| [**DeleteJsonWebKey**](AdminApi.md#DeleteJsonWebKey)                       | **Delete** /keys/{set}/{kid}                     | Delete a JSON Web Key                                                                               |
-| [**DeleteJsonWebKeySet**](AdminApi.md#DeleteJsonWebKeySet)                 | **Delete** /keys/{set}                           | Delete a JSON Web Key Set                                                                           |
-| [**DeleteOAuth2Client**](AdminApi.md#DeleteOAuth2Client)                   | **Delete** /clients/{id}                         | Deletes an OAuth 2.0 Client                                                                         |
-| [**DeleteOAuth2Token**](AdminApi.md#DeleteOAuth2Token)                     | **Delete** /oauth2/tokens                        | Delete OAuth2 Access Tokens from a Client                                                           |
-| [**DeleteTrustedJwtGrantIssuer**](AdminApi.md#DeleteTrustedJwtGrantIssuer) | **Delete** /trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                |
-| [**FlushInactiveOAuth2Tokens**](AdminApi.md#FlushInactiveOAuth2Tokens)     | **Post** /oauth2/flush                           | Flush Expired OAuth2 Access Tokens                                                                  |
-| [**GetConsentRequest**](AdminApi.md#GetConsentRequest)                     | **Get** /oauth2/auth/requests/consent            | Get Consent Request Information                                                                     |
-| [**GetJsonWebKey**](AdminApi.md#GetJsonWebKey)                             | **Get** /keys/{set}/{kid}                        | Fetch a JSON Web Key                                                                                |
-| [**GetJsonWebKeySet**](AdminApi.md#GetJsonWebKeySet)                       | **Get** /keys/{set}                              | Retrieve a JSON Web Key Set                                                                         |
-| [**GetLoginRequest**](AdminApi.md#GetLoginRequest)                         | **Get** /oauth2/auth/requests/login              | Get a Login Request                                                                                 |
-| [**GetLogoutRequest**](AdminApi.md#GetLogoutRequest)                       | **Get** /oauth2/auth/requests/logout             | Get a Logout Request                                                                                |
-| [**GetOAuth2Client**](AdminApi.md#GetOAuth2Client)                         | **Get** /clients/{id}                            | Get an OAuth 2.0 Client                                                                             |
-| [**GetTrustedJwtGrantIssuer**](AdminApi.md#GetTrustedJwtGrantIssuer)       | **Get** /trust/grants/jwt-bearer/issuers/{id}    | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer                                                   |
-| [**IntrospectOAuth2Token**](AdminApi.md#IntrospectOAuth2Token)             | **Post** /oauth2/introspect                      | Introspect OAuth2 Tokens                                                                            |
-| [**ListOAuth2Clients**](AdminApi.md#ListOAuth2Clients)                     | **Get** /clients                                 | List OAuth 2.0 Clients                                                                              |
-| [**ListSubjectConsentSessions**](AdminApi.md#ListSubjectConsentSessions)   | **Get** /oauth2/auth/sessions/consent            | Lists All Consent Sessions of a Subject                                                             |
-| [**ListTrustedJwtGrantIssuers**](AdminApi.md#ListTrustedJwtGrantIssuers)   | **Get** /trust/grants/jwt-bearer/issuers         | List Trusted OAuth2 JWT Bearer Grant Type Issuers                                                   |
-| [**PatchOAuth2Client**](AdminApi.md#PatchOAuth2Client)                     | **Patch** /clients/{id}                          | Patch an OAuth 2.0 Client                                                                           |
-| [**RejectConsentRequest**](AdminApi.md#RejectConsentRequest)               | **Put** /oauth2/auth/requests/consent/reject     | Reject a Consent Request                                                                            |
-| [**RejectLoginRequest**](AdminApi.md#RejectLoginRequest)                   | **Put** /oauth2/auth/requests/login/reject       | Reject a Login Request                                                                              |
-| [**RejectLogoutRequest**](AdminApi.md#RejectLogoutRequest)                 | **Put** /oauth2/auth/requests/logout/reject      | Reject a Logout Request                                                                             |
-| [**RevokeAuthenticationSession**](AdminApi.md#RevokeAuthenticationSession) | **Delete** /oauth2/auth/sessions/login           | Invalidates All Login Sessions of a Certain User Invalidates a Subject&#39;s Authentication Session |
-| [**RevokeConsentSessions**](AdminApi.md#RevokeConsentSessions)             | **Delete** /oauth2/auth/sessions/consent         | Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client                               |
-| [**TrustJwtGrantIssuer**](AdminApi.md#TrustJwtGrantIssuer)                 | **Post** /trust/grants/jwt-bearer/issuers        | Trust an OAuth2 JWT Bearer Grant Type Issuer                                                        |
-| [**UpdateJsonWebKey**](AdminApi.md#UpdateJsonWebKey)                       | **Put** /keys/{set}/{kid}                        | Update a JSON Web Key                                                                               |
-| [**UpdateJsonWebKeySet**](AdminApi.md#UpdateJsonWebKeySet)                 | **Put** /keys/{set}                              | Update a JSON Web Key Set                                                                           |
-| [**UpdateOAuth2Client**](AdminApi.md#UpdateOAuth2Client)                   | **Put** /clients/{id}                            | Update an OAuth 2.0 Client                                                                          |
-| [**UpdateOAuth2ClientLifespans**](AdminApi.md#UpdateOAuth2ClientLifespans) | **Put** /clients/{id}/lifespans                  |
+Method | HTTP request | Description
+------------- | ------------- | -------------
+[**AcceptConsentRequest**](AdminApi.md#AcceptConsentRequest) | **Put** /oauth2/auth/requests/consent/accept | Accept a Consent Request
+[**AcceptLoginRequest**](AdminApi.md#AcceptLoginRequest) | **Put** /oauth2/auth/requests/login/accept | Accept a Login Request
+[**AcceptLogoutRequest**](AdminApi.md#AcceptLogoutRequest) | **Put** /oauth2/auth/requests/logout/accept | Accept a Logout Request
+[**CreateJsonWebKeySet**](AdminApi.md#CreateJsonWebKeySet) | **Post** /keys/{set} | Generate a New JSON Web Key
+[**CreateOAuth2Client**](AdminApi.md#CreateOAuth2Client) | **Post** /clients | Create an OAuth 2.0 Client
+[**DeleteJsonWebKey**](AdminApi.md#DeleteJsonWebKey) | **Delete** /keys/{set}/{kid} | Delete a JSON Web Key
+[**DeleteJsonWebKeySet**](AdminApi.md#DeleteJsonWebKeySet) | **Delete** /keys/{set} | Delete a JSON Web Key Set
+[**DeleteOAuth2Client**](AdminApi.md#DeleteOAuth2Client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
+[**DeleteOAuth2Token**](AdminApi.md#DeleteOAuth2Token) | **Delete** /oauth2/tokens | Delete OAuth2 Access Tokens from a Client
+[**DeleteTrustedJwtGrantIssuer**](AdminApi.md#DeleteTrustedJwtGrantIssuer) | **Delete** /trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
+[**GetConsentRequest**](AdminApi.md#GetConsentRequest) | **Get** /oauth2/auth/requests/consent | Get Consent Request Information
+[**GetJsonWebKey**](AdminApi.md#GetJsonWebKey) | **Get** /keys/{set}/{kid} | Fetch a JSON Web Key
+[**GetJsonWebKeySet**](AdminApi.md#GetJsonWebKeySet) | **Get** /keys/{set} | Retrieve a JSON Web Key Set
+[**GetLoginRequest**](AdminApi.md#GetLoginRequest) | **Get** /oauth2/auth/requests/login | Get a Login Request
+[**GetLogoutRequest**](AdminApi.md#GetLogoutRequest) | **Get** /oauth2/auth/requests/logout | Get a Logout Request
+[**GetOAuth2Client**](AdminApi.md#GetOAuth2Client) | **Get** /clients/{id} | Get an OAuth 2.0 Client
+[**GetTrustedJwtGrantIssuer**](AdminApi.md#GetTrustedJwtGrantIssuer) | **Get** /trust/grants/jwt-bearer/issuers/{id} | Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
+[**IntrospectOAuth2Token**](AdminApi.md#IntrospectOAuth2Token) | **Post** /oauth2/introspect | Introspect OAuth2 Tokens
+[**ListOAuth2Clients**](AdminApi.md#ListOAuth2Clients) | **Get** /clients | List OAuth 2.0 Clients
+[**ListSubjectConsentSessions**](AdminApi.md#ListSubjectConsentSessions) | **Get** /oauth2/auth/sessions/consent | Lists All Consent Sessions of a Subject
+[**ListTrustedJwtGrantIssuers**](AdminApi.md#ListTrustedJwtGrantIssuers) | **Get** /trust/grants/jwt-bearer/issuers | List Trusted OAuth2 JWT Bearer Grant Type Issuers
+[**PatchOAuth2Client**](AdminApi.md#PatchOAuth2Client) | **Patch** /clients/{id} | Patch an OAuth 2.0 Client
+[**RejectConsentRequest**](AdminApi.md#RejectConsentRequest) | **Put** /oauth2/auth/requests/consent/reject | Reject a Consent Request
+[**RejectLoginRequest**](AdminApi.md#RejectLoginRequest) | **Put** /oauth2/auth/requests/login/reject | Reject a Login Request
+[**RejectLogoutRequest**](AdminApi.md#RejectLogoutRequest) | **Put** /oauth2/auth/requests/logout/reject | Reject a Logout Request
+[**RevokeAuthenticationSession**](AdminApi.md#RevokeAuthenticationSession) | **Delete** /oauth2/auth/sessions/login | Invalidates All Login Sessions of a Certain User Invalidates a Subject&#39;s Authentication Session
+[**RevokeConsentSessions**](AdminApi.md#RevokeConsentSessions) | **Delete** /oauth2/auth/sessions/consent | Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
+[**TrustJwtGrantIssuer**](AdminApi.md#TrustJwtGrantIssuer) | **Post** /trust/grants/jwt-bearer/issuers | Trust an OAuth2 JWT Bearer Grant Type Issuer
+[**UpdateJsonWebKey**](AdminApi.md#UpdateJsonWebKey) | **Put** /keys/{set}/{kid} | Update a JSON Web Key
+[**UpdateJsonWebKeySet**](AdminApi.md#UpdateJsonWebKeySet) | **Put** /keys/{set} | Update a JSON Web Key Set
+[**UpdateOAuth2Client**](AdminApi.md#UpdateOAuth2Client) | **Put** /clients/{id} | Update an OAuth 2.0 Client
+
+
 
 ## AcceptConsentRequest
 
@@ -682,65 +682,6 @@ No authorization required
 [[Back to Model list]](../README.md#documentation-for-models)
 [[Back to README]](../README.md)
 
-## FlushInactiveOAuth2Tokens
-
-> FlushInactiveOAuth2Tokens(ctx).FlushInactiveOAuth2TokensRequest(flushInactiveOAuth2TokensRequest).Execute()
-
-Flush Expired OAuth2 Access Tokens
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    flushInactiveOAuth2TokensRequest := *openapiclient.NewFlushInactiveOAuth2TokensRequest() // FlushInactiveOAuth2TokensRequest |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.FlushInactiveOAuth2Tokens(context.Background()).FlushInactiveOAuth2TokensRequest(flushInactiveOAuth2TokensRequest).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.FlushInactiveOAuth2Tokens``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a
-apiFlushInactiveOAuth2TokensRequest struct via the builder pattern
-
-| Name                                 | Type                                                                        | Description | Notes |
-| ------------------------------------ | --------------------------------------------------------------------------- | ----------- | ----- |
-| **flushInactiveOAuth2TokensRequest** | [**FlushInactiveOAuth2TokensRequest**](FlushInactiveOAuth2TokensRequest.md) |             |
-
-### Return type
-
-(empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#)
-[[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
 
 ## GetConsentRequest
 

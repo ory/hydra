@@ -22,14 +22,8 @@ package cli
 
 import (
 	"fmt"
-	"time"
-
-	"github.com/go-openapi/strfmt"
-
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/client/public"
-	"github.com/ory/hydra/internal/httpclient/models"
-
 	"github.com/spf13/cobra"
 
 	httptransport "github.com/go-openapi/runtime/client"
@@ -62,15 +56,6 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 
 	fmt.Printf("Revoked OAuth 2.0 Access Token: %s\n", token)
-}
-
-func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
-	handler := ConfigureClient(cmd)
-	_, err := handler.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{
-		NotAfter: strfmt.DateTime(time.Now().Add(-flagx.MustGetDuration(cmd, "min-age"))),
-	}))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
-	fmt.Println("Successfully flushed inactive access tokens")
 }
 
 func (h *TokenHandler) DeleteToken(cmd *cobra.Command, args []string) {

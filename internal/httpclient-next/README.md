@@ -89,7 +89,6 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**DeleteOAuth2Client**](docs/AdminApi.md#deleteoauth2client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 *AdminApi* | [**DeleteOAuth2Token**](docs/AdminApi.md#deleteoauth2token) | **Delete** /oauth2/tokens | Delete OAuth2 Access Tokens from a Client
 *AdminApi* | [**DeleteTrustedJwtGrantIssuer**](docs/AdminApi.md#deletetrustedjwtgrantissuer) | **Delete** /trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
-*AdminApi* | [**FlushInactiveOAuth2Tokens**](docs/AdminApi.md#flushinactiveoauth2tokens) | **Post** /oauth2/flush | Flush Expired OAuth2 Access Tokens
 *AdminApi* | [**GetConsentRequest**](docs/AdminApi.md#getconsentrequest) | **Get** /oauth2/auth/requests/consent | Get Consent Request Information
 *AdminApi* | [**GetJsonWebKey**](docs/AdminApi.md#getjsonwebkey) | **Get** /keys/{set}/{kid} | Fetch a JSON Web Key
 *AdminApi* | [**GetJsonWebKeySet**](docs/AdminApi.md#getjsonwebkeyset) | **Get** /keys/{set} | Retrieve a JSON Web Key Set

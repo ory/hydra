@@ -1366,38 +1366,6 @@ paths:
         Invalidates a Subject's Authentication Session
       tags:
       - admin
-  /oauth2/flush:
-    post:
-      description: "This endpoint flushes expired OAuth2 access tokens from the database.\
-        \ You can set a time after which no tokens will be\nnot be touched, in case\
-        \ you want to keep recent tokens for auditing. Refresh tokens can not be flushed\
-        \ as they are deleted\nautomatically when performing the refresh flow."
-      operationId: flushInactiveOAuth2Tokens
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/flushInactiveOAuth2TokensRequest'
-        x-originalParamName: Body
-      responses:
-        "204":
-          description: "Empty responses are sent when, for example, resources are\
-            \ deleted. The HTTP status code for empty responses is\ntypically 201."
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jsonError'
-          description: jsonError
-        default:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/jsonError'
-          description: jsonError
-      summary: Flush Expired OAuth2 Access Tokens
-      tags:
-      - admin
   /oauth2/introspect:
     post:
       description: "The introspection endpoint allows to check if a token (both refresh\

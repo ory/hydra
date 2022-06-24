@@ -1529,49 +1529,6 @@
         }
       }
     },
-    "/oauth2/flush": {
-      "post": {
-        "description": "This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be\nnot be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted\nautomatically when performing the refresh flow.",
-        "consumes": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Flush Expired OAuth2 Access Tokens",
-        "operationId": "flushInactiveOAuth2Tokens",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/flushInactiveOAuth2TokensRequest"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          },
-          "default": {
-            "description": "jsonError",
-            "schema": {
-              "$ref": "#/definitions/jsonError"
-            }
-          }
-        }
-      }
-    },
     "/oauth2/introspect": {
       "post": {
         "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\nFor more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).",

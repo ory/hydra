@@ -14,6 +14,7 @@ replace (
 replace github.com/ory/fosite => github.com/ory/fosite v0.42.3-0.20220623093045-89faad818c4c
 
 replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.20220524160009-195240e4a669
+replace github.com/ory/hydra-client-go  => ./internal/httpclient-next
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -62,6 +63,7 @@ require (
 	github.com/ory/go-acc v0.2.8
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
+	github.com/ory/hydra-client-go v1.11.8
 	github.com/ory/x v0.0.423
 	github.com/pborman/uuid v1.2.1
 	github.com/pelletier/go-toml v1.9.5 // indirect
@@ -74,6 +76,7 @@ require (
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/cobra v1.4.0
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.1
 	github.com/subosito/gotenv v1.3.0 // indirect
 	github.com/tidwall/gjson v1.14.0

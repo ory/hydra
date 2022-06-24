@@ -23,7 +23,6 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-openapi/strfmt"
 	"os"
 	"strings"
 
@@ -31,7 +30,6 @@ import (
 
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/hydra/x"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"
@@ -45,9 +43,9 @@ func newClientHandler() *ClientHandler {
 
 func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
-	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
+	ek, encryptSecret, err := NewEncryptionKey(cmd, nil)
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	for _, path := range args {
@@ -59,7 +57,7 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 		cmdx.Must(err, "Could not parse JSON from file %s: %s", path, err)
 
 		response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&c))
-		cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+		cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 		result := response.Payload
 
 		if c.ClientSecret == "" {
@@ -82,85 +80,9 @@ func (h *ClientHandler) ImportClients(cmd *cobra.Command, args []string) {
 	}
 }
 
-func (h *ClientHandler) CreateClient(cmd *cobra.Command, args []string) {
-	var err error
-	m := configureClient(cmd)
-	secret := flagx.MustGetString(cmd, "secret")
-
-	var echoSecret bool
-	if secret == "" {
-		var secretb []byte
-		secretb, err = x.GenerateSecret(26)
-		cmdx.Must(err, "Could not generate OAuth 2.0 Client Secret: %s", err)
-		secret = string(secretb)
-
-		echoSecret = true
-	} else {
-		fmt.Println("You should not provide secrets using command line flags, the secret might leak to bash history and similar systems")
-	}
-
-	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
-	cmdx.Must(err, "Failed to load encryption key: %s", err)
-
-	cc := models.OAuth2Client{
-		AllowedCorsOrigins:                flagx.MustGetStringSlice(cmd, "allowed-cors-origin"),
-		Audience:                          flagx.MustGetStringSlice(cmd, "audience"),
-		BackchannelLogoutSessionRequired:  flagx.MustGetBool(cmd, "backchannel-logout-session-required"),
-		BackchannelLogoutURI:              flagx.MustGetString(cmd, "backchannel-logout-callback"),
-		ClientName:                        flagx.MustGetString(cmd, "name"),
-		ClientSecret:                      secret,
-		ClientURI:                         flagx.MustGetString(cmd, "client-uri"),
-		Contacts:                          flagx.MustGetStringSlice(cmd, "contact"),
-		FrontchannelLogoutSessionRequired: flagx.MustGetBool(cmd, "frontchannel-logout-session-required"),
-		FrontchannelLogoutURI:             flagx.MustGetString(cmd, "frontchannel-logout-callback"),
-		GrantTypes:                        flagx.MustGetStringSlice(cmd, "grant-type"),
-		JwksURI:                           flagx.MustGetString(cmd, "jwks-uri"),
-		LogoURI:                           flagx.MustGetString(cmd, "logo-uri"),
-		Metadata:                          flagx.MustGetString(cmd, "metadata"),
-		Owner:                             flagx.MustGetString(cmd, "owner"),
-		PolicyURI:                         flagx.MustGetString(cmd, "policy-uri"),
-		PostLogoutRedirectUris:            flagx.MustGetStringSlice(cmd, "post-logout-callback"),
-		RedirectUris:                      flagx.MustGetStringSlice(cmd, "redirect-uri"),
-		RequestObjectSigningAlg:           flagx.MustGetString(cmd, "request-object-signing-alg"),
-		RequestUris:                       flagx.MustGetStringSlice(cmd, "request-uri"),
-		ResponseTypes:                     flagx.MustGetStringSlice(cmd, "response-type"),
-		Scope:                             strings.Join(flagx.MustGetStringSlice(cmd, "scope"), " "),
-		SectorIdentifierURI:               "",
-		SubjectType:                       flagx.MustGetString(cmd, "subject-type"),
-		TokenEndpointAuthMethod:           flagx.MustGetString(cmd, "token-endpoint-auth-method"),
-		TosURI:                            flagx.MustGetString(cmd, "tos-uri"),
-		UpdatedAt:                         strfmt.DateTime{},
-	}
-
-	response, err := m.Admin.CreateOAuth2Client(admin.NewCreateOAuth2ClientParams().WithBody(&cc))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
-	result := response.Payload
-
-	fmt.Printf("OAuth 2.0 Client ID: %s\n", result.ClientID)
-	if result.ClientSecret == "" {
-		fmt.Println("This OAuth 2.0 Client has no secret")
-	} else {
-		if echoSecret {
-			if encryptSecret {
-				enc, err := ek.Encrypt([]byte(result.ClientSecret))
-				if err == nil {
-					fmt.Printf("OAuth 2.0 Encrypted Client Secret: %s\n", enc.Base64Encode())
-					return
-				}
-
-				// executes this at last to print raw client secret
-				// because if executes immediately, nobody knows client secret
-				defer cmdx.Must(err, "Failed to encrypt client secret: %s", err)
-			}
-
-			fmt.Printf("OAuth 2.0 Client Secret: %s\n", result.ClientSecret)
-		}
-	}
-}
-
 func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 	newSecret := flagx.MustGetString(cmd, "secret")
 
 	var echoSecret bool
@@ -169,7 +91,7 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 		fmt.Println("You should not provide secrets using command line flags, the secret might leak to bash history and similar systems")
 	}
 
-	ek, encryptSecret, err := newEncryptionKey(cmd, nil)
+	ek, encryptSecret, err := NewEncryptionKey(cmd, nil)
 	cmdx.Must(err, "Failed to load encryption key: %s", err)
 
 	id := args[0]
@@ -198,7 +120,7 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 	}
 
 	response, err := m.Admin.UpdateOAuth2Client(admin.NewUpdateOAuth2ClientParams().WithID(id).WithBody(&cc))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	result := response.Payload
 	fmt.Printf("%s OAuth 2.0 Client updated\n", result.ClientID)
 
@@ -220,11 +142,11 @@ func (h *ClientHandler) UpdateClient(cmd *cobra.Command, args []string) {
 
 func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	for _, c := range args {
 		_, err := m.Admin.DeleteOAuth2Client(admin.NewDeleteOAuth2ClientParams().WithID(c))
-		cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+		cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	}
 
 	fmt.Println("OAuth 2.0 Client(s) deleted")
@@ -232,27 +154,27 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 
 func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
 
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 	if len(args) == 0 {
 		fmt.Print(cmd.UsageString())
 		return
 	}
 
 	response, err := m.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(args[0]))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	cl := response.Payload
 	fmt.Println(cmdx.FormatResponse(cl))
 }
 
 func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	limit := flagx.MustGetInt(cmd, "limit")
 	page := flagx.MustGetInt(cmd, "page")
 	offset := (limit * page) - limit
 
 	response, err := m.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(int64(limit))).WithOffset(pointerx.Int64(int64(offset))))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	cls := response.Payload
 
 	table := newTable()

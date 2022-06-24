@@ -34,14 +34,9 @@ import (
 
 	"github.com/ory/x/snapshotx"
 
-	"github.com/ory/hydra/internal/testhelpers"
 	"github.com/ory/x/contextx"
 
-	"github.com/go-openapi/strfmt"
-
 	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
-
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/hydra/x"
 
@@ -103,54 +98,6 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	ds := new(oauth2.Session)
 	_, err = store.GetAccessTokenSession(ctx, "del-1", ds)
 	require.Error(t, err, "not_found")
-}
-
-func TestHandlerFlushHandler(t *testing.T) {
-
-	t.Run("case=not-after", func(t *testing.T) {
-		ctx := context.Background()
-
-		// Setup database and tests
-		jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-		reg, err := jt.GetRegistry(ctx, t.Name())
-		require.NoError(t, err)
-
-		// Setup rest server
-		h := oauth2.NewHandler(reg, jt.GetConfig())
-
-		r := x.NewRouterAdmin()
-		h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
-			return h
-		})
-
-		ts := httptest.NewServer(r)
-		defer ts.Close()
-		c := hydra.NewHTTPClientWithConfig(nil, &hydra.TransportConfig{Schemes: []string{"http"}, Host: urlx.ParseOrPanic(ts.URL).Host})
-
-		// Get the notAfter test cycles
-		notAfterTests := testhelpers.NewConsentJanitorTestHelper(t.Name()).GetNotAfterTestCycles()
-
-		for k, v := range notAfterTests {
-			t.Run(fmt.Sprintf("case=%s", k), func(t *testing.T) {
-				ctx := context.Background()
-				jt := testhelpers.NewConsentJanitorTestHelper(t.Name())
-
-				notAfter := time.Now().Round(time.Second).Add(-v)
-
-				t.Run("step=setup-access-token", jt.AccessTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
-				t.Run("step=setup-refresh-token", jt.RefreshTokenNotAfterSetup(ctx, reg.ClientManager(), reg.OAuth2Storage()))
-
-				t.Run("step=cleanup", func(t *testing.T) {
-					_, err := c.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{NotAfter: strfmt.DateTime(notAfter)}))
-					require.NoError(t, err)
-				})
-
-				t.Run("step=validate-access-token", jt.AccessTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
-				t.Run("step=validate-refresh-token", jt.RefreshTokenNotAfterValidate(ctx, notAfter, reg.OAuth2Storage()))
-			})
-		}
-
-	})
 }
 
 func TestUserinfo(t *testing.T) {

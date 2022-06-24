@@ -14,7 +14,6 @@ Method | HTTP request | Description
 [**DeleteOAuth2Client**](AdminApi.md#DeleteOAuth2Client) | **Delete** /clients/{id} | Deletes an OAuth 2.0 Client
 [**DeleteOAuth2Token**](AdminApi.md#DeleteOAuth2Token) | **Delete** /oauth2/tokens | Delete OAuth2 Access Tokens from a Client
 [**DeleteTrustedJwtGrantIssuer**](AdminApi.md#DeleteTrustedJwtGrantIssuer) | **Delete** /trust/grants/jwt-bearer/issuers/{id} | Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
-[**FlushInactiveOAuth2Tokens**](AdminApi.md#FlushInactiveOAuth2Tokens) | **Post** /oauth2/flush | Flush Expired OAuth2 Access Tokens
 [**GetConsentRequest**](AdminApi.md#GetConsentRequest) | **Get** /oauth2/auth/requests/consent | Get Consent Request Information
 [**GetJsonWebKey**](AdminApi.md#GetJsonWebKey) | **Get** /keys/{set}/{kid} | Fetch a JSON Web Key
 [**GetJsonWebKeySet**](AdminApi.md#GetJsonWebKeySet) | **Get** /keys/{set} | Retrieve a JSON Web Key Set
@@ -711,70 +710,6 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## FlushInactiveOAuth2Tokens
-
-> FlushInactiveOAuth2Tokens(ctx).FlushInactiveOAuth2TokensRequest(flushInactiveOAuth2TokensRequest).Execute()
-
-Flush Expired OAuth2 Access Tokens
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    flushInactiveOAuth2TokensRequest := *openapiclient.NewFlushInactiveOAuth2TokensRequest() // FlushInactiveOAuth2TokensRequest |  (optional)
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.FlushInactiveOAuth2Tokens(context.Background()).FlushInactiveOAuth2TokensRequest(flushInactiveOAuth2TokensRequest).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.FlushInactiveOAuth2Tokens``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiFlushInactiveOAuth2TokensRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **flushInactiveOAuth2TokensRequest** | [**FlushInactiveOAuth2TokensRequest**](FlushInactiveOAuth2TokensRequest.md) |  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

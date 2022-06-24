@@ -35,6 +35,7 @@ docs/OAuth2TokenIntrospection.md
 docs/Oauth2TokenResponse.md
 docs/OauthTokenResponse.md
 docs/OpenIDConnectContext.md
+docs/Pagination.md
 docs/PreviousConsentSession.md
 docs/PublicApi.md
 docs/RefreshTokenHookRequest.md
@@ -75,6 +76,7 @@ model_o_auth2_token_introspection.go
 model_oauth2_token_response.go
 model_oauth_token_response.go
 model_open_id_connect_context.go
+model_pagination.go
 model_previous_consent_session.go
 model_refresh_token_hook_request.go
 model_refresh_token_hook_response.go

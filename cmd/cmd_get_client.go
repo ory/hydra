@@ -22,10 +22,12 @@ package cmd
 
 import (
 	"fmt"
+
+	"github.com/spf13/cobra"
+
 	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
-	"github.com/spf13/cobra"
 )
 
 func NewGetClientsCmd(root *cobra.Command) *cobra.Command {

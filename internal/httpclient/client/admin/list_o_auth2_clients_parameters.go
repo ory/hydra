@@ -66,27 +66,32 @@ type ListOAuth2ClientsParams struct {
 	*/
 	ClientName *string
 
-	/* Limit.
-
-	   The maximum amount of clients to returned, upper bound is 500 clients.
-
-	   Format: int64
-	*/
-	Limit *int64
-
-	/* Offset.
-
-	   The offset from where to start looking.
-
-	   Format: int64
-	*/
-	Offset *int64
-
 	/* Owner.
 
 	   The owner of the clients to filter by.
 	*/
 	Owner *string
+
+	/* PageSize.
+
+	     Items per PageToken
+
+	This is the number of items per page.
+
+	     Format: int64
+	     Default: 250
+	*/
+	PageSize *int64
+
+	/* PageToken.
+
+	     Pagination PageToken Token
+
+	The page token.
+
+	     Default: "1"
+	*/
+	PageToken *string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -105,7 +110,21 @@ func (o *ListOAuth2ClientsParams) WithDefaults() *ListOAuth2ClientsParams {
 //
 // All values with no default are reset to their zero value.
 func (o *ListOAuth2ClientsParams) SetDefaults() {
-	// no default values defined for this parameter
+	var (
+		pageSizeDefault = int64(250)
+
+		pageTokenDefault = string("1")
+	)
+
+	val := ListOAuth2ClientsParams{
+		PageSize:  &pageSizeDefault,
+		PageToken: &pageTokenDefault,
+	}
+
+	val.timeout = o.timeout
+	val.Context = o.Context
+	val.HTTPClient = o.HTTPClient
+	*o = val
 }
 
 // WithTimeout adds the timeout to the list o auth2 clients params
@@ -152,28 +171,6 @@ func (o *ListOAuth2ClientsParams) SetClientName(clientName *string) {
 	o.ClientName = clientName
 }
 
-// WithLimit adds the limit to the list o auth2 clients params
-func (o *ListOAuth2ClientsParams) WithLimit(limit *int64) *ListOAuth2ClientsParams {
-	o.SetLimit(limit)
-	return o
-}
-
-// SetLimit adds the limit to the list o auth2 clients params
-func (o *ListOAuth2ClientsParams) SetLimit(limit *int64) {
-	o.Limit = limit
-}
-
-// WithOffset adds the offset to the list o auth2 clients params
-func (o *ListOAuth2ClientsParams) WithOffset(offset *int64) *ListOAuth2ClientsParams {
-	o.SetOffset(offset)
-	return o
-}
-
-// SetOffset adds the offset to the list o auth2 clients params
-func (o *ListOAuth2ClientsParams) SetOffset(offset *int64) {
-	o.Offset = offset
-}
-
 // WithOwner adds the owner to the list o auth2 clients params
 func (o *ListOAuth2ClientsParams) WithOwner(owner *string) *ListOAuth2ClientsParams {
 	o.SetOwner(owner)
@@ -183,6 +180,28 @@ func (o *ListOAuth2ClientsParams) WithOwner(owner *string) *ListOAuth2ClientsPar
 // SetOwner adds the owner to the list o auth2 clients params
 func (o *ListOAuth2ClientsParams) SetOwner(owner *string) {
 	o.Owner = owner
+}
+
+// WithPageSize adds the pageSize to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) WithPageSize(pageSize *int64) *ListOAuth2ClientsParams {
+	o.SetPageSize(pageSize)
+	return o
+}
+
+// SetPageSize adds the pageSize to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) SetPageSize(pageSize *int64) {
+	o.PageSize = pageSize
+}
+
+// WithPageToken adds the pageToken to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) WithPageToken(pageToken *string) *ListOAuth2ClientsParams {
+	o.SetPageToken(pageToken)
+	return o
+}
+
+// SetPageToken adds the pageToken to the list o auth2 clients params
+func (o *ListOAuth2ClientsParams) SetPageToken(pageToken *string) {
+	o.PageToken = pageToken
 }
 
 // WriteToRequest writes these params to a swagger request
@@ -210,40 +229,6 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		}
 	}
 
-	if o.Limit != nil {
-
-		// query param limit
-		var qrLimit int64
-
-		if o.Limit != nil {
-			qrLimit = *o.Limit
-		}
-		qLimit := swag.FormatInt64(qrLimit)
-		if qLimit != "" {
-
-			if err := r.SetQueryParam("limit", qLimit); err != nil {
-				return err
-			}
-		}
-	}
-
-	if o.Offset != nil {
-
-		// query param offset
-		var qrOffset int64
-
-		if o.Offset != nil {
-			qrOffset = *o.Offset
-		}
-		qOffset := swag.FormatInt64(qrOffset)
-		if qOffset != "" {
-
-			if err := r.SetQueryParam("offset", qOffset); err != nil {
-				return err
-			}
-		}
-	}
-
 	if o.Owner != nil {
 
 		// query param owner
@@ -256,6 +241,40 @@ func (o *ListOAuth2ClientsParams) WriteToRequest(r runtime.ClientRequest, reg st
 		if qOwner != "" {
 
 			if err := r.SetQueryParam("owner", qOwner); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.PageSize != nil {
+
+		// query param page_size
+		var qrPageSize int64
+
+		if o.PageSize != nil {
+			qrPageSize = *o.PageSize
+		}
+		qPageSize := swag.FormatInt64(qrPageSize)
+		if qPageSize != "" {
+
+			if err := r.SetQueryParam("page_size", qPageSize); err != nil {
+				return err
+			}
+		}
+	}
+
+	if o.PageToken != nil {
+
+		// query param page_token
+		var qrPageToken string
+
+		if o.PageToken != nil {
+			qrPageToken = *o.PageToken
+		}
+		qPageToken := qrPageToken
+		if qPageToken != "" {
+
+			if err := r.SetQueryParam("page_token", qPageToken); err != nil {
 				return err
 			}
 		}

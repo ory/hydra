@@ -54,3 +54,11 @@ func (c outputOAuth2ClientCollection) Interface() interface{} {
 func (c outputOAuth2ClientCollection) Len() int {
 	return len(c.clients)
 }
+
+func (c outputOAuth2ClientCollection) IDs() []string {
+	ids := make([]string, len(c.clients))
+	for i, client := range c.clients {
+		ids[i] = fmt.Sprintf("%v", client.ClientId)
+	}
+	return ids
+}

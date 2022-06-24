@@ -882,6 +882,25 @@
         "title": "Contains optional information about the OpenID Connect request.",
         "type": "object"
       },
+      "pagination": {
+        "properties": {
+          "page_size": {
+            "default": 250,
+            "description": "Items per PageToken\n\nThis is the number of items per page.",
+            "format": "int64",
+            "maximum": 1000,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "page_token": {
+            "default": "1",
+            "description": "Pagination PageToken Token\n\nThe page token.",
+            "minimum": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "refreshTokenHookRequest": {
         "properties": {
           "client_id": {
@@ -1460,21 +1479,25 @@
         "operationId": "listOAuth2Clients",
         "parameters": [
           {
-            "description": "The maximum amount of clients to returned, upper bound is 500 clients.",
+            "description": "Items per PageToken\n\nThis is the number of items per page.",
             "in": "query",
-            "name": "limit",
+            "name": "page_size",
             "schema": {
+              "default": 250,
               "format": "int64",
+              "maximum": 1000,
+              "minimum": 1,
               "type": "integer"
             }
           },
           {
-            "description": "The offset from where to start looking.",
+            "description": "Pagination PageToken Token\n\nThe page token.",
             "in": "query",
-            "name": "offset",
+            "name": "page_token",
             "schema": {
-              "format": "int64",
-              "type": "integer"
+              "default": "1",
+              "minimum": 1,
+              "type": "string"
             }
           },
           {

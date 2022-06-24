@@ -3,7 +3,6 @@ package cmd_test
 import (
 	"context"
 	"encoding/json"
-	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/cmd"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/snapshotx"
@@ -19,8 +18,7 @@ func TestGetClient(t *testing.T) {
 	c := cmd.NewGetClientsCmd(new(cobra.Command))
 	reg := setup(t, c)
 
-	expected := &client.Client{}
-	require.NoError(t, reg.ClientManager().CreateClient(ctx, expected))
+	expected := createClient(t, reg, nil)
 
 	t.Run("case=gets client", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, expected.ID.String()))

@@ -27,7 +27,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// clientsCmd represents the clients command
 func NewClientsCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "clients <command>",

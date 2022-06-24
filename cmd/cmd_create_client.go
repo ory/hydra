@@ -69,6 +69,7 @@ func NewCreateClientsCommand(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "client",
 		Short:   "Create an OAuth 2.0 Client",
+		Args:    cobra.NoArgs,
 		Example: fmt.Sprintf(`%[1]s create client -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar`, root.Use),
 		Long: fmt.Sprintf(`This command creates an OAuth 2.0 Client which can be used to perform various OAuth 2.0 Flows like
 the Authorize Code, Implicit, Refresh flow. This command allows settings all fields defined in the OpenID Connect Dynamic Client Registration standard.

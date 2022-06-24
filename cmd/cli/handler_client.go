@@ -152,20 +152,6 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	fmt.Println("OAuth 2.0 Client(s) deleted")
 }
 
-func (h *ClientHandler) GetClient(cmd *cobra.Command, args []string) {
-
-	m := ConfigureClient(cmd)
-	if len(args) == 0 {
-		fmt.Print(cmd.UsageString())
-		return
-	}
-
-	response, err := m.Admin.GetOAuth2Client(admin.NewGetOAuth2ClientParams().WithID(args[0]))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
-	cl := response.Payload
-	fmt.Println(cmdx.FormatResponse(cl))
-}
-
 func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
 	m := ConfigureClient(cmd)
 

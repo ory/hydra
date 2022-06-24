@@ -4,16 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
+	"testing"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/cmd"
 	"github.com/ory/x/assertx"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/snapshotx"
 	"github.com/ory/x/sqlcon"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"strings"
-	"testing"
 )
 
 func TestDeleteClient(t *testing.T) {

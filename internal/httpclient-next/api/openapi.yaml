@@ -82,24 +82,33 @@ paths:
         \ header, and will be separated by a comma."
       operationId: listOAuth2Clients
       parameters:
-      - description: "The maximum amount of clients to returned, upper bound is 500\
-          \ clients."
+      - description: |-
+          Items per PageToken
+
+          This is the number of items per page.
         explode: true
         in: query
-        name: limit
+        name: page_size
         required: false
         schema:
+          default: 250
           format: int64
+          maximum: 1000
+          minimum: 1
           type: integer
         style: form
-      - description: The offset from where to start looking.
+      - description: |-
+          Pagination PageToken Token
+
+          The page token.
         explode: true
         in: query
-        name: offset
+        name: page_token
         required: false
         schema:
-          format: int64
-          type: integer
+          default: "1"
+          minimum: 1
+          type: string
         style: form
       - description: The name of the clients to filter by.
         explode: true
@@ -3412,6 +3421,27 @@ components:
             type: string
           type: array
       title: Contains optional information about the OpenID Connect request.
+      type: object
+    pagination:
+      properties:
+        page_size:
+          default: 250
+          description: |-
+            Items per PageToken
+
+            This is the number of items per page.
+          format: int64
+          maximum: 1000
+          minimum: 1
+          type: integer
+        page_token:
+          default: "1"
+          description: |-
+            Pagination PageToken Token
+
+            The page token.
+          minimum: 1
+          type: string
       type: object
     refreshTokenHookRequest:
       properties:

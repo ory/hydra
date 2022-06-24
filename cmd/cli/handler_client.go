@@ -32,7 +32,6 @@ import (
 	"github.com/ory/hydra/internal/httpclient/models"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
-	"github.com/ory/x/pointerx"
 )
 
 type ClientHandler struct{}
@@ -150,43 +149,4 @@ func (h *ClientHandler) DeleteClient(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println("OAuth 2.0 Client(s) deleted")
-}
-
-func (h *ClientHandler) ListClients(cmd *cobra.Command, args []string) {
-	m := ConfigureClient(cmd)
-
-	limit := flagx.MustGetInt(cmd, "limit")
-	page := flagx.MustGetInt(cmd, "page")
-	offset := (limit * page) - limit
-
-	response, err := m.Admin.ListOAuth2Clients(admin.NewListOAuth2ClientsParams().WithLimit(pointerx.Int64(int64(limit))).WithOffset(pointerx.Int64(int64(offset))))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
-	cls := response.Payload
-
-	table := newTable()
-	table.SetHeader([]string{
-		"Client ID",
-		"Name",
-		"Response Types",
-		"Scope",
-		"Redirect Uris",
-		"Grant Types",
-		"Token Endpoint Auth Method",
-	})
-
-	data := make([][]string, len(cls))
-	for i, cl := range cls {
-		data[i] = []string{
-			cl.ClientID,
-			cl.ClientName,
-			strings.Join(cl.ResponseTypes, ","),
-			cl.Scope,
-			strings.Join(cl.RedirectUris, "\n"),
-			strings.Join(cl.GrantTypes, ","),
-			cl.TokenEndpointAuthMethod,
-		}
-	}
-
-	table.AppendBulk(data)
-	table.Render()
 }

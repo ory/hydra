@@ -109,17 +109,21 @@
         "operationId": "listOAuth2Clients",
         "parameters": [
           {
+            "maximum": 1000,
+            "minimum": 1,
             "type": "integer",
             "format": "int64",
-            "description": "The maximum amount of clients to returned, upper bound is 500 clients.",
-            "name": "limit",
+            "default": 250,
+            "description": "Items per PageToken\n\nThis is the number of items per page.",
+            "name": "page_size",
             "in": "query"
           },
           {
-            "type": "integer",
-            "format": "int64",
-            "description": "The offset from where to start looking.",
-            "name": "offset",
+            "minimum": 1,
+            "type": "string",
+            "default": "1",
+            "description": "Pagination PageToken Token\n\nThe page token.",
+            "name": "page_token",
             "in": "query"
           },
           {
@@ -3118,6 +3122,25 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "description": "Items per PageToken\n\nThis is the number of items per page.",
+          "type": "integer",
+          "format": "int64",
+          "default": 250,
+          "maximum": 1000,
+          "minimum": 1
+        },
+        "page_token": {
+          "description": "Pagination PageToken Token\n\nThe page token.",
+          "type": "string",
+          "default": "1",
+          "minimum": 1
         }
       }
     },

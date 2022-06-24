@@ -3,6 +3,12 @@ package cmd_test
 import (
 	"context"
 	"encoding/base64"
+	"io/ioutil"
+	"testing"
+
+	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/require"
+
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/hydra/driver"
@@ -11,10 +17,6 @@ import (
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/contextx"
 	"github.com/ory/x/snapshotx"
-	"github.com/spf13/cobra"
-	"github.com/stretchr/testify/require"
-	"io/ioutil"
-	"testing"
 )
 
 func base64EncodedPGPPublicKey(t *testing.T) string {

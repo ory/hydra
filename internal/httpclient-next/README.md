@@ -161,6 +161,7 @@ All URIs are relative to _http://localhost_
  - [Oauth2TokenResponse](docs/Oauth2TokenResponse.md)
  - [OauthTokenResponse](docs/OauthTokenResponse.md)
  - [OpenIDConnectContext](docs/OpenIDConnectContext.md)
+ - [Pagination](docs/Pagination.md)
  - [PreviousConsentSession](docs/PreviousConsentSession.md)
  - [RefreshTokenHookRequest](docs/RefreshTokenHookRequest.md)
  - [RefreshTokenHookResponse](docs/RefreshTokenHookResponse.md)

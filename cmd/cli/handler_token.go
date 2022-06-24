@@ -59,22 +59,22 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 
 	token := args[0]
 	_, err := handler.Public.RevokeOAuth2Token(public.NewRevokeOAuth2TokenParams().WithToken(args[0]), httptransport.BasicAuth(clientID, clientSecret))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 
 	fmt.Printf("Revoked OAuth 2.0 Access Token: %s\n", token)
 }
 
 func (h *TokenHandler) FlushTokens(cmd *cobra.Command, args []string) {
-	handler := configureClient(cmd)
+	handler := ConfigureClient(cmd)
 	_, err := handler.Admin.FlushInactiveOAuth2Tokens(admin.NewFlushInactiveOAuth2TokensParams().WithBody(&models.FlushInactiveOAuth2TokensRequest{
 		NotAfter: strfmt.DateTime(time.Now().Add(-flagx.MustGetDuration(cmd, "min-age"))),
 	}))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	fmt.Println("Successfully flushed inactive access tokens")
 }
 
 func (h *TokenHandler) DeleteToken(cmd *cobra.Command, args []string) {
-	handler := configureClient(cmd)
+	handler := ConfigureClient(cmd)
 	clientID := flagx.MustGetString(cmd, "client-id")
 	if clientID == "" {
 		cmdx.Fatalf(`%s
@@ -83,6 +83,6 @@ Please provide a Client ID using flags --client-id, or environment variables OAU
 `, cmd.UsageString())
 	}
 	_, err := handler.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID(clientID))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	fmt.Printf("Successfully deleted access tokens for client %s\n", clientID)
 }

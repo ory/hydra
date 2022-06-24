@@ -38,7 +38,7 @@ import (
 	"github.com/ory/x/flagx"
 )
 
-func configureClient(cmd *cobra.Command) *hydra.OryHydra {
+func ConfigureClient(cmd *cobra.Command) *hydra.OryHydra {
 	return configureClientBase(cmd, true)
 }
 
@@ -128,15 +128,21 @@ func newTable() *tablewriter.Table {
 	return table
 }
 
-// newEncryptionKey for client secret
-func newEncryptionKey(cmd *cobra.Command, client *http.Client) (ek encrypta.EncryptionKey, encryptSecret bool, err error) {
+const (
+	FlagEncryptionPGPKey    = "pgp-key"
+	FlagEncryptionPGPKeyURL = "pgp-key-url"
+	FlagEncryptionKeybase   = "keybase"
+)
+
+// NewEncryptionKey for client secret
+func NewEncryptionKey(cmd *cobra.Command, client *http.Client) (ek encrypta.EncryptionKey, encryptSecret bool, err error) {
 	if client == nil {
 		client = http.DefaultClient
 	}
 
-	pgpKey := flagx.MustGetString(cmd, "pgp-key")
-	pgpKeyURL := flagx.MustGetString(cmd, "pgp-key-url")
-	keybaseUsername := flagx.MustGetString(cmd, "keybase")
+	pgpKey := flagx.MustGetString(cmd, FlagEncryptionPGPKey)
+	pgpKeyURL := flagx.MustGetString(cmd, FlagEncryptionPGPKeyURL)
+	keybaseUsername := flagx.MustGetString(cmd, FlagEncryptionKeybase)
 
 	if pgpKey != "" {
 		ek, err = encrypta.NewPublicKeyFromBase64Encoded(pgpKey)

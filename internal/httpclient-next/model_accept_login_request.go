@@ -18,9 +18,9 @@ import (
 // AcceptLoginRequest struct for AcceptLoginRequest
 type AcceptLoginRequest struct {
 	// ACR sets the Authentication AuthorizationContext Class Reference value for this authentication session. You can use it to express that, for example, a user authenticated using two factor authentication.
-	Acr     *string                `json:"acr,omitempty"`
-	Amr     []string               `json:"amr,omitempty"`
-	Context map[string]interface{} `json:"context,omitempty"`
+	Acr     *string     `json:"acr,omitempty"`
+	Amr     []string    `json:"amr,omitempty"`
+	Context interface{} `json:"context,omitempty"`
 	// ForceSubjectIdentifier forces the \"pairwise\" user ID of the end-user that authenticated. The \"pairwise\" user ID refers to the (Pairwise Identifier Algorithm)[http://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg] of the OpenID Connect specification. It allows you to set an obfuscated subject (\"user\") identifier that is unique to the client.  Please note that this changes the user ID on endpoint /userinfo and sub claim of the ID Token. It does not change the sub claim in the OAuth 2.0 Introspection.  Per default, ORY Hydra handles this value with its own algorithm. In case you want to set this yourself you can use this field. Please note that setting this field has no effect if `pairwise` is not configured in ORY Hydra or the OAuth 2.0 Client does not expect a pairwise identifier (set via `subject_type` key in the client's configuration).  Please also be aware that ORY Hydra is unable to properly compute this value during authentication. This implies that you have to compute this value on every authentication process (probably depending on the client ID or some other unique value).  If you fail to compute the proper value, then authentication processes which have id_token_hint set might fail.
 	ForceSubjectIdentifier *string `json:"force_subject_identifier,omitempty"`
 	// Remember, if set to true, tells ORY Hydra to remember this user by telling the user agent (browser) to store a cookie with authentication data. If the same user performs another OAuth 2.0 Authorization Request, he/she will not be asked to log in again.
@@ -113,10 +113,10 @@ func (o *AcceptLoginRequest) SetAmr(v []string) {
 	o.Amr = v
 }
 
-// GetContext returns the Context field value if set, zero value otherwise.
-func (o *AcceptLoginRequest) GetContext() map[string]interface{} {
-	if o == nil || o.Context == nil {
-		var ret map[string]interface{}
+// GetContext returns the Context field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *AcceptLoginRequest) GetContext() interface{} {
+	if o == nil {
+		var ret interface{}
 		return ret
 	}
 	return o.Context
@@ -124,11 +124,12 @@ func (o *AcceptLoginRequest) GetContext() map[string]interface{} {
 
 // GetContextOk returns a tuple with the Context field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *AcceptLoginRequest) GetContextOk() (map[string]interface{}, bool) {
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *AcceptLoginRequest) GetContextOk() (*interface{}, bool) {
 	if o == nil || o.Context == nil {
 		return nil, false
 	}
-	return o.Context, true
+	return &o.Context, true
 }
 
 // HasContext returns a boolean if a field has been set.
@@ -140,8 +141,8 @@ func (o *AcceptLoginRequest) HasContext() bool {
 	return false
 }
 
-// SetContext gets a reference to the given map[string]interface{} and assigns it to the Context field.
-func (o *AcceptLoginRequest) SetContext(v map[string]interface{}) {
+// SetContext gets a reference to the given interface{} and assigns it to the Context field.
+func (o *AcceptLoginRequest) SetContext(v interface{}) {
 	o.Context = v
 }
 

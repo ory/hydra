@@ -50,7 +50,7 @@ func newJWKHandler() *JWKHandler {
 
 func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 	cmdx.RangeArgs(cmd, args, []int{1, 2})
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	var kid string
 	if len(args) == 2 {
@@ -62,7 +62,7 @@ func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
 		Kid: pointerx.String(kid),
 		Use: pointerx.String(flagx.MustGetString(cmd, "use")),
 	}))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	fmt.Println(formatResponse(res.Payload))
 }
 
@@ -189,18 +189,18 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 
 func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	keys, err := m.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet(args[0]))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	fmt.Printf("%s\n", formatResponse(keys))
 }
 
 func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {
 	cmdx.ExactArgs(cmd, args, 1)
-	m := configureClient(cmd)
+	m := ConfigureClient(cmd)
 
 	_, err := m.Admin.DeleteJSONWebKeySet(admin.NewDeleteJSONWebKeySetParams().WithSet(args[0]))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", formatSwaggerError(err))
+	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 	fmt.Printf("JSON Web Key Set deleted: %s\n", args[0])
 }

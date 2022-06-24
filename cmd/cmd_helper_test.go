@@ -3,6 +3,7 @@ package cmd_test
 import (
 	"context"
 	"encoding/base64"
+	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/internal"
@@ -47,4 +48,12 @@ var snapshotExcludedClientFields = []snapshotx.ExceptOpt{
 	snapshotx.ExceptNestedKeys("client_secret"),
 	snapshotx.ExceptNestedKeys("created_at"),
 	snapshotx.ExceptNestedKeys("updated_at"),
+}
+
+func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.Client {
+	if c == nil {
+		c = &client.Client{}
+	}
+	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
+	return c
 }

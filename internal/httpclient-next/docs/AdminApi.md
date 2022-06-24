@@ -1262,8 +1262,7 @@ No authorization required
 
 ## ListOAuth2Clients
 
-> []OAuth2Client
-> ListOAuth2Clients(ctx).Limit(limit).Offset(offset).ClientName(clientName).Owner(owner).Execute()
+> []OAuth2Client ListOAuth2Clients(ctx).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
 
 List OAuth 2.0 Clients
 
@@ -1280,14 +1279,14 @@ import (
 )
 
 func main() {
-    limit := int64(789) // int64 | The maximum amount of clients to returned, upper bound is 500 clients. (optional)
-    offset := int64(789) // int64 | The offset from where to start looking. (optional)
+    pageSize := int64(789) // int64 | Items per PageToken  This is the number of items per page. (optional) (default to 250)
+    pageToken := "pageToken_example" // string | Pagination PageToken Token  The page token. (optional) (default to "1")
     clientName := "clientName_example" // string | The name of the clients to filter by. (optional)
     owner := "owner_example" // string | The owner of the clients to filter by. (optional)
 
     configuration := openapiclient.NewConfiguration()
     apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.AdminApi.ListOAuth2Clients(context.Background()).Limit(limit).Offset(offset).ClientName(clientName).Owner(owner).Execute()
+    resp, r, err := apiClient.AdminApi.ListOAuth2Clients(context.Background()).PageSize(pageSize).PageToken(pageToken).ClientName(clientName).Owner(owner).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `AdminApi.ListOAuth2Clients``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
@@ -1304,12 +1303,12 @@ func main() {
 Other parameters are passed through a pointer to a apiListOAuth2ClientsRequest
 struct via the builder pattern
 
-| Name           | Type       | Description                                                            | Notes |
-| -------------- | ---------- | ---------------------------------------------------------------------- | ----- |
-| **limit**      | **int64**  | The maximum amount of clients to returned, upper bound is 500 clients. |
-| **offset**     | **int64**  | The offset from where to start looking.                                |
-| **clientName** | **string** | The name of the clients to filter by.                                  |
-| **owner**      | **string** | The owner of the clients to filter by.                                 |
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **pageSize** | **int64** | Items per PageToken  This is the number of items per page. | [default to 250]
+ **pageToken** | **string** | Pagination PageToken Token  The page token. | [default to &quot;1&quot;]
+ **clientName** | **string** | The name of the clients to filter by. | 
+ **owner** | **string** | The owner of the clients to filter by. | 
 
 ### Return type
 

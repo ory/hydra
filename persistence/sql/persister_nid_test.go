@@ -995,10 +995,10 @@ func (s *PersisterTestSuite) TestGetClients() {
 			c := &client.Client{LegacyClientID: "client-id"}
 			require.NoError(t, r.Persister().CreateClient(s.t1, c))
 
-			actual, err := r.Persister().GetClients(s.t2, client.Filter{Offset: 0, Limit: 100})
+			actual, err := r.Persister().GetClients(s.t2, client.Filter{PerPage: 0, Page: 100})
 			require.NoError(t, err)
 			require.Equal(t, 0, len(actual))
-			actual, err = r.Persister().GetClients(s.t1, client.Filter{Offset: 0, Limit: 100})
+			actual, err = r.Persister().GetClients(s.t1, client.Filter{PerPage: 0, Page: 100})
 			require.NoError(t, err)
 			require.Equal(t, 1, len(actual))
 		})

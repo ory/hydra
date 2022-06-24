@@ -69,7 +69,7 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
 	github.com/ory/hydra-client-go v1.11.8
-	github.com/ory/x v0.0.423
+	github.com/ory/x v0.0.427
 	github.com/pborman/uuid v1.2.1
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
@@ -87,6 +87,7 @@ require (
 	github.com/tidwall/gjson v1.14.1
 	github.com/stretchr/testify v1.7.0
 	github.com/tidwall/sjson v1.2.4
+	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/toqueteos/webbrowser v1.2.0
 	github.com/urfave/negroni v1.0.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.32.0 // indirect

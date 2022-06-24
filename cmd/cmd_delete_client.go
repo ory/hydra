@@ -22,9 +22,11 @@ package cmd
 
 import (
 	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
-	"github.com/spf13/cobra"
 )
 
 func NewDeleteClientCmd(root *cobra.Command) *cobra.Command {

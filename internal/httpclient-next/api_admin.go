@@ -2515,21 +2515,21 @@ func (a *AdminApiService) IntrospectOAuth2TokenExecute(r ApiIntrospectOAuth2Toke
 type ApiListOAuth2ClientsRequest struct {
 	ctx        context.Context
 	ApiService *AdminApiService
-	limit      *int64
-	offset     *int64
+	pageSize   *int64
+	pageToken  *string
 	clientName *string
 	owner      *string
 }
 
-// The maximum amount of clients to returned, upper bound is 500 clients.
-func (r ApiListOAuth2ClientsRequest) Limit(limit int64) ApiListOAuth2ClientsRequest {
-	r.limit = &limit
+// Items per PageToken  This is the number of items per page.
+func (r ApiListOAuth2ClientsRequest) PageSize(pageSize int64) ApiListOAuth2ClientsRequest {
+	r.pageSize = &pageSize
 	return r
 }
 
-// The offset from where to start looking.
-func (r ApiListOAuth2ClientsRequest) Offset(offset int64) ApiListOAuth2ClientsRequest {
-	r.offset = &offset
+// Pagination PageToken Token  The page token.
+func (r ApiListOAuth2ClientsRequest) PageToken(pageToken string) ApiListOAuth2ClientsRequest {
+	r.pageToken = &pageToken
 	return r
 }
 
@@ -2593,11 +2593,11 @@ func (a *AdminApiService) ListOAuth2ClientsExecute(r ApiListOAuth2ClientsRequest
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if r.limit != nil {
-		localVarQueryParams.Add("limit", parameterToString(*r.limit, ""))
+	if r.pageSize != nil {
+		localVarQueryParams.Add("page_size", parameterToString(*r.pageSize, ""))
 	}
-	if r.offset != nil {
-		localVarQueryParams.Add("offset", parameterToString(*r.offset, ""))
+	if r.pageToken != nil {
+		localVarQueryParams.Add("page_token", parameterToString(*r.pageToken, ""))
 	}
 	if r.clientName != nil {
 		localVarQueryParams.Add("client_name", parameterToString(*r.clientName, ""))

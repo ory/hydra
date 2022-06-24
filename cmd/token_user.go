@@ -82,7 +82,7 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
     <li>ID Token: <code>{{ .IDToken }}</code></li>
 </ul>
 {{ if .DisplayBackButton }}
-<a href="{{ .BackURL }}">Back to Welcome Page</a>
+<a href="{{ .BackURL }}">Back to Welcome PageToken</a>
 {{ end }}
 </body>
 </html>`))

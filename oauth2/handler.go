@@ -68,7 +68,6 @@ const (
 	// IntrospectPath points to the OAuth2 introspection endpoint.
 	IntrospectPath   = "/oauth2/introspect"
 	RevocationPath   = "/oauth2/revoke"
-	FlushPath        = "/oauth2/flush"
 	DeleteTokensPath = "/oauth2/tokens" // #nosec G101
 )
 
@@ -110,7 +109,6 @@ func (h *Handler) SetRoutes(admin *x.RouterAdmin, public *x.RouterPublic, corsMi
 	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
 
 	admin.POST(IntrospectPath, h.IntrospectHandler)
-	admin.POST(FlushPath, h.FlushHandler)
 	admin.DELETE(DeleteTokensPath, h.DeleteHandler)
 }
 
@@ -514,47 +512,6 @@ func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ ht
 	}); err != nil {
 		x.LogError(r, errorsx.WithStack(err), h.r.Logger())
 	}
-}
-
-// swagger:route POST /oauth2/flush admin flushInactiveOAuth2Tokens
-//
-// Flush Expired OAuth2 Access Tokens
-//
-// This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
-// not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
-// automatically when performing the refresh flow.
-//
-//     Consumes:
-//     - application/json
-//
-//     Schemes: http, https
-//
-//     Responses:
-//       204: emptyResponse
-//       401: jsonError
-//       default: jsonError
-func (h *Handler) FlushHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var fr FlushInactiveOAuth2TokensRequest
-	if err := json.NewDecoder(r.Body).Decode(&fr); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if fr.NotAfter.IsZero() {
-		fr.NotAfter = time.Now()
-	}
-
-	if err := h.r.OAuth2Storage().FlushInactiveAccessTokens(r.Context(), fr.NotAfter, 1000, 100); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	if err := h.r.OAuth2Storage().FlushInactiveRefreshTokens(r.Context(), fr.NotAfter, 1000, 100); err != nil {
-		h.r.Writer().WriteError(w, r, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
 }
 
 // swagger:route POST /oauth2/token public oauth2Token

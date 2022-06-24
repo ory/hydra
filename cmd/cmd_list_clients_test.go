@@ -1,9 +1,11 @@
 package cmd_test
 
 import (
-	"github.com/ory/hydra/client"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/ory/hydra/client"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"

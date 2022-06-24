@@ -2,13 +2,15 @@ package cmd
 
 import (
 	"encoding/json"
+	"strings"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
 	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/x/flagx"
 	"github.com/ory/x/pointerx"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-	"strings"
 )
 
 func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {

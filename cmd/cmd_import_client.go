@@ -25,14 +25,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
+
+	"github.com/spf13/cobra"
+
 	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/cmd/cli"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/pointerx"
-	"github.com/spf13/cobra"
-	"io"
-	"os"
 )
 
 func NewImportClientCmd(root *cobra.Command) *cobra.Command {

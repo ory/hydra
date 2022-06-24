@@ -21,9 +21,9 @@ type ConsentRequest struct {
 	Acr *string  `json:"acr,omitempty"`
 	Amr []string `json:"amr,omitempty"`
 	// ID is the identifier (\"authorization challenge\") of the consent authorization request. It is used to identify the session.
-	Challenge string                 `json:"challenge"`
-	Client    *OAuth2Client          `json:"client,omitempty"`
-	Context   map[string]interface{} `json:"context,omitempty"`
+	Challenge string        `json:"challenge"`
+	Client    *OAuth2Client `json:"client,omitempty"`
+	Context   interface{}   `json:"context,omitempty"`
 	// LoginChallenge is the login challenge this consent challenge belongs to. It can be used to associate a login and consent request in the login & consent app.
 	LoginChallenge *string `json:"login_challenge,omitempty"`
 	// LoginSessionID is the login session ID. If the user-agent reuses a login session (via cookie / remember flag) this ID will remain the same. If the user-agent did not have an existing authentication session (e.g. remember is false) this will be a new random value. This value is used as the \"sid\" parameter in the ID Token and in OIDC Front-/Back- channel logout. It's value can generally be used to associate consecutive login requests by a certain user.
@@ -177,10 +177,10 @@ func (o *ConsentRequest) SetClient(v OAuth2Client) {
 	o.Client = &v
 }
 
-// GetContext returns the Context field value if set, zero value otherwise.
-func (o *ConsentRequest) GetContext() map[string]interface{} {
-	if o == nil || o.Context == nil {
-		var ret map[string]interface{}
+// GetContext returns the Context field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *ConsentRequest) GetContext() interface{} {
+	if o == nil {
+		var ret interface{}
 		return ret
 	}
 	return o.Context
@@ -188,11 +188,12 @@ func (o *ConsentRequest) GetContext() map[string]interface{} {
 
 // GetContextOk returns a tuple with the Context field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *ConsentRequest) GetContextOk() (map[string]interface{}, bool) {
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *ConsentRequest) GetContextOk() (*interface{}, bool) {
 	if o == nil || o.Context == nil {
 		return nil, false
 	}
-	return o.Context, true
+	return &o.Context, true
 }
 
 // HasContext returns a boolean if a field has been set.
@@ -204,8 +205,8 @@ func (o *ConsentRequest) HasContext() bool {
 	return false
 }
 
-// SetContext gets a reference to the given map[string]interface{} and assigns it to the Context field.
-func (o *ConsentRequest) SetContext(v map[string]interface{}) {
+// SetContext gets a reference to the given interface{} and assigns it to the Context field.
+func (o *ConsentRequest) SetContext(v interface{}) {
 	o.Context = v
 }
 

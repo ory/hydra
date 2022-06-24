@@ -52,8 +52,6 @@ type ClientService interface {
 
 	DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error)
 
-	FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams, opts ...ClientOption) (*FlushInactiveOAuth2TokensNoContent, error)
-
 	GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error)
 
 	GetJSONWebKey(params *GetJSONWebKeyParams, opts ...ClientOption) (*GetJSONWebKeyOK, error)
@@ -587,47 +585,6 @@ func (a *Client) DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuer
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for deleteTrustedJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
-}
-
-/*
-  FlushInactiveOAuth2Tokens flushes expired o auth2 access tokens
-
-  This endpoint flushes expired OAuth2 access tokens from the database. You can set a time after which no tokens will be
-not be touched, in case you want to keep recent tokens for auditing. Refresh tokens can not be flushed as they are deleted
-automatically when performing the refresh flow.
-*/
-func (a *Client) FlushInactiveOAuth2Tokens(params *FlushInactiveOAuth2TokensParams, opts ...ClientOption) (*FlushInactiveOAuth2TokensNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewFlushInactiveOAuth2TokensParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "flushInactiveOAuth2Tokens",
-		Method:             "POST",
-		PathPattern:        "/oauth2/flush",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &FlushInactiveOAuth2TokensReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*FlushInactiveOAuth2TokensNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	unexpectedSuccess := result.(*FlushInactiveOAuth2TokensDefault)
-	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*

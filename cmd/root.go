@@ -86,7 +86,6 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	parent.AddCommand(tokenCmd)
 	tokenCmd.AddCommand(NewTokenClientCmd())
 	tokenCmd.AddCommand(NewTokenDeleteCmd())
-	tokenCmd.AddCommand(NewTokenFlushCmd())
 	tokenCmd.AddCommand(NewTokenIntrospectCmd())
 	tokenCmd.AddCommand(NewTokenRevokeCmd())
 	tokenCmd.AddCommand(NewTokenUserCmd())

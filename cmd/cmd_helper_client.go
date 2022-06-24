@@ -42,6 +42,13 @@ func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
 	}
 }
 
+func registerEncryptFlags(flags *pflag.FlagSet) {
+	// encrypt client secret options
+	flags.String(cli.FlagEncryptionPGPKey, "", "Base64 encoded PGP encryption key for encrypting client secret.")
+	flags.String(cli.FlagEncryptionPGPKeyURL, "", "PGP encryption key URL for encrypting client secret.")
+	flags.String(cli.FlagEncryptionKeybase, "", "Keybase username for encrypting client secret.")
+}
+
 func registerClientFlags(flags *pflag.FlagSet) {
 	flags.String(flagClientMetadata, "{}", "Metadata is an arbitrary JSON String of your choosing.")
 	flags.String(flagClientOwner, "", "The owner of this client, typically email addresses or a user ID.")
@@ -74,8 +81,5 @@ func registerClientFlags(flags *pflag.FlagSet) {
 	flags.Bool(flagClientFrontChannelLogoutSessionRequired, false, "Boolean flag specifying whether the client requires that a sid (session ID) Claim be included in the Logout Token to identify the client session with the OP when the frontchannel-logout-callback is used. If omitted, the default value is false.")
 	flags.String(flagClientFrontChannelLogoutCallback, "", "Client URL that will cause the client to log itself out when rendered in an iframe by Hydra.")
 
-	// encrypt client secret options
-	flags.String(cli.FlagEncryptionPGPKey, "", "Base64 encoded PGP encryption key for encrypting client secret.")
-	flags.String(cli.FlagEncryptionPGPKeyURL, "", "PGP encryption key URL for encrypting client secret.")
-	flags.String(cli.FlagEncryptionKeybase, "", "Keybase username for encrypting client secret.")
+	registerEncryptFlags(flags)
 }

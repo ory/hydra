@@ -46,12 +46,13 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	parent.AddCommand(getCmd)
 	getCmd.AddCommand(NewGetClientsCmd(parent))
 
+	deleteCmd := NewDeleteCmd(parent)
+	parent.AddCommand(deleteCmd)
+	getCmd.AddCommand(NewDeleteClientCmd(parent))
+
 	// Clients
 	clientCmd := NewClientsCmd()
 	parent.AddCommand(clientCmd)
-	clientCmd.AddCommand(NewClientsDeleteCmd())
-	clientCmd.AddCommand(NewClientsImportCmd())
-	clientCmd.AddCommand(NewClientsImportCmd())
 	clientCmd.AddCommand(NewClientsImportCmd())
 	clientCmd.AddCommand(NewClientsListCmd())
 	clientCmd.AddCommand(NewKeysImportCmd())

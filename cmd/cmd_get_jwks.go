@@ -25,39 +25,39 @@ import (
 
 	"github.com/spf13/cobra"
 
-	hydra "github.com/ory/hydra-client-go"
 	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/x/cmdx"
 )
 
-func NewGetClientsCmd(root *cobra.Command) *cobra.Command {
+func NewGetJWKSCmd(root *cobra.Command) *cobra.Command {
 	return &cobra.Command{
-		Use:   "client id-1 [id-2] [id-n]",
-		Args:  cobra.MinimumNArgs(1),
-		Short: "Get one or more OAuth 2.0 Clients by their ID(s)",
-		Long:  fmt.Sprintf(`This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`),
-		Example: fmt.Sprintf(`To get the OAuth 2.0 Client's secret, run:
+		Use:   "jwks set-1",
+		Args:  cobra.ExactArgs(1),
+		Short: "Get a JSON Web Key Set by its ID(s)",
+		Long:  fmt.Sprintf(`This command gets all the details about an JSON Web Key. You can use this command in combination with jq.`),
+		Example: fmt.Sprintf(`To get the JSON Web Key Set's secret, run:
 
-	%s get client <your-client-id> | jq -r '.client_secret'`, root.Use),
+	%s get jwks <set-id> | jq -r '.[].use'`, root.Use),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			m, err := cliclient.NewClient(cmd)
 			if err != nil {
 				return err
 			}
 
-			clients := make([]hydra.OAuth2Client, 0, len(args))
-			for _, id := range args {
-				client, _, err := m.AdminApi.GetOAuth2Client(cmd.Context(), id).Execute()
+			var sets outputJSONWebKeyCollection
+			for _, set := range args {
+				key, _, err := m.AdminApi.GetJsonWebKeySet(cmd.Context(), set).Execute()
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}
-				clients = append(clients, *client)
+
+				sets.Keys = append(sets.Keys, key.Keys...)
 			}
 
-			if len(clients) == 1 {
-				cmdx.PrintRow(cmd, (*outputOAuth2Client)(&clients[0]))
-			} else if len(clients) > 1 {
-				cmdx.PrintTable(cmd, &outputOAuth2ClientCollection{clients})
+			if len(sets.Keys) == 1 {
+				cmdx.PrintRow(cmd, outputJsonWebKey{Set: args[0], JSONWebKey: sets.Keys[0]})
+			} else if len(sets.Keys) > 1 {
+				cmdx.PrintTable(cmd, sets)
 			}
 
 			return nil

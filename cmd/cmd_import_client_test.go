@@ -59,7 +59,18 @@ func TestImportClient(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, file1, file2))
 		require.Len(t, actual.Array(), 4)
 
-		snapshotx.SnapshotT(t, json.RawMessage(actual.Raw), snapshotExcludedClientFields...)
+		for _, v := range []string{
+			"foo", "bar", "baz", "zab",
+		} {
+			found := false
+			for _, j := range actual.Array() {
+				if j.Get("scope").String() == v {
+					found = true
+					break
+				}
+			}
+			assert.True(t, found, "missing client with scope %s", v)
+		}
 	})
 
 	t.Run("case=imports clients from multiple files and stdin", func(t *testing.T) {

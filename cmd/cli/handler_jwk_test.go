@@ -55,7 +55,7 @@ func Test_toSDKFriendlyJSONWebKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			key, _ := josex.LoadPublicKey(tt.args.key)
-			if got := toSDKFriendlyJSONWebKey(key, tt.args.kid, tt.args.use); got.Algorithm != tt.want {
+			if got := ToSDKFriendlyJSONWebKey(key, tt.args.kid, tt.args.use); got.Algorithm != tt.want {
 				t.Errorf("toSDKFriendlyJSONWebKey() = %v, want %v", got.Algorithm, tt.want)
 			}
 		})

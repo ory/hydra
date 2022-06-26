@@ -30,12 +30,10 @@ import (
 
 	"github.com/ory/x/uuidx"
 
-	"github.com/ory/hydra/internal/httpclient/client/admin"
-	"github.com/ory/hydra/internal/httpclient/models"
-	"github.com/ory/x/pointerx"
-
 	"github.com/spf13/cobra"
 	jose "gopkg.in/square/go-jose.v2"
+
+	"github.com/ory/hydra/internal/httpclient/client/admin"
 
 	"github.com/ory/x/cmdx"
 	"github.com/ory/x/flagx"
@@ -48,25 +46,7 @@ func newJWKHandler() *JWKHandler {
 	return &JWKHandler{}
 }
 
-func (h *JWKHandler) CreateKeys(cmd *cobra.Command, args []string) {
-	cmdx.RangeArgs(cmd, args, []int{1, 2})
-	m := ConfigureClient(cmd)
-
-	var kid string
-	if len(args) == 2 {
-		kid = args[1]
-	}
-
-	res, err := m.Admin.CreateJSONWebKeySet(admin.NewCreateJSONWebKeySetParams().WithSet(args[0]).WithBody(&models.JSONWebKeySetGeneratorRequest{
-		Alg: pointerx.String(flagx.MustGetString(cmd, "alg")),
-		Kid: pointerx.String(kid),
-		Use: pointerx.String(flagx.MustGetString(cmd, "use")),
-	}))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
-	fmt.Println(formatResponse(res.Payload))
-}
-
-func toSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
+func ToSDKFriendlyJSONWebKey(key interface{}, kid, use string) jose.JSONWebKey {
 	var alg string
 
 	if jwk, ok := key.(*jose.JSONWebKey); ok {
@@ -106,7 +86,7 @@ func updateKey(set jose.JSONWebKeySet, newKey jose.JSONWebKey) []jose.JSONWebKey
 	return set.Keys
 }
 
-func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
+func (h *JWKHandler) keysImportKeys(cmd *cobra.Command, args []string) {
 	cmdx.MinArgs(cmd, args, 2)
 
 	id := args[0]
@@ -157,9 +137,9 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 			key, publicErr := josex.LoadPublicKey(file)
 			cmdx.Must(publicErr, `Unable to read key from file %s. Decoding file to private key failed with reason "%s" and decoding it to public key failed with reason: %s`, path, privateErr, publicErr)
 
-			set.Keys = updateKey(set, toSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
+			set.Keys = updateKey(set, ToSDKFriendlyJSONWebKey(key, "public:"+keyID, use))
 		} else {
-			set.Keys = updateKey(set, toSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
+			set.Keys = updateKey(set, ToSDKFriendlyJSONWebKey(key, "private:"+keyID, use))
 		}
 
 		fmt.Printf("Successfully loaded key from file: %s\n", path)
@@ -185,15 +165,6 @@ func (h *JWKHandler) ImportKeys(cmd *cobra.Command, args []string) {
 	defer response.Body.Close()
 
 	fmt.Println("JSON Web Key Set successfully imported!")
-}
-
-func (h *JWKHandler) GetKeys(cmd *cobra.Command, args []string) {
-	cmdx.ExactArgs(cmd, args, 1)
-	m := ConfigureClient(cmd)
-
-	keys, err := m.Admin.GetJSONWebKeySet(admin.NewGetJSONWebKeySetParams().WithSet(args[0]))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
-	fmt.Printf("%s\n", formatResponse(keys))
 }
 
 func (h *JWKHandler) DeleteKeys(cmd *cobra.Command, args []string) {

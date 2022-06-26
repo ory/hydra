@@ -41,35 +41,32 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	createCmd := NewCreateCmd(parent)
 	parent.AddCommand(createCmd)
 	createCmd.AddCommand(NewCreateClientsCommand(parent))
+	createCmd.AddCommand(NewCreateJWKSCmd(parent))
 
 	getCmd := NewGetCmd(parent)
 	parent.AddCommand(getCmd)
 	getCmd.AddCommand(NewGetClientsCmd(parent))
+	getCmd.AddCommand(NewGetJWKSCmd(parent))
 
 	deleteCmd := NewDeleteCmd(parent)
 	parent.AddCommand(deleteCmd)
-	getCmd.AddCommand(NewDeleteClientCmd(parent))
+	deleteCmd.AddCommand(NewDeleteClientCmd(parent))
+	deleteCmd.AddCommand(NewDeleteJWKSCommand(parent))
 
 	listCmd := NewListCmd(parent)
 	parent.AddCommand(listCmd)
-	getCmd.AddCommand(NewListClientsCmd(parent))
+	listCmd.AddCommand(NewListClientsCmd(parent))
 
 	updateCmd := NewUpdateCmd(parent)
 	parent.AddCommand(updateCmd)
-	getCmd.AddCommand(NewUpdateClientCmd(parent))
+	updateCmd.AddCommand(NewUpdateClientCmd(parent))
 
 	importCmd := NewImportCmd(parent)
 	parent.AddCommand(importCmd)
-	getCmd.AddCommand(NewImportClientCmd(parent))
+	importCmd.AddCommand(NewImportClientCmd(parent))
+	importCmd.AddCommand(NewKeysImportCmd(parent))
 
 	parent.AddCommand(NewJanitorCmd())
-
-	keyCmd := NewKeysCmd()
-	parent.AddCommand(keyCmd)
-	keyCmd.AddCommand(NewKeysCreateCmd())
-	keyCmd.AddCommand(NewKeysDeleteCmd())
-	keyCmd.AddCommand(NewKeysGetCmd())
-	keyCmd.AddCommand(NewKeysImportCmd())
 
 	migrateCmd := NewMigrateCmd()
 	parent.AddCommand(migrateCmd)

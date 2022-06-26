@@ -22,9 +22,11 @@ package cli
 
 import (
 	"fmt"
+
+	"github.com/spf13/cobra"
+
 	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/client/public"
-	"github.com/spf13/cobra"
 
 	httptransport "github.com/go-openapi/runtime/client"
 

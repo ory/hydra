@@ -1,10 +1,17 @@
 package cliclient
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/ory/x/cmdx"
+	"github.com/ory/x/flagx"
+	"github.com/ory/x/httpx"
 
 	"github.com/pkg/errors"
 
@@ -18,8 +25,10 @@ import (
 )
 
 const (
-	envKeyEndpoint = "HYDRA_ADMIN_URL"
-	FlagEndpoint   = "endpoint"
+	envKeyEndpoint    = "HYDRA_ADMIN_URL"
+	FlagEndpoint      = "endpoint"
+	FlagSkipTLSVerify = "skip-tls-verify"
+	FlagHeaders       = "http-header"
 )
 
 type ContextKey int
@@ -56,10 +65,33 @@ func NewClient(cmd *cobra.Command) (*hydra.APIClient, error) {
 	conf := hydra.NewConfiguration()
 	conf.HTTPClient = retryablehttp.NewClient().StandardClient()
 	conf.HTTPClient.Timeout = time.Second * 10
+
+	rawHeaders := flagx.MustGetStringSlice(cmd, FlagHeaders)
+	var header http.Header
+	for _, h := range rawHeaders {
+		parts := strings.Split(h, ":")
+		if len(parts) != 2 {
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Unable to parse `--http-header` flag. Format of flag value is a `: ` delimited string like `--http-header 'Some-Header: some-values; other values`. Received: %v", rawHeaders)
+			return nil, cmdx.FailSilently(cmd)
+		}
+
+		for k := range parts {
+			parts[k] = strings.TrimSpace(parts[k])
+		}
+
+		header.Add(parts[0], parts[1])
+	}
+
+	rt := httpx.NewTransportWithHeader(header)
+	rt.RoundTripper = &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, FlagSkipTLSVerify)}}
+	conf.HTTPClient.Transport = rt
+
 	conf.Servers = hydra.ServerConfigurations{{URL: u.String()}}
 	return hydra.NewAPIClient(conf), nil
 }
 
 func RegisterClientFlags(flags *pflag.FlagSet) {
 	flags.StringP(FlagEndpoint, FlagEndpoint[:1], "", fmt.Sprintf("The URL of Ory Hydra' Admin API. Alternatively set using the %s environmental variable.", envKeyEndpoint))
+	flags.Bool(FlagSkipTLSVerify, false, "Do not verify TLS certificates. Useful when dealing with self-signed certificates. Do not use in production!")
+	flags.StringSliceP(FlagHeaders, "H", []string{}, "A list of additional HTTP headers to set. HTTP headers is separated by a `: `, for example: `-H 'Authorization: bearer some-token'`.")
 }

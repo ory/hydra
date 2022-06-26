@@ -785,7 +785,6 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //       default: jsonError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")
-
 	if clientID == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'client_id' is not defined but it should have been.`)))
 		return

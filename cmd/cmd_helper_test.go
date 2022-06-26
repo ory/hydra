@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"gopkg.in/square/go-jose.v2"
+
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 
@@ -58,4 +60,10 @@ func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.C
 	}
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
 	return c
+}
+
+func createJWK(t *testing.T, reg driver.Registry, set string, alg string) jose.JSONWebKey {
+	c, err := reg.KeyManager().GenerateAndPersistKeySet(context.Background(), set, "", alg, "sig")
+	require.NoError(t, err)
+	return c.Keys[0]
 }

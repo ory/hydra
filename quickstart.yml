@@ -17,7 +17,7 @@ services:
       - "4444:4444" # Public port
       - "4445:4445" # Admin port
       - "5555:5555" # Port for hydra token user
-    command: serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http
+    command: serve -c /etc/config/hydra/hydra.yml all --dev
     volumes:
       - type: volume
         source: hydra-sqlite

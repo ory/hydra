@@ -613,7 +613,7 @@
           "properties": {
             "issuer": {
               "type": "string",
-              "description": "This value will be used as the \"issuer\" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal to the public value.",
+              "description": "This value will be used as the \"issuer\" in access and ID tokens. It must be specified and using HTTPS protocol, unless --dev is set. This should typically be equal to the public value.",
               "format": "uri",
               "examples": ["https://localhost:4444/"]
             },
@@ -1094,15 +1094,10 @@
         }
       }
     },
-    "dangerous-force-http": {
-      "type": "boolean",
-      "title": "Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead",
-      "description": "DO NOT USE THIS IN PRODUCTION - Disables HTTP/2 over TLS (HTTPS) and serves HTTP instead. This is only available as CLI flag `--dangerous-force-http`."
-    },
     "dev": {
       "type": "boolean",
       "title": "Enable development mode",
-      "description": "Disables critical security measures to allow easier local development. Do not use in production.",
+      "description": "If true, disables critical security measures to allow easier local development. Do not use in production.",
       "default": false
     }
   }

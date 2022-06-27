@@ -61,7 +61,3 @@ func (p *DefaultProvider) TLS(ctx context.Context, iface ServeInterface) TLSConf
 func (c *tlsConfig) Certificate() ([]tls.Certificate, error) {
 	return tlsx.Certificate(c.certString, c.keyString, c.certPath, c.keyPath)
 }
-
-func (p *DefaultProvider) forcedHTTP(ctx context.Context) bool {
-	return p.getProvider(ctx).Bool("dangerous-force-http")
-}

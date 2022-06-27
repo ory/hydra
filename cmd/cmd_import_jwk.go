@@ -125,7 +125,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 			failed := make(map[string]error)
 			for src, kk := range keys {
 				for _, k := range kk {
-					result, _, err := m.AdminApi.UpdateJsonWebKey(cmd.Context(), k.Kid, set).JSONWebKey(k).Execute()
+					result, _, err := m.AdminApi.UpdateJsonWebKey(cmd.Context(), k.Kid, set).JSONWebKey(k).Execute() //nolint:bodyclose
 					if err != nil {
 						failed[src] = cmdx.PrintOpenAPIError(cmd, err)
 						continue

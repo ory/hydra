@@ -8,19 +8,17 @@ import (
 )
 
 type redirectConfiguration interface {
-	InsecureRedirects(context.Context) []string
+	IsDevelopmentMode(context.Context) bool
 }
 
 func IsRedirectURISecure(rc redirectConfiguration) func(context.Context, *url.URL) bool {
 	return func(ctx context.Context, redirectURI *url.URL) bool {
-		if fosite.IsRedirectURISecure(ctx, redirectURI) {
+		if rc.IsDevelopmentMode(ctx) {
 			return true
 		}
 
-		for _, allowed := range rc.InsecureRedirects(ctx) {
-			if redirectURI.String() == allowed {
-				return true
-			}
+		if fosite.IsRedirectURISecure(ctx, redirectURI) {
+			return true
 		}
 
 		return false

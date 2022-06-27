@@ -35,8 +35,6 @@ import (
 
 	"github.com/ory/graceful"
 
-	"github.com/ory/hydra/cmd/cli"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/spf13/cobra"
 	"github.com/toqueteos/webbrowser"
@@ -87,40 +85,40 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
 </body>
 </html>`))
 
-func NewTokenUserCmd() *cobra.Command {
+func NewPerformAuthorizationCodeCmd(parent *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "authorization_code",
-		Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
+		Use:     "authorization-code",
+		Example: fmt.Sprintf("%s perform authorization-code --client-id ... --client-secret ...", parent.Use),
+		Short:   "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
 		Long: `Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
 This command will help you to see if Ory Hydra has been configured properly.
 
 This command must not be used for anything else than manual testing or demo purposes. The server will terminate on error
 and success, unless if the --no-shutdown flag is provided.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			/* #nosec G402 - we want to support dev environments, hence tls trickery */
-			ctx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: flagx.MustGetBool(cmd, "skip-tls-verify")},
-			}})
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, _, err := cmdx.NewClient(cmd)
+			if err != nil {
+				return err
+			}
 
+			ctx := context.WithValue(cmd.Context(), oauth2.HTTPClient, client)
 			isSSL := flagx.MustGetBool(cmd, "https")
 			port := flagx.MustGetInt(cmd, "port")
 			scopes := flagx.MustGetStringSlice(cmd, "scope")
 			prompt := flagx.MustGetStringSlice(cmd, "prompt")
 			maxAge := flagx.MustGetInt(cmd, "max-age")
 			redirectUrl := flagx.MustGetString(cmd, "redirect")
-			backend := flagx.MustGetString(cmd, "token-url")
-			frontend := flagx.MustGetString(cmd, "auth-url")
 			audience := flagx.MustGetStringSlice(cmd, "audience")
 			noShutdown := flagx.MustGetBool(cmd, "no-shutdown")
 
 			clientID := flagx.MustGetString(cmd, "client-id")
 			if clientID == "" {
-				fmt.Print(cmd.UsageString())
-				fmt.Println("Please provide a Client ID using --client-id flag, or OAUTH2_CLIENT_ID environment variable.")
-				return
+				_, _ = fmt.Fprint(cmd.OutOrStdout(), cmd.UsageString())
+				_, _ = fmt.Fprintln(cmd.OutOrStdout(), "Please provide a Client ID using --client-id flag, or OAUTH2_CLIENT_ID environment variable.")
+				return cmdx.FailSilently(cmd)
 			}
-			clientSecret := flagx.MustGetString(cmd, "client-secret")
 
+			clientSecret := flagx.MustGetString(cmd, "client-secret")
 			proto := "http"
 			if isSSL {
 				proto = "https"
@@ -131,19 +129,16 @@ and success, unless if the --no-shutdown flag is provided.`,
 				redirectUrl = serverLocation + "callback"
 			}
 
-			if backend == "" {
-				backend = urlx.AppendPaths(cli.RemoteURI(cmd), "/oauth2/token").String()
+			remote, err := cmdx.RemoteURI(cmd)
+			if err != nil {
+				return err
 			}
-			if frontend == "" {
-				frontend = urlx.AppendPaths(cli.RemoteURI(cmd), "/oauth2/auth").String()
-			}
-
 			conf := oauth2.Config{
 				ClientID:     clientID,
 				ClientSecret: clientSecret,
 				Endpoint: oauth2.Endpoint{
-					TokenURL: backend,
-					AuthURL:  frontend,
+					TokenURL: urlx.AppendPaths(remote, "/oauth2/token").String(),
+					AuthURL:  urlx.AppendPaths(remote, "/oauth2/auth").String(),
 				},
 				RedirectURL: redirectUrl,
 				Scopes:      scopes,
@@ -171,16 +166,20 @@ and success, unless if the --no-shutdown flag is provided.`,
 				_ = webbrowser.Open(serverLocation) // ignore errors
 			}
 
-			fmt.Println("Setting up home route on " + serverLocation)
-			fmt.Println("Setting up callback listener on " + serverLocation + "callback")
-			fmt.Println("Press ctrl + c to end the process.")
-			fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
+			_, _ = fmt.Fprintln(os.Stderr, "Setting up home route on "+serverLocation)
+			_, _ = fmt.Fprintln(os.Stderr, "Setting up callback listener on "+serverLocation+"callback")
+			_, _ = fmt.Fprintln(os.Stderr, "Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
+			_, _ = fmt.Fprintf(os.Stderr, "If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 			r := httprouter.New()
 			var tlsc *tls.Config
 			if isSSL {
 				key, err := rsa.GenerateKey(rand.Reader, 2048)
-				cmdx.Must(err, "Unable to generate RSA key pair: %s", err)
+				if err != nil {
+					_, _ = fmt.Fprintf(os.Stderr, "Unable to generate RSA key pair: %s", err)
+					return cmdx.FailSilently(cmd)
+				}
+
 				cert, err := tlsx.CreateSelfSignedTLSCertificate(key)
 				cmdx.Must(err, "Unable to generate self-signed TLS Certificate: %s", err)
 				// #nosec G402 - This is a false positive because we use graceful.WithDefaults which sets the correct TLS settings.
@@ -217,7 +216,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 			r.GET("/callback", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 				if len(r.URL.Query().Get("error")) > 0 {
-					fmt.Printf("Got error: %s\n", r.URL.Query().Get("error_description"))
+					_, _ = fmt.Fprintf(os.Stderr, "Got error: %s\n", r.URL.Query().Get("error_description"))
 
 					w.WriteHeader(http.StatusInternalServerError)
 					_ = tokenUserError.Execute(w, &ed{
@@ -232,7 +231,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 				}
 
 				if r.URL.Query().Get("state") != string(state) {
-					fmt.Printf("States do not match. Expected %s, got %s\n", string(state), r.URL.Query().Get("state"))
+					_, _ = fmt.Fprintf(os.Stderr, "States do not match. Expected %s, got %s\n", string(state), r.URL.Query().Get("state"))
 
 					w.WriteHeader(http.StatusInternalServerError)
 					_ = tokenUserError.Execute(w, &ed{
@@ -246,7 +245,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 				code := r.URL.Query().Get("code")
 				token, err := conf.Exchange(ctx, code)
 				if err != nil {
-					fmt.Printf("Unable to exchange code for token: %s\n", err)
+					_, _ = fmt.Fprintf(os.Stderr, "Unable to exchange code for token: %s\n", err)
 
 					w.WriteHeader(http.StatusInternalServerError)
 					_ = tokenUserError.Execute(w, &ed{
@@ -256,12 +255,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 					return
 				}
 
-				idt := token.Extra("id_token")
-				fmt.Printf("Access Token:\n\t%s\n", token.AccessToken)
-				fmt.Printf("Refresh Token:\n\t%s\n", token.RefreshToken)
-				fmt.Printf("Expires in:\n\t%s\n", token.Expiry.Format(time.RFC1123))
-				fmt.Printf("ID Token:\n\t%v\n\n", idt)
-
+				cmdx.PrintRow(cmd, outputOAuth2Token(*token))
 				_ = tokenUserResult.Execute(w, struct {
 					AccessToken       string
 					RefreshToken      string
@@ -273,19 +267,18 @@ and success, unless if the --no-shutdown flag is provided.`,
 					AccessToken:       token.AccessToken,
 					RefreshToken:      token.RefreshToken,
 					Expiry:            token.Expiry.Format(time.RFC1123),
-					IDToken:           fmt.Sprintf("%v", idt),
+					IDToken:           fmt.Sprintf("%v", token.Extra("id_token")),
 					BackURL:           serverLocation,
 					DisplayBackButton: noShutdown,
 				})
 				onDone()
 			})
-			var err error
+
 			if isSSL {
-				err = server.ListenAndServeTLS("", "")
-			} else {
-				err = server.ListenAndServe()
+				return server.ListenAndServeTLS("", "")
 			}
-			cmdx.Must(err, "%s", err)
+
+			return server.ListenAndServe()
 		},
 	}
 
@@ -303,7 +296,6 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
 	cmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	cmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
-	cmd.Flags().String("endpoint", os.Getenv("ORY_SDK_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable ORY_SDK_URL")
 	cmd.Flags().Bool("https", false, "Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command")
 
 	return cmd

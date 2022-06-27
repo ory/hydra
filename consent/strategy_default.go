@@ -107,7 +107,7 @@ func (s *DefaultStrategy) matchesValueFromSession(ctx context.Context, c fosite.
 
 func (s *DefaultStrategy) authenticationSession(ctx context.Context, w http.ResponseWriter, r *http.Request) (*LoginSession, error) {
 	// We try to open the session cookie. If it does not exist (indicated by the error), we must authenticate the user.
-	cookie, err := s.r.CookieStore(ctx).Get(r, CookieName(s.c.TLS(ctx, config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie, err := s.r.CookieStore(ctx).Get(r, CookieName(!s.c.IsDevelopmentMode(ctx), CookieAuthenticationName))
 	if err != nil {
 		s.r.Logger().
 			WithRequest(r).
@@ -278,7 +278,7 @@ func (s *DefaultStrategy) forwardAuthenticationRequest(ctx context.Context, w ht
 		return errorsx.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(ctx), cookieAuthenticationCSRFName, csrf, s.c.TLS(ctx, config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(ctx), s.c.CookieSameSiteLegacyWorkaround(ctx)); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(ctx), cookieAuthenticationCSRFName, csrf, !s.c.IsDevelopmentMode(ctx), s.c.CookieSameSiteMode(ctx), s.c.CookieSameSiteLegacyWorkaround(ctx)); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -303,13 +303,14 @@ func (s *DefaultStrategy) revokeAuthenticationSession(ctx context.Context, w htt
 
 func (s *DefaultStrategy) revokeAuthenticationCookie(w http.ResponseWriter, r *http.Request, ss sessions.Store) (string, error) {
 	ctx := r.Context()
-	cookie, _ := ss.Get(r, CookieName(s.c.TLS(ctx, config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie, _ := ss.Get(r, CookieName(!s.c.IsDevelopmentMode(ctx), CookieAuthenticationName))
 	sid, _ := mapx.GetString(cookie.Values, CookieAuthenticationSIDName)
 
 	cookie.Values[CookieAuthenticationSIDName] = ""
 	cookie.Options.HttpOnly = true
+	cookie.Options.Path = "/"
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
-	cookie.Options.Secure = s.c.TLS(ctx, config.PublicInterface).Enabled()
+	cookie.Options.Secure = !s.c.IsDevelopmentMode(ctx)
 	cookie.Options.MaxAge = -1
 
 	if err := cookie.Save(r, w); err != nil {
@@ -337,7 +338,7 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 		return nil, errorsx.WithStack(fosite.ErrRequestUnauthorized.WithHint("The login request has expired. Please try again."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(ctx), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(ctx), s.c.TLS(ctx, config.PublicInterface).Enabled()); err != nil {
+	if err := validateCsrfSession(r, s.r.CookieStore(ctx), cookieAuthenticationCSRFName, session.LoginRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(ctx), !s.c.IsDevelopmentMode(ctx)); err != nil {
 		return nil, err
 	}
 
@@ -434,24 +435,25 @@ func (s *DefaultStrategy) verifyAuthentication(w http.ResponseWriter, r *http.Re
 	}
 
 	// Not a skipped login and the user asked to remember its session, store a cookie
-	cookie, _ := s.r.CookieStore(ctx).Get(r, CookieName(s.c.TLS(ctx, config.PublicInterface).Enabled(), CookieAuthenticationName))
+	cookie, _ := s.r.CookieStore(ctx).Get(r, CookieName(!s.c.IsDevelopmentMode(ctx), CookieAuthenticationName))
 	cookie.Values[CookieAuthenticationSIDName] = sessionID
 	if session.RememberFor >= 0 {
 		cookie.Options.MaxAge = session.RememberFor
 	}
 	cookie.Options.HttpOnly = true
+	cookie.Options.Path = "/"
 	cookie.Options.SameSite = s.c.CookieSameSiteMode(ctx)
-	cookie.Options.Secure = s.c.TLS(ctx, config.PublicInterface).Enabled()
+	cookie.Options.Secure = !s.c.IsDevelopmentMode(ctx)
 	if err := cookie.Save(r, w); err != nil {
 		return nil, errorsx.WithStack(err)
 	}
 
 	s.r.Logger().WithRequest(r).
 		WithFields(logrus.Fields{
-			"cookie_name":      CookieName(s.c.TLS(ctx, config.PublicInterface).Enabled(), CookieAuthenticationName),
+			"cookie_name":      CookieName(!s.c.IsDevelopmentMode(ctx), CookieAuthenticationName),
 			"cookie_http_only": true,
 			"cookie_same_site": s.c.CookieSameSiteMode(ctx),
-			"cookie_secure":    s.c.TLS(ctx, config.PublicInterface).Enabled(),
+			"cookie_secure":    !s.c.IsDevelopmentMode(ctx),
 		}).Debug("Authentication session cookie was set.")
 	return session, nil
 }
@@ -550,7 +552,7 @@ func (s *DefaultStrategy) forwardConsentRequest(ctx context.Context, w http.Resp
 		return errorsx.WithStack(err)
 	}
 
-	if err := createCsrfSession(w, r, s.r.CookieStore(ctx), cookieConsentCSRFName, csrf, s.c.TLS(ctx, config.PublicInterface).Enabled(), s.c.CookieSameSiteMode(ctx), s.c.CookieSameSiteLegacyWorkaround(ctx)); err != nil {
+	if err := createCsrfSession(w, r, s.r.CookieStore(ctx), cookieConsentCSRFName, csrf, !s.c.IsDevelopmentMode(ctx), s.c.CookieSameSiteMode(ctx), s.c.CookieSameSiteLegacyWorkaround(ctx)); err != nil {
 		return errorsx.WithStack(err)
 	}
 
@@ -585,7 +587,7 @@ func (s *DefaultStrategy) verifyConsent(ctx context.Context, w http.ResponseWrit
 		return nil, errorsx.WithStack(fosite.ErrServerError.WithHint("The authenticatedAt value was not set."))
 	}
 
-	if err := validateCsrfSession(r, s.r.CookieStore(ctx), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(ctx), s.c.TLS(ctx, config.PublicInterface).Enabled()); err != nil {
+	if err := validateCsrfSession(r, s.r.CookieStore(ctx), cookieConsentCSRFName, session.ConsentRequest.CSRF, s.c.CookieSameSiteLegacyWorkaround(ctx), !s.c.IsDevelopmentMode(ctx)); err != nil {
 		return nil, err
 	}
 

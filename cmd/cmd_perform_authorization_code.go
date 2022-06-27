@@ -26,6 +26,7 @@ import (
 	"crypto/rsa"
 	"crypto/tls"
 	"fmt"
+	"github.com/pkg/errors"
 	"html/template"
 	"net/http"
 	"os"
@@ -266,7 +267,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 					AccessToken:       token.AccessToken,
 					RefreshToken:      token.RefreshToken,
 					Expiry:            token.Expiry.Format(time.RFC1123),
-					IDToken:           fmt.Sprintf("%v", token.Extra("id_token")),
+					IDToken:           fmt.Sprintf("%s", token.Extra("id_token")),
 					BackURL:           serverLocation,
 					DisplayBackButton: noShutdown,
 				})
@@ -274,10 +275,18 @@ and success, unless if the --no-shutdown flag is provided.`,
 			})
 
 			if isSSL {
-				return server.ListenAndServeTLS("", "")
+				err = server.ListenAndServeTLS("", "")
+			} else {
+				err = server.ListenAndServe()
 			}
 
-			return server.ListenAndServe()
+			if errors.Is(err, http.ErrServerClosed) {
+				return nil
+			} else if err != nil {
+				return err
+			}
+
+			return nil
 		},
 	}
 

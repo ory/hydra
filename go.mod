@@ -17,8 +17,6 @@ replace github.com/gobuffalo/pop/v6 => github.com/gobuffalo/pop/v6 v6.0.4-0.2022
 
 replace github.com/ory/hydra-client-go => ./internal/httpclient-next
 
-replace github.com/ory/x => ../x
-
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
@@ -67,10 +65,9 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
 	github.com/ory/hydra-client-go v1.11.8
-	github.com/ory/x v0.0.427
+	github.com/ory/x v0.0.430
 	github.com/pborman/uuid v1.2.1
 	github.com/pelletier/go-toml v1.9.5 // indirect
-	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/rs/cors v1.8.2

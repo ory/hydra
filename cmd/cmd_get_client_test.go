@@ -21,7 +21,6 @@ func TestGetClient(t *testing.T) {
 	reg := setup(t, c)
 
 	expected := createClient(t, reg, nil)
-
 	t.Run("case=gets client", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, expected.ID.String()))
 		assert.NotEmpty(t, actual.Get("client_id").String())

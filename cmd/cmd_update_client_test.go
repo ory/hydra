@@ -21,7 +21,6 @@ func TestUpdateClient(t *testing.T) {
 	reg := setup(t, c)
 
 	original := createClient(t, reg, nil)
-
 	t.Run("case=creates successfully", func(t *testing.T) {
 		actual := gjson.Parse(cmdx.ExecNoErr(t, c, "--grant-type", "implicit", original.ID.String()))
 		expected, err := reg.ClientManager().GetClient(ctx, actual.Get("client_id").String())

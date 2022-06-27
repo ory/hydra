@@ -43,11 +43,11 @@ type Handler struct {
 func Remote(cmd *cobra.Command) string {
 	if endpoint := flagx.MustGetString(cmd, "endpoint"); endpoint != "" {
 		return strings.TrimRight(endpoint, "/")
-	} else if endpoint := os.Getenv("HYDRA_URL"); endpoint != "" {
+	} else if endpoint := os.Getenv("ORY_SDK_URL"); endpoint != "" {
 		return strings.TrimRight(endpoint, "/")
 	}
 
-	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where Ory Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable HYDRA_URL if an administrative command was used.")
+	cmdx.Fatalf("To execute this command, the endpoint URL must point to the URL where Ory Hydra is located. To set the endpoint URL, use flag --endpoint or environment variable ORY_SDK_URL if an administrative command was used.")
 	return ""
 }
 

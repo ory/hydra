@@ -25,7 +25,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/ory/hydra/internal/httpclient/client/admin"
 	"github.com/ory/hydra/internal/httpclient/client/public"
 
 	httptransport "github.com/go-openapi/runtime/client"
@@ -58,18 +57,4 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
 
 	fmt.Printf("Revoked OAuth 2.0 Access Token: %s\n", token)
-}
-
-func (h *TokenHandler) DeleteToken(cmd *cobra.Command, args []string) {
-	handler := ConfigureClient(cmd)
-	clientID := flagx.MustGetString(cmd, "client-id")
-	if clientID == "" {
-		cmdx.Fatalf(`%s
-
-Please provide a Client ID using flags --client-id, or environment variables OAUTH2_CLIENT_ID
-`, cmd.UsageString())
-	}
-	_, err := handler.Admin.DeleteOAuth2Token(admin.NewDeleteOAuth2TokenParams().WithClientID(clientID))
-	cmdx.Must(err, "The request failed with the following error message:\n%s", FormatSwaggerError(err))
-	fmt.Printf("Successfully deleted access tokens for client %s\n", clientID)
 }

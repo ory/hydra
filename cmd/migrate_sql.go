@@ -26,7 +26,6 @@ import (
 	"github.com/ory/hydra/cmd/cli"
 )
 
-// migrateSqlCmd represents the sql command
 func NewMigrateSqlCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sql <database-url>",
@@ -43,8 +42,7 @@ You can read in the database URL using the -e flag, for example:
 
 ### WARNING ###
 
-Before running this command on an existing database, create a back up!
-`,
+Before running this command on an existing database, create a back up!`,
 		RunE: cli.NewHandler().Migration.MigrateSQL,
 	}
 

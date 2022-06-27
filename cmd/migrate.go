@@ -26,7 +26,6 @@ import (
 	"github.com/ory/x/configx"
 )
 
-// migrateCmd represents the migrate command
 func NewMigrateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "migrate",

@@ -6,13 +6,13 @@ import (
 	"github.com/ory/x/cmdx"
 )
 
-func NewListCmd(root *cobra.Command) *cobra.Command {
+func NewPerformCmd(root *cobra.Command) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     "list",
+		Use:     "perform",
 		Aliases: []string{"ls"},
-		Short:   "List resources",
+		Short:   "Perform OAuth 2.0 Flows",
 	}
-	cmd.AddCommand(NewListClientsCmd(root))
+	cmd.AddCommand(NewPerformClientCredentialsCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())
 	cmdx.RegisterFormatFlags(cmd.PersistentFlags())
 	return cmd

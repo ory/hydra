@@ -36,7 +36,7 @@ func NewTokenDeleteCmd() *cobra.Command {
 		Run:   cli.NewHandler().Token.DeleteToken,
 	}
 	cmd.Flags().String("client-id", os.Getenv("OAUTH2_CLIENT_ID"), "Use the provided OAuth 2.0 Client ID, defaults to environment variable OAUTH2_CLIENT_ID")
-	cmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_URL")
+	cmd.Flags().String("endpoint", os.Getenv("ORY_SDK_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable ORY_SDK_URL")
 	cmd.Flags().String("access-token", os.Getenv("OAUTH2_ACCESS_TOKEN"), "Set an access token to be used in the Authorization header, defaults to environment variable OAUTH2_ACCESS_TOKEN")
 	return cmd
 }

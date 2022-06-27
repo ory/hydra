@@ -28,7 +28,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// validateCmd represents the validate command
 func NewTokenRevokeCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "revoke <token>",

@@ -35,7 +35,7 @@ func NewGetClientsCmd(root *cobra.Command) *cobra.Command {
 		Use:   "client id-1 [id-2] [id-n]",
 		Args:  cobra.MinimumNArgs(1),
 		Short: "Get one or more OAuth 2.0 Clients by their ID(s)",
-		Long:  fmt.Sprintf(`This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`),
+		Long:  `This command gets all the details about an OAuth 2.0 Client. You can use this command in combination with jq.`,
 		Example: fmt.Sprintf(`To get the OAuth 2.0 Client's secret, run:
 
 	%s get client <your-client-id> | jq -r '.client_secret'`, root.Use),
@@ -47,7 +47,7 @@ func NewGetClientsCmd(root *cobra.Command) *cobra.Command {
 
 			clients := make([]hydra.OAuth2Client, 0, len(args))
 			for _, id := range args {
-				client, _, err := m.AdminApi.GetOAuth2Client(cmd.Context(), id).Execute()
+				client, _, err := m.AdminApi.GetOAuth2Client(cmd.Context(), id).Execute() //nolint:bodyclose
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}

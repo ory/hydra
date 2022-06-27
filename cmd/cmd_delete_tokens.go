@@ -42,7 +42,7 @@ func NewDeleteAccessTokensCmd(parent *cobra.Command) *cobra.Command {
 			}
 
 			clientID := args[0]
-			_, err = client.AdminApi.DeleteOAuth2Token(cmd.Context()).ClientId(clientID).Execute()
+			_, err = client.AdminApi.DeleteOAuth2Token(cmd.Context()).ClientId(clientID).Execute() //nolint:bodyclose
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}

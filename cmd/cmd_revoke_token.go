@@ -59,7 +59,7 @@ Please provide a Client ID and Client Secret using flags --client-id and --clien
 				context.WithValue(cmd.Context(), hydra.ContextBasicAuth, hydra.BasicAuth{
 					UserName: clientID,
 					Password: clientSecret,
-				})).Token(token).Execute()
+				})).Token(token).Execute() //nolint:bodyclose
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}

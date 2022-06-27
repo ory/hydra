@@ -207,7 +207,7 @@ func TestProviderCookieSameSiteMode(t *testing.T) {
 	assert.Equal(t, http.SameSiteNoneMode, p.CookieSameSiteMode(ctx))
 
 	p = MustNew(context.Background(), l, configx.SkipValidation())
-	p.MustSet(ctx, "dangerous-force-http", true)
+	p.MustSet(ctx, "dev", true)
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode(ctx))
 	p.MustSet(ctx, KeyCookieSameSiteMode, "none")
 	assert.Equal(t, http.SameSiteLaxMode, p.CookieSameSiteMode(ctx))

@@ -339,8 +339,9 @@ oidc:
 
 urls:
   self:
+
     # This value will be used as the "issuer" in access and ID tokens. It must be
-    # specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal
+    # specified and using HTTPS protocol, unless --dev is set. This should typically be equal
     # to the public value.
     issuer: https://localhost:4444/
 
@@ -425,6 +426,7 @@ secrets:
     - this-is-the-primary-secret
     - this-is-an-old-secret
     - this-is-another-old-secret
+
 
 # Enables profiling if set. Use "cpu" to enable cpu profiling and "mem" to enable memory profiling. For more details
 # on profiling, head over to: https://blog.golang.org/profiling-go-programs

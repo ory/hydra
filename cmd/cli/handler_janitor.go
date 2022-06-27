@@ -111,7 +111,10 @@ func purge(cmd *cobra.Command, args []string) error {
 		driver.WithOptions(co...),
 	}
 
-	d = driver.New(ctx, do...)
+	d, err := driver.New(ctx, do...)
+	if err != nil {
+		return errors.Wrap(err, "Could not create driver")
+	}
 
 	if len(d.Config().DSN()) == 0 {
 		return fmt.Errorf("%s\n%s\n%s\n", cmd.UsageString(),

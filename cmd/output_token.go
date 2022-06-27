@@ -11,7 +11,7 @@ type (
 )
 
 func (_ outputOAuth2Token) Header() []string {
-	return []string{"ACCESS TOKEN", "REFRESH TOKEN", "ID TOKEN", "EXPIRES IN"}
+	return []string{"ACCESS TOKEN", "REFRESH TOKEN", "ID TOKEN", "EXPIRY"}
 }
 
 func (i outputOAuth2Token) Columns() []string {

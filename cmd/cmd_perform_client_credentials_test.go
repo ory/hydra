@@ -3,10 +3,7 @@ package cmd_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/require"
-
-	"github.com/ory/hydra/client"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -21,12 +18,7 @@ func TestPerformClientCredentialsGrant(t *testing.T) {
 	public, _, reg := setupRoutes(t, c)
 	require.NoError(t, c.Flags().Set(cmdx.FlagEndpoint, public.URL))
 
-	expected := createClient(t, reg, &client.Client{
-		GrantTypes:              []string{"client_credentials"},
-		TokenEndpointAuthMethod: "client_secret_post",
-		Secret:                  uuid.Must(uuid.NewV4()).String()},
-	)
-
+	expected := createClientCredentialsClient(t, reg)
 	t.Run("case=exchanges for access token", func(t *testing.T) {
 		result := cmdx.ExecNoErr(t, c, "--client-id", expected.ID.String(), "--client-secret", expected.Secret)
 		actual := gjson.Parse(result)

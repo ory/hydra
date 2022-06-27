@@ -71,6 +71,12 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	performCmd.AddCommand(NewPerformClientCredentialsCmd(parent))
 	performCmd.AddCommand(NewPerformAuthorizationCodeCmd(parent))
 
+	revokeCmd := NewRevokeCmd(parent)
+	revokeCmd.AddCommand(NewRevokeTokenCmd(parent))
+
+	introspectCmd := NewIntrospectCmd(parent)
+	introspectCmd.AddCommand(NewIntrospectTokenCmd(parent))
+
 	parent.AddCommand(NewJanitorCmd())
 
 	migrateCmd := NewMigrateCmd()
@@ -83,11 +89,6 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	serveCmd.AddCommand(NewServeAdminCmd())
 	serveCmd.AddCommand(NewServePublicCmd())
 	serveCmd.AddCommand(NewServeAllCmd())
-
-	tokenCmd := NewTokenCmd()
-	parent.AddCommand(tokenCmd)
-	tokenCmd.AddCommand(NewTokenIntrospectCmd())
-	tokenCmd.AddCommand(NewTokenRevokeCmd())
 
 	parent.AddCommand(NewVersionCmd())
 }

@@ -41,7 +41,8 @@ For BCrypt, set the cost using the environment variable \`OAUTH2_HASHERS_BCRYPT_
 6), the faster the hashing. The higher the cost, the slower.
 EOF
 
-OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DSN=memory hydra serve all --dangerous-force-http --sqa-opt-out > hydra.log 2>&1 &
+killall hydra || true
+OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 SERVE_TLS_ENABLED=false SERVE_PUBLIC_PORT=9000 SERVE_ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DSN=memory hydra serve all --dangerous-force-http --sqa-opt-out > hydra.log 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done
@@ -52,6 +53,7 @@ echo "Creating benchmark client"
 client=$(hydra create client \
   -g client_credentials \
   --scope foo \
+  --format json \
   --endpoint http://localhost:9001)
 echo $client
 
@@ -60,7 +62,7 @@ clientId=$(echo $client | jq -r '.client_id')
 clientSecret=$(echo $client | jq -r '.client_secret')
 
 echo "Generating initial access tokens for token introspection benchmark"
-introToken=$(hydra perform client-credentials --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
+introToken=$(hydra perform client-credentials --format json --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret | jq -r '.access_token')
 
 cat >> BENCHMARKS.md << EOF
 ## OAuth 2.0
@@ -73,6 +75,7 @@ This section contains various benchmarks against OAuth 2.0 endpoints
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
+	-a "$clientId:$clientSecret" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "token=$introToken" \
   http://localhost:9001/oauth2/introspect 2>&1 \
@@ -89,7 +92,7 @@ This endpoint uses [BCrypt](#bcrypt).
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
-	-a $clientId:$clientSecret \
+	-a "$clientId:$clientSecret" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials" \
   http://localhost:9000/oauth2/token 2>&1 \

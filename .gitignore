@@ -27,3 +27,4 @@ packrd/
 persistence/sql/migrations/schema.sql
 cypress/videos
 cypress/screenshots
+BENCHMARKS.md

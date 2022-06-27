@@ -87,10 +87,9 @@ var tokenUserResult = template.Must(template.New("").Parse(`<html>
 </body>
 </html>`))
 
-// cmd represents the token command
 func NewTokenUserCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "user",
+		Use:   "authorization_code",
 		Short: "An exemplary OAuth 2.0 Client performing the OAuth 2.0 Authorize Code Flow",
 		Long: `Starts an exemplary web server that acts as an OAuth 2.0 Client performing the Authorize Code Flow.
 This command will help you to see if Ory Hydra has been configured properly.
@@ -303,7 +302,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 	cmd.Flags().StringSlice("audience", []string{}, "Request a specific OAuth 2.0 Access Token Audience")
 	cmd.Flags().String("auth-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the authorization url, use this flag")
 	cmd.Flags().String("token-url", "", "Usually it is enough to specify the `endpoint` flag, but if you want to force the token url, use this flag")
-	cmd.Flags().String("endpoint", os.Getenv("HYDRA_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable HYDRA_URL")
+	cmd.Flags().String("endpoint", os.Getenv("ORY_SDK_URL"), "Set the URL where Ory Hydra is hosted, defaults to environment variable ORY_SDK_URL")
 	cmd.Flags().Bool("https", false, "Sets up HTTPS for the endpoint using a self-signed certificate which is re-generated every time you start this command")
 
 	return cmd

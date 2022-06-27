@@ -59,6 +59,7 @@ func newRegistryDefault(t *testing.T, url string, c *config.DefaultProvider, mig
 	ctx := context.Background()
 	c.MustSet(ctx, config.KeyLogLevel, "trace")
 	c.MustSet(ctx, config.KeyDSN, url)
+	c.MustSet(ctx, "dev", true)
 
 	r, err := driver.NewRegistryFromDSN(ctx, c, logrusx.New("test_hydra", "master"), false, migrate, ctxer)
 	require.NoError(t, err)

@@ -8,9 +8,8 @@ import (
 
 func NewIntrospectCmd(root *cobra.Command) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     "introspect",
-		Aliases: []string{"ls"},
-		Short:   "Introspect resources",
+		Use:   "introspect",
+		Short: "Introspect resources",
 	}
 	cmd.AddCommand(NewIntrospectTokenCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())

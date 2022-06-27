@@ -4,7 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"io/ioutil"
+	"net/http/httptest"
 	"testing"
+
+	"github.com/gofrs/uuid"
 
 	"gopkg.in/square/go-jose.v2"
 
@@ -12,7 +15,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
-	"github.com/ory/hydra/cmd/cliclient"
 	"github.com/ory/hydra/driver"
 	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/internal/testhelpers"
@@ -31,16 +33,22 @@ func base64EncodedPGPPublicKey(t *testing.T) string {
 	return base64.StdEncoding.EncodeToString(gpgPublicKey)
 }
 
-func setup(t *testing.T, cmd *cobra.Command) driver.Registry {
+func setupRoutes(t *testing.T, cmd *cobra.Command) (*httptest.Server, *httptest.Server, driver.Registry) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
 	reg := internal.NewMockedRegistry(t, &contextx.Default{})
-	_, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
+	public, admin := testhelpers.NewOAuth2Server(ctx, t, reg)
 
-	cliclient.RegisterClientFlags(cmd.Flags())
+	cmdx.RegisterHTTPClientFlags(cmd.Flags())
 	cmdx.RegisterFormatFlags(cmd.Flags())
-	require.NoError(t, cmd.Flags().Set(cliclient.FlagEndpoint, admin.URL))
+	require.NoError(t, cmd.Flags().Set(cmdx.FlagFormat, string(cmdx.FormatJSON)))
+	return public, admin, reg
+}
+
+func setup(t *testing.T, cmd *cobra.Command) driver.Registry {
+	_, admin, reg := setupRoutes(t, cmd)
+	require.NoError(t, cmd.Flags().Set(cmdx.FlagEndpoint, admin.URL))
 	require.NoError(t, cmd.Flags().Set(cmdx.FlagFormat, string(cmdx.FormatJSON)))
 	return reg
 }
@@ -56,9 +64,11 @@ var snapshotExcludedClientFields = []snapshotx.ExceptOpt{
 
 func createClient(t *testing.T, reg driver.Registry, c *client.Client) *client.Client {
 	if c == nil {
-		c = &client.Client{}
+		c = &client.Client{TokenEndpointAuthMethod: "client_secret_post", Secret: uuid.Must(uuid.NewV4()).String()}
 	}
+	secret := c.Secret
 	require.NoError(t, reg.ClientManager().CreateClient(context.Background(), c))
+	c.Secret = secret
 	return c
 }
 

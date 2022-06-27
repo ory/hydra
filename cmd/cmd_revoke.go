@@ -8,9 +8,8 @@ import (
 
 func NewRevokeCmd(root *cobra.Command) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     "revoke",
-		Aliases: []string{"ls"},
-		Short:   "Revoke resources",
+		Use:   "revoke",
+		Short: "Revoke resources",
 	}
 	cmd.AddCommand(NewRevokeTokenCmd(root))
 	cmdx.RegisterHTTPClientFlags(cmd.PersistentFlags())

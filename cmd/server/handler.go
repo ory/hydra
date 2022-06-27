@@ -94,9 +94,12 @@ func isDSNAllowed(ctx context.Context, r driver.Registry) {
 	}
 }
 
-func RunServeAdmin(cmd *cobra.Command, args []string) {
+func RunServeAdmin(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
-	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	d, err := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	if err != nil {
+		return err
+	}
 	isDSNAllowed(ctx, d)
 
 	admin, _, adminmw, _ := setup(ctx, d, cmd)
@@ -117,11 +120,15 @@ func RunServeAdmin(cmd *cobra.Command, args []string) {
 	)
 
 	wg.Wait()
+	return nil
 }
 
-func RunServePublic(cmd *cobra.Command, args []string) {
+func RunServePublic(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
-	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	d, err := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	if err != nil {
+		return err
+	}
 	isDSNAllowed(ctx, d)
 
 	_, public, _, publicmw := setup(ctx, d, cmd)
@@ -142,11 +149,15 @@ func RunServePublic(cmd *cobra.Command, args []string) {
 	)
 
 	wg.Wait()
+	return nil
 }
 
-func RunServeAll(cmd *cobra.Command, args []string) {
+func RunServeAll(cmd *cobra.Command, args []string) error {
 	ctx := cmd.Context()
-	d := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	d, err := driver.New(cmd.Context(), driver.WithOptions(configx.WithFlags(cmd.Flags())))
+	if err != nil {
+		return err
+	}
 
 	admin, public, adminmw, publicmw := setup(ctx, d, cmd)
 
@@ -179,6 +190,7 @@ func RunServeAll(cmd *cobra.Command, args []string) {
 	)
 
 	wg.Wait()
+	return nil
 }
 
 func setup(ctx context.Context, d driver.Registry, cmd *cobra.Command) (admin *x.RouterAdmin, public *x.RouterPublic, adminmw, publicmw *negroni.Negroni) {

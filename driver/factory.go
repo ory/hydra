@@ -61,7 +61,7 @@ func SkipNetworkInit() OptionsModifier {
 	}
 }
 
-func New(ctx context.Context, opts ...OptionsModifier) Registry {
+func New(ctx context.Context, opts ...OptionsModifier) (Registry, error) {
 	o := newOptions()
 	for _, f := range opts {
 		f(o)
@@ -75,21 +75,26 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 		var err error
 		c, err = config.New(ctx, l, o.opts...)
 		if err != nil {
-			l.WithError(err).Fatal("Unable to instantiate configuration.")
+			l.WithError(err).Error("Unable to instantiate configuration.")
+			return nil, err
 		}
 	}
 
 	if o.validate {
-		config.MustValidate(ctx, l, c)
+		if err := config.Validate(ctx, l, c); err != nil {
+			return nil, err
+		}
 	}
 
 	r, err := NewRegistryFromDSN(ctx, c, l, o.skipNetworkInit, false, ctxter)
 	if err != nil {
-		l.WithError(err).Fatal("Unable to create service registry.")
+		l.WithError(err).Error("Unable to create service registry.")
+		return nil, err
 	}
 
 	if err = r.Init(ctx, o.skipNetworkInit, false, &contextx.Default{}); err != nil {
-		l.WithError(err).Fatal("Unable to initialize service registry.")
+		l.WithError(err).Error("Unable to initialize service registry.")
+		return nil, err
 	}
 
 	// Avoid cold cache issues on boot:
@@ -98,6 +103,5 @@ func New(ctx context.Context, opts ...OptionsModifier) Registry {
 	}
 
 	c.Source(ctx).SetTracer(ctx, r.Tracer(ctx))
-
-	return r
+	return r, nil
 }

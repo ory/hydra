@@ -83,6 +83,7 @@ const (
 	KeyOAuth2GrantJWTIssuedDateOptional          = "oauth2.grant.jwt.iat_optional"
 	KeyOAuth2GrantJWTMaxDuration                 = "oauth2.grant.jwt.max_ttl"
 	KeyRefreshTokenHookURL                       = "oauth2.refresh_token_hook" // #nosec G101
+	KeyDevelopmentMode                           = "dev"
 )
 
 const DSNMemory = "memory"
@@ -170,8 +171,8 @@ func (p *DefaultProvider) Source(ctx context.Context) *configx.Provider {
 	return p.getProvider(ctx)
 }
 
-func (p *DefaultProvider) InsecureRedirects(ctx context.Context) []string {
-	return p.getProvider(ctx).Strings("dangerous-allow-insecure-redirect-urls")
+func (p *DefaultProvider) IsDevelopmentMode(ctx context.Context) bool {
+	return p.getProvider(ctx).Bool(KeyDevelopmentMode)
 }
 
 func (p *DefaultProvider) WellKnownKeys(ctx context.Context, include ...string) []string {

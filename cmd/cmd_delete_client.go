@@ -52,7 +52,7 @@ To delete OAuth 2.0 Clients with the owner of "foo@bar.com", run:
 			)
 
 			for _, c := range args {
-				_, err := m.AdminApi.DeleteOAuth2Client(cmd.Context(), c).Execute()
+				_, err := m.AdminApi.DeleteOAuth2Client(cmd.Context(), c).Execute() //nolint:bodyclose
 				if err != nil {
 					failed[c] = cmdx.PrintOpenAPIError(cmd, err)
 					continue

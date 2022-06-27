@@ -42,7 +42,7 @@ For BCrypt, set the cost using the environment variable \`OAUTH2_HASHERS_BCRYPT_
 EOF
 
 killall hydra || true
-OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 SERVE_TLS_ENABLED=false SERVE_PUBLIC_PORT=9000 SERVE_ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DSN=memory hydra serve all --dangerous-force-http --sqa-opt-out > hydra.log 2>&1 &
+OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 SERVE_TLS_ENABLED=false SERVE_PUBLIC_PORT=9000 SERVE_ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DSN=memory hydra serve all --dev --sqa-opt-out > hydra.log 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done

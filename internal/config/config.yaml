@@ -341,7 +341,7 @@ urls:
   self:
 
     # This value will be used as the "issuer" in access and ID tokens. It must be
-    # specified and using HTTPS protocol, unless --dangerous-force-http is set. This should typically be equal
+    # specified and using HTTPS protocol, unless --dev is set. This should typically be equal
     # to the public value.
     issuer: https://localhost:4444/
 

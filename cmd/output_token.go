@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/ory/x/stringsx"
+	"time"
 
 	"golang.org/x/oauth2"
 )
@@ -18,9 +20,9 @@ func (i outputOAuth2Token) Columns() []string {
 	token := oauth2.Token(i)
 	return []string{
 		i.AccessToken,
-		i.RefreshToken,
-		fmt.Sprintf("%v", token.Extra("id_token")),
-		i.Expiry.String(),
+		stringsx.Coalesce(i.RefreshToken, "<empty>"),
+		stringsx.Coalesce(fmt.Sprintf("%s", token.Extra("id_token")), "<empty>"),
+		i.Expiry.Round(time.Second).String(),
 	}
 }
 

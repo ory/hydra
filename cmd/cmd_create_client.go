@@ -64,10 +64,22 @@ const (
 
 func NewCreateClientsCommand(root *cobra.Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "client",
-		Short:   "Create an OAuth 2.0 Client",
-		Args:    cobra.NoArgs,
-		Example: fmt.Sprintf(`%[1]s create client -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar`, root.Use),
+		Use:   "client",
+		Short: "Create an OAuth 2.0 Client",
+		Args:  cobra.NoArgs,
+		Example: fmt.Sprintf(`%[1]s create client -n "my app" -c http://localhost/cb -g authorization_code -r code -a core,foobar
+
+Use the tool jq (or any other JSON tool) to get the OAuth2 Client ID and and Secret:
+
+client=$(hydra create client \
+    --endpoint ... \
+    --format json \
+    ...
+echo $client
+
+# Parse the JSON response using jq to get the client ID and client secret:
+client_id=$(echo $client | jq -r '.client_id')
+client_secret=$(echo $client | jq -r '.client_secret')`, root.Use),
 		Long: fmt.Sprintf(`This command creates an OAuth 2.0 Client which can be used to perform various OAuth 2.0 Flows like
 the Authorize Code, Implicit, Refresh flow. This command allows settings all fields defined in the OpenID Connect Dynamic Client Registration standard.
 

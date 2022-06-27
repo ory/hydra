@@ -10,7 +10,7 @@ services:
       - "5004:4444" # Public port
       - "5001:4445" # Admin port
     command:
-      serve all --dangerous-force-http
+      serve all --dev
     environment:
       - URLS_SELF_ISSUER=http://127_0_0_1:5004/
       - URLS_CONSENT=http://127_0_0_1:5002/consent

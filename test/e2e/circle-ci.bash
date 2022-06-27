@@ -94,7 +94,7 @@ done
 
 ./hydra migrate sql --yes $TEST_DATABASE > ./hydra-migrate.e2e.log 2>&1
     DSN=$TEST_DATABASE \
-    ./hydra serve all --dangerous-force-http --sqa-opt-out > ./hydra.e2e.log 2>&1 &
+    ./hydra serve all --dev --sqa-opt-out > ./hydra.e2e.log 2>&1 &
 
 npm run wait-on -- -l -t 300000 \
   --interval 1000 -s 1 -d 1000 \

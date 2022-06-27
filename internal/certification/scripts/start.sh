@@ -44,6 +44,6 @@ PORT=$hydraport \
     OIDC_DYNAMIC_CLIENT_REGISTRATION_DEFAULT_SCOPE=openid,offline,offline_access,profile,email,address,phone \
     LOG_LEVEL=debug \
     DSN=memory \
-    hydra serve --dangerous-force-http
+    hydra serve --dev
 
 kill %1

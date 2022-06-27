@@ -1,4 +1,4 @@
-FROM golang:1.17-buster AS builder
+FROM golang:1.18-buster AS builder
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
@@ -8,6 +8,7 @@ RUN apt-get update && \
 WORKDIR /go/src/github.com/ory/hydra
 
 COPY go.mod go.sum ./
+COPY internal/httpclient-next/go.* ./internal/httpclient-next
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1

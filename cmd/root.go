@@ -68,13 +68,16 @@ func RegisterCommandRecursive(parent *cobra.Command) {
 	importCmd.AddCommand(NewKeysImportCmd(parent))
 
 	performCmd := NewPerformCmd(parent)
+	parent.AddCommand(performCmd)
 	performCmd.AddCommand(NewPerformClientCredentialsCmd(parent))
 	performCmd.AddCommand(NewPerformAuthorizationCodeCmd(parent))
 
 	revokeCmd := NewRevokeCmd(parent)
+	parent.AddCommand(revokeCmd)
 	revokeCmd.AddCommand(NewRevokeTokenCmd(parent))
 
 	introspectCmd := NewIntrospectCmd(parent)
+	parent.AddCommand(introspectCmd)
 	introspectCmd.AddCommand(NewIntrospectTokenCmd(parent))
 
 	parent.AddCommand(NewJanitorCmd())

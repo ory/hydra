@@ -36,7 +36,7 @@ func clientFromFlags(cmd *cobra.Command) hydra.OAuth2Client {
 		RequestObjectSigningAlg:           pointerx.String(flagx.MustGetString(cmd, flagClientRequestObjectSigningAlg)),
 		RequestUris:                       flagx.MustGetStringSlice(cmd, flagClientRequestURI),
 		ResponseTypes:                     flagx.MustGetStringSlice(cmd, flagClientResponseType),
-		Scope:                             pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), "")),
+		Scope:                             pointerx.String(strings.Join(flagx.MustGetStringSlice(cmd, flagClientScope), " ")),
 		SectorIdentifierUri:               pointerx.String(flagx.MustGetString(cmd, flagClientSectorIdentifierURI)),
 		SubjectType:                       pointerx.String(flagx.MustGetString(cmd, flagClientSubjectType)),
 		TokenEndpointAuthMethod:           pointerx.String(flagx.MustGetString(cmd, flagClientTokenEndpointAuthMethod)),

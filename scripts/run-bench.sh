@@ -6,9 +6,6 @@ cd "$( dirname "${BASH_SOURCE[0]}" )/.."
 
 numReqs=10000
 numParallel=100
-clientId=benchclient
-clientSecret=benchsecret
-basicAuth=YmVuY2hjbGllbnQ6YmVuY2hzZWNyZXQ=
 
 cat > BENCHMARKS.md << EOF
 ---
@@ -44,7 +41,7 @@ For BCrypt, set the cost using the environment variable \`OAUTH2_HASHERS_BCRYPT_
 6), the faster the hashing. The higher the cost, the slower.
 EOF
 
-OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DATABASE_URL=memory hydra serve all --dangerous-force-http --sqa-opt-out > /dev/null 2>&1 &
+OAUTH2_HASHERS_PBKDF2_ITERATIONS=10000 PUBLIC_PORT=9000 ADMIN_PORT=9001 ISSUER_URL=http://localhost:9000 DSN=memory hydra serve all --dangerous-force-http --sqa-opt-out > hydra.log 2>&1 &
 
 while ! echo exit | nc 127.0.0.1 9000; do sleep 1; done
 while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done
@@ -52,15 +49,18 @@ while ! echo exit | nc 127.0.0.1 9001; do sleep 1; done
 sleep 1
 
 echo "Creating benchmark client"
-hydra clients create \
-    -g client_credentials \
-    --id $clientId \
-    --secret $clientSecret \
-    -a foo \
-    --endpoint http://localhost:9001
+client=$(hydra create client \
+  -g client_credentials \
+  --scope foo \
+  --endpoint http://localhost:9001)
+echo $client
+
+# Parse the JSON response using jq to get the client ID and client secret:
+clientId=$(echo $client | jq -r '.client_id')
+clientSecret=$(echo $client | jq -r '.client_secret')
 
 echo "Generating initial access tokens for token introspection benchmark"
-introToken=$(hydra token client --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
+introToken=$(hydra perform client-credentials --endpoint http://localhost:9000 --client-id $clientId --client-secret $clientSecret)
 
 cat >> BENCHMARKS.md << EOF
 ## OAuth 2.0
@@ -73,11 +73,10 @@ This section contains various benchmarks against OAuth 2.0 endpoints
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "token=$introToken" \
-    http://localhost:9001/oauth2/introspect 2>&1 \
-    | tee -a BENCHMARKS.md
-
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "token=$introToken" \
+  http://localhost:9001/oauth2/introspect 2>&1 \
+  | tee -a BENCHMARKS.md
 
 cat >> BENCHMARKS.md << EOF
 \`\`\`
@@ -90,12 +89,11 @@ This endpoint uses [BCrypt](#bcrypt).
 EOF
 
 hey -n $numReqs -c $numParallel -m POST \
-	-H "Authorization: Basic $basicAuth" \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -d "grant_type=client_credentials" \
-    http://localhost:9000/oauth2/token 2>&1 \
-    | tee -a BENCHMARKS.md
-
+	-a $clientId:$clientSecret \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  http://localhost:9000/oauth2/token 2>&1 \
+  | tee -a BENCHMARKS.md
 
 # shellcheck disable=SC2006
 cat >> BENCHMARKS.md << EOF

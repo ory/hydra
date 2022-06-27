@@ -6,9 +6,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /go/src/github.com/ory/hydra
+RUN mkdir -p ./internal/httpclient-next
 
 COPY go.mod go.sum ./
-COPY internal/httpclient-next/go.* ./internal/httpclient-next
+COPY internal/httpclient-next/go.* ./internal/httpclient-next/
 
 ENV GO111MODULE on
 ENV CGO_ENABLED 1

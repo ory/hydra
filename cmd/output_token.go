@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/ory/x/stringsx"
 	"time"
+
+	"github.com/ory/x/stringsx"
 
 	"golang.org/x/oauth2"
 )

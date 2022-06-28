@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"net/http"
 	"time"
@@ -65,8 +66,6 @@ type RegistryBase struct {
 	ctxer        contextx.Contextualizer
 	hh           *healthx.Handler
 	kc           *jwk.AEAD
-	cs           sessions.Store
-	csPrev       [][]byte
 	cos          consent.Strategy
 	writer       herodot.Writer
 	fsc          fosite.ScopeStrategy
@@ -298,18 +297,32 @@ func (m *RegistryBase) KeyCipher() *jwk.AEAD {
 }
 
 func (m *RegistryBase) CookieStore(ctx context.Context) sessions.Store {
-	if m.cs == nil {
-		cs := sessions.NewCookieStore(m.conf.GetCookieSecrets(ctx)...)
-		// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.
-		// MaxAge(0) disables internal MaxAge check by SecureCookie, see:
-		//
-		// https://github.com/ory/hydra/pull/2488#discussion_r618992698
-		cs.MaxAge(0)
-
-		m.cs = cs
-		m.csPrev = m.conf.GetCookieSecrets(ctx)
+	var keys [][]byte
+	for _, k := range m.conf.GetCookieSecrets(ctx) {
+		encrypt := sha256.Sum256(k)
+		keys = append(keys, k, encrypt[:])
 	}
-	return m.cs
+
+	cs := sessions.NewCookieStore(keys...)
+	cs.Options.Secure = !m.Config().IsDevelopmentMode(ctx)
+	cs.Options.HttpOnly = true
+
+	// CookieStore MaxAge is set to 86400 * 30 by default. This prevents secure cookies retrieval with expiration > 30 days.
+	// MaxAge(0) disables internal MaxAge check by SecureCookie, see:
+	//
+	// https://github.com/ory/hydra/pull/2488#discussion_r618992698
+	cs.MaxAge(0)
+
+	if domain := m.Config().CookieDomain(ctx); domain != "" {
+		cs.Options.Domain = domain
+	}
+
+	cs.Options.Path = "/"
+	if sameSite := m.Config().CookieSameSiteMode(ctx); sameSite != 0 {
+		cs.Options.SameSite = sameSite
+	}
+
+	return cs
 }
 
 func (m *RegistryBase) HTTPClient(ctx context.Context, opts ...httpx.ResilientOptions) *retryablehttp.Client {

@@ -185,3 +185,6 @@ post-release: .bin/yq
 		cat quickstart.yml | yq '.services.hydra.image = "oryd/hydra:'$$DOCKER_TAG'"' | sponge quickstart.yml
 		cat quickstart.yml | yq '.services.hydra-migrate.image = "oryd/hydra:'$$DOCKER_TAG'"' | sponge quickstart.yml
 		cat quickstart.yml | yq '.services.consent.image = "oryd/hydra-login-consent-node:'$$DOCKER_TAG'"' | sponge quickstart.yml
+
+generate: .bin/mockgen
+		go generate ./...

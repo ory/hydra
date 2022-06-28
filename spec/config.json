@@ -414,7 +414,36 @@
               "type": "boolean",
               "description": "Some older browser versions don’t work with SameSite=None. This option enables the workaround defined in https://web.dev/samesite-cookie-recipes/ which essentially stores a second cookie without SameSite as a fallback.",
               "default": false,
-              "examples": [true]
+              "examples": [
+                true
+              ]
+            },
+            "domain": {
+              "title": "HTTP Cookie Domain",
+              "description": "Sets the cookie domain for session and CSRF cookies. Useful when dealing with subdomains. Use with care!",
+              "type": "string"
+            },
+            "names": {
+              "title": "Cookie Names",
+              "description": "Sets the session cookie name. Use with care!",
+              "type": "object",
+              "properties": {
+                "login_csrf": {
+                  "type": "string",
+                  "title": "CSRF Cookie Name",
+                  "default": "ory_hydra_login_csrf"
+                },
+                "consent_csrf": {
+                  "type": "string",
+                  "title": "CSRF Cookie Name",
+                  "default": "ory_hydra_consent_csrf"
+                },
+                "session": {
+                  "type": "string",
+                  "title": "Session Cookie Name",
+                  "default": "ory_hydra_session"
+                }
+              }
             }
           }
         }

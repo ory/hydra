@@ -78,11 +78,10 @@
             ]
           },
           "uniqueItems": true,
-          "default": [
-            "*"
-          ],
+          "default": [],
           "examples": [
             [
+              "*",
               "https://example.com",
               "https://*.example.com",
               "https://*.foo.example.com"
@@ -97,7 +96,11 @@
             "GET",
             "PUT",
             "PATCH",
-            "DELETE"
+            "DELETE",
+            "CONNECT",
+            "HEAD",
+            "OPTIONS",
+            "TRACE"
           ],
           "items": {
             "type": "string",
@@ -118,8 +121,12 @@
           "type": "array",
           "description": "A list of non simple headers the client is allowed to use with cross-domain requests.",
           "default": [
-            "Authorization",
-            "Content-Type"
+            "Accept",
+            "Content-Type",
+            "Content-Length",
+            "Accept-Language",
+            "Content-Language",
+            "Authorization"
           ],
           "items": {
             "type": "string"
@@ -129,6 +136,12 @@
           "type": "array",
           "description": "Sets which headers are safe to expose to the API of a CORS API specification.",
           "default": [
+            "Cache-Control",
+            "Expires",
+            "Last-Modified",
+            "Pragma",
+            "Content-Length",
+            "Content-Language",
             "Content-Type"
           ],
           "items": {
@@ -139,11 +152,6 @@
           "type": "boolean",
           "description": "Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.",
           "default": true
-        },
-        "options_passthrough": {
-          "type": "boolean",
-          "description": "TODO",
-          "default": false
         },
         "max_age": {
           "type": "integer",

@@ -22,7 +22,6 @@ serve:
       exposed_headers:
         - Content-Type
       allow_credentials: true
-      options_passthrough: true
       max_age: 1
       debug: false
     access_log:
@@ -46,7 +45,6 @@ serve:
       exposed_headers:
         - Content-Type
       allow_credentials: true
-      options_passthrough: true
       max_age: 1
       debug: false
     access_log:

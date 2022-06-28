@@ -65,7 +65,7 @@ require (
 	github.com/ory/graceful v0.1.1
 	github.com/ory/herodot v0.9.13
 	github.com/ory/hydra-client-go v1.11.8
-	github.com/ory/x v0.0.430
+	github.com/ory/x v0.0.431
 	github.com/pborman/uuid v1.2.1
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pkg/errors v0.9.1

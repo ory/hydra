@@ -53,6 +53,10 @@ const (
 	KeyEncryptSessionData                        = "oauth2.session.encrypt_at_rest"
 	KeyCookieSameSiteMode                        = "serve.cookies.same_site_mode"
 	KeyCookieSameSiteLegacyWorkaround            = "serve.cookies.same_site_legacy_workaround"
+	KeyCookieDomain                              = "serve.cookies.domain"
+	KeyCookieLoginCSRFName                       = "serve.cookies.names.login_csrf"
+	KeyCookieConsentCSRFName                     = "serve.cookies.names.consent_csrf"
+	KeyCookieSessionName                         = "serve.cookies.names.session"
 	KeyConsentRequestMaxAge                      = "ttl.login_consent_request"
 	KeyAccessTokenLifespan                       = "ttl.access_token"  // #nosec G101
 	KeyRefreshTokenLifespan                      = "ttl.refresh_token" // #nosec G101
@@ -462,4 +466,29 @@ func (p *DefaultProvider) GetGrantTypeJWTBearerIssuedDateOptional(ctx context.Co
 
 func (p *DefaultProvider) GetJWTMaxDuration(ctx context.Context) time.Duration {
 	return p.getProvider(ctx).DurationF(KeyOAuth2GrantJWTMaxDuration, time.Hour*24*30)
+}
+
+func (p *DefaultProvider) CookieDomain(ctx context.Context) string {
+	return p.getProvider(ctx).String(KeyCookieDomain)
+}
+
+func (p *DefaultProvider) CookieNameLoginCSRF(ctx context.Context) string {
+	return p.cookieSuffix(ctx, KeyCookieLoginCSRFName)
+}
+
+func (p *DefaultProvider) CookieNameConsentCSRF(ctx context.Context) string {
+	return p.cookieSuffix(ctx, KeyCookieConsentCSRFName)
+}
+
+func (p *DefaultProvider) SessionCookieName(ctx context.Context) string {
+	return p.cookieSuffix(ctx, KeyCookieSessionName)
+}
+
+func (p *DefaultProvider) cookieSuffix(ctx context.Context, key string) string {
+	var suffix string
+	if p.IsDevelopmentMode(ctx) {
+		suffix = "_dev"
+	}
+
+	return p.getProvider(ctx).String(key) + suffix
 }

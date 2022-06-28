@@ -89,14 +89,11 @@ func TestCORSOptions(t *testing.T) {
 	assert.True(t, enabled)
 
 	assert.EqualValues(t, cors.Options{
-		AllowedOrigins:     []string{"*"},
-		AllowedMethods:     []string{"POST", "GET", "PUT", "PATCH", "DELETE"},
-		AllowedHeaders:     []string{"Authorization", "Content-Type"},
-		ExposedHeaders:     []string{"Content-Type"},
-		AllowCredentials:   true,
-		OptionsPassthrough: false,
-		MaxAge:             0,
-		Debug:              false,
+		AllowedOrigins:   []string{},
+		AllowedMethods:   []string{"POST", "GET", "PUT", "PATCH", "DELETE", "CONNECT", "HEAD", "OPTIONS", "TRACE"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Accept-Language", "Content-Language", "Authorization"},
+		ExposedHeaders:   []string{"Cache-Control", "Expires", "Last-Modified", "Pragma", "Content-Length", "Content-Language", "Content-Type"},
+		AllowCredentials: true,
 	}, conf)
 }
 
@@ -240,14 +237,13 @@ func TestViperProviderValidates(t *testing.T) {
 	assert.Equal(t, expectedAdminPermission, c.SocketPermission(AdminInterface))
 
 	expectedCors := cors.Options{
-		AllowedOrigins:     []string{"https://example.com"},
-		AllowedMethods:     []string{"GET"},
-		AllowedHeaders:     []string{"Authorization"},
-		ExposedHeaders:     []string{"Content-Type"},
-		AllowCredentials:   true,
-		MaxAge:             1,
-		Debug:              false,
-		OptionsPassthrough: true,
+		AllowedOrigins:   []string{"https://example.com"},
+		AllowedMethods:   []string{"GET"},
+		AllowedHeaders:   []string{"Authorization"},
+		ExposedHeaders:   []string{"Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           1,
+		Debug:            false,
 	}
 
 	gc, enabled := c.CORS(ctx, AdminInterface)

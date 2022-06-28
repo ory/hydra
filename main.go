@@ -18,8 +18,6 @@
  * @license 	Apache-2.0
  */
 
-//go:generate swagger generate spec
-
 package main
 
 import (

@@ -29,6 +29,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ory/x/corsx"
+
 	"github.com/ory/x/servicelocator"
 
 	analytics "github.com/ory/analytics-go/v4"
@@ -70,21 +72,10 @@ func EnhanceMiddleware(ctx context.Context, d driver.Registry, n *negroni.Negron
 	}
 
 	n.UseHandler(router)
-	if !enableCORS {
-		return n
-	}
+	corsx.ContextualizedMiddleware(func(ctx context.Context) (opts cors.Options, enabled bool) {
+		return d.Config().CORS(ctx, iface)
+	})
 
-	options, enabled := d.Config().CORS(ctx, iface)
-	if !enabled {
-		return n
-	}
-
-	if enabled {
-		d.Logger().
-			WithField("options", fmt.Sprintf("%+v", options)).
-			Infof("Enabling CORS on interface: %s", address)
-		return cors.New(options).Handler(n)
-	}
 	return n
 }
 

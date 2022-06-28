@@ -69,9 +69,34 @@ func (p *DefaultProvider) SocketPermission(iface ServeInterface) *configx.UnixPe
 
 func (p *DefaultProvider) CORS(ctx context.Context, iface ServeInterface) (cors.Options, bool) {
 	return p.getProvider(ctx).CORS(iface.Key(KeyRoot), cors.Options{
-		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		ExposedHeaders:   []string{"Content-Type"},
+		AllowedMethods: []string{
+			"POST",
+			"GET",
+			"PUT",
+			"PATCH",
+			"DELETE",
+			"CONNECT",
+			"HEAD",
+			"OPTIONS",
+			"TRACE",
+		},
+		AllowedHeaders: []string{
+			"Accept",
+			"Content-Type",
+			"Content-Length",
+			"Accept-Language",
+			"Content-Language",
+			"Authorization",
+		},
+		ExposedHeaders: []string{
+			"Cache-Control",
+			"Expires",
+			"Last-Modified",
+			"Pragma",
+			"Content-Length",
+			"Content-Language",
+			"Content-Type",
+		},
 		AllowCredentials: true,
 	})
 }

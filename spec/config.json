@@ -78,9 +78,10 @@
             ]
           },
           "uniqueItems": true,
-          "default": ["*"],
+          "default": [],
           "examples": [
             [
+              "*",
               "https://example.com",
               "https://*.example.com",
               "https://*.foo.example.com"
@@ -90,7 +91,17 @@
         "allowed_methods": {
           "type": "array",
           "description": "A list of HTTP methods the user agent is allowed to use with cross-domain requests.",
-          "default": ["POST", "GET", "PUT", "PATCH", "DELETE"],
+          "default": [
+            "POST",
+            "GET",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "CONNECT",
+            "HEAD",
+            "OPTIONS",
+            "TRACE"
+          ],
           "items": {
             "type": "string",
             "enum": [
@@ -109,7 +120,14 @@
         "allowed_headers": {
           "type": "array",
           "description": "A list of non simple headers the client is allowed to use with cross-domain requests.",
-          "default": ["Authorization", "Content-Type"],
+          "default": [
+            "Accept",
+            "Content-Type",
+            "Content-Length",
+            "Accept-Language",
+            "Content-Language",
+            "Authorization"
+          ],
           "items": {
             "type": "string"
           }
@@ -117,7 +135,15 @@
         "exposed_headers": {
           "type": "array",
           "description": "Sets which headers are safe to expose to the API of a CORS API specification.",
-          "default": ["Content-Type"],
+          "default": [
+            "Cache-Control",
+            "Expires",
+            "Last-Modified",
+            "Pragma",
+            "Content-Length",
+            "Content-Language",
+            "Content-Type"
+          ],
           "items": {
             "type": "string"
           }
@@ -126,11 +152,6 @@
           "type": "boolean",
           "description": "Sets whether the request can include user credentials like cookies, HTTP authentication or client side SSL certificates.",
           "default": true
-        },
-        "options_passthrough": {
-          "type": "boolean",
-          "description": "TODO",
-          "default": false
         },
         "max_age": {
           "type": "integer",

@@ -15,8 +15,8 @@ import (
 	"encoding/json"
 )
 
-// JsonWebKeySetGeneratorRequest struct for JsonWebKeySetGeneratorRequest
-type JsonWebKeySetGeneratorRequest struct {
+// AdminCreateJsonWebKeySetBody struct for AdminCreateJsonWebKeySetBody
+type AdminCreateJsonWebKeySetBody struct {
 	// The algorithm to be used for creating the key. Supports \"RS256\", \"ES256\", \"ES512\", \"HS512\", and \"HS256\"
 	Alg string `json:"alg"`
 	// The kid of the key to be created
@@ -25,28 +25,28 @@ type JsonWebKeySetGeneratorRequest struct {
 	Use string `json:"use"`
 }
 
-// NewJsonWebKeySetGeneratorRequest instantiates a new JsonWebKeySetGeneratorRequest object
+// NewAdminCreateJsonWebKeySetBody instantiates a new AdminCreateJsonWebKeySetBody object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewJsonWebKeySetGeneratorRequest(alg string, kid string, use string) *JsonWebKeySetGeneratorRequest {
-	this := JsonWebKeySetGeneratorRequest{}
+func NewAdminCreateJsonWebKeySetBody(alg string, kid string, use string) *AdminCreateJsonWebKeySetBody {
+	this := AdminCreateJsonWebKeySetBody{}
 	this.Alg = alg
 	this.Kid = kid
 	this.Use = use
 	return &this
 }
 
-// NewJsonWebKeySetGeneratorRequestWithDefaults instantiates a new JsonWebKeySetGeneratorRequest object
+// NewAdminCreateJsonWebKeySetBodyWithDefaults instantiates a new AdminCreateJsonWebKeySetBody object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewJsonWebKeySetGeneratorRequestWithDefaults() *JsonWebKeySetGeneratorRequest {
-	this := JsonWebKeySetGeneratorRequest{}
+func NewAdminCreateJsonWebKeySetBodyWithDefaults() *AdminCreateJsonWebKeySetBody {
+	this := AdminCreateJsonWebKeySetBody{}
 	return &this
 }
 
 // GetAlg returns the Alg field value
-func (o *JsonWebKeySetGeneratorRequest) GetAlg() string {
+func (o *AdminCreateJsonWebKeySetBody) GetAlg() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -57,7 +57,7 @@ func (o *JsonWebKeySetGeneratorRequest) GetAlg() string {
 
 // GetAlgOk returns a tuple with the Alg field value
 // and a boolean to check if the value has been set.
-func (o *JsonWebKeySetGeneratorRequest) GetAlgOk() (*string, bool) {
+func (o *AdminCreateJsonWebKeySetBody) GetAlgOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -65,12 +65,12 @@ func (o *JsonWebKeySetGeneratorRequest) GetAlgOk() (*string, bool) {
 }
 
 // SetAlg sets field value
-func (o *JsonWebKeySetGeneratorRequest) SetAlg(v string) {
+func (o *AdminCreateJsonWebKeySetBody) SetAlg(v string) {
 	o.Alg = v
 }
 
 // GetKid returns the Kid field value
-func (o *JsonWebKeySetGeneratorRequest) GetKid() string {
+func (o *AdminCreateJsonWebKeySetBody) GetKid() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -81,7 +81,7 @@ func (o *JsonWebKeySetGeneratorRequest) GetKid() string {
 
 // GetKidOk returns a tuple with the Kid field value
 // and a boolean to check if the value has been set.
-func (o *JsonWebKeySetGeneratorRequest) GetKidOk() (*string, bool) {
+func (o *AdminCreateJsonWebKeySetBody) GetKidOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -89,12 +89,12 @@ func (o *JsonWebKeySetGeneratorRequest) GetKidOk() (*string, bool) {
 }
 
 // SetKid sets field value
-func (o *JsonWebKeySetGeneratorRequest) SetKid(v string) {
+func (o *AdminCreateJsonWebKeySetBody) SetKid(v string) {
 	o.Kid = v
 }
 
 // GetUse returns the Use field value
-func (o *JsonWebKeySetGeneratorRequest) GetUse() string {
+func (o *AdminCreateJsonWebKeySetBody) GetUse() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -105,7 +105,7 @@ func (o *JsonWebKeySetGeneratorRequest) GetUse() string {
 
 // GetUseOk returns a tuple with the Use field value
 // and a boolean to check if the value has been set.
-func (o *JsonWebKeySetGeneratorRequest) GetUseOk() (*string, bool) {
+func (o *AdminCreateJsonWebKeySetBody) GetUseOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -113,11 +113,11 @@ func (o *JsonWebKeySetGeneratorRequest) GetUseOk() (*string, bool) {
 }
 
 // SetUse sets field value
-func (o *JsonWebKeySetGeneratorRequest) SetUse(v string) {
+func (o *AdminCreateJsonWebKeySetBody) SetUse(v string) {
 	o.Use = v
 }
 
-func (o JsonWebKeySetGeneratorRequest) MarshalJSON() ([]byte, error) {
+func (o AdminCreateJsonWebKeySetBody) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["alg"] = o.Alg
@@ -131,38 +131,38 @@ func (o JsonWebKeySetGeneratorRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableJsonWebKeySetGeneratorRequest struct {
-	value *JsonWebKeySetGeneratorRequest
+type NullableAdminCreateJsonWebKeySetBody struct {
+	value *AdminCreateJsonWebKeySetBody
 	isSet bool
 }
 
-func (v NullableJsonWebKeySetGeneratorRequest) Get() *JsonWebKeySetGeneratorRequest {
+func (v NullableAdminCreateJsonWebKeySetBody) Get() *AdminCreateJsonWebKeySetBody {
 	return v.value
 }
 
-func (v *NullableJsonWebKeySetGeneratorRequest) Set(val *JsonWebKeySetGeneratorRequest) {
+func (v *NullableAdminCreateJsonWebKeySetBody) Set(val *AdminCreateJsonWebKeySetBody) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableJsonWebKeySetGeneratorRequest) IsSet() bool {
+func (v NullableAdminCreateJsonWebKeySetBody) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableJsonWebKeySetGeneratorRequest) Unset() {
+func (v *NullableAdminCreateJsonWebKeySetBody) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableJsonWebKeySetGeneratorRequest(val *JsonWebKeySetGeneratorRequest) *NullableJsonWebKeySetGeneratorRequest {
-	return &NullableJsonWebKeySetGeneratorRequest{value: val, isSet: true}
+func NewNullableAdminCreateJsonWebKeySetBody(val *AdminCreateJsonWebKeySetBody) *NullableAdminCreateJsonWebKeySetBody {
+	return &NullableAdminCreateJsonWebKeySetBody{value: val, isSet: true}
 }
 
-func (v NullableJsonWebKeySetGeneratorRequest) MarshalJSON() ([]byte, error) {
+func (v NullableAdminCreateJsonWebKeySetBody) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableJsonWebKeySetGeneratorRequest) UnmarshalJSON(src []byte) error {
+func (v *NullableAdminCreateJsonWebKeySetBody) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

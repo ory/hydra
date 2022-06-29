@@ -9,11 +9,11 @@ import (
 type (
 	outputJsonWebKey struct {
 		Set string `json:"set"`
-		hydra.JSONWebKey
+		hydra.JsonWebKey
 	}
 	outputJSONWebKeyCollection struct {
 		Set  string             `json:"set"`
-		Keys []hydra.JSONWebKey `json:"keys"`
+		Keys []hydra.JsonWebKey `json:"keys"`
 	}
 )
 
@@ -42,7 +42,7 @@ func (_ outputJSONWebKeyCollection) Header() []string {
 func (c outputJSONWebKeyCollection) Table() [][]string {
 	rows := make([][]string, len(c.Keys))
 	for i, key := range c.Keys {
-		rows[i] = outputJsonWebKey{Set: c.Set, JSONWebKey: key}.Columns()
+		rows[i] = outputJsonWebKey{Set: c.Set, JsonWebKey: key}.Columns()
 	}
 	return rows
 }

@@ -32,9 +32,7 @@ import (
 )
 
 type Handler struct {
-	Keys          *JWKHandler
 	Introspection *IntrospectionHandler
-	Token         *TokenHandler
 	Migration     *MigrateHandler
 	Janitor       *JanitorHandler
 }
@@ -58,9 +56,7 @@ func RemoteURI(cmd *cobra.Command) *url.URL {
 
 func NewHandler() *Handler {
 	return &Handler{
-		Keys:          newJWKHandler(),
 		Introspection: newIntrospectionHandler(),
-		Token:         newTokenHandler(),
 		Migration:     newMigrateHandler(),
 		Janitor:       NewJanitorHandler(),
 	}

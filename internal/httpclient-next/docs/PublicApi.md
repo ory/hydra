@@ -10,7 +10,6 @@ Method | HTTP request | Description
 [**OauthAuth**](PublicApi.md#OauthAuth) | **Get** /oauth2/auth | The OAuth 2.0 Authorize Endpoint
 [**RevokeOAuth2Token**](PublicApi.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth2 Tokens
 [**Userinfo**](PublicApi.md#Userinfo) | **Get** /userinfo | OpenID Connect Userinfo
-[**WellKnown**](PublicApi.md#WellKnown) | **Get** /.well-known/jwks.json | JSON Web Keys Discovery
 
 
 
@@ -383,67 +382,6 @@ Other parameters are passed through a pointer to a apiUserinfoRequest struct via
 ### Authorization
 
 [oauth2](../README.md#oauth2)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## WellKnown
-
-> JSONWebKeySet WellKnown(ctx).Execute()
-
-JSON Web Keys Discovery
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.PublicApi.WellKnown(context.Background()).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.WellKnown``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `WellKnown`: JSONWebKeySet
-    fmt.Fprintf(os.Stdout, "Response from `PublicApi.WellKnown`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-This endpoint does not need any parameter.
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiWellKnownRequest struct via the builder pattern
-
-
-### Return type
-
-[**JSONWebKeySet**](JSONWebKeySet.md)
-
-### Authorization
-
-No authorization required
 
 ### HTTP request headers
 

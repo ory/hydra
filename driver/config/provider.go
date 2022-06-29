@@ -67,6 +67,7 @@ const (
 	KeyConsentURL                                = "urls.consent"
 	KeyErrorURL                                  = "urls.error"
 	KeyPublicURL                                 = "urls.self.public"
+	KeyAdminURL                                  = "urls.self.admin"
 	KeyIssuerURL                                 = "urls.self.issuer"
 	KeyAccessTokenStrategy                       = "strategies.access_token"
 	KeySubjectIdentifierAlgorithmSalt            = "oidc.subject_identifiers.pairwise.salt"
@@ -345,6 +346,10 @@ func (p *DefaultProvider) ErrorURL(ctx context.Context) *url.URL {
 
 func (p *DefaultProvider) PublicURL(ctx context.Context) *url.URL {
 	return urlRoot(p.getProvider(ctx).RequestURIF(KeyPublicURL, p.IssuerURL(ctx)))
+}
+
+func (p *DefaultProvider) AdminURL(ctx context.Context) *url.URL {
+	return urlRoot(p.getProvider(ctx).RequestURIF(KeyAdminURL, p.fallbackURL(ctx, "/", p.host(AdminInterface), p.port(AdminInterface))))
 }
 
 func (p *DefaultProvider) IssuerURL(ctx context.Context) *url.URL {

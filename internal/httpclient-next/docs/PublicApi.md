@@ -6,10 +6,6 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**DisconnectUser**](PublicApi.md#DisconnectUser) | **Get** /oauth2/sessions/logout | OpenID Connect Front-Backchannel Enabled Logout
 [**DiscoverOpenIDConfiguration**](PublicApi.md#DiscoverOpenIDConfiguration) | **Get** /.well-known/openid-configuration | OpenID Connect Discovery
-[**DynamicClientRegistrationCreateOAuth2Client**](PublicApi.md#DynamicClientRegistrationCreateOAuth2Client) | **Post** /oauth2/register | Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationDeleteOAuth2Client**](PublicApi.md#DynamicClientRegistrationDeleteOAuth2Client) | **Delete** /oauth2/register/{id} | Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationGetOAuth2Client**](PublicApi.md#DynamicClientRegistrationGetOAuth2Client) | **Get** /oauth2/register/{id} | Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-[**DynamicClientRegistrationUpdateOAuth2Client**](PublicApi.md#DynamicClientRegistrationUpdateOAuth2Client) | **Put** /oauth2/register/{id} | Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
 [**Oauth2Token**](PublicApi.md#Oauth2Token) | **Post** /oauth2/token | The OAuth 2.0 Token Endpoint
 [**OauthAuth**](PublicApi.md#OauthAuth) | **Get** /oauth2/auth | The OAuth 2.0 Authorize Endpoint
 [**RevokeOAuth2Token**](PublicApi.md#RevokeOAuth2Token) | **Post** /oauth2/revoke | Revoke OAuth2 Tokens
@@ -138,282 +134,6 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## DynamicClientRegistrationCreateOAuth2Client
-
-> OAuth2Client DynamicClientRegistrationCreateOAuth2Client(ctx).OAuth2Client(oAuth2Client).Execute()
-
-Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.PublicApi.DynamicClientRegistrationCreateOAuth2Client(context.Background()).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.DynamicClientRegistrationCreateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DynamicClientRegistrationCreateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `PublicApi.DynamicClientRegistrationCreateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationCreateOAuth2ClientRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DynamicClientRegistrationDeleteOAuth2Client
-
-> DynamicClientRegistrationDeleteOAuth2Client(ctx, id).Execute()
-
-Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.PublicApi.DynamicClientRegistrationDeleteOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.DynamicClientRegistrationDeleteOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationDeleteOAuth2ClientRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DynamicClientRegistrationGetOAuth2Client
-
-> OAuth2Client DynamicClientRegistrationGetOAuth2Client(ctx, id).Execute()
-
-Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.PublicApi.DynamicClientRegistrationGetOAuth2Client(context.Background(), id).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.DynamicClientRegistrationGetOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DynamicClientRegistrationGetOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `PublicApi.DynamicClientRegistrationGetOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationGetOAuth2ClientRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DynamicClientRegistrationUpdateOAuth2Client
-
-> OAuth2Client DynamicClientRegistrationUpdateOAuth2Client(ctx, id).OAuth2Client(oAuth2Client).Execute()
-
-Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol
-
-
-
-### Example
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "os"
-    openapiclient "./openapi"
-)
-
-func main() {
-    id := "id_example" // string | The id of the OAuth 2.0 Client.
-    oAuth2Client := *openapiclient.NewOAuth2Client() // OAuth2Client | 
-
-    configuration := openapiclient.NewConfiguration()
-    apiClient := openapiclient.NewAPIClient(configuration)
-    resp, r, err := apiClient.PublicApi.DynamicClientRegistrationUpdateOAuth2Client(context.Background(), id).OAuth2Client(oAuth2Client).Execute()
-    if err != nil {
-        fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.DynamicClientRegistrationUpdateOAuth2Client``: %v\n", err)
-        fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
-    }
-    // response from `DynamicClientRegistrationUpdateOAuth2Client`: OAuth2Client
-    fmt.Fprintf(os.Stdout, "Response from `PublicApi.DynamicClientRegistrationUpdateOAuth2Client`: %v\n", resp)
-}
-```
-
-### Path Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**id** | **string** | The id of the OAuth 2.0 Client. | 
-
-### Other Parameters
-
-Other parameters are passed through a pointer to a apiDynamicClientRegistrationUpdateOAuth2ClientRequest struct via the builder pattern
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **oAuth2Client** | [**OAuth2Client**](OAuth2Client.md) |  | 
-
-### Return type
-
-[**OAuth2Client**](OAuth2Client.md)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
 ## Oauth2Token
 
 > Oauth2TokenResponse Oauth2Token(ctx).GrantType(grantType).ClientId(clientId).Code(code).RedirectUri(redirectUri).RefreshToken(refreshToken).Execute()
@@ -490,7 +210,7 @@ Name | Type | Description  | Notes
 
 ## OauthAuth
 
-> JsonError OauthAuth(ctx).Execute()
+> OAuth2ApiError OauthAuth(ctx).Execute()
 
 The OAuth 2.0 Authorize Endpoint
 
@@ -517,7 +237,7 @@ func main() {
         fmt.Fprintf(os.Stderr, "Error when calling `PublicApi.OauthAuth``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
     }
-    // response from `OauthAuth`: JsonError
+    // response from `OauthAuth`: OAuth2ApiError
     fmt.Fprintf(os.Stdout, "Response from `PublicApi.OauthAuth`: %v\n", resp)
 }
 ```
@@ -533,7 +253,7 @@ Other parameters are passed through a pointer to a apiOauthAuthRequest struct vi
 
 ### Return type
 
-[**JsonError**](JsonError.md)
+[**OAuth2ApiError**](OAuth2ApiError.md)
 
 ### Authorization
 

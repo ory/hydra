@@ -3,6 +3,8 @@ package driver
 import (
 	"context"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/hydra/hsm"
 	"github.com/ory/x/contextx"
 
@@ -57,7 +59,7 @@ type Registry interface {
 	PrometheusManager() *prometheus.MetricsManager
 	x.TracingProvider
 
-	RegisterRoutes(ctx context.Context, admin *x.RouterAdmin, public *x.RouterPublic)
+	RegisterRoutes(ctx context.Context, admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic)
 	ClientHandler() *client.Handler
 	KeyHandler() *jwk.Handler
 	ConsentHandler() *consent.Handler

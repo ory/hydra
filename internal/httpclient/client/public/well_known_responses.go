@@ -79,22 +79,22 @@ func NewWellKnownInternalServerError() *WellKnownInternalServerError {
 
 /* WellKnownInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type WellKnownInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *WellKnownInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /.well-known/jwks.json][%d] wellKnownInternalServerError  %+v", 500, o.Payload)
 }
-func (o *WellKnownInternalServerError) GetPayload() *models.JSONError {
+func (o *WellKnownInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *WellKnownInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -7,11 +7,27 @@ import (
 	"github.com/ory/x/pagination/tokenpagination"
 )
 
+// swagger:model paginationHeaders
+type PaginationHeaders struct {
+	// The link header contains pagination links.
+	//
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
+	//
+	// in: header
+	Link string `json:"link"`
+
+	// The total number of clients.
+	//
+	// in: header
+	XTotalCount string `json:"x-total-count"`
+}
+
 // swagger:model pagination
 type PaginationParams struct {
-	// Items per PageToken
+	// Items per page
 	//
-	// This is the number of items per page.
+	// This is the number of items per page to return.
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	//
 	// required: false
 	// in: query
@@ -20,9 +36,10 @@ type PaginationParams struct {
 	// max: 1000
 	PageSize int `json:"page_size"`
 
-	// Pagination PageToken Token
+	// Next Page Token
 	//
-	// The page token.
+	// The next page token.
+	// For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	//
 	// required: false
 	// in: query

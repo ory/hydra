@@ -91,22 +91,22 @@ func NewUpdateJSONWebKeyUnauthorized() *UpdateJSONWebKeyUnauthorized {
 
 /* UpdateJSONWebKeyUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type UpdateJSONWebKeyUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *UpdateJSONWebKeyUnauthorized) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}/{kid}][%d] updateJsonWebKeyUnauthorized  %+v", 401, o.Payload)
 }
-func (o *UpdateJSONWebKeyUnauthorized) GetPayload() *models.JSONError {
+func (o *UpdateJSONWebKeyUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *UpdateJSONWebKeyUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -123,22 +123,22 @@ func NewUpdateJSONWebKeyForbidden() *UpdateJSONWebKeyForbidden {
 
 /* UpdateJSONWebKeyForbidden describes a response with status code 403, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type UpdateJSONWebKeyForbidden struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *UpdateJSONWebKeyForbidden) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}/{kid}][%d] updateJsonWebKeyForbidden  %+v", 403, o.Payload)
 }
-func (o *UpdateJSONWebKeyForbidden) GetPayload() *models.JSONError {
+func (o *UpdateJSONWebKeyForbidden) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *UpdateJSONWebKeyForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -155,22 +155,22 @@ func NewUpdateJSONWebKeyInternalServerError() *UpdateJSONWebKeyInternalServerErr
 
 /* UpdateJSONWebKeyInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type UpdateJSONWebKeyInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *UpdateJSONWebKeyInternalServerError) Error() string {
 	return fmt.Sprintf("[PUT /keys/{set}/{kid}][%d] updateJsonWebKeyInternalServerError  %+v", 500, o.Payload)
 }
-func (o *UpdateJSONWebKeyInternalServerError) GetPayload() *models.JSONError {
+func (o *UpdateJSONWebKeyInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *UpdateJSONWebKeyInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

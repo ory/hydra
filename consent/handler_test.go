@@ -75,7 +75,7 @@ func TestGetLogoutRequest(t *testing.T) {
 			}
 
 			h := NewHandler(reg, conf)
-			r := x.NewRouterAdmin()
+			r := x.NewRouterAdmin(conf.AdminURL)
 			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -133,7 +133,7 @@ func TestGetLoginRequest(t *testing.T) {
 			}
 
 			h := NewHandler(reg, conf)
-			r := x.NewRouterAdmin()
+			r := x.NewRouterAdmin(conf.AdminURL)
 			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -205,7 +205,7 @@ func TestGetConsentRequest(t *testing.T) {
 
 			h := NewHandler(reg, conf)
 
-			r := x.NewRouterAdmin()
+			r := x.NewRouterAdmin(conf.AdminURL)
 			h.SetRoutes(r)
 			ts := httptest.NewServer(r)
 			defer ts.Close()
@@ -247,7 +247,7 @@ func TestGetLoginRequestWithDuplicateAccept(t *testing.T) {
 		}))
 
 		h := NewHandler(reg, conf)
-		r := x.NewRouterAdmin()
+		r := x.NewRouterAdmin(conf.AdminURL)
 		h.SetRoutes(r)
 		ts := httptest.NewServer(r)
 		defer ts.Close()

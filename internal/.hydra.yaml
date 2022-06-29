@@ -95,6 +95,7 @@ urls:
   self:
     issuer: https://issuer
     public: https://public
+    admin: https://admin
   login: https://login
   consent: https://consent
   logout: https://logout

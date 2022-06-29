@@ -23,6 +23,129 @@ import (
 // V1ApiService V1Api service
 type V1ApiService service
 
+type ApiAdminCreateJsonWebKeySetRequest struct {
+	ctx                          context.Context
+	ApiService                   *V1ApiService
+	set                          string
+	adminCreateJsonWebKeySetBody *AdminCreateJsonWebKeySetBody
+}
+
+func (r ApiAdminCreateJsonWebKeySetRequest) AdminCreateJsonWebKeySetBody(adminCreateJsonWebKeySetBody AdminCreateJsonWebKeySetBody) ApiAdminCreateJsonWebKeySetRequest {
+	r.adminCreateJsonWebKeySetBody = &adminCreateJsonWebKeySetBody
+	return r
+}
+
+func (r ApiAdminCreateJsonWebKeySetRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
+	return r.ApiService.AdminCreateJsonWebKeySetExecute(r)
+}
+
+/*
+AdminCreateJsonWebKeySet Generate a New JSON Web Key
+
+This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @return ApiAdminCreateJsonWebKeySetRequest
+*/
+func (a *V1ApiService) AdminCreateJsonWebKeySet(ctx context.Context, set string) ApiAdminCreateJsonWebKeySetRequest {
+	return ApiAdminCreateJsonWebKeySetRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+	}
+}
+
+// Execute executes the request
+//  @return JsonWebKeySet
+func (a *V1ApiService) AdminCreateJsonWebKeySetExecute(r ApiAdminCreateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *JsonWebKeySet
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminCreateJsonWebKeySet")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+	if r.adminCreateJsonWebKeySetBody == nil {
+		return localVarReturnValue, nil, reportError("adminCreateJsonWebKeySetBody is required and must be specified")
+	}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.adminCreateJsonWebKeySetBody
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiAdminCreateOAuth2ClientRequest struct {
 	ctx          context.Context
 	ApiService   *V1ApiService
@@ -144,6 +267,212 @@ func (a *V1ApiService) AdminCreateOAuth2ClientExecute(r ApiAdminCreateOAuth2Clie
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiAdminDeleteJsonWebKeyRequest struct {
+	ctx        context.Context
+	ApiService *V1ApiService
+	set        string
+	kid        string
+}
+
+func (r ApiAdminDeleteJsonWebKeyRequest) Execute() (*http.Response, error) {
+	return r.ApiService.AdminDeleteJsonWebKeyExecute(r)
+}
+
+/*
+AdminDeleteJsonWebKey Delete a JSON Web Key
+
+Use this endpoint to delete a single JSON Web Key.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @param kid The JSON Web Key ID (kid)
+ @return ApiAdminDeleteJsonWebKeyRequest
+*/
+func (a *V1ApiService) AdminDeleteJsonWebKey(ctx context.Context, set string, kid string) ApiAdminDeleteJsonWebKeyRequest {
+	return ApiAdminDeleteJsonWebKeyRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+		kid:        kid,
+	}
+}
+
+// Execute executes the request
+func (a *V1ApiService) AdminDeleteJsonWebKeyExecute(r ApiAdminDeleteJsonWebKeyRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteJsonWebKey")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}/{kid}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterToString(r.kid, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
+type ApiAdminDeleteJsonWebKeySetRequest struct {
+	ctx        context.Context
+	ApiService *V1ApiService
+	set        string
+}
+
+func (r ApiAdminDeleteJsonWebKeySetRequest) Execute() (*http.Response, error) {
+	return r.ApiService.AdminDeleteJsonWebKeySetExecute(r)
+}
+
+/*
+AdminDeleteJsonWebKeySet Delete a JSON Web Key Set
+
+Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @return ApiAdminDeleteJsonWebKeySetRequest
+*/
+func (a *V1ApiService) AdminDeleteJsonWebKeySet(ctx context.Context, set string) ApiAdminDeleteJsonWebKeySetRequest {
+	return ApiAdminDeleteJsonWebKeySetRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+	}
+}
+
+// Execute executes the request
+func (a *V1ApiService) AdminDeleteJsonWebKeySetExecute(r ApiAdminDeleteJsonWebKeySetRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminDeleteJsonWebKeySet")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiAdminDeleteOAuth2ClientRequest struct {
 	ctx        context.Context
 	ApiService *V1ApiService
@@ -246,6 +575,232 @@ func (a *V1ApiService) AdminDeleteOAuth2ClientExecute(r ApiAdminDeleteOAuth2Clie
 	}
 
 	return localVarHTTPResponse, nil
+}
+
+type ApiAdminGetJsonWebKeyRequest struct {
+	ctx        context.Context
+	ApiService *V1ApiService
+	set        string
+	kid        string
+}
+
+func (r ApiAdminGetJsonWebKeyRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
+	return r.ApiService.AdminGetJsonWebKeyExecute(r)
+}
+
+/*
+AdminGetJsonWebKey Fetch a JSON Web Key
+
+This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @param kid The JSON Web Key ID (kid)
+ @return ApiAdminGetJsonWebKeyRequest
+*/
+func (a *V1ApiService) AdminGetJsonWebKey(ctx context.Context, set string, kid string) ApiAdminGetJsonWebKeyRequest {
+	return ApiAdminGetJsonWebKeyRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+		kid:        kid,
+	}
+}
+
+// Execute executes the request
+//  @return JsonWebKeySet
+func (a *V1ApiService) AdminGetJsonWebKeyExecute(r ApiAdminGetJsonWebKeyRequest) (*JsonWebKeySet, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *JsonWebKeySet
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetJsonWebKey")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}/{kid}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterToString(r.kid, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiAdminGetJsonWebKeySetRequest struct {
+	ctx        context.Context
+	ApiService *V1ApiService
+	set        string
+}
+
+func (r ApiAdminGetJsonWebKeySetRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
+	return r.ApiService.AdminGetJsonWebKeySetExecute(r)
+}
+
+/*
+AdminGetJsonWebKeySet Retrieve a JSON Web Key Set
+
+This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @return ApiAdminGetJsonWebKeySetRequest
+*/
+func (a *V1ApiService) AdminGetJsonWebKeySet(ctx context.Context, set string) ApiAdminGetJsonWebKeySetRequest {
+	return ApiAdminGetJsonWebKeySetRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+	}
+}
+
+// Execute executes the request
+//  @return JsonWebKeySet
+func (a *V1ApiService) AdminGetJsonWebKeySetExecute(r ApiAdminGetJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *JsonWebKeySet
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminGetJsonWebKeySet")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
 type ApiAdminGetOAuth2ClientRequest struct {
@@ -641,6 +1196,250 @@ func (a *V1ApiService) AdminPatchOAuth2ClientExecute(r ApiAdminPatchOAuth2Client
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiAdminUpdateJsonWebKeyRequest struct {
+	ctx        context.Context
+	ApiService *V1ApiService
+	set        string
+	kid        string
+	jsonWebKey *JsonWebKey
+}
+
+func (r ApiAdminUpdateJsonWebKeyRequest) JsonWebKey(jsonWebKey JsonWebKey) ApiAdminUpdateJsonWebKeyRequest {
+	r.jsonWebKey = &jsonWebKey
+	return r
+}
+
+func (r ApiAdminUpdateJsonWebKeyRequest) Execute() (*JsonWebKey, *http.Response, error) {
+	return r.ApiService.AdminUpdateJsonWebKeyExecute(r)
+}
+
+/*
+AdminUpdateJsonWebKey Update a JSON Web Key
+
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @param kid The JSON Web Key ID (kid)
+ @return ApiAdminUpdateJsonWebKeyRequest
+*/
+func (a *V1ApiService) AdminUpdateJsonWebKey(ctx context.Context, set string, kid string) ApiAdminUpdateJsonWebKeyRequest {
+	return ApiAdminUpdateJsonWebKeyRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+		kid:        kid,
+	}
+}
+
+// Execute executes the request
+//  @return JsonWebKey
+func (a *V1ApiService) AdminUpdateJsonWebKeyExecute(r ApiAdminUpdateJsonWebKeyRequest) (*JsonWebKey, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *JsonWebKey
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminUpdateJsonWebKey")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}/{kid}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"kid"+"}", url.PathEscape(parameterToString(r.kid, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.jsonWebKey
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiAdminUpdateJsonWebKeySetRequest struct {
+	ctx           context.Context
+	ApiService    *V1ApiService
+	set           string
+	jsonWebKeySet *JsonWebKeySet
+}
+
+func (r ApiAdminUpdateJsonWebKeySetRequest) JsonWebKeySet(jsonWebKeySet JsonWebKeySet) ApiAdminUpdateJsonWebKeySetRequest {
+	r.jsonWebKeySet = &jsonWebKeySet
+	return r
+}
+
+func (r ApiAdminUpdateJsonWebKeySetRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
+	return r.ApiService.AdminUpdateJsonWebKeySetExecute(r)
+}
+
+/*
+AdminUpdateJsonWebKeySet Update a JSON Web Key Set
+
+Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param set The JSON Web Key Set
+ @return ApiAdminUpdateJsonWebKeySetRequest
+*/
+func (a *V1ApiService) AdminUpdateJsonWebKeySet(ctx context.Context, set string) ApiAdminUpdateJsonWebKeySetRequest {
+	return ApiAdminUpdateJsonWebKeySetRequest{
+		ApiService: a,
+		ctx:        ctx,
+		set:        set,
+	}
+}
+
+// Execute executes the request
+//  @return JsonWebKeySet
+func (a *V1ApiService) AdminUpdateJsonWebKeySetExecute(r ApiAdminUpdateJsonWebKeySetRequest) (*JsonWebKeySet, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *JsonWebKeySet
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.AdminUpdateJsonWebKeySet")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/admin/keys/{set}"
+	localVarPath = strings.Replace(localVarPath, "{"+"set"+"}", url.PathEscape(parameterToString(r.set, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.jsonWebKeySet
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiAdminUpdateOAuth2ClientRequest struct {
 	ctx          context.Context
 	ApiService   *V1ApiService
@@ -722,6 +1521,114 @@ func (a *V1ApiService) AdminUpdateOAuth2ClientExecute(r ApiAdminUpdateOAuth2Clie
 	}
 	// body params
 	localVarPostBody = r.oAuth2Client
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		var v OAuth2ApiError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		newErr.model = v
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiDiscoverJsonWebKeysRequest struct {
+	ctx        context.Context
+	ApiService *V1ApiService
+}
+
+func (r ApiDiscoverJsonWebKeysRequest) Execute() (*JsonWebKeySet, *http.Response, error) {
+	return r.ApiService.DiscoverJsonWebKeysExecute(r)
+}
+
+/*
+DiscoverJsonWebKeys Discover JSON Web Keys
+
+This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
+if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
+[node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiDiscoverJsonWebKeysRequest
+*/
+func (a *V1ApiService) DiscoverJsonWebKeys(ctx context.Context) ApiDiscoverJsonWebKeysRequest {
+	return ApiDiscoverJsonWebKeysRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//  @return JsonWebKeySet
+func (a *V1ApiService) DiscoverJsonWebKeysExecute(r ApiDiscoverJsonWebKeysRequest) (*JsonWebKeySet, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *JsonWebKeySet
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "V1ApiService.DiscoverJsonWebKeys")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/.well-known/jwks.json"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err

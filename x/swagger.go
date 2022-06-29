@@ -1,10 +1,6 @@
 package x
 
-// It is important that this model object is named JSONWebKey for
-// "swagger generate spec" to generate only on definition of a
-// JSONWebKey.
-//
-// swagger:model JSONWebKey
+// swagger:model jsonWebKey
 type JSONWebKey struct {
 	// Use ("public key use") identifies the intended use of
 	// the public key. The "use" parameter is employed to indicate whether

@@ -65,7 +65,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 				}
 			}
 
-			keys := map[string][]hydra.JSONWebKey{}
+			keys := map[string][]hydra.JsonWebKey{}
 			for src, stream := range streams {
 				content, err := io.ReadAll(stream)
 				if err != nil {
@@ -85,7 +85,7 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 				key = cli.ToSDKFriendlyJSONWebKey(key, "", "")
 
 				var buf bytes.Buffer
-				var jsonWebKey hydra.JSONWebKey
+				var jsonWebKey hydra.JsonWebKey
 				if err := json.NewEncoder(&buf).Encode(key); err != nil {
 					_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Could not encode key from `%s` to JSON: %s", src, err)
 					return cmdx.FailSilently(cmd)
@@ -121,11 +121,11 @@ the imported keys will be added to that set. Otherwise, a new set will be create
 				keys[src] = append(keys[src], jsonWebKey)
 			}
 
-			imported := make([]hydra.JSONWebKey, 0, len(keys))
+			imported := make([]hydra.JsonWebKey, 0, len(keys))
 			failed := make(map[string]error)
 			for src, kk := range keys {
 				for _, k := range kk {
-					result, _, err := m.AdminApi.UpdateJsonWebKey(cmd.Context(), k.Kid, set).JSONWebKey(k).Execute() //nolint:bodyclose
+					result, _, err := m.V1Api.AdminUpdateJsonWebKey(cmd.Context(), k.Kid, set).JsonWebKey(k).Execute() //nolint:bodyclose
 					if err != nil {
 						failed[src] = cmdx.PrintOpenAPIError(cmd, err)
 						continue

@@ -28,9 +28,19 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
+	AdminCreateJSONWebKeySet(params *AdminCreateJSONWebKeySetParams, opts ...ClientOption) (*AdminCreateJSONWebKeySetCreated, error)
+
 	AdminCreateOAuth2Client(params *AdminCreateOAuth2ClientParams, opts ...ClientOption) (*AdminCreateOAuth2ClientCreated, error)
 
+	AdminDeleteJSONWebKey(params *AdminDeleteJSONWebKeyParams, opts ...ClientOption) (*AdminDeleteJSONWebKeyNoContent, error)
+
+	AdminDeleteJSONWebKeySet(params *AdminDeleteJSONWebKeySetParams, opts ...ClientOption) (*AdminDeleteJSONWebKeySetNoContent, error)
+
 	AdminDeleteOAuth2Client(params *AdminDeleteOAuth2ClientParams, opts ...ClientOption) (*AdminDeleteOAuth2ClientNoContent, error)
+
+	AdminGetJSONWebKey(params *AdminGetJSONWebKeyParams, opts ...ClientOption) (*AdminGetJSONWebKeyOK, error)
+
+	AdminGetJSONWebKeySet(params *AdminGetJSONWebKeySetParams, opts ...ClientOption) (*AdminGetJSONWebKeySetOK, error)
 
 	AdminGetOAuth2Client(params *AdminGetOAuth2ClientParams, opts ...ClientOption) (*AdminGetOAuth2ClientOK, error)
 
@@ -38,7 +48,13 @@ type ClientService interface {
 
 	AdminPatchOAuth2Client(params *AdminPatchOAuth2ClientParams, opts ...ClientOption) (*AdminPatchOAuth2ClientOK, error)
 
+	AdminUpdateJSONWebKey(params *AdminUpdateJSONWebKeyParams, opts ...ClientOption) (*AdminUpdateJSONWebKeyOK, error)
+
+	AdminUpdateJSONWebKeySet(params *AdminUpdateJSONWebKeySetParams, opts ...ClientOption) (*AdminUpdateJSONWebKeySetOK, error)
+
 	AdminUpdateOAuth2Client(params *AdminUpdateOAuth2ClientParams, opts ...ClientOption) (*AdminUpdateOAuth2ClientOK, error)
+
+	DiscoverJSONWebKeys(params *DiscoverJSONWebKeysParams, opts ...ClientOption) (*DiscoverJSONWebKeysOK, error)
 
 	DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error)
 
@@ -49,6 +65,47 @@ type ClientService interface {
 	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
+}
+
+/*
+  AdminCreateJSONWebKeySet generates a new JSON web key
+
+  This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+*/
+func (a *Client) AdminCreateJSONWebKeySet(params *AdminCreateJSONWebKeySetParams, opts ...ClientOption) (*AdminCreateJSONWebKeySetCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminCreateJSONWebKeySetParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminCreateJsonWebKeySet",
+		Method:             "POST",
+		PathPattern:        "/admin/keys/{set}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminCreateJSONWebKeySetReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminCreateJSONWebKeySetCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminCreateJSONWebKeySetDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
 /*
@@ -95,6 +152,88 @@ func (a *Client) AdminCreateOAuth2Client(params *AdminCreateOAuth2ClientParams, 
 }
 
 /*
+  AdminDeleteJSONWebKey deletes a JSON web key
+
+  Use this endpoint to delete a single JSON Web Key.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+*/
+func (a *Client) AdminDeleteJSONWebKey(params *AdminDeleteJSONWebKeyParams, opts ...ClientOption) (*AdminDeleteJSONWebKeyNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminDeleteJSONWebKeyParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminDeleteJsonWebKey",
+		Method:             "DELETE",
+		PathPattern:        "/admin/keys/{set}/{kid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminDeleteJSONWebKeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminDeleteJSONWebKeyNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminDeleteJSONWebKeyDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminDeleteJSONWebKeySet deletes a JSON web key set
+
+  Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+*/
+func (a *Client) AdminDeleteJSONWebKeySet(params *AdminDeleteJSONWebKeySetParams, opts ...ClientOption) (*AdminDeleteJSONWebKeySetNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminDeleteJSONWebKeySetParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminDeleteJsonWebKeySet",
+		Method:             "DELETE",
+		PathPattern:        "/admin/keys/{set}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminDeleteJSONWebKeySetReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminDeleteJSONWebKeySetNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminDeleteJSONWebKeySetDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   AdminDeleteOAuth2Client deletes an o auth 2 0 client
 
   Delete an existing OAuth 2.0 Client by its ID.
@@ -135,6 +274,86 @@ func (a *Client) AdminDeleteOAuth2Client(params *AdminDeleteOAuth2ClientParams, 
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*AdminDeleteOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminGetJSONWebKey fetches a JSON web key
+
+  This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
+*/
+func (a *Client) AdminGetJSONWebKey(params *AdminGetJSONWebKeyParams, opts ...ClientOption) (*AdminGetJSONWebKeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminGetJSONWebKeyParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminGetJsonWebKey",
+		Method:             "GET",
+		PathPattern:        "/admin/keys/{set}/{kid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminGetJSONWebKeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminGetJSONWebKeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminGetJSONWebKeyDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminGetJSONWebKeySet retrieves a JSON web key set
+
+  This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+*/
+func (a *Client) AdminGetJSONWebKeySet(params *AdminGetJSONWebKeySetParams, opts ...ClientOption) (*AdminGetJSONWebKeySetOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminGetJSONWebKeySetParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminGetJsonWebKeySet",
+		Method:             "GET",
+		PathPattern:        "/admin/keys/{set}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminGetJSONWebKeySetReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminGetJSONWebKeySetOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminGetJSONWebKeySetDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -272,6 +491,88 @@ func (a *Client) AdminPatchOAuth2Client(params *AdminPatchOAuth2ClientParams, op
 }
 
 /*
+  AdminUpdateJSONWebKey updates a JSON web key
+
+  Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+*/
+func (a *Client) AdminUpdateJSONWebKey(params *AdminUpdateJSONWebKeyParams, opts ...ClientOption) (*AdminUpdateJSONWebKeyOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminUpdateJSONWebKeyParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminUpdateJsonWebKey",
+		Method:             "PUT",
+		PathPattern:        "/admin/keys/{set}/{kid}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminUpdateJSONWebKeyReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminUpdateJSONWebKeyOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminUpdateJSONWebKeyDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminUpdateJSONWebKeySet updates a JSON web key set
+
+  Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
+
+A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
+*/
+func (a *Client) AdminUpdateJSONWebKeySet(params *AdminUpdateJSONWebKeySetParams, opts ...ClientOption) (*AdminUpdateJSONWebKeySetOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminUpdateJSONWebKeySetParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminUpdateJsonWebKeySet",
+		Method:             "PUT",
+		PathPattern:        "/admin/keys/{set}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminUpdateJSONWebKeySetReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminUpdateJSONWebKeySetOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminUpdateJSONWebKeySetDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   AdminUpdateOAuth2Client updates an o auth 2 0 client
 
   Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret is used, otherwise a random secret
@@ -311,6 +612,47 @@ func (a *Client) AdminUpdateOAuth2Client(params *AdminUpdateOAuth2ClientParams, 
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*AdminUpdateOAuth2ClientDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  DiscoverJSONWebKeys discovers JSON web keys
+
+  This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
+if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
+[node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
+*/
+func (a *Client) DiscoverJSONWebKeys(params *DiscoverJSONWebKeysParams, opts ...ClientOption) (*DiscoverJSONWebKeysOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDiscoverJSONWebKeysParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "discoverJsonWebKeys",
+		Method:             "GET",
+		PathPattern:        "/.well-known/jwks.json",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DiscoverJSONWebKeysReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DiscoverJSONWebKeysOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DiscoverJSONWebKeysDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

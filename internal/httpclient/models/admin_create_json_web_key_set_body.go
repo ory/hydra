@@ -14,10 +14,10 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// JSONWebKeySetGeneratorRequest json web key set generator request
+// AdminCreateJSONWebKeySetBody admin create Json web key set body
 //
-// swagger:model jsonWebKeySetGeneratorRequest
-type JSONWebKeySetGeneratorRequest struct {
+// swagger:model adminCreateJsonWebKeySetBody
+type AdminCreateJSONWebKeySetBody struct {
 
 	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES512", "HS512", and "HS256"
 	// Required: true
@@ -35,8 +35,8 @@ type JSONWebKeySetGeneratorRequest struct {
 	Use *string `json:"use"`
 }
 
-// Validate validates this json web key set generator request
-func (m *JSONWebKeySetGeneratorRequest) Validate(formats strfmt.Registry) error {
+// Validate validates this admin create Json web key set body
+func (m *AdminCreateJSONWebKeySetBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAlg(formats); err != nil {
@@ -57,7 +57,7 @@ func (m *JSONWebKeySetGeneratorRequest) Validate(formats strfmt.Registry) error 
 	return nil
 }
 
-func (m *JSONWebKeySetGeneratorRequest) validateAlg(formats strfmt.Registry) error {
+func (m *AdminCreateJSONWebKeySetBody) validateAlg(formats strfmt.Registry) error {
 
 	if err := validate.Required("alg", "body", m.Alg); err != nil {
 		return err
@@ -66,7 +66,7 @@ func (m *JSONWebKeySetGeneratorRequest) validateAlg(formats strfmt.Registry) err
 	return nil
 }
 
-func (m *JSONWebKeySetGeneratorRequest) validateKid(formats strfmt.Registry) error {
+func (m *AdminCreateJSONWebKeySetBody) validateKid(formats strfmt.Registry) error {
 
 	if err := validate.Required("kid", "body", m.Kid); err != nil {
 		return err
@@ -75,7 +75,7 @@ func (m *JSONWebKeySetGeneratorRequest) validateKid(formats strfmt.Registry) err
 	return nil
 }
 
-func (m *JSONWebKeySetGeneratorRequest) validateUse(formats strfmt.Registry) error {
+func (m *AdminCreateJSONWebKeySetBody) validateUse(formats strfmt.Registry) error {
 
 	if err := validate.Required("use", "body", m.Use); err != nil {
 		return err
@@ -84,13 +84,13 @@ func (m *JSONWebKeySetGeneratorRequest) validateUse(formats strfmt.Registry) err
 	return nil
 }
 
-// ContextValidate validates this json web key set generator request based on context it is used
-func (m *JSONWebKeySetGeneratorRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+// ContextValidate validates this admin create Json web key set body based on context it is used
+func (m *AdminCreateJSONWebKeySetBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *JSONWebKeySetGeneratorRequest) MarshalBinary() ([]byte, error) {
+func (m *AdminCreateJSONWebKeySetBody) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -98,8 +98,8 @@ func (m *JSONWebKeySetGeneratorRequest) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *JSONWebKeySetGeneratorRequest) UnmarshalBinary(b []byte) error {
-	var res JSONWebKeySetGeneratorRequest
+func (m *AdminCreateJSONWebKeySetBody) UnmarshalBinary(b []byte) error {
+	var res AdminCreateJSONWebKeySetBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -38,21 +38,11 @@ type ClientService interface {
 
 	AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...ClientOption) (*AcceptLogoutRequestOK, error)
 
-	CreateJSONWebKeySet(params *CreateJSONWebKeySetParams, opts ...ClientOption) (*CreateJSONWebKeySetCreated, error)
-
-	DeleteJSONWebKey(params *DeleteJSONWebKeyParams, opts ...ClientOption) (*DeleteJSONWebKeyNoContent, error)
-
-	DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams, opts ...ClientOption) (*DeleteJSONWebKeySetNoContent, error)
-
 	DeleteOAuth2Token(params *DeleteOAuth2TokenParams, opts ...ClientOption) (*DeleteOAuth2TokenNoContent, error)
 
 	DeleteTrustedJwtGrantIssuer(params *DeleteTrustedJwtGrantIssuerParams, opts ...ClientOption) (*DeleteTrustedJwtGrantIssuerNoContent, error)
 
 	GetConsentRequest(params *GetConsentRequestParams, opts ...ClientOption) (*GetConsentRequestOK, error)
-
-	GetJSONWebKey(params *GetJSONWebKeyParams, opts ...ClientOption) (*GetJSONWebKeyOK, error)
-
-	GetJSONWebKeySet(params *GetJSONWebKeySetParams, opts ...ClientOption) (*GetJSONWebKeySetOK, error)
 
 	GetLoginRequest(params *GetLoginRequestParams, opts ...ClientOption) (*GetLoginRequestOK, error)
 
@@ -81,10 +71,6 @@ type ClientService interface {
 	RevokeConsentSessions(params *RevokeConsentSessionsParams, opts ...ClientOption) (*RevokeConsentSessionsNoContent, error)
 
 	TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...ClientOption) (*TrustJwtGrantIssuerCreated, error)
-
-	UpdateJSONWebKey(params *UpdateJSONWebKeyParams, opts ...ClientOption) (*UpdateJSONWebKeyOK, error)
-
-	UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams, opts ...ClientOption) (*UpdateJSONWebKeySetOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -279,132 +265,6 @@ func (a *Client) AcceptLogoutRequest(params *AcceptLogoutRequestParams, opts ...
 }
 
 /*
-  CreateJSONWebKeySet generates a new JSON web key
-
-  This endpoint is capable of generating JSON Web Key Sets for you. There a different strategies available, such as symmetric cryptographic keys (HS256, HS512) and asymetric cryptographic keys (RS256, ECDSA). If the specified JSON Web Key Set does not exist, it will be created.
-
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-*/
-func (a *Client) CreateJSONWebKeySet(params *CreateJSONWebKeySetParams, opts ...ClientOption) (*CreateJSONWebKeySetCreated, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewCreateJSONWebKeySetParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "createJsonWebKeySet",
-		Method:             "POST",
-		PathPattern:        "/keys/{set}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &CreateJSONWebKeySetReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*CreateJSONWebKeySetCreated)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for createJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  DeleteJSONWebKey deletes a JSON web key
-
-  Use this endpoint to delete a single JSON Web Key.
-
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-*/
-func (a *Client) DeleteJSONWebKey(params *DeleteJSONWebKeyParams, opts ...ClientOption) (*DeleteJSONWebKeyNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewDeleteJSONWebKeyParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "deleteJsonWebKey",
-		Method:             "DELETE",
-		PathPattern:        "/keys/{set}/{kid}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &DeleteJSONWebKeyReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*DeleteJSONWebKeyNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteJsonWebKey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  DeleteJSONWebKeySet deletes a JSON web key set
-
-  Use this endpoint to delete a complete JSON Web Key Set and all the keys in that set.
-
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-*/
-func (a *Client) DeleteJSONWebKeySet(params *DeleteJSONWebKeySetParams, opts ...ClientOption) (*DeleteJSONWebKeySetNoContent, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewDeleteJSONWebKeySetParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "deleteJsonWebKeySet",
-		Method:             "DELETE",
-		PathPattern:        "/keys/{set}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &DeleteJSONWebKeySetReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*DeleteJSONWebKeySetNoContent)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for deleteJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
   DeleteOAuth2Token deletes o auth2 access tokens from a client
 
   This endpoint deletes OAuth2 access tokens issued for a client from the database
@@ -533,88 +393,6 @@ func (a *Client) GetConsentRequest(params *GetConsentRequestParams, opts ...Clie
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for getConsentRequest: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetJSONWebKey fetches a JSON web key
-
-  This endpoint returns a singular JSON Web Key, identified by the set and the specific key ID (kid).
-*/
-func (a *Client) GetJSONWebKey(params *GetJSONWebKeyParams, opts ...ClientOption) (*GetJSONWebKeyOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetJSONWebKeyParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getJsonWebKey",
-		Method:             "GET",
-		PathPattern:        "/keys/{set}/{kid}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &GetJSONWebKeyReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetJSONWebKeyOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getJsonWebKey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  GetJSONWebKeySet retrieves a JSON web key set
-
-  This endpoint can be used to retrieve JWK Sets stored in ORY Hydra.
-
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-*/
-func (a *Client) GetJSONWebKeySet(params *GetJSONWebKeySetParams, opts ...ClientOption) (*GetJSONWebKeySetOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewGetJSONWebKeySetParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "getJsonWebKeySet",
-		Method:             "GET",
-		PathPattern:        "/keys/{set}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &GetJSONWebKeySetReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*GetJSONWebKeySetOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for getJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 
@@ -1234,90 +1012,6 @@ func (a *Client) TrustJwtGrantIssuer(params *TrustJwtGrantIssuerParams, opts ...
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
 	msg := fmt.Sprintf("unexpected success response for trustJwtGrantIssuer: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  UpdateJSONWebKey updates a JSON web key
-
-  Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
-
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-*/
-func (a *Client) UpdateJSONWebKey(params *UpdateJSONWebKeyParams, opts ...ClientOption) (*UpdateJSONWebKeyOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUpdateJSONWebKeyParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "updateJsonWebKey",
-		Method:             "PUT",
-		PathPattern:        "/keys/{set}/{kid}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &UpdateJSONWebKeyReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*UpdateJSONWebKeyOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for updateJsonWebKey: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
-}
-
-/*
-  UpdateJSONWebKeySet updates a JSON web key set
-
-  Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
-
-A JSON Web Key (JWK) is a JavaScript Object Notation (JSON) data structure that represents a cryptographic key. A JWK Set is a JSON data structure that represents a set of JWKs. A JSON Web Key is identified by its set and key id. ORY Hydra uses this functionality to store cryptographic keys used for TLS and JSON Web Tokens (such as OpenID Connect ID tokens), and allows storing user-defined keys as well.
-*/
-func (a *Client) UpdateJSONWebKeySet(params *UpdateJSONWebKeySetParams, opts ...ClientOption) (*UpdateJSONWebKeySetOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewUpdateJSONWebKeySetParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "updateJsonWebKeySet",
-		Method:             "PUT",
-		PathPattern:        "/keys/{set}",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &UpdateJSONWebKeySetReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*UpdateJSONWebKeySetOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for updateJsonWebKeySet: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

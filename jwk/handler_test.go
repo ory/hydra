@@ -27,6 +27,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/hydra/jwk"
 	"github.com/ory/x/contextx"
 
@@ -45,7 +47,7 @@ func TestHandlerWellKnown(t *testing.T) {
 	conf.MustSet(context.Background(), config.KeyWellKnownKeys, []string{x.OpenIDConnectKeyName, x.OpenIDConnectKeyName})
 	router := x.NewRouterPublic()
 	h := reg.KeyHandler()
-	h.SetRoutes(router.RouterAdmin(), router, func(h http.Handler) http.Handler {
+	h.SetRoutes(httprouterx.NewRouterAdminWithPrefixAndRouter(router.Router, "/admin", conf.AdminURL), router, func(h http.Handler) http.Handler {
 		return h
 	})
 	testServer := httptest.NewServer(router)

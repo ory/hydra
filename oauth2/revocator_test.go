@@ -28,6 +28,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/gobuffalo/pop/v6"
 
 	"github.com/ory/hydra/persistence/sql"
@@ -89,8 +91,8 @@ func TestRevoke(t *testing.T) {
 	now := time.Now().UTC().Round(time.Second)
 
 	handler := reg.OAuth2Handler()
-	router := x.NewRouterAdmin()
-	handler.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin(conf.AdminURL)
+	handler.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	server := httptest.NewServer(router)

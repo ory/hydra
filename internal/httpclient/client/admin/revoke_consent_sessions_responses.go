@@ -75,22 +75,22 @@ func NewRevokeConsentSessionsBadRequest() *RevokeConsentSessionsBadRequest {
 
 /* RevokeConsentSessionsBadRequest describes a response with status code 400, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type RevokeConsentSessionsBadRequest struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *RevokeConsentSessionsBadRequest) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsBadRequest  %+v", 400, o.Payload)
 }
-func (o *RevokeConsentSessionsBadRequest) GetPayload() *models.JSONError {
+func (o *RevokeConsentSessionsBadRequest) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *RevokeConsentSessionsBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -107,22 +107,22 @@ func NewRevokeConsentSessionsInternalServerError() *RevokeConsentSessionsInterna
 
 /* RevokeConsentSessionsInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type RevokeConsentSessionsInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *RevokeConsentSessionsInternalServerError) Error() string {
 	return fmt.Sprintf("[DELETE /oauth2/auth/sessions/consent][%d] revokeConsentSessionsInternalServerError  %+v", 500, o.Payload)
 }
-func (o *RevokeConsentSessionsInternalServerError) GetPayload() *models.JSONError {
+func (o *RevokeConsentSessionsInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *RevokeConsentSessionsInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

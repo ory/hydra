@@ -749,6 +749,14 @@
               "examples": [
                 "https://localhost:4444/"
               ]
+            },
+            "admin": {
+              "type": "string",
+              "description": "This is the base location of the admin endpoints of your Ory Hydra installation.",
+              "format": "uri",
+              "examples": [
+                "https://localhost:4445/"
+              ]
             }
           }
         },

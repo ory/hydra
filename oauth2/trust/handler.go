@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/google/uuid"
 
 	"github.com/ory/x/errorsx"
 	"github.com/ory/x/pagination"
-
-	"github.com/ory/hydra/x"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -27,7 +27,7 @@ func NewHandler(r InternalRegistry) *Handler {
 	return &Handler{registry: r}
 }
 
-func (h *Handler) SetRoutes(admin *x.RouterAdmin) {
+func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(grantJWTBearerPath+"/:id", h.Get)
 	admin.GET(grantJWTBearerPath, h.List)
 	admin.POST(grantJWTBearerPath, h.Create)

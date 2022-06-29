@@ -60,7 +60,7 @@ func NewOAuth2Server(ctx context.Context, t *testing.T, reg driver.Registry) (pu
 	reg.Config().MustSet(ctx, config.AdminInterface.Key(config.KeySuffixTLSEnabled), false)
 	reg.Config().MustSet(ctx, config.KeyScopeStrategy, "exact")
 
-	public, admin := x.NewRouterPublic(), x.NewRouterAdmin()
+	public, admin := x.NewRouterPublic(), x.NewRouterAdmin(reg.Config().AdminURL)
 
 	publicTS = httptest.NewServer(public)
 	t.Cleanup(publicTS.Close)

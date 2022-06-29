@@ -46,7 +46,7 @@ func TestJWKSDK(t *testing.T) {
 	conf := internal.NewConfigurationWithDefaults()
 	reg := internal.NewRegistryMemory(t, conf, &contextx.Default{})
 
-	router := x.NewRouterAdmin()
+	router := x.NewRouterAdmin(conf.AdminURL)
 	h := NewHandler(reg)
 	h.SetRoutes(router, x.NewRouterPublic(), func(h http.Handler) http.Handler {
 		return h

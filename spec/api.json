@@ -1,6 +1,19 @@
 {
   "components": {
     "responses": {
+      "adminListOAuth2ClientsResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "items": {
+                "$ref": "#/components/schemas/oAuth2Client"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "description": "The list of clients and pagination information."
+      },
       "emptyResponse": {
         "description": "Empty responses are sent when, for example, resources are deleted. The HTTP status code for empty responses is\ntypically 201."
       },
@@ -16,19 +29,6 @@
           }
         },
         "description": "A list of used consent requests."
-      },
-      "oAuth2ClientList": {
-        "content": {
-          "application/json": {
-            "schema": {
-              "items": {
-                "$ref": "#/components/schemas/oAuth2Client"
-              },
-              "type": "array"
-            }
-          }
-        },
-        "description": "A list of clients."
       }
     },
     "schemas": {
@@ -411,34 +411,6 @@
         },
         "type": "object"
       },
-      "jsonError": {
-        "description": "Error responses are sent when an error (e.g. unauthorized, bad request, ...) occurred.",
-        "properties": {
-          "error": {
-            "description": "Name is the error name.",
-            "example": "The requested resource could not be found",
-            "type": "string"
-          },
-          "error_debug": {
-            "description": "Debug contains debug information. This is usually not available and has to be enabled.",
-            "example": "The database adapter was unable to find the element",
-            "type": "string"
-          },
-          "error_description": {
-            "description": "Description contains further information on the nature of the error.",
-            "example": "Object with ID 12345 does not exist",
-            "type": "string"
-          },
-          "status_code": {
-            "description": "Code represents the error status code (404, 403, 401, ...).",
-            "example": 404,
-            "format": "int64",
-            "type": "integer"
-          }
-        },
-        "title": "Generic Error Response",
-        "type": "object"
-      },
       "jsonPatch": {
         "description": "A JSONPatch document as defined by RFC 6902",
         "properties": {
@@ -469,7 +441,7 @@
         "type": "object"
       },
       "jsonPatchDocument": {
-        "description": "A JSONPatch request",
+        "description": "A JSONPatchDocument request",
         "items": {
           "$ref": "#/components/schemas/jsonPatch"
         },
@@ -577,6 +549,34 @@
         "format": "date-time",
         "title": "NullTime implements sql.NullTime functionality.",
         "type": "string"
+      },
+      "oAuth2ApiError": {
+        "description": "An API error caused by Ory's OAuth 2.0 APIs.",
+        "properties": {
+          "error": {
+            "description": "Name is the error name.",
+            "example": "The requested resource could not be found",
+            "type": "string"
+          },
+          "error_debug": {
+            "description": "Debug contains debug information. This is usually not available and has to be enabled.",
+            "example": "The database adapter was unable to find the element",
+            "type": "string"
+          },
+          "error_description": {
+            "description": "Description contains further information on the nature of the error.",
+            "example": "Object with ID 12345 does not exist",
+            "type": "string"
+          },
+          "status_code": {
+            "description": "Code represents the error status code (404, 403, 401, ...).",
+            "example": 404,
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "title": "OAuth2 API Error",
+        "type": "object"
       },
       "oAuth2Client": {
         "properties": {
@@ -886,7 +886,7 @@
         "properties": {
           "page_size": {
             "default": 250,
-            "description": "Items per PageToken\n\nThis is the number of items per page.",
+            "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
             "format": "int64",
             "maximum": 1000,
             "minimum": 1,
@@ -894,8 +894,21 @@
           },
           "page_token": {
             "default": "1",
-            "description": "Pagination PageToken Token\n\nThe page token.",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
             "minimum": 1,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "paginationHeaders": {
+        "properties": {
+          "link": {
+            "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
+            "type": "string"
+          },
+          "x-total-count": {
+            "description": "The total number of clients.\n\nin: header",
             "type": "string"
           }
         },
@@ -1418,11 +1431,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "JSON Web Keys Discovery",
@@ -1450,21 +1463,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "OpenID Connect Discovery",
@@ -1473,13 +1486,110 @@
         ]
       }
     },
+    "/admin/clients": {
+      "post": {
+        "description": "Create a new OAuth 2.0 client. If you pass `client_secret` the secret is used, otherwise a random secret\nis generated. The secret is echoed in the response. It is not possible to retrieve it later on.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "operationId": "adminCreateOAuth2Client",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/oAuth2Client"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2Client"
+                }
+              }
+            },
+            "description": "oAuth2Client"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2ApiError"
+                }
+              }
+            },
+            "description": "oAuth2ApiError"
+          }
+        },
+        "summary": "Create an OAuth 2.0 Client",
+        "tags": [
+          "v1"
+        ]
+      }
+    },
+    "/admin/clients/{id}": {
+      "put": {
+        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret is used, otherwise a random secret\nis generated. The secret is echoed in the response. It is not possible to retrieve it later on.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "operationId": "adminUpdateOAuth2Client",
+        "parameters": [
+          {
+            "description": "The id of the OAuth 2.0 Client.",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/oAuth2Client"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "Body"
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2Client"
+                }
+              }
+            },
+            "description": "oAuth2Client"
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/oAuth2ApiError"
+                }
+              }
+            },
+            "description": "oAuth2ApiError"
+          }
+        },
+        "summary": "Update an OAuth 2.0 Client",
+        "tags": [
+          "v1"
+        ]
+      }
+    },
     "/clients": {
       "get": {
         "description": "This endpoint lists all clients in the database, and never returns client secrets.\nAs a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,\nbut it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '\u003chttps://hydra-url/admin/clients?limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.\nMultiple links can be included in this header, and will be separated by a comma.",
-        "operationId": "listOAuth2Clients",
+        "operationId": "adminListOAuth2Clients",
         "parameters": [
           {
-            "description": "Items per PageToken\n\nThis is the number of items per page.",
+            "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_size",
             "schema": {
@@ -1491,7 +1601,7 @@
             }
           },
           {
-            "description": "Pagination PageToken Token\n\nThe page token.",
+            "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
             "in": "query",
             "name": "page_token",
             "schema": {
@@ -1519,70 +1629,29 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/oAuth2ClientList"
+            "$ref": "#/components/responses/adminListOAuth2ClientsResponse"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "List OAuth 2.0 Clients",
         "tags": [
-          "admin"
-        ]
-      },
-      "post": {
-        "description": "Create a new OAuth 2.0 client If you pass `client_secret` the secret will be used, otherwise a random secret\nwill be generated. The secret will be returned in the response and you will not be able to retrieve it later on.\nWrite the secret down and keep it somwhere safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
-        "operationId": "createOAuth2Client",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/oAuth2Client"
-              }
-            }
-          },
-          "required": true,
-          "x-originalParamName": "Body"
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/oAuth2Client"
-                }
-              }
-            },
-            "description": "oAuth2Client"
-          },
-          "default": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Create an OAuth 2.0 Client",
-        "tags": [
-          "admin"
+          "v1"
         ]
       }
     },
     "/clients/{id}": {
       "delete": {
         "description": "Delete an existing OAuth 2.0 Client by its ID.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nMake sure that this endpoint is well protected and only callable by first-party components.",
-        "operationId": "deleteOAuth2Client",
+        "operationId": "adminDeleteOAuth2Client",
         "parameters": [
           {
             "description": "The id of the OAuth 2.0 Client.",
@@ -1602,21 +1671,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Deletes an OAuth 2.0 Client",
         "tags": [
-          "admin"
+          "v1"
         ]
       },
       "get": {
         "description": "Get an OAuth 2.0 client by its ID. This endpoint never returns the client secret.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
-        "operationId": "getOAuth2Client",
+        "operationId": "adminGetOAuth2Client",
         "parameters": [
           {
             "description": "The id of the OAuth 2.0 Client.",
@@ -1643,21 +1712,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Get an OAuth 2.0 Client",
         "tags": [
-          "admin"
+          "v1"
         ]
       },
       "patch": {
         "description": "Patch an existing OAuth 2.0 Client. If you pass `client_secret`\nthe secret will be updated and returned via the API. This is the\nonly time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
-        "operationId": "patchOAuth2Client",
+        "operationId": "adminPatchOAuth2Client",
         "parameters": [
           {
             "description": "The id of the OAuth 2.0 Client.",
@@ -1695,68 +1764,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Patch an OAuth 2.0 Client",
         "tags": [
-          "admin"
-        ]
-      },
-      "put": {
-        "description": "Update an existing OAuth 2.0 Client. If you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
-        "operationId": "updateOAuth2Client",
-        "parameters": [
-          {
-            "description": "The id of the OAuth 2.0 Client.",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/oAuth2Client"
-              }
-            }
-          },
-          "required": true,
-          "x-originalParamName": "Body"
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/oAuth2Client"
-                }
-              }
-            },
-            "description": "oAuth2Client"
-          },
-          "default": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/jsonError"
-                }
-              }
-            },
-            "description": "jsonError"
-          }
-        },
-        "summary": "Update an OAuth 2.0 Client",
-        "tags": [
-          "admin"
+          "v1"
         ]
       }
     },
@@ -1862,31 +1879,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Delete a JSON Web Key Set",
@@ -1923,31 +1940,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Retrieve a JSON Web Key Set",
@@ -1994,31 +2011,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Generate a New JSON Web Key",
@@ -2065,31 +2082,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Update a JSON Web Key Set",
@@ -2130,31 +2147,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Delete a JSON Web Key",
@@ -2200,21 +2217,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Fetch a JSON Web Key",
@@ -2270,31 +2287,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "403": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Update a JSON Web Key",
@@ -2315,21 +2332,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "The OAuth 2.0 Authorize Endpoint",
@@ -2367,11 +2384,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "410": {
             "content": {
@@ -2387,11 +2404,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Get Consent Request Information",
@@ -2439,21 +2456,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Accept a Consent Request",
@@ -2501,21 +2518,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Reject a Consent Request",
@@ -2553,21 +2570,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "404": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "410": {
             "content": {
@@ -2583,11 +2600,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Get a Login Request",
@@ -2635,41 +2652,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "404": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Accept a Login Request",
@@ -2717,41 +2734,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "404": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Reject a Login Request",
@@ -2789,11 +2806,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "410": {
             "content": {
@@ -2809,11 +2826,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Get a Logout Request",
@@ -2851,21 +2868,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Accept a Logout Request",
@@ -2911,21 +2928,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Reject a Logout Request",
@@ -2973,21 +2990,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client",
@@ -3034,21 +3051,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Lists All Consent Sessions of a Subject",
@@ -3079,21 +3096,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "500": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Invalidates All Login Sessions of a Certain User\nInvalidates a Subject's Authentication Session",
@@ -3148,21 +3165,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Introspect OAuth2 Tokens",
@@ -3201,16 +3218,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Register an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "public"
+          "v1"
         ]
       }
     },
@@ -3237,11 +3254,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "security": [
@@ -3251,7 +3268,7 @@
         ],
         "summary": "Deletes an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "public"
+          "v1"
         ]
       },
       "get": {
@@ -3283,11 +3300,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "security": [
@@ -3297,11 +3314,11 @@
         ],
         "summary": "Get an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "public"
+          "v1"
         ]
       },
       "put": {
-        "description": "This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nIf you pass `client_secret` the secret will be updated and returned via the API.\nThis is the only time you will be able to retrieve the client secret, so write it down and keep it safe.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
+        "description": "This endpoint behaves like the administrative counterpart (`updateOAuth2Client`) but is capable of facing the\npublic internet directly and can be used in self-service. It implements the OpenID Connect\nDynamic Client Registration Protocol. This feature needs to be enabled in the configuration. This endpoint\nis disabled by default. It can be enabled by an administrator.\n\nIf you pass `client_secret` the secret is used, otherwise a random secret\nis generated. The secret is echoed in the response. It is not possible to retrieve it later on.\n\nTo use this endpoint, you will need to present the client's authentication credentials. If the OAuth2 Client\nuses the Token Endpoint Authentication Method `client_secret_post`, you need to present the client secret in the URL query.\nIf it uses `client_secret_basic`, present the Client ID and the Client Secret in the Authorization header.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.",
         "operationId": "dynamicClientRegistrationUpdateOAuth2Client",
         "parameters": [
           {
@@ -3340,11 +3357,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "security": [
@@ -3354,7 +3371,7 @@
         ],
         "summary": "Update an OAuth 2.0 Client using the OpenID / OAuth2 Dynamic Client Registration Management Protocol",
         "tags": [
-          "public"
+          "v1"
         ]
       }
     },
@@ -3391,21 +3408,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "security": [
@@ -3493,31 +3510,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "401": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "security": [
@@ -3556,21 +3573,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "summary": "Delete OAuth2 Access Tokens from a Client",
@@ -3815,21 +3832,21 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           },
           "default": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/jsonError"
+                  "$ref": "#/components/schemas/oAuth2ApiError"
                 }
               }
             },
-            "description": "jsonError"
+            "description": "oAuth2ApiError"
           }
         },
         "security": [

@@ -92,22 +92,22 @@ func NewOauth2TokenBadRequest() *Oauth2TokenBadRequest {
 
 /* Oauth2TokenBadRequest describes a response with status code 400, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type Oauth2TokenBadRequest struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *Oauth2TokenBadRequest) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenBadRequest  %+v", 400, o.Payload)
 }
-func (o *Oauth2TokenBadRequest) GetPayload() *models.JSONError {
+func (o *Oauth2TokenBadRequest) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *Oauth2TokenBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -124,22 +124,22 @@ func NewOauth2TokenUnauthorized() *Oauth2TokenUnauthorized {
 
 /* Oauth2TokenUnauthorized describes a response with status code 401, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type Oauth2TokenUnauthorized struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *Oauth2TokenUnauthorized) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2TokenUnauthorized  %+v", 401, o.Payload)
 }
-func (o *Oauth2TokenUnauthorized) GetPayload() *models.JSONError {
+func (o *Oauth2TokenUnauthorized) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *Oauth2TokenUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -158,12 +158,12 @@ func NewOauth2TokenDefault(code int) *Oauth2TokenDefault {
 
 /* Oauth2TokenDefault describes a response with status code -1, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type Oauth2TokenDefault struct {
 	_statusCode int
 
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 // Code gets the status code for the oauth2 token default response
@@ -174,13 +174,13 @@ func (o *Oauth2TokenDefault) Code() int {
 func (o *Oauth2TokenDefault) Error() string {
 	return fmt.Sprintf("[POST /oauth2/token][%d] oauth2Token default  %+v", o._statusCode, o.Payload)
 }
-func (o *Oauth2TokenDefault) GetPayload() *models.JSONError {
+func (o *Oauth2TokenDefault) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *Oauth2TokenDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -32,6 +32,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ory/x/httprouterx"
+
 	"github.com/ory/x/snapshotx"
 
 	"github.com/ory/x/contextx"
@@ -84,8 +86,8 @@ func TestHandlerDeleteHandler(t *testing.T) {
 	require.NoError(t, cm.CreateClient(context.Background(), deleteRequest.Client.(*client.Client)))
 	require.NoError(t, store.CreateAccessTokenSession(context.Background(), deleteRequest.ID, deleteRequest))
 
-	r := x.NewRouterAdmin()
-	h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+	r := x.NewRouterAdmin(conf.AdminURL)
+	h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(r)
@@ -116,8 +118,8 @@ func TestUserinfo(t *testing.T) {
 
 	h := reg.OAuth2Handler()
 
-	router := x.NewRouterAdmin()
-	h.SetRoutes(router, router.RouterPublic(), func(h http.Handler) http.Handler {
+	router := x.NewRouterAdmin(conf.AdminURL)
+	h.SetRoutes(router, &httprouterx.RouterPublic{Router: router.Router}, func(h http.Handler) http.Handler {
 		return h
 	})
 	ts := httptest.NewServer(router)
@@ -366,8 +368,8 @@ func TestHandlerWellKnown(t *testing.T) {
 
 		h := oauth2.NewHandler(reg, conf)
 
-		r := x.NewRouterAdmin()
-		h.SetRoutes(r, r.RouterPublic(), func(h http.Handler) http.Handler {
+		r := x.NewRouterAdmin(conf.AdminURL)
+		h.SetRoutes(r, &httprouterx.RouterPublic{Router: r.Router}, func(h http.Handler) http.Handler {
 			return h
 		})
 		ts := httptest.NewServer(r)

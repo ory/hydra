@@ -97,22 +97,22 @@ func NewGetLoginRequestBadRequest() *GetLoginRequestBadRequest {
 
 /* GetLoginRequestBadRequest describes a response with status code 400, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type GetLoginRequestBadRequest struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *GetLoginRequestBadRequest) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestBadRequest  %+v", 400, o.Payload)
 }
-func (o *GetLoginRequestBadRequest) GetPayload() *models.JSONError {
+func (o *GetLoginRequestBadRequest) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *GetLoginRequestBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -129,22 +129,22 @@ func NewGetLoginRequestNotFound() *GetLoginRequestNotFound {
 
 /* GetLoginRequestNotFound describes a response with status code 404, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type GetLoginRequestNotFound struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *GetLoginRequestNotFound) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestNotFound  %+v", 404, o.Payload)
 }
-func (o *GetLoginRequestNotFound) GetPayload() *models.JSONError {
+func (o *GetLoginRequestNotFound) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *GetLoginRequestNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
@@ -193,22 +193,22 @@ func NewGetLoginRequestInternalServerError() *GetLoginRequestInternalServerError
 
 /* GetLoginRequestInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type GetLoginRequestInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *GetLoginRequestInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /oauth2/auth/requests/login][%d] getLoginRequestInternalServerError  %+v", 500, o.Payload)
 }
-func (o *GetLoginRequestInternalServerError) GetPayload() *models.JSONError {
+func (o *GetLoginRequestInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *GetLoginRequestInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

@@ -17,9 +17,9 @@ import (
 
 // Pagination struct for Pagination
 type Pagination struct {
-	// Items per PageToken  This is the number of items per page.
+	// Items per page  This is the number of items per page to return. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	PageSize *int64 `json:"page_size,omitempty"`
-	// Pagination PageToken Token  The page token.
+	// Next Page Token  The next page token. For details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).
 	PageToken *string `json:"page_token,omitempty"`
 }
 

@@ -79,22 +79,22 @@ func NewIsInstanceAliveInternalServerError() *IsInstanceAliveInternalServerError
 
 /* IsInstanceAliveInternalServerError describes a response with status code 500, with default header values.
 
-jsonError
+oAuth2ApiError
 */
 type IsInstanceAliveInternalServerError struct {
-	Payload *models.JSONError
+	Payload *models.OAuth2APIError
 }
 
 func (o *IsInstanceAliveInternalServerError) Error() string {
 	return fmt.Sprintf("[GET /health/alive][%d] isInstanceAliveInternalServerError  %+v", 500, o.Payload)
 }
-func (o *IsInstanceAliveInternalServerError) GetPayload() *models.JSONError {
+func (o *IsInstanceAliveInternalServerError) GetPayload() *models.OAuth2APIError {
 	return o.Payload
 }
 
 func (o *IsInstanceAliveInternalServerError) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
-	o.Payload = new(models.JSONError)
+	o.Payload = new(models.OAuth2APIError)
 
 	// response payload
 	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {

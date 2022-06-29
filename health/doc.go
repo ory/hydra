@@ -20,7 +20,7 @@ package health
 //
 //     Responses:
 //       200: healthStatus
-//       500: jsonError
+//       500: oAuth2ApiError
 func swaggerPublicIsInstanceAlive() {}
 
 // Alive returns an ok status if the instance is ready to handle HTTP requests.
@@ -43,7 +43,7 @@ func swaggerPublicIsInstanceAlive() {}
 //
 //     Responses:
 //       200: healthStatus
-//       500: jsonError
+//       500: oAuth2ApiError
 func swaggerAdminIsInstanceAlive() {}
 
 // Ready returns an ok status if the instance is ready to handle HTTP requests and all ReadyCheckers are ok.

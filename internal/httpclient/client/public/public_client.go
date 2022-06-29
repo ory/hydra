@@ -44,8 +44,6 @@ type ClientService interface {
 
 	Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*UserinfoOK, error)
 
-	WellKnown(params *WellKnownParams, opts ...ClientOption) (*WellKnownOK, error)
-
 	SetTransport(transport runtime.ClientTransport)
 }
 
@@ -349,48 +347,6 @@ func (a *Client) Userinfo(params *UserinfoParams, authInfo runtime.ClientAuthInf
 	// unexpected success response
 	unexpectedSuccess := result.(*UserinfoDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
-}
-
-/*
-  WellKnown JSONs web keys discovery
-
-  This endpoint returns JSON Web Keys to be used as public keys for verifying OpenID Connect ID Tokens and,
-if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
-[node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
-*/
-func (a *Client) WellKnown(params *WellKnownParams, opts ...ClientOption) (*WellKnownOK, error) {
-	// TODO: Validate the params before sending
-	if params == nil {
-		params = NewWellKnownParams()
-	}
-	op := &runtime.ClientOperation{
-		ID:                 "wellKnown",
-		Method:             "GET",
-		PathPattern:        "/.well-known/jwks.json",
-		ProducesMediaTypes: []string{"application/json"},
-		ConsumesMediaTypes: []string{"application/json"},
-		Schemes:            []string{"http", "https"},
-		Params:             params,
-		Reader:             &WellKnownReader{formats: a.formats},
-		Context:            params.Context,
-		Client:             params.HTTPClient,
-	}
-	for _, opt := range opts {
-		opt(op)
-	}
-
-	result, err := a.transport.Submit(op)
-	if err != nil {
-		return nil, err
-	}
-	success, ok := result.(*WellKnownOK)
-	if ok {
-		return success, nil
-	}
-	// unexpected success response
-	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for wellKnown: API contract not enforced by server. Client expected to get an error, but got: %T", result)
-	panic(msg)
 }
 
 // SetTransport changes the transport on the client

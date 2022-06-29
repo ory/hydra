@@ -20,18 +20,18 @@ import (
 // client.Client.JSONWebKeys and this one is last, this one will be
 // effectively written in the swagger spec.
 //
-// swagger:model JSONWebKeySet
+// swagger:model jsonWebKeySet
 type JSONWebKeySet struct {
 
-	// The value of the "keys" parameter is an array of JWK values.  By
-	// default, the order of the JWK values within the array does not imply
-	// an order of preference among them, although applications of JWK Sets
-	// can choose to assign a meaning to the order for their purposes, if
-	// desired.
+	// The value of the "keys" parameter is an array of JSON Web Key (JWK)
+	// values. By default, the order of the JWK values within the array does
+	// not imply an order of preference among them, although applications
+	// of JWK Sets can choose to assign a meaning to the order for their
+	// purposes, if desired.
 	Keys []*JSONWebKey `json:"keys"`
 }
 
-// Validate validates this JSON web key set
+// Validate validates this json web key set
 func (m *JSONWebKeySet) Validate(formats strfmt.Registry) error {
 	var res []error
 
@@ -69,7 +69,7 @@ func (m *JSONWebKeySet) validateKeys(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validate this JSON web key set based on the context it is used
+// ContextValidate validate this json web key set based on the context it is used
 func (m *JSONWebKeySet) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	var res []error
 

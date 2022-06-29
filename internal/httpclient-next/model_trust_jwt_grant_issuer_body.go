@@ -24,7 +24,7 @@ type TrustJwtGrantIssuerBody struct {
 	ExpiresAt time.Time `json:"expires_at"`
 	// The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).
 	Issuer string     `json:"issuer"`
-	Jwk    JSONWebKey `json:"jwk"`
+	Jwk    JsonWebKey `json:"jwk"`
 	// The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
 	Scope []string `json:"scope"`
 	// The \"subject\" identifies the principal that is the subject of the JWT.
@@ -35,7 +35,7 @@ type TrustJwtGrantIssuerBody struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JSONWebKey, scope []string) *TrustJwtGrantIssuerBody {
+func NewTrustJwtGrantIssuerBody(expiresAt time.Time, issuer string, jwk JsonWebKey, scope []string) *TrustJwtGrantIssuerBody {
 	this := TrustJwtGrantIssuerBody{}
 	this.ExpiresAt = expiresAt
 	this.Issuer = issuer
@@ -133,9 +133,9 @@ func (o *TrustJwtGrantIssuerBody) SetIssuer(v string) {
 }
 
 // GetJwk returns the Jwk field value
-func (o *TrustJwtGrantIssuerBody) GetJwk() JSONWebKey {
+func (o *TrustJwtGrantIssuerBody) GetJwk() JsonWebKey {
 	if o == nil {
-		var ret JSONWebKey
+		var ret JsonWebKey
 		return ret
 	}
 
@@ -144,7 +144,7 @@ func (o *TrustJwtGrantIssuerBody) GetJwk() JSONWebKey {
 
 // GetJwkOk returns a tuple with the Jwk field value
 // and a boolean to check if the value has been set.
-func (o *TrustJwtGrantIssuerBody) GetJwkOk() (*JSONWebKey, bool) {
+func (o *TrustJwtGrantIssuerBody) GetJwkOk() (*JsonWebKey, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -152,7 +152,7 @@ func (o *TrustJwtGrantIssuerBody) GetJwkOk() (*JSONWebKey, bool) {
 }
 
 // SetJwk sets field value
-func (o *TrustJwtGrantIssuerBody) SetJwk(v JSONWebKey) {
+func (o *TrustJwtGrantIssuerBody) SetJwk(v JsonWebKey) {
 	o.Jwk = v
 }
 

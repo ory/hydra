@@ -53,7 +53,7 @@ func NewCreateJWKSCmd(parent *cobra.Command) *cobra.Command {
 			}
 
 			//nolint:bodyclose
-			jwks, _, err := m.AdminApi.CreateJsonWebKeySet(context.Background(), args[0]).JsonWebKeySetGeneratorRequest(hydra.JsonWebKeySetGeneratorRequest{
+			jwks, _, err := m.V1Api.AdminCreateJsonWebKeySet(context.Background(), args[0]).AdminCreateJsonWebKeySetBody(hydra.AdminCreateJsonWebKeySetBody{
 				Alg: flagx.MustGetString(cmd, alg),
 				Kid: kid,
 				Use: flagx.MustGetString(cmd, use),

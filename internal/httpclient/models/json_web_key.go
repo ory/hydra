@@ -14,11 +14,9 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// JSONWebKey It is important that this model object is named JSONWebKey for
-// "swagger generate spec" to generate only on definition of a
-// JSONWebKey.
+// JSONWebKey json web key
 //
-// swagger:model JSONWebKey
+// swagger:model jsonWebKey
 type JSONWebKey struct {
 
 	// The "alg" (algorithm) parameter identifies the algorithm intended for
@@ -118,7 +116,7 @@ type JSONWebKey struct {
 	Y string `json:"y,omitempty"`
 }
 
-// Validate validates this JSON web key
+// Validate validates this json web key
 func (m *JSONWebKey) Validate(formats strfmt.Registry) error {
 	var res []error
 
@@ -180,7 +178,7 @@ func (m *JSONWebKey) validateUse(formats strfmt.Registry) error {
 	return nil
 }
 
-// ContextValidate validates this JSON web key based on context it is used
+// ContextValidate validates this json web key based on context it is used
 func (m *JSONWebKey) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }

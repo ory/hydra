@@ -46,7 +46,7 @@ func NewGetJWKSCmd(root *cobra.Command) *cobra.Command {
 
 			var sets outputJSONWebKeyCollection
 			for _, set := range args {
-				key, _, err := m.AdminApi.GetJsonWebKeySet(cmd.Context(), set).Execute() //nolint:bodyclose
+				key, _, err := m.V1Api.AdminGetJsonWebKeySet(cmd.Context(), set).Execute() //nolint:bodyclose
 				if err != nil {
 					return cmdx.PrintOpenAPIError(cmd, err)
 				}
@@ -55,7 +55,7 @@ func NewGetJWKSCmd(root *cobra.Command) *cobra.Command {
 			}
 
 			if len(sets.Keys) == 1 {
-				cmdx.PrintRow(cmd, outputJsonWebKey{Set: args[0], JSONWebKey: sets.Keys[0]})
+				cmdx.PrintRow(cmd, outputJsonWebKey{Set: args[0], JsonWebKey: sets.Keys[0]})
 			} else if len(sets.Keys) > 1 {
 				cmdx.PrintTable(cmd, sets)
 			}

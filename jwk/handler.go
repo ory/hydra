@@ -50,31 +50,47 @@ type Handler struct {
 	r InternalRegistry
 }
 
+// It is important that this model object is named JSONWebKeySet for
+// "swagger generate spec" to generate only on definition of a
+// JSONWebKeySet. Since one with the same name is previously defined as
+// client.Client.JSONWebKeys and this one is last, this one will be
+// effectively written in the swagger spec.
+//
+// swagger:model jsonWebKeySet
+type jsonWebKeySet struct {
+	// The value of the "keys" parameter is an array of JSON Web Key (JWK)
+	// values. By default, the order of the JWK values within the array does
+	// not imply an order of preference among them, although applications
+	// of JWK Sets can choose to assign a meaning to the order for their
+	// purposes, if desired.
+	Keys []x.JSONWebKey `json:"keys"`
+}
+
 func NewHandler(r InternalRegistry) *Handler {
 	return &Handler{r: r}
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.RouterPublic, corsMiddleware func(http.Handler) http.Handler) {
 	public.Handler("OPTIONS", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.WellKnown)))
+	public.Handler("GET", WellKnownKeysPath, corsMiddleware(http.HandlerFunc(h.discoverJsonWebKeys)))
 
-	admin.GET(KeyHandlerPath+"/:set/:key", h.GetKey)
-	admin.GET(KeyHandlerPath+"/:set", h.GetKeySet)
+	admin.GET(KeyHandlerPath+"/:set/:key", h.adminGetJsonWebKey)
+	admin.GET(KeyHandlerPath+"/:set", h.adminGetJsonWebKeySet)
 
 	admin.POST(KeyHandlerPath+"/:set", h.Create)
 
-	admin.PUT(KeyHandlerPath+"/:set/:key", h.UpdateKey)
-	admin.PUT(KeyHandlerPath+"/:set", h.UpdateKeySet)
+	admin.PUT(KeyHandlerPath+"/:set/:key", h.adminUpdateJsonWebKey)
+	admin.PUT(KeyHandlerPath+"/:set", h.adminUpdateJsonWebKeySet)
 
-	admin.DELETE(KeyHandlerPath+"/:set/:key", h.DeleteKey)
-	admin.DELETE(KeyHandlerPath+"/:set", h.DeleteKeySet)
+	admin.DELETE(KeyHandlerPath+"/:set/:key", h.adminDeleteJsonWebKey)
+	admin.DELETE(KeyHandlerPath+"/:set", h.adminDeleteJsonWebKeySet)
 }
 
-// swagger:route GET /.well-known/jwks.json public wellKnown
+// swagger:route GET /.well-known/jwks.json v1 discoverJsonWebKeys
 //
-// JSON Web Keys Discovery
+// Discover JSON Web Keys
 //
-// This endpoint returns JSON Web Keys to be used as public keys for verifying OpenID Connect ID Tokens and,
+// This endpoint returns JSON Web Keys required to verifying OpenID Connect ID Tokens and,
 // if enabled, OAuth 2.0 JWT Access Tokens. This endpoint can be used with client libraries like
 // [node-jwks-rsa](https://github.com/auth0/node-jwks-rsa) among others.
 //
@@ -87,9 +103,9 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JSONWebKeySet
-//       500: oAuth2ApiError
-func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
+//       200: jsonWebKeySet
+//       default: oAuth2ApiError
+func (h *Handler) discoverJsonWebKeys(w http.ResponseWriter, r *http.Request) {
 	var jwks jose.JSONWebKeySet
 
 	ctx := r.Context()
@@ -114,11 +130,25 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 	h.r.Writer().Write(w, r, &jwks)
 }
 
-// swagger:route GET /keys/{set}/{kid} admin getJsonWebKey
+// swagger:parameters adminGetJsonWebKey
+type adminGetJsonWebKey struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+
+	// The JSON Web Key ID (kid)
+	//
+	// in: path
+	// required: true
+	KID string `json:"kid"`
+}
+
+// swagger:route GET /admin/keys/{set}/{kid} v1 adminGetJsonWebKey
 //
 // Fetch a JSON Web Key
 //
-// This endpoint returns a singular JSON Web Key, identified by the set and the specific key ID (kid).
+// This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
 //
 //     Consumes:
 //     - application/json
@@ -129,10 +159,9 @@ func (h *Handler) WellKnown(w http.ResponseWriter, r *http.Request) {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JSONWebKeySet
-//       404: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       200: jsonWebKeySet
+//       default: oAuth2ApiError
+func (h *Handler) adminGetJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 
@@ -146,7 +175,15 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	h.r.Writer().Write(w, r, keys)
 }
 
-// swagger:route GET /keys/{set} admin getJsonWebKeySet
+// swagger:parameters adminGetJsonWebKeySet
+type adminGetJsonWebKeySet struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+}
+
+// swagger:route GET /admin/keys/{set} v1 adminGetJsonWebKeySet
 //
 // Retrieve a JSON Web Key Set
 //
@@ -163,11 +200,9 @@ func (h *Handler) GetKey(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JSONWebKeySet
-//       401: oAuth2ApiError
-//       403: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       200: jsonWebKeySet
+//       default: oAuth2ApiError
+func (h *Handler) adminGetJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
 	keys, err := h.r.KeyManager().GetKeySet(r.Context(), setName)
@@ -180,7 +215,39 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 	h.r.Writer().Write(w, r, keys)
 }
 
-// swagger:route POST /keys/{set} admin createJsonWebKeySet
+// swagger:parameters adminCreateJsonWebKeySet
+type adminCreateJsonWebKeySet struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+
+	// in: body
+	// required: true
+	Body adminCreateJsonWebKeySetBody
+}
+
+// swagger:model adminCreateJsonWebKeySetBody
+type adminCreateJsonWebKeySetBody struct {
+	// The algorithm to be used for creating the key. Supports "RS256", "ES256", "ES512", "HS512", and "HS256"
+	//
+	// required: true
+	Algorithm string `json:"alg"`
+
+	// The "use" (public key use) parameter identifies the intended use of
+	// the public key. The "use" parameter is employed to indicate whether
+	// a public key is used for encrypting data or verifying the signature
+	// on data. Valid values are "enc" and "sig".
+	// required: true
+	Use string `json:"use"`
+
+	// The kid of the key to be created
+	//
+	// required: true
+	KeyID string `json:"kid"`
+}
+
+// swagger:route POST /admin/keys/{set} v1 adminCreateJsonWebKeySet
 //
 // Generate a New JSON Web Key
 //
@@ -197,12 +264,10 @@ func (h *Handler) GetKeySet(w http.ResponseWriter, r *http.Request, ps httproute
 //     Schemes: http, https
 //
 //     Responses:
-//       201: JSONWebKeySet
-//       401: oAuth2ApiError
-//       403: oAuth2ApiError
-//       500: oAuth2ApiError
+//       201: jsonWebKeySet
+//       default: oAuth2ApiError
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var keyRequest createRequest
+	var keyRequest adminCreateJsonWebKeySetBody
 	var set = ps.ByName("set")
 
 	if err := json.NewDecoder(r.Body).Decode(&keyRequest); err != nil {
@@ -217,7 +282,18 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	}
 }
 
-// swagger:route PUT /keys/{set} admin updateJsonWebKeySet
+// swagger:parameters adminUpdateJsonWebKeySet
+type adminUpdateJsonWebKeySet struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+
+	// in: body
+	Body jsonWebKeySet
+}
+
+// swagger:route PUT /admin/keys/{set} v1 adminUpdateJsonWebKeySet
 //
 // Update a JSON Web Key Set
 //
@@ -234,11 +310,9 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request, ps httprouter.P
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JSONWebKeySet
-//       401: oAuth2ApiError
-//       403: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       200: jsonWebKeySet
+//       default: oAuth2ApiError
+func (h *Handler) adminUpdateJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var keySet jose.JSONWebKeySet
 	var set = ps.ByName("set")
 
@@ -255,7 +329,24 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	h.r.Writer().Write(w, r, &keySet)
 }
 
-// swagger:route PUT /keys/{set}/{kid} admin updateJsonWebKey
+// swagger:parameters adminUpdateJsonWebKey
+type adminUpdateJsonWebKey struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+
+	// The JSON Web Key ID (kid)
+	//
+	// in: path
+	// required: true
+	KID string `json:"kid"`
+
+	// in: body
+	Body x.JSONWebKey
+}
+
+// swagger:route PUT /admin/keys/{set}/{kid} v1 adminUpdateJsonWebKey
 //
 // Update a JSON Web Key
 //
@@ -272,11 +363,9 @@ func (h *Handler) UpdateKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //     Schemes: http, https
 //
 //     Responses:
-//       200: JSONWebKey
-//       401: oAuth2ApiError
-//       403: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       200: jsonWebKey
+//       default: oAuth2ApiError
+func (h *Handler) adminUpdateJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var key jose.JSONWebKey
 	var set = ps.ByName("set")
 
@@ -293,7 +382,15 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 	h.r.Writer().Write(w, r, key)
 }
 
-// swagger:route DELETE /keys/{set} admin deleteJsonWebKeySet
+// swagger:parameters adminDeleteJsonWebKeySet
+type adminDeleteJsonWebKeySet struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+}
+
+// swagger:route DELETE /admin/keys/{set} v1 adminDeleteJsonWebKeySet
 //
 // Delete a JSON Web Key Set
 //
@@ -311,10 +408,8 @@ func (h *Handler) UpdateKey(w http.ResponseWriter, r *http.Request, ps httproute
 //
 //     Responses:
 //       204: emptyResponse
-//       401: oAuth2ApiError
-//       403: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) adminDeleteJsonWebKeySet(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 
 	if err := h.r.KeyManager().DeleteKeySet(r.Context(), setName); err != nil {
@@ -325,7 +420,21 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route DELETE /keys/{set}/{kid} admin deleteJsonWebKey
+// swagger:parameters adminDeleteJsonWebKey
+type adminDeleteJsonWebKey struct {
+	// The JSON Web Key Set
+	// in: path
+	// required: true
+	Set string `json:"set"`
+
+	// The JSON Web Key ID (kid)
+	//
+	// in: path
+	// required: true
+	KID string `json:"kid"`
+}
+
+// swagger:route DELETE /admin/keys/{set}/{kid} v1 adminDeleteJsonWebKey
 //
 // Delete a JSON Web Key
 //
@@ -343,10 +452,8 @@ func (h *Handler) DeleteKeySet(w http.ResponseWriter, r *http.Request, ps httpro
 //
 //     Responses:
 //       204: emptyResponse
-//       401: oAuth2ApiError
-//       403: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) DeleteKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) adminDeleteJsonWebKey(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var setName = ps.ByName("set")
 	var keyName = ps.ByName("key")
 

@@ -15,8 +15,8 @@ import (
 	"encoding/json"
 )
 
-// JSONWebKey It is important that this model object is named JSONWebKey for \"swagger generate spec\" to generate only on definition of a JSONWebKey.
-type JSONWebKey struct {
+// JsonWebKey struct for JsonWebKey
+type JsonWebKey struct {
 	// The \"alg\" (algorithm) parameter identifies the algorithm intended for use with the key.  The values used should either be registered in the IANA \"JSON Web Signature and Encryption Algorithms\" registry established by [JWA] or be a value that contains a Collision- Resistant Name.
 	Alg string  `json:"alg"`
 	Crv *string `json:"crv,omitempty"`
@@ -41,12 +41,12 @@ type JSONWebKey struct {
 	Y   *string  `json:"y,omitempty"`
 }
 
-// NewJSONWebKey instantiates a new JSONWebKey object
+// NewJsonWebKey instantiates a new JsonWebKey object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewJSONWebKey(alg string, kid string, kty string, use string) *JSONWebKey {
-	this := JSONWebKey{}
+func NewJsonWebKey(alg string, kid string, kty string, use string) *JsonWebKey {
+	this := JsonWebKey{}
 	this.Alg = alg
 	this.Kid = kid
 	this.Kty = kty
@@ -54,16 +54,16 @@ func NewJSONWebKey(alg string, kid string, kty string, use string) *JSONWebKey {
 	return &this
 }
 
-// NewJSONWebKeyWithDefaults instantiates a new JSONWebKey object
+// NewJsonWebKeyWithDefaults instantiates a new JsonWebKey object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewJSONWebKeyWithDefaults() *JSONWebKey {
-	this := JSONWebKey{}
+func NewJsonWebKeyWithDefaults() *JsonWebKey {
+	this := JsonWebKey{}
 	return &this
 }
 
 // GetAlg returns the Alg field value
-func (o *JSONWebKey) GetAlg() string {
+func (o *JsonWebKey) GetAlg() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -74,7 +74,7 @@ func (o *JSONWebKey) GetAlg() string {
 
 // GetAlgOk returns a tuple with the Alg field value
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetAlgOk() (*string, bool) {
+func (o *JsonWebKey) GetAlgOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -82,12 +82,12 @@ func (o *JSONWebKey) GetAlgOk() (*string, bool) {
 }
 
 // SetAlg sets field value
-func (o *JSONWebKey) SetAlg(v string) {
+func (o *JsonWebKey) SetAlg(v string) {
 	o.Alg = v
 }
 
 // GetCrv returns the Crv field value if set, zero value otherwise.
-func (o *JSONWebKey) GetCrv() string {
+func (o *JsonWebKey) GetCrv() string {
 	if o == nil || o.Crv == nil {
 		var ret string
 		return ret
@@ -97,7 +97,7 @@ func (o *JSONWebKey) GetCrv() string {
 
 // GetCrvOk returns a tuple with the Crv field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetCrvOk() (*string, bool) {
+func (o *JsonWebKey) GetCrvOk() (*string, bool) {
 	if o == nil || o.Crv == nil {
 		return nil, false
 	}
@@ -105,7 +105,7 @@ func (o *JSONWebKey) GetCrvOk() (*string, bool) {
 }
 
 // HasCrv returns a boolean if a field has been set.
-func (o *JSONWebKey) HasCrv() bool {
+func (o *JsonWebKey) HasCrv() bool {
 	if o != nil && o.Crv != nil {
 		return true
 	}
@@ -114,12 +114,12 @@ func (o *JSONWebKey) HasCrv() bool {
 }
 
 // SetCrv gets a reference to the given string and assigns it to the Crv field.
-func (o *JSONWebKey) SetCrv(v string) {
+func (o *JsonWebKey) SetCrv(v string) {
 	o.Crv = &v
 }
 
 // GetD returns the D field value if set, zero value otherwise.
-func (o *JSONWebKey) GetD() string {
+func (o *JsonWebKey) GetD() string {
 	if o == nil || o.D == nil {
 		var ret string
 		return ret
@@ -129,7 +129,7 @@ func (o *JSONWebKey) GetD() string {
 
 // GetDOk returns a tuple with the D field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetDOk() (*string, bool) {
+func (o *JsonWebKey) GetDOk() (*string, bool) {
 	if o == nil || o.D == nil {
 		return nil, false
 	}
@@ -137,7 +137,7 @@ func (o *JSONWebKey) GetDOk() (*string, bool) {
 }
 
 // HasD returns a boolean if a field has been set.
-func (o *JSONWebKey) HasD() bool {
+func (o *JsonWebKey) HasD() bool {
 	if o != nil && o.D != nil {
 		return true
 	}
@@ -146,12 +146,12 @@ func (o *JSONWebKey) HasD() bool {
 }
 
 // SetD gets a reference to the given string and assigns it to the D field.
-func (o *JSONWebKey) SetD(v string) {
+func (o *JsonWebKey) SetD(v string) {
 	o.D = &v
 }
 
 // GetDp returns the Dp field value if set, zero value otherwise.
-func (o *JSONWebKey) GetDp() string {
+func (o *JsonWebKey) GetDp() string {
 	if o == nil || o.Dp == nil {
 		var ret string
 		return ret
@@ -161,7 +161,7 @@ func (o *JSONWebKey) GetDp() string {
 
 // GetDpOk returns a tuple with the Dp field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetDpOk() (*string, bool) {
+func (o *JsonWebKey) GetDpOk() (*string, bool) {
 	if o == nil || o.Dp == nil {
 		return nil, false
 	}
@@ -169,7 +169,7 @@ func (o *JSONWebKey) GetDpOk() (*string, bool) {
 }
 
 // HasDp returns a boolean if a field has been set.
-func (o *JSONWebKey) HasDp() bool {
+func (o *JsonWebKey) HasDp() bool {
 	if o != nil && o.Dp != nil {
 		return true
 	}
@@ -178,12 +178,12 @@ func (o *JSONWebKey) HasDp() bool {
 }
 
 // SetDp gets a reference to the given string and assigns it to the Dp field.
-func (o *JSONWebKey) SetDp(v string) {
+func (o *JsonWebKey) SetDp(v string) {
 	o.Dp = &v
 }
 
 // GetDq returns the Dq field value if set, zero value otherwise.
-func (o *JSONWebKey) GetDq() string {
+func (o *JsonWebKey) GetDq() string {
 	if o == nil || o.Dq == nil {
 		var ret string
 		return ret
@@ -193,7 +193,7 @@ func (o *JSONWebKey) GetDq() string {
 
 // GetDqOk returns a tuple with the Dq field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetDqOk() (*string, bool) {
+func (o *JsonWebKey) GetDqOk() (*string, bool) {
 	if o == nil || o.Dq == nil {
 		return nil, false
 	}
@@ -201,7 +201,7 @@ func (o *JSONWebKey) GetDqOk() (*string, bool) {
 }
 
 // HasDq returns a boolean if a field has been set.
-func (o *JSONWebKey) HasDq() bool {
+func (o *JsonWebKey) HasDq() bool {
 	if o != nil && o.Dq != nil {
 		return true
 	}
@@ -210,12 +210,12 @@ func (o *JSONWebKey) HasDq() bool {
 }
 
 // SetDq gets a reference to the given string and assigns it to the Dq field.
-func (o *JSONWebKey) SetDq(v string) {
+func (o *JsonWebKey) SetDq(v string) {
 	o.Dq = &v
 }
 
 // GetE returns the E field value if set, zero value otherwise.
-func (o *JSONWebKey) GetE() string {
+func (o *JsonWebKey) GetE() string {
 	if o == nil || o.E == nil {
 		var ret string
 		return ret
@@ -225,7 +225,7 @@ func (o *JSONWebKey) GetE() string {
 
 // GetEOk returns a tuple with the E field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetEOk() (*string, bool) {
+func (o *JsonWebKey) GetEOk() (*string, bool) {
 	if o == nil || o.E == nil {
 		return nil, false
 	}
@@ -233,7 +233,7 @@ func (o *JSONWebKey) GetEOk() (*string, bool) {
 }
 
 // HasE returns a boolean if a field has been set.
-func (o *JSONWebKey) HasE() bool {
+func (o *JsonWebKey) HasE() bool {
 	if o != nil && o.E != nil {
 		return true
 	}
@@ -242,12 +242,12 @@ func (o *JSONWebKey) HasE() bool {
 }
 
 // SetE gets a reference to the given string and assigns it to the E field.
-func (o *JSONWebKey) SetE(v string) {
+func (o *JsonWebKey) SetE(v string) {
 	o.E = &v
 }
 
 // GetK returns the K field value if set, zero value otherwise.
-func (o *JSONWebKey) GetK() string {
+func (o *JsonWebKey) GetK() string {
 	if o == nil || o.K == nil {
 		var ret string
 		return ret
@@ -257,7 +257,7 @@ func (o *JSONWebKey) GetK() string {
 
 // GetKOk returns a tuple with the K field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetKOk() (*string, bool) {
+func (o *JsonWebKey) GetKOk() (*string, bool) {
 	if o == nil || o.K == nil {
 		return nil, false
 	}
@@ -265,7 +265,7 @@ func (o *JSONWebKey) GetKOk() (*string, bool) {
 }
 
 // HasK returns a boolean if a field has been set.
-func (o *JSONWebKey) HasK() bool {
+func (o *JsonWebKey) HasK() bool {
 	if o != nil && o.K != nil {
 		return true
 	}
@@ -274,12 +274,12 @@ func (o *JSONWebKey) HasK() bool {
 }
 
 // SetK gets a reference to the given string and assigns it to the K field.
-func (o *JSONWebKey) SetK(v string) {
+func (o *JsonWebKey) SetK(v string) {
 	o.K = &v
 }
 
 // GetKid returns the Kid field value
-func (o *JSONWebKey) GetKid() string {
+func (o *JsonWebKey) GetKid() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -290,7 +290,7 @@ func (o *JSONWebKey) GetKid() string {
 
 // GetKidOk returns a tuple with the Kid field value
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetKidOk() (*string, bool) {
+func (o *JsonWebKey) GetKidOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -298,12 +298,12 @@ func (o *JSONWebKey) GetKidOk() (*string, bool) {
 }
 
 // SetKid sets field value
-func (o *JSONWebKey) SetKid(v string) {
+func (o *JsonWebKey) SetKid(v string) {
 	o.Kid = v
 }
 
 // GetKty returns the Kty field value
-func (o *JSONWebKey) GetKty() string {
+func (o *JsonWebKey) GetKty() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -314,7 +314,7 @@ func (o *JSONWebKey) GetKty() string {
 
 // GetKtyOk returns a tuple with the Kty field value
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetKtyOk() (*string, bool) {
+func (o *JsonWebKey) GetKtyOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -322,12 +322,12 @@ func (o *JSONWebKey) GetKtyOk() (*string, bool) {
 }
 
 // SetKty sets field value
-func (o *JSONWebKey) SetKty(v string) {
+func (o *JsonWebKey) SetKty(v string) {
 	o.Kty = v
 }
 
 // GetN returns the N field value if set, zero value otherwise.
-func (o *JSONWebKey) GetN() string {
+func (o *JsonWebKey) GetN() string {
 	if o == nil || o.N == nil {
 		var ret string
 		return ret
@@ -337,7 +337,7 @@ func (o *JSONWebKey) GetN() string {
 
 // GetNOk returns a tuple with the N field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetNOk() (*string, bool) {
+func (o *JsonWebKey) GetNOk() (*string, bool) {
 	if o == nil || o.N == nil {
 		return nil, false
 	}
@@ -345,7 +345,7 @@ func (o *JSONWebKey) GetNOk() (*string, bool) {
 }
 
 // HasN returns a boolean if a field has been set.
-func (o *JSONWebKey) HasN() bool {
+func (o *JsonWebKey) HasN() bool {
 	if o != nil && o.N != nil {
 		return true
 	}
@@ -354,12 +354,12 @@ func (o *JSONWebKey) HasN() bool {
 }
 
 // SetN gets a reference to the given string and assigns it to the N field.
-func (o *JSONWebKey) SetN(v string) {
+func (o *JsonWebKey) SetN(v string) {
 	o.N = &v
 }
 
 // GetP returns the P field value if set, zero value otherwise.
-func (o *JSONWebKey) GetP() string {
+func (o *JsonWebKey) GetP() string {
 	if o == nil || o.P == nil {
 		var ret string
 		return ret
@@ -369,7 +369,7 @@ func (o *JSONWebKey) GetP() string {
 
 // GetPOk returns a tuple with the P field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetPOk() (*string, bool) {
+func (o *JsonWebKey) GetPOk() (*string, bool) {
 	if o == nil || o.P == nil {
 		return nil, false
 	}
@@ -377,7 +377,7 @@ func (o *JSONWebKey) GetPOk() (*string, bool) {
 }
 
 // HasP returns a boolean if a field has been set.
-func (o *JSONWebKey) HasP() bool {
+func (o *JsonWebKey) HasP() bool {
 	if o != nil && o.P != nil {
 		return true
 	}
@@ -386,12 +386,12 @@ func (o *JSONWebKey) HasP() bool {
 }
 
 // SetP gets a reference to the given string and assigns it to the P field.
-func (o *JSONWebKey) SetP(v string) {
+func (o *JsonWebKey) SetP(v string) {
 	o.P = &v
 }
 
 // GetQ returns the Q field value if set, zero value otherwise.
-func (o *JSONWebKey) GetQ() string {
+func (o *JsonWebKey) GetQ() string {
 	if o == nil || o.Q == nil {
 		var ret string
 		return ret
@@ -401,7 +401,7 @@ func (o *JSONWebKey) GetQ() string {
 
 // GetQOk returns a tuple with the Q field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetQOk() (*string, bool) {
+func (o *JsonWebKey) GetQOk() (*string, bool) {
 	if o == nil || o.Q == nil {
 		return nil, false
 	}
@@ -409,7 +409,7 @@ func (o *JSONWebKey) GetQOk() (*string, bool) {
 }
 
 // HasQ returns a boolean if a field has been set.
-func (o *JSONWebKey) HasQ() bool {
+func (o *JsonWebKey) HasQ() bool {
 	if o != nil && o.Q != nil {
 		return true
 	}
@@ -418,12 +418,12 @@ func (o *JSONWebKey) HasQ() bool {
 }
 
 // SetQ gets a reference to the given string and assigns it to the Q field.
-func (o *JSONWebKey) SetQ(v string) {
+func (o *JsonWebKey) SetQ(v string) {
 	o.Q = &v
 }
 
 // GetQi returns the Qi field value if set, zero value otherwise.
-func (o *JSONWebKey) GetQi() string {
+func (o *JsonWebKey) GetQi() string {
 	if o == nil || o.Qi == nil {
 		var ret string
 		return ret
@@ -433,7 +433,7 @@ func (o *JSONWebKey) GetQi() string {
 
 // GetQiOk returns a tuple with the Qi field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetQiOk() (*string, bool) {
+func (o *JsonWebKey) GetQiOk() (*string, bool) {
 	if o == nil || o.Qi == nil {
 		return nil, false
 	}
@@ -441,7 +441,7 @@ func (o *JSONWebKey) GetQiOk() (*string, bool) {
 }
 
 // HasQi returns a boolean if a field has been set.
-func (o *JSONWebKey) HasQi() bool {
+func (o *JsonWebKey) HasQi() bool {
 	if o != nil && o.Qi != nil {
 		return true
 	}
@@ -450,12 +450,12 @@ func (o *JSONWebKey) HasQi() bool {
 }
 
 // SetQi gets a reference to the given string and assigns it to the Qi field.
-func (o *JSONWebKey) SetQi(v string) {
+func (o *JsonWebKey) SetQi(v string) {
 	o.Qi = &v
 }
 
 // GetUse returns the Use field value
-func (o *JSONWebKey) GetUse() string {
+func (o *JsonWebKey) GetUse() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -466,7 +466,7 @@ func (o *JSONWebKey) GetUse() string {
 
 // GetUseOk returns a tuple with the Use field value
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetUseOk() (*string, bool) {
+func (o *JsonWebKey) GetUseOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -474,12 +474,12 @@ func (o *JSONWebKey) GetUseOk() (*string, bool) {
 }
 
 // SetUse sets field value
-func (o *JSONWebKey) SetUse(v string) {
+func (o *JsonWebKey) SetUse(v string) {
 	o.Use = v
 }
 
 // GetX returns the X field value if set, zero value otherwise.
-func (o *JSONWebKey) GetX() string {
+func (o *JsonWebKey) GetX() string {
 	if o == nil || o.X == nil {
 		var ret string
 		return ret
@@ -489,7 +489,7 @@ func (o *JSONWebKey) GetX() string {
 
 // GetXOk returns a tuple with the X field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetXOk() (*string, bool) {
+func (o *JsonWebKey) GetXOk() (*string, bool) {
 	if o == nil || o.X == nil {
 		return nil, false
 	}
@@ -497,7 +497,7 @@ func (o *JSONWebKey) GetXOk() (*string, bool) {
 }
 
 // HasX returns a boolean if a field has been set.
-func (o *JSONWebKey) HasX() bool {
+func (o *JsonWebKey) HasX() bool {
 	if o != nil && o.X != nil {
 		return true
 	}
@@ -506,12 +506,12 @@ func (o *JSONWebKey) HasX() bool {
 }
 
 // SetX gets a reference to the given string and assigns it to the X field.
-func (o *JSONWebKey) SetX(v string) {
+func (o *JsonWebKey) SetX(v string) {
 	o.X = &v
 }
 
 // GetX5c returns the X5c field value if set, zero value otherwise.
-func (o *JSONWebKey) GetX5c() []string {
+func (o *JsonWebKey) GetX5c() []string {
 	if o == nil || o.X5c == nil {
 		var ret []string
 		return ret
@@ -521,7 +521,7 @@ func (o *JSONWebKey) GetX5c() []string {
 
 // GetX5cOk returns a tuple with the X5c field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetX5cOk() ([]string, bool) {
+func (o *JsonWebKey) GetX5cOk() ([]string, bool) {
 	if o == nil || o.X5c == nil {
 		return nil, false
 	}
@@ -529,7 +529,7 @@ func (o *JSONWebKey) GetX5cOk() ([]string, bool) {
 }
 
 // HasX5c returns a boolean if a field has been set.
-func (o *JSONWebKey) HasX5c() bool {
+func (o *JsonWebKey) HasX5c() bool {
 	if o != nil && o.X5c != nil {
 		return true
 	}
@@ -538,12 +538,12 @@ func (o *JSONWebKey) HasX5c() bool {
 }
 
 // SetX5c gets a reference to the given []string and assigns it to the X5c field.
-func (o *JSONWebKey) SetX5c(v []string) {
+func (o *JsonWebKey) SetX5c(v []string) {
 	o.X5c = v
 }
 
 // GetY returns the Y field value if set, zero value otherwise.
-func (o *JSONWebKey) GetY() string {
+func (o *JsonWebKey) GetY() string {
 	if o == nil || o.Y == nil {
 		var ret string
 		return ret
@@ -553,7 +553,7 @@ func (o *JSONWebKey) GetY() string {
 
 // GetYOk returns a tuple with the Y field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *JSONWebKey) GetYOk() (*string, bool) {
+func (o *JsonWebKey) GetYOk() (*string, bool) {
 	if o == nil || o.Y == nil {
 		return nil, false
 	}
@@ -561,7 +561,7 @@ func (o *JSONWebKey) GetYOk() (*string, bool) {
 }
 
 // HasY returns a boolean if a field has been set.
-func (o *JSONWebKey) HasY() bool {
+func (o *JsonWebKey) HasY() bool {
 	if o != nil && o.Y != nil {
 		return true
 	}
@@ -570,11 +570,11 @@ func (o *JSONWebKey) HasY() bool {
 }
 
 // SetY gets a reference to the given string and assigns it to the Y field.
-func (o *JSONWebKey) SetY(v string) {
+func (o *JsonWebKey) SetY(v string) {
 	o.Y = &v
 }
 
-func (o JSONWebKey) MarshalJSON() ([]byte, error) {
+func (o JsonWebKey) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if true {
 		toSerialize["alg"] = o.Alg
@@ -630,38 +630,38 @@ func (o JSONWebKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-type NullableJSONWebKey struct {
-	value *JSONWebKey
+type NullableJsonWebKey struct {
+	value *JsonWebKey
 	isSet bool
 }
 
-func (v NullableJSONWebKey) Get() *JSONWebKey {
+func (v NullableJsonWebKey) Get() *JsonWebKey {
 	return v.value
 }
 
-func (v *NullableJSONWebKey) Set(val *JSONWebKey) {
+func (v *NullableJsonWebKey) Set(val *JsonWebKey) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableJSONWebKey) IsSet() bool {
+func (v NullableJsonWebKey) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableJSONWebKey) Unset() {
+func (v *NullableJsonWebKey) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableJSONWebKey(val *JSONWebKey) *NullableJSONWebKey {
-	return &NullableJSONWebKey{value: val, isSet: true}
+func NewNullableJsonWebKey(val *JsonWebKey) *NullableJsonWebKey {
+	return &NullableJsonWebKey{value: val, isSet: true}
 }
 
-func (v NullableJSONWebKey) MarshalJSON() ([]byte, error) {
+func (v NullableJsonWebKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableJSONWebKey) UnmarshalJSON(src []byte) error {
+func (v *NullableJsonWebKey) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

@@ -1,4 +1,4 @@
-# JsonWebKeySetGeneratorRequest
+# AdminCreateJsonWebKeySetBody
 
 ## Properties
 
@@ -10,79 +10,77 @@
 
 ## Methods
 
-### NewJsonWebKeySetGeneratorRequest
+### NewAdminCreateJsonWebKeySetBody
 
-`func NewJsonWebKeySetGeneratorRequest(alg string, kid string, use string, ) *JsonWebKeySetGeneratorRequest`
+`func NewAdminCreateJsonWebKeySetBody(alg string, kid string, use string, ) *AdminCreateJsonWebKeySetBody`
 
-NewJsonWebKeySetGeneratorRequest instantiates a new
-JsonWebKeySetGeneratorRequest object This constructor will assign default values
-to properties that have it defined, and makes sure properties required by API
-are set, but the set of arguments will change when the set of required
-properties is changed
+NewAdminCreateJsonWebKeySetBody instantiates a new AdminCreateJsonWebKeySetBody object
+This constructor will assign default values to properties that have it defined,
+and makes sure properties required by API are set, but the set of arguments
+will change when the set of required properties is changed
 
-### NewJsonWebKeySetGeneratorRequestWithDefaults
+### NewAdminCreateJsonWebKeySetBodyWithDefaults
 
-`func NewJsonWebKeySetGeneratorRequestWithDefaults() *JsonWebKeySetGeneratorRequest`
+`func NewAdminCreateJsonWebKeySetBodyWithDefaults() *AdminCreateJsonWebKeySetBody`
 
-NewJsonWebKeySetGeneratorRequestWithDefaults instantiates a new
-JsonWebKeySetGeneratorRequest object This constructor will only assign default
-values to properties that have it defined, but it doesn't guarantee that
-properties required by API are set
+NewAdminCreateJsonWebKeySetBodyWithDefaults instantiates a new AdminCreateJsonWebKeySetBody object
+This constructor will only assign default values to properties that have it defined,
+but it doesn't guarantee that properties required by API are set
 
 ### GetAlg
 
-`func (o *JsonWebKeySetGeneratorRequest) GetAlg() string`
+`func (o *AdminCreateJsonWebKeySetBody) GetAlg() string`
 
 GetAlg returns the Alg field if non-nil, zero value otherwise.
 
 ### GetAlgOk
 
-`func (o *JsonWebKeySetGeneratorRequest) GetAlgOk() (*string, bool)`
+`func (o *AdminCreateJsonWebKeySetBody) GetAlgOk() (*string, bool)`
 
 GetAlgOk returns a tuple with the Alg field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetAlg
 
-`func (o *JsonWebKeySetGeneratorRequest) SetAlg(v string)`
+`func (o *AdminCreateJsonWebKeySetBody) SetAlg(v string)`
 
 SetAlg sets Alg field to given value.
 
 ### GetKid
 
-`func (o *JsonWebKeySetGeneratorRequest) GetKid() string`
+`func (o *AdminCreateJsonWebKeySetBody) GetKid() string`
 
 GetKid returns the Kid field if non-nil, zero value otherwise.
 
 ### GetKidOk
 
-`func (o *JsonWebKeySetGeneratorRequest) GetKidOk() (*string, bool)`
+`func (o *AdminCreateJsonWebKeySetBody) GetKidOk() (*string, bool)`
 
 GetKidOk returns a tuple with the Kid field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetKid
 
-`func (o *JsonWebKeySetGeneratorRequest) SetKid(v string)`
+`func (o *AdminCreateJsonWebKeySetBody) SetKid(v string)`
 
 SetKid sets Kid field to given value.
 
 ### GetUse
 
-`func (o *JsonWebKeySetGeneratorRequest) GetUse() string`
+`func (o *AdminCreateJsonWebKeySetBody) GetUse() string`
 
 GetUse returns the Use field if non-nil, zero value otherwise.
 
 ### GetUseOk
 
-`func (o *JsonWebKeySetGeneratorRequest) GetUseOk() (*string, bool)`
+`func (o *AdminCreateJsonWebKeySetBody) GetUseOk() (*string, bool)`
 
 GetUseOk returns a tuple with the Use field if it's non-nil, zero value
 otherwise and a boolean to check if the value has been set.
 
 ### SetUse
 
-`func (o *JsonWebKeySetGeneratorRequest) SetUse(v string)`
+`func (o *AdminCreateJsonWebKeySetBody) SetUse(v string)`
 
 SetUse sets Use field to given value.
 

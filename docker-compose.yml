@@ -1,0 +1,60 @@
+version: "3.7"
+services: 
+  hydra-build-go: 
+    container_name: hydra-build-go
+    depends_on: 
+      - init-dev
+    image: oryd/hydra:latest-sqlite
+    command: serve  all --dangerous-force-http
+    # command: serve -c /etc/config/hydra/hydra.yml all --dangerous-force-http
+    environment:
+      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+      - SECRETS_SYSTEM=$SECRETS_SYSTEM
+    volumes: 
+      - type: volume
+        source: hydra-sqlite
+        target: /var/lib/sqlite
+      # - type: bind
+      #   source: ./config_hydra.yml
+      #   target: /etc/config/hydra/hydra.yml
+    restart: unless-stopped
+    networks:
+      intranet: 
+      oathkeeper:
+    # entrypoint: /bin/sh -c "while sleep 1000; do :; done;"
+  hydra-migrate:
+    image: oryd/hydra:latest-sqlite
+    environment:
+      - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+    command: migrate sql -e --yes
+    # command: migrate -c /etc/config/hydra/hydra.yml sql -e --yes
+    volumes:
+      - type: volume
+        source: hydra-sqlite
+        target: /var/lib/sqlite
+        read_only: false
+      # - type: bind
+      #   source: ./config_hydra.yml
+      #   target: /etc/config/hydra/hydra.yml
+    restart: on-failure
+    networks: 
+      intranet: 
+  init-dev: 
+    image: go-build
+    container_name: go-builder
+    build: .
+    entrypoint: /bin/bash -c "while sleep 1000; do :; done;"
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: ${PWD}
+        target: $PWD
+
+networks:
+  intranet:
+  oathkeeper: 
+    external: true
+volumes:
+  hydra-sqlite:

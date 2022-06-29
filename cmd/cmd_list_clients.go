@@ -27,7 +27,7 @@ func NewListClientsCmd(root *cobra.Command) *cobra.Command {
 				return err
 			}
 
-			list, resp, err := m.V2Api.AdminListOAuth2Clients(cmd.Context()).PageSize(int64(pageSize)).PageToken(pageToken).Execute()
+			list, resp, err := m.V1Api.AdminListOAuth2Clients(cmd.Context()).PageSize(int64(pageSize)).PageToken(pageToken).Execute()
 			if err != nil {
 				return cmdx.PrintOpenAPIError(cmd, err)
 			}

@@ -12,6 +12,7 @@ configuration.go
 docs/AcceptConsentRequest.md
 docs/AcceptLoginRequest.md
 docs/AdminApi.md
+docs/AdminCreateJsonWebKeySetBody.md
 docs/CompletedRequest.md
 docs/ConsentRequest.md
 docs/ConsentRequestSession.md
@@ -23,10 +24,9 @@ docs/HealthNotReadyStatus.md
 docs/HealthStatus.md
 docs/IsReady200Response.md
 docs/IsReady503Response.md
-docs/JSONWebKey.md
-docs/JSONWebKeySet.md
 docs/JsonPatch.md
-docs/JsonWebKeySetGeneratorRequest.md
+docs/JsonWebKey.md
+docs/JsonWebKeySet.md
 docs/LoginRequest.md
 docs/LogoutRequest.md
 docs/MetadataApi.md
@@ -56,6 +56,7 @@ go.mod
 go.sum
 model_accept_consent_request.go
 model_accept_login_request.go
+model_admin_create_json_web_key_set_body.go
 model_completed_request.go
 model_consent_request.go
 model_consent_request_session.go
@@ -70,7 +71,6 @@ model_is_ready_503_response.go
 model_json_patch.go
 model_json_web_key.go
 model_json_web_key_set.go
-model_json_web_key_set_generator_request.go
 model_login_request.go
 model_logout_request.go
 model_o_auth2_api_error.go

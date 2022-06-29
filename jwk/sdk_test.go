@@ -60,7 +60,7 @@ func TestJWKSDK(t *testing.T) {
 	t.Run("JSON Web Key", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
 			// Create a key called set-foo
-			resultKeys, _, err := sdk.V1Api.AdminCreateJsonWebKeySet(context.Background(), "set-foo").CreateJsonWebKeySetBody(hydra.CreateJsonWebKeySetBody{
+			resultKeys, _, err := sdk.V1Api.AdminCreateJsonWebKeySet(context.Background(), "set-foo").AdminCreateJsonWebKeySetBody(hydra.AdminCreateJsonWebKeySetBody{
 				Alg: "RS256",
 				Kid: "key-bar",
 				Use: "sig",
@@ -111,7 +111,7 @@ func TestJWKSDK(t *testing.T) {
 
 	t.Run("JWK Set", func(t *testing.T) {
 		t.Run("CreateJwkSetKey", func(t *testing.T) {
-			resultKeys, _, err := sdk.V1Api.AdminCreateJsonWebKeySet(ctx, "set-foo2").CreateJsonWebKeySetBody(hydra.CreateJsonWebKeySetBody{
+			resultKeys, _, err := sdk.V1Api.AdminCreateJsonWebKeySet(ctx, "set-foo2").AdminCreateJsonWebKeySetBody(hydra.AdminCreateJsonWebKeySetBody{
 				Alg: "RS256",
 				Kid: "key-bar",
 			}).Execute()

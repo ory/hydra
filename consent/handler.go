@@ -281,7 +281,7 @@ func (h *Handler) adminRevokeOAuth2LoginSessions(w http.ResponseWriter, r *http.
 //     Schemes: http, https
 //
 //     Responses:
-//       200: loginRequest
+//       200: oAuth2LoginRequest
 //       410: handledOAuth2Request
 //       default: oAuth2ApiError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -311,12 +311,22 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 	h.r.Writer().Write(w, r, request)
 }
 
-// swagger:route PUT /oauth2/auth/requests/login/accept admin acceptLoginRequest
+// swagger:parameters acceptLoginRequest
+type swaggerAcceptLoginRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"login_challenge"`
+
+	// in: body
+	Body HandledLoginRequest
+}
+
+// swagger:route PUT /admin/oauth2/auth/requests/login/accept v1 adminAcceptOAuth2LoginRequest
 //
-// Accept a Login Request
+// Accept an OAuth 2.0 Login Request
 //
-// When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
-// (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
+// When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, Ory Hydra asks the login provider
+// (sometimes called "identity provider") to authenticate the subject and then tell Ory Hydra now about it. The login
 // provider is an web-app you write and host, and it must be able to authenticate ("show the subject a login screen")
 // a subject (in OAuth2 the proper name for subject is "resource owner").
 //
@@ -338,11 +348,8 @@ func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps htt
 //     Schemes: http, https
 //
 //     Responses:
-//       200: completedRequest
-//       400: oAuth2ApiError
-//       404: oAuth2ApiError
-//       401: oAuth2ApiError
-//       500: oAuth2ApiError
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
@@ -404,9 +411,9 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	})
 }
 
-// swagger:route PUT /oauth2/auth/requests/login/reject admin rejectLoginRequest
+// swagger:route PUT /admin/oauth2/auth/requests/login/reject admin rejectOAuth2LoginRequest
 //
-// Reject a Login Request
+// Reject an OAuth 2.0 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -417,7 +424,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 // provider uses that challenge to fetch information on the OAuth2 request and then accept or reject the requested authentication process.
 //
 // This endpoint tells ORY Hydra that the subject has not authenticated and includes a reason why the authentication
-// was be denied.
+// was denied.
 //
 // The response contains a redirect URL which the login provider should redirect the user-agent to.
 //
@@ -430,11 +437,8 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Schemes: http, https
 //
 //     Responses:
-//       200: completedRequest
-//       400: oAuth2ApiError
-//       401: oAuth2ApiError
-//       404: oAuth2ApiError
-//       500: oAuth2ApiError
+//       200: successfulOAuth2RequestResponse
+//       default: oAuth2ApiError
 func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),

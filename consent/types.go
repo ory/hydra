@@ -46,7 +46,7 @@ const (
 
 // The response payload sent when accepting or rejecting a login or consent request.
 //
-// swagger:model completedRequest
+// swagger:model successfulOAuth2RequestResponse
 type RequestHandlerResponse struct {
 	// RedirectURL is the URL which you should redirect the user to once the authentication process is completed.
 	//

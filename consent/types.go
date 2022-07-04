@@ -69,7 +69,7 @@ func (_ LoginSession) TableName() string {
 
 // The request payload used to accept a login or consent request.
 //
-// swagger:model rejectRequest
+// swagger:model oAuth2RequestDeniedError
 type RequestDeniedError struct {
 	// The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).
 	//
@@ -155,7 +155,7 @@ func (e *RequestDeniedError) Value() (driver.Value, error) {
 
 // The response payload sent when there is an attempt to access already handled request.
 //
-// swagger:model requestWasHandledResponse
+// swagger:model handledOAuth2Request
 type RequestWasHandledResponse struct {
 	// Original request URL to which you should redirect the user if request was already handled.
 	//
@@ -165,7 +165,7 @@ type RequestWasHandledResponse struct {
 
 // The request payload used to accept a consent request.
 //
-// swagger:model acceptConsentRequest
+// swagger:model acceptOAuth2ConsentRequest
 type HandledConsentRequest struct {
 	// ID instead of Challenge because of pop
 	ID string `json:"-"`
@@ -209,8 +209,13 @@ func (r *HandledConsentRequest) HasError() bool {
 	return r.Error.IsError()
 }
 
+// swagger:model previousOAuth2ConsentSession
+type previousOAuth2ConsentSessions []PreviousConsentSession
+
 // The response used to return used consent requests
 // same as HandledLoginRequest, just with consent_request exposed as json
+//
+// swagger:model previousOAuth2ConsentSession
 type PreviousConsentSession struct {
 	// Named ID because of pop
 	ID string `json:"-" db:"challenge"`
@@ -252,7 +257,7 @@ type PreviousConsentSession struct {
 
 // HandledLoginRequest is the request payload used to accept a login request.
 //
-// swagger:model acceptLoginRequest
+// swagger:model acceptOAuth2LoginRequest
 type HandledLoginRequest struct {
 	// ID instead of challenge for pop
 	ID string `json:"-"`
@@ -379,7 +384,7 @@ func (n *OpenIDConnectContext) Value() (driver.Value, error) {
 
 // Contains information about an ongoing logout request.
 //
-// swagger:model logoutRequest
+// swagger:model oAuth2LogoutRequest
 type LogoutRequest struct {
 	// Challenge is the identifier ("logout challenge") of the logout authentication request. It is used to
 	// identify the session.
@@ -444,7 +449,7 @@ type LogoutResult struct {
 
 // Contains information on an ongoing login request.
 //
-// swagger:model loginRequest
+// swagger:model oAuth2LoginRequest
 type LoginRequest struct {
 	// ID is the identifier ("login challenge") of the login request. It is used to
 	// identify the session.
@@ -517,7 +522,7 @@ type LoginRequest struct {
 
 // Contains information on an ongoing consent request.
 //
-// swagger:model consentRequest
+// swagger:model oAuth2ConsentRequest
 type ConsentRequest struct {
 	// ID is the identifier ("authorization challenge") of the consent authorization request. It is used to
 	// identify the session.

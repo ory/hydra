@@ -43,25 +43,6 @@ type swaggerGetLogoutRequestByChallenge struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:parameters revokeConsentSessions
-type swaggerRevokeConsentSessions struct {
-	// The subject (Subject) who's consent sessions should be deleted.
-	//
-	// in: query
-	// required: true
-	Subject string `json:"subject"`
-
-	// If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
-	//
-	// in: query
-	Client string `json:"client"`
-
-	// If set to `?all=true`, deletes all consent sessions by the Subject that have been granted.
-	//
-	// in: query
-	All bool `json:"all"`
-}
-
 // swagger:parameters listSubjectConsentSessions
 type swaggerListSubjectConsentSessionsPayload struct {
 	// in: query

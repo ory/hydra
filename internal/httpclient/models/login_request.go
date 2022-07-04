@@ -16,7 +16,7 @@ import (
 
 // LoginRequest Contains information on an ongoing login request.
 //
-// swagger:model loginRequest
+// swagger:model oAuth2LoginRequest
 type LoginRequest struct {
 
 	// ID is the identifier ("login challenge") of the login request. It is used to

@@ -482,8 +482,10 @@ type adminListOAuth2Clients struct {
 // OAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are
 // generated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.
 //
-// The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/clients?limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
-// Multiple links can be included in this header, and will be separated by a comma.
+// The "Link" header is also included in successful responses, which contains one or more links for pagination,
+// formatted like so: '<https://project-slug.projects.oryapis.com/admin/clients?limit={limit}&offset={offset}>; rel="{page}"',
+// where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can
+// be included in this header, and will be separated by a comma.
 //
 //     Consumes:
 //     - application/json

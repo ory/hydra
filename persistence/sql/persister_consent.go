@@ -618,26 +618,31 @@ func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time,
 
 		// "hydra_oauth2_authentication_session"
 		var ls consent.LoginSession
-		return p.Connection(ctx).RawQuery(fmt.Sprintf(`
-			DELETE
+		query := fmt.Sprintf(`
+			DELETE FROM %[1]s WHERE id in
+			(SELECT id
 			FROM %[1]s
 			WHERE NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[2]s
-				WHERE %[2]s.login_session_id = %[1]s.id
-				)
+			    (
+			    SELECT NULL
+			    FROM %[2]s
+			    WHERE %[2]s.login_session_id = %[1]s.id
+			    )
 			AND NOT EXISTS
-				(
-				SELECT NULL
-				FROM %[3]s
-				WHERE %[3]s.login_session_id = %[1]s.id
-				)
+			    (
+			    SELECT NULL
+			    FROM %[3]s
+			    WHERE %[3]s.login_session_id = %[1]s.id
+			    )
+			LIMIT %[4]d)
 			`,
 			(&ls).TableName(),
 			(&lr).TableName(),
-			(&cr).TableName()),
-		).Exec()
+			(&cr).TableName(),
+			limit,
+		)
+
+		return p.Connection(ctx).RawQuery(query).Exec()
 	})
 }
 

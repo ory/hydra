@@ -608,7 +608,7 @@ func (p *Persister) VerifyAndInvalidateLogoutRequest(ctx context.Context, verifi
 	})
 }
 
-func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time, limit, batchSize int) error {
+func (p *Persister) FlushInactiveLoginSessions(ctx context.Context, _ time.Time, limit, _ int) error {
 	return p.transaction(ctx, func(ctx context.Context, c *pop.Connection) error {
 		// "hydra_oauth2_authentication_request"
 		var lr consent.LoginRequest

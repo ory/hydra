@@ -70,7 +70,7 @@ func (_ *JanitorHandler) Args(cmd *cobra.Command, args []string) error {
 		!flagx.MustGetBool(cmd, OnlyGrants) &&
 		!flagx.MustGetBool(cmd, OnlyLoginSessions) {
 		return fmt.Errorf("%s\n%s\n", cmd.UsageString(),
-			"Janitor requires at least one of --tokens, --requests or --grants to be set")
+			"Janitor requires at least one of --tokens, --requests, --grants or --login-sessions to be set")
 	}
 
 	limit := flagx.MustGetInt(cmd, Limit)

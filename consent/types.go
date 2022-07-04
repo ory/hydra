@@ -69,7 +69,7 @@ func (_ LoginSession) TableName() string {
 
 // The request payload used to accept a login or consent request.
 //
-// swagger:model oAuth2RequestDeniedError
+// swagger:model rejectOAuth2Request
 type RequestDeniedError struct {
 	// The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).
 	//
@@ -165,7 +165,7 @@ type RequestWasHandledResponse struct {
 
 // The request payload used to accept a consent request.
 //
-// swagger:model handledOAuth2ConsentRequest
+// swagger:model acceptOAuth2ConsentRequest
 type HandledConsentRequest struct {
 	// ID instead of Challenge because of pop
 	ID string `json:"-"`

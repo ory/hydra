@@ -67,8 +67,8 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.PUT(LoginPath+"/accept", h.AcceptLoginRequest)
 	admin.PUT(LoginPath+"/reject", h.rejectOAuth2LoginRequest)
 
-	admin.GET(ConsentPath, h.GetConsentRequest)
-	admin.PUT(ConsentPath+"/accept", h.AcceptConsentRequest)
+	admin.GET(ConsentPath, h.adminGetOAuth2ConsentRequest)
+	admin.PUT(ConsentPath+"/accept", h.adminAcceptOAuth2ConsentRequest)
 	admin.PUT(ConsentPath+"/reject", h.RejectConsentRequest)
 
 	admin.DELETE(SessionsPath+"/login", h.adminRevokeOAuth2LoginSessions)
@@ -513,7 +513,7 @@ func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Reques
 //       200: handledOAuth2ConsentRequest
 //       410: handledOAuth2Request
 //       default: oAuth2ApiError
-func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminGetOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -547,9 +547,9 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 	h.r.Writer().Write(w, r, request)
 }
 
-// swagger:route PUT /oauth2/auth/requests/consent/accept admin acceptConsentRequest
+// swagger:route PUT /admin/oauth2/auth/requests/consent/accept v1 adminAcceptOAuth2ConsentRequest
 //
-// Accept a Consent Request
+// Accept an OAuth 2.0 Consent Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -578,9 +578,8 @@ func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps h
 //
 //     Responses:
 //       200: completedRequest
-//       404: oAuth2ApiError
-//       500: oAuth2ApiError
-func (h *Handler) AcceptConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       default: oAuth2ApiError
+func (h *Handler) adminAcceptOAuth2ConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),
 		r.URL.Query().Get("challenge"),

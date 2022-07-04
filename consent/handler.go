@@ -215,10 +215,18 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 	h.r.Writer().Write(w, r, a)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/login admin revokeAuthenticationSession
+// swagger:parameters adminRevokeOAuth2LoginSessions
+type adminRevokeOAuth2LoginSessions struct {
+	// The subject to revoke authentication sessions for.
+	//
+	// in: query
+	// required: true
+	Subject string `json:"subject"`
+}
+
+// swagger:route DELETE /admin/oauth2/auth/sessions/login v1 adminRevokeOAuth2LoginSessions
 //
 // Invalidates All Login Sessions of a Certain User
-// Invalidates a Subject's Authentication Session
 //
 // This endpoint invalidates a subject's authentication session. After revoking the authentication session, the subject
 // has to re-authenticate at ORY Hydra. This endpoint does not invalidate any tokens and does not work with OpenID Connect
@@ -235,8 +243,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       204: emptyResponse
-//       400: oAuth2ApiError
-//       500: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {

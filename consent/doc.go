@@ -43,13 +43,6 @@ type swaggerGetLogoutRequestByChallenge struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:parameters revokeAuthenticationSession
-type swaggerRevokeAuthenticationSessionPayload struct {
-	// in: query
-	// required: true
-	Subject string `json:"subject"`
-}
-
 // swagger:parameters acceptLoginRequest
 type swaggerAcceptLoginRequest struct {
 	// in: query

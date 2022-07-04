@@ -174,7 +174,7 @@ and success, unless if the --no-shutdown flag is provided.`,
 
 			fmt.Println("Setting up home route on " + serverLocation)
 			fmt.Println("Setting up callback listener on " + serverLocation + "callback")
-			fmt.Println("Press ctrl + c on Linux / Windows or cmd + c on OSX to end the process.")
+			fmt.Println("Press ctrl + c to end the process.")
 			fmt.Printf("If your browser does not open automatically, navigate to:\n\n\t%s\n\n", serverLocation)
 
 			r := httprouter.New()

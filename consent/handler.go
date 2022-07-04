@@ -77,7 +77,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 
 	admin.GET(LogoutPath, h.GetLogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.adminAcceptOAuth2LogoutRequest)
-	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
+	admin.PUT(LogoutPath+"/reject", h.adminRejectOAuth2LogoutRequest)
 }
 
 // swagger:parameters adminRevokeOAuth2ConsentSessions
@@ -761,7 +761,6 @@ type adminAcceptOAuth2LogoutRequest struct {
 // Accept an OAuth 2.0 Logout Request
 //
 // When a user or an application requests ORY Hydra to log out a user, this endpoint is used to confirm that logout request.
-// No body is required.
 //
 // The response contains a redirect URL which the consent provider should redirect the user-agent to.
 //
@@ -791,7 +790,17 @@ func (h *Handler) adminAcceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.
 	})
 }
 
-// swagger:route PUT /oauth2/auth/requests/logout/reject admin rejectLogoutRequest
+// swagger:parameters adminRejectOAuth2LogoutRequest
+type adminRejectOAuth2LogoutRequest struct {
+	// in: query
+	// required: true
+	Challenge string `json:"logout_challenge"`
+
+	// in: body
+	Body RequestDeniedError
+}
+
+// swagger:route PUT /oauth2/auth/requests/logout/reject v1 adminRejectOAuth2LogoutRequest
 //
 // Reject a Logout Request
 //
@@ -809,7 +818,7 @@ func (h *Handler) adminAcceptOAuth2LogoutRequest(w http.ResponseWriter, r *http.
 //       204: emptyResponse
 //       404: oAuth2ApiError
 //       500: oAuth2ApiError
-func (h *Handler) RejectLogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminRejectOAuth2LogoutRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("logout_challenge"),
 		r.URL.Query().Get("challenge"),

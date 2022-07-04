@@ -29,16 +29,6 @@ type swaggerGetLogoutRequestByChallenge struct {
 	Challenge string `json:"logout_challenge"`
 }
 
-// swagger:parameters rejectLogoutRequest
-type swaggerRejectLogoutRequest struct {
-	// in: query
-	// required: true
-	Challenge string `json:"logout_challenge"`
-
-	// in: body
-	Body RequestDeniedError
-}
-
 // swagger:model flushLoginConsentRequest
 type FlushLoginConsentRequest struct {
 	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history

@@ -81,13 +81,31 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.PUT(LogoutPath+"/reject", h.RejectLogoutRequest)
 }
 
-// swagger:route DELETE /oauth2/auth/sessions/consent admin revokeConsentSessions
+// swagger:parameters adminRevokeOAuth2ConsentSessions
+type adminRevokeOAuth2ConsentSessions struct {
+	// The subject (Subject) whose consent sessions should be deleted.
+	//
+	// in: query
+	// required: true
+	Subject string `json:"subject"`
+
+	// If set, deletes only those consent sessions by the Subject that have been granted to the specified OAuth 2.0 Client ID
+	//
+	// in: query
+	Client string `json:"client"`
+
+	// If set to `true` deletes all consent sessions by the Subject that have been granted.
+	//
+	// in: query
+	All bool `json:"all"`
+}
+
+// swagger:route DELETE /admin/oauth2/auth/sessions/consent admin revokeConsentSessions
 //
 // Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
 // This endpoint revokes a subject's granted consent sessions for a specific OAuth 2.0 Client and invalidates all
 // associated OAuth 2.0 Access Tokens.
-//
 //
 //     Consumes:
 //     - application/json
@@ -99,8 +117,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 //
 //     Responses:
 //       204: emptyResponse
-//       400: oAuth2ApiError
-//       500: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
@@ -129,7 +146,7 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/sessions/consent admin listSubjectConsentSessions
+// swagger:route GET /admin/oauth2/auth/sessions/consent v1 adminListSubjectConsentSessions
 //
 // Lists All Consent Sessions of a Subject
 //

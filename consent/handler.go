@@ -71,9 +71,9 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.PUT(ConsentPath+"/accept", h.AcceptConsentRequest)
 	admin.PUT(ConsentPath+"/reject", h.RejectConsentRequest)
 
-	admin.DELETE(SessionsPath+"/login", h.DeleteLoginSession)
-	admin.GET(SessionsPath+"/consent", h.GetConsentSessions)
-	admin.DELETE(SessionsPath+"/consent", h.DeleteConsentSession)
+	admin.DELETE(SessionsPath+"/login", h.adminRevokeOAuth2LoginSessions)
+	admin.GET(SessionsPath+"/consent", h.adminListOAuth2SubjectConsentSessions)
+	admin.DELETE(SessionsPath+"/consent", h.adminRevokeOAuth2ConsentSessions)
 
 	admin.GET(LogoutPath, h.GetLogoutRequest)
 	admin.PUT(LogoutPath+"/accept", h.AcceptLogoutRequest)
@@ -117,7 +117,7 @@ type adminRevokeOAuth2ConsentSessions struct {
 //     Responses:
 //       204: emptyResponse
 //       default: oAuth2ApiError
-func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminRevokeOAuth2ConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	client := r.URL.Query().Get("client")
 	allClients := r.URL.Query().Get("all") == "true"
@@ -178,7 +178,7 @@ type adminListOAuth2SubjectConsentSessions struct {
 //     Responses:
 //       200: handledConsentRequestList
 //       default: oAuth2ApiError
-func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminListOAuth2SubjectConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
@@ -244,7 +244,7 @@ type adminRevokeOAuth2LoginSessions struct {
 //     Responses:
 //       204: emptyResponse
 //       default: oAuth2ApiError
-func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminRevokeOAuth2LoginSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
 		h.r.Writer().WriteError(w, r, errorsx.WithStack(fosite.ErrInvalidRequest.WithHint(`Query parameter 'subject' is not defined but should have been.`)))
@@ -259,9 +259,9 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /oauth2/auth/requests/login admin getLoginRequest
+// swagger:route GET /admin/oauth2/auth/requests/login v1 adminGetOAuth2LoginRequest
 //
-// Get a Login Request
+// Get an OAuth2 Login Request
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // (sometimes called "identity provider") to authenticate the subject and then tell ORY Hydra now about it. The login
@@ -282,10 +282,8 @@ func (h *Handler) DeleteLoginSession(w http.ResponseWriter, r *http.Request, ps 
 //
 //     Responses:
 //       200: loginRequest
-//       400: oAuth2ApiError
-//       404: oAuth2ApiError
-//       410: requestWasHandledResponse
-//       500: oAuth2ApiError
+//       410: handledOAuth2Request
+//       default: oAuth2ApiError
 func (h *Handler) GetLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),

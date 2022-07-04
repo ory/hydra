@@ -100,14 +100,6 @@ type swaggerRejectLogoutRequest struct {
 	Body RequestDeniedError
 }
 
-// A list of used consent requests.
-// swagger:response handledConsentRequestList
-type swaggerListHandledConsentRequestsResult struct {
-	// in: body
-	// type: array
-	Body []PreviousConsentSession
-}
-
 // swagger:model flushLoginConsentRequest
 type FlushLoginConsentRequest struct {
 	// NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history

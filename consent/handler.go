@@ -65,7 +65,7 @@ func NewHandler(
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(LoginPath, h.GetLoginRequest)
 	admin.PUT(LoginPath+"/accept", h.AcceptLoginRequest)
-	admin.PUT(LoginPath+"/reject", h.RejectLoginRequest)
+	admin.PUT(LoginPath+"/reject", h.rejectOAuth2LoginRequest)
 
 	admin.GET(ConsentPath, h.GetConsentRequest)
 	admin.PUT(ConsentPath+"/accept", h.AcceptConsentRequest)
@@ -439,7 +439,7 @@ func (h *Handler) AcceptLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Responses:
 //       200: successfulOAuth2RequestResponse
 //       default: oAuth2ApiError
-func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) rejectOAuth2LoginRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("login_challenge"),
 		r.URL.Query().Get("challenge"),
@@ -486,9 +486,9 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 	})
 }
 
-// swagger:route GET /oauth2/auth/requests/consent admin getConsentRequest
+// swagger:route GET /oauth2/auth/requests/consent v1 adminGetOAuth2ConsentRequest
 //
-// Get Consent Request Information
+// Get OAuth 2.0 Consent Request Information
 //
 // When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
 // to authenticate the subject and then tell ORY Hydra now about it. If the subject authenticated, he/she must now be asked if
@@ -510,10 +510,9 @@ func (h *Handler) RejectLoginRequest(w http.ResponseWriter, r *http.Request, ps 
 //     Schemes: http, https
 //
 //     Responses:
-//       200: consentRequest
-//       404: oAuth2ApiError
-//       410: requestWasHandledResponse
-//       500: oAuth2ApiError
+//       200: handledOAuth2ConsentRequest
+//       410: handledOAuth2Request
+//       default: oAuth2ApiError
 func (h *Handler) GetConsentRequest(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	challenge := stringsx.Coalesce(
 		r.URL.Query().Get("consent_challenge"),

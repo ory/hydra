@@ -165,7 +165,7 @@ type RequestWasHandledResponse struct {
 
 // The request payload used to accept a consent request.
 //
-// swagger:model acceptOAuth2ConsentRequest
+// swagger:model handledOAuth2ConsentRequest
 type HandledConsentRequest struct {
 	// ID instead of Challenge because of pop
 	ID string `json:"-"`

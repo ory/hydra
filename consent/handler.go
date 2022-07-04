@@ -35,7 +35,6 @@ import (
 	"github.com/ory/hydra/driver/config"
 	"github.com/ory/hydra/x"
 	"github.com/ory/x/errorsx"
-	"github.com/ory/x/pagination"
 	"github.com/ory/x/sqlxx"
 	"github.com/ory/x/stringsx"
 	"github.com/ory/x/urlx"
@@ -100,7 +99,7 @@ type adminRevokeOAuth2ConsentSessions struct {
 	All bool `json:"all"`
 }
 
-// swagger:route DELETE /admin/oauth2/auth/sessions/consent admin revokeConsentSessions
+// swagger:route DELETE /admin/oauth2/auth/sessions/consent v1 adminRevokeOAuth2ConsentSessions
 //
 // Revokes Consent Sessions of a Subject for a Specific OAuth 2.0 Client
 //
@@ -146,14 +145,24 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /admin/oauth2/auth/sessions/consent v1 adminListSubjectConsentSessions
+// swagger:parameters adminListOAuth2SubjectConsentSessions
+type adminListOAuth2SubjectConsentSessions struct {
+	x.PaginationHeaders
+
+	// The subject to list the consent sessions for.
+	//
+	// in: query
+	// required: true
+	Subject string `json:"subject"`
+}
+
+// swagger:route GET /admin/oauth2/auth/sessions/consent v1 adminListOAuth2SubjectConsentSessions
 //
 // Lists All Consent Sessions of a Subject
 //
 // This endpoint lists all subject's granted consent sessions, including client and granted scope.
 // If the subject is unknown or has not granted any consent sessions yet, the endpoint returns an
 // empty JSON array with status code 200 OK.
-//
 //
 // The "Link" header is also included in successful responses, which contains one or more links for pagination, formatted like so: '<https://hydra-url/admin/oauth2/auth/sessions/consent?subject={user}&limit={limit}&offset={offset}>; rel="{page}"', where page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'.
 // Multiple links can be included in this header, and will be separated by a comma.
@@ -168,8 +177,7 @@ func (h *Handler) DeleteConsentSession(w http.ResponseWriter, r *http.Request, p
 //
 //     Responses:
 //       200: handledConsentRequestList
-//       400: oAuth2ApiError
-//       500: oAuth2ApiError
+//       default: oAuth2ApiError
 func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	subject := r.URL.Query().Get("subject")
 	if subject == "" {
@@ -177,8 +185,8 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	limit, offset := pagination.Parse(r, 100, 0, 500)
-	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, limit, offset)
+	page, itemsPerPage := x.ParsePagination(r)
+	s, err := h.r.ConsentManager().FindSubjectsGrantedConsentRequests(r.Context(), subject, itemsPerPage, itemsPerPage*page)
 	if errors.Is(err, ErrNoPreviousConsentFound) {
 		h.r.Writer().Write(w, r, []PreviousConsentSession{})
 		return
@@ -203,8 +211,7 @@ func (h *Handler) GetConsentSessions(w http.ResponseWriter, r *http.Request, ps 
 		return
 	}
 
-	pagination.Header(w, r.URL, n, limit, offset)
-
+	x.PaginationHeader(w, r.URL, int64(n), itemsPerPage, itemsPerPage*page)
 	h.r.Writer().Write(w, r, a)
 }
 

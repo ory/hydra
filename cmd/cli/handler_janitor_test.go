@@ -303,7 +303,7 @@ func TestJanitorHandler_Arguments(t *testing.T) {
 		"janitor",
 		"memory")
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "Janitor requires at least one of --tokens, --requests or --grants to be set")
+	require.Contains(t, err.Error(), "Janitor requires at least one of --tokens, --requests, --grants or --login-sessions to be set")
 
 	cmdx.ExecNoErr(t, cmd.NewRootCmd(nil, nil, nil),
 		"janitor",

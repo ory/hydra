@@ -22,62 +22,11 @@ package consent
 
 import "time"
 
-// swagger:parameters getLoginRequest
-type swaggerGetLoginRequestByChallenge struct {
-	// in: query
-	// required: true
-	Challenge string `json:"login_challenge"`
-}
-
-// swagger:parameters getConsentRequest
-type swaggerGetConsentRequestByChallenge struct {
-	// in: query
-	// required: true
-	Challenge string `json:"consent_challenge"`
-}
-
 // swagger:parameters getLogoutRequest
 type swaggerGetLogoutRequestByChallenge struct {
 	// in: query
 	// required: true
 	Challenge string `json:"logout_challenge"`
-}
-
-// swagger:parameters acceptConsentRequest
-type swaggerAcceptConsentRequest struct {
-	// in: query
-	// required: true
-	Challenge string `json:"consent_challenge"`
-
-	// in: body
-	Body HandledConsentRequest
-}
-
-// swagger:parameters acceptLogoutRequest
-type swaggerAcceptLogoutRequest struct {
-	// in: query
-	// required: true
-	Challenge string `json:"logout_challenge"`
-}
-
-// swagger:parameters rejectConsentRequest
-type swaggerRejectConsentRequest struct {
-	// in: query
-	// required: true
-	Challenge string `json:"consent_challenge"`
-
-	// in: body
-	Body RequestDeniedError
-}
-
-// swagger:parameters rejectLoginRequest
-type swaggerRejectLoginRequest struct {
-	// in: query
-	// required: true
-	Challenge string `json:"login_challenge"`
-
-	// in: body
-	Body RequestDeniedError
 }
 
 // swagger:parameters rejectLogoutRequest

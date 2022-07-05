@@ -56,7 +56,7 @@ type RefreshTokenHookRequest struct {
 // swagger:model refreshTokenHookResponse
 type RefreshTokenHookResponse struct {
 	// Session is the session data returned by the hook.
-	Session consent.ConsentRequestSessionData `json:"session"`
+	Session consent.AcceptOAuth2ConsentRequestSession `json:"session"`
 }
 
 // RefreshTokenHook is an AccessRequestHook called for `refresh_token` grant type.
@@ -99,7 +99,8 @@ func RefreshTokenHook(reg interface {
 			return errorsx.WithStack(
 				fosite.ErrServerError.
 					WithWrap(err).
-					WithDebug("refresh token hook: marshal request body"),
+					WithDescription("An error occurred while encoding the refresh token hook.").
+					WithDebugf("Unable to encode the refresh token hook body: %s", err),
 			)
 		}
 
@@ -108,7 +109,8 @@ func RefreshTokenHook(reg interface {
 			return errorsx.WithStack(
 				fosite.ErrServerError.
 					WithWrap(err).
-					WithDebug("refresh token hook: new http request"),
+					WithDescription("An error occurred while preparing the refresh token hook.").
+					WithDebugf("Unable to prepare the HTTP Request: %s", err),
 			)
 		}
 		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
@@ -118,7 +120,8 @@ func RefreshTokenHook(reg interface {
 			return errorsx.WithStack(
 				fosite.ErrServerError.
 					WithWrap(err).
-					WithDebug("refresh token hook: do http request"),
+					WithDescription("An error occurred while executing the refresh token hook.").
+					WithDebugf("Unable to execute HTTP Request: %s", err),
 			)
 		}
 		defer resp.Body.Close()
@@ -132,12 +135,14 @@ func RefreshTokenHook(reg interface {
 		case http.StatusForbidden:
 			return errorsx.WithStack(
 				fosite.ErrAccessDenied.
-					WithDebugf("refresh token hook: %s", resp.Status),
+					WithDescription("The refresh token hook target responded with an error.").
+					WithDebugf("Refresh token hook responded with HTTP status code: %s", resp.Status),
 			)
 		default:
 			return errorsx.WithStack(
 				fosite.ErrServerError.
-					WithDebugf("refresh token hook: %s", resp.Status),
+					WithDescription("The refresh token hook target responded with an error.").
+					WithDebugf("Refresh token hook responded with HTTP status code: %s", resp.Status),
 			)
 		}
 
@@ -146,7 +151,8 @@ func RefreshTokenHook(reg interface {
 			return errorsx.WithStack(
 				fosite.ErrServerError.
 					WithWrap(err).
-					WithDebugf("refresh token hook: unmarshal response body"),
+					WithDescription("The refresh token hook target responded with an error.").
+					WithDebugf("Response from refresh token hook could not be decoded: %s", err),
 			)
 		}
 
@@ -154,7 +160,6 @@ func RefreshTokenHook(reg interface {
 		session.Extra = respBody.Session.AccessToken
 		idTokenClaims := session.IDTokenClaims()
 		idTokenClaims.Extra = respBody.Session.IDToken
-
 		return nil
 	}
 }

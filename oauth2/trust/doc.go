@@ -26,48 +26,7 @@ package trust
 
 import (
 	"time"
-
-	"github.com/ory/hydra/x"
 )
-
-// swagger:model trustJwtGrantIssuerBody
-type trustJwtGrantIssuerBody struct {
-	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
-	//
-	// required: true
-	// example: https://jwt-idp.example.com
-	Issuer string `json:"issuer"`
-
-	// The "subject" identifies the principal that is the subject of the JWT.
-	//
-	// example: mike@example.com
-	Subject string `json:"subject"`
-
-	// The "allow_any_subject" indicates that the issuer is allowed to have any principal as the subject of the JWT.
-	AllowAnySubject bool `json:"allow_any_subject"`
-
-	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
-	//
-	// required:true
-	// example: ["openid", "offline"]
-	Scope []string `json:"scope"`
-
-	// The "jwk" contains public key in JWK format issued by "issuer", that will be used to check JWT assertion signature.
-	//
-	// required:true
-	JWK x.JSONWebKey `json:"jwk"`
-
-	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
-	//
-	// required:true
-	ExpiresAt time.Time `json:"expires_at"`
-}
-
-// swagger:parameters trustJwtGrantIssuer
-type trustJwtGrantIssuer struct {
-	// in: body
-	Body trustJwtGrantIssuerBody
-}
 
 // swagger:parameters listTrustedJwtGrantIssuers
 type listTrustedJwtGrantIssuers struct {

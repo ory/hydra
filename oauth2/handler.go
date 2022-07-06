@@ -510,7 +510,7 @@ func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-// swagger:route POST /oauth2/token public oauth2Token
+// swagger:route POST /oauth2/token v1 performOAuth2TokenFlow
 //
 // The OAuth 2.0 Token Endpoint
 //
@@ -521,8 +521,7 @@ func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Requ
 // > Do not implement a client for this endpoint yourself. Use a library. There are many libraries
 // > available for any programming language. You can find a list of libraries here: https://oauth.net/code/
 // >
-// > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!
-//
+// > Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
 //
 //     Consumes:
 //     - application/x-www-form-urlencoded
@@ -538,8 +537,6 @@ func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Requ
 //
 //     Responses:
 //       200: oauth2TokenResponse
-//       401: oAuth2ApiError
-//       400: oAuth2ApiError
 //       default: oAuth2ApiError
 func (h *Handler) TokenHandler(w http.ResponseWriter, r *http.Request) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
@@ -624,7 +621,7 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 	}
 }
 
-// swagger:route GET /oauth2/auth public oauthAuth
+// swagger:route GET /oauth2/auth v1 oauthAuthorization
 //
 // The OAuth 2.0 Authorize Endpoint
 //

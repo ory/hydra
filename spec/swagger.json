@@ -63,21 +63,15 @@
           "https"
         ],
         "tags": [
-          "public"
+          "v1"
         ],
         "summary": "OpenID Connect Discovery",
-        "operationId": "discoverOpenIDConfiguration",
+        "operationId": "discoverOidcConfiguration",
         "responses": {
           "200": {
-            "description": "wellKnown",
+            "description": "oidcConfiguration",
             "schema": {
-              "$ref": "#/definitions/wellKnown"
-            }
-          },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
+              "$ref": "#/definitions/oidcConfiguration"
             }
           },
           "default": {
@@ -901,6 +895,244 @@
         }
       }
     },
+    "/admin/oauth2/introspect": {
+      "post": {
+        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\nFor more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).",
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "summary": "Introspect OAuth2 Access or Refresh Tokens",
+        "operationId": "adminIntrospectOAuth2Token",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\"\nvalue returned.",
+            "name": "token",
+            "in": "formData",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.",
+            "name": "scope",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "introspectedOAuth2Token",
+            "schema": {
+              "$ref": "#/definitions/introspectedOAuth2Token"
+            }
+          },
+          "default": {
+            "description": "oAuth2ApiError",
+            "schema": {
+              "$ref": "#/definitions/oAuth2ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/oauth2/tokens": {
+      "delete": {
+        "description": "This endpoint deletes OAuth2 access tokens issued for a client from the database",
+        "consumes": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "v1"
+        ],
+        "summary": "Delete OAuth2 Access Tokens from a Client",
+        "operationId": "adminDeleteOAuth2Token",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "client_id",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "default": {
+            "description": "oAuth2ApiError",
+            "schema": {
+              "$ref": "#/definitions/oAuth2ApiError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/trust/grants/jwt-bearer/issuers": {
+      "get": {
+        "description": "Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "v1"
+        ],
+        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
+        "operationId": "adminListTrustedOAuth2JwtGrantIssuers",
+        "responses": {
+          "200": {
+            "description": "trustedOAuth2JwtGrantIssuers",
+            "schema": {
+              "$ref": "#/definitions/trustedOAuth2JwtGrantIssuers"
+            }
+          },
+          "default": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "v1"
+        ],
+        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "adminTrustOAuth2JwtGrantIssuer",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/adminTrustOAuth2JwtGrantIssuerBody"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "trustedOAuth2JwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedOAuth2JwtGrantIssuer"
+            }
+          },
+          "default": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
+    "/admin/trust/grants/jwt-bearer/issuers/{id}": {
+      "get": {
+        "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "v1"
+        ],
+        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "adminGetTrustedOAuth2JwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "trustedOAuth2JwtGrantIssuer",
+            "schema": {
+              "$ref": "#/definitions/trustedOAuth2JwtGrantIssuer"
+            }
+          },
+          "default": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.\n\nOnce deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization Grant.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "v1"
+        ],
+        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
+        "operationId": "adminDeleteTrustedOAuth2JwtGrantIssuer",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The id of the desired grant",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "$ref": "#/responses/emptyResponse"
+          },
+          "default": {
+            "description": "genericError",
+            "schema": {
+              "$ref": "#/definitions/genericError"
+            }
+          }
+        }
+      }
+    },
     "/clients": {
       "get": {
         "description": "This endpoint lists all clients in the database, and never returns client secrets.\nAs a default it lists the first 100 clients. The `limit` parameter can be used to retrieve more clients,\nbut it has an upper bound at 500 objects. Pagination should be used to retrieve more than 500 objects.\n\nOAuth 2.0 clients are used to perform OAuth 2.0 and OpenID Connect flows. Usually, OAuth 2.0 clients are\ngenerated for applications which want to consume your OAuth 2.0 or OpenID Connect capabilities.\n\nThe \"Link\" header is also included in successful responses, which contains one or more links for pagination,\nformatted like so: '\u003chttps://project-slug.projects.oryapis.com/admin/clients?limit={limit}\u0026offset={offset}\u003e; rel=\"{page}\"',\nwhere page is one of the following applicable pages: 'first', 'next', 'last', and 'previous'. Multiple links can\nbe included in this header, and will be separated by a comma.",
@@ -1159,19 +1391,13 @@
           "https"
         ],
         "tags": [
-          "public"
+          "v1"
         ],
         "summary": "The OAuth 2.0 Authorize Endpoint",
-        "operationId": "oauthAuth",
+        "operationId": "performOAuth2AuthorizationFlow",
         "responses": {
           "302": {
             "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
           },
           "default": {
             "description": "oAuth2ApiError",
@@ -1347,61 +1573,6 @@
         "responses": {
           "204": {
             "$ref": "#/responses/emptyResponse"
-          },
-          "default": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
-          }
-        }
-      }
-    },
-    "/oauth2/introspect": {
-      "post": {
-        "description": "The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token\nis neither expired nor revoked. If a token is active, additional information on the token will be included. You can\nset additional data for a token by setting `accessTokenExtra` during the consent flow.\n\nFor more information [read this blog post](https://www.oauth.com/oauth2-servers/token-introspection-endpoint/).",
-        "consumes": [
-          "application/x-www-form-urlencoded"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Introspect OAuth2 Tokens",
-        "operationId": "introspectOAuth2Token",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The string value of the token. For access tokens, this\nis the \"access_token\" value returned from the token endpoint\ndefined in OAuth 2.0. For refresh tokens, this is the \"refresh_token\"\nvalue returned.",
-            "name": "token",
-            "in": "formData",
-            "required": true
-          },
-          {
-            "type": "string",
-            "description": "An optional, space separated list of required scopes. If the access token was not granted one of the\nscopes, the result of active will be false.",
-            "name": "scope",
-            "in": "formData"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "oAuth2TokenIntrospection",
-            "schema": {
-              "$ref": "#/definitions/oAuth2TokenIntrospection"
-            }
-          },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
           },
           "default": {
             "description": "oAuth2ApiError",
@@ -1617,9 +1788,9 @@
           "https"
         ],
         "tags": [
-          "public"
+          "v1"
         ],
-        "summary": "Revoke OAuth2 Tokens",
+        "summary": "Revoke an OAuth2 Access or Refresh Token",
         "operationId": "revokeOAuth2Token",
         "parameters": [
           {
@@ -1633,12 +1804,6 @@
           "200": {
             "$ref": "#/responses/emptyResponse"
           },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
-          },
           "default": {
             "description": "oAuth2ApiError",
             "schema": {
@@ -1650,16 +1815,16 @@
     },
     "/oauth2/sessions/logout": {
       "get": {
-        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html\n\nBack-channel logout is performed asynchronously and does not affect logout flow.",
+        "description": "This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:\n\nhttps://openid.net/specs/openid-connect-frontchannel-1_0.html\nhttps://openid.net/specs/openid-connect-backchannel-1_0.html\n\nBack-channel logout is performed asynchronously and does not affect logout flow.",
         "schemes": [
           "http",
           "https"
         ],
         "tags": [
-          "public"
+          "v1"
         ],
-        "summary": "OpenID Connect Front-Backchannel Enabled Logout",
-        "operationId": "disconnectUser",
+        "summary": "OpenID Connect Front- or Back-channel Enabled Logout",
+        "operationId": "performOidcFrontOrBackChannelLogout",
         "responses": {
           "302": {
             "$ref": "#/responses/emptyResponse"
@@ -1677,7 +1842,7 @@
             "oauth2": []
           }
         ],
-        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above!",
+        "description": "The client makes a request to the token endpoint by sending the\nfollowing parameters using the \"application/x-www-form-urlencoded\" HTTP\nrequest entity-body.\n\n\u003e Do not implement a client for this endpoint yourself. Use a library. There are many libraries\n\u003e available for any programming language. You can find a list of libraries here: https://oauth.net/code/\n\u003e\n\u003e Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above",
         "consumes": [
           "application/x-www-form-urlencoded"
         ],
@@ -1689,10 +1854,10 @@
           "https"
         ],
         "tags": [
-          "public"
+          "v1"
         ],
         "summary": "The OAuth 2.0 Token Endpoint",
-        "operationId": "oauth2Token",
+        "operationId": "performOAuth2TokenFlow",
         "parameters": [
           {
             "type": "string",
@@ -1723,271 +1888,15 @@
         ],
         "responses": {
           "200": {
-            "description": "oauth2TokenResponse",
+            "description": "oAuth2TokenResponse",
             "schema": {
-              "$ref": "#/definitions/oauth2TokenResponse"
-            }
-          },
-          "400": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
-          },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
+              "$ref": "#/definitions/oAuth2TokenResponse"
             }
           },
           "default": {
             "description": "oAuth2ApiError",
             "schema": {
               "$ref": "#/definitions/oAuth2ApiError"
-            }
-          }
-        }
-      }
-    },
-    "/oauth2/tokens": {
-      "delete": {
-        "description": "This endpoint deletes OAuth2 access tokens issued for a client from the database",
-        "consumes": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Delete OAuth2 Access Tokens from a Client",
-        "operationId": "deleteOAuth2Token",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "client_id",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
-          },
-          "default": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
-            }
-          }
-        }
-      }
-    },
-    "/trust/grants/jwt-bearer/issuers": {
-      "get": {
-        "description": "Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "List Trusted OAuth2 JWT Bearer Grant Type Issuers",
-        "operationId": "listTrustedJwtGrantIssuers",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "If optional \"issuer\" is supplied, only jwt-bearer grants with this issuer will be returned.",
-            "name": "issuer",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "description": "The maximum amount of policies returned, upper bound is 500 policies",
-            "name": "limit",
-            "in": "query"
-          },
-          {
-            "type": "integer",
-            "format": "int64",
-            "description": "The offset from where to start looking.",
-            "name": "offset",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "trustedJwtGrantIssuers",
-            "schema": {
-              "$ref": "#/definitions/trustedJwtGrantIssuers"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Use this endpoint to establish a trust relationship for a JWT issuer\nto perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication\nand Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Trust an OAuth2 JWT Bearer Grant Type Issuer",
-        "operationId": "trustJwtGrantIssuer",
-        "parameters": [
-          {
-            "name": "Body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/trustJwtGrantIssuerBody"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "trustedJwtGrantIssuer",
-            "schema": {
-              "$ref": "#/definitions/trustedJwtGrantIssuer"
-            }
-          },
-          "400": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "409": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      }
-    },
-    "/trust/grants/jwt-bearer/issuers/{id}": {
-      "get": {
-        "description": "Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Get a Trusted OAuth2 JWT Bearer Grant Type Issuer",
-        "operationId": "getTrustedJwtGrantIssuer",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The id of the desired grant",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "trustedJwtGrantIssuer",
-            "schema": {
-              "$ref": "#/definitions/trustedJwtGrantIssuer"
-            }
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          }
-        }
-      },
-      "delete": {
-        "description": "Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you\ncreated the trust relationship.\n\nOnce deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile\nfor OAuth 2.0 Client Authentication and Authorization Grant.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "schemes": [
-          "http",
-          "https"
-        ],
-        "tags": [
-          "admin"
-        ],
-        "summary": "Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer",
-        "operationId": "deleteTrustedJwtGrantIssuer",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "The id of the desired grant",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "204": {
-            "$ref": "#/responses/emptyResponse"
-          },
-          "404": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
-            }
-          },
-          "500": {
-            "description": "genericError",
-            "schema": {
-              "$ref": "#/definitions/genericError"
             }
           }
         }
@@ -2009,21 +1918,15 @@
           "https"
         ],
         "tags": [
-          "public"
+          "v1"
         ],
         "summary": "OpenID Connect Userinfo",
-        "operationId": "userinfo",
+        "operationId": "getOidcUserInfo",
         "responses": {
           "200": {
-            "description": "userinfoResponse",
+            "description": "oidcUserInfo",
             "schema": {
-              "$ref": "#/definitions/userinfoResponse"
-            }
-          },
-          "401": {
-            "description": "oAuth2ApiError",
-            "schema": {
-              "$ref": "#/definitions/oAuth2ApiError"
+              "$ref": "#/definitions/oidcUserInfo"
             }
           },
           "default": {
@@ -2173,13 +2076,47 @@
         }
       }
     },
-    "flushInactiveOAuth2TokensRequest": {
+    "adminTrustOAuth2JwtGrantIssuerBody": {
       "type": "object",
+      "required": [
+        "issuer",
+        "scope",
+        "jwk",
+        "expires_at"
+      ],
       "properties": {
-        "notAfter": {
-          "description": "NotAfter sets after which point tokens should not be flushed. This is useful when you want to keep a history\nof recently issued tokens for auditing.",
+        "allow_any_subject": {
+          "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
+          "type": "boolean"
+        },
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
           "type": "string",
           "format": "date-time"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "jwk": {
+          "$ref": "#/definitions/jsonWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "openid",
+            "offline"
+          ]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
         }
       }
     },
@@ -2287,6 +2224,78 @@
       "properties": {
         "status": {
           "description": "Status always contains \"ok\".",
+          "type": "string"
+        }
+      }
+    },
+    "introspectedOAuth2Token": {
+      "description": "Introspection contains an access token's session data as specified by\n[IETF RFC 7662](https://tools.ietf.org/html/rfc7662)",
+      "type": "object",
+      "required": [
+        "active"
+      ],
+      "properties": {
+        "active": {
+          "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
+          "type": "boolean"
+        },
+        "aud": {
+          "description": "Audience contains a list of the token's intended audiences.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "client_id": {
+          "description": "ID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
+          "type": "string"
+        },
+        "exp": {
+          "description": "Expires at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "ext": {
+          "description": "Extra is arbitrary data set by the session.",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "iat": {
+          "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "iss": {
+          "description": "IssuerURL is a string representing the issuer of this token",
+          "type": "string"
+        },
+        "nbf": {
+          "description": "NotBefore is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token is not to be\nused before.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "obfuscated_subject": {
+          "description": "ObfuscatedSubject is set when the subject identifier algorithm was set to \"pairwise\" during authorization.\nIt is the `sub` value of the ID Token that was issued.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
+          "type": "string"
+        },
+        "sub": {
+          "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
+          "type": "string"
+        },
+        "token_type": {
+          "description": "TokenType is the introspected token's type, typically `Bearer`.",
+          "type": "string"
+        },
+        "token_use": {
+          "description": "TokenUse is the introspected token's use, for example `access_token` or `refresh_token`.",
+          "type": "string"
+        },
+        "username": {
+          "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
           "type": "string"
         }
       }
@@ -2800,106 +2809,8 @@
         }
       }
     },
-    "oAuth2TokenIntrospection": {
-      "description": "https://tools.ietf.org/html/rfc7662",
-      "type": "object",
-      "title": "Introspection contains an access token's session data as specified by IETF RFC 7662, see:",
-      "required": [
-        "active"
-      ],
-      "properties": {
-        "active": {
-          "description": "Active is a boolean indicator of whether or not the presented token\nis currently active.  The specifics of a token's \"active\" state\nwill vary depending on the implementation of the authorization\nserver and the information it keeps about its tokens, but a \"true\"\nvalue return for the \"active\" property will generally indicate\nthat a given token has been issued by this authorization server,\nhas not been revoked by the resource owner, and is within its\ngiven time window of validity (e.g., after its issuance time and\nbefore its expiration time).",
-          "type": "boolean"
-        },
-        "aud": {
-          "description": "Audience contains a list of the token's intended audiences.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "client_id": {
-          "description": "ID is aclient identifier for the OAuth 2.0 client that\nrequested this token.",
-          "type": "string"
-        },
-        "exp": {
-          "description": "Expires at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token will expire.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "ext": {
-          "description": "Extra is arbitrary data set by the session.",
-          "type": "object",
-          "additionalProperties": true
-        },
-        "iat": {
-          "description": "Issued at is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token was\noriginally issued.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "iss": {
-          "description": "IssuerURL is a string representing the issuer of this token",
-          "type": "string"
-        },
-        "nbf": {
-          "description": "NotBefore is an integer timestamp, measured in the number of seconds\nsince January 1 1970 UTC, indicating when this token is not to be\nused before.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "obfuscated_subject": {
-          "description": "ObfuscatedSubject is set when the subject identifier algorithm was set to \"pairwise\" during authorization.\nIt is the `sub` value of the ID Token that was issued.",
-          "type": "string"
-        },
-        "scope": {
-          "description": "Scope is a JSON string containing a space-separated list of\nscopes associated with this token.",
-          "type": "string"
-        },
-        "sub": {
-          "description": "Subject of the token, as defined in JWT [RFC7519].\nUsually a machine-readable identifier of the resource owner who\nauthorized this token.",
-          "type": "string"
-        },
-        "token_type": {
-          "description": "TokenType is the introspected token's type, typically `Bearer`.",
-          "type": "string"
-        },
-        "token_use": {
-          "description": "TokenUse is the introspected token's use, for example `access_token` or `refresh_token`.",
-          "type": "string"
-        },
-        "username": {
-          "description": "Username is a human-readable identifier for the resource owner who\nauthorized this token.",
-          "type": "string"
-        }
-      }
-    },
-    "oauth2TokenResponse": {
-      "description": "The Access Token Response",
-      "type": "object",
-      "properties": {
-        "access_token": {
-          "type": "string"
-        },
-        "expires_in": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "id_token": {
-          "type": "string"
-        },
-        "refresh_token": {
-          "type": "string"
-        },
-        "scope": {
-          "type": "string"
-        },
-        "token_type": {
-          "type": "string"
-        }
-      }
-    },
-    "oauthTokenResponse": {
-      "description": "The token response",
+    "oAuth2TokenResponse": {
+      "description": "OAuth2 Token Response",
       "type": "object",
       "properties": {
         "access_token": {
@@ -2931,359 +2842,10 @@
         }
       }
     },
-    "pagination": {
+    "oidcConfiguration": {
+      "description": "It includes links to several endpoints (for example `/oauth2/token`) and exposes information on supported signature algorithms\namong others.",
       "type": "object",
-      "properties": {
-        "page_size": {
-          "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
-          "type": "integer",
-          "format": "int64",
-          "default": 250,
-          "maximum": 1000,
-          "minimum": 1
-        },
-        "page_token": {
-          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
-          "type": "string",
-          "default": "1",
-          "minimum": 1
-        }
-      }
-    },
-    "paginationHeaders": {
-      "type": "object",
-      "properties": {
-        "link": {
-          "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
-          "type": "string"
-        },
-        "x-total-count": {
-          "description": "The total number of clients.\n\nin: header",
-          "type": "string"
-        }
-      }
-    },
-    "previousOAuth2ConsentSession": {
-      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
-      "type": "object",
-      "properties": {
-        "consent_request": {
-          "$ref": "#/definitions/oAuth2ConsentRequest"
-        },
-        "grant_access_token_audience": {
-          "$ref": "#/definitions/StringSliceJSONFormat"
-        },
-        "grant_scope": {
-          "$ref": "#/definitions/StringSliceJSONFormat"
-        },
-        "handled_at": {
-          "$ref": "#/definitions/nullTime"
-        },
-        "remember": {
-          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
-          "type": "boolean"
-        },
-        "remember_for": {
-          "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "session": {
-          "$ref": "#/definitions/acceptOAuth2ConsentRequestSession"
-        }
-      }
-    },
-    "previousOAuth2ConsentSessions": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/previousOAuth2ConsentSession"
-      }
-    },
-    "refreshTokenHookRequest": {
-      "type": "object",
-      "title": "RefreshTokenHookRequest is the request body sent to the refresh token hook.",
-      "properties": {
-        "client_id": {
-          "description": "ClientID is the identifier of the OAuth 2.0 client.",
-          "type": "string"
-        },
-        "granted_audience": {
-          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "granted_scopes": {
-          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "subject": {
-          "description": "Subject is the identifier of the authenticated end-user.",
-          "type": "string"
-        }
-      }
-    },
-    "refreshTokenHookResponse": {
-      "type": "object",
-      "title": "RefreshTokenHookResponse is the response body received from the refresh token hook.",
-      "properties": {
-        "session": {
-          "$ref": "#/definitions/acceptOAuth2ConsentRequestSession"
-        }
-      }
-    },
-    "rejectOAuth2Request": {
-      "type": "object",
-      "title": "The request payload used to accept a login or consent request.",
-      "properties": {
-        "error": {
-          "description": "The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).\n\nDefaults to `request_denied`.",
-          "type": "string"
-        },
-        "error_debug": {
-          "description": "Debug contains information to help resolve the problem as a developer. Usually not exposed\nto the public but only in the server logs.",
-          "type": "string"
-        },
-        "error_description": {
-          "description": "Description of the error in a human readable format.",
-          "type": "string"
-        },
-        "error_hint": {
-          "description": "Hint to help resolve the error.",
-          "type": "string"
-        },
-        "status_code": {
-          "description": "Represents the HTTP status code of the error (e.g. 401 or 403)\n\nDefaults to 400",
-          "type": "integer",
-          "format": "int64"
-        }
-      }
-    },
-    "successfulOAuth2RequestResponse": {
-      "type": "object",
-      "title": "The response payload sent when accepting or rejecting a login, consent, or logout request.",
-      "required": [
-        "redirect_to"
-      ],
-      "properties": {
-        "redirect_to": {
-          "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
-          "type": "string"
-        }
-      }
-    },
-    "trustJwtGrantIssuerBody": {
-      "type": "object",
-      "required": [
-        "issuer",
-        "scope",
-        "jwk",
-        "expires_at"
-      ],
-      "properties": {
-        "allow_any_subject": {
-          "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
-          "type": "boolean"
-        },
-        "expires_at": {
-          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
-          "type": "string",
-          "format": "date-time"
-        },
-        "issuer": {
-          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
-          "type": "string",
-          "example": "https://jwt-idp.example.com"
-        },
-        "jwk": {
-          "$ref": "#/definitions/jsonWebKey"
-        },
-        "scope": {
-          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "example": [
-            "openid",
-            "offline"
-          ]
-        },
-        "subject": {
-          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
-          "type": "string",
-          "example": "mike@example.com"
-        }
-      }
-    },
-    "trustedJsonWebKey": {
-      "type": "object",
-      "properties": {
-        "kid": {
-          "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
-          "type": "string",
-          "example": "123e4567-e89b-12d3-a456-426655440000"
-        },
-        "set": {
-          "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
-          "type": "string",
-          "example": "https://jwt-idp.example.com"
-        }
-      }
-    },
-    "trustedJwtGrantIssuer": {
-      "type": "object",
-      "properties": {
-        "allow_any_subject": {
-          "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
-          "type": "boolean"
-        },
-        "created_at": {
-          "description": "The \"created_at\" indicates, when grant was created.",
-          "type": "string",
-          "format": "date-time"
-        },
-        "expires_at": {
-          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
-          "type": "string",
-          "format": "date-time"
-        },
-        "id": {
-          "type": "string",
-          "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
-        },
-        "issuer": {
-          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
-          "type": "string",
-          "example": "https://jwt-idp.example.com"
-        },
-        "public_key": {
-          "$ref": "#/definitions/trustedJsonWebKey"
-        },
-        "scope": {
-          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "example": [
-            "openid",
-            "offline"
-          ]
-        },
-        "subject": {
-          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
-          "type": "string",
-          "example": "mike@example.com"
-        }
-      }
-    },
-    "trustedJwtGrantIssuers": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/trustedJwtGrantIssuer"
-      }
-    },
-    "userinfoResponse": {
-      "description": "The userinfo response",
-      "type": "object",
-      "properties": {
-        "birthdate": {
-          "description": "End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format. The year MAY be 0000, indicating that it is omitted. To represent only the year, YYYY format is allowed. Note that depending on the underlying platform's date related function, providing just year can result in varying month and day, so the implementers need to take this factor into account to correctly process the dates.",
-          "type": "string"
-        },
-        "email": {
-          "description": "End-User's preferred e-mail address. Its value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax. The RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.",
-          "type": "string"
-        },
-        "email_verified": {
-          "description": "True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.",
-          "type": "boolean"
-        },
-        "family_name": {
-          "description": "Surname(s) or last name(s) of the End-User. Note that in some cultures, people can have multiple family names or no family name; all can be present, with the names being separated by space characters.",
-          "type": "string"
-        },
-        "gender": {
-          "description": "End-User's gender. Values defined by this specification are female and male. Other values MAY be used when neither of the defined values are applicable.",
-          "type": "string"
-        },
-        "given_name": {
-          "description": "Given name(s) or first name(s) of the End-User. Note that in some cultures, people can have multiple given names; all can be present, with the names being separated by space characters.",
-          "type": "string"
-        },
-        "locale": {
-          "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag. This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase, separated by a dash. For example, en-US or fr-CA. As a compatibility note, some implementations have used an underscore as the separator rather than a dash, for example, en_US; Relying Parties MAY choose to accept this locale syntax as well.",
-          "type": "string"
-        },
-        "middle_name": {
-          "description": "Middle name(s) of the End-User. Note that in some cultures, people can have multiple middle names; all can be present, with the names being separated by space characters. Also note that in some cultures, middle names are not used.",
-          "type": "string"
-        },
-        "name": {
-          "description": "End-User's full name in displayable form including all name parts, possibly including titles and suffixes, ordered according to the End-User's locale and preferences.",
-          "type": "string"
-        },
-        "nickname": {
-          "description": "Casual name of the End-User that may or may not be the same as the given_name. For instance, a nickname value of Mike might be returned alongside a given_name value of Michael.",
-          "type": "string"
-        },
-        "phone_number": {
-          "description": "End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400. If the phone number contains an extension, it is RECOMMENDED that the extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.",
-          "type": "string"
-        },
-        "phone_number_verified": {
-          "description": "True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any extensions MUST be represented in RFC 3966 format.",
-          "type": "boolean"
-        },
-        "picture": {
-          "description": "URL of the End-User's profile picture. This URL MUST refer to an image file (for example, a PNG, JPEG, or GIF image file), rather than to a Web page containing an image. Note that this URL SHOULD specifically reference a profile photo of the End-User suitable for displaying when describing the End-User, rather than an arbitrary photo taken by the End-User.",
-          "type": "string"
-        },
-        "preferred_username": {
-          "description": "Non-unique shorthand name by which the End-User wishes to be referred to at the RP, such as janedoe or j.doe. This value MAY be any valid JSON string including special characters such as @, /, or whitespace.",
-          "type": "string"
-        },
-        "profile": {
-          "description": "URL of the End-User's profile page. The contents of this Web page SHOULD be about the End-User.",
-          "type": "string"
-        },
-        "sub": {
-          "description": "Subject - Identifier for the End-User at the IssuerURL.",
-          "type": "string"
-        },
-        "updated_at": {
-          "description": "Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.",
-          "type": "integer",
-          "format": "int64"
-        },
-        "website": {
-          "description": "URL of the End-User's Web page or blog. This Web page SHOULD contain information published by the End-User or an organization that the End-User is affiliated with.",
-          "type": "string"
-        },
-        "zoneinfo": {
-          "description": "String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone. For example, Europe/Paris or America/Los_Angeles.",
-          "type": "string"
-        }
-      }
-    },
-    "version": {
-      "type": "object",
-      "properties": {
-        "version": {
-          "description": "Version is the service's version.",
-          "type": "string"
-        }
-      }
-    },
-    "wellKnown": {
-      "description": "It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms\namong others.",
-      "type": "object",
-      "title": "WellKnown represents important OpenID Connect discovery metadata",
+      "title": "OpenID Connect Discovery ;etadata",
       "required": [
         "issuer",
         "authorization_endpoint",
@@ -3455,6 +3017,311 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "oidcUserInfo": {
+      "description": "The userinfo response",
+      "type": "object",
+      "properties": {
+        "birthdate": {
+          "description": "End-User's birthday, represented as an ISO 8601:2004 [ISO8601‑2004] YYYY-MM-DD format. The year MAY be 0000, indicating that it is omitted. To represent only the year, YYYY format is allowed. Note that depending on the underlying platform's date related function, providing just year can result in varying month and day, so the implementers need to take this factor into account to correctly process the dates.",
+          "type": "string"
+        },
+        "email": {
+          "description": "End-User's preferred e-mail address. Its value MUST conform to the RFC 5322 [RFC5322] addr-spec syntax. The RP MUST NOT rely upon this value being unique, as discussed in Section 5.7.",
+          "type": "string"
+        },
+        "email_verified": {
+          "description": "True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating.",
+          "type": "boolean"
+        },
+        "family_name": {
+          "description": "Surname(s) or last name(s) of the End-User. Note that in some cultures, people can have multiple family names or no family name; all can be present, with the names being separated by space characters.",
+          "type": "string"
+        },
+        "gender": {
+          "description": "End-User's gender. Values defined by this specification are female and male. Other values MAY be used when neither of the defined values are applicable.",
+          "type": "string"
+        },
+        "given_name": {
+          "description": "Given name(s) or first name(s) of the End-User. Note that in some cultures, people can have multiple given names; all can be present, with the names being separated by space characters.",
+          "type": "string"
+        },
+        "locale": {
+          "description": "End-User's locale, represented as a BCP47 [RFC5646] language tag. This is typically an ISO 639-1 Alpha-2 [ISO639‑1] language code in lowercase and an ISO 3166-1 Alpha-2 [ISO3166‑1] country code in uppercase, separated by a dash. For example, en-US or fr-CA. As a compatibility note, some implementations have used an underscore as the separator rather than a dash, for example, en_US; Relying Parties MAY choose to accept this locale syntax as well.",
+          "type": "string"
+        },
+        "middle_name": {
+          "description": "Middle name(s) of the End-User. Note that in some cultures, people can have multiple middle names; all can be present, with the names being separated by space characters. Also note that in some cultures, middle names are not used.",
+          "type": "string"
+        },
+        "name": {
+          "description": "End-User's full name in displayable form including all name parts, possibly including titles and suffixes, ordered according to the End-User's locale and preferences.",
+          "type": "string"
+        },
+        "nickname": {
+          "description": "Casual name of the End-User that may or may not be the same as the given_name. For instance, a nickname value of Mike might be returned alongside a given_name value of Michael.",
+          "type": "string"
+        },
+        "phone_number": {
+          "description": "End-User's preferred telephone number. E.164 [E.164] is RECOMMENDED as the format of this Claim, for example, +1 (425) 555-1212 or +56 (2) 687 2400. If the phone number contains an extension, it is RECOMMENDED that the extension be represented using the RFC 3966 [RFC3966] extension syntax, for example, +1 (604) 555-1234;ext=5678.",
+          "type": "string"
+        },
+        "phone_number_verified": {
+          "description": "True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in E.164 format and any extensions MUST be represented in RFC 3966 format.",
+          "type": "boolean"
+        },
+        "picture": {
+          "description": "URL of the End-User's profile picture. This URL MUST refer to an image file (for example, a PNG, JPEG, or GIF image file), rather than to a Web page containing an image. Note that this URL SHOULD specifically reference a profile photo of the End-User suitable for displaying when describing the End-User, rather than an arbitrary photo taken by the End-User.",
+          "type": "string"
+        },
+        "preferred_username": {
+          "description": "Non-unique shorthand name by which the End-User wishes to be referred to at the RP, such as janedoe or j.doe. This value MAY be any valid JSON string including special characters such as @, /, or whitespace.",
+          "type": "string"
+        },
+        "profile": {
+          "description": "URL of the End-User's profile page. The contents of this Web page SHOULD be about the End-User.",
+          "type": "string"
+        },
+        "sub": {
+          "description": "Subject - Identifier for the End-User at the IssuerURL.",
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "Time the End-User's information was last updated. Its value is a JSON number representing the number of seconds from 1970-01-01T0:0:0Z as measured in UTC until the date/time.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "website": {
+          "description": "URL of the End-User's Web page or blog. This Web page SHOULD contain information published by the End-User or an organization that the End-User is affiliated with.",
+          "type": "string"
+        },
+        "zoneinfo": {
+          "description": "String from zoneinfo [zoneinfo] time zone database representing the End-User's time zone. For example, Europe/Paris or America/Los_Angeles.",
+          "type": "string"
+        }
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "properties": {
+        "page_size": {
+          "description": "Items per page\n\nThis is the number of items per page to return.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "type": "integer",
+          "format": "int64",
+          "default": 250,
+          "maximum": 1000,
+          "minimum": 1
+        },
+        "page_token": {
+          "description": "Next Page Token\n\nThe next page token.\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).",
+          "type": "string",
+          "default": "1",
+          "minimum": 1
+        }
+      }
+    },
+    "paginationHeaders": {
+      "type": "object",
+      "properties": {
+        "link": {
+          "description": "The link header contains pagination links.\n\nFor details on pagination please head over to the [pagination documentation](https://www.ory.sh/docs/ecosystem/api-design#pagination).\n\nin: header",
+          "type": "string"
+        },
+        "x-total-count": {
+          "description": "The total number of clients.\n\nin: header",
+          "type": "string"
+        }
+      }
+    },
+    "previousOAuth2ConsentSession": {
+      "description": "The response used to return used consent requests\nsame as HandledLoginRequest, just with consent_request exposed as json",
+      "type": "object",
+      "properties": {
+        "consent_request": {
+          "$ref": "#/definitions/oAuth2ConsentRequest"
+        },
+        "grant_access_token_audience": {
+          "$ref": "#/definitions/StringSliceJSONFormat"
+        },
+        "grant_scope": {
+          "$ref": "#/definitions/StringSliceJSONFormat"
+        },
+        "handled_at": {
+          "$ref": "#/definitions/nullTime"
+        },
+        "remember": {
+          "description": "Remember, if set to true, tells ORY Hydra to remember this consent authorization and reuse it if the same\nclient asks the same user for the same, or a subset of, scope.",
+          "type": "boolean"
+        },
+        "remember_for": {
+          "description": "RememberFor sets how long the consent authorization should be remembered for in seconds. If set to `0`, the\nauthorization will be remembered indefinitely.",
+          "type": "integer",
+          "format": "int64"
+        },
+        "session": {
+          "$ref": "#/definitions/acceptOAuth2ConsentRequestSession"
+        }
+      }
+    },
+    "previousOAuth2ConsentSessions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/previousOAuth2ConsentSession"
+      }
+    },
+    "refreshTokenHookRequest": {
+      "type": "object",
+      "title": "RefreshTokenHookRequest is the request body sent to the refresh token hook.",
+      "properties": {
+        "client_id": {
+          "description": "ClientID is the identifier of the OAuth 2.0 client.",
+          "type": "string"
+        },
+        "granted_audience": {
+          "description": "GrantedAudience is the list of audiences granted to the OAuth 2.0 client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "granted_scopes": {
+          "description": "GrantedScopes is the list of scopes granted to the OAuth 2.0 client.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subject": {
+          "description": "Subject is the identifier of the authenticated end-user.",
+          "type": "string"
+        }
+      }
+    },
+    "refreshTokenHookResponse": {
+      "type": "object",
+      "title": "RefreshTokenHookResponse is the response body received from the refresh token hook.",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/acceptOAuth2ConsentRequestSession"
+        }
+      }
+    },
+    "rejectOAuth2Request": {
+      "type": "object",
+      "title": "The request payload used to accept a login or consent request.",
+      "properties": {
+        "error": {
+          "description": "The error should follow the OAuth2 error format (e.g. `invalid_request`, `login_required`).\n\nDefaults to `request_denied`.",
+          "type": "string"
+        },
+        "error_debug": {
+          "description": "Debug contains information to help resolve the problem as a developer. Usually not exposed\nto the public but only in the server logs.",
+          "type": "string"
+        },
+        "error_description": {
+          "description": "Description of the error in a human readable format.",
+          "type": "string"
+        },
+        "error_hint": {
+          "description": "Hint to help resolve the error.",
+          "type": "string"
+        },
+        "status_code": {
+          "description": "Represents the HTTP status code of the error (e.g. 401 or 403)\n\nDefaults to 400",
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "successfulOAuth2RequestResponse": {
+      "type": "object",
+      "title": "The response payload sent when accepting or rejecting a login, consent, or logout request.",
+      "required": [
+        "redirect_to"
+      ],
+      "properties": {
+        "redirect_to": {
+          "description": "RedirectURL is the URL which you should redirect the user to once the authentication process is completed.",
+          "type": "string"
+        }
+      }
+    },
+    "trustedJsonWebKey": {
+      "type": "object",
+      "properties": {
+        "kid": {
+          "description": "The \"key_id\" is key unique identifier (same as kid header in jws/jwt).",
+          "type": "string",
+          "example": "123e4567-e89b-12d3-a456-426655440000"
+        },
+        "set": {
+          "description": "The \"set\" is basically a name for a group(set) of keys. Will be the same as \"issuer\" in grant.",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        }
+      }
+    },
+    "trustedOAuth2JwtGrantIssuer": {
+      "type": "object",
+      "properties": {
+        "allow_any_subject": {
+          "description": "The \"allow_any_subject\" indicates that the issuer is allowed to have any principal as the subject of the JWT.",
+          "type": "boolean"
+        },
+        "created_at": {
+          "description": "The \"created_at\" indicates, when grant was created.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires_at": {
+          "description": "The \"expires_at\" indicates, when grant will expire, so we will reject assertion from \"issuer\" targeting \"subject\".",
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "example": "9edc811f-4e28-453c-9b46-4de65f00217f"
+        },
+        "issuer": {
+          "description": "The \"issuer\" identifies the principal that issued the JWT assertion (same as \"iss\" claim in JWT).",
+          "type": "string",
+          "example": "https://jwt-idp.example.com"
+        },
+        "public_key": {
+          "$ref": "#/definitions/trustedJsonWebKey"
+        },
+        "scope": {
+          "description": "The \"scope\" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "openid",
+            "offline"
+          ]
+        },
+        "subject": {
+          "description": "The \"subject\" identifies the principal that is the subject of the JWT.",
+          "type": "string",
+          "example": "mike@example.com"
+        }
+      }
+    },
+    "trustedOAuth2JwtGrantIssuers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/trustedOAuth2JwtGrantIssuer"
+      }
+    },
+    "version": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "Version is the service's version.",
+          "type": "string"
         }
       }
     }

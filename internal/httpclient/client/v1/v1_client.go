@@ -46,6 +46,10 @@ type ClientService interface {
 
 	AdminDeleteOAuth2Client(params *AdminDeleteOAuth2ClientParams, opts ...ClientOption) (*AdminDeleteOAuth2ClientNoContent, error)
 
+	AdminDeleteOAuth2Token(params *AdminDeleteOAuth2TokenParams, opts ...ClientOption) (*AdminDeleteOAuth2TokenNoContent, error)
+
+	AdminDeleteTrustedOAuth2JwtGrantIssuer(params *AdminDeleteTrustedOAuth2JwtGrantIssuerParams, opts ...ClientOption) (*AdminDeleteTrustedOAuth2JwtGrantIssuerNoContent, error)
+
 	AdminGetJSONWebKey(params *AdminGetJSONWebKeyParams, opts ...ClientOption) (*AdminGetJSONWebKeyOK, error)
 
 	AdminGetJSONWebKeySet(params *AdminGetJSONWebKeySetParams, opts ...ClientOption) (*AdminGetJSONWebKeySetOK, error)
@@ -56,9 +60,13 @@ type ClientService interface {
 
 	AdminGetOAuth2LoginRequest(params *AdminGetOAuth2LoginRequestParams, opts ...ClientOption) (*AdminGetOAuth2LoginRequestOK, error)
 
+	AdminGetTrustedOAuth2JwtGrantIssuer(params *AdminGetTrustedOAuth2JwtGrantIssuerParams, opts ...ClientOption) (*AdminGetTrustedOAuth2JwtGrantIssuerOK, error)
+
 	AdminListOAuth2Clients(params *AdminListOAuth2ClientsParams, opts ...ClientOption) (*AdminListOAuth2ClientsOK, error)
 
 	AdminListOAuth2SubjectConsentSessions(params *AdminListOAuth2SubjectConsentSessionsParams, opts ...ClientOption) (*AdminListOAuth2SubjectConsentSessionsOK, error)
+
+	AdminListTrustedOAuth2JwtGrantIssuers(params *AdminListTrustedOAuth2JwtGrantIssuersParams, opts ...ClientOption) (*AdminListTrustedOAuth2JwtGrantIssuersOK, error)
 
 	AdminPatchOAuth2Client(params *AdminPatchOAuth2ClientParams, opts ...ClientOption) (*AdminPatchOAuth2ClientOK, error)
 
@@ -68,6 +76,8 @@ type ClientService interface {
 
 	AdminRevokeOAuth2LoginSessions(params *AdminRevokeOAuth2LoginSessionsParams, opts ...ClientOption) (*AdminRevokeOAuth2LoginSessionsNoContent, error)
 
+	AdminTrustOAuth2JwtGrantIssuer(params *AdminTrustOAuth2JwtGrantIssuerParams, opts ...ClientOption) (*AdminTrustOAuth2JwtGrantIssuerCreated, error)
+
 	AdminUpdateJSONWebKey(params *AdminUpdateJSONWebKeyParams, opts ...ClientOption) (*AdminUpdateJSONWebKeyOK, error)
 
 	AdminUpdateJSONWebKeySet(params *AdminUpdateJSONWebKeySetParams, opts ...ClientOption) (*AdminUpdateJSONWebKeySetOK, error)
@@ -75,6 +85,8 @@ type ClientService interface {
 	AdminUpdateOAuth2Client(params *AdminUpdateOAuth2ClientParams, opts ...ClientOption) (*AdminUpdateOAuth2ClientOK, error)
 
 	DiscoverJSONWebKeys(params *DiscoverJSONWebKeysParams, opts ...ClientOption) (*DiscoverJSONWebKeysOK, error)
+
+	DiscoverOidcConfiguration(params *DiscoverOidcConfigurationParams, opts ...ClientOption) (*DiscoverOidcConfigurationOK, error)
 
 	DynamicClientRegistrationCreateOAuth2Client(params *DynamicClientRegistrationCreateOAuth2ClientParams, opts ...ClientOption) (*DynamicClientRegistrationCreateOAuth2ClientCreated, error)
 
@@ -84,9 +96,19 @@ type ClientService interface {
 
 	DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClientRegistrationUpdateOAuth2ClientParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*DynamicClientRegistrationUpdateOAuth2ClientOK, error)
 
+	GetOidcUserInfo(params *GetOidcUserInfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOidcUserInfoOK, error)
+
+	PerformOAuth2AuthorizationFlow(params *PerformOAuth2AuthorizationFlowParams, opts ...ClientOption) error
+
+	PerformOAuth2TokenFlow(params *PerformOAuth2TokenFlowParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PerformOAuth2TokenFlowOK, error)
+
+	PerformOidcFrontOrBackChannelLogout(params *PerformOidcFrontOrBackChannelLogoutParams, opts ...ClientOption) error
+
 	RejectOAuth2ConsentRequest(params *RejectOAuth2ConsentRequestParams, opts ...ClientOption) (*RejectOAuth2ConsentRequestOK, error)
 
 	RejectOAuth2LoginRequest(params *RejectOAuth2LoginRequestParams, opts ...ClientOption) (*RejectOAuth2LoginRequestOK, error)
+
+	RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error)
 
 	SetTransport(transport runtime.ClientTransport)
 }
@@ -448,6 +470,88 @@ func (a *Client) AdminDeleteOAuth2Client(params *AdminDeleteOAuth2ClientParams, 
 }
 
 /*
+  AdminDeleteOAuth2Token deletes o auth2 access tokens from a client
+
+  This endpoint deletes OAuth2 access tokens issued for a client from the database
+*/
+func (a *Client) AdminDeleteOAuth2Token(params *AdminDeleteOAuth2TokenParams, opts ...ClientOption) (*AdminDeleteOAuth2TokenNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminDeleteOAuth2TokenParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminDeleteOAuth2Token",
+		Method:             "DELETE",
+		PathPattern:        "/admin/oauth2/tokens",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminDeleteOAuth2TokenReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminDeleteOAuth2TokenNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminDeleteOAuth2TokenDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminDeleteTrustedOAuth2JwtGrantIssuer deletes a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to delete trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+
+Once deleted, the associated issuer will no longer be able to perform the JSON Web Token (JWT) Profile
+for OAuth 2.0 Client Authentication and Authorization Grant.
+*/
+func (a *Client) AdminDeleteTrustedOAuth2JwtGrantIssuer(params *AdminDeleteTrustedOAuth2JwtGrantIssuerParams, opts ...ClientOption) (*AdminDeleteTrustedOAuth2JwtGrantIssuerNoContent, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminDeleteTrustedOAuth2JwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminDeleteTrustedOAuth2JwtGrantIssuer",
+		Method:             "DELETE",
+		PathPattern:        "/admin/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminDeleteTrustedOAuth2JwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminDeleteTrustedOAuth2JwtGrantIssuerNoContent)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminDeleteTrustedOAuth2JwtGrantIssuerDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   AdminGetJSONWebKey fetches a JSON web key
 
   This endpoint returns a singular JSON Web Key. It is identified by the set and the specific key ID (kid).
@@ -663,6 +767,46 @@ func (a *Client) AdminGetOAuth2LoginRequest(params *AdminGetOAuth2LoginRequestPa
 }
 
 /*
+  AdminGetTrustedOAuth2JwtGrantIssuer gets a trusted o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to get a trusted JWT Bearer Grant Type Issuer. The ID is the one returned when you
+created the trust relationship.
+*/
+func (a *Client) AdminGetTrustedOAuth2JwtGrantIssuer(params *AdminGetTrustedOAuth2JwtGrantIssuerParams, opts ...ClientOption) (*AdminGetTrustedOAuth2JwtGrantIssuerOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminGetTrustedOAuth2JwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminGetTrustedOAuth2JwtGrantIssuer",
+		Method:             "GET",
+		PathPattern:        "/admin/trust/grants/jwt-bearer/issuers/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminGetTrustedOAuth2JwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminGetTrustedOAuth2JwtGrantIssuerOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminGetTrustedOAuth2JwtGrantIssuerDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   AdminListOAuth2Clients lists o auth 2 0 clients
 
   This endpoint lists all clients in the database, and never returns client secrets.
@@ -752,6 +896,45 @@ func (a *Client) AdminListOAuth2SubjectConsentSessions(params *AdminListOAuth2Su
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*AdminListOAuth2SubjectConsentSessionsDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  AdminListTrustedOAuth2JwtGrantIssuers lists trusted o auth2 j w t bearer grant type issuers
+
+  Use this endpoint to list all trusted JWT Bearer Grant Type Issuers.
+*/
+func (a *Client) AdminListTrustedOAuth2JwtGrantIssuers(params *AdminListTrustedOAuth2JwtGrantIssuersParams, opts ...ClientOption) (*AdminListTrustedOAuth2JwtGrantIssuersOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminListTrustedOAuth2JwtGrantIssuersParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminListTrustedOAuth2JwtGrantIssuers",
+		Method:             "GET",
+		PathPattern:        "/admin/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminListTrustedOAuth2JwtGrantIssuersReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminListTrustedOAuth2JwtGrantIssuersOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminListTrustedOAuth2JwtGrantIssuersDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -923,6 +1106,47 @@ func (a *Client) AdminRevokeOAuth2LoginSessions(params *AdminRevokeOAuth2LoginSe
 }
 
 /*
+  AdminTrustOAuth2JwtGrantIssuer trusts an o auth2 j w t bearer grant type issuer
+
+  Use this endpoint to establish a trust relationship for a JWT issuer
+to perform JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication
+and Authorization Grants [RFC7523](https://datatracker.ietf.org/doc/html/rfc7523).
+*/
+func (a *Client) AdminTrustOAuth2JwtGrantIssuer(params *AdminTrustOAuth2JwtGrantIssuerParams, opts ...ClientOption) (*AdminTrustOAuth2JwtGrantIssuerCreated, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewAdminTrustOAuth2JwtGrantIssuerParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "adminTrustOAuth2JwtGrantIssuer",
+		Method:             "POST",
+		PathPattern:        "/admin/trust/grants/jwt-bearer/issuers",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &AdminTrustOAuth2JwtGrantIssuerReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*AdminTrustOAuth2JwtGrantIssuerCreated)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*AdminTrustOAuth2JwtGrantIssuerDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
   AdminUpdateJSONWebKey updates a JSON web key
 
   Use this method if you do not want to let Hydra generate the JWKs for you, but instead save your own.
@@ -1085,6 +1309,50 @@ func (a *Client) DiscoverJSONWebKeys(params *DiscoverJSONWebKeysParams, opts ...
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*DiscoverJSONWebKeysDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  DiscoverOidcConfiguration opens ID connect discovery
+
+  The well known endpoint an be used to retrieve information for OpenID Connect clients. We encourage you to not roll
+your own OpenID Connect client but to use an OpenID Connect client library instead. You can learn more on this
+flow at https://openid.net/specs/openid-connect-discovery-1_0.html .
+
+Popular libraries for OpenID Connect clients include oidc-client-js (JavaScript), go-oidc (Golang), and others.
+For a full list of clients go here: https://openid.net/developers/certified/
+*/
+func (a *Client) DiscoverOidcConfiguration(params *DiscoverOidcConfigurationParams, opts ...ClientOption) (*DiscoverOidcConfigurationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewDiscoverOidcConfigurationParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "discoverOidcConfiguration",
+		Method:             "GET",
+		PathPattern:        "/.well-known/openid-configuration",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &DiscoverOidcConfigurationReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*DiscoverOidcConfigurationOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*DiscoverOidcConfigurationDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 
@@ -1291,6 +1559,174 @@ func (a *Client) DynamicClientRegistrationUpdateOAuth2Client(params *DynamicClie
 }
 
 /*
+  GetOidcUserInfo opens ID connect userinfo
+
+  This endpoint returns the payload of the ID Token, including the idTokenExtra values, of
+the provided OAuth 2.0 Access Token.
+
+For more information please [refer to the spec](http://openid.net/specs/openid-connect-core-1_0.html#UserInfo).
+
+In the case of authentication error, a WWW-Authenticate header might be set in the response
+with more information about the error. See [the spec](https://datatracker.ietf.org/doc/html/rfc6750#section-3)
+for more details about header format.
+*/
+func (a *Client) GetOidcUserInfo(params *GetOidcUserInfoParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*GetOidcUserInfoOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetOidcUserInfoParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "getOidcUserInfo",
+		Method:             "GET",
+		PathPattern:        "/userinfo",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &GetOidcUserInfoReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetOidcUserInfoOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*GetOidcUserInfoDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  PerformOAuth2AuthorizationFlow thes o auth 2 0 authorize endpoint
+
+  This endpoint is not documented here because you should never use your own implementation to perform OAuth2 flows.
+OAuth2 is a very popular protocol and a library for your programming language will exists.
+
+To learn more about this flow please refer to the specification: https://tools.ietf.org/html/rfc6749
+*/
+func (a *Client) PerformOAuth2AuthorizationFlow(params *PerformOAuth2AuthorizationFlowParams, opts ...ClientOption) error {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPerformOAuth2AuthorizationFlowParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "performOAuth2AuthorizationFlow",
+		Method:             "GET",
+		PathPattern:        "/oauth2/auth",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &PerformOAuth2AuthorizationFlowReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	_, err := a.transport.Submit(op)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+  PerformOAuth2TokenFlow thes o auth 2 0 token endpoint
+
+  The client makes a request to the token endpoint by sending the
+following parameters using the "application/x-www-form-urlencoded" HTTP
+request entity-body.
+
+> Do not implement a client for this endpoint yourself. Use a library. There are many libraries
+> available for any programming language. You can find a list of libraries here: https://oauth.net/code/
+>
+> Do note that Hydra SDK does not implement this endpoint properly. Use one of the libraries listed above
+*/
+func (a *Client) PerformOAuth2TokenFlow(params *PerformOAuth2TokenFlowParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*PerformOAuth2TokenFlowOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPerformOAuth2TokenFlowParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "performOAuth2TokenFlow",
+		Method:             "POST",
+		PathPattern:        "/oauth2/token",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &PerformOAuth2TokenFlowReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*PerformOAuth2TokenFlowOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*PerformOAuth2TokenFlowDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  PerformOidcFrontOrBackChannelLogout opens ID connect front or back channel enabled logout
+
+  This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
+
+https://openid.net/specs/openid-connect-frontchannel-1_0.html
+https://openid.net/specs/openid-connect-backchannel-1_0.html
+
+Back-channel logout is performed asynchronously and does not affect logout flow.
+*/
+func (a *Client) PerformOidcFrontOrBackChannelLogout(params *PerformOidcFrontOrBackChannelLogoutParams, opts ...ClientOption) error {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewPerformOidcFrontOrBackChannelLogoutParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "performOidcFrontOrBackChannelLogout",
+		Method:             "GET",
+		PathPattern:        "/oauth2/sessions/logout",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json", "application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &PerformOidcFrontOrBackChannelLogoutReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	_, err := a.transport.Submit(op)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
   RejectOAuth2ConsentRequest rejects an o auth 2 0 consent request
 
   When an authorization code, hybrid, or implicit OAuth 2.0 Flow is initiated, ORY Hydra asks the login provider
@@ -1390,6 +1826,49 @@ func (a *Client) RejectOAuth2LoginRequest(params *RejectOAuth2LoginRequestParams
 	}
 	// unexpected success response
 	unexpectedSuccess := result.(*RejectOAuth2LoginRequestDefault)
+	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
+}
+
+/*
+  RevokeOAuth2Token revokes an o auth2 access or refresh token
+
+  Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
+longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
+Revoking a refresh token also invalidates the access token that was created with it. A token may only be revoked by
+the client the token was generated for.
+*/
+func (a *Client) RevokeOAuth2Token(params *RevokeOAuth2TokenParams, authInfo runtime.ClientAuthInfoWriter, opts ...ClientOption) (*RevokeOAuth2TokenOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewRevokeOAuth2TokenParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "revokeOAuth2Token",
+		Method:             "POST",
+		PathPattern:        "/oauth2/revoke",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/x-www-form-urlencoded"},
+		Schemes:            []string{"http", "https"},
+		Params:             params,
+		Reader:             &RevokeOAuth2TokenReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*RevokeOAuth2TokenOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	unexpectedSuccess := result.(*RevokeOAuth2TokenDefault)
 	return nil, runtime.NewAPIError("unexpected success response: content available as default response in error", unexpectedSuccess, unexpectedSuccess.Code())
 }
 

@@ -195,8 +195,7 @@ type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
 //
 //     Responses:
 //       204: emptyResponse
-//       404: genericError
-//       500: genericError
+//       default: genericError
 func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
@@ -208,7 +207,7 @@ func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// swagger:route GET /trust/grants/jwt-bearer/issuers admin listTrustedJwtGrantIssuers
+// swagger:route GET /admin/trust/grants/jwt-bearer/issuers v1 adminListTrustedOAuth2JwtGrantIssuers
 //
 // List Trusted OAuth2 JWT Bearer Grant Type Issuers
 //
@@ -223,8 +222,8 @@ func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, 
 //     Schemes: http, https
 //
 //     Responses:
-//       200: trustedJwtGrantIssuers
-//       500: genericError
+//       200: trustedOAuth2JwtGrantIssuers
+//       default: genericError
 func (h *Handler) List(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	limit, offset := pagination.Parse(r, 100, 0, 500)
 	optionalIssuer := r.URL.Query().Get("issuer")

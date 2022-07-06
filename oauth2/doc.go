@@ -223,8 +223,8 @@ type swaggerFlushInactiveAccessTokens struct {
 }
 
 // The userinfo response
-// swagger:model userinfoResponse
-type swaggeruserinfoResponsePayload struct {
+// swagger:model oidcUserInfo
+type oidcUserInfo struct {
 	// Subject - Identifier for the End-User at the IssuerURL.
 	Subject string `json:"sub"`
 

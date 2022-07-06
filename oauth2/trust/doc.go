@@ -45,11 +45,11 @@ type listTrustedJwtGrantIssuers struct {
 	Offset int `json:"offset"`
 }
 
-// swagger:model trustedJwtGrantIssuers
-type trustedJwtGrantIssuers []trustedJwtGrantIssuer
+// swagger:model trustedOAuth2JwtGrantIssuers
+type trustedOAuth2JwtGrantIssuers []trustedOAuth2JwtGrantIssuer
 
-// swagger:model trustedJwtGrantIssuer
-type trustedJwtGrantIssuer struct {
+// swagger:model trustedOAuth2JwtGrantIssuer
+type trustedOAuth2JwtGrantIssuer struct {
 	// example: 9edc811f-4e28-453c-9b46-4de65f00217f
 	ID string `json:"id"`
 

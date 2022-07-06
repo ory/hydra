@@ -101,14 +101,14 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	public.GET(DefaultErrorPath, h.DefaultErrorHandler)
 
 	public.Handler("OPTIONS", RevocationPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.RevocationHandler)))
+	public.Handler("POST", RevocationPath, corsMiddleware(http.HandlerFunc(h.revokeOAuth2Token)))
 	public.Handler("OPTIONS", WellKnownPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.WellKnownHandler)))
+	public.Handler("GET", WellKnownPath, corsMiddleware(http.HandlerFunc(h.discoverOidcConfiguration)))
 	public.Handler("OPTIONS", UserinfoPath, corsMiddleware(http.HandlerFunc(h.handleOptions)))
-	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
-	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.UserinfoHandler)))
+	public.Handler("GET", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
+	public.Handler("POST", UserinfoPath, corsMiddleware(http.HandlerFunc(h.getOidcUserInfo)))
 
-	admin.POST(IntrospectPath, h.IntrospectHandler)
+	admin.POST(IntrospectPath, h.adminIntrospectOAuth2Token)
 	admin.DELETE(DeleteTokensPath, h.DeleteHandler)
 }
 
@@ -225,9 +225,9 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //     Schemes: http, https
 //
 //     Responses:
-//       200: OidcConfiguration
+//       200: oidcConfiguration
 //       default: oAuth2ApiError
-func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) discoverOidcConfiguration(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
 	if err != nil {
 		h.r.Writer().WriteError(w, r, err)
@@ -289,7 +289,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //     Responses:
 //       200: oidcUserInfo
 //       default: oAuth2ApiError
-func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getOidcUserInfo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(ctx))
 	tokenType, ar, err := h.r.OAuth2Provider().IntrospectToken(ctx, fosite.AccessTokenFromRequest(r), fosite.AccessToken, session)
@@ -368,9 +368,9 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// swagger:route POST /oauth2/revoke public revokeOAuth2Token
+// swagger:route POST /oauth2/revoke v1 revokeOAuth2Token
 //
-// Revoke OAuth2 Tokens
+// Revoke an OAuth2 Access or Refresh Token
 //
 // Revoking a token (both access and refresh) means that the tokens will be invalid. A revoked access token can no
 // longer be used to make access requests, and a revoked refresh token can no longer be used to refresh an access token.
@@ -388,9 +388,8 @@ func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 //
 //     Responses:
 //       200: emptyResponse
-//       401: oAuth2ApiError
 //       default: oAuth2ApiError
-func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) revokeOAuth2Token(w http.ResponseWriter, r *http.Request) {
 	var ctx = r.Context()
 
 	err := h.r.OAuth2Provider().NewRevocationRequest(ctx, r)
@@ -401,9 +400,9 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 	h.r.OAuth2Provider().WriteRevocationResponse(ctx, w, err)
 }
 
-// swagger:route POST /oauth2/introspect admin introspectOAuth2Token
+// swagger:route POST /admin/oauth2/introspect adminIntrospectOAuth2Token
 //
-// Introspect OAuth2 Tokens
+// Introspect OAuth2 Access or Refresh Tokens
 //
 // The introspection endpoint allows to check if a token (both refresh and access) is active or not. An active token
 // is neither expired nor revoked. If a token is active, additional information on the token will be included. You can
@@ -420,10 +419,9 @@ func (h *Handler) RevocationHandler(w http.ResponseWriter, r *http.Request) {
 //     Schemes: http, https
 //
 //     Responses:
-//       200: oAuth2TokenIntrospection
-//       401: oAuth2ApiError
+//       200: introspectedOAuth2Token
 //       default: oAuth2ApiError
-func (h *Handler) IntrospectHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *Handler) adminIntrospectOAuth2Token(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var session = NewSessionWithCustomClaims("", h.c.AllowedTopLevelClaims(r.Context()))
 	var ctx = r.Context()
 

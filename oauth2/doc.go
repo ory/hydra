@@ -27,7 +27,7 @@ import "time"
 // It includes links to several endpoints (e.g. /oauth2/token) and exposes information on supported signature algorithms
 // among others.
 //
-// swagger:model wellKnown
+// swagger:model oidcConfiguration
 type WellKnown struct {
 	// URL using the https scheme with no query or fragment component that the OP asserts as its IssuerURL Identifier.
 	// If IssuerURL discovery is supported , this value MUST be identical to the issuer value returned

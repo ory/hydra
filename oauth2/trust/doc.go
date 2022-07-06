@@ -45,14 +45,6 @@ type listTrustedJwtGrantIssuers struct {
 	Offset int `json:"offset"`
 }
 
-// swagger:parameters getTrustedJwtGrantIssuer deleteTrustedJwtGrantIssuer
-type getTrustedJwtGrantIssuer struct {
-	// The id of the desired grant
-	// in: path
-	// required: true
-	ID string `json:"id"`
-}
-
 // swagger:model trustedJwtGrantIssuers
 type trustedJwtGrantIssuers []trustedJwtGrantIssuer
 

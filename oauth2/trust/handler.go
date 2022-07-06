@@ -29,7 +29,7 @@ func NewHandler(r InternalRegistry) *Handler {
 }
 
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
-	admin.GET(grantJWTBearerPath+"/:id", h.Get)
+	admin.GET(grantJWTBearerPath+"/:id", h.adminGetTrustedOAuth2JwtGrantIssuer)
 	admin.GET(grantJWTBearerPath, h.List)
 	admin.POST(grantJWTBearerPath, h.adminTrustOAuth2JwtGrantIssuer)
 	admin.DELETE(grantJWTBearerPath+"/:id", h.Delete)
@@ -128,7 +128,16 @@ func (h *Handler) adminTrustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.
 	h.registry.Writer().WriteCreated(w, r, grantJWTBearerPath+"/"+grant.ID, &grant)
 }
 
-// swagger:route GET /trust/grants/jwt-bearer/issuers/{id} admin getTrustedJwtGrantIssuer
+// swagger:parameters adminGetTrustedOAuth2JwtGrantIssuer
+type adminGetTrustedOAuth2JwtGrantIssuer struct {
+	// The id of the desired grant
+	//
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route GET /admin/trust/grants/jwt-bearer/issuers/{id} v1 adminGetTrustedOAuth2JwtGrantIssuer
 //
 // Get a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
@@ -144,10 +153,9 @@ func (h *Handler) adminTrustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.
 //     Schemes: http, https
 //
 //     Responses:
-//       200: trustedJwtGrantIssuer
-//       404: genericError
-//       500: genericError
-func (h *Handler) Get(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+//       200: trustedOAuth2JwtGrantIssuer
+//       default: genericError
+func (h *Handler) adminGetTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
 	grant, err := h.registry.GrantManager().GetConcreteGrant(r.Context(), id)

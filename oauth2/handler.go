@@ -621,7 +621,7 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 	}
 }
 
-// swagger:route GET /oauth2/auth v1 oauthAuthorization
+// swagger:route GET /oauth2/auth v1 performOAuth2Authorization
 //
 // The OAuth 2.0 Authorize Endpoint
 //
@@ -637,7 +637,6 @@ func (h *Handler) logOrAudit(err error, r *http.Request) {
 //
 //     Responses:
 //       302: emptyResponse
-//       401: oAuth2ApiError
 //       default: oAuth2ApiError
 func (h *Handler) AuthHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ctx = r.Context()
@@ -761,7 +760,7 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 	http.Redirect(w, r, urlx.CopyWithQuery(h.c.ErrorURL(r.Context()), query).String(), http.StatusFound)
 }
 
-// swagger:route DELETE /oauth2/tokens admin deleteOAuth2Token
+// swagger:route DELETE /admin/oauth2/tokens v1 adminDeleteOAuth2Token
 //
 // Delete OAuth2 Access Tokens from a Client
 //
@@ -774,7 +773,6 @@ func (h *Handler) forwardError(w http.ResponseWriter, r *http.Request, err error
 //
 //     Responses:
 //       204: emptyResponse
-//       401: oAuth2ApiError
 //       default: oAuth2ApiError
 func (h *Handler) DeleteHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	clientID := r.URL.Query().Get("client_id")

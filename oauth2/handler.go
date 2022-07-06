@@ -31,8 +31,6 @@ import (
 
 	"github.com/ory/x/httprouterx"
 
-	"gopkg.in/square/go-jose.v2"
-
 	"github.com/pborman/uuid"
 
 	"github.com/ory/x/errorsx"
@@ -114,11 +112,11 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin, public *httprouterx.
 	admin.DELETE(DeleteTokensPath, h.DeleteHandler)
 }
 
-// swagger:route GET /oauth2/sessions/logout public disconnectUser
+// swagger:route GET /oauth2/sessions/logout v1 performOidcFrontOrBackchannelLogout
 //
-// OpenID Connect Front-Backchannel Enabled Logout
+// OpenID Connect Front- or Back-channel Enabled Logout
 //
-// This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front-/Back-channel logout:
+// This endpoint initiates and completes user logout at Ory Hydra and initiates OpenID Connect Front- / Back-channel logout:
 //
 // - https://openid.net/specs/openid-connect-frontchannel-1_0.html
 // - https://openid.net/specs/openid-connect-backchannel-1_0.html
@@ -210,7 +208,7 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 }
 
-// swagger:route GET /.well-known/openid-configuration public discoverOpenIDConfiguration
+// swagger:route GET /.well-known/openid-configuration v1 discoverOidcConfiguration
 //
 // OpenID Connect Discovery
 //
@@ -227,7 +225,7 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //     Schemes: http, https
 //
 //     Responses:
-//       200: wellKnown
+//       200: OidcConfiguration
 //       401: oAuth2ApiError
 //       default: oAuth2ApiError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {

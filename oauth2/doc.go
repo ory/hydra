@@ -308,8 +308,8 @@ type swaggerOAuthTokenResponse struct {
 	TokenType string `json:"token_type"`
 }
 
-// swagger:parameters introspectOAuth2Token
-type swaggerOAuthIntrospectionRequest struct {
+// swagger:parameters introspectedOAuth2Token
+type introspectedOAuth2Token struct {
 	// The string value of the token. For access tokens, this
 	// is the "access_token" value returned from the token endpoint
 	// defined in OAuth 2.0. For refresh tokens, this is the "refresh_token"

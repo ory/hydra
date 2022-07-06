@@ -2,6 +2,7 @@ package trust
 
 import (
 	"encoding/json"
+	"github.com/ory/hydra/x"
 	"net/http"
 	"time"
 
@@ -30,11 +31,50 @@ func NewHandler(r InternalRegistry) *Handler {
 func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(grantJWTBearerPath+"/:id", h.Get)
 	admin.GET(grantJWTBearerPath, h.List)
-	admin.POST(grantJWTBearerPath, h.Create)
+	admin.POST(grantJWTBearerPath, h.adminTrustOAuth2JwtGrantIssuer)
 	admin.DELETE(grantJWTBearerPath+"/:id", h.Delete)
 }
 
-// swagger:route POST /trust/grants/jwt-bearer/issuers admin trustJwtGrantIssuer
+// swagger:model adminTrustOAuth2JwtGrantIssuerBody
+type adminTrustOAuth2JwtGrantIssuerBody struct {
+	// The "issuer" identifies the principal that issued the JWT assertion (same as "iss" claim in JWT).
+	//
+	// required: true
+	// example: https://jwt-idp.example.com
+	Issuer string `json:"issuer"`
+
+	// The "subject" identifies the principal that is the subject of the JWT.
+	//
+	// example: mike@example.com
+	Subject string `json:"subject"`
+
+	// The "allow_any_subject" indicates that the issuer is allowed to have any principal as the subject of the JWT.
+	AllowAnySubject bool `json:"allow_any_subject"`
+
+	// The "scope" contains list of scope values (as described in Section 3.3 of OAuth 2.0 [RFC6749])
+	//
+	// required:true
+	// example: ["openid", "offline"]
+	Scope []string `json:"scope"`
+
+	// The "jwk" contains public key in JWK format issued by "issuer", that will be used to check JWT assertion signature.
+	//
+	// required:true
+	JWK x.JSONWebKey `json:"jwk"`
+
+	// The "expires_at" indicates, when grant will expire, so we will reject assertion from "issuer" targeting "subject".
+	//
+	// required:true
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
+// swagger:parameters adminTrustOAuth2JwtGrantIssuer
+type adminTrustOAuth2JwtGrantIssuer struct {
+	// in: body
+	Body adminTrustOAuth2JwtGrantIssuerBody
+}
+
+// swagger:route POST /admin/trust/grants/jwt-bearer/issuers v1 adminTrustOAuth2JwtGrantIssuer
 //
 // Trust an OAuth2 JWT Bearer Grant Type Issuer
 //
@@ -51,11 +91,9 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 //     Schemes: http, https
 //
 //     Responses:
-//       201: trustedJwtGrantIssuer
-//       400: genericError
-//       409: genericError
-//       500: genericError
-func (h *Handler) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+//       201: trustedOAuth2JwtGrantIssuer
+//       default: genericError
+func (h *Handler) adminTrustOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var grantRequest createGrantRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&grantRequest); err != nil {

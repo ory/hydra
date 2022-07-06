@@ -40,14 +40,14 @@ import (
 	"github.com/ory/hydra/x"
 )
 
-func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *ConsentRequest, h *HandledConsentRequest) {
-	c = &ConsentRequest{
+func MockConsentRequest(key string, remember bool, rememberFor int, hasError bool, skip bool, authAt bool, loginChallengeBase string, network string) (c *OAuth2ConsentRequest, h *AcceptOAuth2ConsentRequest) {
+	c = &OAuth2ConsentRequest{
 		ID:                makeID("challenge", network, key),
 		RequestedScope:    []string{"scopea" + key, "scopeb" + key},
 		RequestedAudience: []string{"auda" + key, "audb" + key},
 		Skip:              skip,
 		Subject:           "subject" + key,
-		OpenIDConnectContext: &OpenIDConnectContext{
+		OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
@@ -82,7 +82,7 @@ func MockConsentRequest(key string, remember bool, rememberFor int, hasError boo
 		authenticatedAt = sqlxx.NullTime(time.Now().UTC().Add(-time.Minute))
 	}
 
-	h = &HandledConsentRequest{
+	h = &AcceptOAuth2ConsentRequest{
 		ConsentRequest:  c,
 		RememberFor:     rememberFor,
 		Remember:        remember,
@@ -122,7 +122,7 @@ func MockLogoutRequest(key string, withClient bool, network string) (c *LogoutRe
 
 func MockAuthRequest(key string, authAt bool, network string) (c *LoginRequest, h *HandledLoginRequest) {
 	c = &LoginRequest{
-		OpenIDConnectContext: &OpenIDConnectContext{
+		OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1" + key, "2" + key},
 			UILocales: []string{"fr" + key, "de" + key},
 			Display:   "popup" + key,
@@ -170,7 +170,7 @@ func MockAuthRequest(key string, authAt bool, network string) (c *LoginRequest, 
 	return c, h
 }
 
-func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *HandledConsentRequest {
+func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *OAuth2ConsentRequest, authAt time.Time, rememberFor int, remember bool, hasError bool) *AcceptOAuth2ConsentRequest {
 	var rde *RequestDeniedError
 	if hasError {
 		rde = &RequestDeniedError{
@@ -183,7 +183,7 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 		}
 	}
 
-	h := &HandledConsentRequest{
+	h := &AcceptOAuth2ConsentRequest{
 		ConsentRequest:  c,
 		RememberFor:     rememberFor,
 		Remember:        remember,
@@ -203,13 +203,13 @@ func SaneMockHandleConsentRequest(t *testing.T, m Manager, c *ConsentRequest, au
 }
 
 // SaneMockConsentRequest does the same thing as MockConsentRequest but uses less insanity and implicit dependencies.
-func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool) (c *ConsentRequest) {
-	c = &ConsentRequest{
+func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool) (c *OAuth2ConsentRequest) {
+	c = &OAuth2ConsentRequest{
 		RequestedScope:    []string{"scopea", "scopeb"},
 		RequestedAudience: []string{"auda", "audb"},
 		Skip:              skip,
 		Subject:           ar.Subject,
-		OpenIDConnectContext: &OpenIDConnectContext{
+		OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1", "2"},
 			UILocales: []string{"fr", "de"},
 			Display:   "popup",
@@ -236,7 +236,7 @@ func SaneMockConsentRequest(t *testing.T, m Manager, ar *LoginRequest, skip bool
 // SaneMockAuthRequest does the same thing as MockAuthRequest but uses less insanity and implicit dependencies.
 func SaneMockAuthRequest(t *testing.T, m Manager, ls *LoginSession, cl *client.Client) (c *LoginRequest) {
 	c = &LoginRequest{
-		OpenIDConnectContext: &OpenIDConnectContext{
+		OpenIDConnectContext: &OAuth2ConsentRequestOpenIDConnectContext{
 			ACRValues: []string{"1", "2"},
 			UILocales: []string{"fr", "de"},
 			Display:   "popup",
@@ -934,7 +934,7 @@ func compareAuthenticationRequest(t *testing.T, a, b *LoginRequest) {
 	assert.EqualValues(t, a.SessionID, b.SessionID)
 }
 
-func compareConsentRequest(t *testing.T, a, b *ConsentRequest) {
+func compareConsentRequest(t *testing.T, a, b *OAuth2ConsentRequest) {
 	assert.EqualValues(t, a.Client.GetID(), b.Client.GetID())
 	assert.EqualValues(t, a.ID, b.ID)
 	assert.EqualValues(t, *a.OpenIDConnectContext, *b.OpenIDConnectContext)

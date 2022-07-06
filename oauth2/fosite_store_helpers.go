@@ -138,9 +138,9 @@ var flushRequests = []*fosite.Request{
 
 func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createClient bool) {
 	cl := &client.Client{LegacyClientID: "foobar"}
-	cr := &consent.ConsentRequest{
+	cr := &consent.OAuth2ConsentRequest{
 		Client:               cl,
-		OpenIDConnectContext: new(consent.OpenIDConnectContext),
+		OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext),
 		LoginChallenge:       sqlxx.NullString(id),
 		ID:                   id,
 		Verifier:             id,
@@ -153,10 +153,10 @@ func mockRequestForeignKey(t *testing.T, id string, x InternalRegistry, createCl
 		require.NoError(t, x.ClientManager().CreateClient(context.Background(), cl))
 	}
 
-	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
+	require.NoError(t, x.ConsentManager().CreateLoginRequest(context.Background(), &consent.LoginRequest{Client: cl, OpenIDConnectContext: new(consent.OAuth2ConsentRequestOpenIDConnectContext), ID: id, Verifier: id, AuthenticatedAt: sqlxx.NullTime(time.Now()), RequestedAt: time.Now()}))
 	require.NoError(t, x.ConsentManager().CreateConsentRequest(context.Background(), cr))
-	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), &consent.HandledConsentRequest{
-		ConsentRequest: cr, Session: new(consent.ConsentRequestSessionData), AuthenticatedAt: sqlxx.NullTime(time.Now()),
+	_, err := x.ConsentManager().HandleConsentRequest(context.Background(), &consent.AcceptOAuth2ConsentRequest{
+		ConsentRequest: cr, Session: new(consent.AcceptOAuth2ConsentRequestSession), AuthenticatedAt: sqlxx.NullTime(time.Now()),
 		ID:          id,
 		RequestedAt: time.Now(),
 		HandledAt:   sqlxx.NullTime(time.Now()),

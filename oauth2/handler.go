@@ -226,7 +226,6 @@ func (h *Handler) LogoutHandler(w http.ResponseWriter, r *http.Request, ps httpr
 //
 //     Responses:
 //       200: OidcConfiguration
-//       401: oAuth2ApiError
 //       default: oAuth2ApiError
 func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	key, err := h.r.OpenIDJWTStrategy().GetPublicKey(r.Context())
@@ -266,7 +265,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// swagger:route GET /userinfo public userinfo
+// swagger:route GET /userinfo v1 getOidcUserInfo
 //
 // OpenID Connect Userinfo
 //
@@ -288,8 +287,7 @@ func (h *Handler) WellKnownHandler(w http.ResponseWriter, r *http.Request) {
 //       oauth2:
 //
 //     Responses:
-//       200: userinfoResponse
-//       401: oAuth2ApiError
+//       200: oidcUserInfo
 //       default: oAuth2ApiError
 func (h *Handler) UserinfoHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

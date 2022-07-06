@@ -379,7 +379,7 @@ func TestHandlerWellKnown(t *testing.T) {
 		require.NoError(t, err)
 		defer res.Body.Close()
 
-		var wellKnownResp oauth2.WellKnown
+		var wellKnownResp oauth2.oidcConfiguration
 		err = json.NewDecoder(res.Body).Decode(&wellKnownResp)
 		require.NoError(t, err, "problem decoding wellknown json response: %+v", err)
 		snapshotx.SnapshotT(t, wellKnownResp)

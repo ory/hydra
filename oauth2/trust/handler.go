@@ -32,7 +32,7 @@ func (h *Handler) SetRoutes(admin *httprouterx.RouterAdmin) {
 	admin.GET(grantJWTBearerPath+"/:id", h.adminGetTrustedOAuth2JwtGrantIssuer)
 	admin.GET(grantJWTBearerPath, h.List)
 	admin.POST(grantJWTBearerPath, h.adminTrustOAuth2JwtGrantIssuer)
-	admin.DELETE(grantJWTBearerPath+"/:id", h.Delete)
+	admin.DELETE(grantJWTBearerPath+"/:id", h.adminDeleteTrustedOAuth2JwtGrantIssuer)
 }
 
 // swagger:model adminTrustOAuth2JwtGrantIssuerBody
@@ -167,7 +167,15 @@ func (h *Handler) adminGetTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *
 	h.registry.Writer().Write(w, r, grant)
 }
 
-// swagger:route DELETE /trust/grants/jwt-bearer/issuers/{id} admin deleteTrustedJwtGrantIssuer
+// swagger:parameters adminDeleteTrustedOAuth2JwtGrantIssuer
+type adminDeleteTrustedOAuth2JwtGrantIssuer struct {
+	// The id of the desired grant
+	// in: path
+	// required: true
+	ID string `json:"id"`
+}
+
+// swagger:route DELETE /admin/trust/grants/jwt-bearer/issuers/{id} v1 adminDeleteTrustedOAuth2JwtGrantIssuer
 //
 // Delete a Trusted OAuth2 JWT Bearer Grant Type Issuer
 //
@@ -189,7 +197,7 @@ func (h *Handler) adminGetTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *
 //       204: emptyResponse
 //       404: genericError
 //       500: genericError
-func (h *Handler) Delete(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *Handler) adminDeleteTrustedOAuth2JwtGrantIssuer(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var id = ps.ByName("id")
 
 	if err := h.registry.GrantManager().DeleteGrant(r.Context(), id); err != nil {
